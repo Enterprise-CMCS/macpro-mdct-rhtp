@@ -1,0 +1,24 @@
+{
+  "comment": "This file is managed by macpro-mdct-core so if you'd like to change it let's do it there",
+  "app": "./deployment/app.ts",
+  "requireApproval": "never",
+  "output": ".cdk/cdk.out",
+  "watch": {
+    "hot": true,
+    "include": [
+      "deployment/**",
+      "services/app-api/**",
+      "services/carts-bigmac-streams/**"
+    ],
+    "exclude": ["services/app-api/coverage/**"]
+  },
+  "context": {
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/core:target-partitions": ["aws"],
+    "@aws-cdk/aws-apigateway:authorizerChangeDeploymentLogicalId": true,
+    "@aws-cdk/aws-secretsmanager:useAttachedSecretResourcePolicyForSecretTargetAttachments": true,
+    "@aws-cdk/aws-apigateway:requestValidatorUniqueId": true,
+    "@aws-cdk/core:includePrefixInUniqueNameGeneration": true,
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": false
+  }
+}
