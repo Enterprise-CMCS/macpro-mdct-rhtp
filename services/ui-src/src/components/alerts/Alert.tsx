@@ -26,8 +26,8 @@ export const Alert = ({
   status = AlertTypes.INFO,
   showIcon = true,
   title,
-  children,
   link,
+  children,
 }: Props) => {
   // Focus the alert whenever an error is rendered (or re-rendered)
   const ref = useRef<HTMLDivElement>(null);

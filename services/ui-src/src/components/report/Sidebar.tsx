@@ -52,6 +52,7 @@ export const Sidebar = () => {
   const navSection = (section: number, index: number = 0): ReactNode => {
     const page = report.pages[section];
     const childSections = page.childPageIds?.map((child) => pageMap.get(child));
+    const hasChildSections = childSections && childSections.length > 0;
 
     return (
       <Box key={page.id}>
@@ -68,7 +69,7 @@ export const Sidebar = () => {
             <Box width="100%" height="100%">
               {navItem(page.title!, index)}
             </Box>
-            {childSections?.length! > 0 && (
+            {hasChildSections && (
               <Box onClick={() => setToggle(page.id)}>
                 <Image
                   src={toggleList[page.id] ? arrowUpIcon : arrowDownIcon}
@@ -82,9 +83,9 @@ export const Sidebar = () => {
             )}
           </Flex>
         </Link>
-        {childSections?.length! > 0 &&
+        {hasChildSections &&
           toggleList[page.id] &&
-          childSections!.map((sec) => navSection(sec!, index + 1))}
+          childSections.map((sec) => navSection(sec!, index + 1))}
       </Box>
     );
   };

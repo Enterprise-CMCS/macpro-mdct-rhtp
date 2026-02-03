@@ -2,7 +2,6 @@
  * File wrapping high level actions away from the useStore file for cleanliness.
  * This contains the root for logic for actions such as updating an answer, saving, etc.
  */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ReportState } from "types";
 import { PageStatus, ParentPageTemplate, Report } from "types/report";
 import { putReport } from "utils/api/requestMethods/report";
@@ -13,7 +12,6 @@ export const buildState = (
   preserveCurrentPage: boolean
 ) => {
   if (!report) return { report: undefined };
-  /* eslint-disable-next-line no-console */
   console.assert(
     report.pages.every((pg, i, a) => i === a.findIndex((p) => p.id === pg.id)),
     "Report pages have unique IDs"

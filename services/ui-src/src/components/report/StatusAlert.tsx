@@ -47,10 +47,8 @@ export const StatusAlert = (props: PageElementProps<StatusAlertTemplate>) => {
   }
 
   return (
-    <Alert
-      status={alert.status}
-      title={alert.title}
-      children={children}
-    ></Alert>
+    <Alert status={alert.status} title={alert.title}>
+      {children}
+    </Alert>
   );
 };

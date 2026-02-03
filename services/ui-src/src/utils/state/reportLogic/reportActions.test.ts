@@ -202,7 +202,7 @@ describe("reportActions", () => {
       const result = mergeAnswers(answers, state);
 
       const page = result?.report?.pages[1] as FormPageTemplate;
-      const elements = page?.elements!;
+      const elements = page?.elements;
       const question = elements[1] as TextboxTemplate;
       expect(page.status).toEqual(PageStatus.IN_PROGRESS);
       expect(question.answer).toEqual("ANSWERED");

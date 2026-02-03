@@ -34,7 +34,7 @@ export const SubnavBar = ({ stateName, reportType }: Props) => {
             )}
             <Link
               as={RouterLink}
-              to={`/report/${report?.type}/${report?.state}` || "/"}
+              to={`/report/${report?.type}/${report?.state}`}
               sx={sx.leaveFormLink}
               variant="outlineButton"
             >
