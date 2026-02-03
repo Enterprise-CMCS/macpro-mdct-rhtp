@@ -5,7 +5,7 @@ repos:
       - id: check-added-large-files
       - id: no-commit-to-branch
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.1
+    rev: v8.56.0
     hooks:
       - id: eslint
         files: '\.[jt]sx?$' # *.js, *.jsx, *.ts and *.tsx
