@@ -1,1 +1,17 @@
+node_modules
+.DS_Store
+build_dev
+tsconfig.tsbuildinfo
+/.env
+*.log
+package-lock.json
+*._S3rver_cors.xml
+tests/playwright-report/
+tests/playwright/.cache/
+tests/playwright/.auth
+/.cdk
+cdk.out
+cdk.context.json
+**/.yarn/*
+services/ui-src/public/env-config.ts
 .vscode/settings.json

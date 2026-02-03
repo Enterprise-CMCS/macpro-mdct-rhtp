@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "strict": true,
+    "allowJs": true,
+    "outDir": ".build",
+    "rootDir": "./",
+    "resolveJsonModule": true,
+    "lib": ["ES2023"],
+    "module": "nodenext",
+    "target": "ES2023",
+    "isolatedModules": true
+  },
+  "ts-node": {
+    "files": true
+  }
+}
