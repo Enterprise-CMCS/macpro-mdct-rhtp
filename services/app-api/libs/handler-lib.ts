@@ -28,12 +28,12 @@ export const handler = <TParams>(
 
       const user = await authenticatedUser(event);
       if (!user) {
-        return unauthenticated({ error: error.UNAUTHORIZED });
+        return unauthenticated(error.UNAUTHORIZED);
       }
 
       const parameters = parser(event);
       if (!parameters) {
-        return badRequest({ error: error.MISSING_DATA });
+        return badRequest(error.MISSING_DATA);
       }
 
       let body: object | undefined = undefined;
@@ -47,7 +47,7 @@ export const handler = <TParams>(
       logger.error("Error: %O", error);
       const message =
         error instanceof Error ? error.message : "Internal Server Error";
-      return internalServerError({ error: message });
+      return internalServerError(message);
     } finally {
       logger.flush();
     }

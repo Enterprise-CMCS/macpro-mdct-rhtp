@@ -1,3 +1,5 @@
+process.env.BannersTable = "local-banners";
+
 /*
  * This mock mutes all logger output during tests! Including console errors!
  *
@@ -25,3 +27,6 @@ vi.mock("../libs/debug-lib", () => {
     flush: vi.fn(),
   };
 });
+
+// BANNER
+export * from "./mockBanner";

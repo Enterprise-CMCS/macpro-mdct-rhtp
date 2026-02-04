@@ -8,6 +8,7 @@ import {
   Duration,
   RemovalPolicy,
 } from "aws-cdk-lib";
+import { Lambda } from "../constructs/lambda.ts";
 import { WafConstruct } from "../constructs/waf.ts";
 import { DynamoDBTable } from "../constructs/dynamodb-table.ts";
 import { isLocalStack } from "../local/util.ts";
@@ -24,7 +25,7 @@ interface CreateApiComponentsProps {
 }
 
 export function createApiComponents(props: CreateApiComponentsProps) {
-  const { scope, stage, project, isDev } = props;
+  const { scope, stage, project, isDev, brokerString, tables } = props;
 
   const service = "app-api";
 
@@ -79,6 +80,49 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       "Access-Control-Allow-Origin": "'*'",
       "Access-Control-Allow-Headers": "'*'",
     },
+  });
+
+  const environment = {
+    NODE_OPTIONS: "--enable-source-maps",
+    STAGE: stage,
+    ...Object.fromEntries(
+      tables.map((table) => [`${table.node.id}Table`, table.table.tableName])
+    ),
+    brokerString,
+  };
+
+  const commonProps = {
+    brokerString,
+    stackName: `${project}-${stage}`,
+    api,
+    environment,
+    isDev,
+    tables,
+  };
+
+  // Banner handlers
+  new Lambda(scope, "createBanner", {
+    entry: "services/app-api/handlers/banners/create.ts",
+    handler: "createBanner",
+    path: "banners/{bannerId}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "deleteBanner", {
+    entry: "services/app-api/handlers/banners/delete.ts",
+    handler: "deleteBanner",
+    path: "banners/{bannerId}",
+    method: "DELETE",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "fetchBanner", {
+    entry: "services/app-api/handlers/banners/fetch.ts",
+    handler: "fetchBanner",
+    path: "banners/{bannerId}",
+    method: "GET",
+    ...commonProps,
   });
 
   if (!isLocalStack) {
