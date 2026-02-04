@@ -1,10 +1,10 @@
-import { mockUseStore } from "utils/testing/setupJest";
+import { mockUseStore } from "utils/testing/setupTest";
 import { currentPageSelector, submittableMetricsSelector } from "./selectors";
 import { PageStatus } from "types";
 
 describe("Selectors", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("getCurrentPage should return the current page object", async () => {

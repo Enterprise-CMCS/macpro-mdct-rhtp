@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { Alert } from "components";
 import { testA11y } from "utils/testing/commonTests";
 
-/** The path to our alert SVG, as injected by jest */
+// mock icon
 const alertIcon = "test-file-stub";
 
 const alertComponent = (
@@ -12,7 +12,7 @@ const alertComponent = (
 );
 
 describe("<Alert />", () => {
-  it("should render correctly", () => {
+  test("should render correctly", () => {
     render(alertComponent);
     expect(screen.getByRole("alert")).toBeVisible();
     expect(
@@ -23,7 +23,7 @@ describe("<Alert />", () => {
     expect(screen.getByAltText("Alert")).toHaveAttribute("src", alertIcon);
   });
 
-  it("should hide the icon when appropriate", () => {
+  test("should hide the icon when appropriate", () => {
     render(<Alert title="mock title" showIcon={false} />);
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });

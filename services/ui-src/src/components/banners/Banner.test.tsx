@@ -7,11 +7,11 @@ const bannerData = {
 };
 
 describe("Test Banner", () => {
-  it("Test Banner with no data", () => {
+  test("Test Banner with no data", () => {
     const { container } = render(<Banner bannerData={undefined}></Banner>);
     expect(container.childElementCount).toEqual(0);
   });
-  it("Test Banner with data", () => {
+  test("Test Banner with data", () => {
     render(<Banner bannerData={bannerData}></Banner>);
     expect(screen.getByText(bannerData.title)).toBeInTheDocument();
     expect(screen.getByText(bannerData.description)).toBeInTheDocument();

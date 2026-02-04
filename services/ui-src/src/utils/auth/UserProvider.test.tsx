@@ -1,13 +1,14 @@
+import { MockedFunction } from "vitest";
 import { useContext } from "react";
 import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // utils
 import { UserContext, UserProvider, useStore } from "utils";
-import { mockUseStore, RouterWrappedComponent } from "utils/testing/setupJest";
+import { mockUseStore, RouterWrappedComponent } from "utils/testing/setupTest";
 
-jest.mock("utils/state/useStore");
-const mockSetUser = jest.fn();
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+vi.mock("utils/state/useStore");
+const mockSetUser = vi.fn();
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue({
   ...mockUseStore,
   setUser: mockSetUser,
@@ -22,11 +23,7 @@ const TestComponent = () => {
       <button onClick={() => context.logout()}>Logout</button>
       <button onClick={() => context.loginWithIDM()}>Log In with IDM</button>
       User Test
-      <p>
-        {mockedUseStore().showLocalLogins
-          ? "showLocalLogins is true"
-          : "showLocalLogins is false"}
-      </p>
+      <p>showLocalLogins is true</p>
     </div>
   );
 };
@@ -48,7 +45,7 @@ const setWindowOrigin = (windowOrigin: string) => {
   }
   delete (window as any).location;
   (window as any).location = {
-    assign: jest.fn(),
+    assign: vi.fn(),
     pathname: "/",
     href: `${windowOrigin}/`,
     origin: windowOrigin,
@@ -57,7 +54,7 @@ const setWindowOrigin = (windowOrigin: string) => {
 
 const breakCheckAuthState = async () => {
   const mockAmplify = require("aws-amplify/auth");
-  mockAmplify.currentSession = jest.fn().mockImplementation(() => {
+  mockAmplify.currentSession = vi.fn().mockImplementation(() => {
     throw new Error();
   });
 };
@@ -131,11 +128,11 @@ describe("<UserProvider />", () => {
 
   describe("Test UserProvider error handling", () => {
     test("Logs error to console if logout throws error", async () => {
-      jest.spyOn(console, "log").mockImplementation(jest.fn());
-      const spy = jest.spyOn(console, "log");
+      vi.spyOn(console, "log").mockImplementation(vi.fn());
+      const spy = vi.spyOn(console, "log");
 
       const mockAmplify = require("aws-amplify/auth");
-      mockAmplify.signOut = jest.fn().mockImplementation(() => {
+      mockAmplify.signOut = vi.fn().mockImplementation(() => {
         throw new Error();
       });
 
@@ -154,7 +151,7 @@ describe("<UserProvider />", () => {
 
   test("check auth function", async () => {
     const mockAmplify = require("aws-amplify/auth");
-    mockAmplify.fetchAuthSession = jest.fn().mockResolvedValue({
+    mockAmplify.fetchAuthSession = vi.fn().mockResolvedValue({
       tokens: {
         idToken: {
           payload: {

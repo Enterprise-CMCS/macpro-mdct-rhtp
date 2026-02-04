@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StatusTableElement } from "./StatusTable";
@@ -6,22 +7,22 @@ import { useStore } from "utils";
 import {
   mockUseReadOnlyUserStore,
   mockStateUserStore,
-} from "utils/testing/setupJest";
+} from "utils/testing/setupTest";
 import { PageStatus } from "types";
 
-jest.mock("utils", () => ({
-  useStore: jest.fn(),
-  submitReport: jest.fn(),
+vi.mock("utils", () => ({
+  useStore: vi.fn(),
+  submitReport: vi.fn(),
 }));
 
-const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async (importOriginal) => ({
+  ...(await importOriginal()),
   useNavigate: () => mockNavigate,
 }));
 
-jest.mock("launchdarkly-react-client-sdk", () => ({
-  useFlags: jest.fn().mockReturnValue({
+vi.mock("launchdarkly-react-client-sdk", () => ({
+  useFlags: vi.fn().mockReturnValue({
     viewPdf: true,
   }),
 }));
@@ -42,12 +43,12 @@ mockPageMap.set("root", 0);
 mockPageMap.set("1", 1);
 mockPageMap.set("2", 2);
 
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
-const mockSetModalComponent = jest.fn();
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
+const mockSetModalComponent = vi.fn();
 
 describe("StatusTable with state user", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockedUseStore.mockImplementation(
       (selector?: Parameters<typeof useStore>[0]) => {

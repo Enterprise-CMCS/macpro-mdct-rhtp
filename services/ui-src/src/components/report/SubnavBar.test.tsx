@@ -1,11 +1,12 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { RouterWrappedComponent, mockUseStore } from "utils/testing/setupJest";
+import { RouterWrappedComponent, mockUseStore } from "utils/testing/setupTest";
 import { useStore } from "utils";
 import { SubnavBar } from "./SubnavBar";
 import { ReportType } from "types";
 
-jest.mock("utils/state/useStore");
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
 describe("Test SubnavBar component", () => {

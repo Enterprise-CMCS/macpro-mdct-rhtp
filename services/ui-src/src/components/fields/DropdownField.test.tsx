@@ -17,7 +17,7 @@ const mockedDropdownElement: DropdownTemplate = {
     { label: "2027", value: "2027" },
   ],
 };
-const updateSpy = jest.fn();
+const updateSpy = vi.fn();
 
 const DropdownWrapper = ({ template }: { template: DropdownTemplate }) => {
   const [element, setElement] = useState(template);
@@ -30,7 +30,7 @@ const DropdownWrapper = ({ template }: { template: DropdownTemplate }) => {
 
 describe("<DropdownField />", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("Test DropdownField basic functionality", () => {

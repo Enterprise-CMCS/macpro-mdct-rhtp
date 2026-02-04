@@ -1,7 +1,8 @@
+import { Mock, MockedFunction } from "vitest";
 import {
   mockUseReadOnlyUserStore,
   mockUseStore,
-} from "utils/testing/setupJest";
+} from "utils/testing/setupTest";
 import { useNavigate, useParams } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
@@ -10,13 +11,13 @@ import { useStore } from "utils";
 import { Page } from "./Page";
 import { AlertTypes } from "types";
 
-jest.mock("react-router-dom", () => ({
-  useNavigate: jest.fn(),
-  useParams: jest.fn(),
+vi.mock("react-router-dom", () => ({
+  useNavigate: vi.fn(),
+  useParams: vi.fn(),
 }));
 
-jest.mock("utils/state/useStore");
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockImplementation(
   (selector?: (state: typeof mockUseStore) => unknown) => {
     if (selector) {
@@ -27,13 +28,13 @@ mockedUseStore.mockImplementation(
 );
 
 // Mock the more complex elements, let them test themselves
-jest.mock("./StatusTable", () => {
+vi.mock("./StatusTable", () => {
   return { StatusTableElement: () => <div>Status Table</div> };
 });
 
-const mockNavigate = jest.fn();
-(useNavigate as jest.Mock).mockReturnValue(mockNavigate);
-(useParams as jest.Mock).mockReturnValue({
+const mockNavigate = vi.fn();
+(useNavigate as Mock).mockReturnValue(mockNavigate);
+(useParams as Mock).mockReturnValue({
   reportType: "exampleReport",
   state: "exampleState",
   reportId: "123",
@@ -174,7 +175,7 @@ const dateFieldElement: PageElement[] = [
 describe("Page Component with state user", () => {
   test.each(elements)("Renders all element types: %p", (element) => {
     const { container } = render(
-      <Page id="mock-page" elements={[element]} setElements={jest.fn()} />
+      <Page id="mock-page" elements={[element]} setElements={vi.fn()} />
     );
     expect(container).not.toBeEmptyDOMElement();
   });
@@ -191,7 +192,7 @@ describe("Page Component with state user", () => {
             label: "click me",
           },
         ]}
-        setElements={jest.fn()}
+        setElements={vi.fn()}
       />
     );
 
@@ -214,7 +215,7 @@ describe("Page Component with state user", () => {
       <Page
         id="mock-page"
         elements={[badObject as unknown as PageElement]}
-        setElements={jest.fn()}
+        setElements={vi.fn()}
       />
     );
     expect(container).not.toBeEmptyDOMElement();
@@ -227,11 +228,7 @@ describe("Page Component with read only user", () => {
   });
   test("text field and radio button should be disabled", () => {
     render(
-      <Page
-        id="mock-page"
-        elements={textFieldElement}
-        setElements={jest.fn()}
-      />
+      <Page id="mock-page" elements={textFieldElement} setElements={vi.fn()} />
     );
     const textField = screen.getByRole("textbox");
     const radioButton = screen.getByLabelText("radio choice 1");
@@ -240,11 +237,7 @@ describe("Page Component with read only user", () => {
   });
   test("date field should be disabled", () => {
     render(
-      <Page
-        id="mock-page"
-        elements={dateFieldElement}
-        setElements={jest.fn()}
-      />
+      <Page id="mock-page" elements={dateFieldElement} setElements={vi.fn()} />
     );
     const dateField = screen.getByRole("textbox");
     expect(dateField).toBeDisabled();

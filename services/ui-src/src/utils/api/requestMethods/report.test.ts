@@ -23,10 +23,10 @@ const report = {
   pages: [] as FormPageTemplate[],
 } as Report;
 
-const mockGet = jest.fn();
-const mockPost = jest.fn();
-const mockPut = jest.fn();
-jest.mock("../apiLib", () => ({
+const mockGet = vi.fn();
+const mockPost = vi.fn();
+const mockPut = vi.fn();
+vi.mock("../apiLib", () => ({
   apiLib: {
     get: (path: string, opts: Record<string, any>) => mockGet(path, opts),
     post: (path: string, opts: Record<string, any>) => mockPost(path, opts),
@@ -41,7 +41,7 @@ const mockReport: ReportOptions = {
 
 describe("utils/report", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
   test("getReport", async () => {
     await getReport("reportType", "PA", "mock-id");

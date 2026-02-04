@@ -2,8 +2,8 @@ import { getSignedTemplateUrl } from "./getTemplateUrl";
 
 const testTemplateName = "TestName";
 
-const mockGet = jest.fn();
-jest.mock("../apiLib", () => ({
+const mockGet = vi.fn();
+vi.mock("../apiLib", () => ({
   apiLib: {
     get: (path: string, options: Record<string, any>) => mockGet(path, options),
   },

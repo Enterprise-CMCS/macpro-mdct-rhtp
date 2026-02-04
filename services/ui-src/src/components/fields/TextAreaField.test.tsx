@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TextAreaField } from "components";
@@ -6,8 +7,8 @@ import { ElementType, TextAreaBoxTemplate } from "types/report";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { useState } from "react";
 
-jest.mock("utils/state/hooks/useElementIsHidden");
-const mockedUseElementIsHidden = useElementIsHidden as jest.MockedFunction<
+vi.mock("utils/state/hooks/useElementIsHidden");
+const mockedUseElementIsHidden = useElementIsHidden as MockedFunction<
   typeof useElementIsHidden
 >;
 mockedUseElementIsHidden.mockReturnValue(false);
@@ -23,7 +24,7 @@ const mockedTextAreaElement: TextAreaBoxTemplate = {
   },
   required: true,
 };
-const updateSpy = jest.fn();
+const updateSpy = vi.fn();
 
 const TextAreaWrapper = ({ template }: { template: TextAreaBoxTemplate }) => {
   const [element, setElement] = useState(template);
@@ -36,7 +37,7 @@ const TextAreaWrapper = ({ template }: { template: TextAreaBoxTemplate }) => {
 
 describe("<TextAreaField />", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("TextAreaField is visible", () => {

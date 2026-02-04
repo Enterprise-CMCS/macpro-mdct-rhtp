@@ -1,15 +1,16 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import {
   RouterWrappedComponent,
   mockNoUserStore,
   mockUseStore,
-} from "utils/testing/setupJest";
+} from "utils/testing/setupTest";
 import { useStore, UserProvider } from "utils";
 import { App } from "components";
 import { testA11yAct } from "utils/testing/commonTests";
 
-jest.mock("utils/state/useStore");
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
 const appComponent = (

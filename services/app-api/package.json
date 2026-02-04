@@ -4,9 +4,8 @@
   "license": "CC0-1.0",
   "main": "handler.js",
   "scripts": {
-    "coverage": "jest --coverage",
-    "test": "jest",
-    "test-watch": "jest --watch"
+    "coverage": "vitest run --coverage",
+    "test": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.946.0",
@@ -20,50 +19,13 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "4.0.18",
     "aws-sdk-client-mock": "^4.1.0",
-    "jest": "^30.2.0",
-    "jsdom": "^26.1.0",
-    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "**/*.{ts,tsx}",
-      "!.build",
-      "!.coverage",
-      "!node_modules"
-    ],
-    "coverageReporters": [
-      "json",
-      [
-        "lcov",
-        {
-          "projectRoot": "../../"
-        }
-      ],
-      "text",
-      "text-summary"
-    ],
-    "globals": {
-      "isolatedModules": true
-    },
-    "moduleDirectories": [
-      "node_modules"
-    ],
-    "moduleNameMapper": {
-      "#node-web-compat": "./node-web-compat-node.js"
-    },
-    "setupFilesAfterEnv": [
-      "<rootDir>/testing/setupJest.ts"
-    ],
-    "transform": {
-      "^.+\\.ts?$": "ts-jest"
-    },
-    "verbose": true
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "packageManager": "yarn@4.12.0"
 }

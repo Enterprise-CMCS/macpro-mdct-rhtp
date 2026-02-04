@@ -4,7 +4,7 @@ import { CheckboxField } from "components";
 import { ElementType, CheckboxTemplate } from "types";
 import { testA11y } from "utils/testing/commonTests";
 
-const updateSpy = jest.fn();
+const updateSpy = vi.fn();
 
 const mockCheckboxElement: CheckboxTemplate = {
   id: "mock-radio-id",
@@ -39,7 +39,7 @@ const CheckboxComponent = (
 
 describe("<CheckboxField />", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("CheckboxField renders as Checkboxes", () => {

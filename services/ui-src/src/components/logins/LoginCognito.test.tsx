@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RouterWrappedComponent } from "utils/testing/setupJest";
+import { RouterWrappedComponent } from "utils/testing/setupTest";
 import { LoginCognito } from "components";
 import { testA11yAct } from "utils/testing/commonTests";
 
@@ -10,15 +10,15 @@ const loginCognitoComponent = (
   </RouterWrappedComponent>
 );
 
-const mockSignIn = jest.fn();
-jest.mock("aws-amplify/auth", () => ({
+const mockSignIn = vi.fn();
+vi.mock("aws-amplify/auth", () => ({
   signIn: (credentials: { username: string; password: string }) =>
     mockSignIn(credentials),
 }));
 
-const mockUseNavigate = jest.fn();
+const mockUseNavigate = vi.fn();
 
-jest.mock("react-router-dom", () => ({
+vi.mock("react-router-dom", () => ({
   useNavigate: () => mockUseNavigate,
 }));
 

@@ -1,4 +1,4 @@
-// AdminDashSelector.test.tsx
+import { Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AdminDashSelector } from "./AdminDashSelector";
@@ -24,7 +24,7 @@ type ChoiceListProps = {
   onChange: () => void;
 };
 
-jest.mock("@cmsgov/design-system", () => ({
+vi.mock("@cmsgov/design-system", () => ({
   Dropdown: ({ label, options, onChange, value }: DropdownProps) => (
     <select aria-label={label} onChange={onChange} value={value}>
       {options.map((option) => (
@@ -53,15 +53,15 @@ jest.mock("@cmsgov/design-system", () => ({
   ),
 }));
 
-jest.mock("react-router-dom", () => ({
-  useNavigate: jest.fn(),
+vi.mock("react-router-dom", () => ({
+  useNavigate: vi.fn(),
 }));
 
 describe("AdminDashSelector Component", () => {
-  const mockNavigate = jest.fn();
+  const mockNavigate = vi.fn();
 
   beforeEach(() => {
-    (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
+    (useNavigate as Mock).mockReturnValue(mockNavigate);
   });
 
   test("renders correctly with header and button label", () => {

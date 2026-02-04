@@ -3,8 +3,8 @@ import { Modal } from "@chakra-ui/react";
 import userEvent from "@testing-library/user-event";
 import { SubmitReportModal } from "./SubmitReportModal";
 
-const mockClose = jest.fn();
-const mockSubmit = jest.fn();
+const mockClose = vi.fn();
+const mockSubmit = vi.fn();
 
 describe("Test SubmitReportModal", () => {
   it("Test SubmitReportModal for RHTP Render", async () => {

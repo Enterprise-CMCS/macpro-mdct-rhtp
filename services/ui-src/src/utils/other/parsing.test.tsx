@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { sanitize } from "dompurify";
 import { parseHtml } from "utils";
 
-jest.mock("dompurify", () => ({
-  sanitize: jest.fn((el) => el),
+vi.mock("dompurify", () => ({
+  sanitize: vi.fn((el) => el),
 }));
 
 describe("utils/parsing", () => {

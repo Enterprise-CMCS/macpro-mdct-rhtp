@@ -13,7 +13,8 @@
     "lib": ["ES2023"],
     "module": "nodenext",
     "target": "ES2023",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": ["vitest/globals"]
   },
   "ts-node": {
     "files": true

@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { UnlockModal } from "components";
 import { testA11y } from "utils/testing/commonTests";
 
-const mockCloseHandler = jest.fn();
+const mockCloseHandler = vi.fn();
 
 const modalComponent = (
   <UnlockModal
@@ -16,7 +16,7 @@ const modalComponent = (
 
 describe("Test Modal", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     render(modalComponent);
   });
 

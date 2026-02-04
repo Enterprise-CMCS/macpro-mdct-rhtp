@@ -1,13 +1,13 @@
 import { getBanner, writeBanner, deleteBanner } from "./banner";
 import { bannerId } from "../../../constants";
-import { mockBannerData } from "utils/testing/setupJest";
+import { mockBannerData } from "utils/testing/setupTest";
 import { initAuthManager } from "utils/auth/authLifecycle";
 
 describe("utils/banner", () => {
   beforeEach(async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     initAuthManager();
-    jest.runAllTimers();
+    vi.runAllTimers();
   });
 
   describe("getBanner()", () => {

@@ -1,28 +1,29 @@
+import { Mock, MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { mockUseStore } from "utils/testing/setupJest";
+import { mockUseStore } from "utils/testing/setupTest";
 import { BrowserRouter as Router, useParams } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { useStore } from "utils";
 
-jest.mock("utils/other/useBreakpoint", () => ({
-  useBreakpoint: jest.fn(() => ({
+vi.mock("utils/other/useBreakpoint", () => ({
+  useBreakpoint: vi.fn(() => ({
     isDesktop: true,
   })),
 }));
 
-jest.mock("utils/state/useStore");
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+vi.mock("react-router-dom", async (importOriginal) => ({
+  ...(await importOriginal()),
   useNavigate: () => mockUseNavigate,
-  useParams: jest.fn(),
+  useParams: vi.fn(),
 }));
 
-const setCurrentPageId = jest.fn();
-const mockUseNavigate = jest.fn();
+const setCurrentPageId = vi.fn();
+const mockUseNavigate = vi.fn();
 
 const mockPageMap = new Map();
 mockPageMap.set("root", 0);
@@ -41,20 +42,20 @@ const report = {
 
 describe("Sidebar", () => {
   beforeEach(() => {
-    (useStore as unknown as jest.Mock).mockReturnValue({
+    (useStore as unknown as Mock).mockReturnValue({
       pageMap: mockPageMap,
       report,
       currentPageId: "id-1",
       setCurrentPageId,
     });
-    (useParams as jest.Mock).mockReturnValue({
+    (useParams as Mock).mockReturnValue({
       reportType: "exampleReport",
       state: "exampleState",
       reportId: "123",
     });
   });
   test("should not render if missing details from the store", () => {
-    (useStore as unknown as jest.Mock).mockReturnValueOnce({
+    (useStore as unknown as Mock).mockReturnValueOnce({
       pageMap: undefined,
       report: undefined,
       currentPageId: undefined,

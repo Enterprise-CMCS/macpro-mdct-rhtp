@@ -18,8 +18,8 @@ import {
   deepMerge,
 } from "./reportActions";
 
-jest.mock("../../api/requestMethods/report", () => ({
-  putReport: jest.fn(),
+vi.mock("../../api/requestMethods/report", () => ({
+  putReport: vi.fn(),
 }));
 const testReport: Report = {
   type: ReportType.RHTP,

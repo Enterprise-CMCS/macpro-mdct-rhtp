@@ -12,7 +12,7 @@ const mockedDateTextboxElement: DateTemplate = {
   helperText: "helper text",
   required: true,
 };
-const updateSpy = jest.fn();
+const updateSpy = vi.fn();
 
 const DateFieldWrapper = ({ template }: { template: DateTemplate }) => {
   const [element, setElement] = useState(template);
@@ -26,7 +26,7 @@ const DateFieldWrapper = ({ template }: { template: DateTemplate }) => {
 describe("<DateField />", () => {
   describe("Test DateField basic functionality", () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     test("DateField is visible", () => {

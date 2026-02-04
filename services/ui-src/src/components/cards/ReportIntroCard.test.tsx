@@ -1,22 +1,23 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ReportIntroCard } from "components";
-import { mockUseStore, RouterWrappedComponent } from "utils/testing/setupJest";
+import { mockUseStore, RouterWrappedComponent } from "utils/testing/setupTest";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 
-jest.mock("utils/other/useBreakpoint", () => ({
-  useBreakpoint: jest.fn(() => ({
+vi.mock("utils/other/useBreakpoint", () => ({
+  useBreakpoint: vi.fn(() => ({
     isDesktop: true,
   })),
 }));
 
-jest.mock("utils/state/useStore");
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
-const mockUseNavigate = jest.fn();
+const mockUseNavigate = vi.fn();
 
-jest.mock("react-router-dom", () => ({
+vi.mock("react-router-dom", () => ({
   useNavigate: () => mockUseNavigate,
 }));
 

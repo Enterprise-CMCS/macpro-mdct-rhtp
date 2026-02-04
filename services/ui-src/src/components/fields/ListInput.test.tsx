@@ -13,7 +13,7 @@ const mockedListInputElement: ListInputTemplate = {
   required: false,
 };
 
-const updateSpy = jest.fn();
+const updateSpy = vi.fn();
 
 const ListInputComponent = (
   <div>
@@ -23,7 +23,7 @@ const ListInputComponent = (
 
 describe("<ListInput />", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     render(ListInputComponent);
   });
   it("ListInput renders", () => {

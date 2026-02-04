@@ -10,7 +10,7 @@ const component = (
 );
 
 describe("RhtpIntroductionCard", () => {
-  it("should render", () => {
+  test("should render", () => {
     render(component);
     expect(
       screen.getByText("When is the RHTP Report Due?", {

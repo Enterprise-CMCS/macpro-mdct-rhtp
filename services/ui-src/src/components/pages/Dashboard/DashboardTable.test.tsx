@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DashboardTable } from "components";
@@ -7,17 +8,17 @@ import {
   mockUseAdminStore,
   mockUseStore,
   RouterWrappedComponent,
-} from "utils/testing/setupJest";
+} from "utils/testing/setupTest";
 
-jest.mock("utils/state/useStore", () => ({
-  useStore: jest.fn().mockReturnValue({}),
+vi.mock("utils/state/useStore", () => ({
+  useStore: vi.fn().mockReturnValue({}),
 }));
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
-const mockArchive = jest.fn();
-const mockRelease = jest.fn();
-jest.mock("utils/api/requestMethods/report", () => ({
+const mockArchive = vi.fn();
+const mockRelease = vi.fn();
+vi.mock("utils/api/requestMethods/report", () => ({
   updateArchivedStatus: () => mockArchive(),
   releaseReport: () => mockRelease(),
 }));
@@ -50,8 +51,8 @@ const dashboardTableComponent = (
   <RouterWrappedComponent>
     <DashboardTable
       reports={reports}
-      openAddEditReportModal={jest.fn}
-      unlockModalOnOpenHandler={jest.fn}
+      openAddEditReportModal={vi.fn()}
+      unlockModalOnOpenHandler={vi.fn()}
     />
   </RouterWrappedComponent>
 );
@@ -60,14 +61,14 @@ const adminDashboardTableComponent = (
   <RouterWrappedComponent>
     <DashboardTable
       reports={reports}
-      openAddEditReportModal={jest.fn}
-      unlockModalOnOpenHandler={jest.fn}
+      openAddEditReportModal={vi.fn()}
+      unlockModalOnOpenHandler={vi.fn()}
     />
   </RouterWrappedComponent>
 );
 
 describe("Dashboard table with state user", () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
   it("should render report name and edit button in table", async () => {
     render(dashboardTableComponent);
     expect(screen.getByText("report 1")).toBeInTheDocument();
@@ -79,7 +80,7 @@ describe("Dashboard table with state user", () => {
 
 describe("Dashboard table with admin user", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockedUseStore.mockReturnValue(mockUseAdminStore);
   });
 

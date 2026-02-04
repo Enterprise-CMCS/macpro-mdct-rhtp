@@ -1,12 +1,12 @@
+import { MockedFunction } from "vitest";
 import { screen, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { useStore } from "utils";
+import { mockUseStore } from "utils/testing/setupTest";
 import { ExportedReportPage } from "./ExportedReportPage";
 
-jest.mock("utils", () => ({
-  ...jest.requireActual("utils"),
-  useStore: jest.fn(),
-}));
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 const report = {
   type: "RHTP",
@@ -32,8 +32,8 @@ const report = {
 
 describe("ExportedReportPage", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useStore as unknown as jest.Mock).mockReturnValue({
+    vi.clearAllMocks();
+    mockedUseStore.mockReturnValue({
       report: report,
     });
   });

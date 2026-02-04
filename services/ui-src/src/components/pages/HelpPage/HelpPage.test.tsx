@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { HelpPage } from "components/pages/HelpPage/HelpPage";
-import { RouterWrappedComponent } from "utils/testing/setupJest";
+import { RouterWrappedComponent } from "utils/testing/setupTest";
 import { testA11y } from "utils/testing/commonTests";
 
 const helpView = (
@@ -24,9 +24,9 @@ describe("Test HelpPage", () => {
     const email1 = screen.getByRole("link", { name: "mdct_help@cms.hhs.gov" });
     expect(email1).toHaveAttribute("href", "mailto:mdct_help@cms.hhs.gov");
     const email2 = screen.getByRole("link", {
-      name: "LABSQuality@cms.hhs.gov",
+      name: "RHTPQuality@cms.hhs.gov",
     });
-    expect(email2).toHaveAttribute("href", "mailto:LABSQuality@cms.hhs.gov");
+    expect(email2).toHaveAttribute("href", "mailto:RHTPQuality@cms.hhs.gov");
   });
 });
 

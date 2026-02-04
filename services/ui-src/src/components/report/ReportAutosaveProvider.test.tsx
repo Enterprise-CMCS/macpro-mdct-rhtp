@@ -2,15 +2,15 @@ import { useContext } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // utils
-import { RouterWrappedComponent } from "utils/testing/setupJest";
+import { RouterWrappedComponent } from "utils/testing/setupTest";
 import {
   ReportAutosaveContext,
   ReportAutosaveProvider,
 } from "./ReportAutosaveProvider";
 
-const mockSaveReport = jest.fn();
+const mockSaveReport = vi.fn();
 
-jest.mock("utils/state/useStore", () => ({
+vi.mock("utils/state/useStore", () => ({
   useStore: () => ({
     report: { id: "test-report" },
     saveReport: mockSaveReport,

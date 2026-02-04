@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RadioField } from "components";
@@ -6,15 +7,15 @@ import { useStore } from "utils";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { testA11y } from "utils/testing/commonTests";
 
-jest.mock("utils/state/hooks/useElementIsHidden");
-const mockedUseElementIsHidden = useElementIsHidden as jest.MockedFunction<
+vi.mock("utils/state/hooks/useElementIsHidden");
+const mockedUseElementIsHidden = useElementIsHidden as MockedFunction<
   typeof useElementIsHidden
 >;
-jest.mock("utils/state/useStore");
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
-const mockClearMeasure = jest.fn();
-const mockChangeDeliveryMethods = jest.fn();
-const mockSetAnswers = jest.fn();
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
+const mockClearMeasure = vi.fn();
+const mockChangeDeliveryMethods = vi.fn();
+const mockSetAnswers = vi.fn();
 mockedUseStore.mockReturnValue({
   currentPageId: "my-id",
   clearMeasure: mockClearMeasure,
@@ -57,7 +58,7 @@ const mockRadioElement: RadioTemplate = {
     answer: "yes",
   },
 };
-const updateSpy = jest.fn();
+const updateSpy = vi.fn();
 
 const RadioFieldComponent = (
   <div data-testid="test-radio-list">
@@ -67,7 +68,7 @@ const RadioFieldComponent = (
 
 describe("<RadioField />", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("RadioField renders as Radio", () => {

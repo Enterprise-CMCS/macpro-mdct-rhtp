@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RouterWrappedComponent } from "utils/testing/setupJest";
+import { RouterWrappedComponent } from "utils/testing/setupTest";
 import { Header } from "components";
 import { testA11y } from "utils/testing/commonTests";
 
-const mockLogout = jest.fn();
+const mockLogout = vi.fn();
 
 const headerComponent = (
   <RouterWrappedComponent>

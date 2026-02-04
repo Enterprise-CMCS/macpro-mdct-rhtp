@@ -5,8 +5,8 @@ import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
 import { AdminBannerMethods } from "types";
 
-const mockWriteAdminBanner = jest.fn();
-window.HTMLElement.prototype.scrollIntoView = jest.fn();
+const mockWriteAdminBanner = vi.fn();
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 const adminBannerFormComponent = (
   writeAdminBanner: AdminBannerMethods["writeAdminBanner"]
@@ -20,7 +20,7 @@ const HOURS = 60 * 60 * 1000;
 
 describe("<AdminBannerForm />", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("AdminBannerForm is visible", () => {

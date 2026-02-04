@@ -1,20 +1,21 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AddEditReportModal } from "components";
 import {
   mockStateUserStore,
   RouterWrappedComponent,
-} from "utils/testing/setupJest";
+} from "utils/testing/setupTest";
 import { useStore } from "utils";
 import { LiteReport, ReportType } from "../../types";
 import assert from "node:assert";
 import { testA11y } from "utils/testing/commonTests";
 
-const mockCloseHandler = jest.fn();
-const mockReportHandler = jest.fn();
-const mockCreateReport = jest.fn();
-const mockUpdateReport = jest.fn();
-const mockGetReportsForState = jest.fn().mockResolvedValue([
+const mockCloseHandler = vi.fn();
+const mockReportHandler = vi.fn();
+const mockCreateReport = vi.fn();
+const mockUpdateReport = vi.fn();
+const mockGetReportsForState = vi.fn().mockResolvedValue([
   {
     id: "1",
     name: "mock-name-a",
@@ -22,11 +23,11 @@ const mockGetReportsForState = jest.fn().mockResolvedValue([
   } as LiteReport,
 ]);
 
-jest.mock("utils/state/useStore");
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockStateUserStore);
 
-jest.mock("utils/api/requestMethods/report", () => ({
+vi.mock("utils/api/requestMethods/report", () => ({
   updateReport: () => mockUpdateReport(),
   createReport: () => mockCreateReport(),
   getReportsForState: () => mockGetReportsForState(),
@@ -72,7 +73,7 @@ describe("Test general modal functionality", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("Modal top close button can be clicked", async () => {
@@ -92,7 +93,7 @@ describe("Test Add Report Modal", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("Add Report Modal shows proper add contents", () => {
@@ -110,7 +111,7 @@ describe("Test Edit Report Modal", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("Edit report modal shows the proper edit contents with editable name", () => {
@@ -142,7 +143,7 @@ describe("Test dropdown for year", () => {
 
 describe("Test submit", () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
   it("Simulate submitting modal", async () => {
     render(addModalComponent);

@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import {
   act,
   fireEvent,
@@ -69,25 +70,25 @@ const testReport: Report = {
   ],
 };
 
-const mockUseParams = jest.fn();
-const mockNavigate = jest.fn();
-const mockSaveReport = jest.fn();
+const mockUseParams = vi.fn();
+const mockNavigate = vi.fn();
+const mockSaveReport = vi.fn();
 
-jest.mock("react-router-dom", () => ({
+vi.mock("react-router-dom", () => ({
   useParams: () => mockUseParams(),
   useNavigate: () => mockNavigate,
 }));
 
-const mockGetReport = jest.fn().mockResolvedValue(testReport);
-jest.mock("../../utils/api/requestMethods/report", () => ({
+const mockGetReport = vi.fn().mockResolvedValue(testReport);
+vi.mock("../../utils/api/requestMethods/report", () => ({
   getReport: () => mockGetReport(),
 }));
 
-jest.mock("utils/state/useStore", () => ({
-  useStore: jest.fn(),
+vi.mock("utils/state/useStore", () => ({
+  useStore: vi.fn(),
 }));
 
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 const setupMockStore = (customState?: Partial<any>) => {
   mockedUseStore.mockImplementation((selector?) => {
@@ -104,8 +105,8 @@ const setupMockStore = (customState?: Partial<any>) => {
         childPageIds: ["general-info", "req-measure-result"],
       },
       saveReport: mockSaveReport,
-      setAnswers: jest.fn(),
-      loadReport: jest.fn(),
+      setAnswers: vi.fn(),
+      loadReport: vi.fn(),
       ...customState,
     } as any;
     return selector ? selector(mockState) : mockState;
@@ -114,7 +115,7 @@ const setupMockStore = (customState?: Partial<any>) => {
 
 describe("ReportPageWrapper", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseParams.mockReturnValue({
       reportType: "RHTP",
       state: "NJ",
@@ -168,7 +169,7 @@ describe("ReportPageWrapper", () => {
   });
 
   test("run autosave when a text field has changed", async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     global.structuredClone = (val: unknown) => {
       return JSON.parse(JSON.stringify(val));
@@ -188,7 +189,7 @@ describe("ReportPageWrapper", () => {
     });
     expect(textbox).toHaveValue("2027");
 
-    jest.runAllTimers();
+    vi.runAllTimers();
     await waitFor(() => expect(mockSaveReport).toHaveBeenCalled());
   });
 });

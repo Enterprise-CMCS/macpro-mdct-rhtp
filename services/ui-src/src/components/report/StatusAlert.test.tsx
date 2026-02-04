@@ -1,17 +1,18 @@
+import { Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { mockUseStore } from "utils/testing/setupJest";
+import { mockUseStore } from "utils/testing/setupTest";
 import { StatusAlert } from "./StatusAlert";
 import { AlertTypes, ElementType, StatusAlertTemplate } from "types";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("utils/state/reportLogic/completeness", () => ({
-  inferredReportStatus: jest.fn().mockReturnValue("Complete"),
+vi.mock("utils/state/reportLogic/completeness", () => ({
+  inferredReportStatus: vi.fn().mockReturnValue("Complete"),
 }));
 
-jest.mock("utils/state/useStore", () => ({
-  useStore: jest
+vi.mock("utils/state/useStore", () => ({
+  useStore: vi
     .fn()
     .mockImplementation(
       (selector?: (state: typeof mockUseStore) => unknown) => {
@@ -23,12 +24,12 @@ jest.mock("utils/state/useStore", () => ({
     ),
 }));
 
-const mockUseNavigate = jest.fn();
+const mockUseNavigate = vi.fn();
 
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+vi.mock("react-router-dom", async (importOriginal) => ({
+  ...(await importOriginal()),
   useNavigate: () => mockUseNavigate,
-  useParams: jest.fn(() => ({
+  useParams: vi.fn(() => ({
     reportType: "RHTP",
     state: "CO",
     reportId: "mock-id",
@@ -73,7 +74,7 @@ describe("<StatusAlert />", () => {
     });
 
     test("Review & Submit banner", () => {
-      (useStore as unknown as jest.Mock).mockImplementation((selector) => {
+      (useStore as unknown as Mock).mockImplementation((selector) => {
         if (selector) {
           return { submittable: true };
         }

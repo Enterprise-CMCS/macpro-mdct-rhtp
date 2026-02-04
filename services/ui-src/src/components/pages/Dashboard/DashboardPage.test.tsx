@@ -1,3 +1,4 @@
+import { Mock, MockedFunction } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { DashboardPage } from "components";
 import {
@@ -5,37 +6,37 @@ import {
   mockUseAdminStore,
   mockUseReadOnlyUserStore,
   mockUseStore,
-} from "utils/testing/setupJest";
+} from "utils/testing/setupTest";
 import { useStore } from "utils";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Report } from "types";
 import { useParams } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 
-window.HTMLElement.prototype.scrollIntoView = jest.fn();
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-jest.mock("utils/other/useBreakpoint", () => ({
-  isMobile: jest.fn().mockReturnValue(false),
-  makeMediaQueryClasses: jest.fn().mockReturnValue("desktop"),
+vi.mock("utils/other/useBreakpoint", () => ({
+  isMobile: vi.fn().mockReturnValue(false),
+  makeMediaQueryClasses: vi.fn().mockReturnValue("desktop"),
 }));
 
-jest.mock("utils/state/useStore", () => ({
-  useStore: jest.fn().mockReturnValue({}),
+vi.mock("utils/state/useStore", () => ({
+  useStore: vi.fn().mockReturnValue({}),
 }));
-const mockedUseStore = useStore as jest.MockedFunction<typeof useStore>;
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useNavigate: () => jest.fn(),
-  useParams: jest.fn(() => ({
+vi.mock("react-router-dom", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useNavigate: () => vi.fn(),
+  useParams: vi.fn(() => ({
     reportType: "RHTP",
     state: "CO",
   })),
 }));
 
-jest.mock("utils/api/requestMethods/report", () => ({
-  getReportsForState: jest.fn().mockResolvedValue([
+vi.mock("utils/api/requestMethods/report", () => ({
+  getReportsForState: vi.fn().mockResolvedValue([
     {
       id: "XYZCO123",
       type: "RHTP",
@@ -59,8 +60,8 @@ jest.mock("utils/api/requestMethods/report", () => ({
   ]),
 }));
 
-jest.mock("utils/other/useBreakpoint", () => ({
-  useBreakpoint: jest.fn(() => ({
+vi.mock("utils/other/useBreakpoint", () => ({
+  useBreakpoint: vi.fn(() => ({
     isDesktop: true,
   })),
 }));
@@ -72,10 +73,10 @@ const dashboardComponent = (
 );
 
 describe("DashboardPage with state user", () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it("should render an empty state when there are no reports", async () => {
-    (getReportsForState as jest.Mock).mockResolvedValueOnce([]);
+    (getReportsForState as Mock).mockResolvedValueOnce([]);
 
     render(dashboardComponent);
     await waitFor(() => {
@@ -95,9 +96,7 @@ describe("DashboardPage with state user", () => {
   });
 
   it("should not call reloadReports if no reportType passed in", async () => {
-    (useParams as jest.Mock)
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(null);
+    (useParams as Mock).mockResolvedValueOnce(null).mockResolvedValueOnce(null);
 
     render(dashboardComponent);
     expect(getReportsForState).toHaveBeenCalledTimes(0);
@@ -217,7 +216,7 @@ describe("DashboardPage with Admin user", () => {
   });
 
   it("should render an empty state when there are no reports", async () => {
-    (getReportsForState as jest.Mock).mockResolvedValueOnce([]);
+    (getReportsForState as Mock).mockResolvedValueOnce([]);
 
     render(dashboardComponent);
     await waitFor(() => {

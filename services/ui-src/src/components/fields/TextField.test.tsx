@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TextField } from "components";
@@ -10,8 +11,8 @@ import {
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { useState } from "react";
 
-jest.mock("utils/state/hooks/useElementIsHidden");
-const mockedUseElementIsHidden = useElementIsHidden as jest.MockedFunction<
+vi.mock("utils/state/hooks/useElementIsHidden");
+const mockedUseElementIsHidden = useElementIsHidden as MockedFunction<
   typeof useElementIsHidden
 >;
 
@@ -35,7 +36,7 @@ const mockedNumberField: NumberFieldTemplate = {
   required: true,
 };
 
-const updateSpy = jest.fn();
+const updateSpy = vi.fn();
 
 const TextFieldWrapper = ({
   template,
@@ -52,7 +53,7 @@ const TextFieldWrapper = ({
 
 describe("<TextField />", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("TextField is visible", () => {
