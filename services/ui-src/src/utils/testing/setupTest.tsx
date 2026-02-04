@@ -1,5 +1,6 @@
 import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
+import "jest-axe/extend-expect";
 import * as framerMotion from "framer-motion";
 import {
   UserRoles,
@@ -50,6 +51,8 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   })),
 });
+
+(window as any)._env_ = {};
 
 window.scrollBy = vi.fn();
 window.scrollTo = vi.fn();
