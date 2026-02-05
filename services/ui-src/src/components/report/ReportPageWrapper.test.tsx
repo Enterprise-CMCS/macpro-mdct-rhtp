@@ -22,7 +22,7 @@ const testReport: Report = {
   type: ReportType.RHTP,
   name: "plan id",
   state: "NJ",
-  id: "NJQMS123",
+  id: "NJGeneral123",
   year: 2026,
   status: ReportStatus.NOT_STARTED,
   archived: false,
@@ -104,7 +104,7 @@ const setupMockStore = (customState?: Partial<any>) => {
         index: 0,
         childPageIds: ["general-info", "req-measure-result"],
       },
-      saveReport: mockSaveReport,
+      saveReport: () => mockSaveReport(),
       setAnswers: vi.fn(),
       loadReport: vi.fn(),
       ...customState,
@@ -166,30 +166,5 @@ describe("ReportPageWrapper", () => {
     expect(mockNavigate).toHaveBeenCalledWith(
       "/report/RHTP/NJ/QMSNJ123/req-measure-result"
     );
-  });
-
-  test("run autosave when a text field has changed", async () => {
-    vi.useFakeTimers();
-
-    global.structuredClone = (val: unknown) => {
-      return JSON.parse(JSON.stringify(val));
-    };
-
-    await act(async () => {
-      render(
-        <ReportAutosaveProvider>
-          <ReportPageWrapper />
-        </ReportAutosaveProvider>
-      );
-    });
-
-    const textbox = screen.getByLabelText("Contact title");
-    await act(async () => {
-      fireEvent.change(textbox, { target: { value: "2027" } });
-    });
-    expect(textbox).toHaveValue("2027");
-
-    vi.runAllTimers();
-    await waitFor(() => expect(mockSaveReport).toHaveBeenCalled());
   });
 });

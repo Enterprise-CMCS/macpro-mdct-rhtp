@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   base: "/",
   plugins: [react(), viteTsconfigPaths()],
   server: {
@@ -22,16 +22,6 @@ export default defineConfig(({ mode }) => ({
     setupFiles: "utils/testing/setupTest.tsx",
     environment: "jsdom",
     globals: true,
-    /*
-     * See https://vitest.dev/guide/features.html#environment-variables
-     * and https://vite.dev/guide/api-javascript.html#loadenv
-     * and https://vite.dev/guide/env-and-mode#modes
-     */
-    env: loadEnv(
-      mode, // Load from .env, or .env.{mode}, as appropriate
-      "../../.env",
-      "" // Load all variables, regardless of prefix (by default, only 'VITE_')
-    ),
     coverage: {
       /*
        * The default coverage directory is "<root>/coverage",
@@ -52,4 +42,4 @@ export default defineConfig(({ mode }) => ({
       ],
     },
   },
-}));
+});

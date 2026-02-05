@@ -1,11 +1,10 @@
 import { apiLib } from "./apiLib";
-
-const mockAmplifyApi = require("aws-amplify/api");
+import * as amplifyApi from "aws-amplify/api";
 
 const mockUpdateTimeout = vi.fn();
 
 vi.mock("utils/auth/authLifecycle", () => ({
-  updateTimeout: mockUpdateTimeout,
+  updateTimeout: () => mockUpdateTimeout(),
 }));
 
 const path = "my/url";
@@ -29,7 +28,7 @@ describe("API lib", () => {
   });
 
   test("Calling post should update the session timeout", async () => {
-    const apiSpy = vi.spyOn(mockAmplifyApi, "post");
+    const apiSpy = vi.spyOn(amplifyApi, "post");
     await apiLib.post(path, mockOptions);
 
     expect(apiSpy).toHaveBeenCalledWith(requestObj);
@@ -37,7 +36,7 @@ describe("API lib", () => {
   });
 
   test("Calling put should update the session timeout", async () => {
-    const apiSpy = vi.spyOn(mockAmplifyApi, "put");
+    const apiSpy = vi.spyOn(amplifyApi, "put");
     await apiLib.put(path, mockOptions);
 
     expect(apiSpy).toHaveBeenCalledWith(requestObj);
@@ -45,7 +44,7 @@ describe("API lib", () => {
   });
 
   test("Calling get should update the session timeout", async () => {
-    const apiSpy = vi.spyOn(mockAmplifyApi, "get");
+    const apiSpy = vi.spyOn(amplifyApi, "get");
     await apiLib.get(path, mockOptions);
 
     expect(apiSpy).toHaveBeenCalledWith(requestObj);
@@ -53,7 +52,7 @@ describe("API lib", () => {
   });
 
   test("Calling del should update the session timeout", async () => {
-    const apiSpy = vi.spyOn(mockAmplifyApi, "del");
+    const apiSpy = vi.spyOn(amplifyApi, "del");
     await apiLib.del(path, mockOptions);
 
     expect(apiSpy).toHaveBeenCalledWith(requestObj);
@@ -65,7 +64,7 @@ describe("API lib", () => {
     const consoleSpy = vi.spyOn(console, "log");
     consoleSpy.mockImplementation(() => {});
 
-    const apiSpy = vi.spyOn(mockAmplifyApi, "del");
+    const apiSpy = vi.spyOn(amplifyApi, "del");
     apiSpy.mockImplementationOnce(() => {
       throw new Error("Mock 500 error");
     });

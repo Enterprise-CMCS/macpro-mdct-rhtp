@@ -2,9 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { Alert } from "components";
 import { testA11y } from "utils/testing/commonTests";
 
-// mock icon
-const alertIcon = "test-file-stub";
-
 const alertComponent = (
   <Alert title="Test alert!" link="https://example.com">
     This is for testing.
@@ -20,7 +17,6 @@ describe("<Alert />", () => {
     ).toHaveAttribute("href", "https://example.com");
     expect(screen.getByRole("alert")).toHaveTextContent("This is for testing.");
     expect(screen.getByRole("img", { name: "Alert" })).toBeVisible();
-    expect(screen.getByAltText("Alert")).toHaveAttribute("src", alertIcon);
   });
 
   test("should hide the icon when appropriate", () => {

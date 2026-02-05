@@ -14,6 +14,15 @@ mockedUseStore.mockReturnValue({
   setUser: mockSetUser,
 });
 
+const mockSignOut = vi.fn();
+const mockFetchAuthSession = vi.fn();
+
+vi.mock("aws-amplify/auth", () => ({
+  signInWithRedirect: vi.fn(),
+  signOut: () => mockSignOut(),
+  fetchAuthSession: () => mockFetchAuthSession(),
+}));
+
 // COMPONENTS
 
 const TestComponent = () => {
@@ -130,9 +139,7 @@ describe("<UserProvider />", () => {
     test("Logs error to console if logout throws error", async () => {
       vi.spyOn(console, "log").mockImplementation(vi.fn());
       const spy = vi.spyOn(console, "log");
-
-      const mockAmplify = require("aws-amplify/auth");
-      mockAmplify.signOut = vi.fn().mockImplementation(() => {
+      mockSignOut.mockImplementation(() => {
         throw new Error();
       });
 
@@ -150,8 +157,7 @@ describe("<UserProvider />", () => {
   });
 
   test("check auth function", async () => {
-    const mockAmplify = require("aws-amplify/auth");
-    mockAmplify.fetchAuthSession = vi.fn().mockResolvedValue({
+    mockFetchAuthSession.mockResolvedValue({
       tokens: {
         idToken: {
           payload: {
