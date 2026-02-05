@@ -26,14 +26,14 @@ describe("<ListInput />", () => {
     vi.clearAllMocks();
     render(ListInputComponent);
   });
-  it("ListInput renders", () => {
+  test("ListInput renders", () => {
     expect(screen.getByText("This is a mock list input")).toBeVisible();
     expect(screen.getByText("mock helper text")).toBeVisible();
     expect(
       screen.getByRole("button", { name: "mock button text" })
     ).toBeVisible();
   });
-  it("ListInput allows adding fields", async () => {
+  test("ListInput allows adding fields", async () => {
     const addBtn = screen.getByRole("button", { name: "mock button text" });
     await userEvent.click(addBtn);
 
@@ -44,7 +44,7 @@ describe("<ListInput />", () => {
     expect(updateSpy).toHaveBeenCalledTimes(5);
   });
 
-  it("ListInput allows removing fields", async () => {
+  test("ListInput allows removing fields", async () => {
     const addBtn = screen.getByRole("button", { name: "mock button text" });
     await userEvent.click(addBtn);
     expect(screen.getByRole("textbox", { name: "mock field" })).toBeVisible();
@@ -58,7 +58,7 @@ describe("<ListInput />", () => {
     expect(updateSpy).toHaveBeenCalledTimes(2);
   });
 
-  it("ListInput shows error when user does not fillout the field", async () => {
+  test("ListInput shows error when user does not fillout the field", async () => {
     const addBtn = screen.getByRole("button", { name: "mock button text" });
     await userEvent.click(addBtn);
     const textbox = screen.getByRole("textbox", { name: "mock field" });

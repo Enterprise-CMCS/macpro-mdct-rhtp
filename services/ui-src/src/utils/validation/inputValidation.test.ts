@@ -8,7 +8,7 @@ import {
 
 describe("Input validation utilities", () => {
   describe("makeEmptyStringCopyOf()", () => {
-    it("should deeply clone objects, preserving non-string properties", () => {
+    test("should deeply clone objects, preserving non-string properties", () => {
       const original = {
         groups: [
           {
@@ -39,7 +39,7 @@ describe("Input validation utilities", () => {
       expect(original.groups[0].items[0].id).toBe(42);
     });
 
-    it("should erase strings at any level within the object", () => {
+    test("should erase strings at any level within the object", () => {
       const object = {
         denominator: "44",
         rates: [
@@ -64,21 +64,21 @@ describe("Input validation utilities", () => {
   });
 
   describe("validateDate()", () => {
-    it("should reject empty values for required fields", () => {
+    test("should reject empty values for required fields", () => {
       const result = validateDate("", "", true);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
       expect(result.errorMessage).toBe("A response is required");
     });
 
-    it("should allow empty values for optional fields", () => {
+    test("should allow empty values for optional fields", () => {
       const result = validateDate("", "", false);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
       expect(result.errorMessage).toBe("");
     });
 
-    it("should reject incomplete dates for required fields", () => {
+    test("should reject incomplete dates for required fields", () => {
       const result = validateDate("1234", "12/34", true);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
@@ -87,7 +87,7 @@ describe("Input validation utilities", () => {
       );
     });
 
-    it("should reject incomplete dates for optional fields", () => {
+    test("should reject incomplete dates for optional fields", () => {
       const result = validateDate("1234", "12/34", false);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
@@ -96,7 +96,7 @@ describe("Input validation utilities", () => {
       );
     });
 
-    it("should reject invalid dates for required fields", () => {
+    test("should reject invalid dates for required fields", () => {
       const result = validateDate("99999999", "99/99/9999", true);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
@@ -105,7 +105,7 @@ describe("Input validation utilities", () => {
       );
     });
 
-    it("should reject invalid dates for optional fields", () => {
+    test("should reject invalid dates for optional fields", () => {
       const result = validateDate("99999999", "99/99/9999", false);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
@@ -114,7 +114,7 @@ describe("Input validation utilities", () => {
       );
     });
 
-    it("should allow valid dates", () => {
+    test("should allow valid dates", () => {
       const result = validateDate("07292025", "07/29/2025", true);
       expect(result.parsedValue).toBeDefined();
       expect(result.isValid).toBe(true);
@@ -123,35 +123,35 @@ describe("Input validation utilities", () => {
   });
 
   describe("validateNumber()", () => {
-    it("should reject empty values for required fields", () => {
+    test("should reject empty values for required fields", () => {
       const result = validateNumber("", true);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
       expect(result.errorMessage).toBe("A response is required");
     });
 
-    it("should allow empty values for optional fields", () => {
+    test("should allow empty values for optional fields", () => {
       const result = validateNumber("", false);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
       expect(result.errorMessage).toBe("");
     });
 
-    it("should reject invalid numbers for required fields", () => {
+    test("should reject invalid numbers for required fields", () => {
       const result = validateNumber("texas", true);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
       expect(result.errorMessage).toBe("Response must be a number");
     });
 
-    it("should reject invalid numbers for optional fields", () => {
+    test("should reject invalid numbers for optional fields", () => {
       const result = validateNumber("texas", false);
       expect(result.parsedValue).toBeUndefined();
       expect(result.isValid).toBe(false);
       expect(result.errorMessage).toBe("Response must be a number");
     });
 
-    it("should allow valid numbers", () => {
+    test("should allow valid numbers", () => {
       const result = validateNumber("12.34", false);
       expect(result.parsedValue).toBe(12.34);
       expect(result.isValid).toBe(true);
@@ -160,15 +160,15 @@ describe("Input validation utilities", () => {
   });
 
   describe("isUrl()", () => {
-    it("should reject undefined", () => {
+    test("should reject undefined", () => {
       expect(isUrl(undefined)).toBe(false);
     });
 
-    it("should reject the empty string", () => {
+    test("should reject the empty string", () => {
       expect(isUrl("")).toBe(false);
     });
 
-    it.each([
+    test.each([
       { input: "hello" },
       { input: "www.cms.gov" },
       { input: "javascript:void(0)" },
@@ -177,7 +177,7 @@ describe("Input validation utilities", () => {
       expect(isUrl(input)).toBe(false);
     });
 
-    it.each([
+    test.each([
       { input: "https://www.cms.gov" },
       { input: "http://www.cms.gov" },
     ])("should accept the string '$input'", ({ input }) => {
@@ -186,15 +186,15 @@ describe("Input validation utilities", () => {
   });
 
   describe("isEmail()", () => {
-    it("should reject undefined", () => {
+    test("should reject undefined", () => {
       expect(isEmail(undefined)).toBe(false);
     });
 
-    it("should reject the empty string", () => {
+    test("should reject the empty string", () => {
       expect(isEmail("")).toBe(false);
     });
 
-    it.each([
+    test.each([
       { input: "hello" },
       { input: "www.cms.gov" },
       { input: "javascript:void(0)" },
@@ -204,7 +204,7 @@ describe("Input validation utilities", () => {
       expect(isEmail(input)).toBe(false);
     });
 
-    it.each([
+    test.each([
       { input: "hello@world.com" },
       { input: "name+folder@gmail.com" },
       { input: "totally-plausible/email.3@test.coforma.io" },

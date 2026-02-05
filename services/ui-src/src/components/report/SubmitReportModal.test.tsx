@@ -7,7 +7,7 @@ const mockClose = vi.fn();
 const mockSubmit = vi.fn();
 
 describe("Test SubmitReportModal", () => {
-  it("Test SubmitReportModal for RHTP Render", async () => {
+  test("Test SubmitReportModal for RHTP Render", async () => {
     const modal = SubmitReportModal(mockClose, mockSubmit, "RHTP");
     render(
       <Modal isOpen={true} onClose={mockClose}>
@@ -24,7 +24,7 @@ describe("Test SubmitReportModal", () => {
     expect(mockSubmit).toHaveBeenCalled();
   });
 
-  it("Test SubmitReportModal cancel and submit interactions", async () => {
+  test("Test SubmitReportModal cancel and submit interactions", async () => {
     const modal = SubmitReportModal(mockClose, mockSubmit, "RHTP");
     render(
       <Modal isOpen={true} onClose={mockClose}>

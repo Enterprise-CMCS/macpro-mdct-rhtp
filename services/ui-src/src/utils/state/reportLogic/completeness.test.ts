@@ -69,32 +69,32 @@ describe("pageInProgress", () => {
     return pageInProgress(report, "mock-page-id");
   };
 
-  it("should treat missing or empty answers as not in progress", () => {
+  test("should treat missing or empty answers as not in progress", () => {
     expect(isInProgress({})).toBe(false);
     expect(isInProgress({ answer: undefined })).toBe(false);
     expect(isInProgress({ answer: "" })).toBe(false);
   });
 
-  it("should treat numeric answers as in progress", () => {
+  test("should treat numeric answers as in progress", () => {
     expect(isInProgress({ answer: 0 })).toBe(true);
     expect(isInProgress({ answer: 42 })).toBe(true);
   });
 
-  it("should treat empty answer objects as not in progress", () => {
+  test("should treat empty answer objects as not in progress", () => {
     expect(isInProgress({ answer: {} })).toBe(false);
     expect(isInProgress({ answer: [] })).toBe(false);
     expect(isInProgress({ answer: [{}, {}] })).toBe(false);
     expect(isInProgress({ answer: { x: [{}] } })).toBe(false);
   });
 
-  it("should treat answers with data in progress", () => {
+  test("should treat answers with data in progress", () => {
     expect(isInProgress({ answer: "hello" })).toBe(true);
     expect(isInProgress({ answer: [1, 2] })).toBe(true);
     expect(isInProgress({ answer: [{ x: 42 }] })).toBe(true);
     expect(isInProgress({ answer: { x: [96, 78] } })).toBe(true);
   });
 
-  it("should treat unknown data types as in progress", () => {
+  test("should treat unknown data types as in progress", () => {
     // We don't, and should never, have a BigInt answer type. But if we did:
     expect(isInProgress({ answer: 99n })).toBe(true);
   });

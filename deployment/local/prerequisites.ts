@@ -29,7 +29,7 @@ export class LocalPrerequisiteStack extends Stack {
       cidrBlock: "10.0.1.0/24",
     });
 
-    new secretsmanager.Secret(this, "HcbsDefaultSecret", {
+    new secretsmanager.Secret(this, "RhtpDefaultSecret", {
       secretName: `${process.env.PROJECT}-default`, // pragma: allowlist secret
       secretObjectValue: {
         vpcName: SecretValue.unsafePlainText("localstack-dev"),

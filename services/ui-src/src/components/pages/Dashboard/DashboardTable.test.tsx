@@ -69,7 +69,7 @@ const adminDashboardTableComponent = (
 
 describe("Dashboard table with state user", () => {
   beforeEach(() => vi.clearAllMocks());
-  it("should render report name and edit button in table", async () => {
+  test("should render report name and edit button in table", async () => {
     render(dashboardTableComponent);
     expect(screen.getByText("report 1")).toBeInTheDocument();
     expect(screen.getAllByLabelText("Edit report 1 report name").length).toBe(
@@ -84,7 +84,7 @@ describe("Dashboard table with admin user", () => {
     mockedUseStore.mockReturnValue(mockUseAdminStore);
   });
 
-  it("should not render the proper controls when admin", async () => {
+  test("should not render the proper controls when admin", async () => {
     render(adminDashboardTableComponent);
     expect(screen.getByText("report 1")).toBeInTheDocument();
     expect(
@@ -95,21 +95,21 @@ describe("Dashboard table with admin user", () => {
     expect(screen.getAllByText("Unlock").length).toBe(3);
   });
 
-  it("should unlock a report on click", async () => {
+  test("should unlock a report on click", async () => {
     render(adminDashboardTableComponent);
     const releaseBtn = screen.getAllByRole("button", { name: "Unlock" })[1];
     await userEvent.click(releaseBtn);
     expect(mockRelease).toHaveBeenCalled();
   });
 
-  it("should archive a report on click", async () => {
+  test("should archive a report on click", async () => {
     render(adminDashboardTableComponent);
     const button = screen.getAllByRole("button", { name: "Archive" })[0];
     await userEvent.click(button);
     expect(mockArchive).toHaveBeenCalled();
   });
 
-  it("should render In revision text for a returned report", async () => {
+  test("should render In revision text for a returned report", async () => {
     render(adminDashboardTableComponent);
     // Setup data includes In Progress with Submission Count >= 1
     expect(screen.getByText("In revision")).toBeInTheDocument();

@@ -145,7 +145,7 @@ describe("Test submit", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
-  it("Simulate submitting modal", async () => {
+  test("Simulate submitting modal", async () => {
     render(addModalComponent);
     const nameTextbox = screen.getByRole("textbox", {
       name: "RHTP Report Name",
@@ -159,7 +159,7 @@ describe("Test submit", () => {
     expect(mockCreateReport).toHaveBeenCalled();
   });
 
-  it("Simulate submitting an edited report", async () => {
+  test("Simulate submitting an edited report", async () => {
     render(editModalComponent);
 
     const nameTextbox = screen.getByRole("textbox", {
@@ -177,7 +177,7 @@ describe("Test submit", () => {
 });
 
 describe("Test in line validation", () => {
-  it("Simulate submitting modal with duplicate report name", async () => {
+  test("Simulate submitting modal with duplicate report name", async () => {
     const user = userEvent.setup();
     render(addModalComponent);
     const nameTextbox = screen.getByRole("textbox", {

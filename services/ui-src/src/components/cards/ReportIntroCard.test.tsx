@@ -21,7 +21,7 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => mockUseNavigate,
 }));
 
-const xyzReportTypeCardComponent = (
+const rhtpReportTypeCardComponent = (
   <RouterWrappedComponent>
     <ReportIntroCard title="RHTP">
       This is the body of the report intro card. Normally it would contain a
@@ -34,7 +34,7 @@ const xyzReportTypeCardComponent = (
 describe("<ReportTypeCard />", () => {
   describe("Renders", () => {
     beforeEach(() => {
-      render(xyzReportTypeCardComponent);
+      render(rhtpReportTypeCardComponent);
     });
 
     test("RHTP ReportTypeCard is visible", () => {
@@ -47,5 +47,5 @@ describe("<ReportTypeCard />", () => {
     });
   });
 
-  testA11y(xyzReportTypeCardComponent);
+  testA11y(rhtpReportTypeCardComponent);
 });

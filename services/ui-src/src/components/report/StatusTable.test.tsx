@@ -96,7 +96,7 @@ describe("StatusTable with state user", () => {
     expect(screen.getByAltText("complete icon")).toBeInTheDocument();
   });
 
-  it("should navigate to the correct editable page when the Edit button is clicked", async () => {
+  test("should navigate to the correct editable page when the Edit button is clicked", async () => {
     render(
       <MemoryRouter>
         <StatusTableElement />
@@ -108,7 +108,7 @@ describe("StatusTable with state user", () => {
 
     expect(editButton).toBeVisible();
   });
-  it("should navigate to PDF when the Review PDF button is clicked", async () => {
+  test("should navigate to PDF when the Review PDF button is clicked", async () => {
     render(
       <MemoryRouter>
         <StatusTableElement />
@@ -122,7 +122,7 @@ describe("StatusTable with state user", () => {
     expect(reviewPdfButton).toHaveAttribute("target", "_blank");
   });
 
-  it("should call the API and render RHTP submit modal when the Submit button is clicked", async () => {
+  test("should call the API and render RHTP submit modal when the Submit button is clicked", async () => {
     render(
       <MemoryRouter initialEntries={["/report/RHTP/CO/mock-report-id"]}>
         <Routes>
@@ -142,7 +142,7 @@ describe("StatusTable with state user", () => {
     expect(mockSetModalComponent).toHaveBeenCalled();
   });
 
-  it("should render the correct submit button text when reportType is from the URL", async () => {
+  test("should render the correct submit button text when reportType is from the URL", async () => {
     render(
       <MemoryRouter initialEntries={["/report/RHTP/CO/mock-report-id"]}>
         <Routes>
@@ -160,7 +160,7 @@ describe("StatusTable with state user", () => {
     expect(submitButton).toBeInTheDocument();
   });
 
-  it("should disable the submit button when submittable is false", async () => {
+  test("should disable the submit button when submittable is false", async () => {
     mockedUseStore.mockImplementation(
       (selector?: Parameters<typeof useStore>[0]) => {
         if (selector) {
@@ -201,7 +201,7 @@ describe("StatusTable with state user", () => {
     expect(submitButton).toBeDisabled();
   });
 
-  it("should not render anything if report is undefined", () => {
+  test("should not render anything if report is undefined", () => {
     mockedUseStore.mockImplementation(() => ({
       ...mockStateUserStore,
       pageMap: mockPageMap,
@@ -248,7 +248,7 @@ describe("StatusPage with Read only user", () => {
       }
     );
   });
-  it("should not render the Submit RHTP Report button when user is read only", async () => {
+  test("should not render the Submit RHTP Report button when user is read only", async () => {
     render(
       <MemoryRouter>
         <StatusTableElement />

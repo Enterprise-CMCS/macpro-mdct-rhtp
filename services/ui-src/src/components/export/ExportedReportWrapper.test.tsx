@@ -43,17 +43,17 @@ const section: FormPageTemplate = {
 };
 
 describe("ExportedReportWrapper", () => {
-  it("ExportedReportWrapper is visible", () => {
+  test("ExportedReportWrapper is visible", () => {
     render(<ExportedReportWrapper section={section}></ExportedReportWrapper>);
     expect(screen.getByText("Contact title")).toBeInTheDocument();
   });
 
-  it("Unanswered optional fields are not rendered", () => {
+  test("Unanswered optional fields are not rendered", () => {
     render(<ExportedReportWrapper section={section}></ExportedReportWrapper>);
     expect(screen.queryByText("Additional comments")).not.toBeInTheDocument();
   });
 
-  it("should recursively expand checked children", () => {
+  test("should recursively expand checked children", () => {
     const elements: PageElement[] = [
       {
         type: ElementType.Radio,

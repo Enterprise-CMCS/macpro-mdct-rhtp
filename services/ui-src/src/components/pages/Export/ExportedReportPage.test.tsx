@@ -37,7 +37,7 @@ describe("ExportedReportPage", () => {
       report: report,
     });
   });
-  it("ExportReportPage is visible", () => {
+  test("ExportReportPage is visible", () => {
     render(
       <MemoryRouter>
         <ExportedReportPage></ExportedReportPage>
@@ -48,7 +48,7 @@ describe("ExportedReportPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("Should not render filtered sections", () => {
+  test("Should not render filtered sections", () => {
     render(
       <MemoryRouter>
         <ExportedReportPage></ExportedReportPage>
