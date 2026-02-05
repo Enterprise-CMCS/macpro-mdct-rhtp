@@ -87,7 +87,6 @@ export const isUrl = (value: string | undefined) => {
 export const isEmail = (value: string | undefined) => {
   /*
    * We are using the regex recommended by the HTML specification itself.
-   * ESLint doesn't love it, but we're not going to change a single character.
    * https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
    */
   const emailPattern =
