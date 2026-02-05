@@ -1,6 +1,6 @@
 import { act, render } from "@testing-library/react";
 import { ReactElement } from "react";
-import { axe } from "vitest-axe";
+import { axe } from "jest-axe";
 
 export const testA11y = (
   component: ReactElement<any, string>,

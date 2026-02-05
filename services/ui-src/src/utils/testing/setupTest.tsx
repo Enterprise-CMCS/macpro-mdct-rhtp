@@ -1,6 +1,5 @@
 import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
-import "jest-axe/extend-expect";
 import * as framerMotion from "framer-motion";
 import {
   UserRoles,
@@ -21,14 +20,8 @@ import { mockBannerData } from "./mockBanner";
  */
 expect.extend(domMatchers);
 
-// for accessibility testing
-import "vitest";
-import type { AxeMatchers } from "vitest-axe";
-
-declare module "vitest" {
-  export interface Assertion extends AxeMatchers {}
-  export interface AsymmetricMatchersContaining extends AxeMatchers {}
-}
+// for accessibility testing, so typescript will recognize .toHaveNoViolations()
+import "jest-axe/extend-expect";
 
 // GLOBALS
 
