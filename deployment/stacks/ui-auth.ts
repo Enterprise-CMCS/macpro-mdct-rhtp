@@ -41,7 +41,7 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
   } = props;
 
   const userPool = new cognito.UserPool(scope, "UserPool", {
-    userPoolName: `${stage}-user-pool`,
+    userPoolName: `${project}-${stage}`,
     signInAliases: {
       email: true,
     },
@@ -107,7 +107,7 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
     "http://localhost:3000/";
 
   const userPoolClient = new cognito.UserPoolClient(scope, "UserPoolClient", {
-    userPoolClientName: `${stage}-user-pool-client`,
+    userPoolClientName: `${project}-${stage}`,
     userPool,
     authFlows: {
       userPassword: true,
@@ -178,15 +178,6 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
       CognitoAuthorizedPolicy: new iam.PolicyDocument({
         statements: [
           new iam.PolicyStatement({
-            actions: [
-              "mobileanalytics:PutEvents",
-              "cognito-sync:*",
-              "cognito-identity:*",
-            ],
-            resources: ["*"],
-            effect: iam.Effect.ALLOW,
-          }),
-          new iam.PolicyStatement({
             actions: ["execute-api:Invoke"],
             resources: [
               `arn:aws:execute-api:${Aws.REGION}:${Aws.ACCOUNT_ID}:${restApiId}/*`,
@@ -208,7 +199,7 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
   if (bootstrapUsersPassword) {
     const service = "ui-auth";
     bootstrapUsersFunction = new Lambda(scope, "bootstrapUsers", {
-      stackName: `${service}-${stage}`,
+      stackName: `${project}-${service}-${stage}`,
       entry: "services/ui-auth/handlers/createUsers.js",
       handler: "handler",
       memorySize: 1024,

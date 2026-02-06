@@ -38,7 +38,7 @@ export const HomePage = () => {
           <>
             <Box>
               <Heading as="h1" variant="h1" paddingBottom="spacer3">
-                Learning and Building Sandbox (LABS) Portal
+                Rural Health Transformation Program
               </Heading>
               <Text paddingBottom="spacer3">
                 Get started by completing the reports for your state or

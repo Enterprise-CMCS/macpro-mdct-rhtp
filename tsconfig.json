@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "include": ["src"],
   "compilerOptions": {
     "incremental": true,
     "target": "ES2024",

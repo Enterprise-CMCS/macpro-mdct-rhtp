@@ -35,7 +35,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   });
 
   const api = new apigateway.RestApi(scope, "ApiGatewayRestApi", {
-    restApiName: `${stage}-app-api`,
+    restApiName: `${project}-${stage}-app-api`,
     deploy: true,
     cloudWatchRole: false,
     deployOptions: {
