@@ -76,8 +76,9 @@ export const UserProvider = ({ children }: Props) => {
         "custom:cms_state": state,
       } = payload as ExpectedTokenShape;
 
-      // "custom:cms_roles" is an string of concat roles so we need to check for the one applicable to LABS
-      const userRole = cms_role.split(",").find((r) => r.includes("mdctrhtp"));
+      // "custom:cms_roles" is an string of concat roles so we need to check for the one applicable to RHTP
+      // TODO: change to mdctrhtp
+      const userRole = cms_role.split(",").find((r) => r.includes("mdcthcbs"));
       const full_name = [given_name, " ", family_name].join("");
       const userCheck = {
         userIsAdmin:
