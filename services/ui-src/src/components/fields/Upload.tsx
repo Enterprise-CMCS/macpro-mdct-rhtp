@@ -1,9 +1,10 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { uploadToBucket } from "utils/other/upload";
 
 export const Upload = () => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [filesToUpload, setFilesToUpload] = useState<(File | null)[]>();
+  const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   const acceptedFileTypes = [
     ".ppt",
@@ -29,9 +30,10 @@ export const Upload = () => {
     event.preventDefault();
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
-      .filter((file) => file);
+      .filter((file) => file != null);
 
-    setFilesToUpload([...(filesToUpload ?? []), ...files]);
+    const prevFiles = filesToUpload ?? [];
+    setFilesToUpload([...prevFiles, ...files]);
   };
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +51,10 @@ export const Upload = () => {
     setFilesToUpload(files);
   };
 
-  const onUploadFiles = () => {};
+  const onUploadFiles = () => {
+    const files = filesToUpload ?? [];
+    uploadToBucket(files);
+  };
 
   return (
     <Box sx={sx.container}>
