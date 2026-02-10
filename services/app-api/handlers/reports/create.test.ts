@@ -31,7 +31,6 @@ const testEvent = {
   body: JSON.stringify({
     year: 2026,
     name: "test report",
-    options: {},
   }),
 };
 
