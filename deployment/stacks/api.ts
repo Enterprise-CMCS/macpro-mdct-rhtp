@@ -150,6 +150,22 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "partialUpdateReport", {
+    entry: "services/app-api/handlers/reports/partialUpdate.ts",
+    handler: "partialUpdateReport",
+    path: "reports/update/{reportType}/{state}/{id}",
+    method: "PUT",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "updateReport", {
+    entry: "services/app-api/handlers/reports/update.ts",
+    handler: "updateReport",
+    path: "reports/{reportType}/{state}/{id}",
+    method: "PUT",
+    ...commonProps,
+  });
+
   if (!isLocalStack) {
     const waf = new WafConstruct(
       scope,

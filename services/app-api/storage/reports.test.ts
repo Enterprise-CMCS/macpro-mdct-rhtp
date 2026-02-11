@@ -1,10 +1,16 @@
-import { getReport, putReport, queryReportsForState } from "./reports";
+import {
+  getReport,
+  putReport,
+  queryReportsForState,
+  updateFields,
+} from "./reports";
 import { Report, ReportType } from "../types/reports";
 import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 
@@ -96,6 +102,35 @@ describe("Report storage helpers", () => {
           },
           ProjectionExpression:
             "#id, #name, #state, #created, #status, #submissionCount, #archived, #lastEdited, #lastEditedBy, #type, #year, #lastEditedByEmail",
+        },
+        expect.any(Function)
+      );
+    });
+  });
+
+  describe("updateFields", () => {
+    test("should call DynamoDB to update report data", async () => {
+      const mockUpdate = vi.fn();
+      mockDynamo.on(UpdateCommand).callsFake(mockUpdate);
+
+      await updateFields(
+        { name: "Updated Name" },
+        ReportType.RHTP,
+        "CO",
+        "mock-report-id"
+      );
+
+      expect(mockUpdate).toHaveBeenCalledWith(
+        {
+          TableName: "local-rhtp-reports",
+          Key: { state: "CO", id: "mock-report-id" },
+          UpdateExpression: "set #updateField = :updateValue",
+          ExpressionAttributeNames: {
+            "#updateField": "name",
+          },
+          ExpressionAttributeValues: {
+            ":updateValue": "Updated Name",
+          },
         },
         expect.any(Function)
       );

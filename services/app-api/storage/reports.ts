@@ -3,6 +3,7 @@ import {
   PutCommand,
   paginateQuery,
   QueryCommandInput,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import {
   collectPageItems,
@@ -78,4 +79,37 @@ export const queryReportsForState = async (
   const reports = await collectPageItems(response);
 
   return reports as LiteReport[];
+};
+
+export const updateField = async (
+  updateField: string,
+  updateValue: string,
+  reportType: ReportType,
+  state: StateAbbr,
+  id: string
+) => {
+  await dynamoClient.send(
+    new UpdateCommand({
+      TableName: reportTables[reportType],
+      Key: { state, id },
+      UpdateExpression: `set #updateField = :updateValue`,
+      ExpressionAttributeNames: {
+        "#updateField": updateField,
+      },
+      ExpressionAttributeValues: {
+        ":updateValue": updateValue,
+      },
+    })
+  );
+};
+
+export const updateFields = async (
+  updateFields: Partial<LiteReport>,
+  reportType: ReportType,
+  state: StateAbbr,
+  id: string
+) => {
+  for (const [key, value] of Object.entries(updateFields)) {
+    await updateField(key, value as string, reportType, state, id);
+  }
 };
