@@ -21,6 +21,19 @@ export function createDataComponents(props: CreateDataComponentsProps) {
         type: dynamodb.AttributeType.STRING,
       },
     }),
+    new DynamoDBTable(scope, "RhtpReports", {
+      stage,
+      isDev,
+      name: "rhtp-reports",
+      partitionKey: {
+        name: "state",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: "id",
+        type: dynamodb.AttributeType.STRING,
+      },
+    }),
   ];
 
   return { tables };

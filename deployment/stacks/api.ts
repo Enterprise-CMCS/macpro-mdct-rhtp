@@ -125,6 +125,47 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  // Report handlers
+  new Lambda(scope, "createReport", {
+    entry: "services/app-api/handlers/reports/create.ts",
+    handler: "createReport",
+    path: "reports/{reportType}/{state}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getReport", {
+    entry: "services/app-api/handlers/reports/get.ts",
+    handler: "getReport",
+    path: "reports/{reportType}/{state}/{id}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getReportsForState", {
+    entry: "services/app-api/handlers/reports/get.ts",
+    handler: "getReportsForState",
+    path: "reports/{reportType}/{state}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "partialUpdateReport", {
+    entry: "services/app-api/handlers/reports/partialUpdate.ts",
+    handler: "partialUpdateReport",
+    path: "reports/update/{reportType}/{state}/{id}",
+    method: "PUT",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "updateReport", {
+    entry: "services/app-api/handlers/reports/update.ts",
+    handler: "updateReport",
+    path: "reports/{reportType}/{state}/{id}",
+    method: "PUT",
+    ...commonProps,
+  });
+
   if (!isLocalStack) {
     const waf = new WafConstruct(
       scope,
