@@ -1,11 +1,12 @@
 // USERS
 
+// TODO: change to mdctrhtp
 export enum UserRoles {
-  ADMIN = "mdctrhtp-bor", // "MDCT RHTP Business Owner Representative"
-  APPROVER = "mdctrhtp-appr", // "MDCT RHTP Approver"
-  HELP_DESK = "mdctrhtp-hd", // "MDCT RHTP Help Desk"
-  INTERNAL = "mdctrhtp-internal-user", // "MDCT RHTP Internal User"
-  STATE_USER = "mdctrhtp-state-user", // "MDCT RHTP State User"
+  ADMIN = "mdcthcbs-bor", // "MDCT RHTP Business Owner Representative"
+  APPROVER = "mdcthcbs-appr", // "MDCT RHTP Approver"
+  HELP_DESK = "mdcthcbs-hd", // "MDCT RHTP Help Desk"
+  INTERNAL = "mdcthcbs-internal-user", // "MDCT RHTP Internal User"
+  STATE_USER = "mdcthcbs-state-user", // "MDCT RHTP State User"
 }
 
 export interface User {
