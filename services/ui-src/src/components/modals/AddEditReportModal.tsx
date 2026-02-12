@@ -29,17 +29,6 @@ export type AddEditReportModalOptions = {
     topText?: string;
     yearHelperText?: string;
   };
-  /**
-   * If a report type has inputs to specify its creation options,
-   * those inputs will be included in this component.
-   * If not (as for TACM and CI), this will be undefined.
-   */
-  OptionsComponent?: (props: {
-    selectedReport: LiteReport | undefined;
-    onOptionsChange: (options: Record<string, any>) => void;
-    submissionAttempted: boolean;
-    setOptionsComplete: (isComplete: boolean) => void;
-  }) => ReactElement;
 };
 
 const buildModalOptions = (
@@ -61,7 +50,7 @@ export const AddEditReportModal = ({
   if (!isReportType(reportType)) return null;
 
   const dropdownYears = [{ label: "2026", value: "2026" }];
-  const { verbiage, OptionsComponent } = buildModalOptions(reportType);
+  const { verbiage } = buildModalOptions(reportType);
 
   const formDataForReport = (report: LiteReport | undefined) => ({
     reportTitle: report?.name ?? "",
@@ -72,8 +61,6 @@ export const AddEditReportModal = ({
   const [formData, setFormData] = useState(initialFormData);
   const [errorData, setErrorData] = useState({ reportTitle: "", year: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [submissionAttempted, setSubmissionAttempted] = useState(false);
-  const [optionsComplete, setOptionsComplete] = useState(!OptionsComponent);
   const readOnly = selectedReport?.status === ReportStatus.SUBMITTED;
   const [reportTitleFieldDirtied, setReportTitleFieldDirtied] = useState(false);
 
@@ -133,7 +120,6 @@ export const AddEditReportModal = ({
   };
   const onSubmit = async (evt: FormEvent) => {
     evt.preventDefault();
-    setSubmissionAttempted(true);
     const reportTitleError = await setErrorMessage(formData.reportTitle);
     const newErrorData = {
       reportTitle: reportTitleError,
@@ -141,10 +127,7 @@ export const AddEditReportModal = ({
     };
     setErrorData(newErrorData);
     const canSubmit =
-      optionsComplete &&
-      !newErrorData.reportTitle &&
-      !!formData.reportTitle &&
-      !!formData.year;
+      !newErrorData.reportTitle && !!formData.reportTitle && !!formData.year;
     if (!canSubmit) {
       return;
     }
@@ -161,7 +144,6 @@ export const AddEditReportModal = ({
       const reportOptions: ReportOptions = {
         name: userEnteredReportName,
         year: Number(formData.year),
-        options: formData.options,
       };
       await createReport(reportType, activeState, reportOptions);
       await reportHandler(reportType, activeState);
@@ -220,14 +202,6 @@ export const AddEditReportModal = ({
             options={dropdownYears}
             disabled={!!selectedReport}
           />
-          {OptionsComponent ? (
-            <OptionsComponent
-              selectedReport={selectedReport}
-              onOptionsChange={onOptionsChange}
-              submissionAttempted={submissionAttempted}
-              setOptionsComplete={setOptionsComplete}
-            />
-          ) : null}
         </Flex>
       </form>
     </Modal>
