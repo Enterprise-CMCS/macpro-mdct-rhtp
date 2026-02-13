@@ -1,4 +1,5 @@
 process.env.BannersTable = "local-banners";
+process.env.RhtpReportsTable = "local-rhtp-reports";
 
 /*
  * This mock mutes all logger output during tests! Including console errors!
