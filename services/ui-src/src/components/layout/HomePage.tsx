@@ -10,7 +10,7 @@ import { checkDateRangeStatus, useStore } from "utils";
 
 export const HomePage = () => {
   const { bannerData, bannerActive, setBannerActive } = useStore();
-  const { userIsAdmin } = useStore().user ?? {};
+  const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
 
   useEffect(() => {
     let bannerActivity = false;
@@ -33,9 +33,7 @@ export const HomePage = () => {
         </Box>
       </Collapse>
       <PageTemplate>
-        {userIsAdmin ? (
-          <AdminDashSelector />
-        ) : (
+        {userIsEndUser && !userIsAdmin ? (
           <>
             <Box>
               <Heading as="h1" variant="h1" paddingBottom="spacer3">
@@ -48,6 +46,8 @@ export const HomePage = () => {
             </Box>
             <RhtpIntroductionCard />
           </>
+        ) : (
+          <AdminDashSelector />
         )}
       </PageTemplate>
     </>
