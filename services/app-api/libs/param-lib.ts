@@ -46,3 +46,24 @@ export const parseBannerId = (event: APIGatewayProxyEvent) => {
 
   return { bannerId };
 };
+
+export const parseUploadParameters = (event: APIGatewayProxyEvent) => {
+  const { state, fileId } = event.pathParameters ?? {};
+  if (!fileId) {
+    logger.warn("Invalid file id in path");
+    return undefined;
+  }
+
+  return { state, fileId };
+};
+
+export const parseUploadViewParameters = (event: APIGatewayProxyEvent) => {
+  const { state, year } = event.pathParameters ?? {};
+
+  if (!state || !year) {
+    logger.warn("Invalid state or year in path");
+    return undefined;
+  }
+
+  return { state, year };
+}
