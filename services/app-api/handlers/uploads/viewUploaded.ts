@@ -1,31 +1,19 @@
-import handler from "../../libs/handler-lib";
-import dynamoDb from "../../libs/dynamodb-lib";
+import { handler } from "../../libs/handler-lib";
+import { parseUploadViewParameters } from "../../libs/param-lib";
+import { queryUpload } from "../../storage/upload";
+import { ok } from "../../libs/response-lib";
 /**
  * Updates the Sections associated with a given year and state
  */
-export const viewUploaded = handler(async (event, _context) => {
-  // State users are prohibited from accessing URLs for other states
-  if (!event.pathParameters) {
-    throw new Error("Path Parameters required");
-  }
-  const { state, year } = event.pathParameters;
-  const body = event.body ? JSON.parse(event.body) : null;
-  const { questionId } = body;
+export const viewUploaded = handler(
+  parseUploadViewParameters,
+  async (request) => {
+    const { state, year } = request.parameters;
+    const body = request.body;
+    const { questionId } = body as any;
 
-  const params = {
-    TableName: process.env.UploadsTable!,
-    KeyConditionExpression:
-      "#uploadedState = :uploadedState and begins_with(#fileId, :fileId)",
-    ExpressionAttributeNames: {
-      "#uploadedState": "uploadedState",
-      "#fileId": "fileId",
-    },
-    ExpressionAttributeValues: {
-      ":uploadedState": state,
-      ":fileId": `${year}-${questionId}`,
-    },
-  };
-
-  const queryValue = await dynamoDb.query(params);
-  return queryValue.Items;
-});
+    const fileId = `${year}-${questionId}`;
+    const queryValue = await queryUpload(fileId, state);
+    return ok(queryValue.Items);
+  },
+);
