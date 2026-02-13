@@ -7,7 +7,7 @@ import { runCommand } from "../lib/runner.ts";
 import { project, region } from "./consts.ts";
 
 export const getCloudFormationStackOutputValues = async (
-  stackName: string
+  stackName: string,
 ): Promise<Record<string, string>> => {
   const cloudFormationClient = new CloudFormationClient({
     region,
@@ -19,15 +19,15 @@ export const getCloudFormationStackOutputValues = async (
   return Object.fromEntries(
     outputs
       .map(
-        (o) => [o.OutputKey ?? (o as any).OutputName, o.OutputValue] as const
+        (o) => [o.OutputKey ?? (o as any).OutputName, o.OutputValue] as const,
       )
-      .filter(([k]) => Boolean(k)) as [string, string][]
+      .filter(([k]) => Boolean(k)) as [string, string][],
   );
 };
 
 const buildUiEnvObject = (
   stage: string,
-  cfnOutputs: Record<string, string>
+  cfnOutputs: Record<string, string>,
 ): Record<string, string> => {
   if (stage === "localstack") {
     return {
@@ -44,6 +44,8 @@ const buildUiEnvObject = (
       COGNITO_USER_POOL_ID: process.env.COGNITO_USER_POOL_ID!,
       COGNITO_IDP_NAME: "Okta",
       POST_SIGNOUT_REDIRECT: "http://localhost:3000/",
+      S3_ATTACHMENTS_BUCKET_REGION: "us-east-1",
+      S3_ATTACHMENTS_BUCKET_NAME: `uploads-${stage}-attachments-000000000000`,
       REACT_APP_LD_SDK_CLIENT: process.env.REACT_APP_LD_SDK_CLIENT!,
     };
   }
@@ -61,13 +63,15 @@ const buildUiEnvObject = (
     COGNITO_USER_POOL_ID: cfnOutputs.CognitoUserPoolId,
     COGNITO_IDP_NAME: "Okta",
     POST_SIGNOUT_REDIRECT: "https://test.home.idm.cms.gov/",
+    S3_ATTACHMENTS_BUCKET_REGION: region,
+    S3_ATTACHMENTS_BUCKET_NAME: cfnOutputs.AttachmentsBucketName,
     REACT_APP_LD_SDK_CLIENT: process.env.REACT_APP_LD_SDK_CLIENT!,
   };
 };
 
 export const runFrontendLocally = async (stage: string) => {
   const outputs = await getCloudFormationStackOutputValues(
-    `${project}-${stage}`
+    `${project}-${stage}`,
   );
   const envVars = buildUiEnvObject(stage, outputs);
   await writeLocalUiEnvFile(envVars);

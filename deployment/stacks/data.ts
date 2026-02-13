@@ -34,6 +34,16 @@ export function createDataComponents(props: CreateDataComponentsProps) {
         type: dynamodb.AttributeType.STRING,
       },
     }),
+    new DynamoDBTable(scope, "Uploads", {
+      stage,
+      isDev,
+      name: "uploads",
+      partitionKey: {
+        name: "uploadedState",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: { name: "fileId", type: dynamodb.AttributeType.STRING },
+    }),
   ];
 
   return { tables };
