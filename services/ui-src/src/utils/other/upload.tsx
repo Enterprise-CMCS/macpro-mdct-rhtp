@@ -1,7 +1,8 @@
-import { downloadData, getUrl, remove, uploadData } from "aws-amplify/storage";
-import React from "react";
+import { getUrl, uploadData } from "aws-amplify/storage";
+import React, { useState } from "react";
 
 export const createSafeS3Key = (s: string) => {
+  console.log("createSafeS3Key");
   return encodeURIComponent(s)
     .replace(/\*/g, "%2A")
     .replace(/\(/g, "%28")
@@ -9,11 +10,14 @@ export const createSafeS3Key = (s: string) => {
 };
 
 const uploadFile = async (file: any) => {
-  const [uploadStatus, setUploadStatus] = React.useState(0);
+  console.log("upload File");
+
   const fileToUpload = file;
 
   let retPromise;
   const targetPathname = `${Date.now()}/${createSafeS3Key(fileToUpload.name)}`;
+
+  console.log("targetPathname", targetPathname);
 
   try {
     const stored = await uploadData({
@@ -21,10 +25,10 @@ const uploadFile = async (file: any) => {
       data: fileToUpload,
       options: {
         contentType: fileToUpload.type,
-        onProgress: ({ transferredBytes, totalBytes }) => {
-          const progressRatio = (transferredBytes / totalBytes!) * 100;
-          setUploadStatus(progressRatio);
-        },
+        // onProgress: ({ transferredBytes, totalBytes }) => {
+        //   const progressRatio = (transferredBytes / totalBytes!) * 100;
+        //   // setUploadStatus(progressRatio);
+        // },
       },
     }).result;
 

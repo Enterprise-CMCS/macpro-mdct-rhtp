@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { uploadToBucket } from "utils/other/upload";
 
 export const Upload = () => {
-  const [isDragOver, setIsDragOver] = useState(false);
+  const [_isDragOver, setIsDragOver] = useState(false);
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   const acceptedFileTypes = [
@@ -28,6 +28,7 @@ export const Upload = () => {
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    //filter to only accepted file types
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
       .filter((file) => file != null);
@@ -51,9 +52,9 @@ export const Upload = () => {
     setFilesToUpload(files);
   };
 
-  const onUploadFiles = () => {
+  const onUploadFiles = async () => {
     const files = filesToUpload ?? [];
-    uploadToBucket(files);
+    await uploadToBucket(files);
   };
 
   return (
