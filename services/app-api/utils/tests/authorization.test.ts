@@ -38,8 +38,9 @@ describe("Authorization functions", () => {
   });
 
   describe("canWriteBanners", () => {
-    test("should forbid admins", () => {
-      expect(canWriteState(adminUser, "CO")).toBe(false);
+    // TODO: Change when we revert canWriteState. See the comment in the function
+    test("should TEMPORARILY allow admins", () => {
+      expect(canWriteState(adminUser, "CO")).toBe(true);
     });
 
     test("should allow state users to read their own state", () => {

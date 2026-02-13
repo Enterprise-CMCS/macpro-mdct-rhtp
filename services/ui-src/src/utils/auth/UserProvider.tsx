@@ -85,7 +85,10 @@ export const UserProvider = ({ children }: Props) => {
           userRole === UserRoles.ADMIN || userRole === UserRoles.APPROVER,
         userIsReadOnly:
           userRole === UserRoles.HELP_DESK || userRole === UserRoles.INTERNAL,
-        userIsEndUser: userRole === UserRoles.STATE_USER,
+        // TODO: For the first year, Admins will be entering data manually for the states
+        // Remove `|| userRole === UserRoles.ADMIN` below when we want to stop allowing Admins to create/edit reports.
+        userIsEndUser:
+          userRole === UserRoles.STATE_USER || userRole === UserRoles.ADMIN,
       };
       const currentUser: User = {
         email,
