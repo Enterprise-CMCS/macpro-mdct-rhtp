@@ -34,7 +34,7 @@ const testReport: Report = {
   pages: [
     {
       id: "root",
-      childPageIds: ["general-info", "req-measure-result"],
+      childPageIds: ["general-info", "mock-report-page"],
     },
     {
       id: "general-info",
@@ -59,15 +59,15 @@ const testReport: Report = {
       ],
     },
     {
-      id: "req-measure-result",
-      title: "Required Measure Results",
+      id: "mock-report-page",
+      title: "Mock Report Page",
       type: PageType.Standard,
       sidebar: true,
       elements: [
         {
           type: ElementType.Header,
           id: "",
-          text: "Required Measure Results",
+          text: "Mock Report Page",
         },
       ],
     },
@@ -94,8 +94,8 @@ describe("reportActions", () => {
   describe("state/management/reportState: setPage", () => {
     test("updates the page info", () => {
       const state = buildState(testReport, false) as ReportState;
-      const result = setPage("req-measure-result", state);
-      expect(result.currentPageId).toEqual("req-measure-result");
+      const result = setPage("mock-report-page", state);
+      expect(result.currentPageId).toEqual("mock-report-page");
     });
   });
 

@@ -300,7 +300,7 @@ export const elementObject: {
     pdfVariants: ["Buttonlink currently not used in PDFs"],
   },
   [ElementType.StatusTable]: {
-    description: "A table for displaying measure status",
+    description: "A table for displaying statuses",
     id: "id-status-table",
     variants: [<StatusTableElement />],
     pdfVariants: ["StatusTable currently not used in PDFs"],
@@ -312,7 +312,7 @@ export const elementObject: {
       <StatusAlert
         element={{
           type: ElementType.StatusAlert,
-          id: "measure-rates",
+          id: "id-status",
           title: "Status Title",
           text: "AlertTypes.SUCCESS",
           status: AlertTypes.SUCCESS,
@@ -321,7 +321,7 @@ export const elementObject: {
       <StatusAlert
         element={{
           type: ElementType.StatusAlert,
-          id: "measure-rates",
+          id: "id-status",
           title: "Status Title",
           text: "AlertTypes.ERROR",
           status: AlertTypes.ERROR,
@@ -330,7 +330,7 @@ export const elementObject: {
       <StatusAlert
         element={{
           type: ElementType.StatusAlert,
-          id: "measure-rates",
+          id: "id-status",
           title: "Status Title",
           text: "AlertTypes.INFO",
           status: AlertTypes.INFO,
@@ -339,7 +339,7 @@ export const elementObject: {
       <StatusAlert
         element={{
           type: ElementType.StatusAlert,
-          id: "measure-rates",
+          id: "id-status",
           title: "Status Title",
           text: "AlertTypes.WARNING",
           status: AlertTypes.WARNING,

@@ -22,7 +22,7 @@ const elements: PageElement[] = [
     label: "Reporting period start date",
     required: true,
     helperText:
-      "What is the reporting period Start Date applicable to the measure results?",
+      "What is the reporting period Start Date applicable to the results?",
   },
   {
     type: ElementType.Textbox,

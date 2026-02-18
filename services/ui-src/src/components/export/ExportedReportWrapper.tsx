@@ -22,20 +22,6 @@ export const renderReportDisplay = (
   return elements?.map((element: ReportTableType) => element.response);
 };
 
-const isStateReporting = (elements: PageElement[]) => {
-  const stateReportIndex = elements.findIndex((item) => {
-    return (
-      item.type === "radio" &&
-      item.clickAction === "qmReportingChange" &&
-      item.answer === "no"
-    );
-  });
-
-  return stateReportIndex > -1
-    ? elements.splice(0, stateReportIndex + 1)
-    : elements;
-};
-
 // Render helper text only if it exists and is not a warning.
 const getHelperText = (element: PageElement) => {
   if (!("helperText" in element)) return "";
@@ -55,9 +41,6 @@ export const ExportedReportWrapper = ({ section }: Props) => {
   });
 
   if (filteredElements == undefined) return null;
-
-  //removes follow up content for "is the state reporting on this measure?" question if the user selects no
-  const stateReportingFiltered = isStateReporting(filteredElements);
 
   const expandCheckedChildren = (elements: PageElement[]): PageElement[] => {
     return elements.flatMap((element) => {
@@ -81,7 +64,7 @@ export const ExportedReportWrapper = ({ section }: Props) => {
     });
   };
 
-  const expandedElements = expandCheckedChildren(stateReportingFiltered);
+  const expandedElements = expandCheckedChildren(filteredElements);
 
   const elements =
     expandedElements?.map((element) => {

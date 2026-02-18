@@ -2,9 +2,6 @@ import { Heading } from "@chakra-ui/react";
 import { ElementType, PageElement } from "types";
 import { notAnsweredText } from "../../constants";
 
-//for ignoring any elements within the page by their id
-const ignoreIdList = ["quality-measures-subheader"];
-
 //elements that are rendered as part of the table that does not need a unique renderer
 const tableElementList = [
   ElementType.Textbox,
@@ -20,8 +17,7 @@ export const shouldUseTable = (type: ElementType) => {
 
 export const renderElements = (element: PageElement) => {
   const { type } = element;
-  if (!renderElementList.includes(type) || ignoreIdList.includes(element.id))
-    return;
+  if (!renderElementList.includes(type)) return;
 
   switch (type) {
     case ElementType.SubHeader:

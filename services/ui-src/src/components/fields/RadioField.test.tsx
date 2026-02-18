@@ -13,13 +13,9 @@ const mockedUseElementIsHidden = useElementIsHidden as MockedFunction<
 >;
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
-const mockClearMeasure = vi.fn();
-const mockChangeDeliveryMethods = vi.fn();
 const mockSetAnswers = vi.fn();
 mockedUseStore.mockReturnValue({
   currentPageId: "my-id",
-  clearMeasure: mockClearMeasure,
-  changeDeliveryMethods: mockChangeDeliveryMethods,
   setAnswers: mockSetAnswers,
 });
 

@@ -12,7 +12,7 @@ export const DateField = (props: PageElementProps<DateTemplate>) => {
   const [displayValue, setDisplayValue] = useState(dateTextbox.answer ?? "");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Need to listen to prop updates from the parent for events like a measure clear
+  // Need to listen to prop updates from the parent for events
   useEffect(() => {
     setDisplayValue(dateTextbox.answer ?? "");
   }, [dateTextbox.answer]);
