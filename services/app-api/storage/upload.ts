@@ -8,7 +8,7 @@ import { QueryCommand } from "@aws-sdk/client-dynamodb";
 import s3 from "../libs/s3-lib";
 import { convertToDynamoExpression } from "../utils/convertToDynamoExpressionVars";
 
-const uploadTableName = process.env.attachmentsBucketName;
+const uploadTableName = process.env.UploadsTable!;
 const client = createClient();
 
 export const deleteUpload = async (
@@ -36,7 +36,6 @@ export const deleteUpload = async (
 export const updateUpload = async (
   state: string,
   year: string,
-  questionId: string,
   username: string,
   uploadedFileName: string,
   awsFilename: string,
@@ -47,14 +46,13 @@ export const updateUpload = async (
     uploadedDate: date.toString(),
     filename: uploadedFileName,
     awsFilename: awsFilename,
-    questionId: questionId,
   };
 
   const params = {
-    TableName: process.env.UploadsTable!,
+    TableName: uploadTableName,
     Key: {
       uploadedState: state,
-      fileId: `${year}-${questionId}_${awsFilename}`, // questionId is not unique outside of a year
+      fileId: `${year}-${awsFilename}`,
     },
     ...convertToDynamoExpression(uploadEntry, "post"),
   };
