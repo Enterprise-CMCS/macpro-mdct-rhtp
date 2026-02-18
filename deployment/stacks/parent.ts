@@ -101,6 +101,7 @@ export class ParentStack extends Stack {
       userPoolId,
       userPoolClientId,
       userPoolClientDomain: `${userPoolDomainName}.auth.${Aws.REGION}.amazoncognito.com`,
+      attachmentsBucketName: attachmentsBucketName!,
     });
 
     new CfnOutput(this, "CloudFrontUrl", {
