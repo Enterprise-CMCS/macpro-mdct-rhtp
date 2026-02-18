@@ -202,53 +202,37 @@ export type ParagraphTemplate = {
   weight?: string;
 };
 
-export type TextboxTemplate = {
+export type InputTemplate = {
+  id: string;
+  label: string;
+  helperText?: string;
+  answer?: string;
+  required: boolean;
+  disabled?: boolean;
+};
+
+export type TextboxTemplate = InputTemplate & {
   type: ElementType.Textbox;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: string;
-  required: boolean;
   hideCondition?: HideCondition;
 };
 
-export type NumberFieldTemplate = {
+export type NumberFieldTemplate = InputTemplate & {
   type: ElementType.NumberField;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: number;
-  required: boolean;
-  hideCondition?: never;
-};
-
-export type TextAreaBoxTemplate = {
-  type: ElementType.TextAreaField;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: string;
   hideCondition?: HideCondition;
-  required: boolean;
 };
 
-export type DateTemplate = {
+export type TextAreaBoxTemplate = InputTemplate & {
+  type: ElementType.TextAreaField;
+  hideCondition?: HideCondition;
+};
+
+export type DateTemplate = InputTemplate & {
   type: ElementType.Date;
-  id: string;
-  label: string;
-  helperText: string;
-  answer?: string;
-  required: boolean;
 };
 
-export type DropdownTemplate = {
+export type DropdownTemplate = InputTemplate & {
   type: ElementType.Dropdown;
-  id: string;
-  label: string;
   options: ChoiceTemplate[];
-  helperText?: string;
-  answer?: string;
-  required: boolean;
 };
 
 export type DividerTemplate = {
@@ -268,26 +252,16 @@ export type AccordionTemplate = {
   value: string;
 };
 
-export type RadioTemplate = {
+export type RadioTemplate = InputTemplate & {
   type: ElementType.Radio;
-  id: string;
-  label: string;
-  helperText?: string;
   choices: ChoiceTemplate[];
-  answer?: string;
-  required: boolean;
   hideCondition?: HideCondition;
   clickAction?: string;
 };
 
-export type CheckboxTemplate = {
+export type CheckboxTemplate = InputTemplate & {
   type: ElementType.Checkbox;
-  id: string;
-  label: string;
   choices: ChoiceTemplate[];
-  helperText?: string;
-  answer?: string[];
-  required: boolean;
 };
 
 export type ButtonLinkTemplate = {
