@@ -36,6 +36,7 @@ export const rhtpReportTemplate: ReportBase = {
           type: ElementType.Textbox,
           label: "Contact name",
           required: true,
+          disabled: true,
           helperText:
             "Enter a person's name or a position title for CMS to contact with questions about this report.",
         },

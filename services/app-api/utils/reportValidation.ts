@@ -58,6 +58,7 @@ const textboxTemplateSchema = object().shape({
   answer: string().notRequired(),
   required: boolean().required(),
   hideCondition: hideConditionSchema,
+  disabled: boolean().notRequired(),
 });
 
 const listInputTemplateSchema = object().shape({

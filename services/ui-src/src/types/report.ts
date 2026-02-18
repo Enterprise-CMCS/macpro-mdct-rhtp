@@ -196,6 +196,7 @@ export type TextboxTemplate = {
   answer?: string;
   required: boolean;
   hideCondition?: HideCondition;
+  disabled?: boolean;
 };
 
 export type NumberFieldTemplate = {
@@ -206,6 +207,7 @@ export type NumberFieldTemplate = {
   answer?: number;
   required: boolean;
   hideCondition?: never;
+  disabled?: boolean;
 };
 
 export type TextAreaBoxTemplate = {
