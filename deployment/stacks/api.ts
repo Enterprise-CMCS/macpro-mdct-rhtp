@@ -3,6 +3,7 @@ import {
   aws_apigateway as apigateway,
   aws_logs as logs,
   aws_wafv2 as wafv2,
+  aws_s3 as s3,
   aws_ec2 as ec2,
   CfnOutput,
   Duration,
@@ -22,10 +23,19 @@ interface CreateApiComponentsProps {
   vpc: ec2.IVpc;
   kafkaAuthorizedSubnets: ec2.ISubnet[];
   brokerString: string;
+  attachmentsBucket: s3.IBucket;
 }
 
 export function createApiComponents(props: CreateApiComponentsProps) {
-  const { scope, stage, project, isDev, brokerString, tables } = props;
+  const {
+    scope,
+    stage,
+    project,
+    isDev,
+    brokerString,
+    tables,
+    attachmentsBucket,
+  } = props;
 
   const service = "app-api";
 
@@ -57,7 +67,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
           "caller: $context.identity.caller, user: $context.identity.user, " +
           "requestTime: $context.requestTime, httpMethod: $context.httpMethod, " +
           "resourcePath: $context.resourcePath, status: $context.status, " +
-          "protocol: $context.protocol, responseLength: $context.responseLength"
+          "protocol: $context.protocol, responseLength: $context.responseLength",
       ),
     },
     defaultCorsPreflightOptions: {
@@ -85,10 +95,12 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   const environment = {
     NODE_OPTIONS: "--enable-source-maps",
     STAGE: stage,
+    attachmentsBucketName: attachmentsBucket.bucketName,
     ...Object.fromEntries(
-      tables.map((table) => [`${table.node.id}Table`, table.table.tableName])
+      tables.map((table) => [`${table.node.id}Table`, table.table.tableName]),
     ),
     brokerString,
+    ...(isLocalStack && { AWS_ENDPOINT_URL: process.env.AWS_ENDPOINT_URL }),
   };
 
   const commonProps = {
@@ -98,6 +110,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     environment,
     isDev,
     tables,
+    buckets: [attachmentsBucket],
   };
 
   // Banner handlers
@@ -166,6 +179,38 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "postUpload", {
+    entry: "services/app-api/handlers/uploads/createUploadPsUrl.ts",
+    handler: "psUpload",
+    path: "/psUrlUpload/{year}/{state}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "postDownload", {
+    entry: "services/app-api/handlers/uploads/createDownloadPsUrl.ts",
+    handler: "getSignedFileUrl",
+    path: "/psUrlDownload/{year}/{state}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "deleteUpload", {
+    entry: "services/app-api/handlers/uploads/delete.ts",
+    handler: "deleteUpload",
+    path: "/uploads/{year}/{state}/{fileId}",
+    method: "DELETE",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "viewUploads", {
+    entry: "services/app-api/handlers/uploads/viewUploaded.ts",
+    handler: "viewUploaded",
+    path: "/uploads/{year}/{state}",
+    method: "POST",
+    ...commonProps,
+  });
+
   if (!isLocalStack) {
     const waf = new WafConstruct(
       scope,
@@ -174,7 +219,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
         name: `${project}-${stage}-${service}`,
         blockRequestBodyOver8KB: false,
       },
-      "REGIONAL"
+      "REGIONAL",
     );
 
     new wafv2.CfnWebACLAssociation(scope, "WebACLAssociation", {

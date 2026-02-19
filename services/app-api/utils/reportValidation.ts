@@ -110,7 +110,7 @@ const dropdownTemplateSchema = object().shape({
       value: string().required(),
       checked: boolean().notRequired(),
       checkedChildren: lazy(() => array().of(pageElementSchema).notRequired()),
-    })
+    }),
   ),
   answer: string().notRequired(),
   required: boolean().required(),
@@ -162,6 +162,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return submissionParagraphSchema;
     case ElementType.ListInput:
       return listInputTemplateSchema;
+    case ElementType.AttachmentArea:
+      return attachmentAreaSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -178,7 +180,7 @@ const radioTemplateSchema = object().shape({
       value: string().required(),
       checked: boolean().notRequired(),
       checkedChildren: lazy(() => array().of(pageElementSchema).notRequired()),
-    })
+    }),
   ),
   answer: string().notRequired(),
   required: boolean().required(),
@@ -197,7 +199,7 @@ const checkboxTemplateSchema = object().shape({
       value: string().required(),
       checked: boolean().notRequired(),
       checkedChildren: lazy(() => array().of(pageElementSchema).notRequired()),
-    })
+    }),
   ),
   answer: array().of(string()).notRequired(),
   required: boolean().required(),
@@ -209,6 +211,14 @@ const buttonLinkTemplateSchema = object().shape({
   label: string().optional(),
   to: string().optional(),
   style: string().optional(),
+});
+
+const attachmentAreaSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
+  id: string().required(),
+  label: string().required(),
+  helperText: string().optional(),
+  required: boolean().required(),
 });
 
 const dividerSchema = object().shape({
@@ -282,12 +292,12 @@ const pagesSchema = array()
             return formPageTemplateSchema;
         }
       }
-    })
+    }),
   )
   .required();
 
 export const isReportOptions = (
-  obj: object | undefined
+  obj: object | undefined,
 ): obj is ReportOptions => {
   const reportOptionsValidationSchema = object()
     .shape({
@@ -315,7 +325,7 @@ const reportValidateSchema = object().shape({
     .of(
       object().shape({
         submitted: number().notRequired(),
-      })
+      }),
     )
     .notRequired(),
   submittedBy: string().notRequired(),
@@ -347,7 +357,7 @@ export const validateReportPayload = async (payload: object | undefined) => {
 };
 
 export const validateReportEditPayload = async (
-  payload: object | undefined
+  payload: object | undefined,
 ) => {
   if (!payload) {
     throw new Error(error.MISSING_DATA);
