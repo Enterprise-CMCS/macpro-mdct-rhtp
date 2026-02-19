@@ -1,15 +1,16 @@
-import { Box, Button, Heading, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Box, Button, Text } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
 } from "utils/other/fileApi";
 
-export const Upload = () => {
+export const Upload = ({ year }: { year: string }) => {
   const [_isDragOver, setIsDragOver] = useState(false);
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
-  const { state, year } = useParams();
+  const [filesToUploaded, setFilesToUploaded] = useState<File[]>();
+  const { state } = useParams();
 
   const acceptedFileTypes = [
     ".ppt",
@@ -21,6 +22,17 @@ export const Upload = () => {
     ".jpeg",
     ".png",
   ];
+
+  useEffect(() => {
+    if (filesToUpload && filesToUpload.length > 0) {
+      const fetchData = async () =>
+        await onUploadFiles().then(() => {
+          setFilesToUploaded([...(filesToUploaded ?? []), ...filesToUpload]);
+          setFilesToUpload([]);
+        });
+      fetchData();
+    }
+  }, [filesToUpload]);
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -71,7 +83,9 @@ export const Upload = () => {
         file,
       );
 
-      await uploadFileToS3(presignedPostData, file);
+      await uploadFileToS3(presignedPostData, file).then((response) => {
+        console.log("response", response);
+      });
     }
   };
 
@@ -85,9 +99,9 @@ export const Upload = () => {
         onDragLeave={handleDragLeave}
       >
         <span>
-          Drag & drop files or
+          Drag files here or
           <label id="drop-zone">
-            Browse
+            Choose from folder
             <input
               type="file"
               id="file-input"
@@ -111,10 +125,24 @@ export const Upload = () => {
         ))}
       </ul>
       <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
-      <Box sx={sx.containerButtons}>
+      <ul>
+        {filesToUploaded?.map((file, fileIdx) => (
+          <li>
+            {file?.name}{" "}
+            <Button variant="unstyled" onClick={() => onRemove(fileIdx)}>
+              x
+            </Button>
+          </li>
+        ))}
+      </ul>
+      <Text sx={sx.uploadedLabel}>
+        These files have been attached to the stage and checkpoint selected
+        above.
+      </Text>
+      {/* <Box sx={sx.containerButtons}>
         <Button onClick={onUploadFiles}>Upload Files</Button>
         <Button variant="link">Cancel</Button>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

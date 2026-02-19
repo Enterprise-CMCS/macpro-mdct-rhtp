@@ -29,7 +29,6 @@ import { useStore } from "utils";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
-import { Upload } from "components/fields/Upload";
 
 export const DashboardPage = () => {
   const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
@@ -117,7 +116,6 @@ export const DashboardPage = () => {
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
         Return home
       </Link>
-      <Upload />
       <Box sx={sx.leadTextBox}>
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}

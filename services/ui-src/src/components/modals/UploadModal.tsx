@@ -1,7 +1,11 @@
 import { Modal } from "components";
 import { Upload } from "components/fields/Upload";
+import { useStore } from "utils";
 
 export const UploadModal = ({ modalDisclosure }: Props) => {
+  const { report } = useStore();
+  const year = report?.year.toString() ?? "";
+
   return (
     <Modal
       data-testid="upload-modal"
@@ -14,7 +18,7 @@ export const UploadModal = ({ modalDisclosure }: Props) => {
         closeButtonText: undefined,
       }}
     >
-      <Upload />
+      <Upload year={year} />
     </Modal>
   );
 };
