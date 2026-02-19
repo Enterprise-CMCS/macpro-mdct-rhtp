@@ -6,10 +6,9 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
-import { ElementType, PageElement } from "types/report";
 import { useStore } from "utils";
 import { Page } from "./Page";
-import { AlertTypes } from "types";
+import { AlertTypes, ElementType, PageElement } from "types";
 
 vi.mock("react-router-dom", () => ({
   useNavigate: vi.fn(),

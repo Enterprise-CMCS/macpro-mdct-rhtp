@@ -1,6 +1,6 @@
 import { apiLib } from "utils";
 import { getRequestHeaders } from "./getRequestHeaders";
-import { LiteReport, Report, ReportOptions } from "types/report";
+import { LiteReport, Report, ReportOptions } from "types";
 
 export async function createReport(
   reportType: string,

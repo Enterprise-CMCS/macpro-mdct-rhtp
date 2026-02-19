@@ -2,8 +2,7 @@
  * File wrapping high level actions away from the useStore file for cleanliness.
  * This contains the root for logic for actions such as updating an answer, saving, etc.
  */
-import { ReportState } from "types";
-import { PageStatus, ParentPageTemplate, Report } from "types/report";
+import { PageStatus, ParentPageTemplate, Report, ReportState } from "types";
 import { putReport } from "utils/api/requestMethods/report";
 import { getLocalHourMinuteTime } from "utils";
 

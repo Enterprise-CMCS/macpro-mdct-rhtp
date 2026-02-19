@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TextAreaField } from "components";
 import { testA11y } from "utils/testing/commonTests";
-import { ElementType, TextAreaBoxTemplate } from "types/report";
+import { ElementType, TextAreaBoxTemplate } from "types";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { useState } from "react";
 

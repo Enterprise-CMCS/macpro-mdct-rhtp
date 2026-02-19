@@ -1,6 +1,6 @@
 import { DateField } from "components/fields/DateField";
 import { testA11y } from "utils/testing/commonTests";
-import { DateTemplate, ElementType } from "types/report";
+import { DateTemplate, ElementType } from "types";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
