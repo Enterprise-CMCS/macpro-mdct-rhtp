@@ -29,6 +29,7 @@ import { useStore } from "utils";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
+import { Upload } from "components/fields/Upload";
 
 export const DashboardPage = () => {
   const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
@@ -36,12 +37,12 @@ export const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<LiteReport[]>([]);
   const [selectedReport, setSelectedReport] = useState<LiteReport | undefined>(
-    undefined
+    undefined,
   );
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [dropdownValue, setDropdownValue] = useState(
-    searchParams.get("year") || "All"
+    searchParams.get("year") || "All",
   );
 
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
@@ -64,7 +65,7 @@ export const DashboardPage = () => {
       setFilteredReports(reports);
     } else {
       setFilteredReports(
-        reports.filter((report) => String(report.year) === filterYear)
+        reports.filter((report) => String(report.year) === filterYear),
       );
     }
   }, [reports, filterYear]);
@@ -116,7 +117,7 @@ export const DashboardPage = () => {
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
         Return home
       </Link>
-
+      <Upload />
       <Box sx={sx.leadTextBox}>
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}

@@ -27,7 +27,15 @@ interface CreateApiComponentsProps {
 }
 
 export function createApiComponents(props: CreateApiComponentsProps) {
-  const { scope, stage, project, isDev, brokerString, tables, attachmentsBucket } = props;
+  const {
+    scope,
+    stage,
+    project,
+    isDev,
+    brokerString,
+    tables,
+    attachmentsBucket,
+  } = props;
 
   const service = "app-api";
 

@@ -8,7 +8,6 @@ import {
 } from "@cmsgov/design-system";
 import { DropdownOptions, ReportType, getReportName } from "types";
 import { StateNames } from "../../constants";
-import { Upload } from "components/fields/Upload";
 
 const reportChoices = Object.values(ReportType).map((type) => {
   return {
@@ -54,7 +53,6 @@ export const AdminDashSelector = () => {
       <Heading as="h1" sx={sx.headerText}>
         View State/Territory Reports
       </Heading>
-      <Upload/>
 
       <form onSubmit={handleSubmit}>
         <>

@@ -3,7 +3,6 @@ import s3 from "../../libs/s3-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { parseUploadViewParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
-import { convertToDynamoExpression } from "../../utils/convertToDynamoExpressionVars";
 import { updateUpload } from "../../storage/upload";
 /**
  * Updates the Sections associated with a given year and state
@@ -11,8 +10,7 @@ import { updateUpload } from "../../storage/upload";
 export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const { user, body } = request;
   // Format Info
-  const { uploadedFileName, questionId } = body as any;
-
+  const { uploadedFileName } = body as any;
   const { state, year } = request.parameters;
 
   const username = user.email ?? "";
@@ -21,16 +19,9 @@ export const psUpload = handler(parseUploadViewParameters, async (request) => {
     .toString()
     .padStart(7, "0"); // including a random value allows docs titled the same thing to be uploaded multiple times
   const dateString = `${date.getFullYear()}${date.getMonth()}${date.getDay()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}`;
-  const awsFilename = `${username}_${randomValue}_${dateString}_${uploadedFileName}`;
+  const awsFilename = `${randomValue}_${dateString}_${uploadedFileName}`;
 
-  await updateUpload(
-    state,
-    year,
-    questionId,
-    username,
-    uploadedFileName,
-    awsFilename,
-  );
+  await updateUpload(state, year, username, uploadedFileName, awsFilename);
 
   // Pre-sign url
   let psurl = await s3.createPresignedPost({
@@ -38,5 +29,5 @@ export const psUpload = handler(parseUploadViewParameters, async (request) => {
     Key: awsFilename,
   });
   psurl = fixLocalstackUrl(psurl);
-  return ok(psurl);
+  return ok({ psurl: psurl });
 });

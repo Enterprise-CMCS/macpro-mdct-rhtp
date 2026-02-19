@@ -60,10 +60,15 @@ export const parseUploadParameters = (event: APIGatewayProxyEvent) => {
 export const parseUploadViewParameters = (event: APIGatewayProxyEvent) => {
   const { state, year } = event.pathParameters ?? {};
 
+  if (!isStateAbbreviation(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+
   if (!state || !year) {
     logger.warn("Invalid state or year in path");
     return undefined;
   }
 
   return { state, year };
-}
+};

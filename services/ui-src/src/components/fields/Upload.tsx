@@ -1,10 +1,12 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { uploadToBucket } from "utils/other/upload";
 
 export const Upload = () => {
   const [_isDragOver, setIsDragOver] = useState(false);
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
+  const { state } = useParams();
 
   const acceptedFileTypes = [
     ".ppt",
@@ -54,7 +56,7 @@ export const Upload = () => {
 
   const onUploadFiles = async () => {
     const files = filesToUpload ?? [];
-    await uploadToBucket(files);
+    await uploadToBucket(files, state!);
   };
 
   return (
