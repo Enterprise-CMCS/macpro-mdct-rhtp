@@ -4,13 +4,14 @@ import { fixLocalstackUrl } from "../../libs/localstack";
 import { parseUploadViewParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { updateUpload } from "../../storage/upload";
+import { UploadFileData } from "../../types/uploads";
 /**
  * Updates the Sections associated with a given year and state
  */
 export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const { user, body } = request;
   // Format Info
-  const { uploadedFileName } = body as any;
+  const { uploadedFileName } = body as UploadFileData;
   const { state, year } = request.parameters;
 
   const username = user.email ?? "";

@@ -1,12 +1,15 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { uploadToBucket } from "utils/other/upload";
+import {
+  recordFileInDatabaseAndGetUploadUrl,
+  uploadFileToS3,
+} from "utils/other/fileApi";
 
 export const Upload = () => {
   const [_isDragOver, setIsDragOver] = useState(false);
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
-  const { state } = useParams();
+  const { state, year } = useParams();
 
   const acceptedFileTypes = [
     ".ppt",
@@ -55,12 +58,26 @@ export const Upload = () => {
   };
 
   const onUploadFiles = async () => {
+    if (!year || !state) {
+      throw new Error("Undefined year or state parameter");
+    }
+
     const files = filesToUpload ?? [];
-    await uploadToBucket(files, state!);
+    for (var i = 0; i < files.length; i++) {
+      const file = files[i];
+      const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
+        year,
+        state,
+        file,
+      );
+
+      await uploadFileToS3(presignedPostData, file);
+    }
   };
 
   return (
     <Box sx={sx.container}>
+      <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
       <Box
         sx={sx.uploadBox}
         onDrop={handleDrop}
@@ -82,8 +99,7 @@ export const Upload = () => {
         </span>
         <span> Supported formats: JPEG, PNG, PDF, CSV, Word, PPT</span>
       </Box>
-      <Heading>Uploading</Heading>
-      <Text sx={sx.uploadedLabel}>Uploaded</Text>
+      <Text sx={sx.uploadedLabel}>Selected Files</Text>
       <ul>
         {filesToUpload?.map((file, fileIdx) => (
           <li>
@@ -94,6 +110,7 @@ export const Upload = () => {
           </li>
         ))}
       </ul>
+      <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
       <Box sx={sx.containerButtons}>
         <Button onClick={onUploadFiles}>Upload Files</Button>
         <Button variant="link">Cancel</Button>
@@ -104,10 +121,6 @@ export const Upload = () => {
 
 const sx = {
   container: {
-    border: "1px solid black",
-    padding: "2rem",
-    margin: "4rem",
-
     h2: {
       margin: "1.5rem 0",
       fontWeight: "700",

@@ -6,7 +6,7 @@ interface PathURL {
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
-  year: number,
+  year: string,
   stateCode: string,
   uploadedFile: File,
 ) => {

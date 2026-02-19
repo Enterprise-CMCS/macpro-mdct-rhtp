@@ -123,6 +123,7 @@ export enum ElementType {
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
   EligibilityTable = "eligibilityTable",
+  AttachmentArea = "attachmentArea",
 }
 
 export type PageElement =
@@ -144,7 +145,8 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | SubmissionParagraphTemplate
-  | ListInputTemplate;
+  | ListInputTemplate
+  | AttachmentAreaTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -321,4 +323,12 @@ export type StatusAlertTemplate = {
   title: string;
   text: string;
   status: AlertTypes;
+};
+
+export type AttachmentAreaTemplate = {
+  type: ElementType.AttachmentArea;
+  id: string;
+  label: string;
+  helperText?: string;
+  required: boolean;
 };

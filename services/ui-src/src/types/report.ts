@@ -5,7 +5,7 @@ export enum ReportType {
 }
 
 export const isReportType = (
-  reportType: string | undefined
+  reportType: string | undefined,
 ): reportType is ReportType => {
   return Object.values(ReportType).includes(reportType as ReportType);
 };
@@ -91,13 +91,13 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 }
 
 export const isReviewSubmitPage = (
-  page: PageTemplate
+  page: PageTemplate,
 ): page is ReviewSubmitTemplate => {
   return page.type === PageType.ReviewSubmit && "submittedView" in page;
 };
 
 export const isFormPageTemplate = (
-  page: PageTemplate
+  page: PageTemplate,
 ): page is FormPageTemplate => {
   return (page as FormPageTemplate).title != undefined;
 };
@@ -127,6 +127,7 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  AttachmentArea = "attachmentArea",
 }
 
 export type PageElement =
@@ -146,7 +147,8 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | ListInputTemplate
-  | SubmissionParagraphTemplate;
+  | SubmissionParagraphTemplate
+  | AttachmentAreaTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -298,6 +300,14 @@ export type ListInputTemplate = {
   helperText: string;
   buttonText: string;
   answer?: string[];
+  required: boolean;
+};
+
+export type AttachmentAreaTemplate = {
+  type: ElementType.AttachmentArea;
+  id: string;
+  label: string;
+  helperText?: string;
   required: boolean;
 };
 
