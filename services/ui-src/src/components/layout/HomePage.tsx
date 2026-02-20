@@ -10,7 +10,7 @@ import { checkDateRangeStatus, useStore } from "utils";
 
 export const HomePage = () => {
   const { bannerData, bannerActive, setBannerActive } = useStore();
-  const { userIsEndUser } = useStore().user ?? {};
+  const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
 
   useEffect(() => {
     let bannerActivity = false;
@@ -33,8 +33,7 @@ export const HomePage = () => {
         </Box>
       </Collapse>
       <PageTemplate>
-        {/* show standard view to state users */}
-        {userIsEndUser ? (
+        {userIsEndUser && !userIsAdmin ? (
           <>
             <Box>
               <Heading as="h1" variant="h1" paddingBottom="spacer3">
@@ -48,7 +47,6 @@ export const HomePage = () => {
             <RhtpIntroductionCard />
           </>
         ) : (
-          // show read-only view to non-state users
           <AdminDashSelector />
         )}
       </PageTemplate>
