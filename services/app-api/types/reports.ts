@@ -4,8 +4,10 @@ export enum ReportType {
   RHTP = "RHTP",
 }
 
-export const isReportType = (x: string | undefined): x is ReportType => {
-  return Object.values(ReportType).includes(x as ReportType);
+export const isReportType = (
+  reportType: string | undefined
+): reportType is ReportType => {
+  return Object.values(ReportType).includes(reportType as ReportType);
 };
 
 export interface ReportOptions {
@@ -93,7 +95,6 @@ export enum PageType {
 export enum ElementType {
   Header = "header",
   SubHeader = "subHeader",
-  NestedHeading = "nestedHeading",
   Textbox = "textbox",
   TextAreaField = "textAreaField",
   NumberField = "numberField",
@@ -116,7 +117,6 @@ export enum ElementType {
 export type PageElement =
   | HeaderTemplate
   | SubHeaderTemplate
-  | NestedHeadingTemplate
   | TextboxTemplate
   | NumberFieldTemplate
   | TextAreaBoxTemplate
@@ -145,131 +145,11 @@ export type ChoiceTemplate = {
   checkedChildren?: PageElement[];
 };
 
-export enum HeaderIcon {
-  Check = "check",
-}
-
-export type HeaderTemplate = {
-  type: ElementType.Header;
-  id: string;
-  text: string;
-  icon?: HeaderIcon;
-};
-
-export const isHeaderTemplate = (
-  element: PageElement
-): element is HeaderTemplate => {
-  return element.type === ElementType.Header;
-};
-
-export type SubHeaderTemplate = {
-  type: ElementType.SubHeader;
-  id: string;
-  text: string;
-  helperText?: string;
-  hideCondition?: HideCondition;
-};
-
-export type NestedHeadingTemplate = {
-  type: ElementType.NestedHeading;
-  id: string;
-  text: string;
-};
-
-export type ParagraphTemplate = {
-  type: ElementType.Paragraph;
-  id: string;
-  title?: string;
-  text: string;
-  weight?: string;
-};
-
-export type TextboxTemplate = {
-  type: ElementType.Textbox;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: string;
-  required: boolean;
-  hideCondition?: HideCondition;
-};
-
-export type NumberFieldTemplate = {
-  type: ElementType.NumberField;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: number;
-  required: boolean;
-  hideCondition?: never;
-};
-
-export type TextAreaBoxTemplate = {
-  type: ElementType.TextAreaField;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: string;
-  hideCondition?: HideCondition;
-  required: boolean;
-};
-
-export type DateTemplate = {
-  type: ElementType.Date;
-  id: string;
-  label: string;
-  helperText: string;
-  answer?: string;
-  required: boolean;
-};
-
-export type DropdownTemplate = {
-  type: ElementType.Dropdown;
-  id: string;
-  label: string;
-  options: ChoiceTemplate[];
-  helperText?: string;
-  answer?: string;
-  required: boolean;
-};
-
-export type DividerTemplate = {
-  type: ElementType.Divider;
-  id: string;
-};
-
-export type SubmissionParagraphTemplate = {
-  type: ElementType.SubmissionParagraph;
-  id: string;
-};
-
 export type AccordionTemplate = {
   type: ElementType.Accordion;
   id: string;
   label: string;
   value: string;
-};
-
-export type RadioTemplate = {
-  type: ElementType.Radio;
-  id: string;
-  label: string;
-  helperText?: string;
-  choices: ChoiceTemplate[];
-  answer?: string;
-  required: boolean;
-  hideCondition?: HideCondition;
-  clickAction?: string;
-};
-
-export type CheckboxTemplate = {
-  type: ElementType.Checkbox;
-  id: string;
-  label: string;
-  choices: ChoiceTemplate[];
-  helperText?: string;
-  answer?: string[];
-  required: boolean;
 };
 
 export type ButtonLinkTemplate = {
@@ -280,15 +160,9 @@ export type ButtonLinkTemplate = {
   style?: string;
 };
 
-export type ListInputTemplate = {
-  type: ElementType.ListInput;
+export type DividerTemplate = {
+  type: ElementType.Divider;
   id: string;
-  label: string;
-  fieldLabel: string;
-  helperText: string;
-  buttonText: string;
-  answer?: string[];
-  required: boolean;
 };
 
 export type StatusTableTemplate = {
@@ -297,10 +171,98 @@ export type StatusTableTemplate = {
   to: PageId;
 };
 
-export type StatusAlertTemplate = {
-  type: ElementType.StatusAlert;
+export type SubmissionParagraphTemplate = {
+  type: ElementType.SubmissionParagraph;
   id: string;
-  title: string;
-  text: string;
-  status: AlertTypes;
 };
+
+export enum HeaderIcon {
+  Check = "check",
+}
+
+interface DisplayElementTemplate {
+  type: ElementType;
+  id: string;
+  text: string;
+}
+
+export interface HeaderTemplate extends DisplayElementTemplate {
+  type: ElementType.Header;
+  icon?: HeaderIcon;
+}
+
+export interface ParagraphTemplate extends DisplayElementTemplate {
+  type: ElementType.Paragraph;
+  title?: string;
+  weight?: string;
+}
+
+export interface StatusAlertTemplate extends DisplayElementTemplate {
+  type: ElementType.StatusAlert;
+  title: string;
+  status: AlertTypes;
+}
+
+export interface SubHeaderTemplate extends DisplayElementTemplate {
+  type: ElementType.SubHeader;
+  helperText?: string;
+  hideCondition?: HideCondition;
+}
+
+interface InputElementTemplate {
+  type: ElementType;
+  id: string;
+  label: string;
+  helperText?: string;
+  required: boolean;
+}
+
+export interface CheckboxTemplate extends InputElementTemplate {
+  type: ElementType.Checkbox;
+  choices: ChoiceTemplate[];
+  answer?: string[];
+}
+
+export interface DateTemplate extends InputElementTemplate {
+  type: ElementType.Date;
+  answer?: string;
+}
+
+export interface DropdownTemplate extends InputElementTemplate {
+  type: ElementType.Dropdown;
+  options: ChoiceTemplate[];
+  answer?: string;
+}
+
+export interface ListInputTemplate extends InputElementTemplate {
+  type: ElementType.ListInput;
+  fieldLabel: string;
+  buttonText: string;
+  answer?: string[];
+}
+
+export interface NumberFieldTemplate extends InputElementTemplate {
+  type: ElementType.NumberField;
+  answer?: number;
+  hideCondition?: never;
+}
+
+export interface RadioTemplate extends InputElementTemplate {
+  type: ElementType.Radio;
+  choices: ChoiceTemplate[];
+  answer?: string;
+  hideCondition?: HideCondition;
+  clickAction?: string;
+}
+
+export interface TextAreaBoxTemplate extends InputElementTemplate {
+  type: ElementType.TextAreaField;
+  answer?: string;
+  hideCondition?: HideCondition;
+}
+
+export interface TextboxTemplate extends InputElementTemplate {
+  type: ElementType.Textbox;
+  answer?: string;
+  hideCondition?: HideCondition;
+}

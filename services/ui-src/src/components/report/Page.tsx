@@ -13,7 +13,7 @@ import {
   ElementType,
   PageElement,
   ReportStatus,
-} from "../../types/report";
+} from "../../types";
 import {
   DateField,
   DropdownField,

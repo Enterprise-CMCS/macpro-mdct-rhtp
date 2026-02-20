@@ -3,12 +3,12 @@ import { devtools, persist } from "zustand/middleware";
 import {
   UserState,
   User,
+  Report,
   ReportState,
   BannerData,
   ErrorVerbiage,
   AdminBannerState,
 } from "types";
-import { Report } from "types/report";
 import { ReactNode } from "react";
 import {
   buildState,

@@ -22,12 +22,6 @@ const report = {
   lastEdited: 1751987780396,
   lastEditedBy: "last edited",
   status: "In progress",
-  options: {
-    cahps: true,
-    nciidd: false,
-    nciad: true,
-    pom: false,
-  },
 };
 
 describe("ExportedReportPage", () => {

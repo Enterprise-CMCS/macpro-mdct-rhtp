@@ -1,14 +1,14 @@
-import { ReportState } from "types";
 import {
   ElementType,
   PageStatus,
   PageType,
   Report,
+  ReportState,
   ReportStatus,
   ReportType,
   TextboxTemplate,
   FormPageTemplate,
-} from "types/report";
+} from "types";
 import {
   buildState,
   mergeAnswers,
@@ -25,7 +25,6 @@ const testReport: Report = {
   type: ReportType.RHTP,
   name: "plan id",
   year: 2026,
-  options: {},
   state: "NJ",
   id: "NJRHTP123",
   status: ReportStatus.NOT_STARTED,

@@ -1,6 +1,12 @@
-import { ParentPageTemplate, PageData, Report } from "types/report";
 import { ReactNode } from "react";
-import { BannerData, ErrorVerbiage, User } from "types";
+import {
+  BannerData,
+  ErrorVerbiage,
+  ParentPageTemplate,
+  PageData,
+  Report,
+  User,
+} from "types";
 
 export interface AdminBannerState {
   bannerData: BannerData | undefined;
