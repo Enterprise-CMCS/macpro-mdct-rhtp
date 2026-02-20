@@ -42,9 +42,9 @@ export const submittableMetricsSelector = (state: ReportState) => {
     const pageIdx = pageMap.get(id);
     if (!pageIdx) return null;
     const section = report.pages[pageIdx] as ParentPageTemplate;
-    // TODO: fix to actually check status
-    let displayStatus = PageStatus.IN_PROGRESS;
-    let submittable = false;
+    // TODO: fix to actually check status and readiness to submit
+    const displayStatus = PageStatus.IN_PROGRESS;
+    const submittable = true;
 
     return {
       section: section,
