@@ -50,7 +50,7 @@ export interface ReportState {
   setModalOpen: (modalOpen: boolean) => void;
   setModalComponent: (modalComponent: ReactNode, modalHeader: string) => void;
   setAnswers: (answers: any) => void;
-  completePage: (measureId: string) => void;
+  completePage: (pageId: string) => void;
   setSidebar: (sidebarOpen: boolean) => void;
   saveReport: () => void;
 }

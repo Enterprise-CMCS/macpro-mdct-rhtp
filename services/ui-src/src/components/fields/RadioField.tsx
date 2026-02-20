@@ -50,16 +50,6 @@ const formatChoices = (
   });
 };
 
-const hintTextColor = (clickAction: string) => {
-  switch (clickAction) {
-    case "qmReportingChange":
-    case "qmDeliveryMethodChange":
-      return "palette.warn_darkest";
-    default:
-      return "palette.gray_dark";
-  }
-};
-
 export const RadioField = (props: PageElementProps<RadioTemplate>) => {
   const radio = props.element;
   const { currentPageId } = useStore();
@@ -75,7 +65,7 @@ export const RadioField = (props: PageElementProps<RadioTemplate>) => {
     React.ChangeEvent<HTMLInputElement> | undefined
   >();
 
-  // Need to listen to prop updates from the parent for events like a measure clear
+  // Need to listen to prop updates from the parent for events
   useEffect(() => {
     setDisplayValue(
       formatChoices(radio.choices, radio.answer, props.updateElement)
@@ -103,11 +93,7 @@ export const RadioField = (props: PageElementProps<RadioTemplate>) => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
-    if (
-      radio.clickAction === "qmDeliveryMethodChange" &&
-      radio.answer &&
-      eventToBeConfirmed === undefined
-    ) {
+    if (radio.answer && eventToBeConfirmed === undefined) {
       setEventToBeConfirmed(event);
       return radioModalOnOpenHandler();
     }
@@ -128,7 +114,7 @@ export const RadioField = (props: PageElementProps<RadioTemplate>) => {
 
   const parsedHint = (
     // This is as="span" because it is inside a CMSDS Hint, which is a <p>.
-    <Box as="span" color={hintTextColor(radio.clickAction!)}>
+    <Box as="span" color="palette.gray_dark">
       {radio.helperText && parseHtml(radio.helperText)}
     </Box>
   );
@@ -157,8 +143,6 @@ export const RadioField = (props: PageElementProps<RadioTemplate>) => {
         onConfirmHandler={modalConfirmHandler}
         content={{
           heading: "Are you sure?",
-          subheading:
-            "Warning: Changing this response will clear any data previously entered in the corresponding delivery system measure results sections.",
           actionButtonText: "Yes",
           closeButtonText: "No",
         }}

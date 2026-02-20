@@ -21,10 +21,6 @@ const mockedTextboxElement: TextboxTemplate = {
   type: ElementType.Textbox,
   label: "test label",
   helperText: "helper text",
-  hideCondition: {
-    controllerElementId: "measure-reporting-radio",
-    answer: "no",
-  },
   required: true,
 };
 
@@ -89,7 +85,7 @@ describe("<TextField />", () => {
     expect(textField).toHaveValue("123");
   });
 
-  test("NumberField should respond to measure clear", () => {
+  test("NumberField should respond to rerender", () => {
     const props = {
       element: {
         ...mockedNumberField,

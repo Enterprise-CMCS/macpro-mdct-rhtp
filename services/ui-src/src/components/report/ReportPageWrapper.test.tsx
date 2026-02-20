@@ -1,11 +1,5 @@
 import { MockedFunction } from "vitest";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   ElementType,
@@ -16,7 +10,6 @@ import {
 } from "types/report";
 import { ReportPageWrapper } from "./ReportPageWrapper";
 import { useStore } from "utils";
-import { ReportAutosaveProvider } from "./ReportAutosaveProvider";
 
 const testReport: Report = {
   type: ReportType.RHTP,
@@ -30,7 +23,7 @@ const testReport: Report = {
   pages: [
     {
       id: "root",
-      childPageIds: ["general-info", "req-measure-result"],
+      childPageIds: ["general-info", "mock-report-page"],
     },
     {
       id: "general-info",
@@ -55,15 +48,15 @@ const testReport: Report = {
       ],
     },
     {
-      id: "req-measure-result",
-      title: "Required Measure Results",
+      id: "mock-report-page",
+      title: "Mock Report Page",
       type: PageType.Standard,
       sidebar: true,
       elements: [
         {
           type: ElementType.Header,
           id: "",
-          text: "Required Measure Results",
+          text: "Mock Report Page",
         },
       ],
     },
@@ -97,12 +90,12 @@ const setupMockStore = (customState?: Partial<any>) => {
       pageMap: new Map([
         ["root", 0],
         ["general-info", 1],
-        ["req-measure-result", 2],
+        ["mock-report-page", 2],
       ]),
       currentPageId: "general-info",
       parentPage: {
         index: 0,
-        childPageIds: ["general-info", "req-measure-result"],
+        childPageIds: ["general-info", "mock-report-page"],
       },
       saveReport: () => mockSaveReport(),
       setAnswers: vi.fn(),
@@ -119,7 +112,7 @@ describe("ReportPageWrapper", () => {
     mockUseParams.mockReturnValue({
       reportType: "RHTP",
       state: "NJ",
-      reportId: "QMSNJ123",
+      reportId: "RHTPNJ123",
     });
     setupMockStore();
   });
@@ -164,7 +157,7 @@ describe("ReportPageWrapper", () => {
     const continueBtn = screen.getByRole("button", { name: "Continue" });
     await userEvent.click(continueBtn);
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/report/RHTP/NJ/QMSNJ123/req-measure-result"
+      "/report/RHTP/NJ/RHTPNJ123/mock-report-page"
     );
   });
 });

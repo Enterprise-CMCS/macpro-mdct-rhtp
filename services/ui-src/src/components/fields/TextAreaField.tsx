@@ -16,7 +16,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
 
   const hideElement = useElementIsHidden(textbox.hideCondition);
 
-  // Need to listen to prop updates from the parent for events like a measure clear
+  // Need to listen to prop updates from the parent for events
   useEffect(() => {
     setDisplayValue(textbox.answer ?? "");
   }, [textbox.answer]);

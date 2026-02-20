@@ -58,7 +58,7 @@ export const dateFieldSection: FormPageTemplate = {
       id: "date",
       label: "Reporting period start date",
       helperText:
-        "What is the reporting period Start Date applicable to the measure results?",
+        "What is the reporting period Start Date applicable to the results?",
       required: true,
     },
   ],

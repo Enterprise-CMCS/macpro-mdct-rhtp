@@ -17,7 +17,7 @@ export const DropdownField = (props: PageElementProps<DropdownTemplate>) => {
   const defaultValue = dropdown.answer ?? dropdown.options[0].value;
   const [displayValue, setDisplayValue] = useState<string>(defaultValue);
 
-  // Need to listen to prop updates from the parent for events like a measure clear
+  // Need to listen to prop updates from the parent for events
   useEffect(() => {
     setDisplayValue(dropdown.answer ?? dropdown.options[0].value);
   }, [dropdown.answer]);

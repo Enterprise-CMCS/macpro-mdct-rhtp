@@ -104,8 +104,8 @@ const reportStore = (set: Set<ReportState>, get: Get<ReportState>) => ({
   setSidebar: (sidebarOpen: boolean) => {
     set(() => ({ sidebarOpen }), false, { type: "setSidebarOpen" });
   },
-  completePage: (measureId: string) => {
-    set((state: ReportState) => markPageComplete(measureId, state), false, {
+  completePage: (pageId: string) => {
+    set((state: ReportState) => markPageComplete(pageId, state), false, {
       type: "completePage",
     });
   },
