@@ -1,12 +1,19 @@
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, List, ListItem, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
+  getUploadedFiles,
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
 } from "utils/other/fileApi";
 
-export const Upload = ({ year }: { year: string }) => {
+export const Upload = ({
+  year,
+  id: uploadId,
+}: {
+  year: string;
+  id: string;
+}) => {
   const [_isDragOver, setIsDragOver] = useState(false);
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
   const [filesToUploaded, setFilesToUploaded] = useState<File[]>();
@@ -22,6 +29,12 @@ export const Upload = ({ year }: { year: string }) => {
     ".jpeg",
     ".png",
   ];
+
+  console.log("uploadId", uploadId);
+
+  useEffect(() => {
+    retrieveUploadedFiles();
+  }, []);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
@@ -69,34 +82,44 @@ export const Upload = ({ year }: { year: string }) => {
     setFilesToUpload(files);
   };
 
+  const retrieveUploadedFiles = async () => {
+    console.log("retrieveUploadedFiles");
+    const uploadedFiles = await getUploadedFiles(year, state!, uploadId);
+    console.log("uploadedFiles", uploadedFiles);
+  };
+
   const onUploadFiles = async () => {
     if (!year || !state) {
       throw new Error("Undefined year or state parameter");
     }
-
     const files = filesToUpload ?? [];
     for (var i = 0; i < files.length; i++) {
       const file = files[i];
       const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
         year,
         state,
+        uploadId,
         file,
       );
-
-      await uploadFileToS3(presignedPostData, file).then((response) => {
-        console.log("response", response);
-      });
+      await uploadFileToS3(presignedPostData, file);
     }
   };
 
   return (
-    <Box sx={sx.container}>
-      <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
+    <VStack sx={sx.container} gap="1rem" alignItems="flex-start">
+      <div>
+        <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
+        <Text sx={sx.uploadedSubLabel}>
+          {" "}
+          Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
+        </Text>
+      </div>
       <Box
         sx={sx.uploadBox}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
+        width="100%"
       >
         <span>
           Drag files here or
@@ -111,39 +134,42 @@ export const Upload = ({ year }: { year: string }) => {
             />
           </label>
         </span>
-        <span> Supported formats: JPEG, PNG, PDF, CSV, Word, PPT</span>
       </Box>
       <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      <ul>
+      <List variant="upload">
         {filesToUpload?.map((file, fileIdx) => (
-          <li>
-            {file?.name}{" "}
+          <ListItem>
+            <VStack>
+              <Button variant="link">{file?.name}</Button>
+              <span>0 KB</span>
+            </VStack>
             <Button variant="unstyled" onClick={() => onRemove(fileIdx)}>
               x
             </Button>
-          </li>
+          </ListItem>
         ))}
-      </ul>
-      <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
-      <ul>
+      </List>
+      <div>
+        <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
+        <Text sx={sx.uploadedSubLabel}>
+          These files have been attached to the stage and checkpoint selected
+          above.
+        </Text>
+      </div>
+      <List variant="upload">
         {filesToUploaded?.map((file, fileIdx) => (
-          <li>
-            {file?.name}{" "}
+          <ListItem>
+            <VStack>
+              <Button variant="link">{file?.name}</Button>
+              <span>0 KB</span>
+            </VStack>
             <Button variant="unstyled" onClick={() => onRemove(fileIdx)}>
               x
             </Button>
-          </li>
+          </ListItem>
         ))}
-      </ul>
-      <Text sx={sx.uploadedLabel}>
-        These files have been attached to the stage and checkpoint selected
-        above.
-      </Text>
-      {/* <Box sx={sx.containerButtons}>
-        <Button onClick={onUploadFiles}>Upload Files</Button>
-        <Button variant="link">Cancel</Button>
-      </Box> */}
-    </Box>
+      </List>
+    </VStack>
   );
 };
 
@@ -153,38 +179,15 @@ const sx = {
       margin: "1.5rem 0",
       fontWeight: "700",
     },
-
-    ul: {
-      padding: "0",
-      margin: "0",
-    },
-    li: {
-      display: "flex",
-      justifyContent: "space-between",
-      listStyle: "none",
-      width: "100%",
-      border: "1px solid #0071bc",
-      padding: ".5rem",
-      borderRadius: "6px",
-
-      button: {
-        width: "content",
-        height: "auto",
-        color: "red",
-      },
-    },
-  },
-
-  containerButtons: {
-    margin: "2rem 0",
-    button: {
-      marginRight: "2rem",
-    },
   },
 
   uploadedLabel: {
     marginBottom: ".75rem",
     fontWeight: "600",
+  },
+
+  uploadedSubLabel: {
+    fontSize: "14px",
   },
 
   uploadBox: {

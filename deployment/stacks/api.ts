@@ -207,7 +207,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     entry: "services/app-api/handlers/uploads/viewUploaded.ts",
     handler: "viewUploaded",
     path: "/uploads/{year}/{state}",
-    method: "POST",
+    method: "GET",
     ...commonProps,
   });
 

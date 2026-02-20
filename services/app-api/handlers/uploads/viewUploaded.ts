@@ -1,19 +1,20 @@
 import { handler } from "../../libs/handler-lib";
 import { parseUploadViewParameters } from "../../libs/param-lib";
-import { queryUpload } from "../../storage/upload";
+import { queryViewUpload } from "../../storage/upload";
 import { ok } from "../../libs/response-lib";
+import { UploadFileData } from "../../types/uploads";
 /**
  * Updates the Sections associated with a given year and state
  */
 export const viewUploaded = handler(
   parseUploadViewParameters,
   async (request) => {
+    const { body } = request;
+    const { uploadId } = body as UploadFileData;
     const { state, year } = request.parameters;
-    const body = request.body;
-    const { questionId } = body as any;
 
-    const fileId = `${year}-${questionId}`;
-    const queryValue = await queryUpload(fileId, state);
-    return ok(queryValue.Items);
+    const fileId = `${year}-${uploadId}`;
+    const uploads = await queryViewUpload(fileId, state);
+    return ok({Items: uploads});
   },
 );

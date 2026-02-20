@@ -11,7 +11,7 @@ import { UploadFileData } from "../../types/uploads";
 export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const { user, body } = request;
   // Format Info
-  const { uploadedFileName } = body as UploadFileData;
+  const { uploadedFileName, uploadId } = body as UploadFileData;
   const { state, year } = request.parameters;
 
   const username = user.email ?? "";
@@ -21,8 +21,9 @@ export const psUpload = handler(parseUploadViewParameters, async (request) => {
     .padStart(7, "0"); // including a random value allows docs titled the same thing to be uploaded multiple times
   const dateString = `${date.getFullYear()}${date.getMonth()}${date.getDay()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}`;
   const awsFilename = `${randomValue}_${dateString}_${uploadedFileName}`;
+  const fileId = `${year}-${uploadId}_${awsFilename}`;
 
-  await updateUpload(state, year, username, uploadedFileName, awsFilename);
+  await updateUpload(state, username, uploadedFileName, awsFilename, fileId);
 
   // Pre-sign url
   let psurl = await s3.createPresignedPost({

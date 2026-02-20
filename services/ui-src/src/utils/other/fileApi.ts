@@ -5,15 +5,26 @@ interface PathURL {
   psurl: string;
 }
 
+export interface UploadData {
+  uploadedState: string;
+  awsFilename: string;
+  filename: string;
+  uploadedDate: string;
+  uploadedUsername: string;
+  fileId: string;
+}
+
 export const recordFileInDatabaseAndGetUploadUrl = async (
   year: string,
   stateCode: string,
+  uploadId: string,
   uploadedFile: File,
 ) => {
   const requestHeaders = await getRequestHeaders();
   const body = {
     uploadedFileName: uploadedFile.name,
     uploadedFileType: uploadedFile.type,
+    uploadId,
   };
 
   const options = {
@@ -56,17 +67,22 @@ export const getFileDownloadUrl = async (
   return response.psurl;
 };
 
-export const getUploadedFiles = async (year: string, stateCode: string) => {
+export const getUploadedFiles = async (
+  year: string,
+  stateCode: string,
+  uploadId: string,
+) => {
+  const requestHeaders = await getRequestHeaders();
   const body = {
     stateCode,
+    uploadId,
   };
-  const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
     body: { ...body },
   };
   const response = await apiLib
-    .post(`/uploads/${year}/${stateCode}`, options)
+    .get<UploadData>(`/uploads/${year}/${stateCode}`, options)
     .catch((error) => {
       console.log("!!!Error downloading files: ", error);
     });

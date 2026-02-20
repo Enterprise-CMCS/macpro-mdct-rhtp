@@ -1,5 +1,6 @@
 import {
   DeleteCommand,
+  GetCommand,
   QueryCommandInput,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -7,6 +8,15 @@ import { createClient } from "./dynamo/dynamodb-lib";
 import { QueryCommand } from "@aws-sdk/client-dynamodb";
 import s3 from "../libs/s3-lib";
 import { convertToDynamoExpression } from "../utils/convertToDynamoExpressionVars";
+
+interface UploadData {
+  uploadedState: string;
+  awsFilename: string;
+  filename: string;
+  uploadedDate: string;
+  uploadedUsername: string;
+  fileId: string;
+}
 
 const uploadTableName = process.env.UploadsTable!;
 const client = createClient();
@@ -35,10 +45,10 @@ export const deleteUpload = async (
 
 export const updateUpload = async (
   state: string,
-  year: string,
   username: string,
   uploadedFileName: string,
   awsFilename: string,
+  fileId: string,
 ) => {
   const date = new Date();
   const uploadEntry = {
@@ -52,7 +62,7 @@ export const updateUpload = async (
     TableName: uploadTableName,
     Key: {
       uploadedState: state,
-      fileId: `${year}-${awsFilename}`,
+      fileId: fileId,
     },
     ...convertToDynamoExpression(uploadEntry, "post"),
   };
@@ -76,4 +86,16 @@ export const queryUpload = async (fileId: string, state: string) => {
   };
 
   return await client.send(new QueryCommand(documentParams));
+};
+
+export const queryViewUpload = async (fileId: string, state: string) => {
+  const response = await client.send(
+    new GetCommand({
+      TableName: uploadTableName,
+      Key: {
+        uploadedState: state,
+      },
+    }),
+  );
+  return response.Item as UploadData | undefined;
 };
