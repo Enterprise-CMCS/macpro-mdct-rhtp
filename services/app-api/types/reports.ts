@@ -4,6 +4,18 @@ export enum ReportType {
   RHTP = "RHTP",
 }
 
+export enum ReportSubType {
+  Annual = "Annual",
+  Quarterly = "Quarterly",
+}
+
+export enum Quarter {
+  Q1 = "Q1",
+  Q2 = "Q2",
+  Q3 = "Q3",
+  Q4 = "Q4",
+}
+
 export const isReportType = (
   reportType: string | undefined
 ): reportType is ReportType => {
@@ -13,6 +25,8 @@ export const isReportType = (
 export interface ReportOptions {
   name: string;
   year: number;
+  subType?: ReportSubType;
+  quarter?: Quarter;
 }
 
 export enum ReportStatus {
@@ -55,6 +69,8 @@ export type LiteReport = Omit<Report, "pages">;
 
 export type ReportBase = {
   type: ReportType;
+  subType?: ReportSubType;
+  quarter?: Quarter;
   year: number;
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[];
 };

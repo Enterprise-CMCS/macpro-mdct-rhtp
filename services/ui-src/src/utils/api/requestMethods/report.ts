@@ -5,7 +5,7 @@ import { LiteReport, Report, ReportOptions } from "types";
 export async function createReport(
   reportType: string,
   state: string,
-  reportOptions: ReportOptions
+  reportOptions?: ReportOptions
 ) {
   const requestHeaders = await getRequestHeaders();
   const options = {

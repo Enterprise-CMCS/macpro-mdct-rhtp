@@ -31,6 +31,8 @@ export const buildReport = async (
     status: ReportStatus.NOT_STARTED,
     name: reportOptions.name,
     year: reportOptions.year,
+    subType: reportOptions.subType,
+    ...(reportOptions.quarter && { quarter: reportOptions.quarter }),
     archived: false,
     submissionCount: 0,
     pages: template.pages,
