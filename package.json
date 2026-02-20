@@ -1,0 +1,43 @@
+{
+  "name": "mdct-rhtp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "homepage": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp#readme",
+  "bugs": {
+    "url": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/issues"
+  },
+  "license": "CC0-1.0",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp.git"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-cloudformation": "^3.981.0",
+    "@aws-sdk/client-lambda": "^3.981.0",
+    "@aws-sdk/client-s3": "^3.981.0",
+    "@aws-sdk/client-secrets-manager": "^3.981.0",
+    "aws-cdk-lib": "^2.237.0",
+    "constructs": "^10.4.5",
+    "jsdom": "^28.0.0",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.10",
+    "aws-cdk": "^2.1029.0",
+    "aws-cdk-local": "^2.19.2",
+    "dotenv": "^17.2.3",
+    "esbuild": "^0.27.2",
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.41.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "yarn@4.12.0"
+}
