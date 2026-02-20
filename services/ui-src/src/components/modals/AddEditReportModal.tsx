@@ -113,17 +113,17 @@ export const AddEditReportModal = ({
 
   const onSubmit = async (evt: FormEvent) => {
     evt.preventDefault();
-    const reportTitleError = await setErrorMessage(formData.reportTitle);
-    const newErrorData = {
-      reportTitle: reportTitleError,
-      year: formData.year ? "" : ErrorMessages.requiredResponse,
-    };
-    setErrorData(newErrorData);
-    const canSubmit =
-      !newErrorData.reportTitle && !!formData.reportTitle && !!formData.year;
-    if (!canSubmit) {
-      return;
-    }
+    // const reportTitleError = await setErrorMessage(formData.reportTitle);
+    // const newErrorData = {
+    //   reportTitle: reportTitleError,
+    //   year: formData.year ? "" : ErrorMessages.requiredResponse,
+    // };
+    // setErrorData(newErrorData);
+    // const canSubmit =
+    //   !newErrorData.reportTitle && !!formData.reportTitle && !!formData.year;
+    // if (!canSubmit) {
+    //   return;
+    // }
 
     setSubmitting(true);
 
@@ -134,11 +134,11 @@ export const AddEditReportModal = ({
       }
       await updateReport(selectedReport);
     } else {
-      const reportOptions: ReportOptions = {
-        name: userEnteredReportName,
-        year: Number(formData.year),
-      };
-      await createReport(reportType, activeState, reportOptions);
+      // const reportOptions: ReportOptions = {
+      //   name: userEnteredReportName,
+      //   year: Number(formData.year),
+      // };
+      await createReport(reportType, activeState);
       await reportHandler(reportType, activeState);
     }
 
@@ -168,7 +168,7 @@ export const AddEditReportModal = ({
       <form id="addEditReportModal" onSubmit={onSubmit}>
         <Flex direction="column" gap="2rem">
           {verbiage.topText && <Text>{verbiage.topText}</Text>}
-          <CmsdsTextField
+          {/* <CmsdsTextField
             name="reportTitle"
             label={verbiage.nameLabel}
             hint={verbiage.nameHelperText(activeState)}
@@ -194,7 +194,7 @@ export const AddEditReportModal = ({
             errorMessage={errorData.year}
             options={dropdownYears}
             disabled={!!selectedReport}
-          />
+          /> */}
         </Flex>
       </form>
     </Modal>

@@ -27,6 +27,8 @@ const queryProjectionFields = [
   "type",
   "year",
   "lastEditedByEmail",
+  "subType",
+  "quarter",
 ];
 
 export const putReport = async (report: Report) => {
