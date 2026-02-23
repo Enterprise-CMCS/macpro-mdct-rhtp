@@ -13,6 +13,7 @@ export const LoginCognito = () => {
 
   const handleLogin = async (event: FormEvent) => {
     event.preventDefault();
+    setError(undefined);
     try {
       await signIn({ username, password });
       navigate(`/`);

@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState, ReactElement } from "react";
-import { Modal } from "components";
+import { Alert, Modal } from "components";
 import {
   TextField as CmsdsTextField,
   Dropdown as CmsdsDropdownField,
@@ -11,6 +11,7 @@ import {
   getReportsForState,
 } from "utils/api/requestMethods/report";
 import {
+  AlertTypes,
   isReportType,
   LiteReport,
   ReportOptions,
@@ -59,6 +60,7 @@ export const AddEditReportModal = ({
   const initialFormData = formDataForReport(selectedReport);
   const [formData, setFormData] = useState(initialFormData);
   const [errorData, setErrorData] = useState({ reportTitle: "", year: "" });
+  const [errorAlert, setErrorAlert] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
   const readOnly = selectedReport?.status === ReportStatus.SUBMITTED;
   const [reportTitleFieldDirtied, setReportTitleFieldDirtied] = useState(false);
@@ -138,12 +140,18 @@ export const AddEditReportModal = ({
       //   name: userEnteredReportName,
       //   year: Number(formData.year),
       // };
-      await createReport(reportType, activeState);
-      await reportHandler(reportType, activeState);
+      try {
+        await createReport(reportType, activeState);
+        await reportHandler(reportType, activeState);
+        modalDisclosure.onClose();
+      } catch (err: any) {
+        const errorMessage =
+          err.message?.split(" - ").at(-1) || "Unknown error";
+        setErrorAlert(errorMessage);
+      }
     }
 
     setSubmitting(false);
-    modalDisclosure.onClose();
   };
 
   return (
@@ -168,6 +176,11 @@ export const AddEditReportModal = ({
       <form id="addEditReportModal" onSubmit={onSubmit}>
         <Flex direction="column" gap="2rem">
           {verbiage.topText && <Text>{verbiage.topText}</Text>}
+          {errorAlert !== undefined ? (
+            <Alert status={AlertTypes.ERROR} title="Failed to create report">
+              {errorAlert}
+            </Alert>
+          ) : null}
           {/* <CmsdsTextField
             name="reportTitle"
             label={verbiage.nameLabel}
