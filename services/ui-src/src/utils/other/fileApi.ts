@@ -95,8 +95,13 @@ export const deleteUploadedFile = async (
   fileId: string,
 ) => {
   const encodedFileId = encodeURIComponent(fileId);
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+    body: { fileId: encodedFileId },
+  };
   await apiLib
-    .del(`/uploads/${year}/${stateCode}/${encodedFileId}`, {})
+    .del(`/uploads/${year}/${stateCode}`, options)
     .catch((error) => {
       console.log("!!!Error retrieving files: ", error);
     });

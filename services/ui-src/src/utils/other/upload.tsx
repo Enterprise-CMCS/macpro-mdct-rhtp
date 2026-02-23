@@ -1,5 +1,6 @@
-import { Box, Button, List, ListItem, Text, VStack } from "@chakra-ui/react";
+import { Image, Button, List, ListItem, Text, VStack } from "@chakra-ui/react";
 import { getUploadedFiles } from "./fileApi";
+import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -48,9 +49,11 @@ export const uploadListRender = (
             )}
             <span>{file.size} KB</span>
           </VStack>
-          <Button variant="unstyled" onClick={() => onRemove(fileIdx, file)}>
-            x
-          </Button>
+          <Button
+            variant="unstyled"
+            onClick={() => onRemove(fileIdx, file)}
+            rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+          />
         </ListItem>
       ))}
     </List>

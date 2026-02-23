@@ -1,7 +1,9 @@
 import { handler } from "../../libs/handler-lib";
 import { canDeleteUpload } from "../../utils/authorization";
 import { error } from "../../utils/constants";
-import { parseUploadParameters } from "../../libs/param-lib";
+import {
+  parseUploadViewParameters,
+} from "../../libs/param-lib";
 import { forbidden, ok } from "../../libs/response-lib";
 import { deleteUpload, queryUpload } from "../../storage/upload";
 
@@ -9,10 +11,11 @@ import { deleteUpload, queryUpload } from "../../storage/upload";
  * Returns the report Sections associated with a given year and state
  */
 export const deleteUploadFile = handler(
-  parseUploadParameters,
+  parseUploadViewParameters,
   async (request) => {
     const { user } = request;
-    const { state, fileId } = request.parameters;
+    const { state } = request.parameters;
+    const { fileId } = request.body as { fileId: string };
 
     if (!canDeleteUpload(user)) {
       return forbidden(error.UNAUTHORIZED);

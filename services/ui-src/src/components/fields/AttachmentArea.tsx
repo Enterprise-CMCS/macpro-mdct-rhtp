@@ -11,7 +11,7 @@ import {
   UploadListProp,
   uploadListRender,
 } from "utils/other/upload";
-import { getFileDownloadUrl } from "utils/other/fileApi";
+import { deleteUploadedFile, getFileDownloadUrl } from "utils/other/fileApi";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>,
@@ -39,9 +39,7 @@ export const AttachmentArea = (
     });
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  fetchData();
 
   const onModalClose = () => {
     setModalOpen(false);
@@ -49,7 +47,9 @@ export const AttachmentArea = (
     //reload uploads when
   };
 
-  const onRemove = () => {};
+  const onRemove = async (id: string, file: UploadListProp) => {
+    await deleteUploadedFile(year, state, file.fileId);
+  };
 
   return (
     <Stack gap="1.5rem">
