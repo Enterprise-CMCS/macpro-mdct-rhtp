@@ -4,16 +4,13 @@ export enum ReportType {
   RHTP = "RHTP",
 }
 
-export enum ReportSubType {
-  Annual = "Annual",
-  Quarterly = "Quarterly",
-}
-
-export enum Quarter {
-  Q1 = "Q1",
-  Q2 = "Q2",
-  Q3 = "Q3",
-  Q4 = "Q4",
+// TODO: Update when the quarter naming has been decided on
+export enum RhtpSubType {
+  ANNUAL = 0,
+  Q1 = 1,
+  Q2 = 2,
+  Q3 = 3,
+  Q4 = 4,
 }
 
 export const isReportType = (
@@ -25,8 +22,7 @@ export const isReportType = (
 export interface ReportOptions {
   name: string;
   year: number;
-  subType?: ReportSubType;
-  quarter?: Quarter;
+  subType?: RhtpSubType;
 }
 
 export const getReportName = (type: string | undefined) => {
@@ -50,8 +46,7 @@ export enum PageStatus {
 
 export type ReportBase = {
   type: ReportType;
-  subType?: ReportSubType;
-  quarter?: Quarter;
+  subType?: RhtpSubType;
   year: number;
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[];
 };

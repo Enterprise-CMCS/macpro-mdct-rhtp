@@ -100,10 +100,9 @@ describe("Report storage helpers", () => {
             "#year": "year",
             "#lastEditedByEmail": "lastEditedByEmail",
             "#subType": "subType",
-            "#quarter": "quarter",
           },
           ProjectionExpression:
-            "#id, #name, #state, #created, #status, #submissionCount, #archived, #lastEdited, #lastEditedBy, #type, #year, #lastEditedByEmail, #subType, #quarter",
+            "#id, #name, #state, #created, #status, #submissionCount, #archived, #lastEdited, #lastEditedBy, #type, #year, #lastEditedByEmail, #subType",
         },
         expect.any(Function)
       );

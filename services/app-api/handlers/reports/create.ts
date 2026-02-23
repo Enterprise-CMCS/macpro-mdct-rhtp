@@ -5,7 +5,7 @@ import { canWriteState } from "../../utils/authorization";
 import { error } from "../../utils/constants";
 import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
-import { ReportSubType, ReportStatus } from "../../types/reports";
+import { RhtpSubType, ReportStatus } from "../../types/reports";
 import { getNextReportOptions } from "../../utils/reports/reportOptions";
 
 export const createReport = handler(
@@ -24,7 +24,7 @@ export const createReport = handler(
       // Report options for very first report
       const reportOptions = {
         year: 2026,
-        subType: ReportSubType.Annual,
+        subType: RhtpSubType.ANNUAL,
         name: `${state} - Annual Report - 2026`,
       };
       const report = await buildReport(reportType, state, reportOptions, user);
@@ -33,9 +33,16 @@ export const createReport = handler(
     }
 
     const latestReport = reports.reduce((latest, current) => {
-      return current.created && current.created > (latest.created ?? 0)
-        ? current
-        : latest;
+      if (latest.year > current.year) {
+        return latest;
+      } else if (
+        latest.year === current.year &&
+        latest.subType! > current.subType!
+      ) {
+        return latest;
+      } else {
+        return current;
+      }
     }, reports[0]);
 
     if (latestReport.status !== ReportStatus.SUBMITTED) {

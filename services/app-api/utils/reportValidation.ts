@@ -16,8 +16,7 @@ import {
   ElementType,
   PageElement,
   ReportOptions,
-  ReportSubType,
-  Quarter,
+  RhtpSubType,
 } from "../types/reports";
 import { error } from "./constants";
 
@@ -295,10 +294,7 @@ export const isReportOptions = (
     .shape({
       name: string().required(),
       year: number().required(),
-      subType: mixed<ReportSubType>()
-        .oneOf(Object.values(ReportSubType))
-        .notRequired(),
-      quarter: mixed<Quarter>().oneOf(Object.values(Quarter)).notRequired(),
+      subType: number().notRequired(),
     })
     .required()
     .noUnknown();
@@ -329,10 +325,7 @@ const reportValidateSchema = object().shape({
   status: mixed<ReportStatus>().oneOf(Object.values(ReportStatus)).required(),
   name: string().required(),
   type: mixed<ReportType>().oneOf(Object.values(ReportType)).required(),
-  subType: mixed<ReportSubType>()
-    .oneOf(Object.values(ReportSubType))
-    .notRequired(),
-  quarter: mixed<Quarter>().oneOf(Object.values(Quarter)).notRequired(),
+  subType: number().notRequired(),
   year: number().required(),
   submissionCount: number().required(),
   archived: boolean().required(),
