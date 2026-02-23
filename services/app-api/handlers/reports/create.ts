@@ -2,7 +2,7 @@ import { handler } from "../../libs/handler-lib";
 import { parseReportTypeAndState } from "../../libs/param-lib";
 import { badRequest, forbidden, ok } from "../../libs/response-lib";
 import { canWriteState } from "../../utils/authorization";
-import { error } from "../../utils/constants";
+import { error, reportStartDates } from "../../utils/constants";
 import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
 import { RhtpSubType, ReportStatus } from "../../types/reports";
@@ -51,13 +51,25 @@ export const createReport = handler(
       );
     }
 
-    const reportOptions = getNextReportOptions(latestReport);
+    const nextReportOptions = getNextReportOptions(latestReport);
 
-    // if (!isReportOptions(body)) {
-    //   return badRequest("Invalid request");
-    // }
+    const report = await buildReport(
+      reportType,
+      state,
+      nextReportOptions,
+      user
+    );
 
-    const report = await buildReport(reportType, state, reportOptions, user);
+    const reportStartDate = reportStartDates[report.subType!](report.year);
+
+    if (Date.now() < reportStartDate) {
+      return badRequest(
+        `The next report cannot be created until ${new Date(
+          reportStartDate
+        ).toLocaleDateString()}.`
+      );
+    }
+
     await putReport(report);
     return ok(report);
   }
