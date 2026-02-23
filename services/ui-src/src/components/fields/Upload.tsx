@@ -1,51 +1,40 @@
-import { Box, Button, List, ListItem, Text, VStack } from "@chakra-ui/react";
+import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import {
   getFileDownloadUrl,
-  getUploadedFiles,
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
 } from "utils/other/fileApi";
+import {
+  acceptedFileTypes,
+  retrieveUploadedFiles,
+  UploadListProp,
+  uploadListRender,
+} from "utils/other/upload";
 
-type uploadListData = {
-  name: string;
-  size: number;
-  fileId: string;
-};
-
-export const Upload = ({
-  year,
-  id: uploadId,
-}: {
-  year: string;
+interface Props {
   id: string;
-}) => {
-  const [_isDragOver, setIsDragOver] = useState(false);
-  const [filesToUpload, setFilesToUpload] = useState<File[]>();
-  const [uploadedFiles, setUploadedFiles] = useState<uploadListData[]>();
-  const { state } = useParams();
+  state: string;
+  year: string;
+}
 
-  const acceptedFileTypes = [
-    ".ppt",
-    ".pdf",
-    ".doc",
-    ".docx",
-    ".csv",
-    ".jpg",
-    ".jpeg",
-    ".png",
-  ];
+export const Upload = ({ id: uploadId, state, year }: Props) => {
+  const [filesToUpload, setFilesToUpload] = useState<File[]>();
+  const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>();
 
   useEffect(() => {
-    retrieveUploadedFiles();
+    const fetchData = async () =>
+      await retrieveUploadedFiles(year, state, uploadId).then((response) => {
+        setUploadedFiles(response);
+      });
+    fetchData();
   }, []);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
         await onUploadFiles().then((response) => {
-          console.log(response);
+          console.log("response", response);
           const listData = filesToUpload.map((file) => {
             return { name: file.name, size: file.size, fileId: "" };
           });
@@ -57,17 +46,12 @@ export const Upload = ({
     }
   }, [filesToUpload]);
 
-  const downloadFile = async (fileId: string) => {
-    window.location.href = await getFileDownloadUrl(year, state!, fileId);
+  const downloadFile = async (file: UploadListProp) => {
+    window.location.href = await getFileDownloadUrl(year, state!, file.fileId);
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragOver(false);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -88,20 +72,12 @@ export const Upload = ({
     }
   };
 
-  const onRemove = (index: number) => {
-    if (!filesToUpload) return;
+  const onRemove = (index: number, file: UploadListProp) => {
+    if (!uploadedFiles) return;
 
-    const files = [...filesToUpload];
+    const files = [...uploadedFiles];
     files.splice(index, 1);
-    setFilesToUpload(files);
-  };
-
-  const retrieveUploadedFiles = async () => {
-    const uploadedFiles = await getUploadedFiles(year, state!, uploadId);
-    const listData = uploadedFiles.map((file) => {
-      return { name: file.filename, size: 0, fileId: file.fileId };
-    });
-    setUploadedFiles(listData);
+    setUploadedFiles(uploadedFiles);
   };
 
   const onUploadFiles = async () => {
@@ -126,7 +102,6 @@ export const Upload = ({
       <div>
         <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
         <Text sx={sx.uploadedSubLabel}>
-          {" "}
           Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
         </Text>
       </div>
@@ -134,7 +109,6 @@ export const Upload = ({
         sx={sx.uploadBox}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
         width="100%"
       >
         <span>
@@ -152,19 +126,7 @@ export const Upload = ({
         </span>
       </Box>
       <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      <List variant="upload">
-        {filesToUpload?.map((file, fileIdx) => (
-          <ListItem>
-            <VStack>
-              <Button variant="link">{file?.name}</Button>
-              <span>{file.size} KB</span>
-            </VStack>
-            <Button variant="unstyled" onClick={() => onRemove(fileIdx)}>
-              x
-            </Button>
-          </ListItem>
-        ))}
-      </List>
+      {uploadListRender(filesToUpload ?? [], onRemove)}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>
@@ -172,21 +134,7 @@ export const Upload = ({
           above.
         </Text>
       </div>
-      <List variant="upload">
-        {uploadedFiles?.map((file, fileIdx) => (
-          <ListItem>
-            <VStack>
-              <Button variant="link" onClick={() => downloadFile(file.fileId)}>
-                {file?.name}
-              </Button>
-              <span>{file.size} KB</span>
-            </VStack>
-            <Button variant="unstyled" onClick={() => onRemove(fileIdx)}>
-              x
-            </Button>
-          </ListItem>
-        ))}
-      </List>
+      {uploadListRender(uploadedFiles ?? [], onRemove, downloadFile)}
     </VStack>
   );
 };

@@ -12,13 +12,14 @@ const accordionVariant = {
 
 const uploadVariant = {
   container: {
-    boxShadow: "0px 3px 9px #00000033",
     width: "100%",
   },
   item: {
     display: "flex",
     justifyContent: "space-between",
     padding: "20px",
+    boxShadow: "0px 3px 9px #00000033",
+    marginBottom: "1rem",
   },
 };
 

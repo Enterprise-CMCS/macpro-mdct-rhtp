@@ -6,39 +6,59 @@ import {
   Stack,
   Heading,
   Image,
-  List,
-  ListItem,
-  VStack,
 } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
+import { useParams } from "react-router-dom";
+import { useStore } from "utils";
+import {
+  retrieveUploadedFiles,
+  UploadListProp,
+  uploadListRender,
+} from "utils/other/upload";
+import { getFileDownloadUrl } from "utils/other/fileApi";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>,
 ) => {
   const { label, helperText, id } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<UploadListProp[]>([]);
+
+  const { state } = useParams();
+  const { report } = useStore();
+  const year = report?.year.toString();
+
+  if (!state || !year) {
+    console.error("Can't retrieve uploads with missing state or year");
+    return;
+  }
+
+  const downloadFile = async (file: UploadListProp) => {
+    window.location.href = await getFileDownloadUrl(year, state!, file.fileId);
+  };
+
+  useEffect(() => {
+    const fetchData = async () =>
+      await retrieveUploadedFiles(year, state, id).then((response) => {
+        setFiles(response);
+      });
+    fetchData();
+  }, []);
 
   const onModalClose = () => {
     setModalOpen(false);
     //reload uploads when
   };
 
+  const onRemove = () => {};
+
   return (
     <Stack gap="1.5rem">
       <Heading variant="h5">{label}</Heading>
       {helperText && <Text>{helperText}</Text>}
-      <List variant="upload">
-        <ListItem>
-          <VStack>
-            <Button variant="link">File</Button>
-            <span>0 KB</span>
-          </VStack>
-          <Button>x</Button>
-        </ListItem>
-      </List>
+      {uploadListRender(files ?? [], onRemove, downloadFile)}
       <Button
         onClick={() => setModalOpen(!isModalOpen)}
         variant="outline"
@@ -52,6 +72,8 @@ export const AttachmentArea = (
           onClose: onModalClose,
         }}
         id={id}
+        state={state}
+        year={year}
       ></UploadModal>
     </Stack>
   );
