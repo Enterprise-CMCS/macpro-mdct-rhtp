@@ -2,7 +2,7 @@ import { handler } from "../../libs/handler-lib";
 import s3 from "../../libs/s3-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { queryUpload } from "../../storage/upload";
-import { parseUploadParameters } from "../../libs/param-lib";
+import { parseUploadViewParameters } from "../../libs/param-lib";
 import { forbidden, ok } from "../../libs/response-lib";
 import { error } from "../../utils/constants";
 
@@ -10,11 +10,11 @@ import { error } from "../../utils/constants";
  * Returns the report Sections associated with a given year and state
  */
 export const getSignedFileUrl = handler(
-  parseUploadParameters,
+  parseUploadViewParameters,
   async (request) => {
-    const { state, fileId } = request.parameters;
-    const { body } = request;
-    if (!body || !fileId) {
+    const { state } = request.parameters;
+    const { fileId } = request.body as { fileId: string };
+    if (!state || !fileId) {
       return forbidden(error.MISSING_DATA);
     }
 

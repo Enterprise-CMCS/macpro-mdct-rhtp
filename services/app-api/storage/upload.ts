@@ -1,13 +1,12 @@
 import {
   DeleteCommand,
-  GetCommand,
   QueryCommandInput,
   UpdateCommand,
+  paginateQuery,
+  QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { createClient } from "./dynamo/dynamodb-lib";
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
+import { collectPageItems, createClient } from "./dynamo/dynamodb-lib";
 import s3 from "../libs/s3-lib";
-import { convertToDynamoExpression } from "../utils/convertToDynamoExpressionVars";
 
 interface UploadData {
   uploadedState: string;
@@ -50,21 +49,19 @@ export const updateUpload = async (
   awsFilename: string,
   fileId: string,
 ) => {
-  const date = new Date();
-  const uploadEntry = {
-    uploadedUsername: username,
-    uploadedDate: date.toString(),
-    filename: uploadedFileName,
-    awsFilename: awsFilename,
-  };
-
   const params = {
     TableName: uploadTableName,
     Key: {
       uploadedState: state,
       fileId: fileId,
     },
-    ...convertToDynamoExpression(uploadEntry, "post"),
+    UpdateExpression: "SET uploadedUsername = :uploadedUsername, uploadedDate = :uploadedDate, filename = :filename, awsFilename = :awsFilename",
+    ExpressionAttributeValues: {
+      ":uploadedUsername": username,
+      ":uploadedDate": new Date().toISOString(),
+      ":filename": uploadedFileName,
+      ":awsFilename": awsFilename,
+    },
   };
 
   await client.send(new UpdateCommand(params));
@@ -75,10 +72,6 @@ export const queryUpload = async (fileId: string, state: string) => {
     TableName: uploadTableName,
     KeyConditionExpression:
       "uploadedState = :uploadedState AND fileId = :fileId",
-    ExpressionAttributeNames: {
-      "#uploadedState": "uploadedState",
-      "#fileId": "fileId",
-    },
     ExpressionAttributeValues: {
       ":uploadedState": state,
       ":fileId": fileId,
@@ -88,14 +81,17 @@ export const queryUpload = async (fileId: string, state: string) => {
   return await client.send(new QueryCommand(documentParams));
 };
 
-export const queryViewUpload = async (fileId: string, state: string) => {
-  const response = await client.send(
-    new GetCommand({
-      TableName: uploadTableName,
-      Key: {
-        uploadedState: state,
-      },
-    }),
-  );
-  return response.Item as UploadData | undefined;
+export const queryViewUpload = async (state: string) => {
+  const params: QueryCommandInput = {
+    TableName: uploadTableName,
+    KeyConditionExpression: "uploadedState = :state",
+    ExpressionAttributeValues: {
+      ":state": state,
+    },
+  };
+
+  const response = paginateQuery({ client }, params);
+  const uploads = await collectPageItems(response);
+
+  return uploads as UploadData[];
 };

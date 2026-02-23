@@ -6,7 +6,6 @@ import {
   Stack,
   Heading,
   Image,
-  Box,
   List,
   ListItem,
   VStack,

@@ -82,7 +82,7 @@ export const getUploadedFiles = async (
     body: { ...body },
   };
   const response = await apiLib
-    .get<UploadData>(`/uploads/${year}/${stateCode}`, options)
+    .get<UploadData[]>(`/uploads/${year}/${stateCode}`, options)
     .catch((error) => {
       console.log("!!!Error downloading files: ", error);
     });
