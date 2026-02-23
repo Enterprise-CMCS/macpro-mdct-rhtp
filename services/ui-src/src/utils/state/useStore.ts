@@ -3,12 +3,12 @@ import { devtools, persist } from "zustand/middleware";
 import {
   UserState,
   User,
+  Report,
   ReportState,
   BannerData,
   ErrorVerbiage,
   AdminBannerState,
 } from "types";
-import { Report } from "types/report";
 import { ReactNode } from "react";
 import {
   buildState,
@@ -104,8 +104,8 @@ const reportStore = (set: Set<ReportState>, get: Get<ReportState>) => ({
   setSidebar: (sidebarOpen: boolean) => {
     set(() => ({ sidebarOpen }), false, { type: "setSidebarOpen" });
   },
-  completePage: (measureId: string) => {
-    set((state: ReportState) => markPageComplete(measureId, state), false, {
+  completePage: (pageId: string) => {
+    set((state: ReportState) => markPageComplete(pageId, state), false, {
       type: "completePage",
     });
   },

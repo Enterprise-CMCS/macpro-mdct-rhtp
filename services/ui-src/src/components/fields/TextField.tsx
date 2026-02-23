@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
 import { parseHtml } from "utils";
-import {
-  TextboxTemplate,
-  NumberFieldTemplate,
-  ElementType,
-} from "../../types/report";
+import { TextboxTemplate, NumberFieldTemplate, ElementType } from "../../types";
 import { PageElementProps } from "../report/Elements";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { ErrorMessages } from "../../constants";
@@ -36,7 +32,7 @@ export const TextField = (
 
   useEffect(() => {
     /*
-     * We need to listen for answer updates, in case the measure is cleared.
+     * We need to listen for answer updates.
      * But we don't want to overwrite input contents while the user is typing.
      * This only comes up if a valid answer becomes invalid mid-typing.
      * For example, typing "123abc" into a number field. The values saved up to

@@ -3,11 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TextField } from "components";
 import { testA11y } from "utils/testing/commonTests";
-import {
-  ElementType,
-  NumberFieldTemplate,
-  TextboxTemplate,
-} from "types/report";
+import { ElementType, NumberFieldTemplate, TextboxTemplate } from "types";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { useState } from "react";
 
@@ -21,10 +17,6 @@ const mockedTextboxElement: TextboxTemplate = {
   type: ElementType.Textbox,
   label: "test label",
   helperText: "helper text",
-  hideCondition: {
-    controllerElementId: "measure-reporting-radio",
-    answer: "no",
-  },
   required: true,
 };
 
@@ -89,7 +81,7 @@ describe("<TextField />", () => {
     expect(textField).toHaveValue("123");
   });
 
-  test("NumberField should respond to measure clear", () => {
+  test("NumberField should respond to rerender", () => {
     const props = {
       element: {
         ...mockedNumberField,

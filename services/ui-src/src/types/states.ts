@@ -1,6 +1,12 @@
-import { ParentPageTemplate, PageData, Report } from "types/report";
 import { ReactNode } from "react";
-import { BannerData, ErrorVerbiage, User } from "types";
+import {
+  BannerData,
+  ErrorVerbiage,
+  ParentPageTemplate,
+  PageData,
+  Report,
+  User,
+} from "types";
 
 export interface AdminBannerState {
   bannerData: BannerData | undefined;
@@ -50,7 +56,7 @@ export interface ReportState {
   setModalOpen: (modalOpen: boolean) => void;
   setModalComponent: (modalComponent: ReactNode, modalHeader: string) => void;
   setAnswers: (answers: any) => void;
-  completePage: (measureId: string) => void;
+  completePage: (pageId: string) => void;
   setSidebar: (sidebarOpen: boolean) => void;
   saveReport: () => void;
 }

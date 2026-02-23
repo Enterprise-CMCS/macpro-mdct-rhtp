@@ -280,7 +280,7 @@ export const DashboardTable = ({
   headers.push("");
 
   const tableContent = {
-    caption: "Quality Measure Reports",
+    caption: "Rural Health Transformation Program Reports",
     headRow: headers,
   };
 

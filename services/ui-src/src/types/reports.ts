@@ -10,6 +10,11 @@ export const isReportType = (
   return Object.values(ReportType).includes(reportType as ReportType);
 };
 
+export interface ReportOptions {
+  name: string;
+  year: number;
+}
+
 export const getReportName = (type: string | undefined) => {
   switch (type) {
     default:
@@ -155,98 +160,11 @@ export type HideCondition = {
   answer: string;
 };
 
-export enum HeaderIcon {
-  Check = "check",
-}
-
-export type HeaderTemplate = {
-  type: ElementType.Header;
-  id: string;
-  text: string;
-  icon?: HeaderIcon;
-};
-
-export type SubHeaderTemplate = {
-  type: ElementType.SubHeader;
-  id: string;
-  text: string;
-  helperText?: string;
-  hideCondition?: HideCondition;
-};
-
-export type ParagraphTemplate = {
-  type: ElementType.Paragraph;
-  id: string;
-  title?: string;
-  text: string;
-  weight?: string;
-};
-
-export type StatusAlertTemplate = {
-  type: ElementType.StatusAlert;
-  id: string;
-  title: string;
-  text: string;
-  status: AlertTypes;
-};
-
-export type TextboxTemplate = {
-  type: ElementType.Textbox;
-  id: string;
+export type ChoiceTemplate = {
   label: string;
-  helperText?: string;
-  answer?: string;
-  required: boolean;
-  hideCondition?: HideCondition;
-};
-
-export type NumberFieldTemplate = {
-  type: ElementType.NumberField;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: number;
-  required: boolean;
-  hideCondition?: never;
-};
-
-export type TextAreaBoxTemplate = {
-  type: ElementType.TextAreaField;
-  id: string;
-  label: string;
-  helperText?: string;
-  answer?: string;
-  hideCondition?: HideCondition;
-  required: boolean;
-};
-
-export type DateTemplate = {
-  type: ElementType.Date;
-  id: string;
-  label: string;
-  helperText: string;
-  answer?: string;
-  required: boolean;
-};
-
-export type DropdownTemplate = {
-  type: ElementType.Dropdown;
-  id: string;
-  label: string;
-  options: ChoiceTemplate[];
-  helperText?: string;
-  answer?: string;
-  required: boolean;
-};
-
-export type DividerTemplate = {
-  type: ElementType.Divider;
-  id: string;
-};
-
-export type SubmissionParagraphTemplate = {
-  type: ElementType.SubmissionParagraph;
-  id: string;
+  value: string;
+  checked?: boolean;
+  checkedChildren?: PageElement[];
 };
 
 export type AccordionTemplate = {
@@ -254,34 +172,6 @@ export type AccordionTemplate = {
   id: string;
   label: string;
   value: string;
-};
-
-export type StatusTableTemplate = {
-  type: ElementType.StatusTable;
-  id: string;
-  to: PageId;
-};
-
-export type RadioTemplate = {
-  type: ElementType.Radio;
-  id: string;
-  label: string;
-  choices: ChoiceTemplate[];
-  helperText?: string;
-  answer?: string;
-  required: boolean;
-  hideCondition?: HideCondition;
-  clickAction?: string;
-};
-
-export type CheckboxTemplate = {
-  type: ElementType.Checkbox;
-  id: string;
-  label: string;
-  choices: ChoiceTemplate[];
-  helperText?: string;
-  answer?: string[];
-  required: boolean;
 };
 
 export type ButtonLinkTemplate = {
@@ -292,16 +182,92 @@ export type ButtonLinkTemplate = {
   style?: string;
 };
 
-export type ListInputTemplate = {
-  type: ElementType.ListInput;
+export type DividerTemplate = {
+  type: ElementType.Divider;
+  id: string;
+};
+
+export type StatusTableTemplate = {
+  type: ElementType.StatusTable;
+  id: string;
+  to: PageId;
+};
+
+export type SubmissionParagraphTemplate = {
+  type: ElementType.SubmissionParagraph;
+  id: string;
+};
+
+export enum HeaderIcon {
+  Check = "check",
+}
+
+interface DisplayElementTemplate {
+  type: ElementType;
+  id: string;
+  text: string;
+}
+
+export interface HeaderTemplate extends DisplayElementTemplate {
+  type: ElementType.Header;
+  icon?: HeaderIcon;
+}
+
+export interface ParagraphTemplate extends DisplayElementTemplate {
+  type: ElementType.Paragraph;
+  title?: string;
+  weight?: string;
+}
+
+export interface StatusAlertTemplate extends DisplayElementTemplate {
+  type: ElementType.StatusAlert;
+  title: string;
+  status: AlertTypes;
+}
+
+export interface SubHeaderTemplate extends DisplayElementTemplate {
+  type: ElementType.SubHeader;
+  helperText?: string;
+  hideCondition?: HideCondition;
+}
+
+interface InputElementTemplate {
+  type: ElementType;
   id: string;
   label: string;
+  helperText?: string;
+  required: boolean;
+}
+
+export interface CheckboxTemplate extends InputElementTemplate {
+  type: ElementType.Checkbox;
+  choices: ChoiceTemplate[];
+  answer?: string[];
+}
+
+export interface DateTemplate extends InputElementTemplate {
+  type: ElementType.Date;
+  answer?: string;
+}
+
+export interface DropdownTemplate extends InputElementTemplate {
+  type: ElementType.Dropdown;
+  options: ChoiceTemplate[];
+  answer?: string;
+}
+
+export interface ListInputTemplate extends InputElementTemplate {
+  type: ElementType.ListInput;
   fieldLabel: string;
-  helperText: string;
   buttonText: string;
   answer?: string[];
-  required: boolean;
-};
+}
+
+export interface NumberFieldTemplate extends InputElementTemplate {
+  type: ElementType.NumberField;
+  answer?: number;
+  hideCondition?: never;
+}
 
 export type AttachmentAreaTemplate = {
   type: ElementType.AttachmentArea;
@@ -311,17 +277,24 @@ export type AttachmentAreaTemplate = {
   required: boolean;
 };
 
-export type ChoiceTemplate = {
-  label: string;
-  value: string;
-  checked?: boolean;
-  checkedChildren?: PageElement[];
-};
+export interface RadioTemplate extends InputElementTemplate {
+  type: ElementType.Radio;
+  choices: ChoiceTemplate[];
+  answer?: string;
+  hideCondition?: HideCondition;
+  clickAction?: string;
+}
 
-export interface ReportOptions {
-  name: string;
-  year: number;
-  options?: {};
+export interface TextAreaBoxTemplate extends InputElementTemplate {
+  type: ElementType.TextAreaField;
+  answer?: string;
+  hideCondition?: HideCondition;
+}
+
+export interface TextboxTemplate extends InputElementTemplate {
+  type: ElementType.Textbox;
+  answer?: string;
+  hideCondition?: HideCondition;
 }
 
 /**

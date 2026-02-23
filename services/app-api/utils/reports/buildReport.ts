@@ -21,7 +21,7 @@ export const buildReport = async (
   const template = structuredClone(getReportTemplate(reportType, year));
 
   const report: Report = {
-    state: state,
+    state,
     id: KSUID.randomSync().string,
     created: Date.now(),
     lastEdited: Date.now(),

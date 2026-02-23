@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import { parseHtml } from "utils";
 import { SingleInputDateField as CmsdsDateField } from "@cmsgov/design-system";
 import { PageElementProps } from "../report/Elements";
-import { DateTemplate } from "../../types/report";
+import { DateTemplate } from "../../types";
 import { validateDate } from "utils/validation/inputValidation";
 
 export const DateField = (props: PageElementProps<DateTemplate>) => {
@@ -12,7 +12,7 @@ export const DateField = (props: PageElementProps<DateTemplate>) => {
   const [displayValue, setDisplayValue] = useState(dateTextbox.answer ?? "");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Need to listen to prop updates from the parent for events like a measure clear
+  // Need to listen to prop updates from the parent for events
   useEffect(() => {
     setDisplayValue(dateTextbox.answer ?? "");
   }, [dateTextbox.answer]);

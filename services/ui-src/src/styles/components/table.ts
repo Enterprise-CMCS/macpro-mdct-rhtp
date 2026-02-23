@@ -45,46 +45,6 @@ const stripedVariant = () => ({
     },
   },
 });
-const measureVariant = {
-  th: {
-    ".mobile &": {
-      display: "none",
-    },
-  },
-  td: {
-    "&:first-of-type": {
-      minWidth: "3rem",
-      padding: "0 0.75rem",
-    },
-    "&:last-of-type": {
-      minWidth: "4rem",
-    },
-    a: {
-      whiteSpace: "nowrap",
-      ".mobile &": {
-        whiteSpace: "wrap",
-      },
-    },
-    ".mobile &": {
-      border: "none",
-      paddingY: "0.5rem",
-      "&:first-of-type": {
-        display: "flex",
-        paddingX: "0",
-      },
-    },
-  },
-  tr: {
-    "th, td": {
-      borderColor: "palette.gray_lighter",
-    },
-    ".mobile &": {
-      display: "flex",
-      flexFlow: "column",
-      paddingY: "0.5rem",
-    },
-  },
-};
 const statusVariant = {
   td: {
     fontSize: "heading_sm",
@@ -163,7 +123,6 @@ const reportDetailsVariant = {
 
 const variants = {
   striped: stripedVariant,
-  measure: measureVariant,
   status: statusVariant,
   export: exportVariant,
   reportDetails: reportDetailsVariant,

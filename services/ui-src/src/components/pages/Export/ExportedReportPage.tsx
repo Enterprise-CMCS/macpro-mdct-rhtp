@@ -48,7 +48,10 @@ export const ExportedReportPage = () => {
             <Helmet>
               <title>{reportTitle(report)}</title>
               <meta name="author" content="CMS" />
-              <meta name="subject" content="Quality Measure Set" />
+              <meta
+                name="subject"
+                content="Rural Health Transformation Program Report"
+              />
               <meta name="language" content="English" />
             </Helmet>
             <Box>

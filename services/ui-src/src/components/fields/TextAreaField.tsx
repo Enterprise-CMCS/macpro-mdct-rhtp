@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
 import { parseHtml } from "utils";
-import { TextAreaBoxTemplate } from "../../types/report";
+import { TextAreaBoxTemplate } from "../../types";
 import { PageElementProps } from "../report/Elements";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { ErrorMessages } from "../../constants";
@@ -16,7 +16,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
 
   const hideElement = useElementIsHidden(textbox.hideCondition);
 
-  // Need to listen to prop updates from the parent for events like a measure clear
+  // Need to listen to prop updates from the parent for events
   useEffect(() => {
     setDisplayValue(textbox.answer ?? "");
   }, [textbox.answer]);

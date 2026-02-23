@@ -16,7 +16,7 @@ import {
   ReportOptions,
   ReportStatus,
   ReportType,
-} from "types/report";
+} from "types";
 import RhtpOptions from "./AddFormOptions/Options";
 import { ErrorMessages } from "../../constants";
 
@@ -55,7 +55,6 @@ export const AddEditReportModal = ({
   const formDataForReport = (report: LiteReport | undefined) => ({
     reportTitle: report?.name ?? "",
     year: report?.year?.toString() ?? dropdownYears[0].value,
-    options: selectedReport?.options ?? {},
   });
   const initialFormData = formDataForReport(selectedReport);
   const [formData, setFormData] = useState(initialFormData);
@@ -112,12 +111,6 @@ export const AddEditReportModal = ({
     setReportTitleFieldDirtied(true);
   };
 
-  const onOptionsChange = (optionsData: Record<string, any>) => {
-    setFormData({
-      ...formData,
-      options: optionsData,
-    });
-  };
   const onSubmit = async (evt: FormEvent) => {
     evt.preventDefault();
     const reportTitleError = await setErrorMessage(formData.reportTitle);
