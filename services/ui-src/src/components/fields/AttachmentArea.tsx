@@ -1,12 +1,6 @@
 import { AttachmentAreaTemplate } from "types";
 import { PageElementProps } from "components/report/Elements";
-import {
-  Text,
-  Button,
-  Stack,
-  Heading,
-  Image,
-} from "@chakra-ui/react";
+import { Text, Button, Stack, Heading, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -39,16 +33,19 @@ export const AttachmentArea = (
     window.location.href = await getFileDownloadUrl(year, state!, file.fileId);
   };
 
+  const fetchData = async () => {
+    await retrieveUploadedFiles(year, state, id).then((response) => {
+      setFiles(response);
+    });
+  };
+
   useEffect(() => {
-    const fetchData = async () =>
-      await retrieveUploadedFiles(year, state, id).then((response) => {
-        setFiles(response);
-      });
     fetchData();
   }, []);
 
   const onModalClose = () => {
     setModalOpen(false);
+    fetchData();
     //reload uploads when
   };
 
