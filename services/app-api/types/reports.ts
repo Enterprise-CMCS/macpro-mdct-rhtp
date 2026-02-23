@@ -226,6 +226,8 @@ interface InputElementTemplate {
   label: string;
   helperText?: string;
   required: boolean;
+  quarterly?: boolean;
+  disabled?: boolean;
 }
 
 export interface CheckboxTemplate extends InputElementTemplate {
