@@ -20,6 +20,12 @@ vi.mock("../../storage/upload", () => ({
   updateUpload: vi.fn(),
 }));
 
+vi.mock("../../libs/s3-lib", () => ({
+  default: {
+    createPresignedPost: vi.fn(),
+  },
+}));
+
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   body: `{"fileId":"mock-id"}`,

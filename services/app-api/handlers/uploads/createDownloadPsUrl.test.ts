@@ -20,6 +20,12 @@ vi.mock("../../storage/upload", () => ({
   queryUpload: vi.fn(),
 }));
 
+vi.mock("../../libs/s3-lib", () => ({
+  default: {
+    getSignedDownloadUrl: vi.fn(),
+  },
+}));
+
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   body: `{"fileId":"mock-id"}`,

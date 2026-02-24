@@ -45,8 +45,8 @@ export const AttachmentArea = (
 
   const onModalClose = () => {
     setModalOpen(false);
+    //get upload list again when modal is closed
     fetchData();
-    //reload uploads when
   };
 
   const onRemove = async (id: string, file: UploadListProp) => {
@@ -59,7 +59,8 @@ export const AttachmentArea = (
       {helperText && <Text>{helperText}</Text>}
       {uploadListRender(files ?? [], onRemove, downloadFile)}
       <Button
-        onClick={() => setModalOpen(!isModalOpen)}
+        width="fit-content"
+        onClick={() => setModalOpen(true)}
         variant="outline"
         leftIcon={<Image src={addIconPrimary} />}
       >

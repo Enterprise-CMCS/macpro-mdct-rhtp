@@ -1,4 +1,13 @@
-import { Image, Button, List, ListItem, Text, VStack } from "@chakra-ui/react";
+import {
+  Image,
+  Button,
+  List,
+  ListItem,
+  Text,
+  VStack,
+  Progress,
+  HStack,
+} from "@chakra-ui/react";
 import { getUploadedFiles } from "./fileApi";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 
@@ -39,21 +48,28 @@ export const uploadListRender = (
     <List variant="upload">
       {files?.map((file, fileIdx) => (
         <ListItem>
-          <VStack>
-            {!onClick ? (
-              <Text>{file?.name}</Text>
-            ) : (
-              <Button variant="link" onClick={() => onClick(file)}>
-                {file?.name}
-              </Button>
+          <VStack width="100%">
+            <HStack width="100%" justifyContent="space-between">
+              <VStack>
+                {!onClick ? (
+                  <Text>{file?.name}</Text>
+                ) : (
+                  <Button variant="link" onClick={() => onClick(file)}>
+                    {file?.name}
+                  </Button>
+                )}
+                <span>{file.size} KB</span>
+              </VStack>
+              <Button
+                variant="unstyled"
+                onClick={() => onRemove(fileIdx, file)}
+                rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+              />
+            </HStack>
+            {!onClick && (
+              <Progress className="progress" size="lg" isIndeterminate />
             )}
-            <span>{file.size} KB</span>
           </VStack>
-          <Button
-            variant="unstyled"
-            onClick={() => onRemove(fileIdx, file)}
-            rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
-          />
         </ListItem>
       ))}
     </List>
