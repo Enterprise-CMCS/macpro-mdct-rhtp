@@ -12,6 +12,7 @@ export interface UploadData {
   uploadedDate: string;
   uploadedUsername: string;
   fileId: string;
+  filesize: number;
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
@@ -24,6 +25,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   const body = {
     uploadedFileName: uploadedFile.name,
     uploadedFileType: uploadedFile.type,
+    uploadedFileSize: uploadedFile.size,
     uploadId,
   };
 
@@ -100,9 +102,7 @@ export const deleteUploadedFile = async (
     headers: { ...requestHeaders },
     body: { fileId: encodedFileId },
   };
-  await apiLib
-    .del(`/uploads/${year}/${stateCode}`, options)
-    .catch((error) => {
-      console.log("!!!Error retrieving files: ", error);
-    });
+  await apiLib.del(`/uploads/${year}/${stateCode}`, options).catch((error) => {
+    console.log("!!!Error retrieving files: ", error);
+  });
 };

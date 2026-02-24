@@ -7,15 +7,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { collectPageItems, createClient } from "./dynamo/dynamodb-lib";
 import s3 from "../libs/s3-lib";
-
-interface UploadData {
-  uploadedState: string;
-  awsFilename: string;
-  filename: string;
-  uploadedDate: string;
-  uploadedUsername: string;
-  fileId: string;
-}
+import { UploadData } from "../types/uploads";
 
 const uploadTableName = process.env.UploadsTable!;
 const client = createClient();
@@ -48,6 +40,7 @@ export const updateUpload = async (
   uploadedFileName: string,
   awsFilename: string,
   fileId: string,
+  uploadedFileSize: number,
 ) => {
   const params = {
     TableName: uploadTableName,
@@ -55,12 +48,14 @@ export const updateUpload = async (
       uploadedState: state,
       fileId: fileId,
     },
-    UpdateExpression: "SET uploadedUsername = :uploadedUsername, uploadedDate = :uploadedDate, filename = :filename, awsFilename = :awsFilename",
+    UpdateExpression:
+      "SET uploadedUsername = :uploadedUsername, uploadedDate = :uploadedDate, filename = :filename, awsFilename = :awsFilename, filesize = :filesize",
     ExpressionAttributeValues: {
       ":uploadedUsername": username,
       ":uploadedDate": new Date().toISOString(),
       ":filename": uploadedFileName,
       ":awsFilename": awsFilename,
+      ":filesize": uploadedFileSize,
     },
   };
 

@@ -22,25 +22,21 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>();
 
+  //check the database for any uploads that already exist
   useEffect(() => {
-    const fetchData = async () =>
-      await retrieveUploadedFiles(year, state, uploadId).then((response) => {
-        setUploadedFiles(response);
-      });
-    fetchData();
+    retrieveUploadedFiles(year, state, uploadId).then((response) => {
+      setUploadedFiles(response);
+    });
   }, []);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
-        await onUploadFiles().then((response) => {
-          console.log("response", response);
-          const listData = filesToUpload.map((file) => {
-            return { name: file.name, size: file.size, fileId: "" };
+        await onUploadFiles().then(() => {
+          retrieveUploadedFiles(year, state, uploadId).then((response) => {
+            setFilesToUpload([]);
+            setUploadedFiles(response);
           });
-
-          setUploadedFiles([...(uploadedFiles ?? []), ...listData]);
-          setFilesToUpload([]);
         });
       fetchData();
     }

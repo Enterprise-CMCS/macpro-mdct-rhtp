@@ -26,7 +26,7 @@ export const retrieveUploadedFiles = async (
 ) => {
   const uploadedFiles = await getUploadedFiles(year, state!, uploadId);
   return uploadedFiles.map((file) => {
-    return { name: file.filename, size: 0, fileId: file.fileId };
+    return { name: file.filename, size: file.filesize, fileId: file.fileId };
   });
 };
 

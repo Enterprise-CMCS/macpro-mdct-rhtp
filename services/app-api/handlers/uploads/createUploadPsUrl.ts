@@ -11,7 +11,8 @@ import { UploadFileData } from "../../types/uploads";
 export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const { user, body } = request;
   // Format Info
-  const { uploadedFileName, uploadId } = body as UploadFileData;
+  const { uploadedFileName, uploadedFileSize, uploadId } =
+    body as UploadFileData;
   const { state, year } = request.parameters;
 
   const username = user.email ?? "";
@@ -23,7 +24,7 @@ export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const awsFilename = `${randomValue}_${dateString}_${uploadedFileName}`;
   const fileId = `${year}-${uploadId}_${awsFilename}`;
 
-  await updateUpload(state, username, uploadedFileName, awsFilename, fileId);
+  await updateUpload(state, username, uploadedFileName, awsFilename, fileId, uploadedFileSize);
 
   // Pre-sign url
   let psurl = await s3.createPresignedPost({

@@ -33,13 +33,15 @@ export const AttachmentArea = (
     window.location.href = await getFileDownloadUrl(year, state!, file.fileId);
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const fetchData = async () => {
     await retrieveUploadedFiles(year, state, id).then((response) => {
       setFiles(response);
     });
   };
-
-  fetchData();
 
   const onModalClose = () => {
     setModalOpen(false);
