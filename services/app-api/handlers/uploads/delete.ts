@@ -1,9 +1,7 @@
 import { handler } from "../../libs/handler-lib";
 import { canDeleteUpload } from "../../utils/authorization";
 import { error } from "../../utils/constants";
-import {
-  parseUploadViewParameters,
-} from "../../libs/param-lib";
+import { parseUploadViewParameters } from "../../libs/param-lib";
 import { forbidden, ok } from "../../libs/response-lib";
 import { deleteUpload, queryUpload } from "../../storage/upload";
 
@@ -31,5 +29,5 @@ export const deleteUploadFile = handler(
 
     await deleteUpload(decodedFileId, state!, document);
     return ok();
-  },
+  }
 );

@@ -12,5 +12,5 @@ export const viewUploaded = handler(
 
     const uploads = await queryViewUpload(state);
     return ok(uploads);
-  },
+  }
 );

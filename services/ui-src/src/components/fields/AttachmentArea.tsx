@@ -14,7 +14,7 @@ import {
 import { deleteUploadedFile, getFileDownloadUrl } from "utils/other/fileApi";
 
 export const AttachmentArea = (
-  props: PageElementProps<AttachmentAreaTemplate>,
+  props: PageElementProps<AttachmentAreaTemplate>
 ) => {
   const { label, helperText, id } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);

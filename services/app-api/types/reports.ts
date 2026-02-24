@@ -112,7 +112,8 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
-  AttachmentArea = "attachmentArea",}
+  AttachmentArea = "attachmentArea",
+}
 
 export type PageElement =
   | HeaderTemplate
@@ -269,4 +270,8 @@ export interface TextboxTemplate extends InputElementTemplate {
 }
 export type AttachmentAreaTemplate = {
   type: ElementType.AttachmentArea;
-}
+  id: string;
+  label: string;
+  helperText?: string;
+  required: boolean;
+};

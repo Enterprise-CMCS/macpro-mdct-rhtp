@@ -33,5 +33,5 @@ export const getSignedFileUrl = handler(
     psurl = fixLocalstackUrl(psurl);
 
     return ok({ psurl: psurl });
-  },
+  }
 );

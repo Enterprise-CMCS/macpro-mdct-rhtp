@@ -110,7 +110,7 @@ const dropdownTemplateSchema = object().shape({
       value: string().required(),
       checked: boolean().notRequired(),
       checkedChildren: lazy(() => array().of(pageElementSchema).notRequired()),
-    }),
+    })
   ),
   answer: string().notRequired(),
   required: boolean().required(),
@@ -180,7 +180,7 @@ const radioTemplateSchema = object().shape({
       value: string().required(),
       checked: boolean().notRequired(),
       checkedChildren: lazy(() => array().of(pageElementSchema).notRequired()),
-    }),
+    })
   ),
   answer: string().notRequired(),
   required: boolean().required(),
@@ -199,7 +199,7 @@ const checkboxTemplateSchema = object().shape({
       value: string().required(),
       checked: boolean().notRequired(),
       checkedChildren: lazy(() => array().of(pageElementSchema).notRequired()),
-    }),
+    })
   ),
   answer: array().of(string()).notRequired(),
   required: boolean().required(),
@@ -292,12 +292,12 @@ const pagesSchema = array()
             return formPageTemplateSchema;
         }
       }
-    }),
+    })
   )
   .required();
 
 export const isReportOptions = (
-  obj: object | undefined,
+  obj: object | undefined
 ): obj is ReportOptions => {
   const reportOptionsValidationSchema = object()
     .shape({
@@ -325,7 +325,7 @@ const reportValidateSchema = object().shape({
     .of(
       object().shape({
         submitted: number().notRequired(),
-      }),
+      })
     )
     .notRequired(),
   submittedBy: string().notRequired(),
@@ -357,7 +357,7 @@ export const validateReportPayload = async (payload: object | undefined) => {
 };
 
 export const validateReportEditPayload = async (
-  payload: object | undefined,
+  payload: object | undefined
 ) => {
   if (!payload) {
     throw new Error(error.MISSING_DATA);

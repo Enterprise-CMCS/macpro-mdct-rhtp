@@ -24,7 +24,14 @@ export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const awsFilename = `${randomValue}_${dateString}_${uploadedFileName}`;
   const fileId = `${year}-${uploadId}_${awsFilename}`;
 
-  await updateUpload(state, username, uploadedFileName, awsFilename, fileId, uploadedFileSize);
+  await updateUpload(
+    state,
+    username,
+    uploadedFileName,
+    awsFilename,
+    fileId,
+    uploadedFileSize
+  );
 
   // Pre-sign url
   let psurl = await s3.createPresignedPost({

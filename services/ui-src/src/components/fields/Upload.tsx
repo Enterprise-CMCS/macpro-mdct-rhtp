@@ -87,7 +87,7 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
         year,
         state,
         uploadId,
-        file,
+        file
       );
       await uploadFileToS3(presignedPostData, file);
     }

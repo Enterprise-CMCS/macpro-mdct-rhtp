@@ -22,7 +22,7 @@ export type UploadListProp = {
 export const retrieveUploadedFiles = async (
   year: string,
   state: string,
-  uploadId: string,
+  uploadId: string
 ) => {
   const uploadedFiles = await getUploadedFiles(year, state!, uploadId);
   return uploadedFiles.map((file) => {
@@ -33,7 +33,7 @@ export const retrieveUploadedFiles = async (
 export const uploadListRender = (
   files: File[] | UploadListProp[],
   onRemove: Function,
-  onClick?: Function,
+  onClick?: Function
 ) => {
   return (
     <List variant="upload">

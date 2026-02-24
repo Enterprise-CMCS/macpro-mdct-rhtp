@@ -67,7 +67,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
           "caller: $context.identity.caller, user: $context.identity.user, " +
           "requestTime: $context.requestTime, httpMethod: $context.httpMethod, " +
           "resourcePath: $context.resourcePath, status: $context.status, " +
-          "protocol: $context.protocol, responseLength: $context.responseLength",
+          "protocol: $context.protocol, responseLength: $context.responseLength"
       ),
     },
     defaultCorsPreflightOptions: {
@@ -97,7 +97,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     STAGE: stage,
     attachmentsBucketName: attachmentsBucket.bucketName,
     ...Object.fromEntries(
-      tables.map((table) => [`${table.node.id}Table`, table.table.tableName]),
+      tables.map((table) => [`${table.node.id}Table`, table.table.tableName])
     ),
     brokerString,
     ...(isLocalStack && { AWS_ENDPOINT_URL: process.env.AWS_ENDPOINT_URL }),
@@ -227,7 +227,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
         name: `${project}-${stage}-${service}`,
         blockRequestBodyOver8KB: false,
       },
-      "REGIONAL",
+      "REGIONAL"
     );
 
     new wafv2.CfnWebACLAssociation(scope, "WebACLAssociation", {

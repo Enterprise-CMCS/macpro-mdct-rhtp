@@ -7,7 +7,7 @@ import { runCommand } from "../lib/runner.ts";
 import { project, region } from "./consts.ts";
 
 export const getCloudFormationStackOutputValues = async (
-  stackName: string,
+  stackName: string
 ): Promise<Record<string, string>> => {
   const cloudFormationClient = new CloudFormationClient({
     region,
@@ -19,15 +19,15 @@ export const getCloudFormationStackOutputValues = async (
   return Object.fromEntries(
     outputs
       .map(
-        (o) => [o.OutputKey ?? (o as any).OutputName, o.OutputValue] as const,
+        (o) => [o.OutputKey ?? (o as any).OutputName, o.OutputValue] as const
       )
-      .filter(([k]) => Boolean(k)) as [string, string][],
+      .filter(([k]) => Boolean(k)) as [string, string][]
   );
 };
 
 const buildUiEnvObject = (
   stage: string,
-  cfnOutputs: Record<string, string>,
+  cfnOutputs: Record<string, string>
 ): Record<string, string> => {
   if (stage === "localstack") {
     return {
@@ -71,7 +71,7 @@ const buildUiEnvObject = (
 
 export const runFrontendLocally = async (stage: string) => {
   const outputs = await getCloudFormationStackOutputValues(
-    `${project}-${stage}`,
+    `${project}-${stage}`
   );
   const envVars = buildUiEnvObject(stage, outputs);
   await writeLocalUiEnvFile(envVars);

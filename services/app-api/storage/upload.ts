@@ -15,7 +15,7 @@ const client = createClient();
 export const deleteUpload = async (
   decodedFileId: string,
   state: string,
-  document: Record<string, any>,
+  document: Record<string, any>
 ) => {
   var params = {
     Bucket: process.env.attachmentsBucketName,
@@ -30,7 +30,7 @@ export const deleteUpload = async (
         uploadedState: state,
         fileId: decodedFileId,
       },
-    }),
+    })
   );
 };
 
@@ -40,7 +40,7 @@ export const updateUpload = async (
   uploadedFileName: string,
   awsFilename: string,
   fileId: string,
-  uploadedFileSize: number,
+  uploadedFileSize: number
 ) => {
   const params = {
     TableName: uploadTableName,

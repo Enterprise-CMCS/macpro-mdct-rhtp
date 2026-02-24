@@ -5,7 +5,7 @@ export enum ReportType {
 }
 
 export const isReportType = (
-  reportType: string | undefined,
+  reportType: string | undefined
 ): reportType is ReportType => {
   return Object.values(ReportType).includes(reportType as ReportType);
 };
@@ -96,13 +96,13 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 }
 
 export const isReviewSubmitPage = (
-  page: PageTemplate,
+  page: PageTemplate
 ): page is ReviewSubmitTemplate => {
   return page.type === PageType.ReviewSubmit && "submittedView" in page;
 };
 
 export const isFormPageTemplate = (
-  page: PageTemplate,
+  page: PageTemplate
 ): page is FormPageTemplate => {
   return (page as FormPageTemplate).title != undefined;
 };

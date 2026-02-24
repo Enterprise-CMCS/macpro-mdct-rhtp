@@ -19,7 +19,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   year: string,
   stateCode: string,
   uploadId: string,
-  uploadedFile: File,
+  uploadedFile: File
 ) => {
   const requestHeaders = await getRequestHeaders();
   const body = {
@@ -36,7 +36,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
 
   const { psurl } = await apiLib.post<PathURL>(
     `/psUrlUpload/${year}/${stateCode}`,
-    options,
+    options
   );
 
   return { presignedUploadUrl: psurl };
@@ -44,7 +44,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
 
 export const uploadFileToS3 = async (
   { presignedUploadUrl }: { presignedUploadUrl: string },
-  file: File,
+  file: File
 ) => {
   return await fetch(presignedUploadUrl, {
     method: "PUT",
@@ -55,7 +55,7 @@ export const uploadFileToS3 = async (
 export const getFileDownloadUrl = async (
   year: string,
   stateCode: string,
-  fileId: string,
+  fileId: string
 ) => {
   const requestHeaders = await getRequestHeaders();
   const options = {
@@ -64,7 +64,7 @@ export const getFileDownloadUrl = async (
   };
   const response = await apiLib.post<PathURL>(
     `/psUrlDownload/${year}/${stateCode}`,
-    options,
+    options
   );
   return response.psurl;
 };
@@ -72,7 +72,7 @@ export const getFileDownloadUrl = async (
 export const getUploadedFiles = async (
   year: string,
   stateCode: string,
-  uploadId: string,
+  uploadId: string
 ) => {
   const requestHeaders = await getRequestHeaders();
   const body = {
@@ -94,7 +94,7 @@ export const getUploadedFiles = async (
 export const deleteUploadedFile = async (
   year: string,
   stateCode: string,
-  fileId: string,
+  fileId: string
 ) => {
   const encodedFileId = encodeURIComponent(fileId);
   const requestHeaders = await getRequestHeaders();

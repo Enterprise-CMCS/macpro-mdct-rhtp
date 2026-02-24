@@ -22,7 +22,7 @@ export class ParentStack extends Stack {
   constructor(
     scope: Construct,
     id: string,
-    props: StackProps & DeploymentConfigProperties,
+    props: StackProps & DeploymentConfigProperties
   ) {
     const {
       isDev,
@@ -51,7 +51,7 @@ export class ParentStack extends Stack {
     const loggingBucket = s3.Bucket.fromBucketName(
       this,
       "LoggingBucket",
-      `cms-cloud-${Aws.ACCOUNT_ID}-${Aws.REGION}`,
+      `cms-cloud-${Aws.ACCOUNT_ID}-${Aws.REGION}`
     );
 
     const { tables } = createDataComponents(commonProps);
@@ -133,11 +133,11 @@ function applyDenyCreateLogGroupPolicy(stack: Stack) {
     stack.node.tryFindChild(id)?.node.tryFindChild("Role") as iam.CfnRole;
 
   findRole(
-    "Custom::S3AutoDeleteObjectsCustomResourceProvider",
+    "Custom::S3AutoDeleteObjectsCustomResourceProvider"
   )?.addPropertyOverride("Policies", [denyCreateLogGroupPolicy]);
 
   findRole(
-    "AWSCDK.TriggerCustomResourceProviderCustomResourceProvider",
+    "AWSCDK.TriggerCustomResourceProviderCustomResourceProvider"
   )?.addPropertyOverride("Policies.1", denyCreateLogGroupPolicy);
 
   stack.node

@@ -36,12 +36,12 @@ export const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<LiteReport[]>([]);
   const [selectedReport, setSelectedReport] = useState<LiteReport | undefined>(
-    undefined,
+    undefined
   );
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [dropdownValue, setDropdownValue] = useState(
-    searchParams.get("year") || "All",
+    searchParams.get("year") || "All"
   );
 
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
@@ -64,7 +64,7 @@ export const DashboardPage = () => {
       setFilteredReports(reports);
     } else {
       setFilteredReports(
-        reports.filter((report) => String(report.year) === filterYear),
+        reports.filter((report) => String(report.year) === filterYear)
       );
     }
   }, [reports, filterYear]);
