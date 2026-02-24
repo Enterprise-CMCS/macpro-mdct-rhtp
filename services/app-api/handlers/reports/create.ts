@@ -53,14 +53,9 @@ export const createReport = handler(
 
     const nextReportOptions = getNextReportOptions(latestReport);
 
-    const report = await buildReport(
-      reportType,
-      state,
-      nextReportOptions,
-      user
+    const reportStartDate = reportStartDates[nextReportOptions.subType!](
+      nextReportOptions.year
     );
-
-    const reportStartDate = reportStartDates[report.subType!](report.year);
 
     if (Date.now() < reportStartDate) {
       return badRequest(
@@ -69,6 +64,13 @@ export const createReport = handler(
         ).toLocaleDateString()}.`
       );
     }
+
+    const report = await buildReport(
+      reportType,
+      state,
+      nextReportOptions,
+      user
+    );
 
     await putReport(report);
     return ok(report);

@@ -16,7 +16,6 @@ import {
   ElementType,
   PageElement,
   ReportOptions,
-  RhtpSubType,
 } from "../types/reports";
 import { error } from "./constants";
 
