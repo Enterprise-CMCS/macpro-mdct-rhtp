@@ -20,7 +20,7 @@ export const getSignedFileUrl = handler(
 
     const results = await queryUpload(fileId, state!);
     if (!results.Items || results.Items.length === 0) {
-      return forbidden(error.MISSING_DATA);
+      return forbidden(error.UNAUTHORIZED);
     }
     const document = results.Items[0];
 
