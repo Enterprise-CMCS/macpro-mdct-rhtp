@@ -1,6 +1,8 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { parseHtml } from "utils";
 import {
+  deleteUploadedFile,
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
@@ -43,7 +45,9 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
   }, [filesToUpload]);
 
   const downloadFile = async (file: UploadListProp) => {
-    window.location.href = await getFileDownloadUrl(year, state!, file.fileId);
+    window.location.href = parseHtml(
+      await getFileDownloadUrl(year, state!, file.fileId)
+    );
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -52,7 +56,7 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    //filter to only accepted file types
+    /** TO DO: add filtering to upload only accepted file types */
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
       .filter((file) => file != null);
@@ -68,12 +72,8 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
     }
   };
 
-  const onRemove = (index: number, file: UploadListProp) => {
-    if (!uploadedFiles) return;
-
-    const files = [...uploadedFiles];
-    files.splice(index, 1);
-    setUploadedFiles(uploadedFiles);
+  const onRemove = async (file: UploadListProp) => {
+    await deleteUploadedFile(year, state, file.fileId);
   };
 
   const onUploadFiles = async () => {
