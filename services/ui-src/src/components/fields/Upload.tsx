@@ -45,7 +45,8 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
   }, [filesToUpload]);
 
   const downloadFile = async (file: UploadListProp) => {
-    window.open(parseHtml(await getFileDownloadUrl(year, state!, file.fileId)));
+    const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
+    window.open(parseHtml(fileLink));
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {

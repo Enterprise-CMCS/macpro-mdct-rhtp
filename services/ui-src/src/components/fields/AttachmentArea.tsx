@@ -30,7 +30,8 @@ export const AttachmentArea = (
   }
 
   const downloadFile = async (file: UploadListProp) => {
-    window.open(parseHtml(await getFileDownloadUrl(year, state!, file.fileId)));
+    const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
+    window.open(parseHtml(fileLink));
   };
 
   useEffect(() => {
