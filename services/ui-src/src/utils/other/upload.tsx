@@ -47,10 +47,10 @@ export const uploadListRender = (
   return (
     <List variant="upload">
       {files?.map((file, fileIdx) => (
-        <ListItem>
+        <ListItem key={`${file.name}.${fileIdx}`}>
           <VStack width="100%">
             <HStack width="100%" justifyContent="space-between">
-              <VStack>
+              <VStack alignItems="flex-start">
                 {!onClick ? (
                   <Text>{file?.name}</Text>
                 ) : (
@@ -62,7 +62,8 @@ export const uploadListRender = (
               </VStack>
               <Button
                 variant="unstyled"
-                onClick={() => onRemove(fileIdx, file)}
+                aria-label={`delete ${file.name}`}
+                onClick={() => onRemove(file)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
               />
             </HStack>

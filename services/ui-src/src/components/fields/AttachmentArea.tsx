@@ -5,7 +5,7 @@ import { UploadModal } from "components/modals/UploadModal";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useParams } from "react-router-dom";
-import { useStore } from "utils";
+import { parseHtml, useStore } from "utils";
 import {
   retrieveUploadedFiles,
   UploadListProp,
@@ -30,7 +30,9 @@ export const AttachmentArea = (
   }
 
   const downloadFile = async (file: UploadListProp) => {
-    window.location.href = await getFileDownloadUrl(year, state!, file.fileId);
+    window.location.href = parseHtml(
+      await getFileDownloadUrl(year, state!, file.fileId)
+    );
   };
 
   useEffect(() => {
@@ -49,7 +51,8 @@ export const AttachmentArea = (
     fetchData();
   };
 
-  const onRemove = async (id: string, file: UploadListProp) => {
+  const onRemove = async (file: UploadListProp) => {
+    /** TO DO: Fix file deletion from s3 bucket */
     await deleteUploadedFile(year, state, file.fileId);
   };
 
