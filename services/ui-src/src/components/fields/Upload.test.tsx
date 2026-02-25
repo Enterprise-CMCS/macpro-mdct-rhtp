@@ -14,21 +14,17 @@ import {
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 
-vi.mock("utils/other/upload", async (importOriginal) => ({
-  ...(await importOriginal()),
-  retrieveUploadedFiles: vi
-    .fn()
-    .mockReturnValue(
-      Promise.resolve([{ name: "mock-name", size: "15", fileId: "mock-id" }])
-    ),
-}));
-
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),
   uploadFileToS3: vi.fn(),
   recordFileInDatabaseAndGetUploadUrl: vi.fn(),
+  getUploadedFiles: vi
+    .fn()
+    .mockReturnValue([
+      { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
+    ]),
 }));
 
 const props = {

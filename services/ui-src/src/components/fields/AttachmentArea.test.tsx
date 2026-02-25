@@ -19,20 +19,15 @@ vi.mock("utils", async (importOriginal) => ({
   useStore: vi.fn().mockReturnValue({ report: { year: "2026" } }),
 }));
 
-vi.mock("utils/other/upload", async (importOriginal) => ({
-  ...(await importOriginal()),
-  retrieveUploadedFiles: vi
-    .fn()
-    .mockReturnValue(
-      Promise.resolve([{ name: "mock-name", size: "15", fileId: "mock-id" }])
-    ),
-  deleteUploadedFile: vi.fn(),
-}));
-
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),
+  getUploadedFiles: vi
+    .fn()
+    .mockReturnValue([
+      { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
+    ]),
 }));
 
 const mockAttachmentAreaElement: AttachmentAreaTemplate = {
