@@ -47,7 +47,7 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
   const downloadFile = async (file: UploadListProp) => {
     const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
     const sanitizeLink = DOMPurify.sanitize(fileLink);
-    console.log(sanitizeLink);
+    window.open(sanitizeLink, "noopener");
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
