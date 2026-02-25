@@ -6,7 +6,7 @@ import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
-} from "utils/other/fileApi";
+} from "utils/api/requestMethods/upload";
 import {
   acceptedFileTypes,
   retrieveUploadedFiles,

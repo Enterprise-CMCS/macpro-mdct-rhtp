@@ -8,7 +8,10 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Upload } from "./Upload";
-import { deleteUploadedFile, getFileDownloadUrl } from "utils/other/fileApi";
+import {
+  deleteUploadedFile,
+  getFileDownloadUrl,
+} from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 
 vi.mock("utils/other/upload", async (importOriginal) => ({
@@ -20,7 +23,7 @@ vi.mock("utils/other/upload", async (importOriginal) => ({
     ),
 }));
 
-vi.mock("utils/other/fileApi", async (importOriginal) => ({
+vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),

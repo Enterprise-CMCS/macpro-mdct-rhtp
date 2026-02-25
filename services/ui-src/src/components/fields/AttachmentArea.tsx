@@ -12,7 +12,10 @@ import {
   UploadListProp,
   uploadListRender,
 } from "utils/other/upload";
-import { deleteUploadedFile, getFileDownloadUrl } from "utils/other/fileApi";
+import {
+  deleteUploadedFile,
+  getFileDownloadUrl,
+} from "utils/api/requestMethods/upload";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>

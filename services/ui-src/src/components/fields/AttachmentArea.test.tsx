@@ -3,7 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
 import { useParams } from "react-router-dom";
 import { ElementType, AttachmentAreaTemplate } from "types";
-import { deleteUploadedFile, getFileDownloadUrl } from "utils/other/fileApi";
+import {
+  deleteUploadedFile,
+  getFileDownloadUrl,
+} from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 import { Mock } from "vitest";
 
@@ -26,7 +29,7 @@ vi.mock("utils/other/upload", async (importOriginal) => ({
   deleteUploadedFile: vi.fn(),
 }));
 
-vi.mock("utils/other/fileApi", async (importOriginal) => ({
+vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),

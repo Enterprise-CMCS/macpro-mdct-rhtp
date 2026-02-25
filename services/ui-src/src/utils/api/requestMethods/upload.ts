@@ -1,5 +1,5 @@
 import { getRequestHeaders } from "utils/api/requestMethods/getRequestHeaders";
-import { apiLib } from "./../api/apiLib";
+import { apiLib } from "../apiLib";
 
 interface PathURL {
   psurl: string;
@@ -83,11 +83,10 @@ export const getUploadedFiles = async (
     headers: { ...requestHeaders },
     body: { ...body },
   };
-  const response = await apiLib
-    .get<UploadData[]>(`/uploads/${year}/${stateCode}`, options)
-    .catch((error) => {
-      console.log("!!!Error downloading files: ", error);
-    });
+  const response = await apiLib.get<UploadData[]>(
+    `/uploads/${year}/${stateCode}`,
+    options
+  );
   return response ? response : [];
 };
 
@@ -102,7 +101,5 @@ export const deleteUploadedFile = async (
     headers: { ...requestHeaders },
     body: { fileId: encodedFileId },
   };
-  await apiLib.del(`/uploads/${year}/${stateCode}`, options).catch((error) => {
-    console.log("!!!Error retrieving files: ", error);
-  });
+  await apiLib.del(`/uploads/${year}/${stateCode}`, options);
 };

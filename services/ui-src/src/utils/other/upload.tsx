@@ -8,7 +8,7 @@ import {
   Progress,
   HStack,
 } from "@chakra-ui/react";
-import { getUploadedFiles } from "./fileApi";
+import { getUploadedFiles } from "../api/requestMethods/upload";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 
 export const acceptedFileTypes = [
