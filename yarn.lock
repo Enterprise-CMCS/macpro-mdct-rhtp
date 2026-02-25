@@ -2020,12 +2020,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"aws-cdk@npm:^2.1029.0":
-  version: 2.1104.0
-  resolution: "aws-cdk@npm:2.1104.0"
+"aws-cdk@npm:2.1031.1":
+  version: 2.1031.1
+  resolution: "aws-cdk@npm:2.1031.1"
+  dependencies:
+    fsevents: "npm:2.3.2"
+  dependenciesMeta:
+    fsevents:
+      optional: true
   bin:
     cdk: bin/cdk
-  checksum: 10c0/ca3eab0f5f746e168bfd5f391db1fd39ebaabbd378481adda04cdc8752e16895c50a6903fc45c324d05b62fa3698a3da85d59edf8a897afa0be194662402803f
+  checksum: 10c0/b93feb87dd4aa17c73effbbf2f3ef277d1e8c4b8eaf0ba0bd3328b00f51201535d12fcee3e8b541080661d49fc9f5c0e585e5d171f297638540a852d6afee615
   languageName: node
   linkType: hard
 
@@ -2387,12 +2392,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:2.3.2":
+  version: 2.3.2
+  resolution: "fsevents@npm:2.3.2"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10c0/be78a3efa3e181cda3cf7a4637cb527bcebb0bd0ea0440105a3bb45b86f9245b307dc10a2507e8f4498a7d4ec349d1910f4d73e4d4495b16103106e07eee735b
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:~2.3.3":
   version: 2.3.3
   resolution: "fsevents@npm:2.3.3"
   dependencies:
     node-gyp: "npm:latest"
   checksum: 10c0/a1f0c44595123ed717febbc478aa952e47adfc28e2092be66b8ab1635147254ca6cfe1df792a8997f22716d4cbafc73309899ff7bfac2ac3ad8cf2e4ecc3ec60
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
+"fsevents@patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>":
+  version: 2.3.2
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"
+  dependencies:
+    node-gyp: "npm:latest"
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -2629,7 +2653,7 @@ __metadata:
     "@aws-sdk/client-s3": "npm:^3.981.0"
     "@aws-sdk/client-secrets-manager": "npm:^3.981.0"
     "@types/node": "npm:^24.10.10"
-    aws-cdk: "npm:^2.1029.0"
+    aws-cdk: "npm:2.1031.1"
     aws-cdk-lib: "npm:^2.237.0"
     aws-cdk-local: "npm:^2.19.2"
     constructs: "npm:^10.4.5"
