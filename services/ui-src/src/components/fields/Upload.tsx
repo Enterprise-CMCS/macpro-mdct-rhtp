@@ -1,14 +1,13 @@
-import { Box, Text, VStack } from "@chakra-ui/react";
+import { Box, Spinner, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import DOMPurify from "dompurify";
 import {
   deleteUploadedFile,
-  getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
 } from "utils/api/requestMethods/upload";
 import {
   acceptedFileTypes,
+  downloadFile,
   retrieveUploadedFiles,
   UploadListProp,
   uploadListRender,
@@ -23,11 +22,13 @@ interface Props {
 export const Upload = ({ id: uploadId, state, year }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   //check the database for any uploads that already exist
   useEffect(() => {
     retrieveUploadedFiles(year, state, uploadId).then((response) => {
       setUploadedFiles(response);
+      setLoading(false);
     });
   }, []);
 
@@ -43,12 +44,6 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
       fetchData();
     }
   }, [filesToUpload]);
-
-  const downloadFile = async (file: UploadListProp) => {
-    const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
-    const sanitizeLink = DOMPurify.sanitize(fileLink);
-    window.open(sanitizeLink, "noopener");
-  };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -123,7 +118,7 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
         </span>
       </Box>
       <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      {uploadListRender(filesToUpload ?? [], onRemove)}
+      {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>
@@ -131,7 +126,17 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
           above.
         </Text>
       </div>
-      {uploadListRender(uploadedFiles ?? [], onRemove, downloadFile)}
+      {loading ? (
+        <Spinner size="sm" />
+      ) : (
+        uploadListRender(
+          uploadedFiles ?? [],
+          year,
+          state,
+          onRemove,
+          downloadFile
+        )
+      )}
     </VStack>
   );
 };

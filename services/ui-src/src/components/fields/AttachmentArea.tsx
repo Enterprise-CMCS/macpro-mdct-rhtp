@@ -1,21 +1,18 @@
-import DOMPurify from "dompurify";
 import { AttachmentAreaTemplate } from "types";
 import { PageElementProps } from "components/report/Elements";
-import { Text, Button, Stack, Heading, Image } from "@chakra-ui/react";
+import { Text, Button, Stack, Heading, Image, Spinner } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useParams } from "react-router-dom";
 import { useStore } from "utils";
 import {
+  downloadFile,
   retrieveUploadedFiles,
   UploadListProp,
   uploadListRender,
 } from "utils/other/upload";
-import {
-  deleteUploadedFile,
-  getFileDownloadUrl,
-} from "utils/api/requestMethods/upload";
+import { deleteUploadedFile } from "utils/api/requestMethods/upload";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
@@ -23,6 +20,7 @@ export const AttachmentArea = (
   const { label, helperText, id } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [files, setFiles] = useState<UploadListProp[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const { state } = useParams();
   const { report } = useStore();
@@ -33,19 +31,15 @@ export const AttachmentArea = (
     return;
   }
 
-  const downloadFile = async (file: UploadListProp) => {
-    const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
-    const sanitizeLink = DOMPurify.sanitize(fileLink);
-    window.open(sanitizeLink, "noopener");
-  };
-
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
     await retrieveUploadedFiles(year, state, id).then((response) => {
       setFiles(response);
+      setLoading(false);
     });
   };
 
@@ -64,7 +58,11 @@ export const AttachmentArea = (
     <Stack gap="1.5rem">
       <Heading variant="h5">{label}</Heading>
       {helperText && <Text>{helperText}</Text>}
-      {uploadListRender(files ?? [], onRemove, downloadFile)}
+      {loading ? (
+        <Spinner size="sm"></Spinner>
+      ) : (
+        uploadListRender(files ?? [], year, state, onRemove, downloadFile)
+      )}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}

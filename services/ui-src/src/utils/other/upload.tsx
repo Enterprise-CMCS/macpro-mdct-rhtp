@@ -8,8 +8,12 @@ import {
   Progress,
   HStack,
 } from "@chakra-ui/react";
-import { getUploadedFiles } from "../api/requestMethods/upload";
+import {
+  getFileDownloadUrl,
+  getUploadedFiles,
+} from "../api/requestMethods/upload";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import DOMPurify from "dompurify";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -39,8 +43,20 @@ export const retrieveUploadedFiles = async (
   });
 };
 
+export const downloadFile = async (
+  year: string,
+  state: string,
+  file: UploadListProp
+) => {
+  const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
+  const sanitizeLink = DOMPurify.sanitize(fileLink);
+  window.open(sanitizeLink);
+};
+
 export const uploadListRender = (
   files: File[] | UploadListProp[],
+  year: string,
+  state: string,
   onRemove: Function,
   onClick?: Function
 ) => {
@@ -54,7 +70,10 @@ export const uploadListRender = (
                 {!onClick ? (
                   <Text>{file?.name}</Text>
                 ) : (
-                  <Button variant="link" onClick={() => onClick(file)}>
+                  <Button
+                    variant="link"
+                    onClick={() => onClick(year, state, file)}
+                  >
                     {file?.name}
                   </Button>
                 )}
