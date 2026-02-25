@@ -293,6 +293,7 @@ export const isReportOptions = (
     .shape({
       name: string().required(),
       year: number().required(),
+      subType: number().notRequired(),
     })
     .required()
     .noUnknown();
@@ -323,6 +324,7 @@ const reportValidateSchema = object().shape({
   status: mixed<ReportStatus>().oneOf(Object.values(ReportStatus)).required(),
   name: string().required(),
   type: mixed<ReportType>().oneOf(Object.values(ReportType)).required(),
+  subType: number().notRequired(),
   year: number().required(),
   submissionCount: number().required(),
   archived: boolean().required(),

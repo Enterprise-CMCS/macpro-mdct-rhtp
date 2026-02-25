@@ -1,4 +1,13 @@
-import { ReportType } from "../types/reports";
+import { ReportType, RhtpSubType } from "../types/reports";
+
+// TODO: These are the generic quarter start dates. Update when actual dates get decided on
+export const reportStartDates = {
+  [RhtpSubType.ANNUAL]: (year: number) => new Date(year, 0, 1).getTime(),
+  [RhtpSubType.Q1]: (year: number) => new Date(year, 0, 1).getTime(),
+  [RhtpSubType.Q2]: (year: number) => new Date(year, 3, 1).getTime(),
+  [RhtpSubType.Q3]: (year: number) => new Date(year, 6, 1).getTime(),
+  [RhtpSubType.Q4]: (year: number) => new Date(year, 9, 1).getTime(),
+};
 
 export const error = {
   UNAUTHORIZED: "User is not authorized to access this resource.",

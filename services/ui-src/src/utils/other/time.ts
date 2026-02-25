@@ -1,5 +1,5 @@
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
-import { DateShape } from "types";
+import { DateShape, Report } from "types";
 import { differenceInSeconds } from "date-fns";
 
 interface TimeShape {
