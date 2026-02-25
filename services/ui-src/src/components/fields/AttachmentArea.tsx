@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { AttachmentAreaTemplate } from "types";
 import { PageElementProps } from "components/report/Elements";
 import { Text, Button, Stack, Heading, Image } from "@chakra-ui/react";
@@ -5,7 +6,7 @@ import { UploadModal } from "components/modals/UploadModal";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useParams } from "react-router-dom";
-import { parseHtml, useStore } from "utils";
+import { useStore } from "utils";
 import {
   retrieveUploadedFiles,
   UploadListProp,
@@ -31,7 +32,7 @@ export const AttachmentArea = (
 
   const downloadFile = async (file: UploadListProp) => {
     const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
-    const sanitizeLink = parseHtml(fileLink);
+    const sanitizeLink = DOMPurify.sanitize(fileLink);
     window.open(sanitizeLink);
   };
 

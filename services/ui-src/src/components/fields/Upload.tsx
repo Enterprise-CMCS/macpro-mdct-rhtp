@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { parseHtml } from "utils";
+import DOMPurify from "dompurify";
 import {
   deleteUploadedFile,
   getFileDownloadUrl,
@@ -46,7 +46,7 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
 
   const downloadFile = async (file: UploadListProp) => {
     const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
-    const sanitizeLink = parseHtml(fileLink);
+    const sanitizeLink = DOMPurify.sanitize(fileLink);
     window.open(sanitizeLink);
   };
 
