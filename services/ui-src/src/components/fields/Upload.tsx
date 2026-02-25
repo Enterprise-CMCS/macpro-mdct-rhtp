@@ -106,6 +106,7 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         width="100%"
+        aria-label="file drop area"
       >
         <span>
           Drag files here or
