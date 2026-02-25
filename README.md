@@ -174,7 +174,7 @@ We have 3 main branches that we work out of:
 - Val (Pointed to [https://mdctrhtpval.cms.gov/](https://mdctrhtpval.cms.gov/)) is our beta branch
 - Production (Pointed to [http://mdctrhtp.cms.gov/](http://mdctrhtp.cms.gov/)) is our release branch
 
-When a pull request is approved and merged into main the deploy script will spin up and upon completion will deploy to [https://mdctrhtpdev.cms.gov/](https://mdctrhtpdev.cms.gov/). If a user wants to deploy to val they can initiate the [Create Deployment PR action](https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/actions/workflows/create-pr.yml) in GitHub actions. setting the target_branch variable to the destination environment. Once that pull request is approved, the deploy script will run again and upon completion will deploy to [https://mdctrhtpval.cms.gov/](https://mdctrhtpval.cms.gov/). So to quickly break it down:
+When a pull request is approved and merged into main the deploy script will spin up and upon completion will deploy to [https://mdctrhtpdev.cms.gov/](https://mdctrhtpdev.cms.gov/). If a user wants to deploy to val they can initiate the [Create Deployment PR action](https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/actions/workflows/create-pr.yml) in GitHub actions, setting the target_branch variable to the destination environment. Once that pull request is approved, the deploy script will run again and upon completion will deploy to [https://mdctrhtpval.cms.gov/](https://mdctrhtpval.cms.gov/). So to quickly break it down:
 
 - Submit pull request of your code to main
 - Approve pull request and merge into main
@@ -186,7 +186,7 @@ When a pull request is approved and merged into main the deploy script will spin
 - Approve pull request and **DO NOT SQUASH YOUR MERGE**, just merge it into production
 - Deploy script runs and will deploy to [http://mdctrhtp.cms.gov/](http://mdctrhtp.cms.gov/).
 
-If you have a PR that needs Product/Design input, the easiest way to get it to them is to use the cloudfront site from Github. Go to your PR and the `Checks` tab, then `Deploy` tab. Click "Summary" and you will find the cloudfront URL in the deploy summary (once that step completes).
+If you have a PR that needs Product/Design input, the easiest way to get it to them is to use the cloudfront site from Github. Go to your PR and the `Checks` tab, then `Deploy` tab. Click `Summary` and you will find the cloudfront URL in the deploy summary (once that step completes).
 
 ## BigMac Kafka Integration
 
