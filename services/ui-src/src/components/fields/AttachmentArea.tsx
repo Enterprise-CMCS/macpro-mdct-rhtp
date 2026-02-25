@@ -36,8 +36,7 @@ export const AttachmentArea = (
   const downloadFile = async (file: UploadListProp) => {
     const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
     const sanitizeLink = DOMPurify.sanitize(fileLink);
-    console.log(sanitizeLink);
-    // window.open(sanitizeLink, 'noopener');
+    window.open(sanitizeLink, "noopener");
   };
 
   useEffect(() => {
