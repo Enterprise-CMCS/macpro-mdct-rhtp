@@ -13,7 +13,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+      - name: Enable Corepack
+        run: corepack enable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
       - name: run unit tests
         run: ./scripts/test-unit.ts
       - name: publish test coverage to qlty
