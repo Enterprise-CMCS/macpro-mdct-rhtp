@@ -15,13 +15,13 @@ import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
 import { StateAbbr } from "../constants";
 
-const makeQuarterlyChanges = (
+export const makeQuarterlyChanges = (
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
 ) => {
   for (const page of pages) {
     if (!page.elements) continue;
     for (const element of page.elements) {
-      if ("quarterly" in element && element.quarterly) {
+      if ("quarterly" in element && !element.quarterly) {
         element.disabled = true;
       }
     }
