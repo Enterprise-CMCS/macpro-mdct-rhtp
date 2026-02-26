@@ -5,11 +5,28 @@ import {
   ReportStatus,
   ReportOptions,
   ReportType,
+  ParentPageTemplate,
+  FormPageTemplate,
+  ReviewSubmitTemplate,
+  RhtpSubType,
 } from "../../types/reports";
 import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
 import { StateAbbr } from "../constants";
+
+export const makeQuarterlyChanges = (
+  pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
+) => {
+  for (const page of pages) {
+    if (!page.elements) continue;
+    for (const element of page.elements) {
+      if ("quarterly" in element && !element.quarterly) {
+        element.disabled = true;
+      }
+    }
+  }
+};
 
 export const buildReport = async (
   reportType: ReportType,
@@ -36,6 +53,10 @@ export const buildReport = async (
     submissionCount: 0,
     pages: template.pages,
   };
+
+  if (reportOptions.subType !== RhtpSubType.ANNUAL) {
+    makeQuarterlyChanges(report.pages);
+  }
 
   /**
    * Report should always be valid in this function, but we're going

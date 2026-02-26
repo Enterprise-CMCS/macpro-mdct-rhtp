@@ -106,7 +106,7 @@ export const TextField = (
         onFocus={() => setHasFocus(true)}
         value={displayValue}
         errorMessage={errorMessage}
-        disabled={disabled}
+        disabled={disabled || textbox.disabled}
       />
     </Box>
   );
