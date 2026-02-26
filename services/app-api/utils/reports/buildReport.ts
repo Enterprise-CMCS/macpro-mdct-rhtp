@@ -8,6 +8,7 @@ import {
   ParentPageTemplate,
   FormPageTemplate,
   ReviewSubmitTemplate,
+  RhtpSubType,
 } from "../../types/reports";
 import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
@@ -53,7 +54,7 @@ export const buildReport = async (
     pages: template.pages,
   };
 
-  if (true) {
+  if (reportOptions.subType !== RhtpSubType.ANNUAL) {
     makeQuarterlyChanges(report.pages);
   }
 
