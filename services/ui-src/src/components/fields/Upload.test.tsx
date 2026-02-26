@@ -11,6 +11,7 @@ import { Upload } from "./Upload";
 import {
   deleteUploadedFile,
   getFileDownloadUrl,
+  recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 
@@ -54,6 +55,7 @@ describe("<Upload />", () => {
 
     const input = screen.getByLabelText("Choose from folder");
     await userEvent.upload(input, [mockPng]);
+    expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
   });
   test("uploading a file by drag and drop", async () => {
     await act(async () => {
@@ -64,6 +66,7 @@ describe("<Upload />", () => {
     fireEvent.drop(dropArea, {
       dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
     });
+    expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
   });
 
   test("test file download", async () => {
