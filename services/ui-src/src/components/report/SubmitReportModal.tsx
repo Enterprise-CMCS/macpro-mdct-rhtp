@@ -9,7 +9,7 @@ export const SubmitReportModal = (
     await onSubmit();
   };
 
-  const submitModalText = `You won’t be able to make edits after submitting unless you send a request to CMS to unlock your submission. After review, your CMS LABS Lead will contact you if there are corrections to be made, and your report status will change to “In revision” in the ${reportType} Report dashboard.`;
+  const submitModalText = `You won’t be able to make edits after submitting unless you send a request to CMS to unlock your submission. After review, your CMS RHTP Lead will contact you if there are corrections to be made, and your report status will change to “In revision” in the ${reportType} Report dashboard.`;
 
   return (
     <>

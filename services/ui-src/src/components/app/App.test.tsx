@@ -34,7 +34,7 @@ describe("<App />", () => {
       screen.getByRole("button", { name: "Here's how you know" })
     ).toBeVisible();
     // Unable to run assertions on collections
-    expect(screen.getAllByAltText("LABS logo")).toBeTruthy();
+    expect(screen.getAllByAltText("RHTP logo")).toBeTruthy();
     expect(screen.getAllByAltText("Help")).toBeTruthy();
     expect(screen.getAllByAltText("Account")).toBeTruthy();
     expect(screen.getAllByAltText("Expand")).toBeTruthy();

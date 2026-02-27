@@ -10,7 +10,7 @@ import { ReportType } from "types";
 export const RhtpIntroductionCard = () => {
   return (
     <ReportIntroCard title="RHTP Report">
-      The RHTP report is a demonstration report for the MDCT LABS application.
+      The RHTP report is a demonstration report for the MDCT RHTP application.
       This report showcases core functionality common across modern MDCT
       applications, including report creation, data entry, validation, and
       submission workflows. Use this report to explore the standard patterns
@@ -20,7 +20,7 @@ export const RhtpIntroductionCard = () => {
         <AccordionItem label="When is the RHTP Report Due?">
           The RHTP report is a demonstration report for testing and development
           purposes. In a production environment, reporting periods and deadlines
-          would be configured based on program requirements. For LABS, this
+          would be configured based on program requirements. For RHTP, this
           report is available at any time for exploring MDCT patterns and
           workflows.
         </AccordionItem>
