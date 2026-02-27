@@ -44,6 +44,8 @@ const buildUiEnvObject = (
       COGNITO_USER_POOL_ID: process.env.COGNITO_USER_POOL_ID!,
       COGNITO_IDP_NAME: "Okta",
       POST_SIGNOUT_REDIRECT: "http://localhost:3000/",
+      S3_ATTACHMENTS_BUCKET_REGION: "us-east-1",
+      S3_ATTACHMENTS_BUCKET_NAME: `uploads-${stage}-attachments-000000000000`,
       REACT_APP_LD_SDK_CLIENT: process.env.REACT_APP_LD_SDK_CLIENT!,
     };
   }
@@ -61,6 +63,8 @@ const buildUiEnvObject = (
     COGNITO_USER_POOL_ID: cfnOutputs.CognitoUserPoolId,
     COGNITO_IDP_NAME: "Okta",
     POST_SIGNOUT_REDIRECT: "https://test.home.idm.cms.gov/",
+    S3_ATTACHMENTS_BUCKET_REGION: region,
+    S3_ATTACHMENTS_BUCKET_NAME: cfnOutputs.AttachmentsBucketName,
     REACT_APP_LD_SDK_CLIENT: process.env.REACT_APP_LD_SDK_CLIENT!,
   };
 };

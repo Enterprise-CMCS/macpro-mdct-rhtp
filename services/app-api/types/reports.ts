@@ -123,6 +123,7 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  AttachmentArea = "attachmentArea",
 }
 
 export type PageElement =
@@ -142,7 +143,8 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | SubmissionParagraphTemplate
-  | ListInputTemplate;
+  | ListInputTemplate
+  | AttachmentAreaTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -279,3 +281,10 @@ export interface TextboxTemplate extends InputElementTemplate {
   answer?: string;
   hideCondition?: HideCondition;
 }
+export type AttachmentAreaTemplate = {
+  type: ElementType.AttachmentArea;
+  id: string;
+  label: string;
+  helperText?: string;
+  required: boolean;
+};

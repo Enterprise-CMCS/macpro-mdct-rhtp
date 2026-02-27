@@ -3,6 +3,7 @@ import {
   Aws,
   aws_ec2 as ec2,
   aws_iam as iam,
+  aws_s3 as s3,
   CfnOutput,
   Stack,
   type StackProps,
@@ -14,6 +15,7 @@ import { createUiAuthComponents } from "./ui-auth.ts";
 import { createApiComponents } from "./api.ts";
 import { deployFrontend } from "./deployFrontend.ts";
 import { isLocalStack } from "../local/util.ts";
+import { createUploadsComponents } from "./uploads.ts";
 import { getSubnets } from "../utils/vpc.ts";
 
 export class ParentStack extends Stack {
@@ -25,6 +27,7 @@ export class ParentStack extends Stack {
     const {
       isDev,
       secureCloudfrontDomainName,
+      stage,
       vpcName,
       kafkaAuthorizedSubnetIds,
     } = props;
@@ -43,13 +46,28 @@ export class ParentStack extends Stack {
     const vpc = ec2.Vpc.fromLookup(this, "Vpc", { vpcName });
     const kafkaAuthorizedSubnets = getSubnets(this, kafkaAuthorizedSubnetIds);
 
+    const attachmentsBucketName = `uploads-${stage}-attachments-${Aws.ACCOUNT_ID}`;
+
+    const loggingBucket = s3.Bucket.fromBucketName(
+      this,
+      "LoggingBucket",
+      `cms-cloud-${Aws.ACCOUNT_ID}-${Aws.REGION}`
+    );
+
     const { tables } = createDataComponents(commonProps);
+
+    const attachmentsBucket = createUploadsComponents({
+      ...commonProps,
+      loggingBucket,
+      attachmentsBucketName: attachmentsBucketName!,
+    });
 
     const { apiGatewayRestApiUrl, restApiId } = createApiComponents({
       ...commonProps,
       tables,
       vpc,
       kafkaAuthorizedSubnets,
+      attachmentsBucket,
     });
 
     if (isLocalStack) {
@@ -83,6 +101,7 @@ export class ParentStack extends Stack {
       userPoolId,
       userPoolClientId,
       userPoolClientDomain: `${userPoolDomainName}.auth.${Aws.REGION}.amazoncognito.com`,
+      attachmentsBucketName: attachmentsBucketName!,
     });
 
     new CfnOutput(this, "CloudFrontUrl", {

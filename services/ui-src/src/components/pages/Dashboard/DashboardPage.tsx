@@ -116,7 +116,6 @@ export const DashboardPage = () => {
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
         Return home
       </Link>
-
       <Box sx={sx.leadTextBox}>
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}

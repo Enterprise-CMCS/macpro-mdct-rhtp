@@ -49,6 +49,12 @@ export const rhtpReportTemplate: ReportBase = {
           helperText:
             "Enter an email address for the person or position above. Department or program-wide email addresses are allowed.",
         },
+        {
+          type: ElementType.AttachmentArea,
+          id: "upload-area",
+          label: "Supporting Evidence: Attachments",
+          required: false,
+        },
       ],
     },
     {
