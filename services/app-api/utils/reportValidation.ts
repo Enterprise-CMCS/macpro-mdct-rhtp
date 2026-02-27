@@ -125,6 +125,24 @@ const accordionTemplateSchema = object().shape({
   value: string().required(),
 });
 
+const useOfFundsTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.UseOfFundsTable)),
+  id: string().required(),
+  answer: array()
+    .of(
+      object().shape({
+        id: string().required(),
+        spentFunds: string().required(),
+        description: string().required(),
+        init: string().required(),
+        useOfFunds: string().required(),
+        recipientName: string().required(),
+        recipientCategory: string().required(),
+      })
+    )
+    .notRequired(),
+});
+
 const pageElementSchema = lazy((value: PageElement): Schema => {
   if (!value.type) {
     throw new Error();
@@ -164,6 +182,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return submissionParagraphSchema;
     case ElementType.ListInput:
       return listInputTemplateSchema;
+    case ElementType.UseOfFundsTable:
+      return useOfFundsTableSchema;
     default:
       throw new Error("Page Element type is not valid");
   }

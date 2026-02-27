@@ -16,6 +16,7 @@ export const rhtpReportTemplate: ReportBase = {
       id: "root",
       childPageIds: [
         "general-information",
+        "use-of-funds",
         "sustainability-and-highlights",
         "review-submit",
       ],
@@ -48,6 +49,23 @@ export const rhtpReportTemplate: ReportBase = {
           required: true,
           helperText:
             "Enter an email address for the person or position above. Department or program-wide email addresses are allowed.",
+        },
+      ],
+    },
+    {
+      id: "use-of-funds",
+      title: "Use of Funds",
+      type: PageType.Standard,
+      sidebar: true,
+      elements: [
+        {
+          type: ElementType.Header,
+          id: "use-of-funds-header",
+          text: "Use of Funds",
+        },
+        {
+          id: "use-of-funds-table",
+          type: ElementType.UseOfFundsTable,
         },
       ],
     },

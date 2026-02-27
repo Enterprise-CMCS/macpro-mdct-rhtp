@@ -123,6 +123,7 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  UseOfFundsTable = "useOfFundsTable",
 }
 
 export type PageElement =
@@ -142,6 +143,7 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | SubmissionParagraphTemplate
+  | UseOfFundsTableTemplate
   | ListInputTemplate;
 
 export type HideCondition = {
@@ -279,3 +281,19 @@ export interface TextboxTemplate extends InputElementTemplate {
   answer?: string;
   hideCondition?: HideCondition;
 }
+
+export type UseOfFundsTableItem = {
+  id: string;
+  spentFunds: string;
+  description: string;
+  init: string;
+  useOfFunds: string;
+  recipientName: string;
+  recipientCategory: string;
+};
+
+export type UseOfFundsTableTemplate = {
+  type: ElementType.UseOfFundsTable;
+  id: string;
+  answer?: UseOfFundsTableItem[];
+};

@@ -27,6 +27,7 @@ import {
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
+import { UseOfFundsTableElement } from "./UseOfFundsTable";
 
 interface Props {
   id: string;
@@ -84,6 +85,10 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <SubmissionParagraph />;
       case ElementType.ListInput:
         return <ListInput {...{ updateElement, disabled, element }} />;
+      case ElementType.UseOfFundsTable:
+        return (
+          <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
+        );
       default:
         assertExhaustive(element);
         return null;

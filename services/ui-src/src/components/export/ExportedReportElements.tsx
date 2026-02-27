@@ -1,6 +1,7 @@
 import { Heading } from "@chakra-ui/react";
 import { ElementType, PageElement } from "types";
 import { notAnsweredText } from "../../constants";
+import { UseOfFundsTableElementExport } from "components/report/UseOfFundsTable";
 
 //elements that are rendered as part of the table that does not need a unique renderer
 const tableElementList = [
@@ -26,6 +27,8 @@ export const renderElements = (element: PageElement) => {
           {element.text}
         </Heading>
       );
+    case ElementType.UseOfFundsTable:
+      return UseOfFundsTableElementExport(element);
   }
 
   if (!("answer" in element)) {

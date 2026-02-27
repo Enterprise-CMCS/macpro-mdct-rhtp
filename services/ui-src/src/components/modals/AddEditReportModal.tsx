@@ -114,6 +114,7 @@ export const AddEditReportModal = ({
   };
 
   const onSubmit = async (evt: FormEvent) => {
+    setSubmitting(true);
     evt.preventDefault();
     // const reportTitleError = await setErrorMessage(formData.reportTitle);
     // const newErrorData = {
@@ -126,8 +127,6 @@ export const AddEditReportModal = ({
     // if (!canSubmit) {
     //   return;
     // }
-
-    setSubmitting(true);
 
     const userEnteredReportName = formData.reportTitle!;
     if (selectedReport) {
@@ -171,7 +170,7 @@ export const AddEditReportModal = ({
         ),
         closeButtonText: "Cancel",
       }}
-      disableConfirm={readOnly}
+      disableConfirm={readOnly || submitting}
     >
       <form id="addEditReportModal" onSubmit={onSubmit}>
         <Flex direction="column" gap="2rem">
