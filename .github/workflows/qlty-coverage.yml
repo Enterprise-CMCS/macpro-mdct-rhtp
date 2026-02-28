@@ -1,6 +1,7 @@
-# In order for main's coverage to reflect on QLTY's dashboard or badges, it must tied to a branch push, not pr
+# This file is managed by macpro-mdct-core so if you'd like to change it let's do it there
 name: Publish main Code Coverage
 
+# In order for main's coverage to reflect on QLTY's dashboard or badges, it must tied to a branch push, not pr
 on:
   push:
     branches: [main]
@@ -22,9 +23,6 @@ jobs:
           node-version-file: ".nvmrc"
       - name: Enable Corepack
         run: corepack enable
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
       - name: run unit tests
         run: ./scripts/test-unit.ts
       - name: publish test coverage to qlty
