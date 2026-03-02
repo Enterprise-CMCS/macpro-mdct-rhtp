@@ -19,6 +19,10 @@ export const isReportType = (
   return Object.values(ReportType).includes(reportType as ReportType);
 };
 
+export interface CreateReportOptions {
+  copyFromReportId?: string;
+}
+
 export interface ReportOptions {
   name: string;
   year: number;
@@ -52,7 +56,7 @@ export type ReportBase = {
 };
 
 export interface Report extends ReportBase, ReportOptions {
-  id?: string;
+  id: string;
   name: string;
   state: StateAbbr;
   created?: number;
