@@ -29,10 +29,7 @@ const testEvent = {
   queryStringParameters: {},
   pathParameters: { reportType: "RHTP", state: "PA" },
   headers: { "cognito-identity-id": "test" },
-  body: JSON.stringify({
-    year: 2026,
-    name: "test report",
-  }),
+  body: JSON.stringify({}),
 };
 
 describe("Test create report handler", () => {
@@ -49,21 +46,11 @@ describe("Test create report handler", () => {
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
 
-  it("should return 403 if user is not authorized", async () => {
+  test("should return 403 if user is not authorized", async () => {
     (canWriteState as Mock).mockReturnValueOnce(false);
     const response = await createReport(testEvent);
     expect(response.statusCode).toBe(StatusCodes.Forbidden);
   });
-
-  // test("Test missing body", async () => {
-  //   const emptyBodyEvent = {
-  //     ...testEvent,
-  //     pathParameters: { reportType: "RHTP", state: "PA" },
-  //     body: null,
-  //   };
-  //   const res = await createReport(emptyBodyEvent);
-  //   expect(res.statusCode).toBe(StatusCodes.BadRequest);
-  // });
 
   test("Test Successful create", async () => {
     const res = await createReport(testEvent);

@@ -15,7 +15,7 @@ import {
   PageType,
   ElementType,
   PageElement,
-  ReportOptions,
+  CreateReportOptions,
 } from "../types/reports";
 import { error } from "./constants";
 
@@ -288,19 +288,17 @@ const pagesSchema = array()
   )
   .required();
 
-export const isReportOptions = (
+export const isCreateReportOptions = (
   obj: object | undefined
-): obj is ReportOptions => {
-  const reportOptionsValidationSchema = object()
+): obj is CreateReportOptions => {
+  const createReportOptionsValidationSchema = object()
     .shape({
-      name: string().required(),
-      year: number().required(),
-      subType: number().notRequired(),
+      copyFromReportId: string().notRequired(),
     })
     .required()
     .noUnknown();
 
-  return reportOptionsValidationSchema.isValidSync(obj, {
+  return createReportOptionsValidationSchema.isValidSync(obj, {
     stripUnknown: false,
     strict: true,
   });
@@ -310,6 +308,7 @@ const reportValidateSchema = object().shape({
   id: string().notRequired(),
   state: string().required(),
   created: number().notRequired(),
+  copyFromReportId: string().notRequired(),
   lastEdited: number().notRequired(),
   lastEditedBy: string().required(),
   lastEditedByEmail: string().notRequired(),
