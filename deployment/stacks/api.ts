@@ -190,7 +190,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "postUpload", {
     entry: "services/app-api/handlers/uploads/createUploadPsUrl.ts",
     handler: "psUpload",
-    path: "/psUrlUpload/{year}/{state}",
+    path: "/uploads/upload/{year}/{state}",
     method: "POST",
     ...commonProps,
   });
@@ -198,7 +198,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "postDownload", {
     entry: "services/app-api/handlers/uploads/createDownloadPsUrl.ts",
     handler: "getSignedFileUrl",
-    path: "/psUrlDownload/{year}/{state}",
+    path: "/uploads/download/{year}/{state}",
     method: "POST",
     ...commonProps,
   });
@@ -206,7 +206,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
     handler: "deleteUpload",
-    path: "/uploads/{year}/{state}",
+    path: "/uploads/{year}/{state}/{fileId}",
     method: "DELETE",
     ...commonProps,
   });

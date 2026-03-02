@@ -3,7 +3,7 @@ import s3 from "../../libs/s3-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { parseUploadViewParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
-import { updateUpload } from "../../storage/upload";
+import { createUpload } from "../../storage/upload";
 import { UploadFileData } from "../../types/uploads";
 /**
  * Updates the Sections associated with a given year and state
@@ -24,7 +24,7 @@ export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const awsFilename = `${randomValue}_${dateString}_${uploadedFileName}`;
   const fileId = `${year}-${uploadId}_${awsFilename}`;
 
-  await updateUpload(
+  await createUpload(
     state,
     username,
     uploadedFileName,

@@ -38,9 +38,7 @@ const mockAttachmentAreaElement: AttachmentAreaTemplate = {
 };
 
 const AttachmentAreaComponent = (
-  <div data-testid="test-checkbox-list">
-    <AttachmentArea element={mockAttachmentAreaElement} />
-  </div>
+  <AttachmentArea element={mockAttachmentAreaElement} />
 );
 
 const consoleMock = vi.spyOn(console, "error");

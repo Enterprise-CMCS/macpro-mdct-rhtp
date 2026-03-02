@@ -281,10 +281,6 @@ export interface TextboxTemplate extends InputElementTemplate {
   answer?: string;
   hideCondition?: HideCondition;
 }
-export type AttachmentAreaTemplate = {
+export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  id: string;
-  label: string;
-  helperText?: string;
-  required: boolean;
-};
+}

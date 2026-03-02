@@ -3,7 +3,7 @@ import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
 import { psUpload } from "./createUploadPsUrl";
-import { updateUpload } from "../../storage/upload";
+import { createUpload } from "../../storage/upload";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
@@ -17,7 +17,7 @@ vi.mock("../../utils/authorization", () => ({
 }));
 
 vi.mock("../../storage/upload", () => ({
-  updateUpload: vi.fn(),
+  createUpload: vi.fn(),
 }));
 
 vi.mock("../../libs/s3-lib", () => ({
@@ -50,7 +50,7 @@ describe("Test psUpload API method", () => {
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
   test("successful create upload ps url", async () => {
-    (updateUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
+    (createUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
     const res = await psUpload(testEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });

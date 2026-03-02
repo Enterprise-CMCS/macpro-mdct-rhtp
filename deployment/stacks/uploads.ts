@@ -100,7 +100,6 @@ export function createUploadsComponents(props: CreateUploadsComponentsProps) {
       conditions: {
         StringNotEquals: {
           "s3:ExistingObjectTag/GuardDutyMalwareScanStatus": "NO_THREATS_FOUND",
-          "s3:ExistingObjectTag/virusScanStatus": "CLEAN",
         },
       },
     })

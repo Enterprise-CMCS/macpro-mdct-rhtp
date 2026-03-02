@@ -37,10 +37,12 @@ export const retrieveUploadedFiles = async (
   state: string,
   uploadId: string
 ) => {
-  const uploadedFiles = await getUploadedFiles(year, state!, uploadId);
-  return uploadedFiles.map((file) => {
-    return { name: file.filename, size: file.filesize, fileId: file.fileId };
-  });
+  const uploadedFiles = await getUploadedFiles(year, state, uploadId);
+  return uploadedFiles.map((file) => ({
+    name: file.filename,
+    size: file.filesize,
+    fileId: file.fileId,
+  }));
 };
 
 export const downloadFile = async (
@@ -48,7 +50,7 @@ export const downloadFile = async (
   state: string,
   file: UploadListProp
 ) => {
-  const fileLink = await getFileDownloadUrl(year, state!, file.fileId);
+  const fileLink = await getFileDownloadUrl(year, state, file.fileId);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
   window.open(sanitizeLink);
 };

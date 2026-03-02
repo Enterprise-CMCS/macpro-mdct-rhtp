@@ -4,7 +4,6 @@ import { Upload } from "components/fields/Upload";
 export const UploadModal = ({ modalDisclosure, id, year, state }: Props) => {
   return (
     <Modal
-      data-testid="upload-modal"
       modalDisclosure={modalDisclosure}
       onConfirmHandler={() => modalDisclosure.onClose()}
       content={{

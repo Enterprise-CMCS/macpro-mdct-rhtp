@@ -34,7 +34,7 @@ export const deleteUpload = async (
   );
 };
 
-export const updateUpload = async (
+export const createUpload = async (
   state: string,
   username: string,
   uploadedFileName: string,

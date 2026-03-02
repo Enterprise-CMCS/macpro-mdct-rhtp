@@ -282,13 +282,9 @@ export interface NumberFieldTemplate extends InputElementTemplate {
   hideCondition?: never;
 }
 
-export type AttachmentAreaTemplate = {
+export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  id: string;
-  label: string;
-  helperText?: string;
-  required: boolean;
-};
+}
 
 export interface RadioTemplate extends InputElementTemplate {
   type: ElementType.Radio;

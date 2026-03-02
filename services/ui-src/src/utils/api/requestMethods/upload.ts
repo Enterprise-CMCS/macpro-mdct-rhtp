@@ -35,7 +35,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   };
 
   const { psurl } = await apiLib.post<PathURL>(
-    `/psUrlUpload/${year}/${stateCode}`,
+    `/uploads/upload/${year}/${stateCode}`,
     options
   );
 
@@ -63,7 +63,7 @@ export const getFileDownloadUrl = async (
     body: { fileId },
   };
   const response = await apiLib.post<PathURL>(
-    `/psUrlDownload/${year}/${stateCode}`,
+    `/uploads/download/${year}/${stateCode}`,
     options
   );
   return response.psurl;
@@ -99,7 +99,7 @@ export const deleteUploadedFile = async (
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    body: { fileId: encodedFileId },
+    body: {},
   };
-  await apiLib.del(`/uploads/${year}/${stateCode}`, options);
+  await apiLib.del(`/uploads/${year}/${stateCode}/${encodedFileId}`, options);
 };
