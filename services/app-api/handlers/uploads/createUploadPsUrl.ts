@@ -5,24 +5,19 @@ import { parseUploadViewParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { createUpload } from "../../storage/upload";
 import { UploadFileData } from "../../types/uploads";
+import KSUID from "ksuid";
 /**
  * Updates the Sections associated with a given year and state
  */
 export const psUpload = handler(parseUploadViewParameters, async (request) => {
   const { user, body } = request;
   // Format Info
-  const { uploadedFileName, uploadedFileSize, uploadId } =
-    body as UploadFileData;
+  const { uploadedFileName, uploadedFileSize } = body as UploadFileData;
   const { state, year } = request.parameters;
 
   const username = user.email ?? "";
-  const date = new Date();
-  const randomValue = Math.floor(Math.random() * (100000 - 100) + 100)
-    .toString()
-    .padStart(7, "0"); // including a random value allows docs titled the same thing to be uploaded multiple times
-  const dateString = `${date.getFullYear()}${date.getMonth()}${date.getDay()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}`;
-  const awsFilename = `${randomValue}_${dateString}_${uploadedFileName}`;
-  const fileId = `${year}-${uploadId}_${awsFilename}`;
+  const awsFilename = `${KSUID.randomSync().string}_${uploadedFileName}`;
+  const fileId = `${year}-${awsFilename}`;
 
   await createUpload(
     state,
@@ -39,5 +34,5 @@ export const psUpload = handler(parseUploadViewParameters, async (request) => {
     Key: awsFilename,
   });
   psurl = fixLocalstackUrl(psurl);
-  return ok({ psurl: psurl });
+  return ok({ psurl: psurl, fileId: fileId });
 });

@@ -3,6 +3,7 @@ import { apiLib } from "../apiLib";
 
 interface PathURL {
   psurl: string;
+  fileId: string;
 }
 
 export interface UploadData {
@@ -18,7 +19,6 @@ export interface UploadData {
 export const recordFileInDatabaseAndGetUploadUrl = async (
   year: string,
   stateCode: string,
-  uploadId: string,
   uploadedFile: File
 ) => {
   const requestHeaders = await getRequestHeaders();
@@ -26,7 +26,6 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
     uploadedFileName: uploadedFile.name,
     uploadedFileType: uploadedFile.type,
     uploadedFileSize: uploadedFile.size,
-    uploadId,
   };
 
   const options = {
@@ -69,15 +68,10 @@ export const getFileDownloadUrl = async (
   return response.psurl;
 };
 
-export const getUploadedFiles = async (
-  year: string,
-  stateCode: string,
-  uploadId: string
-) => {
+export const getUploadedFiles = async (year: string, stateCode: string) => {
   const requestHeaders = await getRequestHeaders();
   const body = {
     stateCode,
-    uploadId,
   };
   const options = {
     headers: { ...requestHeaders },

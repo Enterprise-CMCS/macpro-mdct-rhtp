@@ -26,6 +26,8 @@ export const renderElements = (element: PageElement) => {
           {element.text}
         </Heading>
       );
+    case ElementType.AttachmentArea:
+      return "TBD";
   }
 
   if (!("answer" in element)) {

@@ -34,11 +34,12 @@ const mockAttachmentAreaElement: AttachmentAreaTemplate = {
   id: "mock-attachment-area-id",
   type: ElementType.AttachmentArea,
   label: "mock attachment area",
+  answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   required: true,
 };
 
 const AttachmentAreaComponent = (
-  <AttachmentArea element={mockAttachmentAreaElement} />
+  <AttachmentArea element={mockAttachmentAreaElement} updateElement={vi.fn()} />
 );
 
 const consoleMock = vi.spyOn(console, "error");

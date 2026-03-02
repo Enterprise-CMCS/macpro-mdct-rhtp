@@ -1,7 +1,14 @@
 import { Modal } from "components";
 import { Upload } from "components/fields/Upload";
+import { AttachmentAreaTemplate, UploadData } from "types";
 
-export const UploadModal = ({ modalDisclosure, id, year, state }: Props) => {
+export const UploadModal = ({
+  modalDisclosure,
+  year,
+  state,
+  answer,
+  updatedElement,
+}: Props) => {
   return (
     <Modal
       modalDisclosure={modalDisclosure}
@@ -13,7 +20,12 @@ export const UploadModal = ({ modalDisclosure, id, year, state }: Props) => {
         closeButtonText: undefined,
       }}
     >
-      <Upload year={year} state={state} id={id} />
+      <Upload
+        year={year}
+        state={state}
+        answer={answer}
+        updatedElement={updatedElement}
+      />
     </Modal>
   );
 };
@@ -23,7 +35,8 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
-  id: string;
   year: string;
   state: string;
+  answer: UploadData[];
+  updatedElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
 }

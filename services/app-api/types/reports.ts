@@ -103,6 +103,12 @@ export enum PageType {
   ReviewSubmit = "reviewSubmit",
 }
 
+export type UploadData = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
 export enum ElementType {
   Header = "header",
   SubHeader = "subHeader",
@@ -283,4 +289,5 @@ export interface TextboxTemplate extends InputElementTemplate {
 }
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  answer?: UploadData[];
 }

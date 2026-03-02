@@ -14,6 +14,7 @@ import {
 } from "../api/requestMethods/upload";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
+import { bytesToKiloBytes } from "./parsing";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -32,12 +33,8 @@ export type UploadListProp = {
   fileId: string;
 };
 
-export const retrieveUploadedFiles = async (
-  year: string,
-  state: string,
-  uploadId: string
-) => {
-  const uploadedFiles = await getUploadedFiles(year, state, uploadId);
+export const retrieveUploadedFiles = async (year: string, state: string) => {
+  const uploadedFiles = await getUploadedFiles(year, state);
   return uploadedFiles.map((file) => ({
     name: file.filename,
     size: file.filesize,
@@ -79,7 +76,7 @@ export const uploadListRender = (
                     {file?.name}
                   </Button>
                 )}
-                <span>{file.size} KB</span>
+                <span>{bytesToKiloBytes(file.size)} KB</span>
               </VStack>
               <Button
                 variant="unstyled"

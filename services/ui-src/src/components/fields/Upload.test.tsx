@@ -29,9 +29,10 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
 }));
 
 const props = {
-  id: "mock-id",
   state: "PA",
   year: "2026",
+  answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
+  updatedElement: vi.fn(),
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });

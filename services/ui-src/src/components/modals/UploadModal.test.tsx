@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
+import { AttachmentAreaTemplate } from "types";
 
 const mockCloseHandler = vi.fn();
 
@@ -15,9 +16,10 @@ const modalComponent = (
       isOpen: true,
       onClose: mockCloseHandler,
     }}
-    id={"mock-id"}
     year={"2026"}
     state={"PA"}
+    answer={[]}
+    updatedElement={vi.fn()}
   />
 );
 

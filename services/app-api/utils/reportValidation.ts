@@ -221,6 +221,13 @@ const attachmentAreaSchema = object().shape({
   label: string().required(),
   helperText: string().optional(),
   required: boolean().required(),
+  answer: array().of(
+    object().shape({
+      name: string().required(),
+      size: number().required(),
+      fileId: string().required(),
+    })
+  ),
 });
 
 const dividerSchema = object().shape({

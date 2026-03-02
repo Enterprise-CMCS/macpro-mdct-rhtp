@@ -1,5 +1,6 @@
 import { Box, Spinner, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { AttachmentAreaTemplate, UploadData } from "types";
 import {
   deleteUploadedFile,
   recordFileInDatabaseAndGetUploadUrl,
@@ -14,31 +15,22 @@ import {
 } from "utils/other/upload";
 
 interface Props {
-  id: string;
   state: string;
   year: string;
+  answer: UploadData[];
+  updatedElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
 }
 
-export const Upload = ({ id: uploadId, state, year }: Props) => {
+export const Upload = ({ state, year, answer, updatedElement }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
-  const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>();
-  const [loading, setLoading] = useState<boolean>(true);
-
-  //check the database for any uploads that already exist
-  useEffect(() => {
-    retrieveUploadedFiles(year, state, uploadId).then((response) => {
-      setUploadedFiles(response);
-      setLoading(false);
-    });
-  }, []);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
         await onUploadFiles().then(() => {
-          retrieveUploadedFiles(year, state, uploadId).then((response) => {
+          retrieveUploadedFiles(year, state).then((response) => {
             setFilesToUpload([]);
-            setUploadedFiles(response);
+            updatedElement({ answer: response });
           });
         });
       fetchData();
@@ -81,7 +73,6 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
       const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
         year,
         state,
-        uploadId,
         file
       );
       await uploadFileToS3(presignedPostData, file);
@@ -126,17 +117,7 @@ export const Upload = ({ id: uploadId, state, year }: Props) => {
           above.
         </Text>
       </div>
-      {loading ? (
-        <Spinner size="sm" />
-      ) : (
-        uploadListRender(
-          uploadedFiles ?? [],
-          year,
-          state,
-          onRemove,
-          downloadFile
-        )
-      )}
+      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
     </VStack>
   );
 };
