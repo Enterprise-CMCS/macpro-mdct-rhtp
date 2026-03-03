@@ -61,7 +61,7 @@ export const buildReport = async (
   }
 
   if (report.copyFromReportId) {
-    copyReport(report);
+    await copyReport(report);
   }
 
   /**
