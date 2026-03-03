@@ -15,29 +15,29 @@ const baseStyles = {
 const primaryVariant = {
   width: "fit-content",
   fontWeight: "bold",
-  backgroundColor: "palette.primary",
-  color: "palette.white",
+  backgroundColor: "primary",
+  color: "white",
   "&:hover, &:focus, &:focus:visited": {
-    backgroundColor: "palette.primary_darker",
-    color: "palette.white",
+    backgroundColor: "primary_darker",
+    color: "white",
   },
   "&:disabled, &:disabled:hover": {
-    color: "palette.gray_dark",
-    backgroundColor: "palette.gray_lighter",
+    color: "gray_dark",
+    backgroundColor: "gray_lighter",
     opacity: 1,
   },
   _visited: {
-    color: "palette.white",
+    color: "white",
   },
   ".icon": {
     marginRight: "spacer1",
   },
 };
 const transparentVariant = {
-    color: "palette.primary",
+    color: "primary",
     backgroundColor: "transparent",
     _hover: {
-      color: "palette.primary_darker",
+      color: "primary_darker",
       backgroundColor: "transparent",
       span: {
         filter: svgFilters.primary_darker,
@@ -46,7 +46,7 @@ const transparentVariant = {
   },
   sidebarToggleVariant = {
     position: "absolute",
-    background: "palette.gray_lightest",
+    background: "gray_lightest",
     borderRadius: "0px 10px 10px 0px",
     "img.left": {
       transform: "rotate(90deg)",
@@ -59,25 +59,25 @@ const transparentVariant = {
 const outlineVariant = () => ({
   ...theme.components.Button.variants.transparent,
   border: "1px solid",
-  borderColor: "palette.primary",
+  borderColor: "primary",
   textDecoration: "none",
   fontWeight: "bold",
   "&:disabled, &:disabled:hover": {
-    color: "palette.gray_dark",
-    borderColor: "palette.gray_dark",
+    color: "gray_dark",
+    borderColor: "gray_dark",
   },
   _hover: {
     ...theme.components.Button.variants.transparent._hover,
-    borderColor: "palette.primary_darker",
+    borderColor: "primary_darker",
     span: {
       filter: svgFilters.primary_darker,
     },
   },
   _visited: {
-    color: "palette.primary",
+    color: "primary",
   },
   ":hover, :visited:hover": {
-    color: "palette.primary_darker",
+    color: "primary_darker",
   },
   _focus: {
     textDecoration: "none",
@@ -89,23 +89,23 @@ const linkVariant = () => ({
 });
 // inverse variants
 const inverseVariant = {
-  backgroundColor: "palette.white",
-  color: "palette.primary",
+  backgroundColor: "white",
+  color: "primary",
   _hover: {
-    color: "palette.primary_darker",
+    color: "primary_darker",
     span: {
       filter: svgFilters.primary_darker,
     },
   },
 };
 const inverse_transparentVariant = {
-  color: "palette.white",
+  color: "white",
   backgroundColor: "transparent",
   span: {
     filter: svgFilters.white,
   },
   _hover: {
-    color: "palette.gray_lighter",
+    color: "gray_lighter",
     backgroundColor: "transparent",
     span: {
       filter: svgFilters.gray_lighter,
@@ -115,13 +115,13 @@ const inverse_transparentVariant = {
 const inverse_outlineVariant = () => ({
   ...theme.components.Button.variants.inverse_transparent,
   border: "1px solid",
-  borderColor: "palette.white",
+  borderColor: "white",
   span: {
     filter: svgFilters.white,
   },
   _hover: {
     ...theme.components.Button.variants.transparent._hover,
-    borderColor: "palette.gray_lighter",
+    borderColor: "gray_lighter",
     span: {
       filter: svgFilters.gray_lighter,
     },
@@ -133,14 +133,14 @@ const inverse_linkVariant = () => ({
 });
 // other
 const dangerVariant = {
-  backgroundColor: "palette.error_dark",
-  color: "palette.white",
+  backgroundColor: "error_dark",
+  color: "white",
   _hover: {
-    backgroundColor: "palette.error_darker",
+    backgroundColor: "error_darker",
   },
 };
 const returnVariant = {
-  color: "palette.primary",
+  color: "primary",
   width: "fit-content",
   padding: "0",
   textDecoration: "none",
@@ -148,7 +148,7 @@ const returnVariant = {
     textDecoration: "underline",
   },
   _visited: {
-    color: "palette.primary",
+    color: "primary",
   },
   display: "flex",
   ".icon": {

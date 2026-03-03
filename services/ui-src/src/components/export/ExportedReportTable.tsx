@@ -29,8 +29,8 @@ interface Props {
 export const ExportedReportTable = ({ rows }: Props) => {
   const getTextColor = (element: ReportTableType) => {
     return element.response === notAnsweredText && element.required
-      ? "palette.error_darker"
-      : "palette.black";
+      ? "error_darker"
+      : "black";
   };
 
   return (
@@ -47,7 +47,7 @@ export const ExportedReportTable = ({ rows }: Props) => {
             <Td>
               <Text>{row.indicator}</Text>
               {row.helperText && (
-                <Text color="palette.gray">{parseHtml(row.helperText)}</Text>
+                <Text color="gray">{parseHtml(row.helperText)}</Text>
               )}
               {row.type === ElementType.Date && <Text>MM/DD/YYYY</Text>}
             </Td>

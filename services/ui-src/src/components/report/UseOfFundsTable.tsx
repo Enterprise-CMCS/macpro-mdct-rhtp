@@ -36,6 +36,7 @@ export const UseOfFundsTableElement = (
 
   const initialValues = {
     id: "",
+    budgetPeriod: "",
     spentFunds: "",
     description: "",
     init: "",
@@ -47,6 +48,7 @@ export const UseOfFundsTableElement = (
   const initialItems = [
     {
       id: "1",
+      budgetPeriod: "Budget Period 1",
       spentFunds: "10000",
       description: "Description of how funds were spent",
       init: "1",
@@ -56,6 +58,7 @@ export const UseOfFundsTableElement = (
     },
     {
       id: "2",
+      budgetPeriod: "Budget Period 2",
       spentFunds: "10000",
       description: "Description of how funds were spent",
       init: "1",
@@ -154,31 +157,48 @@ export const UseOfFundsTableElement = (
   const rows = items.map((item, index) => {
     return (
       <Tr key={index}>
-        <Td width="100%" padding="spacer2 !important">
-          <Text>{item.id}</Text>
+        <Td>
+          <Text>{item.budgetPeriod}</Text>
         </Td>
         <Td>
-          <Button
-            as={Link}
-            variant={"outline"}
-            aria-label={`Edit ${item.id}`}
-            onClick={() => {
-              onEditClick(item);
-            }}
-          >
-            Edit
-          </Button>
+          <Text>${item.spentFunds}</Text>
         </Td>
         <Td>
-          <Button
-            variant="plain"
-            aria-label={`Delete ${item.id}`}
-            onClick={() => {
-              handleDeleteClick(item.id);
-            }}
-          >
-            <Image src={cancelIcon} alt={"Delete Item"} />
-          </Button>
+          <Text>{item.description}</Text>
+        </Td>
+        <Td>
+          <Text>{item.init}</Text>
+        </Td>
+        <Td>
+          <Text>{item.useOfFunds}</Text>
+        </Td>
+        <Td>
+          <Text>
+            {item.recipientName}; {item.recipientCategory}
+          </Text>
+        </Td>
+        <Td>
+          <Flex direction="row">
+            <Button
+              as={Link}
+              variant={"transparent"}
+              aria-label={`Edit ${item.id}`}
+              onClick={() => {
+                onEditClick(item);
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="plain"
+              aria-label={`Delete ${item.id}`}
+              onClick={() => {
+                handleDeleteClick(item.id);
+              }}
+            >
+              <Image src={cancelIcon} alt={"Delete Item"} />
+            </Button>
+          </Flex>
         </Td>
       </Tr>
     );
@@ -198,13 +218,13 @@ export const UseOfFundsTableElement = (
       <Table sx={sx.table}>
         <Thead>
           <Tr>
-            <Th>ID</Th>
-            <Th>Spent Funds</Th>
+            <Th>Budget Period</Th>
+            <Th>Spent Funds ($)</Th>
             <Th>Description</Th>
             <Th>Init #</Th>
             <Th>Use of Funds</Th>
-            <Th>Recipient Name</Th>
-            <Th>Recipient Category</Th>
+            <Th>Recipient name and category</Th>
+            <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>{rows}</Tbody>

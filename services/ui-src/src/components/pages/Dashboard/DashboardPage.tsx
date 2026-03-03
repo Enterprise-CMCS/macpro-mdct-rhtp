@@ -297,16 +297,16 @@ const sx = {
     },
     ".ds-c-spinner": {
       "&:before": {
-        borderColor: "palette.black",
+        borderColor: "black",
       },
       "&:after": {
-        borderLeftColor: "palette.black",
+        borderLeftColor: "black",
       },
     },
   },
   accordion: {
     marginTop: "spacer4",
-    color: "palette.base",
+    color: "base",
   },
   accordionItem: {
     marginBottom: "spacer3",
