@@ -14,6 +14,7 @@ import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
 import { StateAbbr } from "../constants";
+import { copyReport } from "./copyReport";
 
 export const makeQuarterlyChanges = (
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
@@ -55,8 +56,12 @@ export const buildReport = async (
     pages: template.pages,
   };
 
-  if (reportOptions.subType !== RhtpSubType.ANNUAL) {
+  if (report.subType !== RhtpSubType.ANNUAL) {
     makeQuarterlyChanges(report.pages);
+  }
+
+  if (report.copyFromReportId) {
+    copyReport(report);
   }
 
   /**
