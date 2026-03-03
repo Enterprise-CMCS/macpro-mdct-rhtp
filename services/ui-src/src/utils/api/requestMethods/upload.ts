@@ -59,10 +59,10 @@ export const getFileDownloadUrl = async (
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    body: { fileId },
+    body: {},
   };
-  const response = await apiLib.post<PathURL>(
-    `/uploads/download/${year}/${stateCode}`,
+  const response = await apiLib.get<PathURL>(
+    `/uploads/download/${year}/${stateCode}/${fileId}`,
     options
   );
   return response.psurl;
@@ -70,12 +70,9 @@ export const getFileDownloadUrl = async (
 
 export const getUploadedFiles = async (year: string, stateCode: string) => {
   const requestHeaders = await getRequestHeaders();
-  const body = {
-    stateCode,
-  };
   const options = {
     headers: { ...requestHeaders },
-    body: { ...body },
+    body: {},
   };
   const response = await apiLib.get<UploadData[]>(
     `/uploads/${year}/${stateCode}`,

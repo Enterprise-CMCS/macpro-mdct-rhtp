@@ -198,8 +198,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "postDownload", {
     entry: "services/app-api/handlers/uploads/createDownloadPsUrl.ts",
     handler: "getSignedFileUrl",
-    path: "/uploads/download/{year}/{state}",
-    method: "POST",
+    path: "/uploads/download/{year}/{state}/{fileId}",
+    method: "GET",
     ...commonProps,
   });
 
