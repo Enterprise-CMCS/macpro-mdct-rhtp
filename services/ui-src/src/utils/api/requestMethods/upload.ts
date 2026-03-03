@@ -34,7 +34,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   };
 
   const { psurl } = await apiLib.post<PathURL>(
-    `/uploads/upload/${year}/${stateCode}`,
+    `/uploads/${year}/${stateCode}`,
     options
   );
 
@@ -62,7 +62,7 @@ export const getFileDownloadUrl = async (
     body: {},
   };
   const response = await apiLib.get<PathURL>(
-    `/uploads/download/${year}/${stateCode}/${fileId}`,
+    `/uploads/${year}/${stateCode}/${fileId}`,
     options
   );
   return response.psurl;

@@ -3,9 +3,6 @@ import { parseUploadParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { deleteUpload, queryUpload } from "../../storage/upload";
 
-/**
- * Returns the report Sections associated with a given year and state
- */
 export const deleteUploadFile = handler(
   parseUploadParameters,
   async (request) => {

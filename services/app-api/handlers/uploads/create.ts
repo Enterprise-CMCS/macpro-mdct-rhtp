@@ -6,9 +6,7 @@ import { ok } from "../../libs/response-lib";
 import { updateUpload } from "../../storage/upload";
 import { UploadFileData } from "../../types/uploads";
 import KSUID from "ksuid";
-/**
- * Updates the Sections associated with a given year and state
- */
+
 export const createUpload = handler(
   parseUploadViewParameters,
   async (request) => {

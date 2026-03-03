@@ -3,7 +3,7 @@ import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
 import { viewUploadsForState, getUpload } from "./get";
-import { queryViewUpload, queryUpload } from "../../storage/upload";
+import { queryViewUploads, queryUpload } from "../../storage/upload";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
@@ -17,7 +17,7 @@ vi.mock("../../utils/authorization", () => ({
 }));
 
 vi.mock("../../storage/upload", () => ({
-  queryViewUpload: vi.fn(),
+  queryViewUploads: vi.fn(),
   queryUpload: vi.fn(),
 }));
 
@@ -58,7 +58,7 @@ describe("Test get API methods", () => {
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
   test("viewUploadsForState successful uploads fetch", async () => {
-    (queryViewUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
+    (queryViewUploads as Mock).mockResolvedValueOnce(mockUploadRespond);
     const res = await viewUploadsForState(mockViewUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });

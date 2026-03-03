@@ -76,7 +76,7 @@ export const queryUpload = async (fileId: string, state: string) => {
   return await client.send(new QueryCommand(documentParams));
 };
 
-export const queryViewUpload = async (state: string) => {
+export const queryViewUploads = async (state: string) => {
   const params: QueryCommandInput = {
     TableName: uploadTableName,
     KeyConditionExpression: "uploadedState = :state",

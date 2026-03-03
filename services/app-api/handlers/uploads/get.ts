@@ -4,34 +4,28 @@ import {
   parseUploadParameters,
   parseUploadViewParameters,
 } from "../../libs/param-lib";
-import { queryViewUpload, queryUpload } from "../../storage/upload";
+import { queryViewUploads, queryUpload } from "../../storage/upload";
 import { forbidden, ok } from "../../libs/response-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { error } from "../../utils/constants";
 
-/**
- * Updates the Sections associated with a given year and state
- */
 export const viewUploadsForState = handler(
   parseUploadViewParameters,
   async (request) => {
     const { state } = request.parameters;
 
-    const uploads = await queryViewUpload(state);
+    const uploads = await queryViewUploads(state);
     return ok(uploads);
   }
 );
 
-/**
- * Returns the report Sections associated with a given year and state
- */
 export const getUpload = handler(parseUploadParameters, async (request) => {
   const { state, fileId } = request.parameters;
   if (!state || !fileId) {
     return forbidden(error.MISSING_DATA);
   }
 
-  const results = await queryUpload(fileId, state!);
+  const results = await queryUpload(fileId, state);
   if (!results.Items || results.Items.length === 0) {
     return forbidden(error.UNAUTHORIZED);
   }
