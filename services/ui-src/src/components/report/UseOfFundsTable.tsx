@@ -54,6 +54,15 @@ export const UseOfFundsTableElement = (
       recipientName: "Recipient Name",
       recipientCategory: "Recipient Category",
     },
+    {
+      id: "2",
+      spentFunds: "10000",
+      description: "Description of how funds were spent",
+      init: "1",
+      useOfFunds: "Use of funds details",
+      recipientName: "Recipient Name",
+      recipientCategory: "Recipient Category",
+    },
   ];
 
   const [items, setItems] = useState(initialItems);
@@ -186,7 +195,7 @@ export const UseOfFundsTableElement = (
         <Image src={addIcon} alt={"Add Item"} sx={sx.addIcon} />
         Add use of funds
       </Button>
-      <Table variant="measure">
+      <Table sx={sx.table}>
         <Thead>
           <Tr>
             <Th>ID</Th>
@@ -352,6 +361,49 @@ const sx = {
     },
     textarea: {
       maxWidth: "440px",
+    },
+  },
+  table: {
+    marginBottom: "spacer5",
+    tbody: {
+      "tr:nth-of-type(even)": {
+        td: {
+          backgroundColor: "gray_lightest_highlight",
+        },
+      },
+      td: {
+        border: "none",
+        paddingBottom: "spacer1",
+        paddingInlineEnd: "spacer2",
+        paddingInlineStart: "spacer2",
+        paddingTop: "spacer1",
+      },
+      label: {
+        margin: 0,
+      },
+    },
+    tfoot: {
+      td: {
+        backgroundColor: "gray_lighter",
+        border: "none",
+        fontWeight: "bold",
+        paddingInlineEnd: "spacer2",
+        paddingInlineStart: "spacer2",
+      },
+    },
+    thead: {
+      th: {
+        backgroundColor: "primary_darkest",
+        color: "white",
+        fontSize: "lg",
+        letterSpacing: "normal",
+        lineHeight: "normal",
+        paddingBottom: "spacer1",
+        paddingInlineEnd: "spacer2",
+        paddingInlineStart: "spacer2",
+        paddingTop: "spacer1",
+        textTransform: "none",
+      },
     },
   },
 };
