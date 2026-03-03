@@ -5,7 +5,7 @@ import { ok } from "../../libs/response-lib";
 /**
  * Updates the Sections associated with a given year and state
  */
-export const viewUploaded = handler(
+export const viewUploadsForState = handler(
   parseUploadViewParameters,
   async (request) => {
     const { state } = request.parameters;

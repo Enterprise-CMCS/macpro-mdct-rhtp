@@ -2,8 +2,8 @@ import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
-import { viewUploaded } from "./viewUploaded";
-import { queryViewUpload } from "../../storage/upload";
+import { createUpload } from "./create";
+import { updateUpload } from "../../storage/upload";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
@@ -17,7 +17,13 @@ vi.mock("../../utils/authorization", () => ({
 }));
 
 vi.mock("../../storage/upload", () => ({
-  queryViewUpload: vi.fn(),
+  updateUpload: vi.fn(),
+}));
+
+vi.mock("../../libs/s3-lib", () => ({
+  default: {
+    createPresignedPost: vi.fn(),
+  },
 }));
 
 const testEvent: APIGatewayProxyEvent = {
@@ -31,7 +37,7 @@ const mockUploadRespond = {
   Items: [{ uploadedState: "PA", fileId: "mock-id", awsFilename: "mockname" }],
 };
 
-describe("Test viewUploaded API methods", () => {
+describe("Test psUpload API method", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -40,12 +46,12 @@ describe("Test viewUploaded API methods", () => {
       ...proxyEvent,
       pathParameters: {},
     } as APIGatewayProxyEvent;
-    const res = await viewUploaded(badTestEvent);
+    const res = await createUpload(badTestEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
-  test("successful uploads fetch", async () => {
-    (queryViewUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
-    const res = await viewUploaded(testEvent);
+  test("successful create upload ps url", async () => {
+    (updateUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
+    const res = await createUpload(testEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });
 });

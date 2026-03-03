@@ -187,9 +187,9 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "postUpload", {
-    entry: "services/app-api/handlers/uploads/createUploadPsUrl.ts",
-    handler: "psUpload",
+  new Lambda(scope, "createUpload", {
+    entry: "services/app-api/handlers/uploads/create.ts",
+    handler: "createUpload",
     path: "/uploads/upload/{year}/{state}",
     method: "POST",
     ...commonProps,
@@ -211,9 +211,9 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "viewUploads", {
-    entry: "services/app-api/handlers/uploads/viewUploaded.ts",
-    handler: "viewUploaded",
+  new Lambda(scope, "viewUploadsForState", {
+    entry: "services/app-api/handlers/uploads/get.ts",
+    handler: "viewUploadsForState",
     path: "/uploads/{year}/{state}",
     method: "GET",
     ...commonProps,
