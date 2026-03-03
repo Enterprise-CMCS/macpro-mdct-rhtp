@@ -45,11 +45,11 @@ const mockUploadRespond = {
   Items: [{ uploadedState: "PA", fileId: "mock-id", awsFilename: "mockname" }],
 };
 
-describe("Test viewUploaded API methods", () => {
+describe("Test get API methods", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  test("missing path params", async () => {
+  test("viewUploadsForState missing path params", async () => {
     const badTestEvent = {
       ...proxyEvent,
       pathParameters: {},
@@ -57,18 +57,12 @@ describe("Test viewUploaded API methods", () => {
     const res = await viewUploadsForState(badTestEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
-  test("successful uploads fetch", async () => {
+  test("viewUploadsForState successful uploads fetch", async () => {
     (queryViewUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
     const res = await viewUploadsForState(mockViewUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });
-});
-
-describe("Test getUpload API method", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-  test("missing path params", async () => {
+  test("getUpload missing path params", async () => {
     const badTestEvent = {
       ...proxyEvent,
       pathParameters: {},
@@ -76,12 +70,12 @@ describe("Test getUpload API method", () => {
     const res = await getUpload(badTestEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
-  test("undefined query returns error", async () => {
+  test("getUpload undefined query returns error", async () => {
     (queryUpload as Mock).mockResolvedValueOnce({});
     const res = await getUpload(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Forbidden);
   });
-  test("successful create download ps url", async () => {
+  test("getUpload successful create download ps url", async () => {
     (queryUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
     const res = await getUpload(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);

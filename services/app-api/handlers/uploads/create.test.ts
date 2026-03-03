@@ -37,7 +37,7 @@ const mockUploadRespond = {
   Items: [{ uploadedState: "PA", fileId: "mock-id", awsFilename: "mockname" }],
 };
 
-describe("Test psUpload API method", () => {
+describe("Test createUpload API method", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
