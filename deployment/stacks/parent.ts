@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import {
-  // Aws,
+  Aws,
   aws_ec2 as ec2,
   aws_iam as iam,
   CfnOutput,
@@ -9,10 +9,10 @@ import {
 } from "aws-cdk-lib";
 import { type DeploymentConfigProperties } from "../deployment-config.ts";
 import { createDataComponents } from "./data.ts";
-// import { createUiComponents } from "./ui.ts";
+import { createUiComponents } from "./ui.ts";
 import { createUiAuthComponents } from "./ui-auth.ts";
 import { createApiComponents } from "./api.ts";
-// import { deployFrontend } from "./deployFrontend.ts";
+import { deployFrontend } from "./deployFrontend.ts";
 import { isLocalStack } from "../local/util.ts";
 import { getSubnets } from "../utils/vpc.ts";
 
@@ -24,7 +24,7 @@ export class ParentStack extends Stack {
   ) {
     const {
       isDev,
-      // secureCloudfrontDomainName,
+      secureCloudfrontDomainName,
       vpcName,
       kafkaAuthorizedSubnetIds,
     } = props;
@@ -45,8 +45,7 @@ export class ParentStack extends Stack {
 
     const { tables } = createDataComponents(commonProps);
 
-    // apiGatewayRestApiUrl
-    const { restApiId } = createApiComponents({
+    const { apiGatewayRestApiUrl, restApiId } = createApiComponents({
       ...commonProps,
       tables,
       vpc,
@@ -63,29 +62,28 @@ export class ParentStack extends Stack {
       return;
     }
 
-    const applicationEndpointUrl = "https://www.example.com";
-    // const { applicationEndpointUrl, distribution, uiBucket } =
-    //   createUiComponents(commonProps);
+    const { applicationEndpointUrl, distribution, uiBucket } =
+      createUiComponents(commonProps);
 
-    // const { userPoolDomainName, identityPoolId, userPoolId, userPoolClientId } =
-    createUiAuthComponents({
+    const { userPoolDomainName, identityPoolId, userPoolId, userPoolClientId } =
+      createUiAuthComponents({
+        ...commonProps,
+        applicationEndpointUrl,
+        restApiId,
+      });
+
+    deployFrontend({
       ...commonProps,
-      applicationEndpointUrl,
-      restApiId,
+      uiBucket,
+      distribution,
+      apiGatewayRestApiUrl,
+      applicationEndpointUrl:
+        secureCloudfrontDomainName ?? applicationEndpointUrl,
+      identityPoolId,
+      userPoolId,
+      userPoolClientId,
+      userPoolClientDomain: `${userPoolDomainName}.auth.${Aws.REGION}.amazoncognito.com`,
     });
-
-    // deployFrontend({
-    //   ...commonProps,
-    //   uiBucket,
-    //   distribution,
-    //   apiGatewayRestApiUrl,
-    //   applicationEndpointUrl:
-    //     secureCloudfrontDomainName ?? applicationEndpointUrl,
-    //   identityPoolId,
-    //   userPoolId,
-    //   userPoolClientId,
-    //   userPoolClientDomain: `${userPoolDomainName}.auth.${Aws.REGION}.amazoncognito.com`,
-    // });
 
     new CfnOutput(this, "CloudFrontUrl", {
       value: applicationEndpointUrl,
