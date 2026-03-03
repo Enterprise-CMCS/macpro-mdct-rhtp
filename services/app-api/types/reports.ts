@@ -19,10 +19,15 @@ export const isReportType = (
   return Object.values(ReportType).includes(reportType as ReportType);
 };
 
+export interface CreateReportOptions {
+  copyFromReportId?: string;
+}
+
 export interface ReportOptions {
   name: string;
   year: number;
   subType?: RhtpSubType;
+  copyFromReportId?: string;
 }
 
 export enum ReportStatus {
@@ -45,7 +50,7 @@ export enum PageStatus {
 }
 
 export interface Report extends ReportBase, ReportOptions {
-  id?: string;
+  id: string;
   name: string;
   state: StateAbbr;
   created?: number;

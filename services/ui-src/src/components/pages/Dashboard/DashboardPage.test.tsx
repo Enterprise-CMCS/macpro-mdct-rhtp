@@ -76,7 +76,9 @@ describe("DashboardPage with state user", () => {
   beforeEach(() => vi.clearAllMocks());
 
   test("should render an empty state when there are no reports", async () => {
-    (getReportsForState as Mock).mockResolvedValueOnce([]);
+    (getReportsForState as Mock)
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
 
     render(dashboardComponent);
     await waitFor(() => {
@@ -174,9 +176,9 @@ describe("DashboardPage with state user", () => {
       expect(screen.getByText("Mock Report Name")).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByText("Start RHTP"));
+    await userEvent.click(screen.getByText("Start RHTP Report"));
 
-    expect(screen.getByText("Add new RHTP Report")).toBeInTheDocument();
+    expect(screen.getByText("Add new RHTP submission")).toBeInTheDocument();
   });
 });
 
@@ -202,7 +204,7 @@ describe("DashboardPage with Admin user", () => {
   beforeEach(() => {
     mockedUseStore.mockReturnValue(mockUseAdminStore);
   });
-  test("should not render the Start Report button when user is read only", async () => {
+  test("should render the Start Report button for admin users at start of report", async () => {
     render(dashboardComponent);
     await waitFor(() => {
       expect(getReportsForState).toHaveBeenCalled();
@@ -216,7 +218,7 @@ describe("DashboardPage with Admin user", () => {
   });
 
   test("should render an empty state when there are no reports", async () => {
-    (getReportsForState as Mock).mockResolvedValueOnce([]);
+    (getReportsForState as Mock).mockResolvedValue([]);
 
     render(dashboardComponent);
     await waitFor(() => {

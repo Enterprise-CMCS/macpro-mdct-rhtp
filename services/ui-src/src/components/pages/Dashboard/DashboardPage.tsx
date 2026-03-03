@@ -5,7 +5,13 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { StateNames } from "../../../constants";
-import { getReportName, isReportType, isStateAbbr, LiteReport } from "types";
+import {
+  getReportName,
+  isReportType,
+  isStateAbbr,
+  LiteReport,
+  ReportStatus,
+} from "types";
 import {
   PageTemplate,
   DashboardTable,
@@ -51,6 +57,9 @@ export const DashboardPage = () => {
     { label: "All", value: "All" },
     { label: "2026", value: "2026" },
   ];
+  const hasSubmittedReport = reports.some(
+    (report) => report.status === ReportStatus.SUBMITTED
+  );
 
   useEffect(() => {
     if (!isReportType(reportType) || !isStateAbbr(state)) {
@@ -232,11 +241,11 @@ export const DashboardPage = () => {
             <Spinner size="md" />
           </Flex>
         )}
-        {!reports?.length &&
+        {!reports.length &&
           (userIsAdmin ? (
             <Text variant="tableEmpty">
-              Once a state or territory begins a RHTP Report, you will be able
-              to view it here.
+              Once a state or territory begins a {reportName} Report, you will
+              be able to view it here.
             </Text>
           ) : (
             <Text variant="tableEmpty">
@@ -247,7 +256,9 @@ export const DashboardPage = () => {
         {userIsEndUser && (
           <Flex justifyContent="center">
             <Button onClick={() => openAddEditReportModal()} type="submit">
-              Start {reportName}
+              {hasSubmittedReport
+                ? `Copy ${reportName} Submission`
+                : `Start ${reportName} Report`}
             </Button>
           </Flex>
         )}
