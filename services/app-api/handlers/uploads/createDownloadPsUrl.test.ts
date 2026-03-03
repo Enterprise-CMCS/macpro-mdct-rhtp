@@ -28,8 +28,8 @@ vi.mock("../../libs/s3-lib", () => ({
 
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
-  body: `{"fileId":"mock-id"}`,
-  pathParameters: { state: "PA", year: "2025" },
+  body: `{}`,
+  pathParameters: { state: "PA", year: "2025", fileId: "mock-id" },
   headers: { "cognito-identity-id": "test" },
 };
 

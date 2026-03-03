@@ -59,7 +59,7 @@ describe("Test fileApi functions", () => {
     expect(result).toBe("200 or whatever");
   });
   test("getFileDownloadUrl", async () => {
-    (apiLib.post as Mock).mockReturnValue({ psurl: "mock.s3/url" });
+    (apiLib.get as Mock).mockReturnValue({ psurl: "mock.s3/url" });
     const result = await getFileDownloadUrl("2025", "PA", "mock-id");
     expect(result).toBe("mock.s3/url");
   });
