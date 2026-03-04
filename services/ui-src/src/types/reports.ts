@@ -129,6 +129,12 @@ export enum PageType {
   ReviewSubmit = "reviewSubmit",
 }
 
+export type UploadData = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
 export enum ElementType {
   Header = "header",
   SubHeader = "subHeader",
@@ -147,6 +153,7 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  AttachmentArea = "attachmentArea",
 }
 
 export type PageElement =
@@ -166,7 +173,8 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | ListInputTemplate
-  | SubmissionParagraphTemplate;
+  | SubmissionParagraphTemplate
+  | AttachmentAreaTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -282,6 +290,11 @@ export interface NumberFieldTemplate extends InputElementTemplate {
   type: ElementType.NumberField;
   answer?: number;
   hideCondition?: never;
+}
+
+export interface AttachmentAreaTemplate extends InputElementTemplate {
+  type: ElementType.AttachmentArea;
+  answer?: UploadData[];
 }
 
 export interface RadioTemplate extends InputElementTemplate {
