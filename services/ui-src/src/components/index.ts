@@ -67,6 +67,7 @@ export { UnlockModal } from "./modals/UnlockModal";
 export { PostLogoutRedirect } from "./PostLogoutRedirect/index";
 // tables
 export { Table } from "./tables/Table";
+export { TableCheckpoint } from "./tables/TableCheckpoint";
 export { TableStatusIcon } from "./tables/TableStatusIcon";
 // dashboard
 export { DashboardPage } from "./pages/Dashboard/DashboardPage";

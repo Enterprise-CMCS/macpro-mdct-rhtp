@@ -49,6 +49,25 @@ export const rhtpReportTemplate: ReportBase = {
           helperText:
             "Enter an email address for the person or position above. Department or program-wide email addresses are allowed.",
         },
+        {
+          type: ElementType.TableCheckpoint,
+          id: "checkpoint-1",
+          label: "Planning",
+          stage: 0,
+          checkpoints: [
+            {
+              id: "planning-1",
+              label: "Establish governance",
+              attachable: true,
+            },
+            {
+              id: "planning-2",
+              label: "Submit project plan to CMS",
+              attachable: false,
+            },
+          ],
+          required: true,
+        },
       ],
     },
     {

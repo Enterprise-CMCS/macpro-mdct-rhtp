@@ -124,6 +124,19 @@ export const isFormPageTemplate = (
 
 export type PageId = string;
 
+export type CheckpointShape = {
+  id: string;
+  label: string;
+  attachable: boolean;
+};
+
+export type CheckpointAnswerShape = {
+  id: string;
+  label: string;
+  completed: boolean;
+  attachments?: { name: string; fileId: string }[];
+};
+
 export enum PageType {
   Standard = "standard",
   ReviewSubmit = "reviewSubmit",
@@ -147,6 +160,7 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  TableCheckpoint = "tableCheckpoint",
 }
 
 export type PageElement =
@@ -166,7 +180,8 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | ListInputTemplate
-  | SubmissionParagraphTemplate;
+  | SubmissionParagraphTemplate
+  | TableCheckpointTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -302,6 +317,13 @@ export interface TextboxTemplate extends InputElementTemplate {
   type: ElementType.Textbox;
   answer?: string;
   hideCondition?: HideCondition;
+}
+
+export interface TableCheckpointTemplate extends InputElementTemplate {
+  type: ElementType.TableCheckpoint;
+  stage: number;
+  checkpoints: CheckpointShape[];
+  answer?: CheckpointAnswerShape[];
 }
 
 /**

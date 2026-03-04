@@ -24,6 +24,7 @@ import {
   StatusAlert,
   CheckboxField,
   ListInput,
+  TableCheckpoint,
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
@@ -84,6 +85,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <SubmissionParagraph />;
       case ElementType.ListInput:
         return <ListInput {...{ updateElement, disabled, element }} />;
+      case ElementType.TableCheckpoint:
+        return <TableCheckpoint {...{ updateElement, disabled, element }} />;
       default:
         assertExhaustive(element);
         return null;

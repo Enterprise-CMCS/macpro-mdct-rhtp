@@ -26,6 +26,8 @@ export const renderElements = (element: PageElement) => {
           {element.text}
         </Heading>
       );
+    case ElementType.TableCheckpoint:
+      return "";
   }
 
   if (!("answer" in element)) {
