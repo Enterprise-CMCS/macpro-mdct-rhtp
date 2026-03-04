@@ -68,6 +68,12 @@ export const rhtpReportTemplate: ReportBase = {
           ],
           required: true,
         },
+        {
+          type: ElementType.AttachmentArea,
+          id: "upload-area",
+          label: "Supporting Evidence: Attachments",
+          required: false,
+        },
       ],
     },
     {

@@ -166,6 +166,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
       return tableCheckpointSchema;
+    case ElementType.AttachmentArea:
+      return attachmentAreaSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -246,6 +248,21 @@ const buttonLinkTemplateSchema = object().shape({
   label: string().optional(),
   to: string().optional(),
   style: string().optional(),
+});
+
+const attachmentAreaSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
+  id: string().required(),
+  label: string().required(),
+  helperText: string().optional(),
+  required: boolean().required(),
+  answer: array().of(
+    object().shape({
+      name: string().required(),
+      size: number().required(),
+      fileId: string().required(),
+    })
+  ),
 });
 
 const dividerSchema = object().shape({

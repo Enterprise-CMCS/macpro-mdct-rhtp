@@ -28,6 +28,7 @@ import {
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
+import { AttachmentArea } from "components/fields/AttachmentArea";
 
 interface Props {
   id: string;
@@ -87,6 +88,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <ListInput {...{ updateElement, disabled, element }} />;
       case ElementType.TableCheckpoint:
         return <TableCheckpoint {...{ updateElement, disabled, element }} />;
+      case ElementType.AttachmentArea:
+        return <AttachmentArea {...{ updateElement, disabled, element }} />;
       default:
         assertExhaustive(element);
         return null;

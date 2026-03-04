@@ -121,6 +121,12 @@ export enum PageType {
   ReviewSubmit = "reviewSubmit",
 }
 
+export type UploadData = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
 export enum ElementType {
   Header = "header",
   SubHeader = "subHeader",
@@ -142,6 +148,7 @@ export enum ElementType {
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
   TableCheckpoint = "tableCheckpoint",
+  AttachmentArea = "attachmentArea",
 }
 
 export type PageElement =
@@ -162,7 +169,8 @@ export type PageElement =
   | DividerTemplate
   | SubmissionParagraphTemplate
   | ListInputTemplate
-  | TableCheckpointTemplate;
+  | TableCheckpointTemplate
+  | AttachmentAreaTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -305,4 +313,9 @@ export interface TableCheckpointTemplate extends InputElementTemplate {
   stage: number;
   checkpoints: CheckpointShape[];
   answer?: CheckpointAnswerShape[];
+}
+
+export interface AttachmentAreaTemplate extends InputElementTemplate {
+  type: ElementType.AttachmentArea;
+  answer?: UploadData[];
 }

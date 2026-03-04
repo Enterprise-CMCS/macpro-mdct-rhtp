@@ -27,7 +27,9 @@ export const renderElements = (element: PageElement) => {
         </Heading>
       );
     case ElementType.TableCheckpoint:
-      return "";
+      return "TBD";
+    case ElementType.AttachmentArea:
+      return "TBD";
   }
 
   if (!("answer" in element)) {
