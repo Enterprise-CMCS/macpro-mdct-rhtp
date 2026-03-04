@@ -24,7 +24,11 @@ import { Fragment, useState, ChangeEvent, useEffect } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
-import { ChoiceList, TextField } from "@cmsgov/design-system";
+import {
+  TextField,
+  Dropdown,
+  DropdownChangeObject,
+} from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
 import { ExportRateTable } from "components/export/ExportedReportTable";
 
@@ -39,7 +43,7 @@ export const UseOfFundsTableElement = (
     budgetPeriod: "",
     spentFunds: "",
     description: "",
-    init: "",
+    initiative: "",
     useOfFunds: "",
     recipientName: "",
     recipientCategory: "",
@@ -51,7 +55,7 @@ export const UseOfFundsTableElement = (
       budgetPeriod: "Budget Period 1",
       spentFunds: "10000",
       description: "Description of how funds were spent",
-      init: "1",
+      initiative: "1",
       useOfFunds: "Use of funds details",
       recipientName: "Recipient Name",
       recipientCategory: "Recipient Category",
@@ -61,11 +65,84 @@ export const UseOfFundsTableElement = (
       budgetPeriod: "Budget Period 2",
       spentFunds: "10000",
       description: "Description of how funds were spent",
-      init: "1",
+      initiative: "1",
       useOfFunds: "Use of funds details",
       recipientName: "Recipient Name",
       recipientCategory: "Recipient Category",
     },
+  ];
+
+  const budgetPeriodOptions = [
+    { label: "- Select an option -", value: "" },
+    { label: "Budget Period 1", value: "Budget Period 1" },
+    { label: "Budget Period 2", value: "Budget Period 2" },
+    { label: "Budget Period 3", value: "Budget Period 3" },
+    { label: "Budget Period 4", value: "Budget Period 4" },
+  ];
+
+  const initiativeOptions = [
+    { label: "- Select an option -", value: "" },
+    { label: "1", value: "1" },
+    { label: "2", value: "2" },
+    { label: "3", value: "3" },
+    { label: "4", value: "4" },
+  ];
+
+  const useOfFundsOptions = [
+    { label: "- Select an option -", value: "" },
+    {
+      label: "Prevention and chronic disease",
+      value: "Prevention and chronic disease",
+    },
+    { label: "Provider payments", value: "Provider payments" },
+    { label: "Consumer tech solutions", value: "Consumer tech solutions" },
+    {
+      label: "Training and technical assistance",
+      value: "Training and technical assistance",
+    },
+    { label: "Workforce", value: "Workforce" },
+    { label: "IT advances", value: "IT advances" },
+    {
+      label: "Appropriate care availability",
+      value: "Appropriate care availability",
+    },
+    { label: "Behavioral health", value: "Behavioral health" },
+    { label: "Innovative care", value: "Innovative care" },
+    {
+      label: "Capital expenditures and infrastructure",
+      value: "Capital expenditures and infrastructure",
+    },
+    { label: "Fostering collaboration", value: "Fostering collaboration" },
+  ];
+
+  const recipientCategoryOptions = [
+    { label: "- Select an option -", value: "" },
+    { label: "State agency", value: "State agency" },
+    { label: "Local government", value: "Local government" },
+    { label: "Rural provider", value: "Rural provider" },
+    { label: "EMS provider", value: "EMS provider" },
+    {
+      label: "Community-based organization",
+      value: "Community-based organization",
+    },
+    {
+      label: "University-affiliated health care organization",
+      value: "University-affiliated health care organization",
+    },
+    {
+      label: "Non-profit health care organization",
+      value: "Non-profit health care organization",
+    },
+    {
+      label: "Other non-profit organization",
+      value: "Other non-profit organization",
+    },
+    {
+      label: "Other health care organization",
+      value: "Other health care organization",
+    },
+    { label: "Contractor", value: "Contractor" },
+    { label: "Other", value: "Other" },
   ];
 
   const [items, setItems] = useState(initialItems);
@@ -90,7 +167,9 @@ export const UseOfFundsTableElement = (
     return "";
   };
 
-  const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    evt: ChangeEvent<HTMLInputElement> | DropdownChangeObject
+  ) => {
     const { name, value } = evt.target;
     setFormValues((prev) => ({
       ...prev,
@@ -167,7 +246,7 @@ export const UseOfFundsTableElement = (
           <Text>{item.description}</Text>
         </Td>
         <Td>
-          <Text>{item.init}</Text>
+          <Text>{item.initiative}</Text>
         </Td>
         <Td>
           <Text>{item.useOfFunds}</Text>
@@ -233,7 +312,7 @@ export const UseOfFundsTableElement = (
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{modalMode} Use of FUnds</ModalHeader>
+          <ModalHeader>{modalMode} Use of Funds</ModalHeader>
           <Button
             className="close"
             leftIcon={<Image src={closeIcon} alt="Close" />}
@@ -245,6 +324,24 @@ export const UseOfFundsTableElement = (
           <ModalBody>
             <Flex direction="column" gap="2rem">
               <Text>hint text</Text>
+              <Dropdown
+                label="Budget Period"
+                name="budgetPeriod"
+                onChange={handleChange}
+                errorMessage={errorMessages.budgetPeriod}
+                options={budgetPeriodOptions}
+                value={formValues.budgetPeriod}
+              />
+              <TextField
+                label="Spent Funds"
+                name="spentFunds"
+                onBlur={handleChange}
+                onChange={handleChange}
+                errorMessage={errorMessages.spentFunds}
+                value={formValues.spentFunds}
+                mask="currency"
+                numeric={true}
+              />
               <TextField
                 label="Description"
                 name="description"
@@ -252,72 +349,40 @@ export const UseOfFundsTableElement = (
                 onChange={handleChange}
                 errorMessage={errorMessages.description}
                 value={formValues.description}
+                multiline={true}
               />
-              {/* <TextField
-                label={fieldLabels.description}
-                name="description"
+              <Dropdown
+                label="Initiative"
+                name="initiative"
+                onChange={handleChange}
+                errorMessage={errorMessages.initiative}
+                options={initiativeOptions}
+                value={formValues.initiative}
+              />
+              <Dropdown
+                label="Use of Funds"
+                name="useOfFunds"
+                onChange={handleChange}
+                errorMessage={errorMessages.useOfFunds}
+                options={useOfFundsOptions}
+                value={formValues.useOfFunds}
+              />
+              <TextField
+                label="Recipient Name"
+                name="recipientName"
                 onBlur={handleChange}
                 onChange={handleChange}
-                multiline
-                errorMessage={errorMessages.description}
-                value={formValues.description}
-              /> */}
-              {/* <ChoiceList
-                name={"recheck"}
-                type={"radio"}
-                errorMessage={errorMessages.recheck}
-                label={fieldLabels.recheck}
-                choices={[
-                  {
-                    label: "No",
-                    value: "No",
-                    checked: formValues.recheck === "No",
-                  },
-                  {
-                    label: "Yes",
-                    value: "Yes",
-                    checked: formValues.recheck === "Yes",
-                    checkedChildren: [
-                      <Box key="radio-sub-page" sx={sx.children}>
-                        <ChoiceList
-                          name={"frequency"}
-                          type={"radio"}
-                          label={fieldLabels.frequency}
-                          errorMessage={errorMessages.frequency}
-                          choices={frequencyOptions.map((option) => {
-                            return {
-                              label: option.label,
-                              value: option.value,
-                              checked: formValues.frequency === option.value,
-                            };
-                          })}
-                          onChange={handleChange}
-                        />
-                      </Box>,
-                    ],
-                  },
-                ]}
+                errorMessage={errorMessages.recipientName}
+                value={formValues.recipientName}
+              />
+              <Dropdown
+                label="Recipient Category"
+                name="recipientCategory"
                 onChange={handleChange}
-              /> */}
-              {/* <ChoiceList
-                name={"eligibilityUpdate"}
-                type={"radio"}
-                errorMessage={errorMessages.eligibilityUpdate}
-                label={fieldLabels.eligibilityUpdate}
-                choices={[
-                  {
-                    label: "No",
-                    value: "No",
-                    checked: formValues.eligibilityUpdate === "No",
-                  },
-                  {
-                    label: "Yes",
-                    value: "Yes",
-                    checked: formValues.eligibilityUpdate === "Yes",
-                  },
-                ]}
-                onChange={handleChange}
-              /> */}
+                errorMessage={errorMessages.recipientCategory}
+                options={recipientCategoryOptions}
+                value={formValues.recipientCategory}
+              />
             </Flex>
           </ModalBody>
           <ModalFooter gap="4">
