@@ -295,5 +295,11 @@ export type UseOfFundsTableItem = {
 export type UseOfFundsTableTemplate = {
   type: ElementType.UseOfFundsTable;
   id: string;
+  dropDownOptions: {
+    budgetPeriodOptions: { label: string; value: string }[];
+    initiativeOptions: { label: string; value: string }[];
+    useOfFundsOptions: { label: string; value: string }[];
+    recipientCategoryOptions: { label: string; value: string }[];
+  };
   answer?: UseOfFundsTableItem[];
 };

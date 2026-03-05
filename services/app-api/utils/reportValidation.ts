@@ -128,6 +128,32 @@ const accordionTemplateSchema = object().shape({
 const useOfFundsTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.UseOfFundsTable)),
   id: string().required(),
+  dropDownOptions: object().shape({
+    budgetPeriodOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+    initiativeOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+    useOfFundsOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+    recipientCategoryOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+  }),
   answer: array()
     .of(
       object().shape({

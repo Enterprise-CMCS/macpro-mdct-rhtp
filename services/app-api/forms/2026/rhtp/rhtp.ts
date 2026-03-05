@@ -7,6 +7,7 @@ import {
   ReportBase,
 } from "../../../types/reports";
 import { exportToPDF } from "../elements";
+import { useOfFundsTableElement } from "./rhtpElements";
 
 export const rhtpReportTemplate: ReportBase = {
   type: ReportType.RHTP,
@@ -82,10 +83,7 @@ export const rhtpReportTemplate: ReportBase = {
           title: "Spent Funds",
           text: `To add an use of funds, click the "Add use of funds" button below.`,
         },
-        {
-          id: "use-of-funds-table",
-          type: ElementType.UseOfFundsTable,
-        },
+        useOfFundsTableElement,
       ],
     },
     {
