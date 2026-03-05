@@ -49,6 +49,7 @@ export const buildReport = async (
     name: reportOptions.name,
     year: reportOptions.year,
     subType: reportOptions.subType,
+    copyFromReportId: reportOptions.copyFromReportId,
     archived: false,
     submissionCount: 0,
     pages: template.pages,

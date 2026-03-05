@@ -7,15 +7,20 @@ import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
 import { RhtpSubType, ReportStatus } from "../../types/reports";
 import { getNextReportOptions } from "../../utils/reports/reportOptions";
+import { isCreateReportOptions } from "../../utils/reportValidation";
 
 export const createReport = handler(
   parseReportTypeAndState,
   async (request) => {
     const { reportType, state } = request.parameters;
-    const { user } = request;
+    const { user, body } = request;
 
     if (!canWriteState(user, state)) {
       return forbidden(error.UNAUTHORIZED);
+    }
+
+    if (!isCreateReportOptions(body)) {
+      return badRequest("Invalid request");
     }
 
     const reports = await queryReportsForState(reportType, state);
@@ -64,6 +69,8 @@ export const createReport = handler(
         ).toLocaleDateString()}.`
       );
     }
+
+    nextReportOptions.copyFromReportId = body?.copyFromReportId;
 
     const report = await buildReport(
       reportType,

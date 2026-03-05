@@ -29,6 +29,8 @@ export const renderElements = (element: PageElement) => {
       );
     case ElementType.UseOfFundsTable:
       return UseOfFundsTableElementExport(element);
+    case ElementType.AttachmentArea:
+      return "TBD";
   }
 
   if (!("answer" in element)) {

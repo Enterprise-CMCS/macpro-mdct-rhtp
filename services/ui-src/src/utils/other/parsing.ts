@@ -9,3 +9,7 @@ export const parseHtml = (html: string) => {
   const parsedHtml = parse(sanitizedHtml);
   return parsedHtml;
 };
+
+export const bytesToKiloBytes = (bytes: number) => {
+  return Math.ceil(bytes / 1000);
+};

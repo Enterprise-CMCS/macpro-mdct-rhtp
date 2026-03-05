@@ -1,153 +1,90 @@
-import { FormEvent, useEffect, useState, ReactElement } from "react";
+import { useEffect, useState, SubmitEvent } from "react";
 import { Alert, Modal } from "components";
 import {
-  TextField as CmsdsTextField,
   Dropdown as CmsdsDropdownField,
+  DropdownOption,
 } from "@cmsgov/design-system";
-import { Spinner, Flex, Text } from "@chakra-ui/react";
+import { Spinner, Flex } from "@chakra-ui/react";
 import {
   createReport,
-  updateReport,
   getReportsForState,
 } from "utils/api/requestMethods/report";
 import {
   AlertTypes,
+  CreateReportOptions,
   isReportType,
   LiteReport,
-  ReportOptions,
   ReportStatus,
-  ReportType,
 } from "types";
-import RhtpOptions from "./AddFormOptions/Options";
-import { ErrorMessages } from "../../constants";
 
-export type AddEditReportModalOptions = {
-  verbiage: {
-    reportName: string;
-    yearSelect: string;
-    nameHelperText: (state: string) => string;
-    nameLabel: string;
-    topText?: string;
-    yearHelperText?: string;
-  };
+const verbiage = {
+  addReportHeader: "Add new RHTP submission",
+  copyReportHeader: "Copy RHTP submission",
+  copyInputLabel:
+    "If you want to copy an existing report, select one (optional)",
+  copyInputHint:
+    "This will pre-populate any fields you’ve added and any settings you’ve applied but will not copy quarterly financial data.",
 };
 
-const buildModalOptions = (
-  reportType: ReportType
-): AddEditReportModalOptions => {
-  const optionsByReportType: Record<ReportType, AddEditReportModalOptions> = {
-    [ReportType.RHTP]: RhtpOptions,
-  };
-  return optionsByReportType[reportType];
+const defaultCopyOption = {
+  label: "-- Select an option --",
+  value: "",
 };
 
 export const AddEditReportModal = ({
   activeState,
   reportType,
   modalDisclosure,
-  selectedReport,
   reportHandler,
 }: Props) => {
   if (!isReportType(reportType)) return null;
 
-  const dropdownYears = [{ label: "2026", value: "2026" }];
-  const { verbiage } = buildModalOptions(reportType);
-
-  const formDataForReport = (report: LiteReport | undefined) => ({
-    reportTitle: report?.name ?? "",
-    year: report?.year?.toString() ?? dropdownYears[0].value,
-  });
-  const initialFormData = formDataForReport(selectedReport);
-  const [formData, setFormData] = useState(initialFormData);
-  const [errorData, setErrorData] = useState({ reportTitle: "", year: "" });
+  const [formData, setFormData] = useState({ copyFromReportId: undefined });
   const [errorAlert, setErrorAlert] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
-  const readOnly = selectedReport?.status === ReportStatus.SUBMITTED;
-  const [reportTitleFieldDirtied, setReportTitleFieldDirtied] = useState(false);
+  const [isFirstReport, setIsFirstReport] = useState<boolean>(true);
+  const [copyOptions, setCopyOptions] = useState<DropdownOption[]>([
+    defaultCopyOption,
+  ]);
 
   useEffect(() => {
-    setFormData(formDataForReport(selectedReport));
-    setReportTitleFieldDirtied(false);
-  }, [selectedReport, modalDisclosure.isOpen]);
+    (async () => {
+      const newCopyOptions: DropdownOption[] = copyOptions;
+      const reports = await getReportsForState(reportType, activeState);
+      reports.map((report: LiteReport) => {
+        if (report.status === ReportStatus.SUBMITTED) {
+          newCopyOptions.push({ label: report.name, value: report.id });
+        }
+      });
+      setCopyOptions(newCopyOptions);
+      setIsFirstReport(newCopyOptions.length === 1);
+    })();
+  }, []);
 
-  useEffect(() => {
-    if (!reportTitleFieldDirtied) return;
-    setErrorMessage(formData.reportTitle).then((errorMessage) => {
-      setErrorData((prevErrorData) => ({
-        ...prevErrorData,
-        reportTitle: errorMessage,
-      }));
-    });
-  }, [formData.reportTitle]);
-
-  const doesReportNameExist = async (value: string) => {
-    let existingReports = await getReportsForState(reportType, activeState);
-    const doesReportNameAlreadyExist = existingReports.some(
-      (report) =>
-        report.name === value &&
-        report.year === Number(formData.year) &&
-        report.id !== selectedReport?.id
-    );
-
-    return doesReportNameAlreadyExist;
-  };
-
-  const setErrorMessage = async (value: string): Promise<string> => {
-    if (!value) {
-      return ErrorMessages.requiredResponse;
-    }
-    const duplicateReportName = await doesReportNameExist(value);
-    if (duplicateReportName) {
-      return ErrorMessages.mustBeUniqueReportName;
-    }
-    return "";
-  };
-
-  const onChange = (evt: { target: { name: string; value: string } }) => {
-    const { name, value } = evt.target;
+  const onChange = (event: { target: { name: string; value: string } }) => {
+    const { name, value } = event.target;
     const updatedFormData = {
       ...formData,
       [name]: value,
     };
     setFormData(updatedFormData);
-    setReportTitleFieldDirtied(true);
   };
 
-  const onSubmit = async (evt: FormEvent) => {
+  const onSubmit = async (event: SubmitEvent) => {
+    event.preventDefault();
     setSubmitting(true);
-    evt.preventDefault();
-    // const reportTitleError = await setErrorMessage(formData.reportTitle);
-    // const newErrorData = {
-    //   reportTitle: reportTitleError,
-    //   year: formData.year ? "" : ErrorMessages.requiredResponse,
-    // };
-    // setErrorData(newErrorData);
-    // const canSubmit =
-    //   !newErrorData.reportTitle && !!formData.reportTitle && !!formData.year;
-    // if (!canSubmit) {
-    //   return;
-    // }
 
-    const userEnteredReportName = formData.reportTitle!;
-    if (selectedReport) {
-      if (userEnteredReportName) {
-        selectedReport.name = userEnteredReportName;
-      }
-      await updateReport(selectedReport);
-    } else {
-      // const reportOptions: ReportOptions = {
-      //   name: userEnteredReportName,
-      //   year: Number(formData.year),
-      // };
-      try {
-        await createReport(reportType, activeState);
-        await reportHandler(reportType, activeState);
-        modalDisclosure.onClose();
-      } catch (err: any) {
-        const errorMessage =
-          err.message?.split(" - ").at(-1) || "Unknown error";
-        setErrorAlert(errorMessage);
-      }
+    const reportOptions: CreateReportOptions = {
+      copyFromReportId: formData.copyFromReportId,
+    };
+
+    try {
+      await createReport(reportType, activeState, reportOptions);
+      await reportHandler(reportType, activeState);
+      modalDisclosure.onClose();
+    } catch (err: any) {
+      const errorMessage = err.message?.split(" - ").at(-1) || "Unknown error";
+      setErrorAlert(errorMessage);
     }
 
     setSubmitting(false);
@@ -155,58 +92,32 @@ export const AddEditReportModal = ({
 
   return (
     <Modal
-      data-testid="add-edit-report-modal"
       formId="addEditReportModal"
       modalDisclosure={modalDisclosure}
       content={{
-        heading: `${selectedReport ? "Edit" : "Add new"} ${
-          verbiage.reportName
-        }`,
-        subheading: "",
-        actionButtonText: submitting ? (
-          <Spinner size="md" />
-        ) : (
-          `${selectedReport ? "Save" : "Start new"}`
-        ),
+        heading: `${isFirstReport ? verbiage.addReportHeader : verbiage.copyReportHeader}`,
+        actionButtonText: submitting ? <Spinner size="md" /> : "Save",
         closeButtonText: "Cancel",
       }}
-      disableConfirm={readOnly || submitting}
+      disableConfirm={submitting}
     >
       <form id="addEditReportModal" onSubmit={onSubmit}>
         <Flex direction="column" gap="2rem">
-          {verbiage.topText && <Text>{verbiage.topText}</Text>}
           {errorAlert !== undefined ? (
             <Alert status={AlertTypes.ERROR} title="Failed to create report">
               {errorAlert}
             </Alert>
           ) : null}
-          {/* <CmsdsTextField
-            name="reportTitle"
-            label={verbiage.nameLabel}
-            hint={verbiage.nameHelperText(activeState)}
-            onChange={onChange}
-            onBlur={() =>
-              setErrorData({
-                ...errorData,
-                reportTitle: formData.reportTitle
-                  ? ""
-                  : ErrorMessages.requiredResponse,
-              })
-            }
-            value={formData.reportTitle}
-            errorMessage={errorData.reportTitle}
-            disabled={readOnly}
-          />
-          <CmsdsDropdownField
-            name="year"
-            label={verbiage.yearSelect}
-            hint={verbiage.yearHelperText ?? ""}
-            onChange={onChange}
-            value={formData.year}
-            errorMessage={errorData.year}
-            options={dropdownYears}
-            disabled={!!selectedReport}
-          /> */}
+          {!isFirstReport && (
+            <CmsdsDropdownField
+              name="copyFromReportId"
+              label={verbiage.copyInputLabel}
+              hint={verbiage.copyInputHint}
+              onChange={onChange}
+              value={formData.copyFromReportId}
+              options={copyOptions}
+            />
+          )}
         </Flex>
       </form>
     </Modal>

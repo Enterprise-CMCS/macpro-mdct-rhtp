@@ -1,0 +1,55 @@
+name: Deploy
+
+on: [push]
+
+concurrency:
+  group: ${{ github.ref_name }}
+
+permissions:
+  id-token: write
+  contents: write
+  actions: read
+
+jobs:
+  deploy:
+    if: ${{ !startsWith(github.ref_name, 'skipci') }}
+    runs-on: ubuntu-latest
+    environment: ${{ (github.ref_name == 'production' && 'production') || (github.ref_name == 'val' && 'val') || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+      - run: corepack enable
+      - uses: actions/cache@v4
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock', 'plugins/**') }}
+      - name: path + branch settings + install packages
+        run: |
+          echo "PATH=$(pwd)/node_modules/.bin/:$PATH" >> $GITHUB_ENV
+          BRANCH_NAME=$(./.github/setBranchName.ts ${{ github.ref_name }})
+          echo "branch_name=${BRANCH_NAME}" >> $GITHUB_ENV
+          ./.github/branchNameValidation.ts $BRANCH_NAME
+          ./run install
+        env:
+          PROJECT: ${{ vars.APP_NAME_LOWER }}
+      - name: Configure AWS credentials for GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_TO_ASSUME }}
+          aws-region: us-east-1
+      - name: deploy
+        run: ./run deploy --stage $branch_name
+        env:
+          PROJECT: ${{ vars.APP_NAME_LOWER }}
+      - id: endpoint
+        run: |
+          APPLICATION_ENDPOINT=$(./scripts/output.ts ${{ env.PROJECT }}-$branch_name CloudFrontUrl)
+          echo "application_endpoint=$APPLICATION_ENDPOINT" >> $GITHUB_OUTPUT
+          echo "## Application Endpoint" >> $GITHUB_STEP_SUMMARY
+          echo "<$APPLICATION_ENDPOINT>" >> $GITHUB_STEP_SUMMARY
+        env:
+          PROJECT: ${{ vars.APP_NAME_LOWER }}
+    outputs:
+      application_endpoint: ${{ steps.endpoint.outputs.application_endpoint }}

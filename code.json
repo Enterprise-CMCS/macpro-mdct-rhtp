@@ -1,0 +1,64 @@
+{
+  "name": "macpro-mdct-rhtp",
+  "version": "",
+  "description": "",
+  "longDescription": "",
+  "permissions": {
+    "licenses": [
+      {
+        "name": "CC0-1.0",
+        "URL": ""
+      }
+    ],
+    "usageType": [],
+    "exemptionText": ""
+  },
+  "organization": "Centers for Medicare & Medicaid Services",
+  "repositoryURL": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp",
+  "repositoryVisibility": "public",
+  "homepageURL": "",
+  "downloadURL": "",
+  "disclaimerURL": "",
+  "disclaimerText": "",
+  "vcs": "git",
+  "laborHours": 9070,
+  "reuseFrequency": {
+    "forks": 0,
+    "clones": 0
+  },
+  "platforms": [],
+  "categories": [],
+  "languages": [
+    "TypeScript",
+    "JavaScript",
+    "SCSS",
+    "Shell",
+    "HTML",
+    "Smarty"
+  ],
+  "contractNumber": [],
+  "SBOM": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/network/dependencies",
+  "relatedCode": [],
+  "reusedCode": [],
+  "partners": [],
+  "date": {
+    "created": "2026-01-13T19:50:51Z",
+    "lastModified": "2026-02-26T20:01:44Z",
+    "metadataLastUpdated": "2026-03-01T00:37:23.518Z"
+  },
+  "tags": [],
+  "contact": {
+    "email": "",
+    "name": ""
+  },
+  "feedbackMechanism": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/issues",
+  "AIUseCaseID": "0",
+  "localisation": false,
+  "userInput": false,
+  "group": "",
+  "projects": [],
+  "systems": [],
+  "subsetInHealthcare": [],
+  "userType": [],
+  "maturityModelTier": 0
+}

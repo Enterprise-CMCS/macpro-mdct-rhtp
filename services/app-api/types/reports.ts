@@ -19,10 +19,15 @@ export const isReportType = (
   return Object.values(ReportType).includes(reportType as ReportType);
 };
 
+export interface CreateReportOptions {
+  copyFromReportId?: string;
+}
+
 export interface ReportOptions {
   name: string;
   year: number;
   subType?: RhtpSubType;
+  copyFromReportId?: string;
 }
 
 export enum ReportStatus {
@@ -45,7 +50,7 @@ export enum PageStatus {
 }
 
 export interface Report extends ReportBase, ReportOptions {
-  id?: string;
+  id: string;
   name: string;
   state: StateAbbr;
   created?: number;
@@ -103,6 +108,12 @@ export enum PageType {
   ReviewSubmit = "reviewSubmit",
 }
 
+export type UploadData = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
 export enum ElementType {
   Header = "header",
   SubHeader = "subHeader",
@@ -124,6 +135,7 @@ export enum ElementType {
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
   UseOfFundsTable = "useOfFundsTable",
+  AttachmentArea = "attachmentArea",
 }
 
 export type PageElement =
@@ -144,6 +156,7 @@ export type PageElement =
   | DividerTemplate
   | SubmissionParagraphTemplate
   | UseOfFundsTableTemplate
+  | AttachmentAreaTemplate
   | ListInputTemplate;
 
 export type HideCondition = {
@@ -304,3 +317,7 @@ export type UseOfFundsTableTemplate = {
   };
   answer?: UseOfFundsTableItem[];
 };
+export interface AttachmentAreaTemplate extends InputElementTemplate {
+  type: ElementType.AttachmentArea;
+  answer?: UploadData[];
+}

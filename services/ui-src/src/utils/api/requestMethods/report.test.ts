@@ -29,11 +29,6 @@ vi.mock("../apiLib", () => ({
   },
 }));
 
-const mockReport: ReportOptions = {
-  name: "report name",
-  year: 2026,
-};
-
 describe("utils/report", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -49,7 +44,7 @@ describe("utils/report", () => {
   });
 
   test("createReport", async () => {
-    await createReport("reportType", "PA", mockReport);
+    await createReport("reportType", "PA");
     expect(mockPost).toHaveBeenCalledTimes(1);
   });
 

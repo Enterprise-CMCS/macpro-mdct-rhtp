@@ -57,6 +57,7 @@ describe("buildReport utility", () => {
       name: "report1",
       year: 2026,
       subType: RhtpSubType.Q1,
+      copyFromReportId: "123",
     } as ReportOptions;
     const report = await buildReport(
       ReportType.RHTP,
@@ -70,6 +71,7 @@ describe("buildReport utility", () => {
     expect(report.subType).toEqual(RhtpSubType.Q1);
     expect(report.lastEditedBy).toBe("James Holden");
     expect(report.lastEditedByEmail).toBe("james.holden@test.com");
+    expect(report.copyFromReportId).toBe("123");
   });
 
   test("Test that a validation failure throws invalid request error", async () => {

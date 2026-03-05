@@ -15,7 +15,7 @@ import {
   PageType,
   ElementType,
   PageElement,
-  ReportOptions,
+  CreateReportOptions,
 } from "../types/reports";
 import { error } from "./constants";
 
@@ -211,6 +211,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.UseOfFundsTable:
       return useOfFundsTableSchema;
+    case ElementType.AttachmentArea:
+      return attachmentAreaSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -258,6 +260,21 @@ const buttonLinkTemplateSchema = object().shape({
   label: string().optional(),
   to: string().optional(),
   style: string().optional(),
+});
+
+const attachmentAreaSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
+  id: string().required(),
+  label: string().required(),
+  helperText: string().optional(),
+  required: boolean().required(),
+  answer: array().of(
+    object().shape({
+      name: string().required(),
+      size: number().required(),
+      fileId: string().required(),
+    })
+  ),
 });
 
 const dividerSchema = object().shape({
@@ -335,19 +352,17 @@ const pagesSchema = array()
   )
   .required();
 
-export const isReportOptions = (
+export const isCreateReportOptions = (
   obj: object | undefined
-): obj is ReportOptions => {
-  const reportOptionsValidationSchema = object()
+): obj is CreateReportOptions => {
+  const createReportOptionsValidationSchema = object()
     .shape({
-      name: string().required(),
-      year: number().required(),
-      subType: number().notRequired(),
+      copyFromReportId: string().notRequired(),
     })
     .required()
     .noUnknown();
 
-  return reportOptionsValidationSchema.isValidSync(obj, {
+  return createReportOptionsValidationSchema.isValidSync(obj, {
     stripUnknown: false,
     strict: true,
   });
@@ -357,6 +372,7 @@ const reportValidateSchema = object().shape({
   id: string().notRequired(),
   state: string().required(),
   created: number().notRequired(),
+  copyFromReportId: string().notRequired(),
   lastEdited: number().notRequired(),
   lastEditedBy: string().required(),
   lastEditedByEmail: string().notRequired(),
