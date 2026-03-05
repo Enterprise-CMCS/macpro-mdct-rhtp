@@ -39,7 +39,6 @@ export const UseOfFundsTableElement = (
   //   const { fieldLabels, modalInstructions, frequencyOptions } = element;
 
   const initialValues = {
-    id: "",
     budgetPeriod: "",
     spentFunds: "",
     description: "",
@@ -145,7 +144,9 @@ export const UseOfFundsTableElement = (
     { label: "Other", value: "Other" },
   ];
 
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState<UseOfFundsTableItem[]>(
+    structuredClone(element.answer) || []
+  );
 
   const [formValues, setFormValues] = useState(initialValues);
   const [errorMessages, setErrorMessages] = useState(initialValues);
@@ -204,10 +205,13 @@ export const UseOfFundsTableElement = (
     let updatedItems;
 
     if (modalMode === "Add") {
-      updatedItems = [...items, formValues];
+      const newItem = { ...formValues, id: crypto.randomUUID() };
+      updatedItems = [...items, newItem];
     } else if (modalMode === "Edit") {
       updatedItems = items.map((item) =>
-        item.id === selectedItemID ? formValues : item
+        item.id === selectedItemID
+          ? { ...formValues, id: selectedItemID }
+          : item
       );
     }
 

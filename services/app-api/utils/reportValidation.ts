@@ -132,9 +132,10 @@ const useOfFundsTableSchema = object().shape({
     .of(
       object().shape({
         id: string().required(),
+        budgetPeriod: string().required(),
         spentFunds: string().required(),
         description: string().required(),
-        init: string().required(),
+        initiative: string().required(),
         useOfFunds: string().required(),
         recipientName: string().required(),
         recipientCategory: string().required(),

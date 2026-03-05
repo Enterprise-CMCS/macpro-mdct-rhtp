@@ -64,6 +64,25 @@ export const rhtpReportTemplate: ReportBase = {
           text: "Use of Funds",
         },
         {
+          type: ElementType.Paragraph,
+          id: "use-of-funds-main-instructions",
+          text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+        },
+        {
+          type: ElementType.Accordion,
+          id: "use-of-funds-instructions",
+          label: "Instructions",
+          value:
+            "<b>Instructions for Completing this section</b>" +
+            "<p>Add the rest of instructions here.</p>",
+        },
+        {
+          type: ElementType.Paragraph,
+          id: "use-of-funds-table-text",
+          title: "Spent Funds",
+          text: `To add an use of funds, click the "Add use of funds" button below.`,
+        },
+        {
           id: "use-of-funds-table",
           type: ElementType.UseOfFundsTable,
         },
