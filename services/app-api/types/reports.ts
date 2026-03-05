@@ -284,9 +284,10 @@ export interface TextboxTemplate extends InputElementTemplate {
 
 export type UseOfFundsTableItem = {
   id: string;
+  budgetPeriod: string;
   spentFunds: string;
   description: string;
-  init: string;
+  initiative: string;
   useOfFunds: string;
   recipientName: string;
   recipientCategory: string;

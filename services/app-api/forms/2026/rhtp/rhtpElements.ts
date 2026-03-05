@@ -2,6 +2,7 @@ import { UseOfFundsTableTemplate, ElementType } from "../../../types/reports";
 
 export const useOfFundsOptions = {
   dropDownOptions: {
+    // These are placeholder
     budgetPeriodOptions: [
       { label: "- Select an option -", value: "" },
       { label: "Budget Period 1", value: "Budget Period 1" },
@@ -9,6 +10,7 @@ export const useOfFundsOptions = {
       { label: "Budget Period 3", value: "Budget Period 3" },
       { label: "Budget Period 4", value: "Budget Period 4" },
     ],
+    // These are placeholder, the initiatives will be come from a previous question in the report
     initiativeOptions: [
       { label: "- Select an option -", value: "" },
       { label: "1", value: "1" },
