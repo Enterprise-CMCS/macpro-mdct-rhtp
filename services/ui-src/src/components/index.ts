@@ -36,6 +36,8 @@ export { TextField } from "./fields/TextField";
 export { TextAreaField } from "./fields/TextAreaField";
 export { ListInput } from "./fields/ListInput";
 export { AttachmentArea } from "./fields/AttachmentArea";
+export { AccordionGroup } from "./fields/AccordionGroup";
+export { TableCheckpoint } from "./fields/TableCheckpoint";
 // forms
 export { AdminBannerForm } from "./forms/AdminBannerForm";
 export { AdminDashSelector } from "./forms/AdminDashSelector";
@@ -68,7 +70,6 @@ export { UnlockModal } from "./modals/UnlockModal";
 export { PostLogoutRedirect } from "./PostLogoutRedirect/index";
 // tables
 export { Table } from "./tables/Table";
-export { TableCheckpoint } from "./tables/TableCheckpoint";
 export { TableStatusIcon } from "./tables/TableStatusIcon";
 // dashboard
 export { DashboardPage } from "./pages/Dashboard/DashboardPage";

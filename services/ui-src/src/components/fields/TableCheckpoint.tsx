@@ -50,6 +50,8 @@ export const TableCheckpoint = (
     props.updateElement({ answer: newValue });
   };
 
+  const removeAttachment = () => {};
+
   return (
     <Flex gap="1.25rem" flexDirection="column">
       <Label>{`Stage ${stage}: ${label}`}</Label>
@@ -80,7 +82,7 @@ export const TableCheckpoint = (
               </Td>
               <Td>fake attachment</Td>
               <Td>
-                <Button variant="unstyled">
+                <Button variant="unstyled" onClick={() => removeAttachment()}>
                   <Image src={cancelIcon} alt="Remove" />
                 </Button>
               </Td>

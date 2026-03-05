@@ -127,6 +127,11 @@ export type UploadData = {
   fileId: string;
 };
 
+export type AccordionGroupItem = {
+  label: string;
+  children: PageElement[];
+};
+
 export enum ElementType {
   Header = "header",
   SubHeader = "subHeader",
@@ -149,6 +154,7 @@ export enum ElementType {
   ListInput = "listInput",
   TableCheckpoint = "tableCheckpoint",
   AttachmentArea = "attachmentArea",
+  AccordionGroup = "accordionGroup",
 }
 
 export type PageElement =
@@ -170,7 +176,8 @@ export type PageElement =
   | SubmissionParagraphTemplate
   | ListInputTemplate
   | TableCheckpointTemplate
-  | AttachmentAreaTemplate;
+  | AttachmentAreaTemplate
+  | AccordionGroupTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -318,4 +325,12 @@ export interface TableCheckpointTemplate extends InputElementTemplate {
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
   answer?: UploadData[];
+}
+
+export interface AccordionGroupTemplate {
+  type: ElementType.AccordionGroup;
+  id: string;
+  accordions: AccordionGroupItem[];
+  required: boolean;
+  answer?: boolean[];
 }

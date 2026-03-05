@@ -165,9 +165,11 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
     case ElementType.ListInput:
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
-      return tableCheckpointSchema;
+      return tableCheckpointTemplateSchema;
     case ElementType.AttachmentArea:
       return attachmentAreaSchema;
+    case ElementType.AccordionGroup:
+      return accordionGroupTemplateSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -209,7 +211,7 @@ const checkboxTemplateSchema = object().shape({
   required: boolean().required(),
 });
 
-const tableCheckpointSchema = object().shape({
+const tableCheckpointTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.TableCheckpoint)),
   id: string().required(),
   label: string().required(),
@@ -240,6 +242,21 @@ const tableCheckpointSchema = object().shape({
     )
     .notRequired(),
   required: boolean().required(),
+});
+
+const accordionGroupTemplateSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AccordionGroup)),
+  id: string().required(),
+  accordions: array()
+    .of(
+      object().shape({
+        label: string().required(),
+        children: lazy(() => array().of(pageElementSchema).required()),
+      })
+    )
+    .required(),
+  required: boolean().required(),
+  answer: array().of(boolean()).notRequired(),
 });
 
 const buttonLinkTemplateSchema = object().shape({

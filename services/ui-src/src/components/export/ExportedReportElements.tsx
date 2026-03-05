@@ -30,6 +30,8 @@ export const renderElements = (element: PageElement) => {
       return "TBD";
     case ElementType.AttachmentArea:
       return "TBD";
+    case ElementType.AccordionGroup:
+      return "TBD";
   }
 
   if (!("answer" in element)) {
