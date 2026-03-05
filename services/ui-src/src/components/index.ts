@@ -57,6 +57,7 @@ export { ReportPageWrapper } from "./report/ReportPageWrapper";
 export { Sidebar } from "./report/Sidebar";
 export { StatusTableElement } from "./report/StatusTable";
 export { SubnavBar } from "./report/SubnavBar";
+export { InitiativesTable } from "./report/InitiativesTable";
 // menus
 export { Menu } from "./menus/Menu";
 export { MenuOption } from "./menus/MenuOption";
