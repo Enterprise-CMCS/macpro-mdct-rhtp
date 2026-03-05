@@ -17,6 +17,10 @@ vi.mock("../../utils/reportValidation", () => ({
   validateReportPayload: vi.fn().mockImplementation(async (rpt) => rpt),
 }));
 
+vi.mock("./copyReport", () => ({
+  copyReport: vi.fn(),
+}));
+
 describe("buildReport utility", () => {
   beforeEach(() => {
     vi.clearAllMocks();

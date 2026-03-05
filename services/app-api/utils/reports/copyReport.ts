@@ -14,9 +14,13 @@ const copyAnswer = (oldElements: PageElement[], newElements: PageElement[]) => {
   }
 };
 
-export const copyReport = async (newReport: Report, copyFromId: string) => {
-  const { pages: newPages, state, type } = newReport;
-  const reportToCopy = await getReportFromDatabase(type, state, copyFromId);
+export const copyReport = async (newReport: Report) => {
+  const { copyFromReportId, pages: newPages, state, type } = newReport;
+  const reportToCopy = await getReportFromDatabase(
+    type,
+    state,
+    copyFromReportId!
+  );
   if (!reportToCopy) return;
 
   for (const oldPage of reportToCopy.pages) {
