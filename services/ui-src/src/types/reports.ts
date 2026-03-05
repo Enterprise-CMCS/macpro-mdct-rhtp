@@ -154,6 +154,7 @@ export enum ElementType {
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
   AttachmentArea = "attachmentArea",
+  InitiativesTable = "initiativesTable",
 }
 
 export type PageElement =
@@ -174,6 +175,7 @@ export type PageElement =
   | DividerTemplate
   | ListInputTemplate
   | SubmissionParagraphTemplate
+  | InitiativesTableTemplate
   | AttachmentAreaTemplate;
 
 export type HideCondition = {
@@ -206,6 +208,11 @@ export type ButtonLinkTemplate = {
 export type DividerTemplate = {
   type: ElementType.Divider;
   id: string;
+};
+
+export type InitiativesTableTemplate = {
+  id: string;
+  type: ElementType.InitiativesTable;
 };
 
 export type StatusTableTemplate = {
