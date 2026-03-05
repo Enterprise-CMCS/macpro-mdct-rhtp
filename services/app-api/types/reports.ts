@@ -121,7 +121,7 @@ export enum PageType {
   ReviewSubmit = "reviewSubmit",
 }
 
-export type UploadData = {
+export type UploadListProp = {
   name: string;
   size: number;
   fileId: string;
@@ -324,7 +324,7 @@ export interface TableCheckpointTemplate extends InputElementTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  answer?: UploadData[];
+  answer?: UploadListProp[];
 }
 
 export interface AccordionGroupTemplate {

@@ -15,6 +15,7 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
+import { UploadListProp } from "types";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -26,12 +27,6 @@ export const acceptedFileTypes = [
   ".jpeg",
   ".png",
 ];
-
-export type UploadListProp = {
-  name: string;
-  size: number;
-  fileId: string;
-};
 
 export const retrieveUploadedFiles = async (year: string, state: string) => {
   const uploadedFiles = await getUploadedFiles(year, state);

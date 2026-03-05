@@ -30,10 +30,10 @@ export const AccordionGroup = (
   const collapseAll = () => {};
 
   return (
-    <Box>
+    <Box width="100%">
       <Button onClick={expandAll}>Expand all</Button>
       <Button onClick={collapseAll}>Collapse all</Button>
-      <Accordion allowMultiple index={accordionState} allowToggle>
+      <Accordion allowMultiple allowToggle>
         {accordions.map((accordion, index) => (
           <AccordionItem label={accordion.label}>
             <Page

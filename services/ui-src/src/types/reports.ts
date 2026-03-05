@@ -48,6 +48,12 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
+export type UploadListProp = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
 export type ReportBase = {
   type: ReportType;
   subType?: RhtpSubType;
@@ -134,19 +140,13 @@ export type CheckpointAnswerShape = {
   id: string;
   label: string;
   completed: boolean;
-  attachments?: { name: string; fileId: string }[];
+  attachments?: UploadListProp[];
 };
 
 export enum PageType {
   Standard = "standard",
   ReviewSubmit = "reviewSubmit",
 }
-
-export type UploadData = {
-  name: string;
-  size: number;
-  fileId: string;
-};
 
 export type AccordionGroupItem = {
   label: string;
@@ -316,7 +316,7 @@ export interface NumberFieldTemplate extends InputElementTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  answer?: UploadData[];
+  answer?: UploadListProp[];
 }
 
 export interface RadioTemplate extends InputElementTemplate {

@@ -1,16 +1,12 @@
-import { AttachmentAreaTemplate } from "types";
+import { AttachmentAreaTemplate, UploadListProp } from "types";
 import { PageElementProps } from "components/report/Elements";
-import { Text, Button, Stack, Heading, Image, Spinner } from "@chakra-ui/react";
+import { Text, Button, Stack, Heading, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useParams } from "react-router-dom";
 import { useStore } from "utils";
-import {
-  downloadFile,
-  UploadListProp,
-  uploadListRender,
-} from "utils/other/upload";
+import { downloadFile, uploadListRender } from "utils/other/upload";
 import { deleteUploadedFile } from "utils/api/requestMethods/upload";
 
 export const AttachmentArea = (
@@ -32,12 +28,15 @@ export const AttachmentArea = (
 
   const onModalClose = () => {
     setModalOpen(false);
-    //get upload list again when modal is closed
   };
 
   const onRemove = async (file: UploadListProp) => {
     /** TO DO: Fix file deletion from s3 bucket */
     await deleteUploadedFile(year, state, file.fileId);
+  };
+
+  const saveToReport = (uploads: UploadListProp[]) => {
+    updateElement({ answer: uploads });
   };
 
   return (
@@ -61,7 +60,7 @@ export const AttachmentArea = (
         state={state}
         year={year}
         answer={answer ?? []}
-        updatedElement={updateElement}
+        saveToReport={saveToReport}
       ></UploadModal>
     </Stack>
   );

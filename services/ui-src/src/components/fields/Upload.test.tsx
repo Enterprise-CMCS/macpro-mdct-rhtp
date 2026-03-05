@@ -32,7 +32,7 @@ const props = {
   state: "PA",
   year: "2026",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
-  updatedElement: vi.fn(),
+  saveToReport: vi.fn(),
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });

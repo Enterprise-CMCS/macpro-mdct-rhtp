@@ -51,7 +51,7 @@ export const rhtpReportTemplate: ReportBase = {
         },
         {
           type: ElementType.TableCheckpoint,
-          id: "checkpoint-1",
+          id: "checkpoint-0",
           label: "Planning",
           stage: 0,
           checkpoints: [
@@ -64,6 +64,35 @@ export const rhtpReportTemplate: ReportBase = {
               id: "planning-2",
               label: "Submit project plan to CMS",
               attachable: false,
+            },
+          ],
+          required: true,
+        },
+        {
+          type: ElementType.TableCheckpoint,
+          id: "checkpoint-2",
+          label: "Early Implementation",
+          stage: 2,
+          checkpoints: [
+            {
+              id: "early-implementation-1",
+              label: "Continue initiative",
+              attachable: true,
+            },
+            {
+              id: "early-implementation-2",
+              label: "Achieve at least one milestone",
+              attachable: true,
+            },
+            {
+              id: "early-implementation-3",
+              label: "Establish metric reporting methodology",
+              attachable: true,
+            },
+            {
+              id: "early-implementation-4",
+              label: "Submit updated project plan to CMS",
+              attachable: true,
             },
           ],
           required: true,

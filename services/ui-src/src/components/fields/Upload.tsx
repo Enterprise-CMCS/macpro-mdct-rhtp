@@ -1,6 +1,6 @@
-import { Box, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { AttachmentAreaTemplate, UploadData } from "types";
+import { AttachmentAreaTemplate, UploadListProp } from "types";
 import {
   deleteUploadedFile,
   recordFileInDatabaseAndGetUploadUrl,
@@ -10,18 +10,17 @@ import {
   acceptedFileTypes,
   downloadFile,
   retrieveUploadedFiles,
-  UploadListProp,
   uploadListRender,
 } from "utils/other/upload";
 
 interface Props {
   state: string;
   year: string;
-  answer: UploadData[];
-  updatedElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
+  answer: UploadListProp[];
+  saveToReport: (uploads: UploadListProp[]) => void;
 }
 
-export const Upload = ({ state, year, answer, updatedElement }: Props) => {
+export const Upload = ({ state, year, answer, saveToReport }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   useEffect(() => {
@@ -30,7 +29,7 @@ export const Upload = ({ state, year, answer, updatedElement }: Props) => {
         await onUploadFiles().then(() => {
           retrieveUploadedFiles(year, state).then((response) => {
             setFilesToUpload([]);
-            updatedElement({ answer: response });
+            saveToReport(response);
           });
         });
       fetchData();
