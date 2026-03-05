@@ -125,6 +125,51 @@ const accordionTemplateSchema = object().shape({
   value: string().required(),
 });
 
+const useOfFundsTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.UseOfFundsTable)),
+  id: string().required(),
+  dropDownOptions: object().shape({
+    budgetPeriodOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+    initiativeOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+    useOfFundsOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+    recipientCategoryOptions: array().of(
+      object().shape({
+        label: string().required(),
+        value: string().notRequired(),
+      })
+    ),
+  }),
+  answer: array()
+    .of(
+      object().shape({
+        id: string().required(),
+        budgetPeriod: string().required(),
+        spentFunds: string().required(),
+        description: string().required(),
+        initiative: string().required(),
+        useOfFunds: string().required(),
+        recipientName: string().required(),
+        recipientCategory: string().required(),
+      })
+    )
+    .notRequired(),
+});
+
 const pageElementSchema = lazy((value: PageElement): Schema => {
   if (!value.type) {
     throw new Error();
@@ -164,6 +209,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return submissionParagraphSchema;
     case ElementType.ListInput:
       return listInputTemplateSchema;
+    case ElementType.UseOfFundsTable:
+      return useOfFundsTableSchema;
     case ElementType.AttachmentArea:
       return attachmentAreaSchema;
     default:

@@ -69,7 +69,7 @@ const sx = {
     width: "100%",
     flexDirection: "column",
     alignItems: "center",
-    backgroundColor: "palette.gray_lightest",
+    backgroundColor: "gray_lightest",
     ".desktop &": {
       padding: "0 1rem",
     },
@@ -77,7 +77,7 @@ const sx = {
   headerBar: {
     minHeight: "4rem",
     alignItems: "center",
-    bg: "palette.primary_darkest",
+    bg: "primary_darkest",
   },
   headerContainer: {
     maxW: "appMax",

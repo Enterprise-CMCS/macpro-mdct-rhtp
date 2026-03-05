@@ -134,6 +134,7 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  UseOfFundsTable = "useOfFundsTable",
   AttachmentArea = "attachmentArea",
 }
 
@@ -154,8 +155,9 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | SubmissionParagraphTemplate
-  | ListInputTemplate
-  | AttachmentAreaTemplate;
+  | UseOfFundsTableTemplate
+  | AttachmentAreaTemplate
+  | ListInputTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -292,6 +294,29 @@ export interface TextboxTemplate extends InputElementTemplate {
   answer?: string;
   hideCondition?: HideCondition;
 }
+
+export type UseOfFundsTableItem = {
+  id: string;
+  budgetPeriod: string;
+  spentFunds: string;
+  description: string;
+  initiative: string;
+  useOfFunds: string;
+  recipientName: string;
+  recipientCategory: string;
+};
+
+export type UseOfFundsTableTemplate = {
+  type: ElementType.UseOfFundsTable;
+  id: string;
+  dropDownOptions: {
+    budgetPeriodOptions: { label: string; value: string }[];
+    initiativeOptions: { label: string; value: string }[];
+    useOfFundsOptions: { label: string; value: string }[];
+    recipientCategoryOptions: { label: string; value: string }[];
+  };
+  answer?: UseOfFundsTableItem[];
+};
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
   answer?: UploadData[];

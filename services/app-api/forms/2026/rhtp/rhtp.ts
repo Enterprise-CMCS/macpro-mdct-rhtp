@@ -7,6 +7,7 @@ import {
   ReportBase,
 } from "../../../types/reports";
 import { exportToPDF } from "../elements";
+import { useOfFundsTableElement } from "./rhtpElements";
 
 export const rhtpReportTemplate: ReportBase = {
   type: ReportType.RHTP,
@@ -16,6 +17,7 @@ export const rhtpReportTemplate: ReportBase = {
       id: "root",
       childPageIds: [
         "general-information",
+        "use-of-funds",
         "sustainability-and-highlights",
         "review-submit",
       ],
@@ -55,6 +57,39 @@ export const rhtpReportTemplate: ReportBase = {
           label: "Supporting Evidence: Attachments",
           required: false,
         },
+      ],
+    },
+    {
+      id: "use-of-funds",
+      title: "Use of Funds",
+      type: PageType.Standard,
+      sidebar: true,
+      elements: [
+        {
+          type: ElementType.Header,
+          id: "use-of-funds-header",
+          text: "Use of Funds",
+        },
+        {
+          type: ElementType.Paragraph,
+          id: "use-of-funds-main-instructions",
+          text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+        },
+        {
+          type: ElementType.Accordion,
+          id: "use-of-funds-instructions",
+          label: "Instructions",
+          value:
+            "<b>Instructions for Completing this section</b>" +
+            "<p>Add the rest of instructions here.</p>",
+        },
+        {
+          type: ElementType.Paragraph,
+          id: "use-of-funds-table-text",
+          title: "Spent Funds",
+          text: `To add an use of funds, click the "Add use of funds" button below.`,
+        },
+        useOfFundsTableElement,
       ],
     },
     {

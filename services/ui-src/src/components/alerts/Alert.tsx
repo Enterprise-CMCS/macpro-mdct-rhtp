@@ -82,20 +82,20 @@ const sx = {
     borderInlineStartWidth: "0.5rem",
     alignItems: "start",
     "&.info": {
-      backgroundColor: "palette.secondary_lightest",
-      borderInlineStartColor: "palette.secondary",
+      backgroundColor: "secondary_lightest",
+      borderInlineStartColor: "secondary",
     },
     "&.success": {
-      backgroundColor: "palette.success_lightest",
-      borderInlineStartColor: "palette.success",
+      backgroundColor: "success_lightest",
+      borderInlineStartColor: "success",
     },
     "&.warning": {
-      backgroundColor: "palette.warn_lightest",
-      borderInlineStartColor: "palette.warn",
+      backgroundColor: "warn_lightest",
+      borderInlineStartColor: "warn",
     },
     "&.error": {
-      backgroundColor: "palette.error_lightest",
-      borderInlineStartColor: "palette.error",
+      backgroundColor: "error_lightest",
+      borderInlineStartColor: "error",
     },
   },
   content: {
@@ -115,7 +115,7 @@ const sx = {
     },
   },
   icon: {
-    color: "palette.base",
+    color: "base",
     minWidth: "1.5rem",
     height: "1.5rem",
     marginLeft: "spacer1",
