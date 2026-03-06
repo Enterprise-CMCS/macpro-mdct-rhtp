@@ -107,7 +107,7 @@ export const parseNumber = (value: string) => {
   value = value.trim();
   if (value === "") return undefined;
   const nonNumericChars = /[^.-\d]/;
-  if (value.match(nonNumericChars)) return undefined;
+  if (nonNumericChars.test(value)) return undefined;
   if (isNaN(Number(value))) return undefined;
   const parsed = parseFloat(value);
   if (Object.is(parsed, -0)) return 0;

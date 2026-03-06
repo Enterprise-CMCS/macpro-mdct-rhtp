@@ -64,7 +64,7 @@ const setWindowOrigin = (windowOrigin: string) => {
 const breakCheckAuthState = async () => {
   const mockAmplify = require("aws-amplify/auth");
   mockAmplify.currentSession = vi.fn().mockImplementation(() => {
-    throw new Error();
+    throw new Error("Some error message");
   });
 };
 
@@ -140,7 +140,7 @@ describe("<UserProvider />", () => {
       vi.spyOn(console, "log").mockImplementation(vi.fn());
       const spy = vi.spyOn(console, "log");
       mockSignOut.mockImplementation(() => {
-        throw new Error();
+        throw new Error("Some error message");
       });
 
       await act(async () => {

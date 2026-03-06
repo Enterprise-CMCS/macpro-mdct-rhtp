@@ -45,9 +45,7 @@ export const setPage = (targetPageId: string, currentState: ReportState) => {
   let parentPage = undefined;
   if (parent) {
     // @ts-ignore TODO
-    const pageIndex = parent.childPageIds.findIndex(
-      (pageId) => pageId === targetPageId
-    );
+    const pageIndex = parent.childPageIds?.indexOf(targetPageId) ?? -1;
     parentPage = {
       parent: parent.id,
       childPageIds: parent.childPageIds!,
@@ -141,7 +139,7 @@ export const saveReport = async (state: ReportState) => {
   if (!state.report) return {};
   try {
     await putReport(state.report); // Submit to API
-  } catch (_) {
+  } catch {
     return { errorMessage: "Something went wrong, try again." };
   }
   return { lastSavedTime: getLocalHourMinuteTime() };

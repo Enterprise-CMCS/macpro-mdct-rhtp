@@ -94,10 +94,11 @@ export const elementSatisfiesRequired = (
   pageElements: PageElement[]
 ) => {
   //while list input is not required, if the user adds a field and leaves it blank, that would make it incomplete and prevent form submission
-  if (element.type === ElementType.ListInput) {
-    if (element.answer?.some((item) => item === "" || item === undefined)) {
-      return false;
-    }
+  if (
+    element.type === ElementType.ListInput &&
+    element.answer?.some((item) => item === "" || item === undefined)
+  ) {
+    return false;
   }
 
   // TODO: make less ugly
