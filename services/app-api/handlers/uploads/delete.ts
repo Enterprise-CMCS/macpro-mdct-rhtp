@@ -6,7 +6,6 @@ import { deleteUpload, queryUpload } from "../../storage/upload";
 export const deleteUploadFile = handler(
   parseUploadParameters,
   async (request) => {
-    const { user } = request;
     const { state, fileId } = request.parameters;
 
     const decodedFileId = decodeURIComponent(fileId);

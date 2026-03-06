@@ -1,6 +1,6 @@
 import { AttachmentAreaTemplate } from "types";
 import { PageElementProps } from "components/report/Elements";
-import { Text, Button, Stack, Heading, Image, Spinner } from "@chakra-ui/react";
+import { Text, Button, Stack, Heading, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";

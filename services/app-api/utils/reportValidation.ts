@@ -127,7 +127,7 @@ const accordionTemplateSchema = object().shape({
 
 const pageElementSchema = lazy((value: PageElement): Schema => {
   if (!value.type) {
-    throw new Error();
+    throw new Error("Some error message");
   }
   switch (value.type) {
     case ElementType.Header:
@@ -290,13 +290,12 @@ const pagesSchema = array()
         if (pageObject.id && pageObject.childPageIds) {
           return parentPageTemplateSchema;
         } else {
-          throw new Error();
+          throw new Error("Some error message");
         }
       } else {
         switch (pageObject.type) {
           case PageType.ReviewSubmit:
             return reviewSubmitTemplateSchema;
-          case PageType.Standard:
           default:
             return formPageTemplateSchema;
         }

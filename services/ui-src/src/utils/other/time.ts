@@ -1,5 +1,5 @@
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
-import { DateShape, Report } from "types";
+import { DateShape } from "types";
 import { differenceInSeconds } from "date-fns";
 
 interface TimeShape {
@@ -20,7 +20,7 @@ export const getLocalHourMinuteTime = () => {
     localTime.lastIndexOf(":")
   );
   const twelveHourIndicator = localTime.includes("AM") ? "am" : "pm";
-  return localTimeHourMinute.concat(twelveHourIndicator);
+  return `${localTimeHourMinute}${twelveHourIndicator}`;
 };
 
 /*
@@ -120,7 +120,7 @@ export const checkDateRangeStatus = (
   startDate: number,
   endDate: number
 ): boolean => {
-  const currentTime = new Date().valueOf();
+  const currentTime = Date.now();
   return currentTime >= startDate && currentTime <= endDate;
 };
 
@@ -138,9 +138,7 @@ export const calculateNextQuarter = (previousQuarter: string) => {
   if (previousQuarter) {
     const formattedQuarter = previousQuarter.split(" ");
     const year = parseInt(formattedQuarter[0]);
-    const period = parseInt(
-      formattedQuarter[1][formattedQuarter[1].length - 1]
-    );
+    const period = parseInt(formattedQuarter[1].at(-1)!);
     const nextPeriod = (period % 4) + 1;
     const nextYear = period === 4 ? year + 1 : year;
     return `${nextYear} Q${nextPeriod}`;

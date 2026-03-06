@@ -25,7 +25,7 @@ export const createReport = handler(
 
     const reports = await queryReportsForState(reportType, state);
 
-    if (reports.length < 1) {
+    if (reports.length === 0) {
       // Report options for very first report
       const reportOptions = {
         year: 2026,
