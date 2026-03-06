@@ -9,9 +9,7 @@ export const AccordionGroup = (
   props: PageElementProps<AccordionGroupTemplate>
 ) => {
   const { accordions } = props.element;
-  const [accordionState, setAccordionState] = useState<number[] | undefined>(
-    []
-  );
+  const [accordionState, setAccordionState] = useState<number[]>([]);
 
   const setAccordionChildren = (element: PageElement[], index: number) => {
     const updatedAnswer = accordions[index];
@@ -25,17 +23,50 @@ export const AccordionGroup = (
     });
   };
 
-  const expandAll = () => {};
+  const expandAll = () => {
+    const items = accordions.reduce((prev: number[], _curr, index) => {
+      prev.push(index);
+      return prev;
+    }, []);
 
-  const collapseAll = () => {};
+    setAccordionState(items);
+  };
+
+  const collapseAll = () => {
+    setAccordionState([]);
+  };
+
+  const toggle = (index: number) => {
+    if (accordionState.includes(index)) {
+      setAccordionState(accordionState.filter((number) => number != index));
+    } else {
+      setAccordionState([...accordionState, index]);
+    }
+  };
 
   return (
     <Box width="100%">
-      <Button onClick={expandAll}>Expand all</Button>
-      <Button onClick={collapseAll}>Collapse all</Button>
-      <Accordion allowMultiple allowToggle>
+      <Box padding="1.5rem">
+        <Button
+          onClick={expandAll}
+          variant="link"
+          marginRight="1.5rem"
+          fontWeight="bold"
+        >
+          Expand all
+        </Button>
+        <Button onClick={collapseAll} variant="link" fontWeight="bold">
+          Collapse all
+        </Button>
+      </Box>
+      <Accordion
+        allowMultiple
+        allowToggle
+        variant="border"
+        index={accordionState}
+      >
         {accordions.map((accordion, index) => (
-          <AccordionItem label={accordion.label}>
+          <AccordionItem label={accordion.label} onClick={() => toggle(index)}>
             <Page
               id="radio-children"
               setElements={(element) => setAccordionChildren(element, index)}
