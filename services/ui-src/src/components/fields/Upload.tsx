@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { AttachmentAreaTemplate, UploadListProp } from "types";
+import { UploadListProp } from "types";
 import {
   deleteUploadedFile,
   recordFileInDatabaseAndGetUploadUrl,
@@ -14,20 +14,28 @@ import {
 } from "utils/other/upload";
 
 interface Props {
+  id: string;
   state: string;
   year: string;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
 }
 
-export const Upload = ({ state, year, answer, saveToReport }: Props) => {
+export const Upload = ({
+  id: uploadId,
+  state,
+  year,
+  answer,
+  saveToReport,
+}: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
+  console.log(uploadId);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
         await onUploadFiles().then(() => {
-          retrieveUploadedFiles(year, state).then((response) => {
+          retrieveUploadedFiles(year, state, uploadId).then((response) => {
             setFilesToUpload([]);
             saveToReport(response);
           });
@@ -72,7 +80,8 @@ export const Upload = ({ state, year, answer, saveToReport }: Props) => {
       const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
         year,
         state,
-        file
+        file,
+        uploadId
       );
       await uploadFileToS3(presignedPostData, file);
     }

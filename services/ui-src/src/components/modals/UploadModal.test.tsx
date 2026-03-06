@@ -16,6 +16,7 @@ const modalComponent = (
       isOpen: true,
       onClose: mockCloseHandler,
     }}
+    id={"mock-id"}
     year={"2026"}
     state={"PA"}
     answer={[]}

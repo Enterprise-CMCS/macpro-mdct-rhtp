@@ -12,12 +12,13 @@ export const createUpload = handler(
   async (request) => {
     const { user, body } = request;
     // Format Info
-    const { uploadedFileName, uploadedFileSize } = body as UploadFileData;
+    const { uploadedFileName, uploadedFileSize, uploadId } =
+      body as UploadFileData;
     const { state, year } = request.parameters;
 
     const username = user.email ?? "";
     const awsFilename = `${KSUID.randomSync().string}_${uploadedFileName}`;
-    const fileId = `${year}-${awsFilename}`;
+    const fileId = `${uploadId}_${year}-${awsFilename}`;
 
     await updateUpload(
       state,

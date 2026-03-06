@@ -28,8 +28,12 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
-export const retrieveUploadedFiles = async (year: string, state: string) => {
-  const uploadedFiles = await getUploadedFiles(year, state);
+export const retrieveUploadedFiles = async (
+  year: string,
+  state: string,
+  uploadId: string
+) => {
+  const uploadedFiles = await getUploadedFiles(year, state, uploadId);
   return uploadedFiles.map((file) => ({
     name: file.filename,
     size: file.filesize,

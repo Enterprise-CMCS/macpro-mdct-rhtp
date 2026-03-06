@@ -12,7 +12,7 @@ import { deleteUploadedFile } from "utils/api/requestMethods/upload";
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
-  const { label, helperText, answer } = props.element;
+  const { id, label, helperText, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   const { state } = useParams();
@@ -61,6 +61,7 @@ export const AttachmentArea = (
         year={year}
         answer={answer ?? []}
         saveToReport={saveToReport}
+        id={id}
       ></UploadModal>
     </Stack>
   );

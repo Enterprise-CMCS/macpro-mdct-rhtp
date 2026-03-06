@@ -7,6 +7,7 @@ import { UploadListProp } from "types";
 
 export const UploadModal = ({
   modalDisclosure,
+  id,
   year,
   state,
   dropdowns,
@@ -24,7 +25,6 @@ export const UploadModal = ({
   };
 
   const saveToModal = (uploads: UploadListProp[]) => {
-    console.log("uploads", uploads);
     saveToReport(uploads, values);
   };
 
@@ -50,6 +50,7 @@ export const UploadModal = ({
           ></Dropdown>
         ))}
         <Upload
+          id={id}
           year={year}
           state={state}
           answer={answer}
@@ -65,6 +66,7 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
+  id: string;
   year: string;
   state: string;
   answer: UploadListProp[];

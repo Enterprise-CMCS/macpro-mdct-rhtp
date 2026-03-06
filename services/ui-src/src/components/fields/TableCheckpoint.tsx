@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { PageElementProps } from "components/report/Elements";
 import {
+  CheckpointAnswerShape,
   CheckpointShape,
   TableCheckpointTemplate,
   UploadListProp,
@@ -24,6 +25,7 @@ import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router-dom";
 import { useStore } from "utils";
 import { downloadFile } from "utils/other/upload";
+import { currentPageSelector } from "utils/state/selectors";
 
 const formatCheckpoints = (checkpoints: CheckpointShape[]) => {
   return checkpoints.map((checkpoint) => ({
@@ -34,45 +36,23 @@ const formatCheckpoints = (checkpoints: CheckpointShape[]) => {
   }));
 };
 
-const checkpointOptions = (checkpoints: CheckpointShape[]) => {
+const checkpointOptions = (stage: number, checkpoints: CheckpointShape[]) => {
   return {
     label: "Checkpoint #",
     options: checkpoints
+      .map((checkpoint, index) => ({
+        ...checkpoint,
+        label: `${stage}.${index} ${checkpoint.label}`,
+      }))
       .filter((checkpoint) => checkpoint.attachable)
       .map((checkpoint) => ({ label: checkpoint.label, value: checkpoint.id })),
   };
 };
 
-export const TableCheckpoint = (
-  props: PageElementProps<TableCheckpointTemplate>
-) => {
-  const { id, checkpoints, label, stage, answer } = props.element;
-  const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const { updateElement } = props;
-
-  const { state } = useParams();
-  const { report } = useStore();
-  const year = report?.year.toString();
-
-  //if there is answer on load, we need to build the shape from the checkpoints data
-  const initialDisplayValue = answer ?? formatCheckpoints(checkpoints);
-  const [displayValue, setDisplayValue] = useState(initialDisplayValue);
-  const stageOption = {
-    label: "Stage",
-    options: [{ label: `${stage} ${label}`, value: id }],
-  };
-
-  const header = [
-    "#",
-    "Checkpoint",
-    "Check if Complete",
-    "Attachments",
-    "Actions",
-  ];
-
+const buildRows = (stage: number, values: CheckpointAnswerShape[]) => {
   const rows = [];
-  for (var i = 0; i < displayValue.length; i++) {
-    const { id, completed, label, attachments } = displayValue[i];
+  for (var i = 0; i < values.length; i++) {
+    const { id, completed, label, attachments } = values[i];
     const stageNo = `${stage}.${i + 1}`;
     const row = {
       id,
@@ -96,6 +76,41 @@ export const TableCheckpoint = (
     }
   }
 
+  return rows;
+};
+
+export const TableCheckpoint = (
+  props: PageElementProps<TableCheckpointTemplate>
+) => {
+  const { id, checkpoints, label, stage, answer } = props.element;
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const { updateElement } = props;
+
+  const { state } = useParams();
+  const { report } = useStore();
+  const year = report?.year.toString();
+  const currentPage = useStore(currentPageSelector);
+
+  //if there is answer on load, we need to build the shape from the checkpoints data
+  const initialDisplayValue = answer ?? formatCheckpoints(checkpoints);
+  const [displayValue, setDisplayValue] = useState(initialDisplayValue);
+  const stageOption = {
+    label: "Stage",
+    options: [{ label: `${stage} ${label}`, value: id }],
+  };
+
+  // console.log(currentPage);
+
+  const header = [
+    "#",
+    "Checkpoint",
+    "Check if Complete",
+    "Attachments",
+    "Actions",
+  ];
+
+  const rows = buildRows(stage, displayValue);
+
   const onChangeHandler = (id: string) => {
     const newValue = [...displayValue];
     for (var i = 0; i < newValue.length; i++) {
@@ -104,6 +119,7 @@ export const TableCheckpoint = (
     updateElement({ answer: newValue });
   };
 
+  /** TO DO: Add function once upload delete is working */
   const removeAttachment = () => {};
 
   const onModalClose = () => {
@@ -126,7 +142,7 @@ export const TableCheckpoint = (
   }
 
   return (
-    <Flex gap="1.25rem" flexDirection="column">
+    <Flex gap="1.25rem" flexDirection="column" width="100%">
       <Label>{`Stage ${stage}: ${label}`}</Label>
       <Text>To upload attachments, click the button below.</Text>
       <Button
@@ -172,9 +188,11 @@ export const TableCheckpoint = (
                 )}
               </Td>
               <Td>
-                <Button variant="unstyled" onClick={() => removeAttachment()}>
-                  <Image src={cancelIcon} alt="Remove" />
-                </Button>
+                {"file" in row && row.file.fileId && (
+                  <Button variant="unstyled" onClick={() => removeAttachment()}>
+                    <Image src={cancelIcon} alt="Remove" />
+                  </Button>
+                )}
               </Td>
             </Tr>
           ))}
@@ -188,7 +206,8 @@ export const TableCheckpoint = (
         state={state}
         year={year}
         answer={[]}
-        dropdowns={[stageOption, checkpointOptions(checkpoints)]}
+        id={"test"}
+        dropdowns={[stageOption, checkpointOptions(stage, checkpoints)]}
         saveToReport={saveToReport}
       ></UploadModal>
     </Flex>
