@@ -92,7 +92,7 @@ export const rhtpReportTemplate: ReportBase = {
             {
               id: "early-implementation-4",
               label: "Submit updated project plan to CMS",
-              attachable: true,
+              attachable: false,
             },
           ],
           required: true,

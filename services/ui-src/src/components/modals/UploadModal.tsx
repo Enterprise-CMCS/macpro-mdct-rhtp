@@ -13,6 +13,7 @@ export const UploadModal = ({
   dropdowns,
   answer,
   saveToReport,
+  onChangeOverride,
 }: Props) => {
   const [values, setDropdownValues] = useState<string[]>(
     dropdowns?.map((dropdown) => dropdown.options[0].value) ?? []
@@ -21,6 +22,9 @@ export const UploadModal = ({
   const onChange = (change: DropdownChangeObject, index: number) => {
     const newValues = [...values];
     newValues[index] = change.target.value;
+
+    if (onChangeOverride) onChangeOverride(newValues[index]);
+
     setDropdownValues(newValues);
   };
 
@@ -71,5 +75,6 @@ interface Props {
   state: string;
   answer: UploadListProp[];
   dropdowns?: { label: string; options: { label: string; value: string }[] }[];
+  onChangeOverride?: (change: string) => void;
   saveToReport: (uploads: UploadListProp[], options: string[]) => void;
 }

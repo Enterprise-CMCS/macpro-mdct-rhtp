@@ -29,7 +29,6 @@ export const Upload = ({
   saveToReport,
 }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
-  console.log(uploadId);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {

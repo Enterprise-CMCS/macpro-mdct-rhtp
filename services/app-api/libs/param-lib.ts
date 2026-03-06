@@ -57,6 +57,21 @@ export const parseUploadParameters = (event: APIGatewayProxyEvent) => {
   return { state, fileId };
 };
 
+export const parseCreateUploadParameters = (event: APIGatewayProxyEvent) => {
+  const { state, year } = event.pathParameters ?? {};
+  if (!isStateAbbreviation(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+
+  if (!state || !year) {
+    logger.warn("Invalid state, year or fileId in path");
+    return undefined;
+  }
+
+  return { state, year };
+};
+
 export const parseUploadViewParameters = (event: APIGatewayProxyEvent) => {
   const { state, year, fileId } = event.pathParameters ?? {};
 

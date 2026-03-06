@@ -85,21 +85,25 @@ export const TableCheckpoint = (
   const { id, checkpoints, label, stage, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { updateElement } = props;
-
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
+
   const currentPage = useStore(currentPageSelector);
+  // console.log(currentPage);
 
   //if there is answer on load, we need to build the shape from the checkpoints data
   const initialDisplayValue = answer ?? formatCheckpoints(checkpoints);
   const [displayValue, setDisplayValue] = useState(initialDisplayValue);
+  const [uploadId, setUploadId] = useState<string>(displayValue[0].id);
+  const [files, setFiles] = useState<UploadListProp[]>(
+    displayValue[0].attachments ?? []
+  );
+
   const stageOption = {
     label: "Stage",
     options: [{ label: `${stage} ${label}`, value: id }],
   };
-
-  // console.log(currentPage);
 
   const header = [
     "#",
@@ -117,6 +121,16 @@ export const TableCheckpoint = (
       if (newValue[i].id == id) newValue[i].completed = !newValue[i].completed;
     }
     updateElement({ answer: newValue });
+  };
+
+  const onDropdownChangeHandler = (change: string) => {
+    setUploadId(change);
+    if (answer) {
+      const data = answer.filter((data) => data.id === change);
+      if (data.length > 0) {
+        setFiles(data[0].attachments ?? []);
+      }
+    }
   };
 
   /** TO DO: Add function once upload delete is working */
@@ -205,9 +219,10 @@ export const TableCheckpoint = (
         }}
         state={state}
         year={year}
-        answer={[]}
-        id={"test"}
+        answer={files}
+        id={uploadId}
         dropdowns={[stageOption, checkpointOptions(stage, checkpoints)]}
+        onChangeOverride={onDropdownChangeHandler}
         saveToReport={saveToReport}
       ></UploadModal>
     </Flex>
