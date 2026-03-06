@@ -1,23 +1,24 @@
 import { handler } from "../../libs/handler-lib";
 import s3 from "../../libs/s3-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
-import { parseUploadViewParameters } from "../../libs/param-lib";
+import { parseCreateUploadParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { updateUpload } from "../../storage/upload";
 import { UploadFileData } from "../../types/uploads";
 import KSUID from "ksuid";
 
 export const createUpload = handler(
-  parseUploadViewParameters,
+  parseCreateUploadParameters,
   async (request) => {
     const { user, body } = request;
     // Format Info
-    const { uploadedFileName, uploadedFileSize } = body as UploadFileData;
+    const { uploadedFileName, uploadedFileSize, uploadId } =
+      body as UploadFileData;
     const { state, year } = request.parameters;
 
     const username = user.email ?? "";
     const awsFilename = `${KSUID.randomSync().string}_${uploadedFileName}`;
-    const fileId = `${year}-${awsFilename}`;
+    const fileId = `${uploadId}_${year}-${awsFilename}`;
 
     await updateUpload(
       state,

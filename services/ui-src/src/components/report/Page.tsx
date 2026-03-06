@@ -24,6 +24,8 @@ import {
   StatusAlert,
   CheckboxField,
   ListInput,
+  TableCheckpoint,
+  AccordionGroup,
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
@@ -85,8 +87,12 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <SubmissionParagraph />;
       case ElementType.ListInput:
         return <ListInput {...{ updateElement, disabled, element }} />;
+      case ElementType.TableCheckpoint:
+        return <TableCheckpoint {...{ updateElement, disabled, element }} />;
       case ElementType.AttachmentArea:
         return <AttachmentArea {...{ updateElement, disabled, element }} />;
+      case ElementType.AccordionGroup:
+        return <AccordionGroup {...{ updateElement, disabled, element }} />;
       default:
         assertExhaustive(element);
         return null;

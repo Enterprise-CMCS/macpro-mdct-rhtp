@@ -20,7 +20,6 @@ const uploadVariant = {
     justifyContent: "space-between",
     padding: "20px",
     boxShadow: "0px 3px 9px #00000033",
-    marginBottom: "1rem",
     ".progress": {
       width: "100%",
       background: "transparent",

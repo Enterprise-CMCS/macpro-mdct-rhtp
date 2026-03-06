@@ -1,6 +1,6 @@
-import { Box, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { AttachmentAreaTemplate, UploadData } from "types";
+import { UploadListProp } from "types";
 import {
   deleteUploadedFile,
   recordFileInDatabaseAndGetUploadUrl,
@@ -10,27 +10,33 @@ import {
   acceptedFileTypes,
   downloadFile,
   retrieveUploadedFiles,
-  UploadListProp,
   uploadListRender,
 } from "utils/other/upload";
 
 interface Props {
+  id: string;
   state: string;
   year: string;
-  answer: UploadData[];
-  updatedElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
+  answer: UploadListProp[];
+  saveToReport: (uploads: UploadListProp[]) => void;
 }
 
-export const Upload = ({ state, year, answer, updatedElement }: Props) => {
+export const Upload = ({
+  id: uploadId,
+  state,
+  year,
+  answer,
+  saveToReport,
+}: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
         await onUploadFiles().then(() => {
-          retrieveUploadedFiles(year, state).then((response) => {
+          retrieveUploadedFiles(year, state, uploadId).then((response) => {
             setFilesToUpload([]);
-            updatedElement({ answer: response });
+            saveToReport(response);
           });
         });
       fetchData();
@@ -73,7 +79,8 @@ export const Upload = ({ state, year, answer, updatedElement }: Props) => {
       const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
         year,
         state,
-        file
+        file,
+        uploadId
       );
       await uploadFileToS3(presignedPostData, file);
     }

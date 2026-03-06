@@ -1,14 +1,37 @@
+import { Stack } from "@chakra-ui/react";
+import { Dropdown, DropdownChangeObject } from "@cmsgov/design-system";
 import { Modal } from "components";
 import { Upload } from "components/fields/Upload";
-import { AttachmentAreaTemplate, UploadData } from "types";
+import { useState } from "react";
+import { UploadListProp } from "types";
 
 export const UploadModal = ({
   modalDisclosure,
+  id,
   year,
   state,
+  dropdowns,
   answer,
-  updatedElement,
+  saveToReport,
+  onChangeOverride,
 }: Props) => {
+  const [values, setDropdownValues] = useState<string[]>(
+    dropdowns?.map((dropdown) => dropdown.options[0].value) ?? []
+  );
+
+  const onChange = (change: DropdownChangeObject, index: number) => {
+    const newValues = [...values];
+    newValues[index] = change.target.value;
+
+    if (onChangeOverride) onChangeOverride(newValues[index]);
+
+    setDropdownValues(newValues);
+  };
+
+  const saveToModal = (uploads: UploadListProp[]) => {
+    saveToReport(uploads, values);
+  };
+
   return (
     <Modal
       modalDisclosure={modalDisclosure}
@@ -20,12 +43,24 @@ export const UploadModal = ({
         closeButtonText: undefined,
       }}
     >
-      <Upload
-        year={year}
-        state={state}
-        answer={answer}
-        updatedElement={updatedElement}
-      />
+      <Stack gap="1.5rem">
+        {dropdowns?.map((dropdown, index) => (
+          <Dropdown
+            name={dropdown.label}
+            label={dropdown.label}
+            value={values[index]}
+            options={dropdown.options}
+            onChange={(change) => onChange(change, index)}
+          ></Dropdown>
+        ))}
+        <Upload
+          id={id}
+          year={year}
+          state={state}
+          answer={answer}
+          saveToReport={saveToModal}
+        />
+      </Stack>
     </Modal>
   );
 };
@@ -35,8 +70,11 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
+  id: string;
   year: string;
   state: string;
-  answer: UploadData[];
-  updatedElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
+  answer: UploadListProp[];
+  dropdowns?: { label: string; options: { label: string; value: string }[] }[];
+  onChangeOverride?: (change: string) => void;
+  saveToReport: (uploads: UploadListProp[], options: string[]) => void;
 }

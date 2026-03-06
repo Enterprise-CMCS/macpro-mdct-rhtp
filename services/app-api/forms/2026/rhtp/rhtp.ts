@@ -50,10 +50,112 @@ export const rhtpReportTemplate: ReportBase = {
             "Enter an email address for the person or position above. Department or program-wide email addresses are allowed.",
         },
         {
-          type: ElementType.AttachmentArea,
-          id: "upload-area",
-          label: "Supporting Evidence: Attachments",
-          required: false,
+          type: ElementType.TableCheckpoint,
+          id: "checkpoint-0",
+          label: "Planning",
+          stage: 0,
+          checkpoints: [
+            {
+              id: "planning-1",
+              label: "Establish governance",
+              attachable: true,
+            },
+            {
+              id: "planning-2",
+              label: "Submit project plan to CMS",
+              attachable: false,
+            },
+          ],
+          required: true,
+        },
+        {
+          type: ElementType.TableCheckpoint,
+          id: "checkpoint-2",
+          label: "Early Implementation",
+          stage: 2,
+          checkpoints: [
+            {
+              id: "early-implementation-1",
+              label: "Continue initiative",
+              attachable: true,
+            },
+            {
+              id: "early-implementation-2",
+              label: "Achieve at least one milestone",
+              attachable: true,
+            },
+            {
+              id: "early-implementation-3",
+              label: "Establish metric reporting methodology",
+              attachable: true,
+            },
+            {
+              id: "early-implementation-4",
+              label: "Submit updated project plan to CMS",
+              attachable: false,
+            },
+          ],
+          required: true,
+        },
+        {
+          type: ElementType.AccordionGroup,
+          id: "group-test",
+          accordions: [
+            {
+              label: "B.2 Presidental Fitness Test",
+              children: [
+                {
+                  id: "test-comment",
+                  type: ElementType.Textbox,
+                  label: "Testing textbox",
+                  helperText: "This is the hint text",
+                  required: true,
+                },
+              ],
+            },
+            {
+              label: "B.3 SNAP Food Restriction Waiver Policy",
+              children: [
+                {
+                  type: ElementType.Dropdown,
+                  id: "curr-status",
+                  label: "Current Status",
+                  helperText: "This is the hint text",
+                  options: [
+                    { label: "Option 1", value: "op-1" },
+                    { label: "Option 2", value: "op-2" },
+                  ],
+                  required: true,
+                },
+                {
+                  type: ElementType.AttachmentArea,
+                  id: "upload-area",
+                  label: "Supporting Evidence: Attachments",
+                  required: false,
+                },
+                {
+                  id: "optional-comment",
+                  type: ElementType.TextAreaField,
+                  label: "Optional Comments/Notes",
+                  helperText: "This is the hint text",
+                  required: true,
+                },
+              ],
+            },
+            {
+              label: "B.4 Nutrition Continuing Medical Education",
+              children: [
+                {
+                  id: "optional-comment",
+                  type: ElementType.TextAreaField,
+                  label: "Optional Comments/Notes",
+                  helperText: "This is the hint text",
+                  required: true,
+                },
+              ],
+            },
+          ],
+          required: true,
         },
       ],
     },

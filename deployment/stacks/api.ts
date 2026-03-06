@@ -214,7 +214,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "viewUploadsForState", {
     entry: "services/app-api/handlers/uploads/get.ts",
     handler: "viewUploadsForState",
-    path: "/uploads/{year}/{state}",
+    path: "/uploads/{year}/{state}/view/{fileId}",
     method: "GET",
     ...commonProps,
   });

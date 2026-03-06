@@ -26,7 +26,11 @@ export const renderElements = (element: PageElement) => {
           {element.text}
         </Heading>
       );
+    case ElementType.TableCheckpoint:
+      return "TBD";
     case ElementType.AttachmentArea:
+      return "TBD";
+    case ElementType.AccordionGroup:
       return "TBD";
   }
 

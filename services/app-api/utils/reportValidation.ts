@@ -164,8 +164,12 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return submissionParagraphSchema;
     case ElementType.ListInput:
       return listInputTemplateSchema;
+    case ElementType.TableCheckpoint:
+      return tableCheckpointTemplateSchema;
     case ElementType.AttachmentArea:
       return attachmentAreaSchema;
+    case ElementType.AccordionGroup:
+      return accordionGroupTemplateSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -205,6 +209,54 @@ const checkboxTemplateSchema = object().shape({
   ),
   answer: array().of(string()).notRequired(),
   required: boolean().required(),
+});
+
+const tableCheckpointTemplateSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.TableCheckpoint)),
+  id: string().required(),
+  label: string().required(),
+  helperText: string().notRequired(),
+  stage: number().required(),
+  checkpoints: array().of(
+    object().shape({
+      id: string().required(),
+      label: string().required(),
+      attachable: boolean().notRequired(),
+    })
+  ),
+  answer: array()
+    .of(
+      object().shape({
+        id: string().required(),
+        label: string().required(),
+        completed: boolean().required(),
+        attachments: array()
+          .of(
+            object().shape({
+              name: string().required(),
+              fileId: string().required(),
+            })
+          )
+          .notRequired(),
+      })
+    )
+    .notRequired(),
+  required: boolean().required(),
+});
+
+const accordionGroupTemplateSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AccordionGroup)),
+  id: string().required(),
+  accordions: array()
+    .of(
+      object().shape({
+        label: string().required(),
+        children: lazy(() => array().of(pageElementSchema).required()),
+      })
+    )
+    .required(),
+  required: boolean().required(),
+  answer: array().of(boolean()).notRequired(),
 });
 
 const buttonLinkTemplateSchema = object().shape({

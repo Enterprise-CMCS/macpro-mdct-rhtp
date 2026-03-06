@@ -102,16 +102,34 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 
 export type PageId = string;
 
+export type CheckpointShape = {
+  id: string;
+  label: string;
+  attachable: boolean;
+};
+
+export type CheckpointAnswerShape = {
+  id: string;
+  label: string;
+  completed: boolean;
+  attachments?: { name: string; fileId: string }[];
+};
+
 export enum PageType {
   Standard = "standard",
   Modal = "modal",
   ReviewSubmit = "reviewSubmit",
 }
 
-export type UploadData = {
+export type UploadListProp = {
   name: string;
   size: number;
   fileId: string;
+};
+
+export type AccordionGroupItem = {
+  label: string;
+  children: PageElement[];
 };
 
 export enum ElementType {
@@ -134,7 +152,9 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  TableCheckpoint = "tableCheckpoint",
   AttachmentArea = "attachmentArea",
+  AccordionGroup = "accordionGroup",
 }
 
 export type PageElement =
@@ -155,7 +175,9 @@ export type PageElement =
   | DividerTemplate
   | SubmissionParagraphTemplate
   | ListInputTemplate
-  | AttachmentAreaTemplate;
+  | TableCheckpointTemplate
+  | AttachmentAreaTemplate
+  | AccordionGroupTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -292,7 +314,23 @@ export interface TextboxTemplate extends InputElementTemplate {
   answer?: string;
   hideCondition?: HideCondition;
 }
+
+export interface TableCheckpointTemplate extends InputElementTemplate {
+  type: ElementType.TableCheckpoint;
+  stage: number;
+  checkpoints: CheckpointShape[];
+  answer?: CheckpointAnswerShape[];
+}
+
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  answer?: UploadData[];
+  answer?: UploadListProp[];
+}
+
+export interface AccordionGroupTemplate {
+  type: ElementType.AccordionGroup;
+  id: string;
+  accordions: AccordionGroupItem[];
+  required: boolean;
+  answer?: boolean[];
 }
