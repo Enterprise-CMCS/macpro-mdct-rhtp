@@ -13,7 +13,7 @@ export const UploadModal = ({
   dropdowns,
   answer,
   saveToReport,
-  onChangeOverride,
+  onChangeExpanded,
 }: Props) => {
   const [values, setDropdownValues] = useState<string[]>(
     dropdowns?.map((dropdown) => dropdown.options[0].value) ?? []
@@ -23,8 +23,10 @@ export const UploadModal = ({
     const newValues = [...values];
     newValues[index] = change.target.value;
 
-    if (onChangeOverride) onChangeOverride(newValues[index]);
-
+    //if their are multiple dropdowns, we want the value of the last dropdown
+    if (onChangeExpanded) {
+      onChangeExpanded(newValues[newValues.length - 1]);
+    }
     setDropdownValues(newValues);
   };
 
@@ -75,6 +77,6 @@ interface Props {
   state: string;
   answer: UploadListProp[];
   dropdowns?: { label: string; options: { label: string; value: string }[] }[];
-  onChangeOverride?: (change: string) => void;
+  onChangeExpanded?: (change: string) => void;
   saveToReport: (uploads: UploadListProp[], options: string[]) => void;
 }

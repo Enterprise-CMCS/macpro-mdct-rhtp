@@ -25,8 +25,8 @@ import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router-dom";
 import { useStore } from "utils";
 import { downloadFile } from "utils/other/upload";
-import { currentPageSelector } from "utils/state/selectors";
 
+/** This builds a default data structure for the checkpoint table if there's no answer set */
 const formatCheckpoints = (checkpoints: CheckpointShape[]) => {
   return checkpoints.map((checkpoint) => ({
     label: checkpoint.label,
@@ -36,94 +36,95 @@ const formatCheckpoints = (checkpoints: CheckpointShape[]) => {
   }));
 };
 
-const checkpointOptions = (stage: number, checkpoints: CheckpointShape[]) => {
-  return {
-    label: "Checkpoint #",
-    options: checkpoints
-      .map((checkpoint, index) => ({
-        ...checkpoint,
-        label: `${stage}.${index} ${checkpoint.label}`,
-      }))
-      .filter((checkpoint) => checkpoint.attachable)
-      .map((checkpoint) => ({ label: checkpoint.label, value: checkpoint.id })),
-  };
+/** Builds the dropdowns for the checkpoint in the uploads modal */
+const uploadDropdownOptions = (
+  id: string,
+  stage: number,
+  label: string,
+  checkpoints: CheckpointShape[]
+) => {
+  return [
+    {
+      label: "Stage",
+      options: [{ label: `${stage} ${label}`, value: id }],
+    },
+    {
+      label: "Checkpoint #",
+      options: checkpoints
+        .map((checkpoint, index) => ({
+          ...checkpoint,
+          label: `${stage}.${index} ${checkpoint.label}`,
+        }))
+        .filter((checkpoint) => checkpoint.attachable)
+        .map((checkpoint) => ({
+          label: checkpoint.label,
+          value: checkpoint.id,
+        })),
+    },
+  ];
 };
 
+/** Formatting the the data from the elements into renderable rows for the table */
 const buildRows = (stage: number, values: CheckpointAnswerShape[]) => {
-  const rows = [];
-  for (var i = 0; i < values.length; i++) {
-    const { id, completed, label, attachments } = values[i];
-    const stageNo = `${stage}.${i + 1}`;
+  return values.reduce((prev: any[], curr, index) => {
+    const { id, completed, label, attachments } = curr;
     const row = {
       id,
-      stageNo,
+      stageNo: `${stage}.${index + 1}`,
       completed,
       label,
     };
     if (attachments) {
-      rows.push({ ...row, file: attachments[0] ?? {} });
-      for (var j = 1; j < attachments.length; j++) {
-        rows.push({
-          id,
-          stageNo: "",
-          label: "",
-          completed: undefined,
-          file: attachments[j],
-        });
-      }
+      const copy = [...attachments];
+      prev.push({ ...row, file: copy.shift() ?? {} });
+      copy.forEach((file) =>
+        prev.push({ id, stageNo: "", label: "", completed: undefined, file })
+      );
     } else {
-      rows.push(row);
+      prev.push(row);
     }
-  }
-
-  return rows;
+    return prev;
+  }, []);
 };
+
+/** TO DO: Add function once upload delete is working */
+const removeAttachment = () => {};
+
+const header = [
+  "#",
+  "Checkpoint",
+  "Check if Complete",
+  "Attachments",
+  "Actions",
+];
 
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
 ) => {
   const { id, checkpoints, label, stage, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const { updateElement } = props;
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
 
-  const currentPage = useStore(currentPageSelector);
-  // console.log(currentPage);
-
   //if there is answer on load, we need to build the shape from the checkpoints data
   const initialDisplayValue = answer ?? formatCheckpoints(checkpoints);
-  const [displayValue, setDisplayValue] = useState(initialDisplayValue);
-  const [uploadId, setUploadId] = useState<string>(displayValue[0].id);
+  const [uploadId, setUploadId] = useState<string>(initialDisplayValue[0].id);
   const [files, setFiles] = useState<UploadListProp[]>(
-    displayValue[0].attachments ?? []
+    initialDisplayValue[0].attachments ?? []
   );
 
-  const stageOption = {
-    label: "Stage",
-    options: [{ label: `${stage} ${label}`, value: id }],
-  };
+  const rows = buildRows(stage, initialDisplayValue);
 
-  const header = [
-    "#",
-    "Checkpoint",
-    "Check if Complete",
-    "Attachments",
-    "Actions",
-  ];
-
-  const rows = buildRows(stage, displayValue);
-
-  const onChangeHandler = (id: string) => {
-    const newValue = [...displayValue];
+  const onCheckboxeHandler = (id: string) => {
+    const newValue = [...initialDisplayValue];
     for (var i = 0; i < newValue.length; i++) {
       if (newValue[i].id == id) newValue[i].completed = !newValue[i].completed;
     }
-    updateElement({ answer: newValue });
+    props.updateElement({ answer: newValue });
   };
 
-  const onDropdownChangeHandler = (change: string) => {
+  const onDropdownHandler = (change: string) => {
     setUploadId(change);
     if (answer) {
       const data = answer.filter((data) => data.id === change);
@@ -133,20 +134,18 @@ export const TableCheckpoint = (
     }
   };
 
-  /** TO DO: Add function once upload delete is working */
-  const removeAttachment = () => {};
-
   const onModalClose = () => {
     setModalOpen(false);
   };
 
   const saveToReport = (uploads: UploadListProp[], options: string[]) => {
-    const newValue = [...displayValue];
+    const newValue = [...initialDisplayValue];
     const checkpoint = newValue.findIndex((value) => value.id == options[1]);
 
     if (checkpoint >= 0) {
       newValue[checkpoint].attachments = uploads;
-      updateElement({ answer: newValue });
+      props.updateElement({ answer: newValue });
+      setFiles(newValue[checkpoint].attachments);
     }
   };
 
@@ -175,7 +174,7 @@ export const TableCheckpoint = (
           </Tr>
         </Thead>
         <Tbody>
-          {rows.map((row, index) => (
+          {rows.map((row) => (
             <Tr>
               <Td>{row.stageNo}</Td>
               <Td>{row.label}</Td>
@@ -183,7 +182,7 @@ export const TableCheckpoint = (
                 {row.completed != undefined ? (
                   <Checkbox
                     isChecked={row.completed}
-                    onChange={() => onChangeHandler(row.id)}
+                    onChange={() => onCheckboxeHandler(row.id)}
                   ></Checkbox>
                 ) : (
                   <></>
@@ -221,8 +220,8 @@ export const TableCheckpoint = (
         year={year}
         answer={files}
         id={uploadId}
-        dropdowns={[stageOption, checkpointOptions(stage, checkpoints)]}
-        onChangeOverride={onDropdownChangeHandler}
+        dropdowns={uploadDropdownOptions(id, stage, label, checkpoints)}
+        onChangeExpanded={onDropdownHandler}
         saveToReport={saveToReport}
       ></UploadModal>
     </Flex>

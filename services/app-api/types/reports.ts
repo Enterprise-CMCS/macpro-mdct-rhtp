@@ -102,6 +102,12 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 
 export type PageId = string;
 
+export type UploadListProp = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
 export type CheckpointShape = {
   id: string;
   label: string;
@@ -112,7 +118,7 @@ export type CheckpointAnswerShape = {
   id: string;
   label: string;
   completed: boolean;
-  attachments?: { name: string; fileId: string }[];
+  attachments?: UploadListProp[];
 };
 
 export enum PageType {
@@ -120,12 +126,6 @@ export enum PageType {
   Modal = "modal",
   ReviewSubmit = "reviewSubmit",
 }
-
-export type UploadListProp = {
-  name: string;
-  size: number;
-  fileId: string;
-};
 
 export type AccordionGroupItem = {
   label: string;
