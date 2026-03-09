@@ -7,7 +7,7 @@ export const UploadModal = ({
   year,
   state,
   answer,
-  updatedElement,
+  updateElement,
 }: Props) => {
   return (
     <Modal
@@ -24,7 +24,7 @@ export const UploadModal = ({
         year={year}
         state={state}
         answer={answer}
-        updatedElement={updatedElement}
+        updateElement={updateElement}
       />
     </Modal>
   );
@@ -38,5 +38,5 @@ interface Props {
   year: string;
   state: string;
   answer: UploadData[];
-  updatedElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
+  updateElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
 }

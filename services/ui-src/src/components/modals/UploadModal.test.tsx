@@ -19,7 +19,7 @@ const modalComponent = (
     year={"2026"}
     state={"PA"}
     answer={[]}
-    updatedElement={vi.fn()}
+    updateElement={vi.fn()}
   />
 );
 
