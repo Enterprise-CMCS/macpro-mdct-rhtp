@@ -82,8 +82,9 @@ export const AddEditReportModal = ({
       await createReport(reportType, activeState, reportOptions);
       await reportHandler(reportType, activeState);
       modalDisclosure.onClose();
-    } catch (err: any) {
-      const errorMessage = err.message?.split(" - ").at(-1) || "Unknown error";
+    } catch (error: any) {
+      const errorMessage =
+        error.message?.split(" - ").at(-1) || "Unknown error";
       setErrorAlert(errorMessage);
     }
 

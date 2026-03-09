@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
-import { AttachmentAreaTemplate } from "types";
 
 const mockCloseHandler = vi.fn();
 

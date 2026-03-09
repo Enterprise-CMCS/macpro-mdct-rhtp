@@ -1,4 +1,4 @@
-import { Box, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { AttachmentAreaTemplate, UploadData } from "types";
 import {

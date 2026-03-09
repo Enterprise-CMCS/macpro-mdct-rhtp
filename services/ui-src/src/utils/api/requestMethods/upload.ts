@@ -78,7 +78,7 @@ export const getUploadedFiles = async (year: string, stateCode: string) => {
     `/uploads/${year}/${stateCode}`,
     options
   );
-  return response ? response : [];
+  return response ?? [];
 };
 
 export const deleteUploadedFile = async (
