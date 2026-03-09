@@ -9,7 +9,13 @@ const tableElementList = [
   ElementType.TextAreaField,
 ];
 
-const renderElementList = [...tableElementList, ElementType.SubHeader];
+const renderElementList = [
+  ...tableElementList,
+  ElementType.SubHeader,
+  ElementType.TableCheckpoint,
+  ElementType.AttachmentArea,
+  ElementType.AccordionGroup,
+];
 
 export const shouldUseTable = (type: ElementType) => {
   return tableElementList.includes(type);
