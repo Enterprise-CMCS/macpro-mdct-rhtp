@@ -1,14 +1,28 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
-import { AttachmentAreaTemplate } from "types";
 
 const mockCloseHandler = vi.fn();
+const mockChangedExpanded = vi.fn();
+const mockSaveToReport = vi.fn();
 
 vi.mock("utils/other/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   retrieveUploadedFiles: vi.fn().mockReturnValue(Promise.resolve([])),
 }));
+
+vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
+  ...(await importOriginal()),
+  uploadFileToS3: vi.fn(),
+  recordFileInDatabaseAndGetUploadUrl: vi.fn(),
+  getUploadedFiles: vi
+    .fn()
+    .mockReturnValue([
+      { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
+    ]),
+}));
+
+const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 
 const modalComponent = (
   <UploadModal
@@ -20,7 +34,17 @@ const modalComponent = (
     year={"2026"}
     state={"PA"}
     answer={[]}
-    saveToReport={vi.fn()}
+    dropdowns={[
+      {
+        label: "mock label",
+        options: [
+          { label: "option 1", value: "opt1" },
+          { label: "option 2", value: "opt2" },
+        ],
+      },
+    ]}
+    saveToReport={mockSaveToReport}
+    onChangeExpanded={mockChangedExpanded}
   />
 );
 
@@ -37,6 +61,22 @@ describe("Test Modal", () => {
   test("Modals action button can be clicked", async () => {
     await userEvent.click(screen.getByText("Done"));
     expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+  });
+
+  test("Modal dropdowns are selectable", async () => {
+    const dropdown = screen.getAllByLabelText("mock label")[0];
+    await userEvent.selectOptions(dropdown, "option 2");
+    expect(mockChangedExpanded).toHaveBeenCalledTimes(1);
+  });
+
+  test("Modal will run saveToReport function when a file is uploaded", async () => {
+    const dropArea = screen.getByLabelText("file drop area");
+    fireEvent.drop(dropArea, {
+      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+    });
+    await waitFor(() => {
+      expect(mockSaveToReport).toHaveBeenCalledTimes(1);
+    });
   });
 
   test("Modals close button can be clicked", async () => {
