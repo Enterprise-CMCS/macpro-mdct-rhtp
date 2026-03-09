@@ -15,6 +15,7 @@ export const ErrorMessages = {
   ) => `${numerator} must be 0 when the ${denominator} is 0`,
   mustBeUniqueReportName:
     "A report with this name already exists during this reporting period.",
+  mustBeACurrency: "Response must be a valid currency amount",
 } as const;
 
 export const PRODUCTION_HOST_DOMAIN = "mdctrhtp.cms.gov";

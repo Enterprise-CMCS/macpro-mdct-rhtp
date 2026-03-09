@@ -29,6 +29,7 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
+import { isValidCurrency } from "utils/validation/inputValidation";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
@@ -70,6 +71,10 @@ export const UseOfFundsTableElement = (
   const validateField = (name: string, value: string) => {
     if (!value) {
       return ErrorMessages.requiredResponse;
+    }
+
+    if (name === "spentFunds" && !isValidCurrency(value)) {
+      return ErrorMessages.mustBeACurrency;
     }
 
     return "";

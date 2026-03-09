@@ -20,7 +20,6 @@ export const Modal = ({
   modalDisclosure,
   content,
   onConfirmHandler,
-  submitting,
   formId,
   children,
   disableConfirm,
@@ -60,9 +59,9 @@ export const Modal = ({
               form={formId}
               type="submit"
               data-testid="modal-submit-button"
-              disabled={disableConfirm || submitting}
+              disabled={disableConfirm}
             >
-              {submitting ? <Spinner size="md" /> : content.actionButtonText}
+              {content.actionButtonText}
             </Button>
           )}
           {onConfirmHandler && (
@@ -70,9 +69,9 @@ export const Modal = ({
               sx={sx.action}
               onClick={() => onConfirmHandler()}
               data-testid="modal-submit-button"
-              disabled={disableConfirm || submitting}
+              disabled={disableConfirm}
             >
-              {submitting ? <Spinner size="md" /> : content.actionButtonText}
+              {content.actionButtonText}
             </Button>
           )}
           {content.closeButtonText && (
@@ -102,7 +101,6 @@ interface Props {
     actionButtonText: string | ReactNode;
     closeButtonText?: string;
   };
-  submitting?: boolean;
   onConfirmHandler?: () => void;
   disableConfirm?: boolean;
   formId?: string;
