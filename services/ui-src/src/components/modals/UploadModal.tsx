@@ -16,7 +16,7 @@ export const UploadModal = ({
   onChangeExpanded,
 }: Props) => {
   const [values, setDropdownValues] = useState<string[]>(
-    dropdowns?.map((dropdown) => dropdown.options[0].value) ?? []
+    dropdowns?.map((dropdown) => dropdown.options[0]?.value) ?? []
   );
 
   const onChange = (change: DropdownChangeObject, index: number) => {

@@ -140,6 +140,40 @@ const elements: PageElement[] = [
     type: ElementType.SubmissionParagraph,
     id: "",
   },
+  {
+    type: ElementType.AccordionGroup,
+    id: "",
+    accordions: [],
+    required: false,
+  },
+  {
+    type: ElementType.AttachmentArea,
+    id: "",
+    label: "",
+    required: false,
+  },
+  {
+    type: ElementType.ListInput,
+    fieldLabel: "",
+    buttonText: "button",
+    id: "id",
+    label: "mock label",
+    required: false,
+  },
+  {
+    type: ElementType.TableCheckpoint,
+    id: "mockod",
+    label: "mock label",
+    stage: 0,
+    checkpoints: [
+      {
+        id: "mock id",
+        label: "label",
+        attachable: false,
+      },
+    ],
+    required: false,
+  },
 ];
 
 const textFieldElement: PageElement[] = [
