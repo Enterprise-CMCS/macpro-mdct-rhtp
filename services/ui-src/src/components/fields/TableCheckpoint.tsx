@@ -53,7 +53,7 @@ const uploadDropdownOptions = (
       options: checkpoints
         .map((checkpoint, index) => ({
           ...checkpoint,
-          label: `${stage}.${index} ${checkpoint.label}`,
+          label: `${stage}.${index + 1} ${checkpoint.label}`,
         }))
         .filter((checkpoint) => checkpoint.attachable)
         .map((checkpoint) => ({
@@ -159,6 +159,7 @@ export const TableCheckpoint = (
       <Label>{`Stage ${stage}: ${label}`}</Label>
       <Text>To upload attachments, click the button below.</Text>
       <Button
+        aria-label="Upload attachments"
         variant="outline"
         alignSelf="flex-start"
         onClick={() => setModalOpen(true)}
@@ -181,6 +182,7 @@ export const TableCheckpoint = (
               <Td>
                 {row.completed != undefined ? (
                   <Checkbox
+                    aria-label={`Check if ${row.label} is complete`}
                     isChecked={row.completed}
                     onChange={() => onCheckboxeHandler(row.id)}
                   ></Checkbox>
@@ -191,6 +193,7 @@ export const TableCheckpoint = (
               <Td>
                 {"file" in row ? (
                   <Button
+                    aria-label={`Download ${row.file.name}`}
                     variant="link"
                     onClick={() => downloadFile(year, state, row.file)}
                   >
@@ -202,7 +205,11 @@ export const TableCheckpoint = (
               </Td>
               <Td>
                 {"file" in row && row.file.fileId && (
-                  <Button variant="unstyled" onClick={() => removeAttachment()}>
+                  <Button
+                    variant="unstyled"
+                    onClick={() => removeAttachment()}
+                    aria-label={`Remove ${row.file.name}`}
+                  >
                     <Image src={cancelIcon} alt="Remove" />
                   </Button>
                 )}

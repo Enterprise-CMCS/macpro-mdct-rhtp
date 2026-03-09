@@ -234,6 +234,7 @@ const tableCheckpointTemplateSchema = object().shape({
           .of(
             object().shape({
               name: string().required(),
+              size: number().required(),
               fileId: string().required(),
             })
           )

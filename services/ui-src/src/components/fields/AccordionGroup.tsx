@@ -59,12 +59,7 @@ export const AccordionGroup = (
           Collapse all
         </Button>
       </Box>
-      <Accordion
-        allowMultiple
-        allowToggle
-        variant="border"
-        index={accordionState}
-      >
+      <Accordion allowMultiple variant="border" index={accordionState}>
         {accordions.map((accordion, index) => (
           <AccordionItem label={accordion.label} onClick={() => toggle(index)}>
             <Page
