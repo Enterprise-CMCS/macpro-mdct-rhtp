@@ -2,7 +2,6 @@ import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { UploadListProp } from "types";
 import {
-  deleteUploadedFile,
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
 } from "utils/api/requestMethods/upload";
@@ -65,10 +64,6 @@ export const Upload = ({
     }
   };
 
-  const onRemove = async (file: UploadListProp) => {
-    await deleteUploadedFile(year, state, file.fileId);
-  };
-
   const onUploadFiles = async () => {
     if (!year || !state) {
       throw new Error("Undefined year or state parameter");
@@ -116,7 +111,7 @@ export const Upload = ({
         </span>
       </Box>
       <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+      {uploadListRender(filesToUpload ?? [], year, state)}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>
@@ -124,7 +119,7 @@ export const Upload = ({
           above.
         </Text>
       </div>
-      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
+      {uploadListRender(answer ?? [], year, state, downloadFile)}
     </VStack>
   );
 };

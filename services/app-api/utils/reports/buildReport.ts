@@ -14,6 +14,7 @@ import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
 import { StateAbbr } from "../constants";
+import { copyReport } from "./copyReport";
 
 export const makeQuarterlyChanges = (
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
@@ -55,8 +56,12 @@ export const buildReport = async (
     pages: template.pages,
   };
 
-  if (reportOptions.subType !== RhtpSubType.ANNUAL) {
+  if (report.subType !== RhtpSubType.ANNUAL) {
     makeQuarterlyChanges(report.pages);
+  }
+
+  if (report.copyFromReportId) {
+    await copyReport(report);
   }
 
   /**
@@ -66,8 +71,8 @@ export const buildReport = async (
   let validatedReport: Report | undefined;
   try {
     validatedReport = await validateReportPayload(report);
-  } catch (err) {
-    logger.error(err);
+  } catch (error) {
+    logger.error(error);
     throw new Error("Invalid request");
   }
 

@@ -1,9 +1,4 @@
-import {
-  background,
-  border,
-  ComponentStyleConfig,
-  theme,
-} from "@chakra-ui/react";
+import { ComponentStyleConfig, theme } from "@chakra-ui/react";
 
 const baseStyles = {
   table: {

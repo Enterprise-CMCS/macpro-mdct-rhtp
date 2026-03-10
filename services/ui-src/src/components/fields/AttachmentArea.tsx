@@ -30,7 +30,7 @@ export const AttachmentArea = (
     setModalOpen(false);
   };
 
-  const onRemove = async (file: UploadListProp) => {
+  const _onRemove = async (file: UploadListProp) => {
     /** TO DO: Fix file deletion from s3 bucket */
     await deleteUploadedFile(year, state, file.fileId);
   };
@@ -43,7 +43,7 @@ export const AttachmentArea = (
     <Stack gap="1.5rem">
       <Heading variant="h5">{label}</Heading>
       {helperText && <Text>{helperText}</Text>}
-      {answer && uploadListRender(answer, year, state, onRemove, downloadFile)}
+      {uploadListRender(answer ?? [], year, state, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}
@@ -62,7 +62,7 @@ export const AttachmentArea = (
         answer={answer ?? []}
         saveToReport={saveToReport}
         id={id}
-      ></UploadModal>
+      />
     </Stack>
   );
 };

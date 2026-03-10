@@ -34,6 +34,7 @@ const props = {
   id: "mock-id",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   saveToReport: vi.fn(),
+  updateElement: vi.fn(),
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });

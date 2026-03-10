@@ -25,7 +25,8 @@ export const UploadModal = ({
 
     //if their are multiple dropdowns, we want the value of the last dropdown
     if (onChangeExpanded) {
-      onChangeExpanded(newValues[newValues.length - 1]);
+      const index = newValues.length - 1;
+      onChangeExpanded(newValues.at(index) ?? "");
     }
     setDropdownValues(newValues);
   };

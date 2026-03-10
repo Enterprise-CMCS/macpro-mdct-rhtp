@@ -142,7 +142,7 @@ export const TableCheckpoint = (
     const newValue = [...initialDisplayValue];
     const checkpoint = newValue.findIndex((value) => value.id == options[1]);
 
-    if (checkpoint >= 0) {
+    if (checkpoint !== -1) {
       newValue[checkpoint].attachments = uploads;
       props.updateElement({ answer: newValue });
       setFiles(newValue[checkpoint].attachments);

@@ -155,6 +155,7 @@ export enum ElementType {
   TableCheckpoint = "tableCheckpoint",
   AttachmentArea = "attachmentArea",
   AccordionGroup = "accordionGroup",
+  InitiativesTable = "initiativesTable",
 }
 
 export type PageElement =
@@ -176,8 +177,9 @@ export type PageElement =
   | SubmissionParagraphTemplate
   | ListInputTemplate
   | TableCheckpointTemplate
-  | AttachmentAreaTemplate
-  | AccordionGroupTemplate;
+  | AccordionGroupTemplate
+  | InitiativesTableTemplate
+  | AttachmentAreaTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -209,6 +211,11 @@ export type ButtonLinkTemplate = {
 export type DividerTemplate = {
   type: ElementType.Divider;
   id: string;
+};
+
+export type InitiativesTableTemplate = {
+  id: string;
+  type: ElementType.InitiativesTable;
 };
 
 export type StatusTableTemplate = {

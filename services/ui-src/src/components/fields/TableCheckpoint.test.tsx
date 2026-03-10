@@ -75,21 +75,23 @@ const TableCheckpointComponent = (
 );
 
 const TableCheckpointAnswerComponent = () => {
-  const newMockTable = { ...mockTableCheckpointElement };
-  newMockTable.answer = [
-    {
-      id: "mock-point-1",
-      label: "checkpoint 1",
-      completed: false,
-      attachments: [
-        {
-          name: "mock-file",
-          size: 35,
-          fileId: "mock-file-id",
-        },
-      ],
-    },
-  ];
+  const newMockTable = {
+    ...mockTableCheckpointElement,
+    answer: [
+      {
+        id: "mock-point-1",
+        label: "checkpoint 1",
+        completed: false,
+        attachments: [
+          {
+            name: "mock-file",
+            size: 35,
+            fileId: "mock-file-id",
+          },
+        ],
+      },
+    ],
+  };
   return (
     <div data-testid="test-checkbox-list">
       <TableCheckpoint element={newMockTable} updateElement={updateSpy} />
