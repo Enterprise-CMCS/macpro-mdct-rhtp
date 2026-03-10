@@ -9,6 +9,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import {
+  deleteUploadedFile,
   getFileDownloadUrl,
   getUploadedFiles,
 } from "../api/requestMethods/upload";
@@ -52,11 +53,27 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
+const removeFile = async (
+  file: File | UploadListProp,
+  year: string,
+  state: string,
+  updateElement: Function
+) => {
+  if (!("fileId" in file)) return;
+  await deleteUploadedFile(year, state, file.fileId);
+  retrieveUploadedFiles(year, state).then((response) => {
+    const remainingUploads = response.filter(
+      ({ fileId }) => fileId !== file.fileId
+    );
+    updateElement({ answer: remainingUploads });
+  });
+};
+
 export const uploadListRender = (
   files: File[] | UploadListProp[],
   year: string,
   state: string,
-  onRemove: Function,
+  updateElement: Function,
   onClick?: Function
 ) => {
   return (
@@ -67,13 +84,13 @@ export const uploadListRender = (
             <HStack width="100%" justifyContent="space-between">
               <VStack alignItems="flex-start">
                 {!onClick ? (
-                  <Text>{file?.name}</Text>
+                  <Text>{file.name}</Text>
                 ) : (
                   <Button
                     variant="link"
                     onClick={() => onClick(year, state, file)}
                   >
-                    {file?.name}
+                    {file.name}
                   </Button>
                 )}
                 <span>{bytesToKiloBytes(file.size)} KB</span>
@@ -81,7 +98,7 @@ export const uploadListRender = (
               <Button
                 variant="unstyled"
                 aria-label={`delete ${file.name}`}
-                onClick={() => onRemove(file)}
+                onClick={() => removeFile(file, year, state, updateElement)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
               />
             </HStack>

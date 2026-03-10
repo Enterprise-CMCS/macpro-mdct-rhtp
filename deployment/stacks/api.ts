@@ -205,7 +205,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
 
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
-    handler: "deleteUpload",
+    handler: "deleteUploadedFile",
     path: "/uploads/{year}/{state}/{fileId}",
     method: "DELETE",
     ...commonProps,

@@ -3,7 +3,7 @@ import { parseUploadParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { deleteUpload, queryUpload } from "../../storage/upload";
 
-export const deleteUploadFile = handler(
+export const deleteUploadedFile = handler(
   parseUploadParameters,
   async (request) => {
     const { state, fileId } = request.parameters;

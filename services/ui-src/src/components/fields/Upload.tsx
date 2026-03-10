@@ -2,7 +2,6 @@ import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { AttachmentAreaTemplate, UploadData } from "types";
 import {
-  deleteUploadedFile,
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
 } from "utils/api/requestMethods/upload";
@@ -10,7 +9,6 @@ import {
   acceptedFileTypes,
   downloadFile,
   retrieveUploadedFiles,
-  UploadListProp,
   uploadListRender,
 } from "utils/other/upload";
 
@@ -18,10 +16,10 @@ interface Props {
   state: string;
   year: string;
   answer: UploadData[];
-  updatedElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
+  updateElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
 }
 
-export const Upload = ({ state, year, answer, updatedElement }: Props) => {
+export const Upload = ({ state, year, answer, updateElement }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   useEffect(() => {
@@ -30,7 +28,7 @@ export const Upload = ({ state, year, answer, updatedElement }: Props) => {
         await onUploadFiles().then(() => {
           retrieveUploadedFiles(year, state).then((response) => {
             setFilesToUpload([]);
-            updatedElement({ answer: response });
+            updateElement({ answer: response });
           });
         });
       fetchData();
@@ -57,10 +55,6 @@ export const Upload = ({ state, year, answer, updatedElement }: Props) => {
       const file = event.target.files;
       setFilesToUpload([...(filesToUpload ?? []), ...file]);
     }
-  };
-
-  const onRemove = async (file: UploadListProp) => {
-    await deleteUploadedFile(year, state, file.fileId);
   };
 
   const onUploadFiles = async () => {
@@ -109,7 +103,7 @@ export const Upload = ({ state, year, answer, updatedElement }: Props) => {
         </span>
       </Box>
       <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+      {uploadListRender(filesToUpload ?? [], year, state, updateElement)}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>
@@ -117,7 +111,7 @@ export const Upload = ({ state, year, answer, updatedElement }: Props) => {
           above.
         </Text>
       </div>
-      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
+      {uploadListRender(answer ?? [], year, state, updateElement, downloadFile)}
     </VStack>
   );
 };
