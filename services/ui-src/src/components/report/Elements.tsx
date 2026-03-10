@@ -174,7 +174,7 @@ export const ButtonLinkElement = ({
   return (
     <Button {...propObj.prop}>
       <Image {...propObj.style} className="icon" />
-      Button
+      {button.label}
     </Button>
   );
 };
