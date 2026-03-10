@@ -25,11 +25,12 @@ vi.mock("react-router-dom", async (importOriginal) => ({
 const setCurrentPageId = vi.fn();
 const mockUseNavigate = vi.fn();
 
-const mockPageMap = new Map();
-mockPageMap.set("root", 0);
-mockPageMap.set("id-1", 1);
-mockPageMap.set("id-2", 2);
-mockPageMap.set("child-1", 3);
+const mockPageMap = new Map([
+  ["root", 0],
+  ["id-1", 1],
+  ["id-2", 2],
+  ["child-1", 3],
+]);
 
 const report = {
   pages: [

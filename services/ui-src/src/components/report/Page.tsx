@@ -24,6 +24,7 @@ import {
   StatusAlert,
   CheckboxField,
   ListInput,
+  InitiativesTable,
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
@@ -90,6 +91,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return (
           <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
         );
+      case ElementType.InitiativesTable:
+        return <InitiativesTable {...{ updateElement, disabled, element }} />;
       case ElementType.AttachmentArea:
         return <AttachmentArea {...{ updateElement, disabled, element }} />;
       default:

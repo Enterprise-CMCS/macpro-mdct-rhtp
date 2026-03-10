@@ -57,7 +57,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       dataTraceEnabled: true,
       metricsEnabled: false,
       throttlingBurstLimit: 5000,
-      throttlingRateLimit: 10000.0,
+      throttlingRateLimit: 10000,
       cachingEnabled: false,
       cacheTtl: Duration.seconds(300),
       cacheDataEncrypted: false,
@@ -205,7 +205,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
 
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
-    handler: "deleteUpload",
+    handler: "deleteUploadedFile",
     path: "/uploads/{year}/{state}/{fileId}",
     method: "DELETE",
     ...commonProps,

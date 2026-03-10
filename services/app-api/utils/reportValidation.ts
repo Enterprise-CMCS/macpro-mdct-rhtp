@@ -172,7 +172,7 @@ const useOfFundsTableSchema = object().shape({
 
 const pageElementSchema = lazy((value: PageElement): Schema => {
   if (!value.type) {
-    throw new Error();
+    throw new Error("Some error message");
   }
   switch (value.type) {
     case ElementType.Header:
@@ -211,6 +211,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.UseOfFundsTable:
       return useOfFundsTableSchema;
+    case ElementType.InitiativesTable:
+      return initiativesTableSchema;
     case ElementType.AttachmentArea:
       return attachmentAreaSchema;
     default:
@@ -277,6 +279,11 @@ const attachmentAreaSchema = object().shape({
   ),
 });
 
+const initiativesTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.InitiativesTable)),
+  id: string().required(),
+});
+
 const dividerSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Divider)),
   id: string().required(),
@@ -337,13 +344,12 @@ const pagesSchema = array()
         if (pageObject.id && pageObject.childPageIds) {
           return parentPageTemplateSchema;
         } else {
-          throw new Error();
+          throw new Error("Some error message");
         }
       } else {
         switch (pageObject.type) {
           case PageType.ReviewSubmit:
             return reviewSubmitTemplateSchema;
-          case PageType.Standard:
           default:
             return formPageTemplateSchema;
         }

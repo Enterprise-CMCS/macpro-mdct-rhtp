@@ -11,7 +11,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spinner,
 } from "@chakra-ui/react";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
 import { useBreakpoint } from "utils";

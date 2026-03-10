@@ -155,6 +155,7 @@ export enum ElementType {
   ListInput = "listInput",
   UseOfFundsTable = "useOfFundsTable",
   AttachmentArea = "attachmentArea",
+  InitiativesTable = "initiativesTable",
 }
 
 export type PageElement =
@@ -175,8 +176,9 @@ export type PageElement =
   | DividerTemplate
   | ListInputTemplate
   | UseOfFundsTableTemplate
-  | AttachmentAreaTemplate
-  | SubmissionParagraphTemplate;
+  | SubmissionParagraphTemplate
+  | InitiativesTableTemplate
+  | AttachmentAreaTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -208,6 +210,11 @@ export type ButtonLinkTemplate = {
 export type DividerTemplate = {
   type: ElementType.Divider;
   id: string;
+};
+
+export type InitiativesTableTemplate = {
+  id: string;
+  type: ElementType.InitiativesTable;
 };
 
 export type StatusTableTemplate = {

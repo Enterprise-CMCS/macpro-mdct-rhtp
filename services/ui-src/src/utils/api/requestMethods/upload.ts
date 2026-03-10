@@ -78,7 +78,7 @@ export const getUploadedFiles = async (year: string, stateCode: string) => {
     `/uploads/${year}/${stateCode}`,
     options
   );
-  return response ? response : [];
+  return response ?? [];
 };
 
 export const deleteUploadedFile = async (
@@ -86,11 +86,10 @@ export const deleteUploadedFile = async (
   stateCode: string,
   fileId: string
 ) => {
-  const encodedFileId = encodeURIComponent(fileId);
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
     body: {},
   };
-  await apiLib.del(`/uploads/${year}/${stateCode}/${encodedFileId}`, options);
+  await apiLib.del(`/uploads/${year}/${stateCode}/${fileId}`, options);
 };

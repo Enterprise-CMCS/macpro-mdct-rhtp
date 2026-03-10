@@ -240,7 +240,7 @@ export const DashboardPage = () => {
             <Spinner size="md" />
           </Flex>
         )}
-        {!reports.length &&
+        {reports.length === 0 &&
           (userIsAdmin ? (
             <Text variant="tableEmpty">
               Once a state or territory begins a {reportName} Report, you will

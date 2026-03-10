@@ -9,7 +9,7 @@ import {
   updateReport,
 } from "./report";
 // types
-import { FormPageTemplate, Report, ReportOptions, ReportType } from "types";
+import { FormPageTemplate, Report, ReportType } from "types";
 
 const report = {
   type: ReportType.RHTP,

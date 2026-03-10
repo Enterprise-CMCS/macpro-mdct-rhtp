@@ -318,6 +318,7 @@ export const UseOfFundsTableElement = (
 export const UseOfFundsTableElementExport = (
   element: UseOfFundsTableTemplate
 ) => {
+  console.log("element", element);
   return <div>empty div for now</div>;
 };
 

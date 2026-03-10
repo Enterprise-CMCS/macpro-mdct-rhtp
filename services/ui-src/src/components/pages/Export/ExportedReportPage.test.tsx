@@ -2,7 +2,6 @@ import { MockedFunction } from "vitest";
 import { screen, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { useStore } from "utils";
-import { mockUseStore } from "utils/testing/setupTest";
 import { ExportedReportPage } from "./ExportedReportPage";
 
 vi.mock("utils/state/useStore");

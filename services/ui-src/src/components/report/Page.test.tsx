@@ -43,7 +43,7 @@ const elements: PageElement[] = [
   {
     type: ElementType.Header,
     id: "",
-    text: "My Header",
+    text: "My header",
   },
   {
     type: ElementType.SubHeader,
@@ -58,46 +58,46 @@ const elements: PageElement[] = [
   {
     type: ElementType.Textbox,
     id: "",
-    label: "labeled",
+    label: "Textbox label",
     required: true,
   },
   {
     type: ElementType.TextAreaField,
     id: "",
-    label: "labeled",
+    label: "Text area label",
     required: true,
   },
   {
     type: ElementType.NumberField,
     id: "",
-    label: "number label",
+    label: "Number label",
     required: true,
   },
   {
     type: ElementType.Date,
     id: "",
-    label: "date label",
+    label: "Date label",
     required: true,
-    helperText: "can you read this?",
+    helperText: "This is a date field",
   },
   {
     type: ElementType.Dropdown,
     id: "",
-    label: "date label",
-    helperText: "can you read this?",
+    label: "Dropdown label",
+    helperText: "This is a dropdown field",
     required: true,
     options: [{ label: "mock label", value: " mock value" }],
   },
   {
     type: ElementType.Accordion,
     id: "",
-    label: "Some text",
+    label: "Accordion text",
     value: "Other",
   },
   {
     type: ElementType.Radio,
     id: "",
-    label: "date label",
+    label: "Radio label",
     required: true,
     choices: [
       { label: "a", value: "1", checkedChildren: [] },
@@ -105,9 +105,9 @@ const elements: PageElement[] = [
     ],
   },
   {
-    type: ElementType.Radio,
+    type: ElementType.Checkbox,
     id: "",
-    label: "label",
+    label: "Checkbox label",
     required: true,
     choices: [
       { label: "a", value: "1", checkedChildren: [] },
@@ -117,7 +117,7 @@ const elements: PageElement[] = [
   {
     type: ElementType.ButtonLink,
     to: "report-page-id",
-    label: "click me",
+    label: "Button link",
     id: "",
   },
   {
@@ -140,19 +140,29 @@ const elements: PageElement[] = [
     type: ElementType.SubmissionParagraph,
     id: "",
   },
+  {
+    type: ElementType.InitiativesTable,
+    id: "",
+  },
+  {
+    type: ElementType.AttachmentArea,
+    id: "",
+    label: "Attachment area label",
+    required: true,
+  },
 ];
 
 const textFieldElement: PageElement[] = [
   {
     type: ElementType.Textbox,
     id: "",
-    label: "labeled",
+    label: "Textbox label",
     required: true,
   },
   {
     type: ElementType.Radio,
     id: "",
-    label: "radio button",
+    label: "Radio label",
     required: true,
     choices: [
       { label: "radio choice 1", value: "1", checkedChildren: [] },
@@ -165,8 +175,8 @@ const dateFieldElement: PageElement[] = [
   {
     type: ElementType.Date,
     id: "",
-    label: "date label",
-    helperText: "can you read this?",
+    label: "Date label",
+    helperText: "This is a date field",
     required: true,
   },
 ];
@@ -188,7 +198,7 @@ describe("Page Component with state user", () => {
             type: ElementType.ButtonLink,
             id: "",
             to: "report-page-id",
-            label: "click me",
+            label: "Button link",
           },
         ]}
         setElements={vi.fn()}
