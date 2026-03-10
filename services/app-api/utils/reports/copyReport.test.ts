@@ -42,13 +42,14 @@ const mockOldReport: Report = {
 // any type so it doesn't complain about accessing .answer on generic PageElement
 const mockNewReport: any = structuredClone(mockOldReport);
 mockNewReport.id = "mock-new-report";
+mockNewReport.copyFromReportId = "mock-old-report";
 delete mockNewReport.pages[1].elements[1].answer;
 
 describe("copyReport util", () => {
   test("copyReport copies data from old report into new one", async () => {
     mockGetReport.mockReturnValue(mockOldReport);
     expect(mockNewReport.pages[1].elements[1].answer).toBeUndefined();
-    await copyReport(mockNewReport, "mock-old-report");
+    await copyReport(mockNewReport);
     expect(mockNewReport.pages[1].elements[1].answer).toEqual("mock answer");
   });
 });
