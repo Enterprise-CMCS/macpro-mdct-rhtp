@@ -164,6 +164,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return submissionParagraphSchema;
     case ElementType.ListInput:
       return listInputTemplateSchema;
+    case ElementType.InitiativesTable:
+      return initiativesTableSchema;
     case ElementType.AttachmentArea:
       return attachmentAreaSchema;
     default:
@@ -228,6 +230,11 @@ const attachmentAreaSchema = object().shape({
       fileId: string().required(),
     })
   ),
+});
+
+const initiativesTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.InitiativesTable)),
+  id: string().required(),
 });
 
 const dividerSchema = object().shape({
