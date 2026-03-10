@@ -259,8 +259,8 @@ const checkboxTemplateSchema = object().shape({
 const buttonLinkTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ButtonLink)),
   id: string().required(),
-  label: string().optional(),
-  to: string().optional(),
+  label: string().required(),
+  to: string().required(),
   style: string().optional(),
 });
 

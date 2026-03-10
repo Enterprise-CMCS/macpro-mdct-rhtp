@@ -293,6 +293,7 @@ export const elementObject: {
         element={{
           type: ElementType.ButtonLink,
           id: "id-button-link",
+          to: "page-link",
           label: "Button Link Label",
         }}
       />,

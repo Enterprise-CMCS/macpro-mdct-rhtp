@@ -9,6 +9,11 @@ import {
 import { exportToPDF } from "../elements";
 import { useOfFundsTableElement } from "./rhtpElements";
 
+// TODO build out list by state
+export enum Initiatives {
+  "initiative-1" = "Initiative 1",
+}
+
 export const rhtpReportTemplate: ReportBase = {
   type: ReportType.RHTP,
   year: 2026,
