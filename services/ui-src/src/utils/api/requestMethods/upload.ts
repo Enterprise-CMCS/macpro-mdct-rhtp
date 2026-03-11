@@ -19,13 +19,15 @@ export interface UploadData {
 export const recordFileInDatabaseAndGetUploadUrl = async (
   year: string,
   stateCode: string,
-  uploadedFile: File
+  uploadedFile: File,
+  uploadId: string
 ) => {
   const requestHeaders = await getRequestHeaders();
   const body = {
     uploadedFileName: uploadedFile.name,
     uploadedFileType: uploadedFile.type,
     uploadedFileSize: uploadedFile.size,
+    uploadId,
   };
 
   const options = {
@@ -61,6 +63,7 @@ export const getFileDownloadUrl = async (
     headers: { ...requestHeaders },
     body: {},
   };
+
   const response = await apiLib.get<PathURL>(
     `/uploads/${year}/${stateCode}/${fileId}`,
     options
@@ -68,14 +71,19 @@ export const getFileDownloadUrl = async (
   return response.psurl;
 };
 
-export const getUploadedFiles = async (year: string, stateCode: string) => {
+export const getUploadedFiles = async (
+  year: string,
+  stateCode: string,
+  uploadId: string
+) => {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
     body: {},
   };
+
   const response = await apiLib.get<UploadData[]>(
-    `/uploads/${year}/${stateCode}`,
+    `/uploads/${year}/${stateCode}/view/${uploadId}`,
     options
   );
   return response ?? [];

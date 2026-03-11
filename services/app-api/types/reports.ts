@@ -102,16 +102,34 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 
 export type PageId = string;
 
+export type UploadListProp = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
+export type CheckpointShape = {
+  id: string;
+  label: string;
+  attachable: boolean;
+};
+
+export type CheckpointAnswerShape = {
+  id: string;
+  label: string;
+  completed: boolean;
+  attachments?: UploadListProp[];
+};
+
 export enum PageType {
   Standard = "standard",
   Modal = "modal",
   ReviewSubmit = "reviewSubmit",
 }
 
-export type UploadData = {
-  name: string;
-  size: number;
-  fileId: string;
+export type AccordionGroupItem = {
+  label: string;
+  children: PageElement[];
 };
 
 export enum ElementType {
@@ -134,8 +152,10 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  TableCheckpoint = "tableCheckpoint",
   UseOfFundsTable = "useOfFundsTable",
   AttachmentArea = "attachmentArea",
+  AccordionGroup = "accordionGroup",
   InitiativesTable = "initiativesTable",
 }
 
@@ -158,6 +178,8 @@ export type PageElement =
   | SubmissionParagraphTemplate
   | UseOfFundsTableTemplate
   | ListInputTemplate
+  | TableCheckpointTemplate
+  | AccordionGroupTemplate
   | InitiativesTableTemplate
   | AttachmentAreaTemplate;
 
@@ -302,6 +324,13 @@ export interface TextboxTemplate extends InputElementTemplate {
   hideCondition?: HideCondition;
 }
 
+export interface TableCheckpointTemplate extends InputElementTemplate {
+  type: ElementType.TableCheckpoint;
+  stage: number;
+  checkpoints: CheckpointShape[];
+  answer?: CheckpointAnswerShape[];
+}
+
 export type UseOfFundsTableItem = {
   id: string;
   budgetPeriod: string;
@@ -326,5 +355,13 @@ export type UseOfFundsTableTemplate = {
 };
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  answer?: UploadData[];
+  answer?: UploadListProp[];
+}
+
+export interface AccordionGroupTemplate {
+  type: ElementType.AccordionGroup;
+  id: string;
+  accordions: AccordionGroupItem[];
+  required: boolean;
+  answer?: boolean[];
 }

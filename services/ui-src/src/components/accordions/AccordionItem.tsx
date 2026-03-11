@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { MouseEventHandler, ReactNode } from "react";
 import {
   AccordionButton,
   AccordionItem as AccordionItemRoot,
@@ -10,24 +10,28 @@ import {
 import plusIcon from "assets/icons/accordion/icon_plus.svg";
 import minusIcon from "assets/icons/accordion/icon_minus.svg";
 
-export const AccordionItem = ({ label, children, sx: sxOverride }: Props) => {
+export const AccordionItem = ({
+  label,
+  children,
+  sx: sxOverride,
+  onClick,
+}: Props) => {
   return (
-    <AccordionItemRoot sx={sxOverride ?? sx.root}>
+    <AccordionItemRoot sx={sxOverride ?? ""}>
       {({ isExpanded }) => (
         <>
           <AccordionButton
-            sx={sx.accordionButton}
             aria-label={label}
             title="accordion-button"
+            onClick={onClick}
           >
             <Text flex="1">{label}</Text>
             <Image
               src={isExpanded ? minusIcon : plusIcon}
               alt={isExpanded ? "Collapse" : "Expand"}
-              sx={sx.accordionIcon}
             />
           </AccordionButton>
-          <AccordionPanel sx={sx.accordionPanel}>{children}</AccordionPanel>
+          <AccordionPanel>{children}</AccordionPanel>
         </>
       )}
     </AccordionItemRoot>
@@ -38,25 +42,5 @@ interface Props {
   children?: ReactNode | ReactNode[];
   label?: string;
   sx?: SystemStyleObject;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
-
-const sx = {
-  root: {
-    borderStyle: "none",
-  },
-  accordionButton: {
-    minHeight: "3.5rem",
-    bg: "gray_lightest",
-    textAlign: "left",
-  },
-  accordionPanel: {
-    padding: "spacer3",
-    ".mobile &": {
-      paddingX: "spacer1",
-      paddingY: "spacer1",
-    },
-  },
-  accordionIcon: {
-    width: "1rem",
-  },
-};

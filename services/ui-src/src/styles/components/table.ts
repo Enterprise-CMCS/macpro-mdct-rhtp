@@ -121,11 +121,47 @@ const reportDetailsVariant = {
   },
 };
 
+const metricVariant = {
+  table: {
+    boxShadow: "0px 2px 8px 0px #0000001F",
+    th: {
+      background: "primary_darkest",
+      color: "white",
+      padding: "1rem 0.75rem",
+    },
+    tr: {
+      padding: "1rem",
+      border: "none",
+    },
+    "tr:nth-child(even)": {
+      background: "gray_lightest_highlight",
+    },
+    td: {
+      border: "none",
+      padding: "1rem 0.75rem",
+      "label, button": {
+        margin: "0",
+        display: "flex",
+        justifyContent: "center",
+      },
+      ".chakra-checkbox span": {
+        width: "32px",
+        height: "32px",
+        borderColor: "black",
+        svg: {
+          width: "1.4rem",
+        },
+      },
+    },
+  },
+};
+
 const variants = {
   striped: stripedVariant,
   status: statusVariant,
   export: exportVariant,
   reportDetails: reportDetailsVariant,
+  metric: metricVariant,
 };
 
 const sizes = {};

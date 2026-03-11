@@ -48,6 +48,12 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
+export type UploadListProp = {
+  name: string;
+  size: number;
+  fileId: string;
+};
+
 export type ReportBase = {
   type: ReportType;
   subType?: RhtpSubType;
@@ -124,15 +130,27 @@ export const isFormPageTemplate = (
 
 export type PageId = string;
 
+export type CheckpointShape = {
+  id: string;
+  label: string;
+  attachable: boolean;
+};
+
+export type CheckpointAnswerShape = {
+  id: string;
+  label: string;
+  completed: boolean;
+  attachments?: UploadListProp[];
+};
+
 export enum PageType {
   Standard = "standard",
   ReviewSubmit = "reviewSubmit",
 }
 
-export type UploadData = {
-  name: string;
-  size: number;
-  fileId: string;
+export type AccordionGroupItem = {
+  label: string;
+  children: PageElement[];
 };
 
 export enum ElementType {
@@ -153,8 +171,10 @@ export enum ElementType {
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
+  TableCheckpoint = "tableCheckpoint",
   UseOfFundsTable = "useOfFundsTable",
   AttachmentArea = "attachmentArea",
+  AccordionGroup = "accordionGroup",
   InitiativesTable = "initiativesTable",
 }
 
@@ -177,8 +197,10 @@ export type PageElement =
   | ListInputTemplate
   | UseOfFundsTableTemplate
   | SubmissionParagraphTemplate
-  | InitiativesTableTemplate
-  | AttachmentAreaTemplate;
+  | TableCheckpointTemplate
+  | AttachmentAreaTemplate
+  | AccordionGroupTemplate
+  | InitiativesTableTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -303,7 +325,7 @@ export interface NumberFieldTemplate extends InputElementTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  answer?: UploadData[];
+  answer?: UploadListProp[];
 }
 
 export interface RadioTemplate extends InputElementTemplate {
@@ -326,6 +348,20 @@ export interface TextboxTemplate extends InputElementTemplate {
   hideCondition?: HideCondition;
 }
 
+export interface TableCheckpointTemplate extends InputElementTemplate {
+  type: ElementType.TableCheckpoint;
+  stage: number;
+  checkpoints: CheckpointShape[];
+  answer?: CheckpointAnswerShape[];
+}
+
+export interface AccordionGroupTemplate {
+  type: ElementType.AccordionGroup;
+  id: string;
+  accordions: AccordionGroupItem[];
+  required: boolean;
+  answer?: boolean[];
+}
 export type UseOfFundsTableItem = {
   id: string;
   budgetPeriod: string;
