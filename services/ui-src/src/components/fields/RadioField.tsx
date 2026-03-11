@@ -114,7 +114,7 @@ export const RadioField = (props: PageElementProps<RadioTemplate>) => {
 
   const parsedHint = (
     // This is as="span" because it is inside a CMSDS Hint, which is a <p>.
-    <Box as="span" color="palette.gray_dark">
+    <Box as="span" color="gray_dark">
       {radio.helperText && parseHtml(radio.helperText)}
     </Box>
   );

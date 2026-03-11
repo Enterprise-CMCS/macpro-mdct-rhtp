@@ -28,6 +28,7 @@ import {
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
+import { UseOfFundsTableElement } from "./UseOfFundsTable";
 import { AttachmentArea } from "components/fields/AttachmentArea";
 
 interface Props {
@@ -86,6 +87,10 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <SubmissionParagraph />;
       case ElementType.ListInput:
         return <ListInput {...{ updateElement, disabled, element }} />;
+      case ElementType.UseOfFundsTable:
+        return (
+          <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
+        );
       case ElementType.InitiativesTable:
         return <InitiativesTable {...{ updateElement, disabled, element }} />;
       case ElementType.AttachmentArea:
