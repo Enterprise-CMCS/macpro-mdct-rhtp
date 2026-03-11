@@ -125,7 +125,7 @@ const metricVariant = {
   table: {
     boxShadow: "0px 2px 8px 0px #0000001F",
     th: {
-      background: "palette.primary_darkest",
+      background: "primary_darkest",
       color: "white",
       padding: "1rem 0.75rem",
     },
@@ -134,7 +134,7 @@ const metricVariant = {
       border: "none",
     },
     "tr:nth-child(even)": {
-      background: "palette.gray_lightest_highlight",
+      background: "gray_lightest_highlight",
     },
     td: {
       border: "none",
