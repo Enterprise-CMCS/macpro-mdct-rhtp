@@ -77,8 +77,7 @@ export const UserProvider = ({ children }: Props) => {
       } = payload as ExpectedTokenShape;
 
       // "custom:cms_roles" is an string of concat roles so we need to check for the one applicable to RHTP
-      // TODO: change to mdctrhtp
-      const userRole = cms_role.split(",").find((r) => r.includes("mdcthcbs"));
+      const userRole = cms_role.split(",").find((r) => r.includes("mdctrhtp"));
       const full_name = [given_name, " ", family_name].join("");
       const userCheck = {
         userIsAdmin:
@@ -123,7 +122,7 @@ export const UserProvider = ({ children }: Props) => {
       updateTimeout,
       getExpiration,
     }),
-    [user, logout, showLocalLogins]
+    [user, logout, showLocalLogins],
   );
 
   return <UserContext.Provider value={values}>{children}</UserContext.Provider>;
