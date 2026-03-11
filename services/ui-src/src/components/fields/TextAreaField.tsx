@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
+import { Box } from "@chakra-ui/react";
 import { parseHtml } from "utils";
 import { TextAreaBoxTemplate } from "../../types";
 import { PageElementProps } from "../report/Elements";
@@ -48,17 +49,19 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
   }
 
   return (
-    <CmsdsTextField
-      name={textbox.id}
-      label={labelText}
-      hint={parsedHint}
-      onChange={onChangeHandler}
-      onBlur={onChangeHandler}
-      value={displayValue}
-      errorMessage={errorMessage}
-      multiline
-      rows={3}
-      disabled={props.disabled}
-    />
+    <Box width={"100%"}>
+      <CmsdsTextField
+        name={textbox.id}
+        label={labelText}
+        hint={parsedHint}
+        onChange={onChangeHandler}
+        onBlur={onChangeHandler}
+        value={displayValue}
+        errorMessage={errorMessage}
+        multiline
+        rows={3}
+        disabled={props.disabled}
+      />
+    </Box>
   );
 };
