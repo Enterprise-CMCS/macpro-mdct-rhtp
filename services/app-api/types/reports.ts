@@ -153,6 +153,7 @@ export enum ElementType {
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
   TableCheckpoint = "tableCheckpoint",
+  UseOfFundsTable = "useOfFundsTable",
   AttachmentArea = "attachmentArea",
   AccordionGroup = "accordionGroup",
   InitiativesTable = "initiativesTable",
@@ -175,6 +176,7 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | SubmissionParagraphTemplate
+  | UseOfFundsTableTemplate
   | ListInputTemplate
   | TableCheckpointTemplate
   | AccordionGroupTemplate
@@ -329,6 +331,28 @@ export interface TableCheckpointTemplate extends InputElementTemplate {
   answer?: CheckpointAnswerShape[];
 }
 
+export type UseOfFundsTableItem = {
+  id: string;
+  budgetPeriod: string;
+  spentFunds: string;
+  description: string;
+  initiative: string;
+  useOfFunds: string;
+  recipientName: string;
+  recipientCategory: string;
+};
+
+export type UseOfFundsTableTemplate = {
+  type: ElementType.UseOfFundsTable;
+  id: string;
+  dropDownOptions: {
+    budgetPeriodOptions: { label: string; value: string }[];
+    initiativeOptions: { label: string; value: string }[];
+    useOfFundsOptions: { label: string; value: string }[];
+    recipientCategoryOptions: { label: string; value: string }[];
+  };
+  answer?: UseOfFundsTableItem[];
+};
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
   answer?: UploadListProp[];

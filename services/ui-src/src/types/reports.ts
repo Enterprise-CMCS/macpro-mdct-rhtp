@@ -172,6 +172,7 @@ export enum ElementType {
   SubmissionParagraph = "submissionParagraph",
   ListInput = "listInput",
   TableCheckpoint = "tableCheckpoint",
+  UseOfFundsTable = "useOfFundsTable",
   AttachmentArea = "attachmentArea",
   AccordionGroup = "accordionGroup",
   InitiativesTable = "initiativesTable",
@@ -194,6 +195,7 @@ export type PageElement =
   | StatusAlertTemplate
   | DividerTemplate
   | ListInputTemplate
+  | UseOfFundsTableTemplate
   | SubmissionParagraphTemplate
   | TableCheckpointTemplate
   | AttachmentAreaTemplate
@@ -360,6 +362,28 @@ export interface AccordionGroupTemplate {
   required: boolean;
   answer?: boolean[];
 }
+export type UseOfFundsTableItem = {
+  id: string;
+  budgetPeriod: string;
+  spentFunds: string;
+  description: string;
+  initiative: string;
+  useOfFunds: string;
+  recipientName: string;
+  recipientCategory: string;
+};
+
+export type UseOfFundsTableTemplate = {
+  type: ElementType.UseOfFundsTable;
+  id: string;
+  dropDownOptions: {
+    budgetPeriodOptions: { label: string; value: string }[];
+    initiativeOptions: { label: string; value: string }[];
+    useOfFundsOptions: { label: string; value: string }[];
+    recipientCategoryOptions: { label: string; value: string }[];
+  };
+  answer?: UseOfFundsTableItem[];
+};
 
 /**
  * Instructs Typescript to complain if it detects that this function may be reachable.

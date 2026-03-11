@@ -6,7 +6,7 @@ const baseStyles = {
     width: "100%",
   },
   button: {
-    background: "palette.gray_lightest",
+    background: "gray_lightest",
     padding: "0 1.5rem",
     textAlign: "left",
     minHeight: "3.5rem",
@@ -19,7 +19,7 @@ const baseStyles = {
       },
     },
     a: {
-      color: "palette.primary",
+      color: "primary",
       textDecoration: "underline",
     },
     header: {

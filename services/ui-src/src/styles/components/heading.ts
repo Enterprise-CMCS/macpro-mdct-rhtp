@@ -1,7 +1,7 @@
 import { ComponentStyleConfig } from "@chakra-ui/react";
 
 const baseStyles = {
-  color: "palette.base",
+  color: "base",
   fontWeight: "normal",
   margin: "0",
 };
