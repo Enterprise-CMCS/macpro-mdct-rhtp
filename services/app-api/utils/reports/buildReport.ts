@@ -21,6 +21,7 @@ import {
   returnToInitiativesDashboard,
 } from "../../forms/2026/elements";
 import { Initiatives } from "../../forms/2026/rhtp/rhtp";
+import { checkpointsTables } from "../../forms/2026/rhtp/rhtpElements";
 
 export const makeQuarterlyChanges = (
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
@@ -42,7 +43,11 @@ export const buildInitiativePages = (report: Report) => {
       title,
       type: PageType.Standard,
       sidebar: false,
-      elements: [returnToInitiativesDashboard, initiativeHeader(title)],
+      elements: [
+        returnToInitiativesDashboard,
+        initiativeHeader(title),
+        ...checkpointsTables,
+      ],
     });
   }
 };
