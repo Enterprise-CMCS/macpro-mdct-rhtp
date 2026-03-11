@@ -70,7 +70,7 @@ const sx = {
     "&:hover": {
       color: "white",
       textDecoration: "none",
-      backgroundColor: "palette.primary_darker",
+      backgroundColor: "primary_darker",
     },
   },
 };

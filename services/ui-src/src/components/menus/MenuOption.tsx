@@ -24,8 +24,8 @@ interface Props {
 const sx = {
   text: {
     fontWeight: "heading_md",
-    color: "palette.white",
-    _groupHover: { color: "palette.gray_lighter" },
+    color: "white",
+    _groupHover: { color: "gray_lighter" },
   },
   menuIcon: {
     width: "1.5rem",

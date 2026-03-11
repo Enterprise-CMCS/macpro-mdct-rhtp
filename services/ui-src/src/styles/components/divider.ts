@@ -1,7 +1,7 @@
 import { ComponentStyleConfig } from "@chakra-ui/react";
 
 const baseStyles = {
-  borderColor: "palette.gray_lighter",
+  borderColor: "gray_lighter",
 };
 
 const dividerTheme: ComponentStyleConfig = {

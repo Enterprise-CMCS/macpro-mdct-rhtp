@@ -146,7 +146,7 @@ export const sx = {
     },
     ".performance-rate-header": {
       marginBottom: "spacer2",
-      color: "palette.black",
+      color: "black",
     },
   },
   innerContainer: {

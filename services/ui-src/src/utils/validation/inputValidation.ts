@@ -122,3 +122,11 @@ export const stringifyInput = (value: number | undefined) => {
   if (value === undefined) return "";
   return value.toString();
 };
+
+/**
+ * Checks to see if the given string is a valid currency format (e.g. "1,234.56").
+ */
+export const isValidCurrency = (value: string) => {
+  const currencyPattern = /^\d*(,\d{3})*(\.\d*)?$/;
+  return currencyPattern.test(value);
+};
