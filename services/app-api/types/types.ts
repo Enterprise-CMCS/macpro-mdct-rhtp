@@ -1,13 +1,12 @@
 import { HttpResponse } from "../libs/response-lib";
 import { StateAbbr } from "../utils/constants";
 
-// TODO: change to mdctrhtp
 export enum UserRoles {
-  ADMIN = "mdcthcbs-bor", // "MDCT RHTP Business Owner Representative"
-  APPROVER = "mdcthcbs-appr", // "MDCT RHTP Approver"
-  HELP_DESK = "mdcthcbs-hd", // "MDCT RHTP Help Desk"
-  INTERNAL = "mdcthcbs-internal-user", // "MDCT RHTP Internal User"
-  STATE_USER = "mdcthcbs-state-user", // "MDCT RHTP State User"
+  ADMIN = "mdctrhtp-bor", // "MDCT RHTP Business Owner Representative"
+  APPROVER = "mdctrhtp-appr", // "MDCT RHTP Approver"
+  HELP_DESK = "mdctrhtp-hd", // "MDCT RHTP Help Desk"
+  INTERNAL = "mdctrhtp-internal-user", // "MDCT RHTP Internal User"
+  STATE_USER = "mdctrhtp-state-user", // "MDCT RHTP State User"
 }
 export const isUserRole = (role: string): role is UserRoles => {
   return Object.values(UserRoles).includes(role as UserRoles);
@@ -48,7 +47,7 @@ export interface APIGatewayProxyEvent {
  * but in theory those should be extracted & validated here as well.
  */
 export type ParameterParser<TParams> = (
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ) => TParams | undefined;
 
 /**
@@ -74,5 +73,5 @@ export interface AuthenticatedRequest<TParams> {
  *   4. Returning an HTTP Response (complete with status and headers)
  */
 export type HandlerLambda<TParams> = (
-  request: AuthenticatedRequest<TParams>
+  request: AuthenticatedRequest<TParams>,
 ) => Promise<HttpResponse>;
