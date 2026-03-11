@@ -9,12 +9,13 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { logger } from "./debug-lib";
+import { isLocalStack } from "./localstack";
 
 export const awsConfig = {
   region: "us-east-1",
   logger,
-  endpoint: process.env.AWS_ENDPOINT_URL,
-  forcePathStyle: true,
+  ...(isLocalStack() && { endpoint: process.env.AWS_ENDPOINT_URL }),
+  ...(isLocalStack() && { forcePathStyle: true }),
 };
 
 const client = new S3Client(awsConfig);
