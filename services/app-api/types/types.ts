@@ -47,7 +47,7 @@ export interface APIGatewayProxyEvent {
  * but in theory those should be extracted & validated here as well.
  */
 export type ParameterParser<TParams> = (
-  event: APIGatewayProxyEvent,
+  event: APIGatewayProxyEvent
 ) => TParams | undefined;
 
 /**
@@ -73,5 +73,5 @@ export interface AuthenticatedRequest<TParams> {
  *   4. Returning an HTTP Response (complete with status and headers)
  */
 export type HandlerLambda<TParams> = (
-  request: AuthenticatedRequest<TParams>,
+  request: AuthenticatedRequest<TParams>
 ) => Promise<HttpResponse>;
