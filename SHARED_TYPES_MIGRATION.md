@@ -7,12 +7,15 @@ This project now uses a centralized shared types package located at `services/sh
 ## What Changed
 
 ### 1. New Package Structure
+
 - **Location**: `services/shared/`
 - **Package name**: `@rhtp/shared`
 - **Exports**: Common types used by both UI and API
 
 ### 2. Workspace Configuration
+
 The root `package.json` now includes workspace configuration:
+
 ```json
 "workspaces": [
   "services/shared",
@@ -22,7 +25,9 @@ The root `package.json` now includes workspace configuration:
 ```
 
 ### 3. Updated Dependencies
+
 Both `app-api` and `ui-src` now depend on `@rhtp/shared`:
+
 ```json
 "dependencies": {
   "@rhtp/shared": "workspace:*",
@@ -35,6 +40,7 @@ Both `app-api` and `ui-src` now depend on `@rhtp/shared`:
 ### Importing Shared Types
 
 **Before:**
+
 ```typescript
 // In app-api
 import { Report, ReportType } from "../types/reports";
@@ -44,6 +50,7 @@ import { Report, ReportType } from "./types/reports";
 ```
 
 **After:**
+
 ```typescript
 // In both app-api and ui-src
 import { Report, ReportType } from "@rhtp/shared";
@@ -52,6 +59,7 @@ import { Report, ReportType } from "@rhtp/shared";
 ### What's in the Shared Package?
 
 ✅ **Shared types** (in `services/shared/src/types/reports.ts`):
+
 - `Report`, `ReportBase`, `LiteReport`
 - `ReportType`, `RhtpSubType`, `ReportStatus`, `PageStatus`
 - `AlertTypes` (used across boundaries)
@@ -63,11 +71,13 @@ import { Report, ReportType } from "@rhtp/shared";
 ### What Stays in Local Type Files?
 
 #### Backend (`services/app-api/types/reports.ts`):
+
 - Backend-specific extensions (e.g., `CreateReportOptions` with server-side logic)
 - API handler-specific types
 - DynamoDB-specific types
 
 #### Frontend (`services/ui-src/src/types/reports.ts`):
+
 - React component-specific types
 - UI helper functions (e.g., `getReportName`)
 - Type guards (e.g., `isReviewSubmitPage`, `isFormPageTemplate`)
@@ -76,28 +86,33 @@ import { Report, ReportType } from "@rhtp/shared";
 ## Setup Instructions
 
 ### 1. Install Dependencies
+
 ```bash
 # From project root
 yarn install
 ```
 
 This will:
+
 - Link the shared package to both app-api and ui-src
 - Install all dependencies across workspaces
 
 ### 2. Build the Shared Package
+
 ```bash
 cd services/shared
 yarn build
 ```
 
 Or use watch mode during development:
+
 ```bash
 cd services/shared
 yarn watch
 ```
 
 ### 3. Verify Everything Works
+
 ```bash
 # Test backend
 cd services/app-api
@@ -118,6 +133,7 @@ yarn test
    - Is it a core domain type?
 
 2. **Add to shared package**:
+
    ```typescript
    // services/shared/src/types/reports.ts
    export interface NewSharedType {
@@ -126,12 +142,14 @@ yarn test
    ```
 
 3. **Export from index**:
+
    ```typescript
    // services/shared/src/index.ts
    export * from "./types/reports.js";
    ```
 
 4. **Build the package**:
+
    ```bash
    cd services/shared
    yarn build
@@ -145,6 +163,7 @@ yarn test
 ### When to Keep Types Separate
 
 Keep types in their respective packages when they:
+
 - Are environment-specific (browser APIs, AWS SDK types)
 - Contain side effects (React hooks, API clients)
 - Are only used internally
@@ -163,6 +182,7 @@ Keep types in their respective packages when they:
 ### TypeScript Can't Find `@rhtp/shared`
 
 **Solution**: Make sure you've run `yarn install` and built the shared package:
+
 ```bash
 yarn install
 cd services/shared
@@ -172,12 +192,14 @@ yarn build
 ### Changes in Shared Package Not Reflected
 
 **Solution**: Rebuild the shared package:
+
 ```bash
 cd services/shared
 yarn build
 ```
 
 Or use watch mode:
+
 ```bash
 cd services/shared
 yarn watch

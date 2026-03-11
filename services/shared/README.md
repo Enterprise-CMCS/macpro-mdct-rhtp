@@ -5,6 +5,7 @@ Shared types and utilities for MDCT-RHTP frontend and backend.
 ## Purpose
 
 This package contains type definitions and utility functions that are used by both:
+
 - `services/app-api` (backend API)
 - `services/ui-src` (frontend React app)
 
@@ -13,11 +14,13 @@ By centralizing shared code here, we ensure consistency across the application a
 ## Usage
 
 ### In app-api (backend):
+
 ```typescript
 import { Report, ReportType, ReportStatus } from "@rhtp/shared";
 ```
 
 ### In ui-src (frontend):
+
 ```typescript
 import { Report, ReportType, ReportStatus } from "@rhtp/shared";
 ```
@@ -36,6 +39,7 @@ yarn watch
 ## What Goes Here?
 
 ✅ **Include:**
+
 - Types that cross the API boundary (request/response types)
 - Enums used by both frontend and backend
 - Shared constants
@@ -43,6 +47,7 @@ yarn watch
 - Type guards that work on both sides
 
 ❌ **Don't Include:**
+
 - Frontend-specific types (React components, UI state)
 - Backend-specific types (AWS SDK types, database clients)
 - Side-effect producing code (API calls, DOM manipulation)

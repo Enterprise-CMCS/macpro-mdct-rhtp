@@ -16,14 +16,14 @@
   "directories": {
     "test": "tests"
   },
-  "type": "module",
-  "main": "index.js",
   "workspaces": [
     "cli",
     "services/shared",
     "services/app-api",
     "services/ui-src"
   ],
+  "type": "module",
+  "main": "index.js",
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.985.0",
     "@aws-sdk/client-lambda": "^3.985.0",
