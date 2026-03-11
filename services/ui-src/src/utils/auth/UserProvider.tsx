@@ -122,7 +122,7 @@ export const UserProvider = ({ children }: Props) => {
       updateTimeout,
       getExpiration,
     }),
-    [user, logout, showLocalLogins],
+    [user, logout, showLocalLogins]
   );
 
   return <UserContext.Provider value={values}>{children}</UserContext.Provider>;
