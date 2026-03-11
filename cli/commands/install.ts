@@ -17,20 +17,20 @@ async function* findPackageJsonDirectories(
 }
 
 export const installDeps = async () => {
-  for await (const dir of findPackageJsonDirectories(".")) {
-    const commandPieces = ["yarn", "install"];
-    if (process.env.CI === "true") {
-      commandPieces.push("--immutable");
-    }
-
-    await runCommand(`yarn install ${dir}`, commandPieces, dir, {
-      quiet: true,
-    });
+  // With Yarn workspaces, we only need to install from the root
+  // Individual workspace installations are handled automatically
+  const commandPieces = ["yarn", "install"];
+  if (process.env.CI === "true") {
+    commandPieces.push("--immutable");
   }
+
+  await runCommand(`yarn install`, commandPieces, ".", {
+    quiet: true,
+  });
 };
 
 export const install = {
   command: "install",
   describe: "install all project dependencies",
-  handler: async () => {},
+  handler: async () => { },
 };
