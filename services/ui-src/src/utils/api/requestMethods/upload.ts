@@ -61,7 +61,6 @@ export const getFileDownloadUrl = async (
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    body: {},
   };
 
   const response = await apiLib.get<PathURL>(
@@ -79,7 +78,6 @@ export const getUploadedFiles = async (
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    body: {},
   };
 
   const response = await apiLib.get<UploadData[]>(
@@ -97,7 +95,6 @@ export const deleteUploadedFile = async (
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    body: {},
   };
   await apiLib.del(`/uploads/${year}/${stateCode}/${fileId}`, options);
 };
