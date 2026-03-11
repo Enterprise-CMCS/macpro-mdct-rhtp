@@ -64,6 +64,12 @@ export const Upload = ({
     }
   };
 
+  const onRemove = () => {
+    retrieveUploadedFiles(year, state, uploadId).then((response) => {
+      saveToReport(response);
+    });
+  };
+
   const onUploadFiles = async () => {
     if (!year || !state) {
       throw new Error("Undefined year or state parameter");
@@ -111,7 +117,7 @@ export const Upload = ({
         </span>
       </Box>
       <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      {uploadListRender(filesToUpload ?? [], year, state)}
+      {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>
@@ -119,7 +125,7 @@ export const Upload = ({
           above.
         </Text>
       </div>
-      {uploadListRender(answer ?? [], year, state, downloadFile)}
+      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
     </VStack>
   );
 };

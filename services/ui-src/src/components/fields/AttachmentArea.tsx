@@ -6,8 +6,11 @@ import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useParams } from "react-router-dom";
 import { useStore } from "utils";
-import { downloadFile, uploadListRender } from "utils/other/upload";
-import { deleteUploadedFile } from "utils/api/requestMethods/upload";
+import {
+  downloadFile,
+  retrieveUploadedFiles,
+  uploadListRender,
+} from "utils/other/upload";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
@@ -30,9 +33,10 @@ export const AttachmentArea = (
     setModalOpen(false);
   };
 
-  const _onRemove = async (file: UploadListProp) => {
-    /** TO DO: Fix file deletion from s3 bucket */
-    await deleteUploadedFile(year, state, file.fileId);
+  const onRemove = () => {
+    retrieveUploadedFiles(year, state, id).then((response) => {
+      saveToReport(response);
+    });
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
@@ -43,7 +47,7 @@ export const AttachmentArea = (
     <Stack gap="1.5rem">
       <Heading variant="h5">{label}</Heading>
       {helperText && <Text>{helperText}</Text>}
-      {uploadListRender(answer ?? [], year, state, downloadFile)}
+      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}

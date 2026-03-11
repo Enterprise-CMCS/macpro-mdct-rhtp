@@ -24,7 +24,11 @@ import { useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router-dom";
 import { useStore } from "utils";
-import { downloadFile } from "utils/other/upload";
+import {
+  downloadFile,
+  removeFile,
+  retrieveUploadedFiles,
+} from "utils/other/upload";
 
 /** This builds a default data structure for the checkpoint table if there's no answer set */
 const formatCheckpoints = (checkpoints: CheckpointShape[]) => {
@@ -87,9 +91,6 @@ const buildRows = (stage: number, values: CheckpointAnswerShape[]) => {
   }, []);
 };
 
-/** TO DO: Add function once upload delete is working */
-const removeAttachment = () => {};
-
 const header = [
   "#",
   "Checkpoint",
@@ -113,6 +114,11 @@ export const TableCheckpoint = (
   const [files, setFiles] = useState<UploadListProp[]>(
     initialDisplayValue[0].attachments ?? []
   );
+
+  if (!state || !year) {
+    console.error("Can't retrieve uploads with missing state or year");
+    return;
+  }
 
   const rows = buildRows(stage, initialDisplayValue);
 
@@ -138,9 +144,9 @@ export const TableCheckpoint = (
     setModalOpen(false);
   };
 
-  const saveToReport = (uploads: UploadListProp[], options: string[]) => {
+  const saveToReport = (uploads: UploadListProp[], dropdownValue: string) => {
     const newValue = [...initialDisplayValue];
-    const checkpoint = newValue.findIndex((value) => value.id == options[1]);
+    const checkpoint = newValue.findIndex((value) => value.id == dropdownValue);
 
     if (checkpoint !== -1) {
       newValue[checkpoint].attachments = uploads;
@@ -149,10 +155,13 @@ export const TableCheckpoint = (
     }
   };
 
-  if (!state || !year) {
-    console.error("Can't retrieve uploads with missing state or year");
-    return;
-  }
+  const removeAttachment = async (file: UploadListProp) => {
+    const onRemove = () =>
+      retrieveUploadedFiles(year, state, uploadId).then((response) => {
+        saveToReport(response, uploadId);
+      });
+    await removeFile(file, year, state, onRemove);
+  };
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
@@ -207,7 +216,7 @@ export const TableCheckpoint = (
                 {"file" in row && row.file.fileId && (
                   <Button
                     variant="unstyled"
-                    onClick={() => removeAttachment()}
+                    onClick={() => removeAttachment(row.file)}
                     aria-label={`Remove ${row.file.name}`}
                   >
                     <Image src={cancelIcon} alt="Remove" />

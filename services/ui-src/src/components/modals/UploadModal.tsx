@@ -32,7 +32,9 @@ export const UploadModal = ({
   };
 
   const saveToModal = (uploads: UploadListProp[]) => {
-    saveToReport(uploads, values);
+    const dropdownIndex = values.length - 1;
+    const value = values.at(dropdownIndex) ?? "";
+    saveToReport(uploads, value);
   };
 
   return (
@@ -79,5 +81,5 @@ interface Props {
   answer: UploadListProp[];
   dropdowns?: { label: string; options: { label: string; value: string }[] }[];
   onChangeExpanded?: (change: string) => void;
-  saveToReport: (uploads: UploadListProp[], options: string[]) => void;
+  saveToReport: (uploads: UploadListProp[], key: string) => void;
 }

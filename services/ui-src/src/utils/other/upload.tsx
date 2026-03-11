@@ -52,24 +52,23 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
-const removeFile = async (
+export const removeFile = async (
   file: File | UploadListProp,
   year: string,
-  state: string
+  state: string,
+  onRemove: Function
 ) => {
   if (!("fileId" in file)) return;
-  await deleteUploadedFile(year, state, file.fileId);
-  // retrieveUploadedFiles(year, state, uploadId).then((response) => {
-  //   const remainingUploads = response.filter(
-  //     ({ fileId }) => fileId !== file.fileId
-  //   );
-  // });
+  await deleteUploadedFile(year, state, file.fileId).then(() => {
+    onRemove();
+  });
 };
 
 export const uploadListRender = (
   files: File[] | UploadListProp[],
   year: string,
   state: string,
+  onRemove: Function,
   onClick?: Function
 ) => {
   return (
@@ -94,7 +93,7 @@ export const uploadListRender = (
               <Button
                 variant="unstyled"
                 aria-label={`delete ${file.name}`}
-                onClick={() => removeFile(file, year, state)}
+                onClick={() => removeFile(file, year, state, onRemove)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
               />
             </HStack>

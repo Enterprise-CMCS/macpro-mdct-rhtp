@@ -22,6 +22,7 @@ export const rhtpReportTemplate: ReportBase = {
       childPageIds: [
         "general-information",
         "initiatives",
+        "state-policy-commitments",
         "sustainability-and-highlights",
         "review-submit",
       ],
@@ -103,9 +104,50 @@ export const rhtpReportTemplate: ReportBase = {
           ],
           required: true,
         },
+      ],
+    },
+    {
+      id: "initiatives",
+      title: "Initiatives",
+      type: PageType.Standard,
+      sidebar: true,
+      elements: [
+        {
+          type: ElementType.Header,
+          id: "initiatives-header",
+          text: "Initiatives",
+        },
+        {
+          type: ElementType.Paragraph,
+          id: "initiatives-instructions",
+          text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+        },
+        {
+          type: ElementType.Accordion,
+          id: "initiatives-accordion-instructions",
+          label: "More details",
+          value: "<b>More details coming soon.</b>",
+        },
+        {
+          type: ElementType.InitiativesTable,
+          id: "initiatives-table",
+        },
+      ],
+    },
+    {
+      id: "state-policy-commitments",
+      title: "State Policy Commitments",
+      type: PageType.Standard,
+      sidebar: true,
+      elements: [
+        {
+          type: ElementType.Header,
+          id: "state-policy-commitments-header",
+          text: "State Policy Commitments",
+        },
         {
           type: ElementType.AccordionGroup,
-          id: "group-test",
+          id: "state-policy-commitments-group",
           accordions: [
             {
               label: "B.2 Presidental Fitness Test",
@@ -162,34 +204,6 @@ export const rhtpReportTemplate: ReportBase = {
             },
           ],
           required: true,
-        },
-      ],
-    },
-    {
-      id: "initiatives",
-      title: "Initiatives",
-      type: PageType.Standard,
-      sidebar: true,
-      elements: [
-        {
-          type: ElementType.Header,
-          id: "initiatives-header",
-          text: "Initiatives",
-        },
-        {
-          type: ElementType.Paragraph,
-          id: "initiatives-instructions",
-          text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
-        },
-        {
-          type: ElementType.Accordion,
-          id: "initiatives-accordion-instructions",
-          label: "More details",
-          value: "<b>More details coming soon.</b>",
-        },
-        {
-          type: ElementType.InitiativesTable,
-          id: "initiatives-table",
         },
       ],
     },
