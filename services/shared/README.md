@@ -13,42 +13,37 @@ By centralizing shared code here, we ensure consistency across the application a
 
 ## Usage
 
-### In app-api (backend):
+### In app-api (backend) and ui-src (frontend):
 
 ```typescript
 import { Report, ReportType, ReportStatus } from "@rhtp/shared";
 ```
 
-### In ui-src (frontend):
-
-```typescript
-import { Report, ReportType, ReportStatus } from "@rhtp/shared";
-```
+or import from the previous locations of the types files, as we are exporting the shared types there.
 
 ## Development
 
 ```bash
-# Build the package
-cd services/shared
-yarn build
+./run local
+```
 
-# Watch for changes (useful during development)
+is running this under the hood to build and watch the types package:
+
+```bash
 yarn watch
 ```
 
-## What Goes Here?
+## Troubleshooting
 
-✅ **Include:**
+Make sure you've run `yarn install` and built the shared package:
 
-- Types that cross the API boundary (request/response types)
-- Enums used by both frontend and backend
-- Shared constants
-- Utility functions used by both
-- Type guards that work on both sides
+```bash
+yarn install
+cd services/shared
+yarn build
+```
 
-❌ **Don't Include:**
-
-- Frontend-specific types (React components, UI state)
-- Backend-specific types (AWS SDK types, database clients)
-- Side-effect producing code (API calls, DOM manipulation)
-- Environment-specific logic
+In Vs Code Command Pallette run:
+`>TypeScript: Restart TS Server`
+and/or
+`Developer: Reload Window`
