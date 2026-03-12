@@ -219,6 +219,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return attachmentAreaSchema;
     case ElementType.AccordionGroup:
       return accordionGroupTemplateSchema;
+    case ElementType.ActionTable:
+      return actionTableSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -330,6 +332,46 @@ const attachmentAreaSchema = object().shape({
       fileId: string().required(),
     })
   ),
+});
+
+const actionTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.ActionTable)),
+  id: string().required(),
+  label: string().required(),
+  hintText: string().required(),
+  modal: object()
+    .shape({
+      title: string().required(),
+      hintText: string().notRequired(),
+      elements: array()
+        .of(
+          object().shape({
+            id: string().required(),
+            type: string().required(),
+            editOnly: boolean().notRequired(),
+            children: array()
+              .of(
+                object().shape({
+                  label: string().required(),
+                  value: string().required(),
+                })
+              )
+              .notRequired(),
+          })
+        )
+        .required(),
+    })
+    .required(),
+  rows: array()
+    .of(
+      object().shape({
+        id: string().required(),
+        header: string().required(),
+        type: string().notRequired(),
+      })
+    )
+    .required(),
+  answer: array().of(mixed()).notRequired(),
 });
 
 const initiativesTableSchema = object().shape({

@@ -47,7 +47,9 @@ export const AttachmentArea = (
     <Stack gap="1.5rem">
       <Heading variant="h5">{label}</Heading>
       {helperText && <Text>{helperText}</Text>}
-      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
+      {answer &&
+        answer.length > 0 &&
+        uploadListRender(answer, year, state, onRemove, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}
