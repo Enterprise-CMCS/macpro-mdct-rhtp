@@ -157,6 +157,7 @@ export enum ElementType {
   AttachmentArea = "attachmentArea",
   AccordionGroup = "accordionGroup",
   InitiativesTable = "initiativesTable",
+  ActionTable = "actionTable",
 }
 
 export type PageElement =
@@ -181,7 +182,8 @@ export type PageElement =
   | TableCheckpointTemplate
   | AccordionGroupTemplate
   | InitiativesTableTemplate
-  | AttachmentAreaTemplate;
+  | AttachmentAreaTemplate
+  | ActionTableTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -364,4 +366,33 @@ export interface AccordionGroupTemplate {
   accordions: AccordionGroupItem[];
   required: boolean;
   answer?: boolean[];
+}
+
+export type Row = { id: string; header: string; type?: ElementType };
+type MetricDataObject = {
+  no: number;
+  status: string;
+  metric: string;
+  prevValue: string;
+  currValue: string;
+  date: string;
+};
+
+export interface ActionTableTemplate {
+  type: ElementType.ActionTable;
+  id: string;
+  label: string;
+  hintText: string;
+  modal: {
+    title: string;
+    hintText?: string;
+    elements: {
+      id: string;
+      type: ElementType;
+      editOnly?: boolean;
+      children?: { label: string; value: string }[];
+    }[];
+  };
+  rows: Row[];
+  answer?: MetricDataObject[];
 }

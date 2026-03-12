@@ -2,6 +2,7 @@ import {
   UseOfFundsTableTemplate,
   ElementType,
   PageElement,
+  ActionTableTemplate,
 } from "../../../types/reports";
 
 export const useOfFundsOptions = {
@@ -227,3 +228,55 @@ export const checkpointsTables: PageElement[] = [
     required: true,
   },
 ];
+
+export const metricTable: ActionTableTemplate = {
+  type: ElementType.ActionTable,
+  id: "metrics-table",
+  label: "Metrics",
+  hintText:
+    "To add an metric, click button below. [Hint text here to let users know they must report on 4 metrics per initative]",
+  modal: {
+    title: "Metric",
+    hintText: "[hint text]",
+    elements: [
+      {
+        id: "status",
+        type: ElementType.Dropdown,
+        editOnly: true,
+        children: [
+          { label: "Status", value: "Active" },
+          { label: "Status", value: "Abandon" },
+        ],
+      },
+      { id: "metric", type: ElementType.TextAreaField },
+      { id: "currValue", type: ElementType.Textbox },
+      { id: "date", type: ElementType.Date },
+    ],
+  },
+  rows: [
+    { id: "no", header: "#" },
+    { id: "status", header: "Status" },
+    { id: "metric", header: "Metric" },
+    { id: "prevValue", header: "Previous Value", type: ElementType.Textbox },
+    { id: "currValue", header: "Current Value", type: ElementType.Textbox },
+    { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },
+  ],
+  answer: [
+    {
+      no: 1,
+      status: "Active",
+      metric: "Rural provider retention rate",
+      prevValue: "",
+      currValue: "",
+      date: "",
+    },
+    {
+      no: 2,
+      status: "Active",
+      metric: "Percent of rural facilities utilizing RPM",
+      prevValue: "",
+      currValue: "",
+      date: "",
+    },
+  ],
+};
