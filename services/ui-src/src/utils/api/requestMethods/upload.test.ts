@@ -75,7 +75,6 @@ describe("Test fileApi functions", () => {
     expect(apiLib.del as Mock).toHaveBeenCalledWith(
       "/uploads/2025/PA/mock-id",
       {
-        body: {},
         headers: { "x-api-key": undefined },
       }
     );
