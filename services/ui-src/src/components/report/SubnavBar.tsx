@@ -55,7 +55,7 @@ interface Props {
 const sx = {
   subnavBar: {
     position: "sticky",
-    bg: "palette.secondary_lightest",
+    bg: "secondary_lightest",
   },
   subnavContainer: {
     maxW: "appMax",

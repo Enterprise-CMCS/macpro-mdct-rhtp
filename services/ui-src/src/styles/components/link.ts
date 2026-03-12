@@ -6,14 +6,14 @@ const baseStyles = {
 };
 
 const primaryVariant = {
-  color: "palette.primary",
+  color: "primary",
   _visited: {
-    color: "palette.primary",
-    textDecorationColor: "palette.primary",
+    color: "primary",
+    textDecorationColor: "primary",
   },
   ":hover, :visited:hover": {
-    color: "palette.primary_darker",
-    textDecorationColor: "palette.primary_darker",
+    color: "primary_darker",
+    textDecorationColor: "primary_darker",
   },
 };
 const returnVariant = {
@@ -23,7 +23,7 @@ const returnVariant = {
     textDecoration: "underline",
   },
   _visited: {
-    color: "palette.primary",
+    color: "primary",
   },
   display: "flex",
   ".icon": {
@@ -40,50 +40,50 @@ const sidebarVariant = {
   textAlign: "left",
   textDecoration: "none",
   background: "transparent",
-  color: "palette.base",
+  color: "base",
   fontWeight: "body_sm_link",
   border: "1px solid",
   borderRadius: "0",
-  borderColor: "palette.gray_lighter",
+  borderColor: "gray_lighter",
   borderWidth: "0 0 1px 0",
   fontSize: "body_sm_link",
   lineHeight: "body_sm_link",
   paddingLeft: "1rem",
   height: "var(--chakra-sizes-10)",
   _visited: {
-    color: "palette.base",
+    color: "base",
   },
   ":focus, :focus:visited": {
-    color: "palette.secondary_darkest",
+    color: "secondary_darkest",
   },
   _hover: {
-    color: "palette.secondary_darkest",
-    backgroundColor: "palette.gray_lightest_highlight",
+    color: "secondary_darkest",
+    backgroundColor: "gray_lightest_highlight",
     border: "1px solid",
-    borderColor: "palette.secondary",
+    borderColor: "secondary",
     borderWidth: "0 0 0 4px",
     textDecoration: "none",
   },
   "&.selected": {
-    backgroundColor: "palette.gray_lightest_highlight",
+    backgroundColor: "gray_lightest_highlight",
     border: "1px solid",
-    borderColor: "palette.secondary",
+    borderColor: "secondary",
     borderWidth: "0 0 0 2px",
-    color: "palette.secondary_darkest",
+    color: "secondary_darkest",
   },
 };
 const inverseVariant = {
-  color: "palette.white",
+  color: "white",
   _visited: {
-    color: "palette.white",
-    textDecorationColor: "palette.white",
+    color: "white",
+    textDecorationColor: "white",
   },
   ":hover, :visited:hover": {
-    color: "palette.gray_lighter",
-    textDecorationColor: "palette.gray_lighter",
+    color: "gray_lighter",
+    textDecorationColor: "gray_lighter",
   },
   ":active, :focus, :focus:visited": {
-    color: "palette.white",
+    color: "white",
   },
 };
 const unstyledVariant = {
@@ -93,16 +93,16 @@ const unstyledVariant = {
   },
 };
 const outlineButtonVariant = {
-  color: "palette.primary",
+  color: "primary",
   border: "1px solid",
   paddingY: "spacer1",
   paddingX: "spacer2",
   borderRadius: "5px",
   fontWeight: "bold",
   textDecoration: "none",
-  _visited: { color: "palette.primary" },
+  _visited: { color: "primary" },
   ":hover, :visited:hover": {
-    color: "palette.primary_darker",
+    color: "primary_darker",
     textDecoration: "none",
   },
   ".mobile &": {

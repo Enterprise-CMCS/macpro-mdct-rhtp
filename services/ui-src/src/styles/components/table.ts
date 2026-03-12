@@ -5,8 +5,8 @@ const baseStyles = {
     th: {
       padding: "0.5rem 0",
       borderBottom: "1px solid",
-      borderColor: "palette.gray_light",
-      color: "palette.gray",
+      borderColor: "gray_light",
+      color: "gray",
       fontWeight: "heading_sm_bold",
       textTransform: "none",
       letterSpacing: "normal",
@@ -14,13 +14,13 @@ const baseStyles = {
     },
     tr: {
       borderBottom: "1px solid",
-      borderColor: "palette.gray_light",
+      borderColor: "gray_light",
     },
     td: {
       paddingLeft: 0,
       borderTop: "1px solid",
       borderBottom: "1px solid",
-      borderColor: "palette.gray_light",
+      borderColor: "gray_light",
       textAlign: "left",
       "&:last-of-type": {
         paddingRight: 0,
@@ -88,18 +88,18 @@ const statusVariant = {
 const exportVariant = {
   table: {
     "th, td": {
-      borderColor: "palette.gray_lighter",
+      borderColor: "gray_lighter",
     },
     td: {
       fontSize: "heading_sm",
       width: "50%",
       "p:first-of-type": {
         fontWeight: "heading_sm_bold",
-        color: "palette.black",
+        color: "black",
       },
       "&:first-child": {
         "p:nth-child(2)": {
-          color: "palette.gray_medium",
+          color: "gray_medium",
         },
       },
       "vertical-align": "top",
@@ -121,11 +121,47 @@ const reportDetailsVariant = {
   },
 };
 
+const metricVariant = {
+  table: {
+    boxShadow: "0px 2px 8px 0px #0000001F",
+    th: {
+      background: "primary_darkest",
+      color: "white",
+      padding: "1rem 0.75rem",
+    },
+    tr: {
+      padding: "1rem",
+      border: "none",
+    },
+    "tr:nth-child(even)": {
+      background: "gray_lightest_highlight",
+    },
+    td: {
+      border: "none",
+      padding: "1rem 0.75rem",
+      "label, button": {
+        margin: "0",
+        display: "flex",
+        justifyContent: "center",
+      },
+      ".chakra-checkbox span": {
+        width: "32px",
+        height: "32px",
+        borderColor: "black",
+        svg: {
+          width: "1.4rem",
+        },
+      },
+    },
+  },
+};
+
 const variants = {
   striped: stripedVariant,
   status: statusVariant,
   export: exportVariant,
   reportDetails: reportDetailsVariant,
+  metric: metricVariant,
 };
 
 const sizes = {};

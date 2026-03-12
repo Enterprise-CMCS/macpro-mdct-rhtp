@@ -44,8 +44,7 @@ export const Table = ({ content, variant, children }: Props) => {
                   key={`${cell}${rowIndex}-body-cell`}
                   sx={{
                     tableCell: sx.tableCell,
-                    color:
-                      cell == notAnsweredText ? "palette.error_darker" : "",
+                    color: cell == notAnsweredText ? "error_darker" : "",
                   }}
                 >
                   {parseHtml(cell)}
@@ -95,7 +94,7 @@ const sx = {
   },
   tableHeader: {
     padding: "0.75rem 0.5rem",
-    borderColor: "palette.gray_lighter",
+    borderColor: "gray_lighter",
     ".mobile &": {
       fontSize: "heading_xs",
     },
@@ -109,6 +108,6 @@ const sx = {
     },
   },
   notAnswered: {
-    color: "palette.error_darker",
+    color: "error_darker",
   },
 };

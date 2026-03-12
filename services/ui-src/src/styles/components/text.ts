@@ -1,7 +1,7 @@
 import { ComponentStyleConfig } from "@chakra-ui/react";
 
 const baseStyles = {
-  color: "palette.base",
+  color: "base",
   transition: "all 0.3s ease",
   ".mobile &": {
     fontSize: "body_md",
@@ -14,15 +14,15 @@ const tableEmptyVariant = {
   textAlign: "center",
 };
 const helperTextVariant = {
-  color: "palette.gray_dark",
+  color: "gray_dark",
 };
 const errorVariant = {
-  color: "palette.error",
+  color: "error",
   fontSize: "body_xs",
   marginTop: "spacer_half",
 };
 const greyVariant = {
-  color: "palette.gray",
+  color: "gray",
   fontWeight: "body_sm",
   textTransform: "none",
   letterSpacing: "normal",

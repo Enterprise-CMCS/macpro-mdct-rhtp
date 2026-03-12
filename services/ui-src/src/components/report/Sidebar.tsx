@@ -142,7 +142,7 @@ const sx = {
     height: "100%",
   },
   sidebarList: {
-    background: "palette.gray_lightest",
+    background: "gray_lightest",
     width: "20.5rem",
     flexDir: "column",
   },

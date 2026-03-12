@@ -7,6 +7,7 @@ import {
   ReportBase,
 } from "../../../types/reports";
 import { exportToPDF } from "../elements";
+import { useOfFundsTableElement } from "./rhtpElements";
 
 // TODO build out list by state
 export enum Initiatives {
@@ -22,6 +23,8 @@ export const rhtpReportTemplate: ReportBase = {
       childPageIds: [
         "general-information",
         "initiatives",
+        "state-policy-commitments",
+        "use-of-funds",
         "sustainability-and-highlights",
         "review-submit",
       ],
@@ -55,12 +58,6 @@ export const rhtpReportTemplate: ReportBase = {
           helperText:
             "Enter an email address for the person or position above. Department or program-wide email addresses are allowed.",
         },
-        {
-          type: ElementType.AttachmentArea,
-          id: "upload-area",
-          label: "Supporting Evidence: Attachments",
-          required: false,
-        },
       ],
     },
     {
@@ -89,6 +86,107 @@ export const rhtpReportTemplate: ReportBase = {
           type: ElementType.InitiativesTable,
           id: "initiatives-table",
         },
+      ],
+    },
+    {
+      id: "state-policy-commitments",
+      title: "State Policy Commitments",
+      type: PageType.Standard,
+      sidebar: true,
+      elements: [
+        {
+          type: ElementType.Header,
+          id: "state-policy-commitments-header",
+          text: "State Policy Commitments",
+        },
+        {
+          type: ElementType.AccordionGroup,
+          id: "state-policy-commitments-group",
+          accordions: [
+            {
+              label: "B.2 Presidental Fitness Test",
+              children: [
+                {
+                  id: "test-comment",
+                  type: ElementType.Textbox,
+                  label: "Testing textbox",
+                  helperText: "This is the hint text",
+                  required: true,
+                },
+              ],
+            },
+            {
+              label: "B.3 SNAP Food Restriction Waiver Policy",
+              children: [
+                {
+                  type: ElementType.Dropdown,
+                  id: "curr-status",
+                  label: "Current Status",
+                  helperText: "This is the hint text",
+                  options: [
+                    { label: "Option 1", value: "op-1" },
+                    { label: "Option 2", value: "op-2" },
+                  ],
+                  required: true,
+                },
+                {
+                  type: ElementType.AttachmentArea,
+                  id: "upload-area",
+                  label: "Supporting Evidence: Attachments",
+                  required: false,
+                },
+                {
+                  id: "optional-comment",
+                  type: ElementType.TextAreaField,
+                  label: "Optional Comments/Notes",
+                  helperText: "This is the hint text",
+                  required: true,
+                },
+              ],
+            },
+            {
+              label: "B.4 Nutrition Continuing Medical Education",
+              children: [
+                {
+                  id: "optional-comment",
+                  type: ElementType.TextAreaField,
+                  label: "Optional Comments/Notes",
+                  helperText: "This is the hint text",
+                  required: true,
+                },
+              ],
+            },
+          ],
+          required: true,
+        },
+      ],
+    },
+    {
+      id: "use-of-funds",
+      title: "Use of Funds",
+      type: PageType.Standard,
+      sidebar: true,
+      elements: [
+        {
+          type: ElementType.Paragraph,
+          id: "use-of-funds-main-instructions",
+          text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+        },
+        {
+          type: ElementType.Accordion,
+          id: "use-of-funds-instructions",
+          label: "Instructions",
+          value:
+            "<b>Instructions for Completing this section</b>" +
+            "<p>Add the rest of instructions here.</p>",
+        },
+        {
+          type: ElementType.Paragraph,
+          id: "use-of-funds-table-text",
+          title: "Spent Funds",
+          text: `To add an use of funds, click the "Add use of funds" button below.`,
+        },
+        useOfFundsTableElement,
       ],
     },
     {

@@ -141,6 +141,12 @@ const elements: PageElement[] = [
     id: "",
   },
   {
+    type: ElementType.AccordionGroup,
+    id: "",
+    accordions: [],
+    required: false,
+  },
+  {
     type: ElementType.InitiativesTable,
     id: "",
   },
@@ -149,6 +155,28 @@ const elements: PageElement[] = [
     id: "",
     label: "Attachment area label",
     required: true,
+  },
+  {
+    type: ElementType.ListInput,
+    fieldLabel: "",
+    buttonText: "button",
+    id: "id",
+    label: "mock label",
+    required: false,
+  },
+  {
+    type: ElementType.TableCheckpoint,
+    id: "mockod",
+    label: "mock label",
+    stage: 0,
+    checkpoints: [
+      {
+        id: "mock id",
+        label: "label",
+        attachable: false,
+      },
+    ],
+    required: false,
   },
 ];
 

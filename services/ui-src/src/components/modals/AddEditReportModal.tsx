@@ -100,6 +100,7 @@ export const AddEditReportModal = ({
         actionButtonText: submitting ? <Spinner size="md" /> : "Save",
         closeButtonText: "Cancel",
       }}
+      disableConfirm={submitting}
     >
       <form id="addEditReportModal" onSubmit={onSubmit}>
         <Flex direction="column" gap="2rem">

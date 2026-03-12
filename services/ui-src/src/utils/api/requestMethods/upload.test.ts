@@ -49,7 +49,8 @@ describe("Test fileApi functions", () => {
     const result = await recordFileInDatabaseAndGetUploadUrl(
       "2025",
       "PA",
-      mockPng
+      mockPng,
+      "mock-id"
     );
     expect(result).toEqual({ presignedUploadUrl: "https://mock.url" });
   });
@@ -65,7 +66,7 @@ describe("Test fileApi functions", () => {
   });
   test("getUploadedFiles", async () => {
     (apiLib.get as Mock).mockReturnValue(mockData);
-    const result = await getUploadedFiles("2025", "PA");
+    const result = await getUploadedFiles("2025", "PA", "mock-id");
     expect(result).toBe(mockData);
   });
   test("deleteUploadedFile", async () => {
@@ -74,7 +75,6 @@ describe("Test fileApi functions", () => {
     expect(apiLib.del as Mock).toHaveBeenCalledWith(
       "/uploads/2025/PA/mock-id",
       {
-        body: {},
         headers: { "x-api-key": undefined },
       }
     );
