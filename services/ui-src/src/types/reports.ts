@@ -2,14 +2,12 @@
 export * from "@rhtp/shared";
 
 // Import types for local use (types only, not values)
-import type {
-  ParentPageTemplate,
-  FormPageTemplate,
-  ReviewSubmitTemplate,
+import {
+  type ParentPageTemplate,
+  type FormPageTemplate,
+  type ReviewSubmitTemplate,
+  PageType,
 } from "@rhtp/shared";
-
-// Import enum values that we need to use in our code
-import { PageType } from "@rhtp/shared";
 
 // Frontend-specific utilities and type guards
 export const getReportName = (type: string | undefined) => {

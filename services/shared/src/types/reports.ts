@@ -96,6 +96,7 @@ export interface ReportOptions {
   name: string;
   year: number;
   subType?: RhtpSubType;
+  copyFromReportId?: string;
 }
 
 export enum ReportStatus {
@@ -224,6 +225,7 @@ export enum ElementType {
   InitiativesTable = "initiativesTable",
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
+  UseOfFundsTable = "useOfFundsTable",
 }
 
 export type PageElement =
@@ -247,6 +249,7 @@ export type PageElement =
   | InitiativesTableTemplate
   | TableCheckpointTemplate
   | AccordionGroupTemplate
+  | UseOfFundsTableTemplate
   | AttachmentAreaTemplate;
 
 export type HideCondition = {
@@ -409,3 +412,26 @@ export interface AccordionGroupTemplate {
   required: boolean;
   answer?: boolean[];
 }
+
+export type UseOfFundsTableItem = {
+  id: string;
+  budgetPeriod: string;
+  spentFunds: string;
+  description: string;
+  initiative: string;
+  useOfFunds: string;
+  recipientName: string;
+  recipientCategory: string;
+};
+
+export type UseOfFundsTableTemplate = {
+  type: ElementType.UseOfFundsTable;
+  id: string;
+  dropDownOptions: {
+    budgetPeriodOptions: { label: string; value: string }[];
+    initiativeOptions: { label: string; value: string }[];
+    useOfFundsOptions: { label: string; value: string }[];
+    recipientCategoryOptions: { label: string; value: string }[];
+  };
+  answer?: UseOfFundsTableItem[];
+};
