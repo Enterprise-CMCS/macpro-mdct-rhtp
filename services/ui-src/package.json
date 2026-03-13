@@ -17,6 +17,7 @@
     "@cmsgov/design-system": "^13.0.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@rhtp/shared": "workspace:*",
     "aws-amplify": "^6.16.0",
     "core-js": "^3.41.0",
     "date-fns": "^4.1.0",

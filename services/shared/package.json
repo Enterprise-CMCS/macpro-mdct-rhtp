@@ -1,0 +1,24 @@
+{
+  "name": "@rhtp/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for MDCT-RHTP frontend and backend",
+  "license": "CC0-1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepare": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
