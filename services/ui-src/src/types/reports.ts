@@ -1,7 +1,5 @@
-// Re-export shared types from the shared package
 export * from "@rhtp/shared";
 
-// Import types for local use (types only, not values)
 import {
   type ParentPageTemplate,
   type FormPageTemplate,
@@ -9,7 +7,6 @@ import {
   PageType,
 } from "@rhtp/shared";
 
-// Frontend-specific utilities and type guards
 export const getReportName = (type: string | undefined) => {
   switch (type) {
     default:
