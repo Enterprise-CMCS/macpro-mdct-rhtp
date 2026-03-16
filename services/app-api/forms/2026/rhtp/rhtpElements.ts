@@ -244,8 +244,8 @@ export const metricTable: ActionTableTemplate = {
         type: ElementType.Dropdown,
         editOnly: true,
         children: [
-          { label: "Status", value: "Active" },
-          { label: "Status", value: "Abandon" },
+          { label: "Active", value: "Active" },
+          { label: "Abandon", value: "Abandon" },
         ],
       },
       { id: "metric", type: ElementType.TextAreaField },
@@ -259,7 +259,7 @@ export const metricTable: ActionTableTemplate = {
     { id: "metric", header: "Metric" },
     { id: "prevValue", header: "Previous Value", type: ElementType.Textbox },
     { id: "currValue", header: "Current Value", type: ElementType.Textbox },
-    { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },
+    { id: "date", header: "As of Date", type: ElementType.Date },
   ],
   answer: [
     {

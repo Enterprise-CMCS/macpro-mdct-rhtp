@@ -152,6 +152,9 @@ const metricVariant = {
           width: "1.4rem",
         },
       },
+      ".ds-c-label-mask": {
+        display: "none",
+      },
     },
   },
 };

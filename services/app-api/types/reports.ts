@@ -369,7 +369,8 @@ export interface AccordionGroupTemplate {
 }
 
 export type Row = { id: string; header: string; type?: ElementType };
-type MetricDataObject = {
+
+export type MetricDataObject = {
   no: number;
   status: string;
   metric: string;

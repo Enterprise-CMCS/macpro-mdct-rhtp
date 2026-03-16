@@ -388,7 +388,8 @@ export type UseOfFundsTableTemplate = {
 };
 
 export type Row = { id: string; header: string; type?: ElementType };
-type MetricDataObject = {
+
+export type MetricDataObject = {
   no: number;
   status: string;
   metric: string;
@@ -413,7 +414,14 @@ export interface ActionTableTemplate {
     }[];
   };
   rows: Row[];
-  answer?: MetricDataObject[];
+  answer?: {
+    no: number;
+    status: string;
+    metric: string;
+    prevValue: string;
+    currValue: string;
+    date: string;
+  }[];
 }
 
 /**

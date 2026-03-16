@@ -9,43 +9,27 @@ import {
   Tr,
   Text,
 } from "@chakra-ui/react";
-import { Label, TextField, SingleInputDateField } from "@cmsgov/design-system";
+import { Label } from "@cmsgov/design-system";
+import { Modal } from "components/modals/Modal";
 import { PageElementProps } from "components/report/Elements";
 import { useState } from "react";
-import { ActionTableTemplate, ElementType, Row } from "types";
+import { ActionTableTemplate, Row } from "types";
+import { buildElement } from "utils/state/reportLogic/tableBuilder";
 
-const buildElement = (defaultValue: string, element: ElementType) => {
-  switch (element) {
-    case ElementType.Textbox:
-      return (
-        <TextField
-          label=""
-          name="description"
-          onBlur={() => {}}
-          onChange={() => {}}
-          value={defaultValue}
-        />
-      );
-    case ElementType.Date:
-      return (
-        <SingleInputDateField
-          name=""
-          label=""
-          onChange={() => {}}
-          value={defaultValue}
-        />
-      );
-  }
-  return element;
-};
 //look into making it type generate and use the row id as consts
-const buildRows = (rows: Row[], answer: any[]) => {
+const buildRows = (
+  rows: Row[],
+  answer: any[],
+  onChange: (value: string, index: number, id: string) => void
+) => {
   const filledRows: any = [];
-  answer.forEach((item) => {
+  answer.forEach((item, rowIndex) => {
     const rowElement: any = [];
-    rows.map((row) => {
+    rows.map((row, _colIndex) => {
       const value = row.type
-        ? buildElement(item[row.id], row.type)
+        ? buildElement(item[row.id], row.type, (value) =>
+            onChange(value, rowIndex, row.id)
+          )
         : item[row.id];
       rowElement.push(<Td>{value}</Td>);
     });
@@ -61,11 +45,38 @@ const buildRows = (rows: Row[], answer: any[]) => {
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { label, hintText, modal, rows, answer } = props.element;
-  const [_isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalDefault, setModalDefault] = useState({
+    status: "",
+    metric: "",
+    prevValue: "",
+    currValue: "",
+    date: "",
+  });
 
-  console.log(modal);
+  const onChange = (value: string, index: number, id: string) => {
+    const newAnswer = [...(answer ?? [])];
+    const selected: any = newAnswer[index];
+    selected[id] = value;
+    props.updateElement({ answer: newAnswer });
+  };
 
-  const formattedRows = buildRows(rows, answer ?? []);
+  const formattedRows = buildRows(rows, answer ?? [], onChange);
+
+  const onModalChange = (value: string, id: string) => {
+    const newDefault: any = { ...modalDefault, [id]: value };
+    setModalDefault(newDefault);
+  };
+
+  const onModalSave = () => {
+    const newAnswer = [...(answer ?? [])];
+    newAnswer.push({ no: newAnswer.length, ...modalDefault });
+    props.updateElement({ answer: newAnswer });
+  };
+
+  const fieldLabel = (id: string) => {
+    return rows.find((row) => row.id == id)?.header ?? "";
+  };
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
@@ -94,6 +105,34 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           ))}
         </Tbody>
       </Table>
+      <Modal
+        data-testid="action-modal"
+        modalDisclosure={{
+          isOpen: isModalOpen,
+          onClose: () => {
+            setModalOpen(false);
+          },
+        }}
+        children={
+          <Flex flexDir="column" gap="1.5rem">
+            {modal.elements.map((element) =>
+              buildElement(
+                (modalDefault as any)[element.id],
+                element.type,
+                (value) => onModalChange(value, element.id),
+                fieldLabel(element.id),
+                element.children
+              )
+            )}
+          </Flex>
+        }
+        onConfirmHandler={onModalSave}
+        content={{
+          heading: `Add ${modal.title}`,
+          actionButtonText: "Save",
+          closeButtonText: "Close",
+        }}
+      ></Modal>
     </Flex>
   );
 };
