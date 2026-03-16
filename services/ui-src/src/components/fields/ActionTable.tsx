@@ -20,7 +20,8 @@ import { buildElement } from "utils/state/reportLogic/tableBuilder";
 const buildRows = (
   rows: Row[],
   answer: any[],
-  onChange: (value: string, index: number, id: string) => void
+  onChange: (value: string, index: number, id: string) => void,
+  onEdit: (index: number) => void
 ) => {
   const filledRows: any = [];
   answer.forEach((item, rowIndex) => {
@@ -35,7 +36,9 @@ const buildRows = (
     });
     rowElement.push(
       <Td>
-        <Button variant="link">Edit/Abandon</Button>
+        <Button variant="link" onClick={() => onEdit(rowIndex)}>
+          Edit/Abandon
+        </Button>
       </Td>
     );
     filledRows.push(rowElement);
@@ -46,13 +49,15 @@ const buildRows = (
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [modalDefault, setModalDefault] = useState({
+  const initial = {
     status: "",
     metric: "",
     prevValue: "",
     currValue: "",
     date: "",
-  });
+  };
+
+  const [modalDefault, setModalDefault] = useState(initial);
 
   const onChange = (value: string, index: number, id: string) => {
     const newAnswer = [...(answer ?? [])];
@@ -61,7 +66,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     props.updateElement({ answer: newAnswer });
   };
 
-  const formattedRows = buildRows(rows, answer ?? [], onChange);
+  const onModalEdit = (index: number) => {
+    if (answer) setModalDefault(answer[index]);
+    setModalOpen(true);
+  };
+
+  const formattedRows = buildRows(rows, answer ?? [], onChange, onModalEdit);
 
   const onModalChange = (value: string, id: string) => {
     const newDefault: any = { ...modalDefault, [id]: value };
@@ -111,6 +121,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           isOpen: isModalOpen,
           onClose: () => {
             setModalOpen(false);
+            setModalDefault(initial);
           },
         }}
         children={
