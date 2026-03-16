@@ -56,7 +56,15 @@ describe("InitiativesTable component", () => {
       })
     ).toBeVisible();
     expect(
+      screen.getByRole("button", {
+        name: "Edit name or status of Mock Initiative 1",
+      })
+    ).toBeVisible();
+    expect(
       screen.getByRole("link", { name: "Edit Mock Initiative 1" })
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Add initiative" })
     ).toBeVisible();
   });
 });
