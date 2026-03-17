@@ -16,7 +16,5 @@ export const installDeps = async () => {
 export const install = {
   command: "install",
   describe: "install all project dependencies",
-  handler: async () => {
-    await installDeps();
-  },
+  handler: async () => {},
 };
