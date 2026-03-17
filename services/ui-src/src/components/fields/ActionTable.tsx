@@ -16,6 +16,18 @@ import { useState } from "react";
 import { ActionTableTemplate, Row } from "types";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 
+enum ModalMode {
+  ADD = "add",
+  EDIT = "edit",
+  CLOSED = "closed",
+}
+
+type ModalObject = {
+  mode: ModalMode;
+  data: any;
+  index?: number;
+};
+
 //look into making it type generate and use the row id as consts
 const buildRows = (
   rows: Row[],
@@ -57,7 +69,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     date: "",
   };
 
-  const [modalDefault, setModalDefault] = useState(initial);
+  const [modalObject, setModalObject] = useState<ModalObject>({
+    mode: ModalMode.CLOSED,
+    data: initial,
+  });
 
   const onChange = (value: string, index: number, id: string) => {
     const newAnswer = [...(answer ?? [])];
@@ -67,21 +82,37 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   };
 
   const onModalEdit = (index: number) => {
-    if (answer) setModalDefault(answer[index]);
+    if (!answer) return;
+
+    setModalObject({
+      mode: ModalMode.EDIT,
+      data: answer[index],
+      index: index,
+    });
     setModalOpen(true);
   };
 
   const formattedRows = buildRows(rows, answer ?? [], onChange, onModalEdit);
 
   const onModalChange = (value: string, id: string) => {
-    const newDefault: any = { ...modalDefault, [id]: value };
-    setModalDefault(newDefault);
+    const newDefault: any = { ...modalObject.data, [id]: value };
+    setModalObject({ ...modalObject, data: newDefault });
   };
 
   const onModalSave = () => {
     const newAnswer = [...(answer ?? [])];
-    newAnswer.push({ no: newAnswer.length, ...modalDefault });
+
+    switch (modalObject.mode) {
+      case ModalMode.ADD:
+        newAnswer.push({ no: newAnswer.length, ...modalObject.data });
+        break;
+      case ModalMode.EDIT:
+        if (modalObject.index) newAnswer[modalObject.index] = modalObject.data;
+        break;
+    }
+
     props.updateElement({ answer: newAnswer });
+    setModalOpen(false);
   };
 
   const fieldLabel = (id: string) => {
@@ -93,10 +124,13 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
       <Label>{label}</Label>
       <Text>{hintText}</Text>
       <Button
-        aria-label="Upload attachments"
+        aria-label={`add ${label}`}
         variant="outline"
         alignSelf="flex-start"
-        onClick={() => setModalOpen(true)}
+        onClick={() => {
+          setModalOpen(true);
+          setModalObject({ mode: ModalMode.ADD, data: initial });
+        }}
       >
         Add {label.toLowerCase()}
       </Button>
@@ -121,14 +155,14 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           isOpen: isModalOpen,
           onClose: () => {
             setModalOpen(false);
-            setModalDefault(initial);
+            setModalObject({ mode: ModalMode.CLOSED, data: initial });
           },
         }}
         children={
           <Flex flexDir="column" gap="1.5rem">
             {modal.elements.map((element) =>
               buildElement(
-                (modalDefault as any)[element.id],
+                modalObject.data[element.id],
                 element.type,
                 (value) => onModalChange(value, element.id),
                 fieldLabel(element.id),
@@ -139,7 +173,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         }
         onConfirmHandler={onModalSave}
         content={{
-          heading: `Add ${modal.title}`,
+          heading:
+            modalObject.mode === ModalMode.EDIT
+              ? `Edit ${modal.title}`
+              : `Add ${modal.title}`,
           actionButtonText: "Save",
           closeButtonText: "Close",
         }}
