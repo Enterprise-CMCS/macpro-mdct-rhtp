@@ -23,6 +23,17 @@ export interface CreateReportOptions {
   copyFromReportId?: string;
 }
 
+export interface CreateInitiativeOptions {
+  initiativeName: string;
+  initiativeNumber: string;
+  initiativeAttestation: boolean;
+}
+
+export interface UpdateInitiativeOptions {
+  initiativeName: string;
+  initiativeAbandon: boolean;
+}
+
 export interface ReportOptions {
   name: string;
   year: number;
@@ -46,6 +57,7 @@ export enum AlertTypes {
 export enum PageStatus {
   NOT_STARTED = "Not started",
   IN_PROGRESS = "In progress",
+  ABANDONED = "Abandoned",
   COMPLETE = "Complete",
 }
 
@@ -72,7 +84,12 @@ export type ReportBase = {
   type: ReportType;
   subType?: RhtpSubType;
   year: number;
-  pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[];
+  pages: (
+    | ParentPageTemplate
+    | FormPageTemplate
+    | InitiativePageTemplate
+    | ReviewSubmitTemplate
+  )[];
 };
 
 export type ParentPageTemplate = {
@@ -95,6 +112,10 @@ export type FormPageTemplate = {
   hideNavButtons?: boolean;
   childPageIds?: PageId[];
 };
+
+export interface InitiativePageTemplate extends FormPageTemplate {
+  initiativeNumber: string;
+}
 
 export interface ReviewSubmitTemplate extends FormPageTemplate {
   submittedView: PageElement[];
