@@ -27,6 +27,7 @@ export interface ReportOptions {
   name: string;
   year: number;
   subType?: RhtpSubType;
+  copyFromReportId?: string;
 }
 
 export const getReportName = (type: string | undefined) => {

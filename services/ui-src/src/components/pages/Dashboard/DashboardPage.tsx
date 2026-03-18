@@ -231,7 +231,6 @@ export const DashboardPage = () => {
         {!isLoading && (
           <DashboardTable
             reports={filteredReports}
-            openAddEditReportModal={openAddEditReportModal}
             unlockModalOnOpenHandler={unlockModalOnOpenHandler}
           />
         )}
