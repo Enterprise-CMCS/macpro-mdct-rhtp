@@ -21,6 +21,7 @@ export const AddEditInitiativeModal = ({
   selectedInitiative,
 }: Props) => {
   const { report, updateReport } = useStore();
+  const [submitting, setSubmitting] = useState(false);
   const [formValues, setFormValues] = useState(initialValues);
   const [errorMessages, setErrorMessages] = useState(initialValues);
 
@@ -39,6 +40,7 @@ export const AddEditInitiativeModal = ({
 
   const onClose = () => {
     modalDisclosure.onClose();
+    setSubmitting(false);
     setFormValues(initialValues);
     setErrorMessages(initialValues);
   };
@@ -85,6 +87,7 @@ export const AddEditInitiativeModal = ({
     setErrorMessages(errors);
     if (hasError) return;
 
+    setSubmitting(true);
     const {
       initiativeName,
       initiativeNumber,
@@ -98,7 +101,7 @@ export const AddEditInitiativeModal = ({
         initiativeAttestation,
       };
       await createInitiative(report, newInitiative);
-    } else if (selectedInitiative.title !== initiativeName) {
+    } else if (selectedInitiative) {
       const updatedInitiative = {
         initiativeName,
         initiativeAbandon: initiativeAbandon === "No" ? false : true,
@@ -118,6 +121,7 @@ export const AddEditInitiativeModal = ({
         onClose,
       }}
       onConfirmHandler={onSubmit}
+      submitting={submitting}
       content={{
         heading: "Add Initiative",
         actionButtonText: "Save",
