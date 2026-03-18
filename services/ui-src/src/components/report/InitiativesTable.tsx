@@ -1,4 +1,4 @@
-import { InitiativesTableTemplate } from "types";
+import { InitiativePageTemplate, InitiativesTableTemplate } from "types";
 import { PageElementProps } from "./Elements";
 import { useStore } from "utils";
 import {
@@ -16,7 +16,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { AddEditInitiativeModal } from "components/modals/AddEditInitiativeModal";
 
@@ -27,9 +27,14 @@ export const InitiativesTable = (
   const { reportType, state, reportId } = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedInitiative, setSelectedInitiative] = useState<any>(undefined);
+  const [initiatives, setInitiatives] = useState<any[]>([]);
 
-  const initiatives =
-    report?.pages.filter((page) => !page.sidebar && page.id !== "root") || [];
+  useEffect(() => {
+    const initiatives = (report?.pages.filter(
+      (page) => "initiativeNumber" in page
+    ) || []) as InitiativePageTemplate[];
+    setInitiatives(initiatives);
+  }, [report]);
 
   const editInitiative = (initiative: object) => {
     setSelectedInitiative(initiative);
@@ -42,31 +47,36 @@ export const InitiativesTable = (
   };
 
   // Build Rows
-  const rows = initiatives.map((initiative, index) => (
-    <Tr key={index}>
-      <Td>
-        <Text fontWeight="bold">{initiative.title}</Text>
-        <Text>Status: Not started</Text>
-      </Td>
-      <Td>
-        <Button
-          variant="link"
-          onClick={() => editInitiative(initiative)}
-          aria-label={`Edit name or status of ${initiative.title}`}
-        >
-          Edit name/status
-        </Button>
-        <Button
-          as={Link}
-          variant="outline"
-          href={`/report/${reportType}/${state}/${reportId}/${initiative.id}`}
-          aria-label={`Edit ${initiative.title}`}
-        >
-          Edit
-        </Button>
-      </Td>
-    </Tr>
-  ));
+  const rows = initiatives.map(
+    (initiative: InitiativePageTemplate, index: number) => {
+      const displayName = `${initiative.initiativeNumber}: ${initiative.title}`;
+      return (
+        <Tr key={index}>
+          <Td>
+            <Text fontWeight="bold">{displayName}</Text>
+            <Text>{`Status: ${initiative.status || "Not started"}`}</Text>
+          </Td>
+          <Td>
+            <Button
+              variant="link"
+              onClick={() => editInitiative(initiative)}
+              aria-label={`Edit name or status of ${displayName}`}
+            >
+              Edit name/status
+            </Button>
+            <Button
+              as={Link}
+              variant="outline"
+              href={`/report/${reportType}/${state}/${reportId}/${initiative.id}`}
+              aria-label={`Edit ${displayName}`}
+            >
+              Edit
+            </Button>
+          </Td>
+        </Tr>
+      );
+    }
+  );
 
   return (
     <Stack gap="1.5rem" width="100%">

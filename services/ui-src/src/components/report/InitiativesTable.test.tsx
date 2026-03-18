@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { InitiativesTable } from "./InitiativesTable";
 import { ElementType, InitiativesTableTemplate } from "types";
 import { useStore } from "utils";
+import userEvent from "@testing-library/user-event";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
@@ -34,13 +35,14 @@ describe("InitiativesTable component", () => {
   });
 
   test("renders with initiatives", () => {
-    mockedUseStore.mockReturnValueOnce({
+    mockedUseStore.mockReturnValue({
       report: {
         pages: [
           {
             sidebar: false,
             id: "mock-initiative-1",
-            title: "Mock Initiative 1",
+            title: "Mock Initiative",
+            initiativeNumber: "123",
           },
         ],
       },
@@ -52,19 +54,45 @@ describe("InitiativesTable component", () => {
     expect(screen.getByRole("columnheader", { name: "Actions" })).toBeVisible();
     expect(
       screen.getByRole("cell", {
-        name: "Mock Initiative 1 Status: Not started",
+        name: "123: Mock Initiative Status: Not started",
       })
     ).toBeVisible();
     expect(
       screen.getByRole("button", {
-        name: "Edit name or status of Mock Initiative 1",
+        name: "Edit name or status of 123: Mock Initiative",
       })
     ).toBeVisible();
     expect(
-      screen.getByRole("link", { name: "Edit Mock Initiative 1" })
+      screen.getByRole("link", { name: "Edit 123: Mock Initiative" })
     ).toBeVisible();
     expect(
       screen.getByRole("button", { name: "Add initiative" })
     ).toBeVisible();
+  });
+
+  test("can click to edit initiative", async () => {
+    mockedUseStore.mockReturnValue({
+      report: {
+        pages: [
+          {
+            sidebar: false,
+            id: "mock-initiative-1",
+            title: "Mock Initiative",
+            initiativeNumber: "123",
+          },
+        ],
+      },
+    });
+    render(<InitiativesTable element={mockTemplate} />);
+    const editInitiativeNameButton = screen.getByRole("button", {
+      name: "Edit name or status of 123: Mock Initiative",
+    });
+    expect(editInitiativeNameButton).toBeVisible();
+    await userEvent.click(editInitiativeNameButton);
+    expect(
+      screen.getByRole("textbox", { name: "Initiative Name" })
+    ).toHaveValue("Mock Initiative");
+    const closeButton = screen.getByRole("button", { name: "Cancel" });
+    await userEvent.click(closeButton);
   });
 });

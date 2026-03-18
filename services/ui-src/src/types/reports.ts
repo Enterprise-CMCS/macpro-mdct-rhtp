@@ -45,6 +45,7 @@ export enum ReportStatus {
 export enum PageStatus {
   NOT_STARTED = "Not started",
   IN_PROGRESS = "In progress",
+  ABANDONED = "Abandoned",
   COMPLETE = "Complete",
 }
 
@@ -83,6 +84,7 @@ export type LiteReport = Omit<Report, "pages">;
 export type PageTemplate =
   | ParentPageTemplate
   | FormPageTemplate
+  | InitiativePageTemplate
   | ReviewSubmitTemplate;
 
 export type ParentPageTemplate = {
@@ -111,6 +113,10 @@ export type FormPageTemplate = {
   hideNavButtons?: boolean;
   childPageIds?: PageId[];
 };
+
+export interface InitiativePageTemplate extends FormPageTemplate {
+  initiativeNumber: string;
+}
 
 export interface ReviewSubmitTemplate extends FormPageTemplate {
   submittedView: PageElement[];

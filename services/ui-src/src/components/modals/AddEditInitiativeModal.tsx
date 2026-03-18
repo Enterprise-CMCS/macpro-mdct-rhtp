@@ -3,6 +3,11 @@ import { Flex } from "@chakra-ui/react";
 import { ChoiceList, TextField } from "@cmsgov/design-system";
 import { Modal } from "./Modal";
 import { ErrorMessages } from "../../constants";
+import {
+  createInitiative,
+  updateInitiative,
+} from "utils/api/requestMethods/initiatives";
+import { getReport, useStore } from "utils";
 
 const initialValues = {
   initiativeName: "",
@@ -15,6 +20,7 @@ export const AddEditInitiativeModal = ({
   modalDisclosure,
   selectedInitiative,
 }: Props) => {
+  const { report, updateReport } = useStore();
   const [formValues, setFormValues] = useState(initialValues);
   const [errorMessages, setErrorMessages] = useState(initialValues);
 
@@ -31,6 +37,19 @@ export const AddEditInitiativeModal = ({
     }
   }, [selectedInitiative]);
 
+  const onClose = () => {
+    modalDisclosure.onClose();
+    setFormValues(initialValues);
+    setErrorMessages(initialValues);
+  };
+
+  const validateField = (value: string | boolean) => {
+    if (!value) {
+      return ErrorMessages.requiredResponse;
+    }
+    return "";
+  };
+
   const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = evt.target;
     const newValue =
@@ -45,20 +64,59 @@ export const AddEditInitiativeModal = ({
 
     setErrorMessages((prev) => ({
       ...prev,
-      [name]: !newValue ? ErrorMessages.requiredResponse : "",
+      [name]: validateField(newValue),
     }));
   };
 
-  // TODO
-  const onSubmit = () => {
-    modalDisclosure.onClose();
-    setFormValues(initialValues);
-    setErrorMessages(initialValues);
+  const onSubmit = async () => {
+    if (!report) return;
+    const errors: any = structuredClone(initialValues);
+    let hasError = false;
+    for (const [key, value] of Object.entries(formValues)) {
+      if (!selectedInitiative && key === "initiativeAbandon") continue;
+      if (
+        selectedInitiative &&
+        (key === "initiativeNumber" || key === "initiativeAttestation")
+      )
+        continue;
+      errors[key] = validateField(value);
+      if (errors[key] !== "") hasError = true;
+    }
+    setErrorMessages(errors);
+    if (hasError) return;
+
+    const {
+      initiativeName,
+      initiativeNumber,
+      initiativeAttestation,
+      initiativeAbandon,
+    } = formValues;
+    if (initiativeAttestation) {
+      const newInitiative = {
+        initiativeName,
+        initiativeNumber,
+        initiativeAttestation,
+      };
+      await createInitiative(report, newInitiative);
+    } else if (selectedInitiative.title !== initiativeName) {
+      const updatedInitiative = {
+        initiativeName,
+        initiativeAbandon: initiativeAbandon === "No" ? false : true,
+      };
+      await updateInitiative(report, updatedInitiative, selectedInitiative.id);
+    }
+
+    const newReport = await getReport(report.type, report.state, report.id);
+    updateReport(newReport);
+    onClose();
   };
 
   return (
     <Modal
-      modalDisclosure={modalDisclosure}
+      modalDisclosure={{
+        isOpen: modalDisclosure.isOpen,
+        onClose,
+      }}
       onConfirmHandler={onSubmit}
       content={{
         heading: "Add Initiative",
@@ -96,7 +154,6 @@ export const AddEditInitiativeModal = ({
               onChange={handleChange}
               errorMessage={errorMessages.initiativeNumber}
               value={formValues.initiativeNumber}
-              numeric={true}
             />
             <TextField
               label="Initiative Name"
