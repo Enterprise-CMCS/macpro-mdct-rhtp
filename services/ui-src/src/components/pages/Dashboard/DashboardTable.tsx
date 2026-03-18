@@ -18,7 +18,6 @@ import {
   formatMonthDayYear,
   releaseReport,
   reportBasePath,
-  updateArchivedStatus,
   useStore,
 } from "utils";
 
@@ -41,10 +40,7 @@ interface TableProps extends Omit<
   showAdminControlsColumn: boolean | undefined;
   navigate: NavigateFunction;
   userIsEndUser: boolean | undefined;
-  toggleArchived: (rowIndex: number) => void;
   toggleRelease: (rowIndex: number) => void;
-  /** Used to store the archive index of the table row */
-  archiving: number | undefined;
   /** Used to store the unlock index of the table row */
   unlocking: number | undefined;
 }
@@ -96,7 +92,6 @@ export const HorizontalTable = (props: TableProps) => {
             <Button
               onClick={() => props.navigate(reportBasePath(report))}
               variant="outline"
-              disabled={report.archived}
               aria-label={
                 report.status !== ReportStatus.SUBMITTED
                   ? `Edit ${report.name} report`
@@ -117,7 +112,6 @@ export const HorizontalTable = (props: TableProps) => {
                   onClick={async () => await props.toggleRelease(idx)}
                   disabled={
                     report.status !== ReportStatus.SUBMITTED ||
-                    report.archived ||
                     props.unlocking === idx
                   }
                 >
@@ -125,19 +119,6 @@ export const HorizontalTable = (props: TableProps) => {
                     <Spinner size="sm" marginRight="spacer_half" />
                   )}
                   Unlock
-                </Button>
-              </td>
-              <td>
-                <Button
-                  variant="link"
-                  fontSize="body_sm"
-                  onClick={async () => await props.toggleArchived(idx)}
-                  disabled={props.archiving === idx}
-                >
-                  {props.archiving === idx && (
-                    <Spinner size="sm" marginRight="spacer_half" />
-                  )}
-                  {report.archived ? "Unarchive" : "Archive"}
                 </Button>
               </td>
             </>
@@ -198,7 +179,6 @@ export const VerticalTable = (props: TableProps) => {
               width="100px"
               height="30px"
               fontSize="body_sm"
-              disabled={report.archived}
               aria-label={
                 report.status !== ReportStatus.SUBMITTED
                   ? "Edit " + report.name + " report"
@@ -217,7 +197,6 @@ export const VerticalTable = (props: TableProps) => {
                     onClick={async () => await props.toggleRelease(idx)}
                     disabled={
                       report.status !== ReportStatus.SUBMITTED ||
-                      report.archived ||
                       props.unlocking === idx
                     }
                   >
@@ -225,18 +204,6 @@ export const VerticalTable = (props: TableProps) => {
                       <Spinner size="sm" marginRight="spacer_half" />
                     )}
                     Unlock
-                  </Button>
-                </td>
-                <td>
-                  <Button
-                    variant="link"
-                    onClick={async () => await props.toggleArchived(idx)}
-                    disabled={props.archiving === idx}
-                  >
-                    {props.archiving === idx && (
-                      <Spinner size="sm" marginRight="spacer_half" />
-                    )}
-                    {report.archived ? "Unarchive" : "Archive"}
                   </Button>
                 </td>
               </>
@@ -257,8 +224,6 @@ export const DashboardTable = ({
   const navigate = useNavigate();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const [reportsInView, setReportsInView] = useState<LiteReport[]>(reports);
-
-  const [archiving, setArchiving] = useState<number>();
   const [unlocking, setUnlocking] = useState<number>();
 
   // Translate role to defined behaviors
@@ -282,17 +247,6 @@ export const DashboardTable = ({
   const tableContent = {
     caption: "Rural Health Transformation Program Reports",
     headRow: headers,
-  };
-
-  const toggleArchived = async (idx: number) => {
-    setArchiving(idx);
-    const reports = [...reportsInView];
-    const report = reports[idx];
-    await updateArchivedStatus(report, !report.archived);
-    report.archived = !report.archived;
-    reports[idx] = report;
-    setReportsInView(reports);
-    setArchiving(undefined);
   };
 
   const toggleRelease = async (idx: number) => {
@@ -319,9 +273,7 @@ export const DashboardTable = ({
           openAddEditReportModal,
           navigate,
           userIsEndUser,
-          toggleArchived,
           toggleRelease,
-          archiving,
           unlocking,
         })}
       </Hide>
@@ -335,9 +287,7 @@ export const DashboardTable = ({
           openAddEditReportModal,
           navigate,
           userIsEndUser,
-          toggleArchived,
           toggleRelease,
-          archiving,
           unlocking,
         })}
       </Show>

@@ -34,10 +34,6 @@ export const canWriteBanner = (user: User) => {
   return user.role == UserRoles.ADMIN;
 };
 
-export const canArchiveReport = (user: User) => {
-  return [UserRoles.ADMIN, UserRoles.APPROVER].includes(user.role);
-};
-
 export const canReleaseReport = (user: User) => {
   return [UserRoles.ADMIN, UserRoles.APPROVER].includes(user.role);
 };
