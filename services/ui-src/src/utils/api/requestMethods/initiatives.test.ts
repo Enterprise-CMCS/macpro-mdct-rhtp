@@ -32,12 +32,12 @@ describe("initiatives api", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  test("createReport", async () => {
+  test("createInitiative", async () => {
     await createInitiative(report, mockInitiativeCreate);
     expect(mockPost).toHaveBeenCalledTimes(1);
   });
 
-  test("putReport", async () => {
+  test("updateInitiative", async () => {
     await updateInitiative(report, mockInitiativeUpdate, "12345");
     expect(mockPut).toHaveBeenCalledTimes(1);
   });

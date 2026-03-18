@@ -55,7 +55,7 @@ export const parseInitiativeUpdateParameters = (
     return undefined;
   }
   if (!initiativeId) {
-    logger.warn("Missing initiative name in path");
+    logger.warn("Missing initiative ID in path");
     return undefined;
   }
 
