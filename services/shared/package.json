@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Shared types and utilities for MDCT-RHTP frontend and backend",
   "license": "CC0-1.0",
-  "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
