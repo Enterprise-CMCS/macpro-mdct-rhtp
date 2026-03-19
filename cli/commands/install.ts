@@ -2,7 +2,6 @@
 import { runCommand } from "../lib/runner.ts";
 
 export const installDeps = async () => {
-  // With Yarn workspaces, we only need to install from the root
   const commandPieces = ["yarn", "install"];
   if (process.env.CI === "true") {
     commandPieces.push("--immutable");
