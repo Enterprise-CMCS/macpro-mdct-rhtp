@@ -1,7 +1,7 @@
 import { Mock } from "vitest";
 import { createInitiative } from "./create";
 import { StatusCodes } from "../../../libs/response-lib";
-import { canWriteState } from "../../../utils/authorization";
+import { canWriteInitiatives } from "../../../utils/authorization";
 import { authenticatedUser } from "../../../utils/authentication";
 import { validReport } from "../../../utils/tests/mockReport";
 import { ReportStatus } from "../../../types/reports";
@@ -17,7 +17,7 @@ vi.mocked(authenticatedUser).mockReturnValue({
 } as User);
 
 vi.mock("../../../utils/authorization", () => ({
-  canWriteState: vi.fn().mockReturnValue(true),
+  canWriteInitiatives: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock(
@@ -45,7 +45,6 @@ const testEvent = {
   body: JSON.stringify({
     initiativeName: "Mock Initiative Name",
     initiativeNumber: "123",
-    initiativeAttestation: true,
   }),
 };
 
@@ -64,7 +63,7 @@ describe("Test create initiative handler", () => {
   });
 
   test("should return 403 if user is not authorized", async () => {
-    (canWriteState as Mock).mockReturnValueOnce(false);
+    (canWriteInitiatives as Mock).mockReturnValueOnce(false);
     const response = await createInitiative(testEvent);
     expect(response.statusCode).toBe(StatusCodes.Forbidden);
   });

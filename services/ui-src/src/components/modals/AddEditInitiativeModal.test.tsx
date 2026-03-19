@@ -8,6 +8,7 @@ import {
   updateInitiative,
 } from "utils/api/requestMethods/initiatives";
 import { mockReportStore } from "utils/testing/setupTest";
+import { InitiativePageTemplate } from "types";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
@@ -44,9 +45,6 @@ describe("AddEditInitiativeModal component", () => {
       expect(
         screen.getByRole("textbox", { name: "Initiative Name" })
       ).toBeInTheDocument();
-      expect(
-        screen.getByRole("group", { name: "Attestation" })
-      ).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
       const closeButton = screen.getByRole("button", { name: "Cancel" });
       expect(closeButton).toBeInTheDocument();
@@ -73,13 +71,9 @@ describe("AddEditInitiativeModal component", () => {
       const initiativeNameInput = screen.getByRole("textbox", {
         name: "Initiative Name",
       });
-      const initiativeAttestationInput = screen.getByRole("checkbox", {
-        name: "I have been granted approval to add a new initiative",
-      });
 
       await userEvent.type(initiativeNumberInput, "123");
       await userEvent.type(initiativeNameInput, "New Initiative");
-      await userEvent.click(initiativeAttestationInput);
 
       const saveButton = screen.getByRole("button", { name: "Save" });
       await userEvent.click(saveButton);
@@ -89,7 +83,6 @@ describe("AddEditInitiativeModal component", () => {
         {
           initiativeName: "New Initiative",
           initiativeNumber: "123",
-          initiativeAttestation: true,
         }
       );
     });
@@ -103,20 +96,20 @@ describe("AddEditInitiativeModal component", () => {
             isOpen: true,
             onClose: vi.fn(),
           }}
-          selectedInitiative={{
-            id: "mock-initiative-1",
-            title: "Mock initiative",
-          }}
+          selectedInitiative={
+            {
+              id: "mock-initiative-1",
+              title: "Mock initiative",
+              initiativeNumber: "123",
+            } as InitiativePageTemplate
+          }
         />
       );
     });
 
     test("renders edit form for edit initiative", () => {
       expect(
-        screen.getByRole("heading", { name: "Add Initiative" })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("textbox", { name: "Initiative Name" })
+        screen.getByRole("heading", { name: "Edit 123: Mock initiative" })
       ).toBeInTheDocument();
       expect(
         screen.getByRole("radiogroup", { name: "Abandon initiative?" })
@@ -138,12 +131,8 @@ describe("AddEditInitiativeModal component", () => {
     });
 
     test("can successfully fill out and submit edit initiative form", async () => {
-      const initiativeNameInput = screen.getByRole("textbox", {
-        name: "Initiative Name",
-      });
       const initiativeAbandonInput = screen.getByRole("radio", { name: "Yes" });
 
-      await userEvent.type(initiativeNameInput, " for State");
       await userEvent.click(initiativeAbandonInput);
 
       const saveButton = screen.getByRole("button", { name: "Save" });
@@ -152,7 +141,6 @@ describe("AddEditInitiativeModal component", () => {
       expect(mockUpdateInitiative).toHaveBeenCalledWith(
         mockReportStore.report,
         {
-          initiativeName: "Mock initiative for State",
           initiativeAbandon: true,
         },
         "mock-initiative-1"

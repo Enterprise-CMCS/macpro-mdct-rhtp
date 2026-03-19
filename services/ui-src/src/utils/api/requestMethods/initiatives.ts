@@ -5,11 +5,9 @@ import { Report } from "types";
 interface CreateInitiativeData {
   initiativeName: string;
   initiativeNumber: string;
-  initiativeAttestation: boolean;
 }
 
 interface UpdateInitiativeData {
-  initiativeName: string;
   initiativeAbandon: boolean;
 }
 

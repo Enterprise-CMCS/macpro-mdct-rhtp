@@ -20,11 +20,9 @@ vi.mock("../apiLib", () => ({
 const mockInitiativeCreate = {
   initiativeName: "Mock Initiative Name",
   initiativeNumber: "12345",
-  initiativeAttestation: true,
 };
 
 const mockInitiativeUpdate = {
-  initiativeName: "Mock Initiative Name Change",
   initiativeAbandon: false,
 };
 

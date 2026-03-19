@@ -1,10 +1,7 @@
 import { FormPageTemplate, PageStatus, PageType } from "../../../types/reports";
 import { Initiatives } from "../../constants";
 import { validReport } from "../../tests/mockReport";
-import {
-  buildInitiativePages,
-  updateInitiativeNameAndStatus,
-} from "./initiatives";
+import { buildInitiativePages, updateInitiativeStatus } from "./initiatives";
 
 describe("initiative utilities", () => {
   beforeEach(() => {
@@ -21,34 +18,33 @@ describe("initiative utilities", () => {
     });
   });
 
-  describe("updateInitiativeNameAndStatus utility", () => {
-    test("test updates initiative name and status within report", () => {
+  describe("updateInitiativeStatus utility", () => {
+    test("test abandons initiative", () => {
       const mockBaseReport = {
         ...validReport,
         pages: [
           ...validReport.pages,
           {
-            id: "mock-old-initiative-name-123",
-            title: "Mock Old Initiative Name",
+            id: "mock-initiative-name-123",
+            title: "Mock Initiative Name",
             type: PageType.Standard,
           } as FormPageTemplate,
         ],
       };
       const mockBody = {
-        initiativeName: "Mock New Initiative Name",
         initiativeAbandon: true,
       };
-      updateInitiativeNameAndStatus(
+      updateInitiativeStatus(
         mockBaseReport,
         mockBody,
-        "mock-old-initiative-name-123"
+        "mock-initiative-name-123"
       );
       expect(mockBaseReport).toEqual(
         expect.objectContaining({
           pages: expect.arrayContaining([
             expect.objectContaining({
-              id: "mock-old-initiative-name-123",
-              title: "Mock New Initiative Name",
+              id: "mock-initiative-name-123",
+              title: "Mock Initiative Name",
               status: PageStatus.ABANDONED,
             }),
           ]),

@@ -9,9 +9,9 @@ import {
 } from "../../../libs/response-lib";
 import { getReport, putReport } from "../../../storage/reports";
 import { ReportStatus } from "../../../types/reports";
-import { canWriteState } from "../../../utils/authorization";
+import { canWriteInitiatives } from "../../../utils/authorization";
 import { error } from "../../../utils/constants";
-import { updateInitiativeNameAndStatus } from "../../../utils/reports/initiatives/initiatives";
+import { updateInitiativeStatus } from "../../../utils/reports/initiatives/initiatives";
 import {
   isUpdateInitiativeBody,
   validateReportPayload,
@@ -23,7 +23,7 @@ export const updateInitiative = handler(
     const { reportType, state, id, initiativeId } = request.parameters;
     const { user, body } = request;
 
-    if (!canWriteState(user, state)) {
+    if (!canWriteInitiatives(user)) {
       return forbidden(error.UNAUTHORIZED);
     }
 
@@ -42,7 +42,7 @@ export const updateInitiative = handler(
     }
 
     // handle updating initiative
-    updateInitiativeNameAndStatus(report, body, initiativeId);
+    updateInitiativeStatus(report, body, initiativeId);
 
     // validate new report
     try {

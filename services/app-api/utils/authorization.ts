@@ -30,6 +30,10 @@ export const canWriteState = (user: User, state: StateAbbr) => {
   return false;
 };
 
+export const canWriteInitiatives = (user: User) => {
+  return [UserRoles.ADMIN, UserRoles.APPROVER].includes(user.role);
+};
+
 export const canWriteBanner = (user: User) => {
   return user.role == UserRoles.ADMIN;
 };

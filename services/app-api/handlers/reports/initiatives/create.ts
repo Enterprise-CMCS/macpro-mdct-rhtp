@@ -9,7 +9,7 @@ import {
 } from "../../../libs/response-lib";
 import { getReport, putReport } from "../../../storage/reports";
 import { ReportStatus } from "../../../types/reports";
-import { canWriteState } from "../../../utils/authorization";
+import { canWriteInitiatives } from "../../../utils/authorization";
 import { error } from "../../../utils/constants";
 import { buildInitiativePages } from "../../../utils/reports/initiatives/initiatives";
 import {
@@ -23,7 +23,7 @@ export const createInitiative = handler(
     const { reportType, state, id } = request.parameters;
     const { user, body } = request;
 
-    if (!canWriteState(user, state)) {
+    if (!canWriteInitiatives(user)) {
       return forbidden(error.UNAUTHORIZED);
     }
 

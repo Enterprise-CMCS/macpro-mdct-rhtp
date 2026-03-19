@@ -443,9 +443,6 @@ export const isCreateInitiativeBody = (
     .shape({
       initiativeName: string().required(),
       initiativeNumber: string().required(),
-      initiativeAttestation: boolean()
-        .required()
-        .test("is-true", (value) => value === true),
     })
     .required()
     .noUnknown();
@@ -461,7 +458,6 @@ export const isUpdateInitiativeBody = (
 ): obj is UpdateInitiativeOptions => {
   const updateInitiativeSchema = object()
     .shape({
-      initiativeName: string().required(),
       initiativeAbandon: boolean().required(),
     })
     .required()

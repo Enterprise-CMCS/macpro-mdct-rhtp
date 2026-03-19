@@ -1,10 +1,15 @@
 import { Mock } from "vitest";
 import { updateInitiative } from "./update";
 import { StatusCodes } from "../../../libs/response-lib";
-import { canWriteState } from "../../../utils/authorization";
+import { canWriteInitiatives } from "../../../utils/authorization";
 import { authenticatedUser } from "../../../utils/authentication";
 import { validReport } from "../../../utils/tests/mockReport";
-import { FormPageTemplate, ReportStatus } from "../../../types/reports";
+import {
+  FormPageTemplate,
+  PageStatus,
+  PageType,
+  ReportStatus,
+} from "../../../types/reports";
 import { APIGatewayProxyEvent, User, UserRoles } from "../../../types/types";
 import { getReport, putReport } from "../../../storage/reports";
 
@@ -16,7 +21,7 @@ vi.mocked(authenticatedUser).mockReturnValue({
 } as User);
 
 vi.mock("../../../utils/authorization", () => ({
-  canWriteState: vi.fn().mockReturnValue(true),
+  canWriteInitiatives: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock("../../../storage/reports");
@@ -34,12 +39,11 @@ const testEvent = {
     reportType: "RHTP",
     state: "PA",
     id: "RHTPPA123",
-    initiativeId: "mock-old-initiative-name-123",
+    initiativeId: "mock-initiative-name-123",
   },
   headers: { "cognito-identity-id": "test" },
   body: JSON.stringify({
-    initiativeName: "Mock New Initiative Name",
-    initiativeAbandon: false,
+    initiativeAbandon: true,
   }),
 };
 
@@ -58,7 +62,7 @@ describe("Test update initiative handler", () => {
   });
 
   test("should return 403 if user is not authorized", async () => {
-    (canWriteState as Mock).mockReturnValueOnce(false);
+    (canWriteInitiatives as Mock).mockReturnValueOnce(false);
     const response = await updateInitiative(testEvent);
     expect(response.statusCode).toBe(StatusCodes.Forbidden);
   });
@@ -104,8 +108,9 @@ describe("Test update initiative handler", () => {
       pages: [
         ...validReport.pages,
         {
-          id: "mock-old-initiative-name-123",
-          title: "Mock Old Initiative Name",
+          id: "mock-initiative-name-123",
+          title: "Mock Initiative Name",
+          type: PageType.Standard,
         } as FormPageTemplate,
       ],
     });
@@ -116,8 +121,9 @@ describe("Test update initiative handler", () => {
       expect.objectContaining({
         pages: expect.arrayContaining([
           expect.objectContaining({
-            id: "mock-old-initiative-name-123",
-            title: "Mock New Initiative Name",
+            id: "mock-initiative-name-123",
+            title: "Mock Initiative Name",
+            status: PageStatus.ABANDONED,
           }),
         ]),
       })

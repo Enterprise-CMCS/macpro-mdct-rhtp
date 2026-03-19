@@ -26,11 +26,9 @@ export interface CreateReportOptions {
 export interface CreateInitiativeOptions {
   initiativeName: string;
   initiativeNumber: string;
-  initiativeAttestation: boolean;
 }
 
 export interface UpdateInitiativeOptions {
-  initiativeName: string;
   initiativeAbandon: boolean;
 }
 

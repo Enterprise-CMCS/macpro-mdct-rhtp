@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import { ChoiceList, TextField } from "@cmsgov/design-system";
 import { Modal } from "./Modal";
@@ -8,12 +8,12 @@ import {
   updateInitiative,
 } from "utils/api/requestMethods/initiatives";
 import { getReport, useStore } from "utils";
+import { InitiativePageTemplate } from "types";
 
 const initialValues = {
   initiativeName: "",
   initiativeNumber: "",
   initiativeAbandon: "",
-  initiativeAttestation: false,
 };
 
 export const AddEditInitiativeModal = ({
@@ -25,19 +25,6 @@ export const AddEditInitiativeModal = ({
   const [formValues, setFormValues] = useState(initialValues);
   const [errorMessages, setErrorMessages] = useState(initialValues);
 
-  useEffect(() => {
-    if (selectedInitiative) {
-      setFormValues({
-        initiativeName: selectedInitiative.title,
-        initiativeAbandon: "",
-        initiativeNumber: "",
-        initiativeAttestation: false,
-      });
-    } else {
-      setFormValues(initialValues);
-    }
-  }, [selectedInitiative]);
-
   const onClose = () => {
     modalDisclosure.onClose();
     setSubmitting(false);
@@ -45,7 +32,7 @@ export const AddEditInitiativeModal = ({
     setErrorMessages(initialValues);
   };
 
-  const validateField = (value: string | boolean) => {
+  const validateField = (value: string) => {
     if (!value) {
       return ErrorMessages.requiredResponse;
     }
@@ -54,19 +41,15 @@ export const AddEditInitiativeModal = ({
 
   const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = evt.target;
-    const newValue =
-      name === "initiativeAttestation"
-        ? !formValues.initiativeAttestation
-        : value;
 
     setFormValues((prev) => ({
       ...prev,
-      [name]: newValue,
+      [name]: value,
     }));
 
     setErrorMessages((prev) => ({
       ...prev,
-      [name]: validateField(newValue),
+      [name]: validateField(value),
     }));
   };
 
@@ -78,7 +61,7 @@ export const AddEditInitiativeModal = ({
       if (!selectedInitiative && key === "initiativeAbandon") continue;
       if (
         selectedInitiative &&
-        (key === "initiativeNumber" || key === "initiativeAttestation")
+        (key === "initiativeNumber" || key === "initiativeName")
       )
         continue;
       errors[key] = validateField(value);
@@ -88,22 +71,15 @@ export const AddEditInitiativeModal = ({
     if (hasError) return;
 
     setSubmitting(true);
-    const {
-      initiativeName,
-      initiativeNumber,
-      initiativeAttestation,
-      initiativeAbandon,
-    } = formValues;
-    if (initiativeAttestation) {
+    const { initiativeName, initiativeNumber, initiativeAbandon } = formValues;
+    if (initiativeName && initiativeNumber) {
       const newInitiative = {
         initiativeName,
         initiativeNumber,
-        initiativeAttestation,
       };
       await createInitiative(report, newInitiative);
     } else if (selectedInitiative) {
       const updatedInitiative = {
-        initiativeName,
         initiativeAbandon: initiativeAbandon === "No" ? false : true,
       };
       await updateInitiative(report, updatedInitiative, selectedInitiative.id);
@@ -112,6 +88,15 @@ export const AddEditInitiativeModal = ({
     const newReport = await getReport(report.type, report.state, report.id);
     updateReport(newReport);
     onClose();
+  };
+
+  const getHeaderText = () => {
+    if (selectedInitiative) {
+      const { initiativeNumber, title } = selectedInitiative;
+      return `Edit ${initiativeNumber}: ${title}`;
+    } else {
+      return "Add Initiative";
+    }
   };
 
   return (
@@ -123,7 +108,7 @@ export const AddEditInitiativeModal = ({
       onConfirmHandler={onSubmit}
       submitting={submitting}
       content={{
-        heading: "Add Initiative",
+        heading: getHeaderText(),
         actionButtonText: "Save",
         closeButtonText: "Cancel",
       }}
@@ -131,13 +116,6 @@ export const AddEditInitiativeModal = ({
       <Flex direction="column" gap="2rem">
         {selectedInitiative ? (
           <>
-            <TextField
-              label="Initiative Name"
-              name="initiativeName"
-              onChange={handleChange}
-              errorMessage={errorMessages.initiativeName}
-              value={formValues.initiativeName}
-            />
             <ChoiceList
               label="Abandon initiative?"
               name="initiativeAbandon"
@@ -166,20 +144,6 @@ export const AddEditInitiativeModal = ({
               errorMessage={errorMessages.initiativeName}
               value={formValues.initiativeName}
             />
-            <ChoiceList
-              label="Attestation"
-              name="initiativeAttestation"
-              type="checkbox"
-              onChange={handleChange}
-              errorMessage={errorMessages.initiativeAttestation}
-              choices={[
-                {
-                  label: "I have been granted approval to add a new initiative",
-                  value: "",
-                  checked: formValues.initiativeAttestation,
-                },
-              ]}
-            />
           </>
         )}
       </Flex>
@@ -192,5 +156,5 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
-  selectedInitiative: any;
+  selectedInitiative: InitiativePageTemplate | undefined;
 }

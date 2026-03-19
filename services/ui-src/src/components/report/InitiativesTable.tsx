@@ -1,4 +1,8 @@
-import { InitiativePageTemplate, InitiativesTableTemplate } from "types";
+import {
+  InitiativePageTemplate,
+  InitiativesTableTemplate,
+  PageStatus,
+} from "types";
 import { PageElementProps } from "./Elements";
 import { useStore } from "utils";
 import {
@@ -24,9 +28,12 @@ export const InitiativesTable = (
   _props: PageElementProps<InitiativesTableTemplate>
 ) => {
   const { report } = useStore();
+  const { userIsAdmin } = useStore().user ?? {};
   const { reportType, state, reportId } = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedInitiative, setSelectedInitiative] = useState<any>(undefined);
+  const [selectedInitiative, setSelectedInitiative] = useState<
+    InitiativePageTemplate | undefined
+  >(undefined);
   const [initiatives, setInitiatives] = useState<any[]>([]);
 
   useEffect(() => {
@@ -36,7 +43,7 @@ export const InitiativesTable = (
     setInitiatives(initiatives);
   }, [report]);
 
-  const editInitiative = (initiative: object) => {
+  const editInitiative = (initiative: InitiativePageTemplate) => {
     setSelectedInitiative(initiative);
     onOpen();
   };
@@ -57,13 +64,15 @@ export const InitiativesTable = (
             <Text>{`Status: ${initiative.status || "Not started"}`}</Text>
           </Td>
           <Td>
-            <Button
-              variant="link"
-              onClick={() => editInitiative(initiative)}
-              aria-label={`Edit name or status of ${displayName}`}
-            >
-              Edit name/status
-            </Button>
+            {userIsAdmin && initiative.status !== PageStatus.ABANDONED && (
+              <Button
+                variant="link"
+                onClick={() => editInitiative(initiative)}
+                aria-label={`Edit status of ${displayName}`}
+              >
+                Edit status
+              </Button>
+            )}
             <Button
               as={Link}
               variant="outline"
@@ -92,14 +101,16 @@ export const InitiativesTable = (
         </Thead>
         <Tbody>{rows}</Tbody>
       </Table>
-      <Button
-        width="fit-content"
-        onClick={onOpen}
-        variant="outline"
-        leftIcon={<Image src={addIconPrimary} />}
-      >
-        Add initiative
-      </Button>
+      {userIsAdmin && (
+        <Button
+          width="fit-content"
+          onClick={onOpen}
+          variant="outline"
+          leftIcon={<Image src={addIconPrimary} />}
+        >
+          Add initiative
+        </Button>
+      )}
       <AddEditInitiativeModal
         modalDisclosure={{
           isOpen,

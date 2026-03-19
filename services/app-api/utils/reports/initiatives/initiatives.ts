@@ -40,22 +40,18 @@ export const buildInitiativePages = (
   }
 };
 
-export const updateInitiativeNameAndStatus = (
+export const updateInitiativeStatus = (
   report: Report,
   body: UpdateInitiativeOptions,
   initiativeId: string
 ) => {
-  const { initiativeName, initiativeAbandon } = body;
+  const { initiativeAbandon } = body;
   const initiativeIndex = report.pages.findIndex(
     (page) => page.id === initiativeId
   );
-  if (initiativeIndex !== -1) {
-    report.pages[initiativeIndex].title = initiativeName;
-  }
-  if (
-    initiativeAbandon &&
-    report.pages[initiativeIndex].type === PageType.Standard
-  ) {
+  if (report.pages[initiativeIndex].type !== PageType.Standard) return;
+
+  if (initiativeAbandon) {
     report.pages[initiativeIndex].status = PageStatus.ABANDONED;
   }
 };
