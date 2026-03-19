@@ -107,7 +107,6 @@ export const local = {
         ],
         "."
       ),
-      runCommand("Shared package watch", ["yarn", "watch"], "services/shared"),
       runFrontendLocally("localstack"),
     ]);
   },
