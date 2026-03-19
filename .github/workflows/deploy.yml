@@ -32,7 +32,6 @@ jobs:
           echo "branch_name=${BRANCH_NAME}" >> $GITHUB_ENV
           ./.github/branchNameValidation.ts $BRANCH_NAME
           ./run install
-          cd services/shared && yarn build
         env:
           PROJECT: ${{ vars.APP_NAME_LOWER }}
       - name: Configure AWS credentials for GitHub Actions
