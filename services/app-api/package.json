@@ -8,9 +8,9 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "~3.985.0",
-    "@aws-sdk/lib-dynamodb": "~3.985.0",
-    "@aws-sdk/s3-request-presigner": "~3.985.0",
+    "@aws-sdk/client-dynamodb": "~3.994.0",
+    "@aws-sdk/lib-dynamodb": "~3.994.0",
+    "@aws-sdk/s3-request-presigner": "~3.994.0",
     "@rhtp/shared": "workspace:*",
     "dompurify": "^3.3.2",
     "jsdom": "^26.0.0",
