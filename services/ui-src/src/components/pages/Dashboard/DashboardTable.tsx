@@ -256,7 +256,6 @@ export const DashboardTable = ({
 }: DashboardTableProps) => {
   const navigate = useNavigate();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
-  const [reportsInView, setReportsInView] = useState<LiteReport[]>(reports);
 
   const [archiving, setArchiving] = useState<number>();
   const [unlocking, setUnlocking] = useState<number>();
@@ -286,24 +285,20 @@ export const DashboardTable = ({
 
   const toggleArchived = async (idx: number) => {
     setArchiving(idx);
-    const reports = [...reportsInView];
     const report = reports[idx];
     await updateArchivedStatus(report, !report.archived);
     report.archived = !report.archived;
     reports[idx] = report;
-    setReportsInView(reports);
     setArchiving(undefined);
   };
 
   const toggleRelease = async (idx: number) => {
     setUnlocking(idx);
-    const reports = [...reportsInView];
     const report = reports[idx];
     await releaseReport(report);
     unlockModalOnOpenHandler();
     report.status = ReportStatus.IN_PROGRESS;
     reports[idx] = report;
-    setReportsInView(reports);
     setUnlocking(undefined);
   };
 
