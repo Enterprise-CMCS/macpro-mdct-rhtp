@@ -20,7 +20,9 @@
     "cli",
     "services/shared",
     "services/app-api",
-    "services/ui-src"
+    "services/ui-src",
+    "services/ui-auth",
+    "services/topics"
   ],
   "type": "module",
   "main": "index.js",
