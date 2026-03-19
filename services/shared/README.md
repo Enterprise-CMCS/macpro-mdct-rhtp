@@ -23,25 +23,15 @@ or import from the previous locations of the types files, as we are exporting th
 
 ## Development
 
+Everything should work when you run:
+
 ```bash
 ./run local
 ```
 
-is running this under the hood to build and watch the types package:
-
-```bash
-yarn watch
-```
-
 ## Troubleshooting
 
-Make sure you've run `yarn install` and built the shared package:
-
-```bash
-yarn install
-cd services/shared
-yarn build
-```
+Make sure you've run `yarn install` at the root of the project:
 
 In Vs Code Command Pallette run:
 `>TypeScript: Restart TS Server`
