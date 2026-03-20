@@ -159,12 +159,34 @@ const metricVariant = {
   },
 };
 
+const initiativeVariant = {
+  table: {
+    th: {
+      "&:last-of-type": {
+        textAlign: "right",
+      },
+    },
+    td: {
+      "&:last-of-type": {
+        textAlign: "right",
+      },
+      ".chakra-link": {
+        width: "5rem",
+      },
+      ".chakra-button": {
+        padding: "0 1rem",
+      },
+    },
+  },
+};
+
 const variants = {
   striped: stripedVariant,
   status: statusVariant,
   export: exportVariant,
   reportDetails: reportDetailsVariant,
   metric: metricVariant,
+  initiative: initiativeVariant,
 };
 
 const sizes = {};

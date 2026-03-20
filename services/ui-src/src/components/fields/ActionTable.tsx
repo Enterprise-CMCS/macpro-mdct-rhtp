@@ -13,7 +13,7 @@ import { Label } from "@cmsgov/design-system";
 import { Modal } from "components/modals/Modal";
 import { PageElementProps } from "components/report/Elements";
 import { useState } from "react";
-import { ActionTableTemplate, Row } from "types";
+import { ActionTableTemplate, ActionRowElement } from "types";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 
 enum ModalMode {
@@ -30,7 +30,7 @@ type ModalObject = {
 
 //look into making it type generate and use the row id as consts
 const buildRows = (
-  rows: Row[],
+  rows: ActionRowElement[],
   answer: any[],
   onChange: (value: string, index: number, id: string) => void,
   onEdit: (index: number) => void

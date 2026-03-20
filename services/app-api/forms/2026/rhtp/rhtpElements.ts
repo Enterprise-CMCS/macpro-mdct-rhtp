@@ -262,21 +262,21 @@ export const metricTable: ActionTableTemplate = {
     { id: "date", header: "As of Date", type: ElementType.Date },
   ],
   answer: [
-    {
-      no: 1,
-      status: "Active",
-      metric: "Rural provider retention rate",
-      prevValue: "",
-      currValue: "",
-      date: "",
-    },
-    {
-      no: 2,
-      status: "Active",
-      metric: "Percent of rural facilities utilizing RPM",
-      prevValue: "",
-      currValue: "",
-      date: "",
-    },
+    [
+      { id: "no", value: 1 },
+      { id: "status", value: "Active" },
+      { id: "metric", value: "Rural provider retention rate" },
+      { id: "prevValue", value: "" },
+      { id: "currValue", value: "" },
+      { id: "date", value: "" },
+    ],
+    [
+      { id: "no", value: 1 },
+      { id: "status", value: "Active" },
+      { id: "metric", value: "Percent of rural facilities utilizing RPM" },
+      { id: "prevValue", value: "" },
+      { id: "currValue", value: "" },
+      { id: "date", value: "" },
+    ],
   ],
 };

@@ -24,7 +24,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock', 'plugins/**') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('yarn.lock', 'plugins/**') }}
       - name: path + branch settings + install packages
         run: |
           echo "PATH=$(pwd)/node_modules/.bin/:$PATH" >> $GITHUB_ENV
