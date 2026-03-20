@@ -8,9 +8,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.985.0",
-    "@aws-sdk/lib-dynamodb": "^3.985.0",
-    "@aws-sdk/s3-request-presigner": "^3.985.0",
+    "@aws-sdk/client-dynamodb": "~3.1012.0",
+    "@aws-sdk/lib-dynamodb": "~3.1012.0",
+    "@aws-sdk/s3-request-presigner": "~3.1012.0",
+    "@rhtp/shared": "workspace:*",
     "dompurify": "^3.3.2",
     "jsdom": "^26.0.0",
     "jwt-decode": "3.1.2",
@@ -23,7 +24,7 @@
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock": "~4.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
