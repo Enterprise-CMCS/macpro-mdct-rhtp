@@ -39,26 +39,19 @@ const reports = [
     name: "report 3",
     submissionCount: 1,
     status: ReportStatus.IN_PROGRESS,
+    copyFromReportId: "xyz",
   },
 ] as Report[];
 
 const dashboardTableComponent = (
   <RouterWrappedComponent>
-    <DashboardTable
-      reports={reports}
-      openAddEditReportModal={vi.fn()}
-      unlockModalOnOpenHandler={vi.fn()}
-    />
+    <DashboardTable reports={reports} unlockModalOnOpenHandler={vi.fn()} />
   </RouterWrappedComponent>
 );
 
 const adminDashboardTableComponent = (
   <RouterWrappedComponent>
-    <DashboardTable
-      reports={reports}
-      openAddEditReportModal={vi.fn()}
-      unlockModalOnOpenHandler={vi.fn()}
-    />
+    <DashboardTable reports={reports} unlockModalOnOpenHandler={vi.fn()} />
   </RouterWrappedComponent>
 );
 
@@ -66,10 +59,8 @@ describe("Dashboard table with state user", () => {
   beforeEach(() => vi.clearAllMocks());
   test("should render report name and edit button in table", async () => {
     render(dashboardTableComponent);
-    expect(screen.getByText("report 1")).toBeInTheDocument();
-    expect(screen.getAllByLabelText("Edit report 1 report name").length).toBe(
-      1
-    );
+    expect(screen.getByText("report 1")).toBeVisible();
+    expect(screen.getByText("Copied from previous report")).toBeVisible();
   });
 });
 
@@ -79,12 +70,9 @@ describe("Dashboard table with admin user", () => {
     mockedUseStore.mockReturnValue(mockUseAdminStore);
   });
 
-  test("should not render the proper controls when admin", async () => {
+  test("should render the proper controls when admin", async () => {
     render(adminDashboardTableComponent);
-    expect(screen.getByText("report 1")).toBeInTheDocument();
-    expect(
-      screen.queryByLabelText("Edit report 1 report name")
-    ).not.toBeInTheDocument();
+    expect(screen.getByText("report 1")).toBeVisible();
     expect(screen.getAllByText("View").length).toBe(3);
     expect(screen.getAllByText("Unlock").length).toBe(3);
   });
@@ -99,6 +87,6 @@ describe("Dashboard table with admin user", () => {
   test("should render In revision text for a returned report", async () => {
     render(adminDashboardTableComponent);
     // Setup data includes In Progress with Submission Count >= 1
-    expect(screen.getByText("In revision")).toBeInTheDocument();
+    expect(screen.getByText("In revision")).toBeVisible();
   });
 });
