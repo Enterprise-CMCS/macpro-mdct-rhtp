@@ -81,10 +81,7 @@ export const DashboardPage = () => {
   const reloadReports = (reportType: string, state: string) => {
     (async () => {
       setIsLoading(true);
-      let result = await getReportsForState(reportType, state);
-      if (!userIsAdmin) {
-        result = result.filter((report: LiteReport) => !report.archived);
-      }
+      const result = await getReportsForState(reportType, state);
       setReports(result);
       setIsLoading(false);
     })();
@@ -154,10 +151,6 @@ export const DashboardPage = () => {
                     started and submitted once have a count of 1. When a state
                     or territory resubmits a previous submission, the count
                     increases by 1.
-                  </li>
-                  <li>
-                    To archive a submission and hide it from a state or
-                    territory’s dashboard, use “Archive”.
                   </li>
                 </ul>
               </Box>

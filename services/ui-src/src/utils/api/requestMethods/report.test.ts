@@ -5,8 +5,6 @@ import {
   putReport,
   releaseReport,
   postSubmitReport,
-  updateArchivedStatus,
-  updateReport,
 } from "./report";
 // types
 import { FormPageTemplate, Report, ReportType } from "types";
@@ -58,18 +56,8 @@ describe("utils/report", () => {
     expect(mockPost).toHaveBeenCalledTimes(1);
   });
 
-  test("updateArchivedStatus", async () => {
-    await updateArchivedStatus(report, true);
-    expect(mockPut).toHaveBeenCalledTimes(1);
-  });
-
   test("releaseReport", async () => {
     await releaseReport(report);
-    expect(mockPut).toHaveBeenCalledTimes(1);
-  });
-
-  test("updateReport", async () => {
-    await updateReport(report);
     expect(mockPut).toHaveBeenCalledTimes(1);
   });
 });
