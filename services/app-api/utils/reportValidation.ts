@@ -71,6 +71,7 @@ const listInputTemplateSchema = object().shape({
   buttonText: string().required(),
   answer: array().of(string()).notRequired(),
   required: boolean().required(),
+  validation: string().notRequired(),
 });
 
 const numberFieldTemplateSchema = object().shape({
