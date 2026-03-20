@@ -3,18 +3,24 @@ import {
   buildElement,
   getErrorMessage,
 } from "utils/state/reportLogic/tableBuilder";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import { ActionAnswerShape, ActionModalElement, ActionRowElement } from "types";
 
-export const ActionModal = ({ rows, modal, edit, modalDisclosure }: Props) => {
-  const initial = rows.map((row) => ({ id: row.id, value: "" }));
+export const ActionModal = ({
+  rows,
+  modal,
+  form,
+  modalDisclosure,
+  onSave,
+}: Props) => {
   const [errorMessages, setErrorMessages] = useState<string[]>(
     modal.elements.map(() => "")
   );
-  const data = edit ?? initial;
-
-  console.log(data);
+  const [formData, setFormData] = useState<ActionAnswerShape>(form.data);
+  useEffect(() => {
+    setFormData(form.data);
+  }, [form.data]);
 
   /* general functions */
   const fieldLabel = (id: string) => {
@@ -22,11 +28,10 @@ export const ActionModal = ({ rows, modal, edit, modalDisclosure }: Props) => {
   };
 
   const onModalChange = (value: string, id: string, index: number) => {
-    const newData = [...data];
+    const newData = [...formData];
     const columnIndex = newData.findIndex((item) => item.id === id);
-    if (columnIndex === -1) return;
-
     newData[columnIndex].value = value;
+    setFormData(newData);
 
     const element = modal.elements[index];
     const newErrorMessages = [...errorMessages];
@@ -40,15 +45,7 @@ export const ActionModal = ({ rows, modal, edit, modalDisclosure }: Props) => {
   };
 
   const onModalSave = () => {
-    // const newAnswer = [...(answer ?? [])];
-    // switch (modalObject.mode) {
-    //   case ModalMode.ADD:
-    //     newAnswer.push();
-    //     break;
-    //   case ModalMode.EDIT:
-    //     if (modalObject.index) newAnswer[modalObject.index] = modalObject.data;
-    //     break;
-    // }
+    onSave(formData);
     onModalClose();
   };
 
@@ -64,7 +61,7 @@ export const ActionModal = ({ rows, modal, edit, modalDisclosure }: Props) => {
           {modal.elements.map((element, index) =>
             buildElement(
               element,
-              data.find((data) => data.id === element.id)?.value!,
+              formData.find((data) => data.id === element.id)?.value!,
               (value) => onModalChange(value, element.id, index),
               fieldLabel(element.id),
               errorMessages[index]
@@ -74,7 +71,10 @@ export const ActionModal = ({ rows, modal, edit, modalDisclosure }: Props) => {
       }
       onConfirmHandler={onModalSave}
       content={{
-        heading: edit ? `Edit ${modal.title}` : `Add ${modal.title}`,
+        heading:
+          form.index !== undefined
+            ? `Edit ${modal.title}`
+            : `Add ${modal.title}`,
         actionButtonText: "Save",
         closeButtonText: "Close",
       }}
@@ -89,7 +89,8 @@ interface Props {
     hintText?: string;
     elements: ActionModalElement[];
   };
-  edit: ActionAnswerShape | undefined;
+  form: { data: ActionAnswerShape; index: number | undefined };
+  onSave: (data: ActionAnswerShape) => void;
   modalDisclosure: {
     isOpen: boolean;
     onClose: () => void;

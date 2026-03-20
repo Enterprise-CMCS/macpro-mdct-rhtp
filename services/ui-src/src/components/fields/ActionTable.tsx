@@ -58,7 +58,11 @@ const buildRows = (
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [modalEditValue, setModalEditValue] = useState<ActionAnswerShape>();
+  const initial = rows.map((row) => ({ id: row.id, value: "" }));
+  const [modalData, setModalData] = useState<{
+    data: ActionAnswerShape;
+    index: number | undefined;
+  }>({ data: initial, index: undefined });
 
   const onChange = (value: string, index: number, id: string) => {
     const newAnswer = [...(answer ?? [])];
@@ -70,11 +74,21 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   /* Modal functions */
   const onModalEdit = (index: number) => {
     if (!answer) return;
-    setModalEditValue(answer[index]);
+    setModalData({ data: answer[index], index });
     setModalOpen(true);
   };
 
   const formattedRows = buildRows(rows, answer ?? [], onChange, onModalEdit);
+
+  const onSave = (data: ActionAnswerShape) => {
+    if (modalData.index === undefined) {
+      props.updateElement({ answer: [...(answer ?? []), data] });
+    } else {
+      const newAnswer = [...answer!];
+      newAnswer[modalData.index] = data;
+      props.updateElement({ answer: newAnswer });
+    }
+  };
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
@@ -86,6 +100,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         alignSelf="flex-start"
         onClick={() => {
           setModalOpen(true);
+          setModalData({ data: initial, index: undefined });
         }}
       >
         Add {label.toLowerCase()}
@@ -108,12 +123,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
       <ActionModal
         rows={rows}
         modal={modal}
-        edit={modalEditValue}
+        form={modalData}
+        onSave={onSave}
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: () => {
             setModalOpen(false);
-            setModalEditValue(undefined);
           },
         }}
       ></ActionModal>
