@@ -31,6 +31,9 @@ const buildRows = (
   const formattedRows: JSX.Element[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: JSX.Element[] = [];
+    const status = answerRow.find((row) => row.id === "status");
+    console.log("status", status);
+
     rows.map((row) => {
       const element = answerRow.find((item) => item.id === row.id);
 
@@ -53,6 +56,23 @@ const buildRows = (
   });
 
   return formattedRows;
+};
+
+/** Handles unique column ids like no for # column */
+const formatUniqueKeys = (
+  data: ActionAnswerShape,
+  answer: ActionAnswerShape[]
+) => {
+  //if there's a no column, auto generate the next row number in the table
+  if (data.some((column) => column.id === "no")) {
+    const foundIndex = data.findIndex((column) => column.id === "no");
+    data[foundIndex] = {
+      id: "no",
+      value: (answer.length + 1).toString(),
+    };
+  }
+
+  return data;
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
@@ -82,6 +102,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   const onSave = (data: ActionAnswerShape) => {
     if (modalData.index === undefined) {
+      //special case code for certain column headers
+      data = formatUniqueKeys(data, answer ?? []);
       props.updateElement({ answer: [...(answer ?? []), data] });
     } else {
       const newAnswer = [...answer!];
