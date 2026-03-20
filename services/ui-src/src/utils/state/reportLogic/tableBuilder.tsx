@@ -9,8 +9,8 @@ import { ActionElement, ElementType } from "types";
 import { validateDate } from "utils/validation/inputValidation";
 
 export const buildElement = (
-  defaultValue: string | number,
   element: ActionElement,
+  defaultValue: string | number,
   onChange: (value: string) => void,
   label?: string,
   errorMessage?: string
@@ -30,6 +30,7 @@ export const buildElement = (
           options={children as DropdownOption[]}
           value={defaultValue}
           errorMessage={errorMessage}
+          disabled={element.disabled}
         />
       );
     case ElementType.Textbox:
@@ -45,6 +46,7 @@ export const buildElement = (
           }}
           value={defaultValue}
           errorMessage={errorMessage}
+          disabled={element.disabled}
         />
       );
     case ElementType.TextAreaField:
@@ -62,6 +64,7 @@ export const buildElement = (
           errorMessage={errorMessage}
           multiline
           rows={3}
+          disabled={element.disabled}
         />
       );
     case ElementType.Date:
@@ -74,10 +77,11 @@ export const buildElement = (
           }}
           value={defaultValue as string}
           errorMessage={errorMessage}
+          disabled={element.disabled}
         />
       );
     default:
-      console.log("missing: " + element);
+      console.error("missing: " + element);
   }
   return <></>;
 };

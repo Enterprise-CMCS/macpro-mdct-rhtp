@@ -31,14 +31,14 @@ const buildRows = (
   const formattedRows: JSX.Element[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: JSX.Element[] = [];
-    rows.map((row, rowIndex) => {
+    rows.map((row) => {
       const element = answerRow.find((item) => item.id === row.id);
 
       const value =
         row.type === ElementType.Paragraph
           ? element?.value
-          : buildElement(element?.value!, row, (value) =>
-              onChange(value, rowIndex, row.id)
+          : buildElement(row, element?.value!, (value) =>
+              onChange(value, answerRowIndex, row.id)
             );
       rowElement.push(<Td>{value}</Td>);
     });
@@ -62,8 +62,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   const onChange = (value: string, index: number, id: string) => {
     const newAnswer = [...(answer ?? [])];
-    const selected: any = newAnswer[index];
-    selected[id] = value;
+    var rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
+    newAnswer[index][rowIndex].value = value;
     props.updateElement({ answer: newAnswer });
   };
 

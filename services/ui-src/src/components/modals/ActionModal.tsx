@@ -63,8 +63,8 @@ export const ActionModal = ({ rows, modal, edit, modalDisclosure }: Props) => {
         <Flex flexDir="column" gap="1.5rem">
           {modal.elements.map((element, index) =>
             buildElement(
-              data.find((data) => data.id === element.id)?.value!,
               element,
+              data.find((data) => data.id === element.id)?.value!,
               (value) => onModalChange(value, element.id, index),
               fieldLabel(element.id),
               errorMessages[index]
