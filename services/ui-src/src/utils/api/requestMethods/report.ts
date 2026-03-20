@@ -41,19 +41,6 @@ export async function putReport(report: Report) {
   );
 }
 
-export async function updateReport(report: Partial<Report>) {
-  const requestHeaders = await getRequestHeaders();
-  const options = {
-    headers: { ...requestHeaders },
-    body: { ...report },
-  };
-
-  return await apiLib.put(
-    `/reports/update/${report.type}/${report.state}/${report.id}`,
-    options
-  );
-}
-
 export async function postSubmitReport(report: Report) {
   const requestHeaders = await getRequestHeaders();
   const options = {
@@ -62,22 +49,6 @@ export async function postSubmitReport(report: Report) {
   };
   return await apiLib.post<Report>(
     `/reports/submit/${report.type}/${report.state}/${report.id}`,
-    options
-  );
-}
-
-export async function updateArchivedStatus(
-  report: LiteReport,
-  archiveStatus: boolean
-) {
-  const requestHeaders = await getRequestHeaders();
-  const options = {
-    headers: { ...requestHeaders },
-    body: { archived: archiveStatus },
-  };
-
-  return await apiLib.put(
-    `/reports/${report.type}/${report.state}/${report.id}/archive`,
     options
   );
 }
