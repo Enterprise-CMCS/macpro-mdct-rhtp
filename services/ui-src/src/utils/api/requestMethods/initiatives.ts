@@ -1,17 +1,12 @@
 import { apiLib } from "utils";
 import { getRequestHeaders } from "./getRequestHeaders";
-import { Report } from "types";
+import {
+  CreateInitiativeOptions,
+  Report,
+  UpdateInitiativeOptions,
+} from "types";
 
-interface CreateInitiativeData {
-  initiativeName: string;
-  initiativeNumber: string;
-}
-
-interface UpdateInitiativeData {
-  initiativeAbandon: boolean;
-}
-
-async function createInitiative(report: Report, data: CreateInitiativeData) {
+async function createInitiative(report: Report, data: CreateInitiativeOptions) {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
@@ -26,7 +21,7 @@ async function createInitiative(report: Report, data: CreateInitiativeData) {
 
 async function updateInitiative(
   report: Report,
-  data: UpdateInitiativeData,
+  data: UpdateInitiativeOptions,
   initiativeId: string
 ) {
   const requestHeaders = await getRequestHeaders();

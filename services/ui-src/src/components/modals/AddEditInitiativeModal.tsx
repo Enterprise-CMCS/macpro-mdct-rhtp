@@ -8,7 +8,11 @@ import {
   updateInitiative,
 } from "utils/api/requestMethods/initiatives";
 import { getReport, useStore } from "utils";
-import { InitiativePageTemplate } from "types";
+import {
+  CreateInitiativeOptions,
+  InitiativePageTemplate,
+  UpdateInitiativeOptions,
+} from "types";
 
 const initialValues = {
   initiativeName: "",
@@ -73,13 +77,13 @@ export const AddEditInitiativeModal = ({
     setSubmitting(true);
     const { initiativeName, initiativeNumber, initiativeAbandon } = formValues;
     if (initiativeName && initiativeNumber) {
-      const newInitiative = {
+      const newInitiative: CreateInitiativeOptions = {
         initiativeName,
         initiativeNumber,
       };
       await createInitiative(report, newInitiative);
     } else if (selectedInitiative) {
-      const updatedInitiative = {
+      const updatedInitiative: UpdateInitiativeOptions = {
         initiativeAbandon: initiativeAbandon === "No" ? false : true,
       };
       await updateInitiative(report, updatedInitiative, selectedInitiative.id);
