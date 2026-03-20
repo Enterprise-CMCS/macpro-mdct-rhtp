@@ -2,17 +2,23 @@ import {
   TextField,
   SingleInputDateField,
   Dropdown,
+  DropdownOption,
 } from "@cmsgov/design-system";
-import { ElementType } from "types";
+import { ErrorMessages } from "../../../constants";
+import { ActionElement, ElementType } from "types";
+import { validateDate } from "utils/validation/inputValidation";
 
 export const buildElement = (
-  defaultValue: string,
-  element: ElementType,
+  defaultValue: string | number,
+  element: ActionElement,
   onChange: (value: string) => void,
   label?: string,
-  children?: any
+  errorMessage?: string
 ) => {
-  switch (element) {
+  const { type } = element;
+  const children = "children" in element ? element.children : [];
+
+  switch (type) {
     case ElementType.Dropdown:
       return (
         <Dropdown
@@ -21,8 +27,9 @@ export const buildElement = (
           onChange={(event) => {
             onChange(event.target.value);
           }}
-          options={children}
+          options={children as DropdownOption[]}
           value={defaultValue}
+          errorMessage={errorMessage}
         />
       );
     case ElementType.Textbox:
@@ -30,11 +37,14 @@ export const buildElement = (
         <TextField
           label={label}
           name="description"
-          onBlur={() => {}}
           onChange={(event) => {
             onChange(event.target.value);
           }}
+          onBlur={(event) => {
+            onChange(event.target.value);
+          }}
           value={defaultValue}
+          errorMessage={errorMessage}
         />
       );
     case ElementType.TextAreaField:
@@ -42,11 +52,14 @@ export const buildElement = (
         <TextField
           label={label}
           name="description"
-          onBlur={() => {}}
           onChange={(event) => {
             onChange(event.target.value);
           }}
+          onBlur={(event) => {
+            onChange(event.target.value);
+          }}
           value={defaultValue}
+          errorMessage={errorMessage}
           multiline
           rows={3}
         />
@@ -59,11 +72,25 @@ export const buildElement = (
           onChange={(_rawValue: string, maskedValue: string) => {
             onChange(maskedValue);
           }}
-          value={defaultValue}
+          value={defaultValue as string}
+          errorMessage={errorMessage}
         />
       );
     default:
       console.log("missing: " + element);
   }
-  return element;
+  return <></>;
+};
+
+export const getErrorMessage = (validation: string, value: string) => {
+  switch (validation) {
+    case "required":
+      if (!value) return ErrorMessages.requiredResponse;
+      break;
+    case "date":
+      const { errorMessage } = validateDate(value, value, true);
+      return errorMessage;
+  }
+
+  return "";
 };

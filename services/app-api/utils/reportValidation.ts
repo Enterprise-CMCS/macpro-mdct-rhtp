@@ -334,6 +334,12 @@ const attachmentAreaSchema = object().shape({
   ),
 });
 
+const ActionElementsScheme = {
+  id: string().required(),
+  type: string().required(),
+  disabled: boolean().notRequired(),
+};
+
 const actionTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ActionTable)),
   id: string().required(),
@@ -346,8 +352,7 @@ const actionTableSchema = object().shape({
       elements: array()
         .of(
           object().shape({
-            id: string().required(),
-            type: string().required(),
+            ...ActionElementsScheme,
             editOnly: boolean().notRequired(),
             children: array()
               .of(
@@ -357,6 +362,7 @@ const actionTableSchema = object().shape({
                 })
               )
               .notRequired(),
+            validation: string().required(),
           })
         )
         .required(),
@@ -365,9 +371,8 @@ const actionTableSchema = object().shape({
   rows: array()
     .of(
       object().shape({
-        id: string().required(),
+        ...ActionElementsScheme,
         header: string().required(),
-        type: string().notRequired(),
       })
     )
     .required(),

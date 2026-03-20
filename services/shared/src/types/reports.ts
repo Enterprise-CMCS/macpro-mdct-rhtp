@@ -438,13 +438,23 @@ export type UseOfFundsTableTemplate = {
   answer?: UseOfFundsTableItem[];
 };
 
-export type ActionRowElement = {
+export interface ActionElement {
   id: string;
-  header: string;
-  type?: ElementType;
-};
+  type: ElementType;
+  disabled?: boolean;
+}
 
-export type ActionAnswerShape = { id: string; value: string | number };
+export interface ActionRowElement extends ActionElement {
+  header: string;
+}
+
+export interface ActionModalElement extends ActionElement {
+  editOnly?: boolean;
+  children?: { label: string; value: string }[];
+  validation: string;
+}
+
+export type ActionAnswerShape = { id: string; value: string | number }[];
 
 export interface ActionTableTemplate {
   type: ElementType.ActionTable;
@@ -454,13 +464,8 @@ export interface ActionTableTemplate {
   modal: {
     title: string;
     hintText?: string;
-    elements: {
-      id: string;
-      type: ElementType;
-      editOnly?: boolean;
-      children?: { label: string; value: string }[];
-    }[];
+    elements: ActionModalElement[];
   };
   rows: ActionRowElement[];
-  answer?: ActionAnswerShape[][];
+  answer?: ActionAnswerShape[];
 }
