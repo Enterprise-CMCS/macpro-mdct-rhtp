@@ -21,7 +21,6 @@ export const ComponentInventory = () => {
     state: "PA",
     status: ReportStatus.IN_PROGRESS,
     submissionCount: 0,
-    archived: false,
     submitted: 1,
     submittedBy: "User Name",
     pages: [

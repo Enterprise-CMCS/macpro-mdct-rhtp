@@ -132,7 +132,6 @@ export interface Report extends ReportBase, ReportOptions {
   submittedByEmail?: string;
   status: ReportStatus;
   submissionCount: number;
-  archived: boolean;
 }
 
 export type LiteReport = Omit<Report, "pages">;

@@ -451,13 +451,7 @@ const reportValidateSchema = object().shape({
   subType: number().notRequired(),
   year: number().required(),
   submissionCount: number().required(),
-  archived: boolean().required(),
   pages: pagesSchema,
-});
-
-// Can add more editable fields here in the future
-const reportEditValidateSchema = object().shape({
-  name: string().notRequired(),
 });
 
 export const validateReportPayload = async (payload: object | undefined) => {
@@ -470,18 +464,4 @@ export const validateReportPayload = async (payload: object | undefined) => {
   });
 
   return validatedPayload as Report;
-};
-
-export const validateReportEditPayload = async (
-  payload: object | undefined
-) => {
-  if (!payload) {
-    throw new Error(error.MISSING_DATA);
-  }
-
-  const validatedPayload = await reportEditValidateSchema.validate(payload, {
-    stripUnknown: true,
-  });
-
-  return validatedPayload as Partial<Report>;
 };
