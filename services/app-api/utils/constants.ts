@@ -16,7 +16,6 @@ export const error = {
   INVALID_DATA: "Provided data is not valid.",
   SERVER_ERROR: "An unspecified server error occured.",
   CREATION_ERROR: "Could not be created due to a database error.",
-  ALREADY_ARCHIVED: "Cannot update archived report.",
   END_DATE_BEFORE_START_DATE: "End date can't be before start date",
 };
 
@@ -93,3 +92,17 @@ export const reportTables: { [key in ReportType]: string } = {
 export const tableTopics: { [key in ReportType]: string } = {
   RHTP: "rhtp-reports",
 };
+
+// TODO build out list by state
+export const Initiatives = [
+  {
+    id: "416c4eab-7658-4f5d-a559-a8ef616f86df",
+    name: "First Initiative",
+    initiativeNumber: "123",
+  },
+  {
+    id: "47129b18-a036-46ae-9e24-ecf3ed666bc5",
+    name: "Second Initiative",
+    initiativeNumber: "456",
+  },
+];

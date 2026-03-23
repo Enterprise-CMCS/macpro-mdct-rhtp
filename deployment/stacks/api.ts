@@ -163,14 +163,6 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "partialUpdateReport", {
-    entry: "services/app-api/handlers/reports/partialUpdate.ts",
-    handler: "partialUpdateReport",
-    path: "reports/update/{reportType}/{state}/{id}",
-    method: "PUT",
-    ...commonProps,
-  });
-
   new Lambda(scope, "submitReport", {
     entry: "services/app-api/handlers/reports/submit.ts",
     handler: "submitReport",
@@ -183,6 +175,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     entry: "services/app-api/handlers/reports/update.ts",
     handler: "updateReport",
     path: "reports/{reportType}/{state}/{id}",
+    method: "PUT",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "releaseReport", {
+    entry: "services/app-api/handlers/reports/release.ts",
+    handler: "releaseReport",
+    path: "reports/release/{reportType}/{state}/{id}",
     method: "PUT",
     ...commonProps,
   });
@@ -216,6 +216,22 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "viewUploadsForState",
     path: "/uploads/{year}/{state}/view/{fileId}",
     method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "createInitiative", {
+    entry: "services/app-api/handlers/reports/initiatives/create.ts",
+    handler: "createInitiative",
+    path: "reports/{reportType}/{state}/{id}/initiatives",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "updateInitiative", {
+    entry: "services/app-api/handlers/reports/initiatives/update.ts",
+    handler: "updateInitiative",
+    path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
+    method: "PUT",
     ...commonProps,
   });
 

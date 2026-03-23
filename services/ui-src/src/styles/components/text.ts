@@ -21,7 +21,7 @@ const errorVariant = {
   fontSize: "body_xs",
   marginTop: "spacer_half",
 };
-const greyVariant = {
+const grayVariant = {
   color: "gray",
   fontWeight: "body_sm",
   textTransform: "none",
@@ -33,7 +33,7 @@ const variants = {
   tableEmpty: tableEmptyVariant,
   helperText: helperTextVariant,
   error: errorVariant,
-  grey: greyVariant,
+  gray: grayVariant,
 };
 
 const textTheme: ComponentStyleConfig = {
