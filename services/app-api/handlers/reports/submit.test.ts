@@ -22,6 +22,10 @@ vi.mock("../../storage/reports", () => ({
   putReport: () => vi.fn(),
 }));
 
+vi.mock("../../utils/reportValidation", () => ({
+  validateReportPayload: vi.fn(),
+}));
+
 const invalidReport = JSON.stringify({
   type: "RHTP",
   state: "PA",
