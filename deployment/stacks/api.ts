@@ -211,6 +211,22 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "createInitiative", {
+    entry: "services/app-api/handlers/reports/initiatives/create.ts",
+    handler: "createInitiative",
+    path: "reports/{reportType}/{state}/{id}/initiatives",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "updateInitiative", {
+    entry: "services/app-api/handlers/reports/initiatives/update.ts",
+    handler: "updateInitiative",
+    path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
+    method: "PUT",
+    ...commonProps,
+  });
+
   if (!isLocalStack) {
     const waf = new WafConstruct(
       scope,

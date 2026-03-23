@@ -11,6 +11,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spinner,
 } from "@chakra-ui/react";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
 import { useBreakpoint } from "utils";
@@ -19,6 +20,7 @@ export const Modal = ({
   modalDisclosure,
   content,
   onConfirmHandler,
+  submitting,
   formId,
   children,
   disableConfirm,
@@ -60,7 +62,7 @@ export const Modal = ({
               data-testid="modal-submit-button"
               disabled={disableConfirm}
             >
-              {content.actionButtonText}
+              {submitting ? <Spinner size="md" /> : content.actionButtonText}
             </Button>
           )}
           {onConfirmHandler && (
@@ -70,7 +72,7 @@ export const Modal = ({
               data-testid="modal-submit-button"
               disabled={disableConfirm}
             >
-              {content.actionButtonText}
+              {submitting ? <Spinner size="md" /> : content.actionButtonText}
             </Button>
           )}
           {content.closeButtonText && (
@@ -101,6 +103,7 @@ interface Props {
     closeButtonText?: string;
   };
   onConfirmHandler?: () => void;
+  submitting?: boolean;
   disableConfirm?: boolean;
   formId?: string;
   children?: ReactNode;

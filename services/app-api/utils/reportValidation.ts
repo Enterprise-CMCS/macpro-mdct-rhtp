@@ -16,6 +16,8 @@ import {
   ElementType,
   PageElement,
   CreateReportOptions,
+  CreateInitiativeOptions,
+  UpdateInitiativeOptions,
 } from "../types/reports";
 import { error } from "./constants";
 
@@ -379,6 +381,10 @@ const formPageTemplateSchema = object().shape({
   childPageIds: array().of(string()).notRequired(),
 });
 
+const initiativePageTemplateSchema = formPageTemplateSchema.shape({
+  initiativeNumber: string().required(),
+});
+
 const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
   submittedView: array().of(pageElementSchema).required(),
 });
@@ -393,6 +399,9 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
 const pagesSchema = array()
   .of(
     lazy((pageObject) => {
+      if (pageObject.initiativeNumber) {
+        return initiativePageTemplateSchema;
+      }
       if (!pageObject.type) {
         if (pageObject.id && pageObject.childPageIds) {
           return parentPageTemplateSchema;
@@ -422,6 +431,39 @@ export const isCreateReportOptions = (
     .noUnknown();
 
   return createReportOptionsValidationSchema.isValidSync(obj, {
+    stripUnknown: false,
+    strict: true,
+  });
+};
+
+export const isCreateInitiativeBody = (
+  obj: object | undefined
+): obj is CreateInitiativeOptions => {
+  const createInitiativeSchema = object()
+    .shape({
+      initiativeName: string().required(),
+      initiativeNumber: string().required(),
+    })
+    .required()
+    .noUnknown();
+
+  return createInitiativeSchema.isValidSync(obj, {
+    stripUnknown: false,
+    strict: true,
+  });
+};
+
+export const isUpdateInitiativeBody = (
+  obj: object | undefined
+): obj is UpdateInitiativeOptions => {
+  const updateInitiativeSchema = object()
+    .shape({
+      initiativeAbandon: boolean().required(),
+    })
+    .required()
+    .noUnknown();
+
+  return updateInitiativeSchema.isValidSync(obj, {
     stripUnknown: false,
     strict: true,
   });
@@ -458,7 +500,6 @@ export const validateReportPayload = async (payload: object | undefined) => {
   if (!payload) {
     throw new Error(error.MISSING_DATA);
   }
-
   const validatedPayload = await reportValidateSchema.validate(payload, {
     stripUnknown: true,
   });

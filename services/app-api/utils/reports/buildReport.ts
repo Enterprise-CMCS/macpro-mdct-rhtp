@@ -9,23 +9,13 @@ import {
   FormPageTemplate,
   ReviewSubmitTemplate,
   RhtpSubType,
-  PageType,
 } from "../../types/reports";
 import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
 import { StateAbbr } from "../constants";
 import { copyReport } from "./copyReport";
-import {
-  initiativeHeader,
-  initiativeInstructions,
-  initiativeInstructionsAccordion,
-  initiativeNarrative,
-  initiativeNumberOfPeopleServed,
-  returnToInitiativesDashboard,
-} from "../../forms/2026/elements";
-import { Initiatives } from "../../forms/2026/rhtp/rhtp";
-import { checkpointsTables } from "../../forms/2026/rhtp/rhtpElements";
+import { buildInitiativePages } from "./initiatives/initiatives";
 
 export const makeQuarterlyChanges = (
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
@@ -37,26 +27,6 @@ export const makeQuarterlyChanges = (
         element.disabled = true;
       }
     }
-  }
-};
-
-export const buildInitiativePages = (report: Report) => {
-  for (const [id, title] of Object.entries(Initiatives)) {
-    report.pages.push({
-      id,
-      title,
-      type: PageType.Standard,
-      sidebar: false,
-      elements: [
-        returnToInitiativesDashboard,
-        initiativeHeader(title),
-        initiativeInstructions,
-        initiativeInstructionsAccordion,
-        initiativeNarrative,
-        initiativeNumberOfPeopleServed,
-        ...checkpointsTables,
-      ],
-    });
   }
 };
 
