@@ -65,9 +65,19 @@ describe("Test ActionModal component", () => {
       screen.getAllByRole("button", { name: "Close" })[0]
     ).toBeInTheDocument();
   });
-  test("Modal fields update with user input", () => {
+  test("Modal fields update with user input", async () => {
     const textbox = screen.getByRole("textbox", { name: "Mock Textbox" });
-    userEvent.type(textbox, "hello");
-    screen.debug(textbox);
+    await userEvent.type(textbox, "hello");
+    expect(textbox).toHaveValue("hello");
+  });
+  test("Modal save", async () => {
+    const saveBtn = screen.getByRole("button", { name: "Save" });
+    await userEvent.click(saveBtn);
+    expect(mockSaveHandler).toHaveBeenCalled();
+  });
+  test("Modal closes", async () => {
+    const closeBtn = screen.getAllByRole("button", { name: "Close" })[0];
+    await userEvent.click(closeBtn);
+    expect(mockCloseHandler).toHaveBeenCalled();
   });
 });
