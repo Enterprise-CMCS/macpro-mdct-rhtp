@@ -30,7 +30,7 @@ const mockPutReport = vi.mocked(putReport);
 
 vi.mock("../../../utils/reportValidation", async (importOriginal) => ({
   ...(await importOriginal()),
-  validateReportPayload: vi.fn(),
+  validateReportPayload: vi.fn((input) => input),
 }));
 
 const testEvent = {

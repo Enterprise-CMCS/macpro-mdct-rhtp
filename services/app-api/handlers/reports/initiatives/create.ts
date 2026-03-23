@@ -35,7 +35,7 @@ export const createInitiative = handler(
       return badRequest("Invalid request");
     }
 
-    const report = await getReport(reportType, state, id);
+    let report = await getReport(reportType, state, id);
     if (!report) return notFound();
     if (report.status === ReportStatus.SUBMITTED) {
       return badRequest("Invalid request");
@@ -54,7 +54,7 @@ export const createInitiative = handler(
 
     // validate new report
     try {
-      await validateReportPayload(report);
+      report = await validateReportPayload(report);
     } catch (error) {
       logger.error(error);
       return badRequest("Invalid request");
