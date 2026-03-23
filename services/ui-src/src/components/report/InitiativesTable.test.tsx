@@ -3,8 +3,10 @@ import { render, screen } from "@testing-library/react";
 import { InitiativesTable } from "./InitiativesTable";
 import { ElementType, InitiativesTableTemplate } from "types";
 import { useStore } from "utils";
+import { RouterWrappedComponent } from "utils/testing/setupTest";
 
 vi.mock("utils/state/useStore");
+
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue({
   report: {
@@ -21,12 +23,18 @@ const mockTemplate: InitiativesTableTemplate = {
   id: "mock-table-id",
 };
 
+const mockInitiativeTableComponent = (
+  <RouterWrappedComponent>
+    <InitiativesTable element={mockTemplate} />
+  </RouterWrappedComponent>
+);
+
 describe("InitiativesTable component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
   test("renders", () => {
-    render(<InitiativesTable element={mockTemplate} />);
+    render(mockInitiativeTableComponent);
     expect(
       screen.getByRole("columnheader", { name: "Initiative name Status" })
     ).toBeVisible();
@@ -45,7 +53,7 @@ describe("InitiativesTable component", () => {
         ],
       },
     });
-    render(<InitiativesTable element={mockTemplate} />);
+    render(mockInitiativeTableComponent);
     expect(
       screen.getByRole("columnheader", { name: "Initiative name Status" })
     ).toBeVisible();

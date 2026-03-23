@@ -15,7 +15,7 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { AddEditInitiativeModal } from "components/modals/AddEditInitiativeModal";
@@ -41,6 +41,8 @@ export const InitiativesTable = (
     onClose();
   };
 
+  const navigate = useNavigate();
+
   // Build Rows
   const rows = initiatives.map((initiative, index) => (
     <Tr key={index}>
@@ -61,6 +63,12 @@ export const InitiativesTable = (
           variant="outline"
           href={`/report/${reportType}/${state}/${reportId}/${initiative.id}`}
           aria-label={`Edit ${initiative.title}`}
+          onClick={(e) => {
+            e.preventDefault();
+            navigate(
+              `/report/${reportType}/${state}/${reportId}/${initiative.id}`
+            );
+          }}
         >
           Edit
         </Button>
