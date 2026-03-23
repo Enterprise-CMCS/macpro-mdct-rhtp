@@ -69,10 +69,9 @@ export async function releaseReport(report: LiteReport) {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    body: { ...report },
   };
 
-  return await apiLib.put(
+  await apiLib.put(
     `/reports/release/${report.type}/${report.state}/${report.id}`,
     options
   );

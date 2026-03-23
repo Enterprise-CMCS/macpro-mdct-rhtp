@@ -214,7 +214,6 @@ export const DashboardTable = ({
 }: DashboardTableProps) => {
   const navigate = useNavigate();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
-  const [reportsInView, setReportsInView] = useState<LiteReport[]>(reports);
   const [unlocking, setUnlocking] = useState<number>();
 
   // Translate role to defined behaviors
@@ -239,13 +238,11 @@ export const DashboardTable = ({
 
   const toggleRelease = async (idx: number) => {
     setUnlocking(idx);
-    const reports = [...reportsInView];
     const report = reports[idx];
     await releaseReport(report);
     unlockModalOnOpenHandler();
     report.status = ReportStatus.IN_PROGRESS;
     reports[idx] = report;
-    setReportsInView(reports);
     setUnlocking(undefined);
   };
 
