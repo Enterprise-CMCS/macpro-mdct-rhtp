@@ -152,8 +152,14 @@ const metricVariant = {
           width: "1.4rem",
         },
       },
+      ".ds-c-single-input-date-field": {
+        minWidth: "100px",
+      },
       ".ds-c-label-mask": {
         display: "none",
+      },
+      "&:last-of-type": {
+        paddingRight: "0.75rem",
       },
     },
   },

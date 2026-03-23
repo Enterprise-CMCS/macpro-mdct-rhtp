@@ -1,9 +1,9 @@
+import { useEffect, useState, SubmitEvent } from "react";
 import { Modal } from "components/modals/Modal";
 import {
   buildElement,
   getErrorMessage,
 } from "utils/state/reportLogic/tableBuilder";
-import { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import { ActionAnswerShape, ActionModalElement, ActionRowElement } from "types";
 
@@ -18,6 +18,7 @@ export const ActionModal = ({
     modal.elements.map(() => "")
   );
   const [formData, setFormData] = useState<ActionAnswerShape>(form.data);
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     setFormData(form.data);
   }, [form.data]);
@@ -44,19 +45,32 @@ export const ActionModal = ({
     setErrorMessages(modal.elements.map(() => ""));
   };
 
-  const onModalSave = () => {
+  const onSubmit = async (event: SubmitEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
     onSave(formData);
+    setSubmitting(false);
     onModalClose();
   };
 
   return (
     <Modal
-      data-testid="action-modal"
+      formId="actionModal"
       modalDisclosure={{
         isOpen: modalDisclosure.isOpen,
         onClose: onModalClose,
       }}
-      children={
+      content={{
+        heading:
+          form.index !== undefined
+            ? `Edit ${modal.title}`
+            : `Add ${modal.title}`,
+        actionButtonText: "Save",
+        closeButtonText: "Close",
+      }}
+      disableConfirm={submitting}
+    >
+      <form id="actionModal" onSubmit={onSubmit}>
         <Flex flexDir="column" gap="1.5rem">
           {modal.elements.map((element, index) =>
             buildElement(
@@ -68,17 +82,8 @@ export const ActionModal = ({
             )
           )}
         </Flex>
-      }
-      onConfirmHandler={onModalSave}
-      content={{
-        heading:
-          form.index !== undefined
-            ? `Edit ${modal.title}`
-            : `Add ${modal.title}`,
-        actionButtonText: "Save",
-        closeButtonText: "Close",
-      }}
-    ></Modal>
+      </form>
+    </Modal>
   );
 };
 
