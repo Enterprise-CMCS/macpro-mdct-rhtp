@@ -26,8 +26,19 @@ export const copyReport = async (newReport: Report) => {
   for (const oldPage of reportToCopy.pages) {
     if (oldPage.elements) {
       const newPage = newPages.find((newPage) => newPage.id === oldPage.id);
+      // ensure initiatives not in base template get copied
+      if (!newPage && "initiativeNumber" in oldPage) {
+        newReport.pages.push(oldPage);
+        continue;
+      }
+
       const newElements = newPage?.elements;
-      if (!newElements) return;
+      if (!newElements) continue;
+
+      if ("status" in oldPage && newPage.status !== oldPage.status) {
+        newPage.status = oldPage.status;
+      }
+
       copyAnswer(oldPage.elements, newElements);
     }
   }
