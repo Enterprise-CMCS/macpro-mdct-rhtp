@@ -16,6 +16,7 @@ const renderElementList = [
   ElementType.TableCheckpoint,
   ElementType.AttachmentArea,
   ElementType.AccordionGroup,
+  ElementType.ActionTable,
 ];
 
 export const shouldUseTable = (type: ElementType) => {

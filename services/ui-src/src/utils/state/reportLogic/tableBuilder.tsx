@@ -37,7 +37,7 @@ export const buildElement = (
       return (
         <TextField
           label={label}
-          name="description"
+          name={label ?? "textbox"}
           onChange={(event) => {
             onChange(event.target.value);
           }}
@@ -53,7 +53,7 @@ export const buildElement = (
       return (
         <TextField
           label={label}
-          name="description"
+          name={label ?? "textarea"}
           onChange={(event) => {
             onChange(event.target.value);
           }}

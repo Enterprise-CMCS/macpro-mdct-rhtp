@@ -38,18 +38,18 @@ const buildRows = (
   onEdit: (index: number) => void
 ) => {
   const formattedRows: JSX.Element[][] = [];
-  answer.forEach((colAnswer, colAnswerIndex) => {
+  answer.forEach((columnAnswer, columnAnswerIndex) => {
     const rowElement: JSX.Element[] = [];
-    const disabled = isRowDisabled(rows, colAnswer);
+    const disabled = isRowDisabled(rows, columnAnswer);
 
-    rows.map((col) => {
-      const element = colAnswer.find((item) => item.id === col.id);
-      const formattedCol = { ...col, disabled: disabled || col.disabled };
+    rows.map((column) => {
+      const element = columnAnswer.find((item) => item.id === column.id);
+      const formattedCol = { ...column, disabled: disabled || column.disabled };
       const value =
-        col.type === ElementType.Paragraph
+        column.type === ElementType.Paragraph
           ? element?.value
           : buildElement(formattedCol, element?.value!, (value) =>
-              onChange(value, colAnswerIndex, col.id)
+              onChange(value, columnAnswerIndex, column.id)
             );
       rowElement.push(<Td>{value}</Td>);
     });
@@ -57,7 +57,7 @@ const buildRows = (
       <Td>
         <Button
           variant="link"
-          onClick={() => onEdit(colAnswerIndex)}
+          onClick={() => onEdit(columnAnswerIndex)}
           disabled={disabled}
         >
           Edit/Abandon
