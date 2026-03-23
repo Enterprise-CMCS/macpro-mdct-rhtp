@@ -6,7 +6,7 @@ $image-path: "~@cmsgov/design-system/dist/images";
 @mixin tabbed-focus {
   box-shadow:
     0 0 0 3px #fff,
-    0 0 4px 6px var(--chakra-colors-palette-focus_dark) !important;
+    0 0 4px 6px var(--chakra-colors-focus_dark) !important;
   // Add support for Windows High Contrast Mode (WHCM)
   // The transparent color only shows when WHCM is triggered
   outline: 3px solid transparent;
@@ -38,9 +38,9 @@ li::marker {
 }
 
 a {
-  color: var(--chakra-colors-palette-white);
+  color: var(--chakra-colors-white);
   &:hover {
-    color: var(--chakra-colors-palette-gray_light);
+    color: var(--chakra-colors-gray_light);
   }
   transition: all 0.3s ease !important;
 }
@@ -52,7 +52,7 @@ a {
   max-width: var(--chakra-sizes-appMax);
   display: flex;
   flex-direction: column;
-  background-color: var(--chakra-colors-palette-gray_lightest);
+  background-color: var(--chakra-colors-gray_lightest);
 
   header {
     display: flex;
@@ -144,7 +144,7 @@ button {
     @include tabbed-focus;
   }
   &:disabled::before {
-    box-shadow: inset 0 0 4em 1em var(--chakra-colors-palette-gray_light);
+    box-shadow: inset 0 0 4em 1em var(--chakra-colors-gray_light);
   }
 }
 
@@ -178,15 +178,15 @@ button {
 
 // Tech Specs Link Styles
 .tech-spec-link {
-  color: var(--chakra-colors-palette-primary);
+  color: var(--chakra-colors-primary);
   text-decoration: underline;
 
   &:visited {
-    color: var(--chakra-colors-palette-visited);
+    color: var(--chakra-colors-visited);
   }
 
   &:hover {
-    color: var(--chakra-colors-palette-primary_darker);
+    color: var(--chakra-colors-primary_darker);
   }
 }
 
