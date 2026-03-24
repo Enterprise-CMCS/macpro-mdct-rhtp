@@ -6,7 +6,7 @@ import {
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../../constants";
 import { ActionElement, ElementType } from "types";
-import { validateDate } from "utils/validation/inputValidation";
+import { parseNumber, validateDate } from "utils/validation/inputValidation";
 
 export const buildElement = (
   element: ActionElement,
@@ -88,12 +88,25 @@ export const buildElement = (
   return null;
 };
 
-export const getErrorMessage = (validation: string, value: string[]) => {
-  switch (validation) {
-    case "required":
-      if (!value[0]) return ErrorMessages.requiredResponse;
+export const getErrorMessage = (
+  type: string,
+  required: boolean,
+  value: string[]
+) => {
+  switch (type) {
+    case ElementType.Textbox:
+      const parsedValue = parseNumber(value[0]);
+      const valueIsNonNumeric = value && parsedValue === undefined;
+      if (!value && required) {
+        return ErrorMessages.requiredResponse;
+      } else if (valueIsNonNumeric) {
+        return ErrorMessages.mustBeANumber;
+      }
       break;
-    case "date":
+    case ElementType.TextAreaField:
+      if (!value[0] && required) return ErrorMessages.requiredResponse;
+      break;
+    case ElementType.Date:
       const { errorMessage } = validateDate(value[0], value[1], true);
       return errorMessage;
   }

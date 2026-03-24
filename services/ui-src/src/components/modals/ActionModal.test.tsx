@@ -25,14 +25,14 @@ const modal = {
         { label: "Active", value: "Active" },
         { label: "Abandon", value: "Abandon" },
       ],
-      validation: "required",
+      required: true,
     },
     {
       id: "mock-textbox",
       type: ElementType.Textbox,
-      validation: "required",
+      required: true,
     },
-    { id: "mock-date", type: ElementType.Date, validation: "date" },
+    { id: "mock-date", type: ElementType.Date, required: true },
   ],
 };
 

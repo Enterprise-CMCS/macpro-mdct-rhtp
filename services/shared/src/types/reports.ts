@@ -469,7 +469,7 @@ export interface ActionRowElement extends ActionElement {
 export interface ActionModalElement extends ActionElement {
   editOnly?: boolean;
   children?: { label: string; value: string }[];
-  validation: string;
+  required: boolean;
 }
 
 export type ActionAnswerShape = { id: string; value: string | number }[];

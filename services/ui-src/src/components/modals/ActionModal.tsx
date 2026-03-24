@@ -41,7 +41,11 @@ export const ActionModal = ({
 
     const element = renderElements[index];
     const newErrorMessages = [...errorMessages];
-    newErrorMessages[index] = getErrorMessage(element.validation, value);
+    newErrorMessages[index] = getErrorMessage(
+      element.type,
+      element.required,
+      value
+    );
     setErrorMessages(newErrorMessages);
   };
 

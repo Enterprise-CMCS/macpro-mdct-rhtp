@@ -16,7 +16,7 @@ const mockActionTableElement: ActionTableTemplate = {
     elements: [
       {
         type: ElementType.Dropdown,
-        validation: "required",
+        required: true,
         id: "status",
         children: [
           { label: "Active", value: "active" },

@@ -364,7 +364,7 @@ const actionTableSchema = object().shape({
                 })
               )
               .notRequired(),
-            validation: string().required(),
+            required: boolean().required(),
           })
         )
         .required(),
