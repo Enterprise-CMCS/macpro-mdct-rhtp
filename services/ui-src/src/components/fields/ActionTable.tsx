@@ -7,9 +7,8 @@ import {
   Th,
   Thead,
   Tr,
-  Text,
 } from "@chakra-ui/react";
-import { Label } from "@cmsgov/design-system";
+import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useState } from "react";
@@ -26,7 +25,7 @@ const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
   //check to see if status is a row in the table
   if (rows.some((row) => row.id === "status")) {
     const value = answer.find((field) => field.id === "status")?.value;
-    if (value === "Abandon") return true;
+    if (value === "Abandoned") return true;
   }
   return false;
 };
@@ -34,7 +33,7 @@ const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
 const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
-  onChange: (value: string, index: number, id: string) => void,
+  onChange: (value: string[], index: number, id: string) => void,
   onEdit: (index: number) => void
 ) => {
   const formattedRows: JSX.Element[][] = [];
@@ -45,12 +44,9 @@ const buildRows = (
     rows.map((column) => {
       const element = columnAnswer.find((item) => item.id === column.id);
       const formattedCol = { ...column, disabled: disabled || column.disabled };
-      const value =
-        column.type === ElementType.Paragraph
-          ? element?.value
-          : buildElement(formattedCol, element?.value!, (value) =>
-              onChange(value, columnAnswerIndex, column.id)
-            );
+      const value = buildElement(formattedCol, element?.value!, (value) =>
+        onChange(value, columnAnswerIndex, column.id)
+      );
       rowElement.push(<Td>{value}</Td>);
     });
     rowElement.push(
@@ -87,7 +83,7 @@ const formatUniqueKeys = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const { label, hintText, modal, rows, answer } = props.element;
+  const { id, label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   const dropdownIds = modal.elements
@@ -110,10 +106,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
-  const onChange = (value: string, index: number, id: string) => {
+  const onChange = (value: string[], index: number, id: string) => {
     const newAnswer = [...(answer ?? [])];
-    var rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
-    newAnswer[index][rowIndex].value = value;
+    const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
+    newAnswer[index][rowIndex].value = value[0];
     props.updateElement({ answer: newAnswer });
   };
 
@@ -141,7 +137,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
       <Label>{label}</Label>
-      <Text>{hintText}</Text>
+      <Hint id={id}>{hintText}</Hint>
       <Button
         aria-label={`add ${label}`}
         variant="outline"

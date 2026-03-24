@@ -245,7 +245,7 @@ export const metricTable: ActionTableTemplate = {
         editOnly: true,
         children: [
           { label: "Active", value: "Active" },
-          { label: "Abandon", value: "Abandon" },
+          { label: "Abandoned", value: "Abandoned" },
         ],
         validation: "required",
       },

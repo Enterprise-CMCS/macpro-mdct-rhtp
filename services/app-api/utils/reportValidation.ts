@@ -336,7 +336,7 @@ const attachmentAreaSchema = object().shape({
   ),
 });
 
-const ActionElementsScheme = {
+const ActionElementsSchema = {
   id: string().required(),
   type: string().required(),
   disabled: boolean().notRequired(),
@@ -354,7 +354,7 @@ const actionTableSchema = object().shape({
       elements: array()
         .of(
           object().shape({
-            ...ActionElementsScheme,
+            ...ActionElementsSchema,
             editOnly: boolean().notRequired(),
             children: array()
               .of(
@@ -373,7 +373,7 @@ const actionTableSchema = object().shape({
   rows: array()
     .of(
       object().shape({
-        ...ActionElementsScheme,
+        ...ActionElementsSchema,
         header: string().required(),
       })
     )

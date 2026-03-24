@@ -33,10 +33,10 @@ export const ActionModal = ({
     return rows.find((row) => row.id == id)?.header ?? "";
   };
 
-  const onModalChange = (value: string, id: string, index: number) => {
+  const onModalChange = (value: string[], id: string, index: number) => {
     const newData = [...formData];
     const columnIndex = newData.findIndex((item) => item.id === id);
-    newData[columnIndex].value = value;
+    newData[columnIndex].value = value[0];
     setFormData(newData);
 
     const element = renderElements[index];
@@ -50,7 +50,7 @@ export const ActionModal = ({
     setErrorMessages(renderElements.map(() => ""));
   };
 
-  const onSubmit = async (event: SubmitEvent) => {
+  const onSubmit = (event: SubmitEvent) => {
     event.preventDefault();
     setSubmitting(true);
     onSave(formData);

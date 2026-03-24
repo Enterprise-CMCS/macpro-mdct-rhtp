@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 const updateSpy = vi.fn();
 
 const mockActionTableElement: ActionTableTemplate = {
-  id: "mock-accordiongroup-id",
+  id: "mock-action-table-id",
   type: ElementType.ActionTable,
   label: "",
   hintText: "",

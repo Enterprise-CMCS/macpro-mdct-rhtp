@@ -89,14 +89,14 @@ describe("Test tableBuilder functions", () => {
 
   describe("Test getErrorMessage function", () => {
     test("Test valid input", () => {
-      const errorRequiredMsg = getErrorMessage("required", "mock value");
+      const errorRequiredMsg = getErrorMessage("required", ["mock value"]);
       expect(errorRequiredMsg).toBe("");
     });
     test("Test error messages", () => {
-      const errorRequiredMsg = getErrorMessage("required", "");
+      const errorRequiredMsg = getErrorMessage("required", [""]);
       expect(errorRequiredMsg).toBe("A response is required");
 
-      const errorDateMsg = getErrorMessage("date", "not validate");
+      const errorDateMsg = getErrorMessage("date", ["not validate"]);
       expect(errorDateMsg).toBe("Response must be a date in MMDDYYYY format");
     });
   });
