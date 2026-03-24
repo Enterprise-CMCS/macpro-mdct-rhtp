@@ -14,8 +14,13 @@ export const ActionModal = ({
   modalDisclosure,
   onSave,
 }: Props) => {
+  const isEdit = form.index !== undefined;
+  const renderElements = !isEdit
+    ? modal.elements.filter((element) => !element.editOnly)
+    : modal.elements;
+
   const [errorMessages, setErrorMessages] = useState<string[]>(
-    modal.elements.map(() => "")
+    renderElements.map(() => "")
   );
   const [formData, setFormData] = useState<ActionAnswerShape>(form.data);
   const [submitting, setSubmitting] = useState(false);
@@ -34,7 +39,7 @@ export const ActionModal = ({
     newData[columnIndex].value = value;
     setFormData(newData);
 
-    const element = modal.elements[index];
+    const element = renderElements[index];
     const newErrorMessages = [...errorMessages];
     newErrorMessages[index] = getErrorMessage(element.validation, value);
     setErrorMessages(newErrorMessages);
@@ -42,7 +47,7 @@ export const ActionModal = ({
 
   const onModalClose = () => {
     modalDisclosure.onClose();
-    setErrorMessages(modal.elements.map(() => ""));
+    setErrorMessages(renderElements.map(() => ""));
   };
 
   const onSubmit = async (event: SubmitEvent) => {
@@ -61,10 +66,7 @@ export const ActionModal = ({
         onClose: onModalClose,
       }}
       content={{
-        heading:
-          form.index !== undefined
-            ? `Edit ${modal.title}`
-            : `Add ${modal.title}`,
+        heading: isEdit ? `Edit ${modal.title}` : `Add ${modal.title}`,
         actionButtonText: "Save",
         closeButtonText: "Close",
       }}
@@ -72,7 +74,7 @@ export const ActionModal = ({
     >
       <form id="actionModal" onSubmit={onSubmit}>
         <Flex flexDir="column" gap="1.5rem">
-          {modal.elements.map((element, index) =>
+          {renderElements.map((element, index) =>
             buildElement(
               element,
               formData.find((data) => data.id === element.id)?.value!,
