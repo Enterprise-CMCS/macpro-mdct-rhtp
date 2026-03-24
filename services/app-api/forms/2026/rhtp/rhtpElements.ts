@@ -267,22 +267,5 @@ export const metricTable: ActionTableTemplate = {
     { id: "currValue", header: "Current Value", type: ElementType.Textbox },
     { id: "date", header: "As of Date", type: ElementType.Date },
   ],
-  answer: [
-    [
-      { id: "no", value: 1 },
-      { id: "status", value: "Active" },
-      { id: "metric", value: "Rural provider retention rate" },
-      { id: "prevValue", value: "" },
-      { id: "currValue", value: "" },
-      { id: "date", value: "" },
-    ],
-    [
-      { id: "no", value: 1 },
-      { id: "status", value: "Active" },
-      { id: "metric", value: "Percent of rural facilities utilizing RPM" },
-      { id: "prevValue", value: "" },
-      { id: "currValue", value: "" },
-      { id: "date", value: "" },
-    ],
-  ],
+  answer: [],
 };

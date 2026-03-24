@@ -28,12 +28,10 @@ const mockAccordionGroupElement: AccordionGroupTemplate = {
 };
 
 const AccordionGroupComponent = (
-  <div data-testid="test-checkbox-list">
-    <AccordionGroup
-      element={mockAccordionGroupElement}
-      updateElement={updateSpy}
-    />
-  </div>
+  <AccordionGroup
+    element={mockAccordionGroupElement}
+    updateElement={updateSpy}
+  />
 );
 
 describe("<AccordionGroup />", () => {
