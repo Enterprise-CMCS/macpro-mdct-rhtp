@@ -89,23 +89,30 @@ describe("Test tableBuilder functions", () => {
 
   describe("Test getErrorMessage function", () => {
     test("Test valid input", () => {
-      const errorRequiredMsg = getErrorMessage(ElementType.Textbox, true, [
-        "mock value",
-      ]);
-      expect(errorRequiredMsg).toBe("");
-    });
-    test("Test error messages", () => {
-      const errorRequiredMsg = getErrorMessage(
-        ElementType.TextAreaField,
-        true,
-        [""]
+      expect(getErrorMessage(ElementType.Textbox, true, ["mock value"])).toBe(
+        ""
       );
-      expect(errorRequiredMsg).toBe("A response is required");
-
-      const errorDateMsg = getErrorMessage(ElementType.Date, true, [
-        "not validate",
-      ]);
-      expect(errorDateMsg).toBe("Response must be a date in MMDDYYYY format");
+    });
+    test("Test Date error message", () => {
+      expect(getErrorMessage(ElementType.Date, true, ["not validate"])).toBe(
+        "Response must be a date in MMDDYYYY format"
+      );
+    });
+    test("Test Textbox & TextAreaField error message", () => {
+      expect(getErrorMessage(ElementType.Textbox, true, [""])).toBe(
+        "A response is required"
+      );
+      expect(getErrorMessage(ElementType.TextAreaField, true, [""])).toBe(
+        "A response is required"
+      );
+    });
+    test("Test NumberField error message", () => {
+      expect(getErrorMessage(ElementType.NumberField, true, ["abc"])).toBe(
+        "Response must be a number"
+      );
+      expect(getErrorMessage(ElementType.NumberField, true, [""])).toBe(
+        "A response is required"
+      );
     });
   });
 });
