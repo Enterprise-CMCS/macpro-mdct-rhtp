@@ -95,6 +95,11 @@ export const getErrorMessage = (
 ) => {
   switch (type) {
     case ElementType.Textbox:
+      if (!value[0] && required) {
+        return ErrorMessages.requiredResponse;
+      }
+      break;
+    case ElementType.NumberField:
       const parsedValue = parseNumber(value[0]);
       const valueIsNonNumeric = value && parsedValue === undefined;
       if (!value && required) {
