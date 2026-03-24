@@ -24,6 +24,7 @@ export const AttachmentArea = (
   const year = report?.year.toString();
 
   const updateElement = props.updateElement;
+  const files = answer ?? [];
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -48,8 +49,7 @@ export const AttachmentArea = (
     <Stack gap="0">
       <Label fieldId={id}>{label}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
-      {answer &&
-        uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
+      {uploadListRender(files, year, state, onRemove, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}
@@ -65,7 +65,7 @@ export const AttachmentArea = (
         }}
         state={state}
         year={year}
-        answer={answer ?? []}
+        answer={files}
         saveToReport={saveToReport}
         id={id}
       />
