@@ -3,6 +3,7 @@ export * from "@rhtp/shared";
 import {
   type ParentPageTemplate,
   type FormPageTemplate,
+  type InitiativePageTemplate,
   type ReviewSubmitTemplate,
   PageType,
 } from "@rhtp/shared";
@@ -17,6 +18,7 @@ export const getReportName = (type: string | undefined) => {
 export type PageTemplate =
   | ParentPageTemplate
   | FormPageTemplate
+  | InitiativePageTemplate
   | ReviewSubmitTemplate;
 
 export interface PageData {

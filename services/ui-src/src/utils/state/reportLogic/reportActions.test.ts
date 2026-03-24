@@ -28,7 +28,6 @@ const testReport: Report = {
   state: "NJ",
   id: "NJRHTP123",
   status: ReportStatus.NOT_STARTED,
-  archived: false,
   submissionCount: 0,
   pages: [
     {

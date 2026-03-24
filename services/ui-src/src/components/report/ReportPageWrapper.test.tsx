@@ -12,7 +12,6 @@ const testReport: Report = {
   id: "NJGeneral123",
   year: 2026,
   status: ReportStatus.NOT_STARTED,
-  archived: false,
   submissionCount: 0,
   pages: [
     {

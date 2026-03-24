@@ -26,7 +26,7 @@ export const handler = <TParams>(
         queryStringParameters: event.queryStringParameters,
       });
 
-      const user = await authenticatedUser(event);
+      const user = authenticatedUser(event);
       if (!user) {
         return unauthenticated(error.UNAUTHORIZED);
       }
