@@ -32,6 +32,7 @@ import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
 import { AttachmentArea } from "components/fields/AttachmentArea";
+import { AttachmentTable } from "components/fields/AttachmentTable";
 
 interface Props {
   id: string;
@@ -101,6 +102,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <AttachmentArea {...{ updateElement, disabled, element }} />;
       case ElementType.AccordionGroup:
         return <AccordionGroup {...{ updateElement, disabled, element }} />;
+      case ElementType.AttachmentTable:
+        return <AttachmentTable {...{ updateElement, disabled, element }} />;
       default:
         assertExhaustive(element);
         return null;

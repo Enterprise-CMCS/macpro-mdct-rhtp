@@ -244,6 +244,7 @@ export enum ElementType {
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
   UseOfFundsTable = "useOfFundsTable",
+  AttachmentTable = "attachmentTable",
 }
 
 export type PageElement =
@@ -268,7 +269,8 @@ export type PageElement =
   | TableCheckpointTemplate
   | AccordionGroupTemplate
   | UseOfFundsTableTemplate
-  | AttachmentAreaTemplate;
+  | AttachmentAreaTemplate
+  | AttachmentTableTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -452,4 +454,17 @@ export type UseOfFundsTableTemplate = {
     recipientCategoryOptions: { label: string; value: string }[];
   };
   answer?: UseOfFundsTableItem[];
+};
+
+export type AttachmentTableTemplate = {
+  type: ElementType.AttachmentTable;
+  id: string;
+  answer?: {
+    attachment: { id: string; name: string };
+    initiatives: string[];
+    stage: number;
+    checkpoints: string;
+    status: string;
+    comments: { name: string; date: string }[];
+  }[];
 };

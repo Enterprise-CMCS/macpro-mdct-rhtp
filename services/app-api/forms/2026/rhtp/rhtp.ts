@@ -17,6 +17,7 @@ export const rhtpReportTemplate: ReportBase = {
       id: "root",
       childPageIds: [
         "general-information",
+        "initiative-attachments",
         "initiatives",
         "state-policy-commitments",
         "use-of-funds",
@@ -52,6 +53,28 @@ export const rhtpReportTemplate: ReportBase = {
           required: true,
           helperText:
             "Enter an email address for the person or position above. Department or program-wide email addresses are allowed.",
+        },
+      ],
+    },
+    {
+      id: "initiative-attachments",
+      title: "Initiative Attachments",
+      type: PageType.Standard,
+      sidebar: true,
+      elements: [
+        {
+          type: ElementType.Header,
+          id: "initiatives-header",
+          text: "Initiative Attachments",
+        },
+        {
+          type: ElementType.Paragraph,
+          id: "initiatives-instructions",
+          text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+        },
+        {
+          type: ElementType.AttachmentTable,
+          id: "initiative-attachments-table",
         },
       ],
     },
