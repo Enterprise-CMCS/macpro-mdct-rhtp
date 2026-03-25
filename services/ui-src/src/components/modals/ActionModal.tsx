@@ -6,6 +6,7 @@ import {
 } from "utils/state/reportLogic/tableBuilder";
 import { Flex } from "@chakra-ui/react";
 import { ActionAnswerShape, ActionModalElement, ActionRowElement } from "types";
+import { ErrorMessages } from "../../constants";
 
 export const ActionModal = ({
   rows,
@@ -56,6 +57,19 @@ export const ActionModal = ({
 
   const onSubmit = (event: SubmitEvent) => {
     event.preventDefault();
+
+    const activeKeys = renderElements.map((element) => element.id);
+    const values = form.data
+      .filter((item) => activeKeys.includes(item.id))
+      .map((item) => item.value);
+
+    const errors = values.map((value) =>
+      !value ? ErrorMessages.requiredResponse : ""
+    );
+    setErrorMessages(errors);
+
+    if (errors.some((error) => error != "")) return;
+
     setSubmitting(true);
     onSave(formData);
     setSubmitting(false);
