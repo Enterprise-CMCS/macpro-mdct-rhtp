@@ -7,15 +7,23 @@ import userEvent from "@testing-library/user-event";
 import {
   mockAdminUserStore,
   mockStateUserStore,
+  RouterWrappedComponent,
 } from "utils/testing/setupTest";
 
 vi.mock("utils/state/useStore");
+
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 const mockTemplate: InitiativesTableTemplate = {
   type: ElementType.InitiativesTable,
   id: "mock-table-id",
 };
+
+const mockInitiativeTableComponent = (
+  <RouterWrappedComponent>
+    <InitiativesTable element={mockTemplate} />
+  </RouterWrappedComponent>
+);
 
 describe("InitiativesTable component", () => {
   describe("admin view", () => {
@@ -34,7 +42,7 @@ describe("InitiativesTable component", () => {
         },
         ...mockAdminUserStore,
       });
-      render(<InitiativesTable element={mockTemplate} />);
+      render(mockInitiativeTableComponent);
     });
     test("renders with initiatives", () => {
       expect(
@@ -90,7 +98,7 @@ describe("InitiativesTable component", () => {
         },
         ...mockStateUserStore,
       });
-      render(<InitiativesTable element={mockTemplate} />);
+      render(mockInitiativeTableComponent);
     });
 
     test("renders with initiatives, cannot add or edit initiatives", () => {
