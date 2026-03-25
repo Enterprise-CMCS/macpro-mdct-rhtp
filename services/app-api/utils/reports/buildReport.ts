@@ -15,7 +15,6 @@ import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
 import { StateAbbr } from "../constants";
 import { copyReport } from "./copyReport";
-import { buildInitiativePages } from "./initiatives/initiatives";
 
 export const makeQuarterlyChanges = (
   pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
@@ -59,8 +58,6 @@ export const buildReport = async (
   if (report.subType !== RhtpSubType.ANNUAL) {
     makeQuarterlyChanges(report.pages);
   }
-
-  buildInitiativePages(report);
 
   if (report.copyFromReportId) {
     await copyReport(report);

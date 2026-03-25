@@ -1,92 +1,72 @@
 import {
-  UseOfFundsTableTemplate,
+  AccordionTemplate,
+  ButtonLinkTemplate,
   ElementType,
+  HeaderTemplate,
+  NumberFieldTemplate,
   PageElement,
-} from "../../../types/reports";
+  PageType,
+  ParagraphTemplate,
+  TextAreaBoxTemplate,
+} from "@rhtp/shared";
 
-export const useOfFundsOptions = {
-  dropDownOptions: {
-    // These are placeholder
-    budgetPeriodOptions: [
-      { label: "- Select an option -", value: "" },
-      { label: "Budget Period 1", value: "Budget Period 1" },
-      { label: "Budget Period 2", value: "Budget Period 2" },
-      { label: "Budget Period 3", value: "Budget Period 3" },
-      { label: "Budget Period 4", value: "Budget Period 4" },
-    ],
-    // These are placeholder, the initiatives will be come from a previous question in the report
-    initiativeOptions: [
-      { label: "- Select an option -", value: "" },
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-    useOfFundsOptions: [
-      { label: "- Select an option -", value: "" },
-      {
-        label: "Prevention and chronic disease",
-        value: "Prevention and chronic disease",
-      },
-      { label: "Provider payments", value: "Provider payments" },
-      { label: "Consumer tech solutions", value: "Consumer tech solutions" },
-      {
-        label: "Training and technical assistance",
-        value: "Training and technical assistance",
-      },
-      { label: "Workforce", value: "Workforce" },
-      { label: "IT advances", value: "IT advances" },
-      {
-        label: "Appropriate care availability",
-        value: "Appropriate care availability",
-      },
-      { label: "Behavioral health", value: "Behavioral health" },
-      { label: "Innovative care", value: "Innovative care" },
-      {
-        label: "Capital expenditures and infrastructure",
-        value: "Capital expenditures and infrastructure",
-      },
-      { label: "Fostering collaboration", value: "Fostering collaboration" },
-    ],
-    recipientCategoryOptions: [
-      { label: "- Select an option -", value: "" },
-      { label: "State agency", value: "State agency" },
-      { label: "Local government", value: "Local government" },
-      { label: "Rural provider", value: "Rural provider" },
-      { label: "EMS provider", value: "EMS provider" },
-      {
-        label: "Community-based organization",
-        value: "Community-based organization",
-      },
-      {
-        label: "University-affiliated health care organization",
-        value: "University-affiliated health care organization",
-      },
-      {
-        label: "Non-profit health care organization",
-        value: "Non-profit health care organization",
-      },
-      {
-        label: "Other non-profit organization",
-        value: "Other non-profit organization",
-      },
-      {
-        label: "Other health care organization",
-        value: "Other health care organization",
-      },
-      { label: "Contractor", value: "Contractor" },
-      { label: "Other", value: "Other" },
-    ],
+// TODO build out list by state
+export const INITIATIVES = [
+  {
+    id: "416c4eab-7658-4f5d-a559-a8ef616f86df",
+    name: "First Initiative",
+    initiativeNumber: "123",
   },
+  {
+    id: "47129b18-a036-46ae-9e24-ecf3ed666bc5",
+    name: "Second Initiative",
+    initiativeNumber: "456",
+  },
+];
+
+const returnToInitiativesDashboard: ButtonLinkTemplate = {
+  type: ElementType.ButtonLink,
+  id: "return-button",
+  to: "initiatives",
+  label: "Return to initiatives dashboard",
 };
 
-export const useOfFundsTableElement: UseOfFundsTableTemplate = {
-  type: ElementType.UseOfFundsTable,
-  id: "use-of-funds-table",
-  ...useOfFundsOptions,
+const initiativeHeader: (initiativeName: string) => HeaderTemplate = (
+  initiativeName: string
+) => ({
+  type: ElementType.Header,
+  id: "initiative-header",
+  text: initiativeName,
+});
+
+const initiativeInstructions: ParagraphTemplate = {
+  type: ElementType.Paragraph,
+  id: "initiative-instructions",
+  text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
 };
 
-export const checkpointsTables: PageElement[] = [
+const initiativeInstructionsAccordion: AccordionTemplate = {
+  type: ElementType.Accordion,
+  id: "initiative-instructions-accordion",
+  label: "Further instructions",
+  value: "More coming soon...",
+};
+
+const initiativeNarrative: TextAreaBoxTemplate = {
+  type: ElementType.TextAreaField,
+  id: "initiative-narrative",
+  label: "Narrative",
+  required: true,
+};
+
+const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
+  type: ElementType.NumberField,
+  id: "initiative-number-of-people-served",
+  label: "Number of people served",
+  required: true,
+};
+
+const checkpointsTables: PageElement[] = [
   {
     type: ElementType.TableCheckpoint,
     id: "checkpoint-0",
@@ -227,3 +207,27 @@ export const checkpointsTables: PageElement[] = [
     required: true,
   },
 ];
+
+// TODO - better array typing and parsing once we have initiatives by state
+export const buildInitiativePages = (initiatives: any[] = INITIATIVES) => {
+  const initiativePages = [];
+  for (const { id, name, initiativeNumber } of initiatives) {
+    initiativePages.push({
+      id,
+      title: name,
+      initiativeNumber,
+      type: PageType.Standard,
+      sidebar: false,
+      elements: [
+        returnToInitiativesDashboard,
+        initiativeHeader(name),
+        initiativeInstructions,
+        initiativeInstructionsAccordion,
+        initiativeNarrative,
+        initiativeNumberOfPeopleServed,
+        ...checkpointsTables,
+      ],
+    });
+  }
+  return initiativePages;
+};
