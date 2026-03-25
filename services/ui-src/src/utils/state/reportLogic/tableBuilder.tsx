@@ -94,23 +94,17 @@ export const getErrorMessage = (
   required: boolean,
   value: string[]
 ) => {
+  if (!value[0] && required) {
+    return ErrorMessages.requiredResponse;
+  }
+
   switch (type) {
-    case ElementType.Textbox:
-      if (!value[0] && required) {
-        return ErrorMessages.requiredResponse;
-      }
-      break;
     case ElementType.NumberField:
       const parsedValue = parseNumber(value[0]);
       const valueIsNonNumeric = value && parsedValue === undefined;
-      if (!value[0] && required) {
-        return ErrorMessages.requiredResponse;
-      } else if (valueIsNonNumeric) {
+      if (valueIsNonNumeric) {
         return ErrorMessages.mustBeANumber;
       }
-      break;
-    case ElementType.TextAreaField:
-      if (!value[0] && required) return ErrorMessages.requiredResponse;
       break;
     case ElementType.Date:
       const { errorMessage } = validateDate(value[0], value[1], true);
