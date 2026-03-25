@@ -63,8 +63,10 @@ export const ActionModal = ({
       .filter((item) => activeKeys.includes(item.id))
       .map((item) => item.value);
 
-    const errors = values.map((value) =>
-      !value ? ErrorMessages.requiredResponse : ""
+    const errors = values.map((value, index) =>
+      !value && renderElements[index].required
+        ? ErrorMessages.requiredResponse
+        : errorMessages[index]
     );
     setErrorMessages(errors);
 
