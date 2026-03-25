@@ -37,23 +37,31 @@ const buildRows = (
   onEdit: (index: number) => void
 ) => {
   const formattedRows: JSX.Element[][] = [];
-  answer.forEach((columnAnswer, columnAnswerIndex) => {
+  answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: JSX.Element[] = [];
-    const disabled = isRowDisabled(rows, columnAnswer);
+    const disabled = isRowDisabled(rows, answerRow);
 
     rows.map((column) => {
-      const element = columnAnswer.find((item) => item.id === column.id);
-      const formattedCol = { ...column, disabled: disabled || column.disabled };
-      const value = buildElement(formattedCol, element?.value!, (value) =>
-        onChange(value, columnAnswerIndex, column.id)
-      );
-      rowElement.push(<Td>{value}</Td>);
+      //autogenerate next # column
+      if (column.id === "no") {
+        rowElement.push(<Td>{answerRowIndex + 1}</Td>);
+      } else {
+        const element = answerRow.find((item) => item.id === column.id);
+        const formattedCol = {
+          ...column,
+          disabled: disabled || column.disabled,
+        };
+        const value = buildElement(formattedCol, element?.value!, (value) =>
+          onChange(value, answerRowIndex, column.id)
+        );
+        rowElement.push(<Td>{value}</Td>);
+      }
     });
     rowElement.push(
       <Td>
         <Button
           variant="link"
-          onClick={() => onEdit(columnAnswerIndex)}
+          onClick={() => onEdit(answerRowIndex)}
           disabled={disabled}
         >
           Edit/Abandon
@@ -64,22 +72,6 @@ const buildRows = (
   });
 
   return formattedRows;
-};
-
-/** Handles formatting for unique column ids like no for # column */
-const formatUniqueKeys = (
-  data: ActionAnswerShape,
-  answer: ActionAnswerShape[]
-) => {
-  //if there's a no column, auto generate the next row number in the table
-  if (data.some((column) => column.id === "no")) {
-    const foundIndex = data.findIndex((column) => column.id === "no");
-    data[foundIndex] = {
-      id: "no",
-      value: (answer.length + 1).toString(),
-    };
-  }
-  return data;
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
@@ -124,8 +116,6 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   const onSave = (data: ActionAnswerShape) => {
     if (modalData.index === undefined) {
-      //special case code for certain column headers
-      data = formatUniqueKeys(data, answer ?? []);
       props.updateElement({ answer: [...(answer ?? []), data] });
     } else {
       const newAnswer = [...answer!];
