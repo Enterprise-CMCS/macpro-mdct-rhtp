@@ -244,6 +244,7 @@ export enum ElementType {
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
   UseOfFundsTable = "useOfFundsTable",
+  ActionTable = "actionTable",
 }
 
 export type PageElement =
@@ -268,7 +269,8 @@ export type PageElement =
   | TableCheckpointTemplate
   | AccordionGroupTemplate
   | UseOfFundsTableTemplate
-  | AttachmentAreaTemplate;
+  | AttachmentAreaTemplate
+  | ActionTableTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -454,3 +456,35 @@ export type UseOfFundsTableTemplate = {
   };
   answer?: UseOfFundsTableItem[];
 };
+
+export interface ActionElement {
+  id: string;
+  type: ElementType;
+  disabled?: boolean;
+}
+
+export interface ActionRowElement extends ActionElement {
+  header: string;
+}
+
+export interface ActionModalElement extends ActionElement {
+  editOnly?: boolean;
+  children?: { label: string; value: string }[];
+  required: boolean;
+}
+
+export type ActionAnswerShape = { id: string; value: string | number }[];
+
+export interface ActionTableTemplate {
+  type: ElementType.ActionTable;
+  id: string;
+  label: string;
+  hintText: string;
+  modal: {
+    title: string;
+    hintText?: string;
+    elements: ActionModalElement[];
+  };
+  rows: ActionRowElement[];
+  answer?: ActionAnswerShape[];
+}

@@ -12,7 +12,10 @@ import {
   initiativeNumberOfPeopleServed,
   returnToInitiativesDashboard,
 } from "../../../forms/2026/elements";
-import { checkpointsTables } from "../../../forms/2026/rhtp/rhtpElements";
+import {
+  checkpointsTables,
+  metricTable,
+} from "../../../forms/2026/rhtp/rhtpElements";
 import { Initiatives } from "../../constants";
 
 // TODO - better array typing and parsing once we have initiatives by state
@@ -34,6 +37,7 @@ export const buildInitiativePages = (
         initiativeInstructionsAccordion,
         initiativeNarrative,
         initiativeNumberOfPeopleServed,
+        metricTable,
         ...checkpointsTables,
       ],
     });
