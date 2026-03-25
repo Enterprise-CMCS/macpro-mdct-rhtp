@@ -16,6 +16,7 @@ export const ErrorMessages = {
   mustBeUniqueReportName:
     "A report with this name already exists during this reporting period.",
   mustBeACurrency: "Response must be a valid currency amount",
+  mustBeALink: "Response must be a valid url",
 } as const;
 
 export const PRODUCTION_HOST_DOMAIN = "mdctrhtp.cms.gov";

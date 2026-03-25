@@ -245,6 +245,7 @@ export enum ElementType {
   AccordionGroup = "accordionGroup",
   UseOfFundsTable = "useOfFundsTable",
   AttachmentTable = "attachmentTable",
+  ActionTable = "actionTable",
 }
 
 export type PageElement =
@@ -270,7 +271,8 @@ export type PageElement =
   | AccordionGroupTemplate
   | UseOfFundsTableTemplate
   | AttachmentAreaTemplate
-  | AttachmentTableTemplate;
+  | AttachmentTableTemplate
+  | ActionTableTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -385,6 +387,7 @@ export interface ListInputTemplate extends InputElementTemplate {
   fieldLabel: string;
   buttonText: string;
   answer?: string[];
+  validation?: string;
 }
 
 export interface NumberFieldTemplate extends InputElementTemplate {
@@ -468,3 +471,34 @@ export type AttachmentTableTemplate = {
     comments: { name: string; date: string }[];
   }[];
 };
+export interface ActionElement {
+  id: string;
+  type: ElementType;
+  disabled?: boolean;
+}
+
+export interface ActionRowElement extends ActionElement {
+  header: string;
+}
+
+export interface ActionModalElement extends ActionElement {
+  editOnly?: boolean;
+  children?: { label: string; value: string }[];
+  required: boolean;
+}
+
+export type ActionAnswerShape = { id: string; value: string | number }[];
+
+export interface ActionTableTemplate {
+  type: ElementType.ActionTable;
+  id: string;
+  label: string;
+  hintText: string;
+  modal: {
+    title: string;
+    hintText?: string;
+    elements: ActionModalElement[];
+  };
+  rows: ActionRowElement[];
+  answer?: ActionAnswerShape[];
+}

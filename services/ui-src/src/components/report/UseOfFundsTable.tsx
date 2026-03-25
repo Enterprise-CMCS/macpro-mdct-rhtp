@@ -209,7 +209,7 @@ export const UseOfFundsTableElement = (
         <Image src={addIcon} alt={"Add Item"} sx={sx.addIcon} />
         Add use of funds
       </Button>
-      <Table sx={sx.table}>
+      <Table variant="metric">
         <Thead>
           <Tr>
             <Th>Budget Period</Th>
@@ -325,48 +325,5 @@ export const UseOfFundsTableElementExport = (
 const sx = {
   addIcon: {
     padding: "3px",
-  },
-  table: {
-    marginBottom: "spacer5",
-    tbody: {
-      "tr:nth-of-type(even)": {
-        td: {
-          backgroundColor: "gray_lightest_highlight",
-        },
-      },
-      td: {
-        border: "none",
-        paddingBottom: "spacer1",
-        paddingInlineEnd: "spacer2",
-        paddingInlineStart: "spacer2",
-        paddingTop: "spacer1",
-      },
-      label: {
-        margin: 0,
-      },
-    },
-    tfoot: {
-      td: {
-        backgroundColor: "gray_lighter",
-        border: "none",
-        fontWeight: "bold",
-        paddingInlineEnd: "spacer2",
-        paddingInlineStart: "spacer2",
-      },
-    },
-    thead: {
-      th: {
-        backgroundColor: "primary_darkest",
-        color: "white",
-        fontSize: "lg",
-        letterSpacing: "normal",
-        lineHeight: "normal",
-        paddingBottom: "spacer1",
-        paddingInlineEnd: "spacer2",
-        paddingInlineStart: "spacer2",
-        paddingTop: "spacer1",
-        textTransform: "none",
-      },
-    },
   },
 };

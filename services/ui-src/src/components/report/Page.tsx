@@ -27,6 +27,7 @@ import {
   TableCheckpoint,
   AccordionGroup,
   InitiativesTable,
+  ActionTable,
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
@@ -104,6 +105,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <AccordionGroup {...{ updateElement, disabled, element }} />;
       case ElementType.AttachmentTable:
         return <AttachmentTable {...{ updateElement, disabled, element }} />;
+      case ElementType.ActionTable:
+        return <ActionTable {...{ updateElement, disabled, element }} />;
       default:
         assertExhaustive(element);
         return null;
