@@ -1,6 +1,6 @@
 import { AttachmentAreaTemplate, UploadListProp } from "types";
 import { PageElementProps } from "components/report/Elements";
-import { Text, Button, Stack, Heading, Image } from "@chakra-ui/react";
+import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -11,6 +11,7 @@ import {
   retrieveUploadedFiles,
   uploadListRender,
 } from "utils/other/upload";
+import { Hint, Label } from "@cmsgov/design-system";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
@@ -23,6 +24,7 @@ export const AttachmentArea = (
   const year = report?.year.toString();
 
   const updateElement = props.updateElement;
+  const files = answer ?? [];
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -44,12 +46,10 @@ export const AttachmentArea = (
   };
 
   return (
-    <Stack gap="1.5rem">
-      <Heading variant="h5">{label}</Heading>
-      {helperText && <Text>{helperText}</Text>}
-      {answer &&
-        answer.length > 0 &&
-        uploadListRender(answer, year, state, onRemove, downloadFile)}
+    <Stack gap="0">
+      <Label fieldId={id}>{label}</Label>
+      {helperText && <Hint id={id}>{helperText}</Hint>}
+      {uploadListRender(files, year, state, onRemove, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}
@@ -65,7 +65,7 @@ export const AttachmentArea = (
         }}
         state={state}
         year={year}
-        answer={answer ?? []}
+        answer={files}
         saveToReport={saveToReport}
         id={id}
       />
