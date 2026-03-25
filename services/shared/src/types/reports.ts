@@ -383,6 +383,7 @@ export interface ListInputTemplate extends InputElementTemplate {
   fieldLabel: string;
   buttonText: string;
   answer?: string[];
+  validation?: string;
 }
 
 export interface NumberFieldTemplate extends InputElementTemplate {
