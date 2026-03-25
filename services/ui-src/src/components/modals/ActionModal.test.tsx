@@ -71,6 +71,12 @@ describe("Test ActionModal component", () => {
     expect(textbox).toHaveValue("hello");
   });
   test("Modal save", async () => {
+    const textbox = screen.getByRole("textbox", { name: "Mock Textbox" });
+    await userEvent.type(textbox, "hello");
+
+    const date = screen.getByRole("textbox", { name: "Mock Date" });
+    await userEvent.type(date, "2/2/2022");
+
     const saveBtn = screen.getByRole("button", { name: "Save" });
     await userEvent.click(saveBtn);
     expect(mockSaveHandler).toHaveBeenCalled();
