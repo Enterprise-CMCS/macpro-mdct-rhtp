@@ -44,12 +44,10 @@ const mockActionTableElement: ActionTableTemplate = {
   ],
   answer: [
     [
-      { id: "no", value: "1" },
       { id: "mock-text", value: "hello" },
       { id: "status", value: "active" },
     ],
     [
-      { id: "no", value: "2" },
       { id: "mock-text", value: "bye" },
       { id: "status", value: "Abandoned" },
     ],
