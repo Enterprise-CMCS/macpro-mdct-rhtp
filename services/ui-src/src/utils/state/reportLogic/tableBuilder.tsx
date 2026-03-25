@@ -36,6 +36,7 @@ export const buildElement = (
         />
       );
     case ElementType.Textbox:
+    case ElementType.NumberField:
       return (
         <TextField
           label={label}
