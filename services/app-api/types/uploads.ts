@@ -1,16 +1,11 @@
-export type InitiativeUploadData = {
-  id: string[];
-  status: string;
-  stage: string;
-  checkpoints: [];
-};
+import { InitiativeUploadData } from "@rhtp/shared";
 
 export type UploadFileData = {
   uploadedFileName: string;
   uploadedFileType: string;
   uploadedFileSize: number;
   uploadId: string;
-  initiatives?: InitiativeUploadData;
+  initiative?: InitiativeUploadData;
 };
 
 export interface UploadData {
@@ -21,5 +16,5 @@ export interface UploadData {
   uploadedUsername: string;
   fileId: string;
   filesize: number;
-  initiatives?: InitiativeUploadData;
+  initiative?: InitiativeUploadData;
 }

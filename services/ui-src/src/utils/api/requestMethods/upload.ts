@@ -1,5 +1,6 @@
 import { getRequestHeaders } from "utils/api/requestMethods/getRequestHeaders";
 import { apiLib } from "../apiLib";
+import { InitiativeUploadData } from "types";
 
 interface PathURL {
   psurl: string;
@@ -14,7 +15,7 @@ export interface UploadData {
   uploadedUsername: string;
   fileId: string;
   filesize: number;
-  initiative: { id: string[]; status: string; stage: string; checkpoints: [] };
+  initiative: InitiativeUploadData;
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
@@ -29,12 +30,6 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
     uploadedFileType: uploadedFile.type,
     uploadedFileSize: uploadedFile.size,
     uploadId,
-    initiatives: {
-      ids: ["416c4eab-7658-4f5d-a559-a8ef616f86df"],
-      stage: "checkpoint-3",
-      checkpoints: "midway-imp-3",
-      status: "Under approval",
-    },
   };
 
   const options = {
@@ -48,6 +43,31 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   );
 
   return { presignedUploadUrl: psurl };
+};
+
+export const updateUpload = async (
+  year: string,
+  stateCode: string,
+  fileId: string,
+  initiative: InitiativeUploadData
+) => {
+  const requestHeaders = await getRequestHeaders();
+  const body = {
+    fileId,
+    initiative,
+  };
+
+  console.log("upload");
+
+  const options = {
+    headers: { ...requestHeaders },
+    body: { ...body },
+  };
+
+  return await apiLib.post<PathURL>(
+    `/uploads/${year}/${stateCode}/${fileId}`,
+    options
+  );
 };
 
 export const uploadFileToS3 = async (

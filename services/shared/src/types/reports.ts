@@ -189,10 +189,18 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 
 export type PageId = string;
 
+export type InitiativeUploadData = {
+  ids: string[];
+  status: string;
+  stage: string;
+  checkpoints: string;
+};
+
 export type UploadListProp = {
   name: string;
   size: number;
   fileId: string;
+  initiative?: InitiativeUploadData;
 };
 
 export type CheckpointShape = {

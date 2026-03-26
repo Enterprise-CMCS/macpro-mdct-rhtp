@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Stack,
   Table,
@@ -24,6 +23,7 @@ import {
   UploadListProp,
 } from "types";
 import { useStore } from "utils";
+import { updateUpload } from "utils/api/requestMethods/upload";
 import { retrieveUploadedFiles } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 
@@ -41,11 +41,23 @@ export const AttachmentTable = (
 ) => {
   const { id } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [initiatives, setInitiatives] = useState<any[]>([]);
-  const [files, setFiles] = useState<any>([]);
+  const [files, setFiles] = useState<UploadListProp[]>([]);
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
+  const [initiativeOptions, setInitiativeOptions] = useState<
+    { label: string; value: string; checked: boolean }[]
+  >([]);
+  const [stageOption, setStageOption] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [checkpointOption, setCheckpointOption] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [selection, setSelection] = useState<{
+    stage: string;
+    checkpoint: string;
+  }>({ stage: "", checkpoint: "" });
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -56,44 +68,83 @@ export const AttachmentTable = (
     const initiatives = (report?.pages.filter(
       (page) => "initiativeNumber" in page
     ) || []) as InitiativePageTemplate[];
-    setInitiatives(initiatives);
-    retrieveUploadedFiles(year, state, id).then((response) => {
-      setFiles(response);
-    });
+
+    setInitiativeOptions(
+      initiatives.map((initiative) => ({
+        label: `${initiative.initiativeNumber}: ${initiative.title}`,
+        value: initiative.id,
+        checked: false,
+      }))
+    );
   }, [report]);
 
-  const initiativeChoices = initiatives.map((initiative) => ({
-    label: `${initiative.initiativeNumber}: ${initiative.title}`,
-    value: initiative.id,
-  }));
-
-  console.log(files);
-
-  const stages = checkpointsList.map((checks) => ({
-    label: `${checks.stage} ${checks.label}`,
-    value: checks.id,
-  }));
-  let checkpoints = checkpointsList
-    .find((checks) => checks.id === stages[0].value)
-    ?.checkpoints.filter((checks) => checks.attachable)
-    .map((check) => ({ label: check.label, value: check.id }));
-
-  const [selection, setSelection] = useState<{
-    stage: string;
-    checkpoint: string;
-  }>({ stage: stages[0].value, checkpoint: checkpoints![0].value });
+  useEffect(() => {
+    retrieveUploadedFiles(year, state, id).then((response) => {
+      console.log("response", response);
+      setFiles(response);
+    });
+    setStageOption(
+      checkpointsList.map((checks) => ({
+        label: `${checks.stage} ${checks.label}`,
+        value: checks.id,
+      }))
+    );
+    setCheckpointOption(
+      checkpointsList[0].checkpoints
+        .filter((checks) => checks.attachable)
+        .map((check) => ({ label: check.label, value: check.id }))
+    );
+    setSelection({
+      stage: checkpointsList[0].id,
+      checkpoint: checkpointsList[0].checkpoints[0].id,
+    });
+  }, []);
 
   const onChangeHandler = (event: DropdownChangeObject) => {
     const value = event.target.value;
-    setSelection({ ...selection, stage: value });
-    checkpoints = checkpointsList
-      .find((checks) => checks.id === value)
-      ?.checkpoints.filter((checks) => checks.attachable)
-      .map((check) => ({ label: check.label, value: check.id }));
+    const checkpoints =
+      checkpointsList
+        .find((checks) => checks.id === value)
+        ?.checkpoints.filter((checks) => checks.attachable)
+        .map((check) => ({ label: check.label, value: check.id })) ?? [];
+
+    setCheckpointOption(checkpoints);
+    setSelection({ stage: value, checkpoint: checkpoints[0].value });
+    console.log(initiativeOptions);
+  };
+
+  const onChoiceChangeHandler = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    const choices = [...initiativeOptions];
+    const choiceIndex = initiativeOptions.findIndex(
+      (option) => option.value === value
+    );
+    choices[choiceIndex].checked = !choices[choiceIndex].checked;
+    setInitiativeOptions(choices);
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
-    console.log("uploads", uploads);
+    console.log("saveToReport", uploads);
+    const fetchData = async () =>
+      await Promise.all(
+        uploads.map((upload) => {
+          updateUpload(year, state, upload.fileId, {
+            ids: initiativeOptions
+              .filter((option) => option.checked)
+              .map((option) => option.value),
+            status: "Under approval",
+            stage: selection.stage,
+            checkpoints: selection.checkpoint,
+          });
+        })
+      ).then((response) => {
+        console.log("run all");
+        console.log(response);
+      });
+
+    fetchData();
   };
 
   return (
@@ -115,9 +166,20 @@ export const AttachmentTable = (
           </Tr>
         </Thead>
         <Tbody>
-          {files.map((file: any) => (
+          {files.map((file) => (
             <Tr>
-              <Td>{file.name}</Td>
+              <Td>
+                <Button variant="link">{file.name}</Button>
+              </Td>
+              <Td>{file.initiative?.ids.join(" ")}</Td>
+              <Td>{file.initiative?.stage}</Td>
+              <Td>{file.initiative?.checkpoints}</Td>
+              <Td>{file.initiative?.status}</Td>
+              <Td>
+                <Button variant="outline">Edit</Button>
+                <Button variant="link">message</Button>
+                <Button variant="link">cancel</Button>
+              </Td>
             </Tr>
           ))}
         </Tbody>
@@ -131,31 +193,30 @@ export const AttachmentTable = (
         }}
         state={state}
         year={year}
-        answer={[]}
+        answer={files}
         id={id}
         selections={
           <Stack gap="1.5rem">
-            <Box>
-              Initiative
-              <ChoiceList
-                choices={initiativeChoices}
-                name={""}
-                type={"checkbox"}
-                label={undefined}
-              ></ChoiceList>
-            </Box>
+            <ChoiceList
+              choices={initiativeOptions}
+              name={"initiative-choice-list"}
+              type={"checkbox"}
+              label={"Initiative"}
+              onChange={onChoiceChangeHandler}
+              hint={"This is the hint text"}
+            ></ChoiceList>
             <Dropdown
               name={"stage"}
               label={"Stage"}
-              value={selection.stage}
-              options={stages}
+              value={selection?.stage}
+              options={stageOption}
               onChange={onChangeHandler}
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
               label={"Checkpoint #"}
-              options={checkpoints!}
-              value={selection.checkpoint}
+              options={checkpointOption}
+              value={selection?.checkpoint}
               onChange={(dropdown) => {
                 const value = dropdown.target.value;
                 setSelection({ ...selection, checkpoint: value });

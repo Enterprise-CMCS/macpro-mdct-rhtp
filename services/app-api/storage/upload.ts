@@ -7,7 +7,8 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { collectPageItems, createClient } from "./dynamo/dynamodb-lib";
 import s3 from "../libs/s3-lib";
-import { InitiativeUploadData, UploadData } from "../types/uploads";
+import { UploadData } from "../types/uploads";
+import { InitiativeUploadData } from "@rhtp/shared";
 
 const uploadTableName = process.env.UploadsTable!;
 const client = createClient();
@@ -40,8 +41,7 @@ export const updateUpload = async (
   uploadedFileName: string,
   awsFilename: string,
   fileId: string,
-  uploadedFileSize: number,
-  initiative: InitiativeUploadData | undefined
+  uploadedFileSize: number
 ) => {
   const params = {
     TableName: uploadTableName,
@@ -50,13 +50,32 @@ export const updateUpload = async (
       fileId: fileId,
     },
     UpdateExpression:
-      "SET uploadedUsername = :uploadedUsername, uploadedDate = :uploadedDate, filename = :filename, awsFilename = :awsFilename, filesize = :filesize, initiative = :initiative",
+      "SET uploadedUsername = :uploadedUsername, uploadedDate = :uploadedDate, filename = :filename, awsFilename = :awsFilename, filesize = :filesize",
     ExpressionAttributeValues: {
       ":uploadedUsername": username,
       ":uploadedDate": new Date().toISOString(),
       ":filename": uploadedFileName,
       ":awsFilename": awsFilename,
       ":filesize": uploadedFileSize,
+    },
+  };
+
+  await client.send(new UpdateCommand(params));
+};
+
+export const updateUpload2 = async (
+  state: string,
+  fileId: string,
+  initiative: InitiativeUploadData | undefined
+) => {
+  const params = {
+    TableName: uploadTableName,
+    Key: {
+      uploadedState: state,
+      fileId: fileId,
+    },
+    UpdateExpression: "SET initiative = :initiative",
+    ExpressionAttributeValues: {
       ":initiative": initiative,
     },
   };
