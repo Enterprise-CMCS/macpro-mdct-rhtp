@@ -1,21 +1,10 @@
 import { FormPageTemplate, PageStatus, PageType } from "../../../types/reports";
-import { Initiatives } from "../../constants";
 import { validReport } from "../../tests/mockReport";
-import { buildInitiativePages, updateInitiativeStatus } from "./initiatives";
+import { updateInitiativeStatus } from "./initiatives";
 
 describe("initiative utilities", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  describe("buildInitiativePages utility", () => {
-    test("test builds pages for each initiative given", () => {
-      const mockBaseReport = structuredClone(validReport);
-      buildInitiativePages(mockBaseReport);
-      expect(mockBaseReport.pages.length).toEqual(
-        validReport.pages.length + Initiatives.length
-      );
-    });
   });
 
   describe("updateInitiativeStatus utility", () => {

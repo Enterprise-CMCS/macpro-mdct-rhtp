@@ -39,6 +39,7 @@ export const retrieveUploadedFiles = async (
     name: file.filename,
     size: file.filesize,
     fileId: file.fileId,
+    initiative: file.initiative,
   }));
 };
 

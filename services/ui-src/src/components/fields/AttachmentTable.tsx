@@ -4,6 +4,7 @@ import {
   Stack,
   Table,
   Tbody,
+  Td,
   Th,
   Thead,
   Tr,
@@ -17,8 +18,13 @@ import { UploadModal } from "components/modals/UploadModal";
 import { PageElementProps } from "components/report/Elements";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AttachmentTableTemplate, InitiativePageTemplate } from "types";
+import {
+  AttachmentTableTemplate,
+  InitiativePageTemplate,
+  UploadListProp,
+} from "types";
 import { useStore } from "utils";
+import { retrieveUploadedFiles } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 
 const header = [
@@ -36,15 +42,24 @@ export const AttachmentTable = (
   const { id } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [initiatives, setInitiatives] = useState<any[]>([]);
+  const [files, setFiles] = useState<any>([]);
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
+
+  if (!state || !year) {
+    console.error("Can't retrieve uploads with missing state or year");
+    return;
+  }
 
   useEffect(() => {
     const initiatives = (report?.pages.filter(
       (page) => "initiativeNumber" in page
     ) || []) as InitiativePageTemplate[];
     setInitiatives(initiatives);
+    retrieveUploadedFiles(year, state, id).then((response) => {
+      setFiles(response);
+    });
   }, [report]);
 
   const initiativeChoices = initiatives.map((initiative) => ({
@@ -52,10 +67,7 @@ export const AttachmentTable = (
     value: initiative.id,
   }));
 
-  if (!state || !year) {
-    console.error("Can't retrieve uploads with missing state or year");
-    return;
-  }
+  console.log(files);
 
   const stages = checkpointsList.map((checks) => ({
     label: `${checks.stage} ${checks.label}`,
@@ -80,10 +92,12 @@ export const AttachmentTable = (
       .map((check) => ({ label: check.label, value: check.id }));
   };
 
-  const saveToReport = () => {};
+  const saveToReport = (uploads: UploadListProp[]) => {
+    console.log("uploads", uploads);
+  };
 
   return (
-    <Stack width="100%">
+    <Stack width="100%" gap="1.5rem">
       <Button
         aria-label="Add Attachment"
         variant="outline"
@@ -100,7 +114,13 @@ export const AttachmentTable = (
             ))}
           </Tr>
         </Thead>
-        <Tbody></Tbody>
+        <Tbody>
+          {files.map((file: any) => (
+            <Tr>
+              <Td>{file.name}</Td>
+            </Tr>
+          ))}
+        </Tbody>
       </Table>
       <UploadModal
         modalDisclosure={{

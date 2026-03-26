@@ -12,7 +12,7 @@ export const createUpload = handler(
   async (request) => {
     const { user, body } = request;
     // Format Info
-    const { uploadedFileName, uploadedFileSize, uploadId } =
+    const { uploadedFileName, uploadedFileSize, uploadId, initiatives } =
       body as UploadFileData;
     const { state, year } = request.parameters;
 
@@ -26,7 +26,8 @@ export const createUpload = handler(
       uploadedFileName,
       awsFilename,
       fileId,
-      uploadedFileSize
+      uploadedFileSize,
+      initiatives
     );
 
     // Pre-sign url

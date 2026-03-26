@@ -14,6 +14,7 @@ export interface UploadData {
   uploadedUsername: string;
   fileId: string;
   filesize: number;
+  initiative: { id: string[]; status: string; stage: string; checkpoints: [] };
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
@@ -28,6 +29,12 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
     uploadedFileType: uploadedFile.type,
     uploadedFileSize: uploadedFile.size,
     uploadId,
+    initiatives: {
+      ids: ["416c4eab-7658-4f5d-a559-a8ef616f86df"],
+      stage: "checkpoint-3",
+      checkpoints: "midway-imp-3",
+      status: "Under approval",
+    },
   };
 
   const options = {

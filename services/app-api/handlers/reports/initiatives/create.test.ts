@@ -7,7 +7,7 @@ import { validReport } from "../../../utils/tests/mockReport";
 import { ReportStatus } from "../../../types/reports";
 import { APIGatewayProxyEvent, User, UserRoles } from "../../../types/types";
 import { getReport, putReport } from "../../../storage/reports";
-import { buildInitiativePages } from "../../../utils/reports/initiatives/initiatives";
+import { buildInitiativePages } from "../../../forms/2026/rhtp/pages/initiatives";
 
 vi.mock("../../../utils/authentication");
 vi.mocked(authenticatedUser).mockReturnValue({
@@ -20,13 +20,9 @@ vi.mock("../../../utils/authorization", () => ({
   canWriteInitiatives: vi.fn().mockReturnValue(true),
 }));
 
-vi.mock(
-  "../../../utils/reports/initiatives/initiatives",
-  async (importOriginal) => ({
-    ...(await importOriginal()),
-    buildInitiativePages: vi.fn(),
-  })
-);
+vi.mock("../../../forms/2026/rhtp/pages/initiatives", () => ({
+  buildInitiativePages: vi.fn(() => []),
+}));
 const mockBuildInitiatives = vi.mocked(buildInitiativePages);
 
 vi.mock("../../../storage/reports");
@@ -107,7 +103,7 @@ describe("Test create initiative handler", () => {
     mockGetReport.mockResolvedValue(validReport);
     const res = await createInitiative(testEvent);
 
-    expect(mockBuildInitiatives).toHaveBeenCalledWith(validReport, [
+    expect(mockBuildInitiatives).toHaveBeenCalledWith([
       expect.objectContaining({
         name: "Mock Initiative Name",
         initiativeNumber: "123",
