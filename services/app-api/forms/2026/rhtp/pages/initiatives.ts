@@ -1,5 +1,6 @@
 import {
   AccordionTemplate,
+  ActionTableTemplate,
   ButtonLinkTemplate,
   ElementType,
   HeaderTemplate,
@@ -64,6 +65,47 @@ const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   id: "initiative-number-of-people-served",
   label: "Number of people served",
   required: true,
+};
+
+export const metricTable: ActionTableTemplate = {
+  type: ElementType.ActionTable,
+  id: "metrics-table",
+  label: "Metrics",
+  hintText:
+    "To add an metric, click button below. [Hint text here to let users know they must report on 4 metrics per initative]",
+  modal: {
+    title: "Metric",
+    hintText: "[hint text]",
+    elements: [
+      {
+        id: "status",
+        type: ElementType.Dropdown,
+        editOnly: true,
+        children: [
+          { label: "Active", value: "Active" },
+          { label: "Abandoned", value: "Abandoned" },
+        ],
+        required: true,
+      },
+      { id: "metric", type: ElementType.TextAreaField, required: true },
+      { id: "currValue", type: ElementType.NumberField, required: true },
+      { id: "date", type: ElementType.Date, required: true },
+    ],
+  },
+  rows: [
+    { id: "no", header: "#", type: ElementType.Paragraph },
+    { id: "status", header: "Status", type: ElementType.Paragraph },
+    { id: "metric", header: "Metric", type: ElementType.Paragraph },
+    {
+      id: "prevValue",
+      header: "Previous Value",
+      type: ElementType.NumberField,
+      disabled: true,
+    },
+    { id: "currValue", header: "Current Value", type: ElementType.NumberField },
+    { id: "date", header: "As of Date", type: ElementType.Date },
+  ],
+  answer: [],
 };
 
 const checkpointsTables: PageElement[] = [

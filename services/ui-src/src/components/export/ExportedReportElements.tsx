@@ -16,6 +16,7 @@ const renderElementList = [
   ElementType.TableCheckpoint,
   ElementType.AttachmentArea,
   ElementType.AccordionGroup,
+  ElementType.ActionTable,
 ];
 
 export const shouldUseTable = (type: ElementType) => {
@@ -40,6 +41,8 @@ export const renderElements = (element: PageElement) => {
     case ElementType.AttachmentArea:
       return "TBD";
     case ElementType.AccordionGroup:
+      return "TBD";
+    case ElementType.ActionTable:
       return "TBD";
   }
 
