@@ -267,6 +267,7 @@ export const buildInitiativePages = (initiatives: any[] = INITIATIVES) => {
         initiativeInstructionsAccordion,
         initiativeNarrative,
         initiativeNumberOfPeopleServed,
+        metricTable,
         ...checkpointsTables,
       ],
     });
