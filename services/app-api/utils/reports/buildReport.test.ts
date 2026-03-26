@@ -94,7 +94,7 @@ describe("buildReport utility", () => {
       year: 2026,
     } as ReportOptions;
 
-    expect(async () => {
+    await expect(async () => {
       await buildReport(ReportType.RHTP, state, reportOptions, user);
     }).rejects.toThrow("Invalid request");
   });

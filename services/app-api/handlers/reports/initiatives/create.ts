@@ -11,7 +11,7 @@ import { getReport, putReport } from "../../../storage/reports";
 import { ReportStatus } from "../../../types/reports";
 import { canWriteInitiatives } from "../../../utils/authorization";
 import { error } from "../../../utils/constants";
-import { buildInitiativePages } from "../../../utils/reports/initiatives/initiatives";
+import { buildInitiativePages } from "../../../forms/2026/rhtp/pages/initiatives";
 import {
   isCreateInitiativeBody,
   validateReportPayload,
@@ -50,7 +50,8 @@ export const createInitiative = handler(
         initiativeNumber,
       },
     ];
-    buildInitiativePages(report, newInitiative);
+    const newPages = buildInitiativePages(newInitiative);
+    report.pages.push(...newPages);
 
     // validate new report
     try {
