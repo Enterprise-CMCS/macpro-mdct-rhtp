@@ -36,7 +36,10 @@ export const buildReport = async (
   user: User
 ) => {
   const year = reportOptions.year;
-  const template = structuredClone(getReportTemplate(reportType, year));
+  // json parse and stringify used instead of structuredClone to break shared references between repeat elements
+  const template = JSON.parse(
+    JSON.stringify(getReportTemplate(reportType, year))
+  );
 
   const report: Report = {
     state,
