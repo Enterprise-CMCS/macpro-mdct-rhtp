@@ -1,16 +1,12 @@
-import { ReportType } from "../types/reports";
+import { isStateAbbr, ReportBase, ReportType } from "../types/reports";
 import { rhtpReportTemplate as rhtpReportTemplate2026 } from "./2026/rhtp/rhtp";
 
-const formsByYear = {
-  2026: {
-    rhtpReportTemplate: rhtpReportTemplate2026,
-  },
+const formsByYearAndState: { [year: number]: (state: string) => ReportBase } = {
+  2026: (state: string) => rhtpReportTemplate2026(state),
 };
 
-function assertYearIsValid(
-  year: number
-): asserts year is keyof typeof formsByYear {
-  if (year in formsByYear) {
+function assertYearAndStateAreValid(year: number, state: string) {
+  if (year in formsByYearAndState && isStateAbbr(state)) {
     return;
   } else {
     throw new Error(
@@ -19,11 +15,15 @@ function assertYearIsValid(
   }
 }
 
-export const getReportTemplate = (reportType: ReportType, year: number) => {
-  assertYearIsValid(year);
+export const getReportTemplate = (
+  reportType: ReportType,
+  year: number,
+  state: string
+) => {
+  assertYearAndStateAreValid(year, state);
   switch (reportType) {
     case ReportType.RHTP:
-      return formsByYear[year].rhtpReportTemplate;
+      return formsByYearAndState[year](state);
     default:
       throw new Error(
         `Not implemented - getReportTemplate for ReportType ${reportType}`
