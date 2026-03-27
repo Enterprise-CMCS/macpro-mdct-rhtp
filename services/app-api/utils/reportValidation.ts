@@ -222,6 +222,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return attachmentAreaSchema;
     case ElementType.AccordionGroup:
       return accordionGroupTemplateSchema;
+    case ElementType.AttachmentTable:
+      return attachmentTableSchema;
     case ElementType.ActionTable:
       return actionTableSchema;
     default:
@@ -385,6 +387,29 @@ const actionTableSchema = object().shape({
 const initiativesTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.InitiativesTable)),
   id: string().required(),
+});
+
+const attachmentTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AttachmentTable)),
+  id: string().required(),
+  answer: array()
+    .of(
+      object().shape({
+        attachment: object().shape({
+          id: string().required(),
+          name: string().required(),
+        }),
+        initiatives: array().of(string()).required(),
+        stage: number().required(),
+        checkpoints: string().required(),
+        status: string().required(),
+        comments: object().shape({
+          name: string().required(),
+          date: string().required(),
+        }),
+      })
+    )
+    .notRequired(),
 });
 
 const dividerSchema = object().shape({

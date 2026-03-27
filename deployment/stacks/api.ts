@@ -195,6 +195,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "updateUpload", {
+    entry: "services/app-api/handlers/uploads/update.ts",
+    handler: "updateUploads",
+    path: "/uploads/{year}/{state}/{fileId}",
+    method: "POST",
+    ...commonProps,
+  });
+
   new Lambda(scope, "getUpload", {
     entry: "services/app-api/handlers/uploads/get.ts",
     handler: "getUpload",

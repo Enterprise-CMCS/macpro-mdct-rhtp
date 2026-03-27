@@ -1,8 +1,11 @@
+import { InitiativeUploadData } from "@rhtp/shared";
+
 export type UploadFileData = {
   uploadedFileName: string;
   uploadedFileType: string;
   uploadedFileSize: number;
   uploadId: string;
+  initiative?: InitiativeUploadData;
 };
 
 export interface UploadData {
@@ -13,4 +16,5 @@ export interface UploadData {
   uploadedUsername: string;
   fileId: string;
   filesize: number;
+  initiative?: InitiativeUploadData;
 }

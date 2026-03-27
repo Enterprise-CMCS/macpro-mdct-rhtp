@@ -189,10 +189,18 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 
 export type PageId = string;
 
+export type InitiativeUploadData = {
+  ids: string[];
+  status: string;
+  stage: string;
+  checkpoints: string;
+};
+
 export type UploadListProp = {
   name: string;
   size: number;
   fileId: string;
+  initiative?: InitiativeUploadData;
 };
 
 export type CheckpointShape = {
@@ -244,6 +252,7 @@ export enum ElementType {
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
   UseOfFundsTable = "useOfFundsTable",
+  AttachmentTable = "attachmentTable",
   ActionTable = "actionTable",
 }
 
@@ -270,6 +279,7 @@ export type PageElement =
   | AccordionGroupTemplate
   | UseOfFundsTableTemplate
   | AttachmentAreaTemplate
+  | AttachmentTableTemplate
   | ActionTableTemplate;
 
 export type HideCondition = {
@@ -457,6 +467,18 @@ export type UseOfFundsTableTemplate = {
   answer?: UseOfFundsTableItem[];
 };
 
+export type AttachmentTableTemplate = {
+  type: ElementType.AttachmentTable;
+  id: string;
+  answer?: {
+    attachment: { id: string; name: string };
+    initiatives: string[];
+    stage: number;
+    checkpoints: string;
+    status: string;
+    comments: { name: string; date: string }[];
+  }[];
+};
 export interface ActionElement {
   id: string;
   type: ElementType;

@@ -42,6 +42,8 @@ export const renderElements = (element: PageElement) => {
       return "TBD";
     case ElementType.AccordionGroup:
       return "TBD";
+    case ElementType.AttachmentTable:
+      return "TBD";
     case ElementType.ActionTable:
       return "TBD";
   }

@@ -8,6 +8,7 @@ import {
 import { collectPageItems, createClient } from "./dynamo/dynamodb-lib";
 import s3 from "../libs/s3-lib";
 import { UploadData } from "../types/uploads";
+import { InitiativeUploadData } from "@rhtp/shared";
 
 const uploadTableName = process.env.UploadsTable!;
 const client = createClient();
@@ -56,6 +57,26 @@ export const updateUpload = async (
       ":filename": uploadedFileName,
       ":awsFilename": awsFilename,
       ":filesize": uploadedFileSize,
+    },
+  };
+
+  await client.send(new UpdateCommand(params));
+};
+
+export const updateUpload2 = async (
+  state: string,
+  fileId: string,
+  initiative: InitiativeUploadData | undefined
+) => {
+  const params = {
+    TableName: uploadTableName,
+    Key: {
+      uploadedState: state,
+      fileId: fileId,
+    },
+    UpdateExpression: "SET initiative = :initiative",
+    ExpressionAttributeValues: {
+      ":initiative": initiative,
     },
   };
 
