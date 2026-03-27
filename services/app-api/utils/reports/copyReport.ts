@@ -21,22 +21,15 @@ const copyAnswer = (oldElements: PageElement[], newElements: PageElement[]) => {
 };
 
 const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
-  const newAnswers: ActionAnswerShape[] = [];
-  for (const oldAnswerRow of oldAnswerRows) {
+  return oldAnswerRows.map((oldAnswerRow) => {
     const newAnswerRow = structuredClone(oldAnswerRow);
-    const prevValueIndex = oldAnswerRow.findIndex(
-      (answer: { id: string; value: string | number }) =>
-        answer.id === "prevValue"
+    const indexes = ["prevValue", "currValue"].map((key) =>
+      oldAnswerRow.findIndex((row) => row.id === key)
     );
-    const currValueIndex = oldAnswerRow.findIndex(
-      (answer: { id: string; value: string | number }) =>
-        answer.id === "currValue"
-    );
-    newAnswerRow[prevValueIndex].value = oldAnswerRow[currValueIndex].value;
-    newAnswerRow[currValueIndex].value = "";
-    newAnswers.push(newAnswerRow);
-  }
-  return newAnswers;
+    newAnswerRow[indexes[0]].value = oldAnswerRow[indexes[1]].value;
+    newAnswerRow[indexes[1]].value = "";
+    return newAnswerRow;
+  });
 };
 
 export const copyReport = async (newReport: Report) => {
