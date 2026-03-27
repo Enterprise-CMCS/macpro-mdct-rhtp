@@ -1,13 +1,13 @@
 import { ReportType, ReportBase } from "../../../types/reports";
 import { generalInformation } from "./pages/general-information";
-import { buildInitiativePages } from "./pages/initiatives";
+import { buildInitiativePages } from "./pages/initiatives/initiatives";
 import { initiativesTable } from "./pages/initiatives-table";
 import { reviewAndSubmit } from "./pages/review-and-submit";
 import { statePolicyCommitments } from "./pages/state-policy-commitments";
 import { sustainabilityAndHighlights } from "./pages/sustainability-and-highlights";
 import { useOfFunds } from "./pages/use-of-funds";
 
-export const rhtpReportTemplate: ReportBase = {
+export const rhtpReportTemplate = (state: string): ReportBase => ({
   type: ReportType.RHTP,
   year: 2026,
   pages: [
@@ -28,6 +28,6 @@ export const rhtpReportTemplate: ReportBase = {
     useOfFunds,
     sustainabilityAndHighlights,
     reviewAndSubmit,
-    ...buildInitiativePages(),
+    ...buildInitiativePages(state),
   ],
-};
+});

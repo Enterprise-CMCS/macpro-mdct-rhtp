@@ -7,7 +7,7 @@ import {
 } from "../../types/reports";
 import { StateAbbr } from "../constants";
 
-const rhtpReportTemplate = rhtpReportTemplate2026;
+const rhtpReportTemplate = rhtpReportTemplate2026("PA");
 
 export const validReport: Report = {
   type: rhtpReportTemplate.type,
