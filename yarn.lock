@@ -841,6 +841,53 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aws-sdk/client-support@npm:~3.1012.0":
+  version: 3.1012.0
+  resolution: "@aws-sdk/client-support@npm:3.1012.0"
+  dependencies:
+    "@aws-crypto/sha256-browser": "npm:5.2.0"
+    "@aws-crypto/sha256-js": "npm:5.2.0"
+    "@aws-sdk/core": "npm:^3.973.21"
+    "@aws-sdk/credential-provider-node": "npm:^3.972.22"
+    "@aws-sdk/middleware-host-header": "npm:^3.972.8"
+    "@aws-sdk/middleware-logger": "npm:^3.972.8"
+    "@aws-sdk/middleware-recursion-detection": "npm:^3.972.8"
+    "@aws-sdk/middleware-user-agent": "npm:^3.972.22"
+    "@aws-sdk/region-config-resolver": "npm:^3.972.8"
+    "@aws-sdk/types": "npm:^3.973.6"
+    "@aws-sdk/util-endpoints": "npm:^3.996.5"
+    "@aws-sdk/util-user-agent-browser": "npm:^3.972.8"
+    "@aws-sdk/util-user-agent-node": "npm:^3.973.8"
+    "@smithy/config-resolver": "npm:^4.4.11"
+    "@smithy/core": "npm:^3.23.12"
+    "@smithy/fetch-http-handler": "npm:^5.3.15"
+    "@smithy/hash-node": "npm:^4.2.12"
+    "@smithy/invalid-dependency": "npm:^4.2.12"
+    "@smithy/middleware-content-length": "npm:^4.2.12"
+    "@smithy/middleware-endpoint": "npm:^4.4.26"
+    "@smithy/middleware-retry": "npm:^4.4.43"
+    "@smithy/middleware-serde": "npm:^4.2.15"
+    "@smithy/middleware-stack": "npm:^4.2.12"
+    "@smithy/node-config-provider": "npm:^4.3.12"
+    "@smithy/node-http-handler": "npm:^4.5.0"
+    "@smithy/protocol-http": "npm:^5.3.12"
+    "@smithy/smithy-client": "npm:^4.12.6"
+    "@smithy/types": "npm:^4.13.1"
+    "@smithy/url-parser": "npm:^4.2.12"
+    "@smithy/util-base64": "npm:^4.3.2"
+    "@smithy/util-body-length-browser": "npm:^4.2.2"
+    "@smithy/util-body-length-node": "npm:^4.2.3"
+    "@smithy/util-defaults-mode-browser": "npm:^4.3.42"
+    "@smithy/util-defaults-mode-node": "npm:^4.2.45"
+    "@smithy/util-endpoints": "npm:^3.3.3"
+    "@smithy/util-middleware": "npm:^4.2.12"
+    "@smithy/util-retry": "npm:^4.2.12"
+    "@smithy/util-utf8": "npm:^4.2.2"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/6504d7a6bc14d63f4e67a61632b2d037b76a3a204ed3fd35ea569b2b8381301039c302eae628cc42ec40e3c29b9f3d9d3ec08fb6f4a13e9081da0fdac5228a67
+  languageName: node
+  linkType: hard
+
 "@aws-sdk/core@npm:^3.973.19, @aws-sdk/core@npm:^3.973.6":
   version: 3.973.19
   resolution: "@aws-sdk/core@npm:3.973.19"
@@ -10530,6 +10577,7 @@ __metadata:
     "@aws-sdk/client-lambda": "npm:~3.1012.0"
     "@aws-sdk/client-s3": "npm:~3.1012.0"
     "@aws-sdk/client-secrets-manager": "npm:~3.1012.0"
+    "@aws-sdk/client-support": "npm:~3.1012.0"
     "@octokit/auth-action": "npm:^6.0.1"
     "@octokit/rest": "npm:^22.0.0"
     "@types/node": "npm:^24.10.10"
