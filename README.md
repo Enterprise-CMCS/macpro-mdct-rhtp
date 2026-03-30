@@ -197,6 +197,10 @@ RHTP pipes updates from the report object tables to BigMac for downstream consum
 - `services/app-api/handlers/kafka/post/postKafkaData.ts` - Add the bucket and table names into the appropriate arrays. They will be parsed with their event types accordingly.
 - `services/topics/createTopics.js` - Declare the new topic names. Both the stream name for the bucket and table should be added here.
 
+## Architecture
+
+![Architecture Diagram](./.images/architecture.png?raw=true)
+
 ## GitHub Actions Secret Management
 
 - Secrets are added to GitHub secrets by GitHub Admins
