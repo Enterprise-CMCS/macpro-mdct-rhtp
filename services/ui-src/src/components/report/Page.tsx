@@ -24,7 +24,10 @@ import {
   StatusAlert,
   CheckboxField,
   ListInput,
+  TableCheckpoint,
+  AccordionGroup,
   InitiativesTable,
+  ActionTable,
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
@@ -87,6 +90,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <SubmissionParagraph />;
       case ElementType.ListInput:
         return <ListInput {...{ updateElement, disabled, element }} />;
+      case ElementType.TableCheckpoint:
+        return <TableCheckpoint {...{ updateElement, disabled, element }} />;
       case ElementType.UseOfFundsTable:
         return (
           <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
@@ -95,6 +100,10 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <InitiativesTable {...{ updateElement, disabled, element }} />;
       case ElementType.AttachmentArea:
         return <AttachmentArea {...{ updateElement, disabled, element }} />;
+      case ElementType.AccordionGroup:
+        return <AccordionGroup {...{ updateElement, disabled, element }} />;
+      case ElementType.ActionTable:
+        return <ActionTable {...{ updateElement, disabled, element }} />;
       default:
         assertExhaustive(element);
         return null;

@@ -11,12 +11,7 @@ import {
 import { User } from "../../types/types";
 import { StateAbbr } from "../../utils/constants";
 import { validateReportPayload } from "../../utils/reportValidation";
-import {
-  buildInitiativePages,
-  buildReport,
-  makeQuarterlyChanges,
-} from "./buildReport";
-import { validReport } from "../tests/mockReport";
+import { buildReport, makeQuarterlyChanges } from "./buildReport";
 
 vi.mock("../../utils/reportValidation", () => ({
   validateReportPayload: vi.fn().mockImplementation(async (rpt) => rpt),
@@ -99,7 +94,7 @@ describe("buildReport utility", () => {
       year: 2026,
     } as ReportOptions;
 
-    expect(async () => {
+    await expect(async () => {
       await buildReport(ReportType.RHTP, state, reportOptions, user);
     }).rejects.toThrow("Invalid request");
   });
@@ -146,17 +141,5 @@ describe("makeQuarterlyChanges utility", () => {
     expect("disabled" in mockHeader).toBe(false);
     expect(mockTextBox1.disabled).toBe(true);
     expect("disabled" in mockTextBox2).toBe(false);
-  });
-});
-
-describe("buildInitiativePages utility", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  test("test only disabled quarterly false elements", () => {
-    const mockBaseReport = structuredClone(validReport);
-    buildInitiativePages(mockBaseReport);
-    expect(mockBaseReport.pages.length).toEqual(validReport.pages.length + 1);
   });
 });

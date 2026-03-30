@@ -12,9 +12,13 @@ import { error } from "../../utils/constants";
 export const viewUploadsForState = handler(
   parseUploadViewParameters,
   async (request) => {
-    const { state } = request.parameters;
+    const { state, year, fileId } = request.parameters;
 
-    const uploads = await queryViewUploads(state);
+    if (!state || !fileId) {
+      return forbidden(error.MISSING_DATA);
+    }
+
+    const uploads = await queryViewUploads(state, `${fileId}_${year}`);
     return ok(uploads);
   }
 );

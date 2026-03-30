@@ -16,6 +16,7 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
+import { UploadListProp } from "types";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -28,14 +29,12 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
-export type UploadListProp = {
-  name: string;
-  size: number;
-  fileId: string;
-};
-
-export const retrieveUploadedFiles = async (year: string, state: string) => {
-  const uploadedFiles = await getUploadedFiles(year, state);
+export const retrieveUploadedFiles = async (
+  year: string,
+  state: string,
+  uploadId: string
+) => {
+  const uploadedFiles = await getUploadedFiles(year, state, uploadId);
   return uploadedFiles.map((file) => ({
     name: file.filename,
     size: file.filesize,
@@ -53,19 +52,15 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
-const removeFile = async (
+export const removeFile = async (
   file: File | UploadListProp,
   year: string,
   state: string,
-  updateElement: Function
+  onRemove: Function
 ) => {
   if (!("fileId" in file)) return;
-  await deleteUploadedFile(year, state, file.fileId);
-  retrieveUploadedFiles(year, state).then((response) => {
-    const remainingUploads = response.filter(
-      ({ fileId }) => fileId !== file.fileId
-    );
-    updateElement({ answer: remainingUploads });
+  await deleteUploadedFile(year, state, file.fileId).then(() => {
+    onRemove();
   });
 };
 
@@ -73,7 +68,7 @@ export const uploadListRender = (
   files: File[] | UploadListProp[],
   year: string,
   state: string,
-  updateElement: Function,
+  onRemove: Function,
   onClick?: Function
 ) => {
   return (
@@ -98,7 +93,7 @@ export const uploadListRender = (
               <Button
                 variant="unstyled"
                 aria-label={`delete ${file.name}`}
-                onClick={() => removeFile(file, year, state, updateElement)}
+                onClick={() => removeFile(file, year, state, onRemove)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
               />
             </HStack>

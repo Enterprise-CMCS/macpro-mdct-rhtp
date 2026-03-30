@@ -21,7 +21,6 @@ const queryProjectionFields = [
   "created",
   "status",
   "submissionCount",
-  "archived",
   "lastEdited",
   "lastEditedBy",
   "type",
@@ -103,15 +102,4 @@ export const updateField = async (
       },
     })
   );
-};
-
-export const updateFields = async (
-  updateFields: Partial<LiteReport>,
-  reportType: ReportType,
-  state: StateAbbr,
-  id: string
-) => {
-  for (const [key, value] of Object.entries(updateFields)) {
-    await updateField(key, value as string, reportType, state, id);
-  }
 };

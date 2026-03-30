@@ -1,6 +1,11 @@
-import { UseOfFundsTableTemplate, ElementType } from "../../../types/reports";
+import {
+  ElementType,
+  FormPageTemplate,
+  PageType,
+  UseOfFundsTableTemplate,
+} from "@rhtp/shared";
 
-export const useOfFundsOptions = {
+const useOfFundsOptions = {
   dropDownOptions: {
     // These are placeholder
     budgetPeriodOptions: [
@@ -9,6 +14,7 @@ export const useOfFundsOptions = {
       { label: "Budget Period 2", value: "Budget Period 2" },
       { label: "Budget Period 3", value: "Budget Period 3" },
       { label: "Budget Period 4", value: "Budget Period 4" },
+      { label: "Budget Period 5", value: "Budget Period 5" },
     ],
     // These are placeholder, the initiatives will be come from a previous question in the report
     initiativeOptions: [
@@ -76,8 +82,43 @@ export const useOfFundsOptions = {
   },
 };
 
-export const useOfFundsTableElement: UseOfFundsTableTemplate = {
+const useOfFundsTableElement: UseOfFundsTableTemplate = {
   type: ElementType.UseOfFundsTable,
   id: "use-of-funds-table",
   ...useOfFundsOptions,
+};
+
+export const useOfFunds: FormPageTemplate = {
+  id: "use-of-funds",
+  title: "Use of Funds",
+  type: PageType.Standard,
+  sidebar: true,
+  elements: [
+    {
+      type: ElementType.Paragraph,
+      id: "use-of-funds-main-instructions",
+      text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+    },
+    {
+      type: ElementType.Accordion,
+      id: "use-of-funds-instructions",
+      label: "Instructions",
+      value:
+        "<b>Budget Period dates for each Budget Period listed in the table below will consist of the following:</b>" +
+        "<ul>" +
+        "  <li>Budget Period 1 (12/29/2025 - 10/30/2026)</li>" +
+        "  <li>Budget Period 2 (10/31/2026 - 10/30/2027)</li>" +
+        "  <li>Budget Period 3 (10/31/2027 - 10/30/2028)</li>" +
+        "  <li>Budget Period 4 (10/31/2028 - 10/30/2029)</li>" +
+        "  <li>Budget Period 5 (10/31/2029 - 10/30/2030)</li>" +
+        "</ul>",
+    },
+    {
+      type: ElementType.Paragraph,
+      id: "use-of-funds-table-text",
+      title: "Spent Funds",
+      text: `To add an use of funds, click the "Add use of funds" button below.`,
+    },
+    useOfFundsTableElement,
+  ],
 };

@@ -179,7 +179,6 @@ export const mockReportStore: ReportState = {
     name: "mock-report-title",
     year: 2026,
     state: "PA",
-    archived: false,
     submissionCount: 0,
     pages: [
       {

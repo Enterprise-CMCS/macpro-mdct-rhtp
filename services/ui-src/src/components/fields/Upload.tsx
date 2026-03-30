@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { AttachmentAreaTemplate, UploadData } from "types";
+import { UploadListProp } from "types";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
@@ -13,22 +13,29 @@ import {
 } from "utils/other/upload";
 
 interface Props {
+  id: string;
   state: string;
   year: string;
-  answer: UploadData[];
-  updateElement: (updatedElement: Partial<AttachmentAreaTemplate>) => void;
+  answer: UploadListProp[];
+  saveToReport: (uploads: UploadListProp[]) => void;
 }
 
-export const Upload = ({ state, year, answer, updateElement }: Props) => {
+export const Upload = ({
+  id: uploadId,
+  state,
+  year,
+  answer,
+  saveToReport,
+}: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
         await onUploadFiles().then(() => {
-          retrieveUploadedFiles(year, state).then((response) => {
+          retrieveUploadedFiles(year, state, uploadId).then((response) => {
             setFilesToUpload([]);
-            updateElement({ answer: response });
+            saveToReport(response);
           });
         });
       fetchData();
@@ -57,6 +64,12 @@ export const Upload = ({ state, year, answer, updateElement }: Props) => {
     }
   };
 
+  const onRemove = () => {
+    retrieveUploadedFiles(year, state, uploadId).then((response) => {
+      saveToReport(response);
+    });
+  };
+
   const onUploadFiles = async () => {
     if (!year || !state) {
       throw new Error("Undefined year or state parameter");
@@ -67,7 +80,8 @@ export const Upload = ({ state, year, answer, updateElement }: Props) => {
       const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
         year,
         state,
-        file
+        file,
+        uploadId
       );
       await uploadFileToS3(presignedPostData, file);
     }
@@ -103,7 +117,7 @@ export const Upload = ({ state, year, answer, updateElement }: Props) => {
         </span>
       </Box>
       <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      {uploadListRender(filesToUpload ?? [], year, state, updateElement)}
+      {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>
@@ -111,7 +125,7 @@ export const Upload = ({ state, year, answer, updateElement }: Props) => {
           above.
         </Text>
       </div>
-      {uploadListRender(answer ?? [], year, state, updateElement, downloadFile)}
+      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
     </VStack>
   );
 };
