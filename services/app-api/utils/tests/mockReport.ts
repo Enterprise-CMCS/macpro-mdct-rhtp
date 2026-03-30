@@ -21,7 +21,6 @@ export const validReport: Report = {
   lastEditedByEmail: "stateuser2@test.com",
   status: ReportStatus.NOT_STARTED,
   name: "RHTP valid report",
-  archived: false,
   submissionCount: 0,
 };
 

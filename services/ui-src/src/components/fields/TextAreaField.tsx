@@ -49,7 +49,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
   }
 
   return (
-    <Box>
+    <Box width={"100%"}>
       <CmsdsTextField
         name={textbox.id}
         label={labelText}

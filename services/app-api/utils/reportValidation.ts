@@ -16,6 +16,8 @@ import {
   ElementType,
   PageElement,
   CreateReportOptions,
+  CreateInitiativeOptions,
+  UpdateInitiativeOptions,
 } from "../types/reports";
 import { error } from "./constants";
 
@@ -71,6 +73,7 @@ const listInputTemplateSchema = object().shape({
   buttonText: string().required(),
   answer: array().of(string()).notRequired(),
   required: boolean().required(),
+  validation: string().notRequired(),
 });
 
 const numberFieldTemplateSchema = object().shape({
@@ -209,12 +212,18 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return submissionParagraphSchema;
     case ElementType.ListInput:
       return listInputTemplateSchema;
+    case ElementType.TableCheckpoint:
+      return tableCheckpointTemplateSchema;
     case ElementType.UseOfFundsTable:
       return useOfFundsTableSchema;
     case ElementType.InitiativesTable:
       return initiativesTableSchema;
     case ElementType.AttachmentArea:
       return attachmentAreaSchema;
+    case ElementType.AccordionGroup:
+      return accordionGroupTemplateSchema;
+    case ElementType.ActionTable:
+      return actionTableSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -256,6 +265,55 @@ const checkboxTemplateSchema = object().shape({
   required: boolean().required(),
 });
 
+const tableCheckpointTemplateSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.TableCheckpoint)),
+  id: string().required(),
+  label: string().required(),
+  helperText: string().notRequired(),
+  stage: number().required(),
+  checkpoints: array().of(
+    object().shape({
+      id: string().required(),
+      label: string().required(),
+      attachable: boolean().notRequired(),
+    })
+  ),
+  answer: array()
+    .of(
+      object().shape({
+        id: string().required(),
+        label: string().required(),
+        completed: boolean().required(),
+        attachments: array()
+          .of(
+            object().shape({
+              name: string().required(),
+              size: number().required(),
+              fileId: string().required(),
+            })
+          )
+          .notRequired(),
+      })
+    )
+    .notRequired(),
+  required: boolean().required(),
+});
+
+const accordionGroupTemplateSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AccordionGroup)),
+  id: string().required(),
+  accordions: array()
+    .of(
+      object().shape({
+        label: string().required(),
+        children: lazy(() => array().of(pageElementSchema).required()),
+      })
+    )
+    .required(),
+  required: boolean().required(),
+  answer: array().of(boolean()).notRequired(),
+});
+
 const buttonLinkTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ButtonLink)),
   id: string().required(),
@@ -277,6 +335,51 @@ const attachmentAreaSchema = object().shape({
       fileId: string().required(),
     })
   ),
+});
+
+const ActionElementsSchema = {
+  id: string().required(),
+  type: string().required(),
+  disabled: boolean().notRequired(),
+};
+
+const actionTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.ActionTable)),
+  id: string().required(),
+  label: string().required(),
+  hintText: string().required(),
+  modal: object()
+    .shape({
+      title: string().required(),
+      hintText: string().notRequired(),
+      elements: array()
+        .of(
+          object().shape({
+            ...ActionElementsSchema,
+            editOnly: boolean().notRequired(),
+            children: array()
+              .of(
+                object().shape({
+                  label: string().required(),
+                  value: string().required(),
+                })
+              )
+              .notRequired(),
+            required: boolean().required(),
+          })
+        )
+        .required(),
+    })
+    .required(),
+  rows: array()
+    .of(
+      object().shape({
+        ...ActionElementsSchema,
+        header: string().required(),
+      })
+    )
+    .required(),
+  answer: array().of(mixed()).notRequired(),
 });
 
 const initiativesTableSchema = object().shape({
@@ -326,6 +429,10 @@ const formPageTemplateSchema = object().shape({
   childPageIds: array().of(string()).notRequired(),
 });
 
+const initiativePageTemplateSchema = formPageTemplateSchema.shape({
+  initiativeNumber: string().required(),
+});
+
 const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
   submittedView: array().of(pageElementSchema).required(),
 });
@@ -340,6 +447,9 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
 const pagesSchema = array()
   .of(
     lazy((pageObject) => {
+      if (pageObject.initiativeNumber) {
+        return initiativePageTemplateSchema;
+      }
       if (!pageObject.type) {
         if (pageObject.id && pageObject.childPageIds) {
           return parentPageTemplateSchema;
@@ -374,6 +484,39 @@ export const isCreateReportOptions = (
   });
 };
 
+export const isCreateInitiativeBody = (
+  obj: object | undefined
+): obj is CreateInitiativeOptions => {
+  const createInitiativeSchema = object()
+    .shape({
+      initiativeName: string().required(),
+      initiativeNumber: string().required(),
+    })
+    .required()
+    .noUnknown();
+
+  return createInitiativeSchema.isValidSync(obj, {
+    stripUnknown: false,
+    strict: true,
+  });
+};
+
+export const isUpdateInitiativeBody = (
+  obj: object | undefined
+): obj is UpdateInitiativeOptions => {
+  const updateInitiativeSchema = object()
+    .shape({
+      initiativeAbandon: boolean().required(),
+    })
+    .required()
+    .noUnknown();
+
+  return updateInitiativeSchema.isValidSync(obj, {
+    stripUnknown: false,
+    strict: true,
+  });
+};
+
 const reportValidateSchema = object().shape({
   id: string().notRequired(),
   state: string().required(),
@@ -398,37 +541,16 @@ const reportValidateSchema = object().shape({
   subType: number().notRequired(),
   year: number().required(),
   submissionCount: number().required(),
-  archived: boolean().required(),
   pages: pagesSchema,
-});
-
-// Can add more editable fields here in the future
-const reportEditValidateSchema = object().shape({
-  name: string().notRequired(),
 });
 
 export const validateReportPayload = async (payload: object | undefined) => {
   if (!payload) {
     throw new Error(error.MISSING_DATA);
   }
-
   const validatedPayload = await reportValidateSchema.validate(payload, {
     stripUnknown: true,
   });
 
   return validatedPayload as Report;
-};
-
-export const validateReportEditPayload = async (
-  payload: object | undefined
-) => {
-  if (!payload) {
-    throw new Error(error.MISSING_DATA);
-  }
-
-  const validatedPayload = await reportEditValidateSchema.validate(payload, {
-    stripUnknown: true,
-  });
-
-  return validatedPayload as Partial<Report>;
 };

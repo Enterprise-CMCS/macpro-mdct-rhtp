@@ -36,6 +36,9 @@ export { TextField } from "./fields/TextField";
 export { TextAreaField } from "./fields/TextAreaField";
 export { ListInput } from "./fields/ListInput";
 export { AttachmentArea } from "./fields/AttachmentArea";
+export { AccordionGroup } from "./fields/AccordionGroup";
+export { TableCheckpoint } from "./fields/TableCheckpoint";
+export { ActionTable } from "./fields/ActionTable";
 // forms
 export { AdminBannerForm } from "./forms/AdminBannerForm";
 export { AdminDashSelector } from "./forms/AdminDashSelector";

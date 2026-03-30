@@ -10,7 +10,14 @@ const tableElementList = [
   ElementType.TextAreaField,
 ];
 
-const renderElementList = [...tableElementList, ElementType.SubHeader];
+const renderElementList = [
+  ...tableElementList,
+  ElementType.SubHeader,
+  ElementType.TableCheckpoint,
+  ElementType.AttachmentArea,
+  ElementType.AccordionGroup,
+  ElementType.ActionTable,
+];
 
 export const shouldUseTable = (type: ElementType) => {
   return tableElementList.includes(type);
@@ -27,9 +34,15 @@ export const renderElements = (element: PageElement) => {
           {element.text}
         </Heading>
       );
+    case ElementType.TableCheckpoint:
+      return "TBD";
     case ElementType.UseOfFundsTable:
       return UseOfFundsTableElementExport(element);
     case ElementType.AttachmentArea:
+      return "TBD";
+    case ElementType.AccordionGroup:
+      return "TBD";
+    case ElementType.ActionTable:
       return "TBD";
   }
 

@@ -121,11 +121,78 @@ const reportDetailsVariant = {
   },
 };
 
+const metricVariant = {
+  table: {
+    boxShadow: "0px 2px 8px 0px #0000001F",
+    th: {
+      background: "primary_darkest",
+      color: "white",
+      padding: "1rem 0.75rem",
+    },
+    tr: {
+      padding: "1rem",
+      border: "none",
+    },
+    "tr:nth-child(even)": {
+      background: "gray_lightest_highlight",
+    },
+    td: {
+      border: "none",
+      padding: "1rem 0.75rem",
+      "label, button": {
+        margin: "0",
+        display: "flex",
+        justifyContent: "center",
+      },
+      ".chakra-checkbox span": {
+        width: "32px",
+        height: "32px",
+        borderColor: "black",
+        svg: {
+          width: "1.4rem",
+        },
+      },
+      ".ds-c-single-input-date-field": {
+        minWidth: "100px",
+      },
+      ".ds-c-label-mask": {
+        display: "none",
+      },
+      "&:last-of-type": {
+        paddingRight: "0.75rem",
+      },
+    },
+  },
+};
+
+const initiativeVariant = {
+  table: {
+    th: {
+      "&:last-of-type": {
+        textAlign: "right",
+      },
+    },
+    td: {
+      "&:last-of-type": {
+        textAlign: "right",
+      },
+      ".chakra-link": {
+        width: "5rem",
+      },
+      ".chakra-button": {
+        padding: "0 1rem",
+      },
+    },
+  },
+};
+
 const variants = {
   striped: stripedVariant,
   status: statusVariant,
   export: exportVariant,
   reportDetails: reportDetailsVariant,
+  metric: metricVariant,
+  initiative: initiativeVariant,
 };
 
 const sizes = {};
