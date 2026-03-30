@@ -40,7 +40,6 @@ const buildRows = (
   answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: JSX.Element[] = [];
     const disabled = isRowDisabled(rows, answerRow);
-
     rows.map((column) => {
       //autogenerate next # column
       if (column.id === "no") {
