@@ -245,6 +245,7 @@ export enum ElementType {
   AccordionGroup = "accordionGroup",
   UseOfFundsTable = "useOfFundsTable",
   ActionTable = "actionTable",
+  AttachmentTable = "attachmentTable",
 }
 
 export type PageElement =
@@ -270,6 +271,7 @@ export type PageElement =
   | AccordionGroupTemplate
   | UseOfFundsTableTemplate
   | AttachmentAreaTemplate
+  | AttachmentTableTemplate
   | ActionTableTemplate;
 
 export type HideCondition = {
@@ -455,6 +457,19 @@ export type UseOfFundsTableTemplate = {
     recipientCategoryOptions: { label: string; value: string }[];
   };
   answer?: UseOfFundsTableItem[];
+};
+
+export type AttachmentTableTemplate = {
+  type: ElementType.AttachmentTable;
+  id: string;
+  answer?: {
+    attachment: { id: string; name: string };
+    initiatives: string[];
+    stage: number;
+    checkpoints: string;
+    status: string;
+    comments: { name: string; date: string }[];
+  }[];
 };
 
 export interface ActionElement {
