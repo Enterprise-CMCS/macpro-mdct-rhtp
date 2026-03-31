@@ -1,7 +1,7 @@
 {
   "PA": [
     {
-      "id": "5f89d136-f1ab-473e-9ed3-63ed82b6894f",
+      "id": "efdf6a80-1008-473f-9972-28d4039f21e8",
       "title": "First Initiative",
       "initiativeNumber": "123",
       "narrative": "First Initiative for the state of PA",
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "id": "3e13bb21-2aac-4d1c-abac-1676de822268",
+      "id": "8078c4ec-6c1a-458c-a470-eb99c9a377cf",
       "title": "Second Initiative",
       "initiativeNumber": "456",
       "narrative": "Second Initiative for the state of PA",
@@ -30,6 +30,66 @@
         },
         {
           "name": "PASI - Metric 2",
+          "status": "Active"
+        }
+      ]
+    }
+  ],
+  "NY": [
+    {
+      "id": "f8267199-ec73-4ea8-9cb7-71e5f675d638",
+      "title": "First Initiative",
+      "initiativeNumber": "123",
+      "narrative": "First Initiative for the state of NY",
+      "status": "In progress",
+      "metrics": [
+        {
+          "name": "NYFI - Metric 1",
+          "status": "Active"
+        }
+      ]
+    }
+  ],
+  "WA": [
+    {
+      "id": "3244f9f4-f306-49a3-9af0-5f9e9b9dc7ea",
+      "title": "First Initiative",
+      "initiativeNumber": "123",
+      "narrative": "First Initiative for the state of WA",
+      "status": "In progress",
+      "metrics": [
+        {
+          "name": "WAFI - Metric 1",
+          "status": "Active"
+        }
+      ]
+    }
+  ],
+  "GA": [
+    {
+      "id": "f0389ae6-7281-45fe-87d1-9d0c68275ecd",
+      "title": "First Initiative",
+      "initiativeNumber": "123",
+      "narrative": "First Initiative for the state of GA",
+      "status": "In progress",
+      "metrics": [
+        {
+          "name": "GAFI - Metric 1",
+          "status": "Active"
+        }
+      ]
+    }
+  ],
+  "WI": [
+    {
+      "id": "8c4c9cf8-bf7e-41e1-bcaf-ce0c8a5ca8a5",
+      "title": "First Initiative",
+      "initiativeNumber": "123",
+      "narrative": "First Initiative for the state of WI",
+      "status": "In progress",
+      "metrics": [
+        {
+          "name": "WIFI - Metric 1",
           "status": "Active"
         }
       ]
