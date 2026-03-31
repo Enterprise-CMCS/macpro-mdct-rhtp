@@ -265,7 +265,7 @@ export const buildInitiativePages = (
   state: string,
   initiatives: any = INITIATIVES
 ) => {
-  if (!(state in INITIATIVES)) return [];
+  if (!(state in initiatives)) return [];
   const initiativesForState = initiatives[state];
   const initiativePages = [];
   for (const {
