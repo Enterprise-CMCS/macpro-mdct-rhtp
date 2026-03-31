@@ -44,13 +44,13 @@ export const UseOfFundsTableElement = (
   const initiatives = report?.pages.filter(
     (page) => "initiativeNumber" in page
   );
-  const initiativeOptions = [{ label: "- Select an option -", value: "" }];
-  for (let initiative of initiatives ?? []) {
-    initiativeOptions.push({
+  const initiativeOptions = [
+    { label: "- Select an option -", value: "" },
+    ...(initiatives ?? []).map((initiative) => ({
       label: `${initiative.initiativeNumber}: ${initiative.title}`,
       value: initiative.initiativeNumber,
-    });
-  }
+    })),
+  ];
 
   const initialValues = {
     budgetPeriod: "",
