@@ -450,7 +450,6 @@ export type UseOfFundsTableTemplate = {
   id: string;
   dropDownOptions: {
     budgetPeriodOptions: { label: string; value: string }[];
-    initiativeOptions: { label: string; value: string }[];
     useOfFundsOptions: { label: string; value: string }[];
     recipientCategoryOptions: { label: string; value: string }[];
   };

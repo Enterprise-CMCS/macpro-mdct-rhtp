@@ -138,12 +138,6 @@ const useOfFundsTableSchema = object().shape({
         value: string().notRequired(),
       })
     ),
-    initiativeOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
     useOfFundsOptions: array().of(
       object().shape({
         label: string().required(),

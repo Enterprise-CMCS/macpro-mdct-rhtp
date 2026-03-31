@@ -30,17 +30,27 @@ import {
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
 import { isValidCurrency } from "utils/validation/inputValidation";
+import { useStore } from "utils";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
 ) => {
   const { element, updateElement } = props;
-  const {
-    budgetPeriodOptions,
-    initiativeOptions,
-    useOfFundsOptions,
-    recipientCategoryOptions,
-  } = element.dropDownOptions;
+  const { budgetPeriodOptions, useOfFundsOptions, recipientCategoryOptions } =
+    element.dropDownOptions;
+  const { report } = useStore();
+
+  // Initiative options are dynamic and are generated based on the initiatives added previously in the form
+  const initiatives = report?.pages.filter(
+    (page) => "initiativeNumber" in page
+  );
+  const initiativeOptions = [{ label: "- Select an option -", value: "" }];
+  for (let initiative of initiatives ?? []) {
+    initiativeOptions.push({
+      label: `${initiative.initiativeNumber}: ${initiative.title}`,
+      value: initiative.initiativeNumber,
+    });
+  }
 
   const initialValues = {
     budgetPeriod: "",
