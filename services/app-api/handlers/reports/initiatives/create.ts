@@ -11,7 +11,7 @@ import { getReport, putReport } from "../../../storage/reports";
 import { ReportStatus } from "../../../types/reports";
 import { canWriteInitiatives } from "../../../utils/authorization";
 import { error } from "../../../utils/constants";
-import { buildInitiativePages } from "../../../forms/2026/rhtp/pages/initiatives";
+import { buildInitiativePages } from "../../../forms/2026/rhtp/pages/initiatives/initiatives";
 import {
   isCreateInitiativeBody,
   validateReportPayload,
@@ -43,14 +43,16 @@ export const createInitiative = handler(
 
     // handle adding initiative
     const { initiativeName, initiativeNumber } = body;
-    const newInitiative = [
-      {
-        id: crypto.randomUUID(),
-        name: initiativeName,
-        initiativeNumber,
-      },
-    ];
-    const newPages = buildInitiativePages(newInitiative);
+    const newInitiative = {
+      [state]: [
+        {
+          id: crypto.randomUUID(),
+          name: initiativeName,
+          initiativeNumber,
+        },
+      ],
+    };
+    const newPages = buildInitiativePages(state, newInitiative);
     report.pages.push(...newPages);
 
     // validate new report
