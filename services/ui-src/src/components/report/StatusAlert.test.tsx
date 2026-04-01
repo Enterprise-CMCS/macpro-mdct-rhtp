@@ -26,7 +26,7 @@ vi.mock("utils/state/useStore", () => ({
 
 const mockUseNavigate = vi.fn();
 
-vi.mock("react-router-dom", async (importOriginal) => ({
+vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => mockUseNavigate,
   useParams: vi.fn(() => ({

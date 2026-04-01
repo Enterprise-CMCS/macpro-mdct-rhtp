@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { ElementType, TableCheckpointTemplate } from "types";
 import {
   getFileDownloadUrl,
@@ -18,7 +18,7 @@ import { Mock } from "vitest";
 
 const updateSpy = vi.fn();
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA" }),
 }));
 

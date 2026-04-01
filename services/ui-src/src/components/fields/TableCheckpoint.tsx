@@ -22,7 +22,7 @@ import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import { Label } from "@cmsgov/design-system";
 import { useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
   downloadFile,

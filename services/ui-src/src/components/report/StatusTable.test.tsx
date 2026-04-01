@@ -2,7 +2,7 @@ import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StatusTableElement } from "./StatusTable";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { useStore } from "utils";
 import {
   mockUseReadOnlyUserStore,
@@ -16,7 +16,7 @@ vi.mock("utils", () => ({
 }));
 
 const mockNavigate = vi.fn();
-vi.mock("react-router-dom", async (importOriginal) => ({
+vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => mockNavigate,
 }));

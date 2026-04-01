@@ -2,7 +2,7 @@ import { Mock, MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { mockUseStore } from "utils/testing/setupTest";
-import { BrowserRouter as Router, useParams } from "react-router-dom";
+import { BrowserRouter as Router, useParams } from "react-router";
 import { Sidebar } from "./Sidebar";
 import { useStore } from "utils";
 
@@ -16,7 +16,7 @@ vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
-vi.mock("react-router-dom", async (importOriginal) => ({
+vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => mockUseNavigate,
   useParams: vi.fn(),

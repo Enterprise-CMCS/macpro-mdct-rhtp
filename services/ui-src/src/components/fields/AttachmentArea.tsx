@@ -4,7 +4,7 @@ import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
   downloadFile,
