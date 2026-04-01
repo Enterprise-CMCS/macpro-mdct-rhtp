@@ -157,6 +157,7 @@ export const AttachmentTable = (
   };
 
   const onEdit = () => {
+    /** TODO: add editting in modal */
     setModalOpen(true);
   };
 
@@ -170,63 +171,68 @@ export const AttachmentTable = (
       >
         Add Attachment
       </Button>
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            {header.map((item) => (
-              <Th>{item}</Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {displayValue.map((row, rowIndex) => (
+      {displayValue.length === 0 ? (
+        <p>No attachments found. Click 'Add Attachment' to get started</p>
+      ) : (
+        <Table variant="initiative" width="800px">
+          <Thead>
             <Tr>
-              <Td>
-                <Button
-                  variant="link"
-                  onClick={() => downloadFile(year, state, row.attachment)}
-                >
-                  {row.attachment.name}
-                </Button>
-              </Td>
-              <Td>
-                Initiatives{" "}
-                {row.initiatives
-                  .map(
-                    (id) =>
-                      `#${initiativeNumbers.find((opt) => opt.value === id)?.label}`
-                  )
-                  .join(", ")}
-              </Td>
-              <Td>
-                {stageOption.find((opt) => opt.value === row.stage)?.label}
-              </Td>
-              <Td>
-                {
-                  checkpointsArr.find((check) => check.id === row?.checkpoints)
-                    ?.label
-                }
-              </Td>
-              <Td>{row.status}</Td>
-              <Td>
-                <Button variant="outline" onClick={() => onEdit()}>
-                  Edit
-                </Button>
-                <Button variant="link">
-                  <Image src={commentIcon} alt="Comment" />
-                </Button>
-                <Button
-                  variant="link"
-                  onClick={() => removeAttachment(row.attachment, rowIndex)}
-                  aria-label={`Remove ${row.attachment.name}`}
-                >
-                  <Image src={cancelIcon} alt="Remove" />
-                </Button>
-              </Td>
+              {header.map((item) => (
+                <Th>{item}</Th>
+              ))}
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {displayValue.map((row, rowIndex) => (
+              <Tr>
+                <Td>
+                  <Button
+                    variant="link"
+                    onClick={() => downloadFile(year, state, row.attachment)}
+                  >
+                    {row.attachment.name}
+                  </Button>
+                </Td>
+                <Td>
+                  Initiatives{" "}
+                  {row.initiatives
+                    .map(
+                      (id) =>
+                        `#${initiativeNumbers.find((opt) => opt.value === id)?.label}`
+                    )
+                    .join(", ")}
+                </Td>
+                <Td>
+                  {stageOption.find((opt) => opt.value === row.stage)?.label}
+                </Td>
+                <Td>
+                  {
+                    checkpointsArr.find(
+                      (check) => check.id === row?.checkpoints
+                    )?.label
+                  }
+                </Td>
+                <Td>{row.status}</Td>
+                <Td className="actions" display="flex">
+                  <Button variant="outline" onClick={() => onEdit()}>
+                    Edit
+                  </Button>
+                  <Button variant="link">
+                    <Image src={commentIcon} alt="Comment" />
+                  </Button>
+                  <Button
+                    variant="link"
+                    onClick={() => removeAttachment(row.attachment, rowIndex)}
+                    aria-label={`Remove ${row.attachment.name}`}
+                  >
+                    <Image src={cancelIcon} alt="Remove" />
+                  </Button>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      )}
       <UploadModal
         modalDisclosure={{
           isOpen: isModalOpen,
@@ -238,8 +244,9 @@ export const AttachmentTable = (
         year={year}
         answer={[]}
         id={id}
+        hint="[hint text]"
         selections={
-          <Stack gap="1.5rem">
+          <Stack gap="1.5rem" marginTop="1.5rem">
             <ChoiceList
               choices={initiativeOptions}
               name={"initiative-choice-list"}

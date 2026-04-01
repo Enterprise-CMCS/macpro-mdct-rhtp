@@ -8,6 +8,7 @@ import { UploadListProp } from "types";
 export const UploadModal = ({
   modalDisclosure,
   id,
+  hint,
   year,
   state,
   dropdowns,
@@ -44,7 +45,7 @@ export const UploadModal = ({
       onConfirmHandler={() => modalDisclosure.onClose()}
       content={{
         heading: "Upload Attachments",
-        subheading: undefined,
+        subheading: hint,
         actionButtonText: "Done",
         closeButtonText: undefined,
       }}
@@ -78,6 +79,7 @@ interface Props {
     onClose: () => void;
   };
   id: string;
+  hint?: string;
   year: string;
   state: string;
   answer: UploadListProp[];
