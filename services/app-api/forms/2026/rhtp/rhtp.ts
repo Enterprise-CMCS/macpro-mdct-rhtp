@@ -3,7 +3,7 @@ import { generalInformation } from "./pages/general-information";
 import { buildInitiativePages } from "./pages/initiatives/initiatives";
 import { initiativesTable } from "./pages/initiatives-table";
 import { reviewAndSubmit } from "./pages/review-and-submit";
-import { statePolicyCommitments } from "./pages/state-policy-commitments";
+import { buildStatePolicyCommitments } from "./pages/state-policy-commitments/state-policy-commitments";
 import { sustainabilityAndHighlights } from "./pages/sustainability-and-highlights";
 import { useOfFunds } from "./pages/use-of-funds";
 
@@ -24,7 +24,7 @@ export const rhtpReportTemplate = (state: string): ReportBase => ({
     },
     generalInformation,
     initiativesTable,
-    statePolicyCommitments,
+    buildStatePolicyCommitments(state),
     useOfFunds,
     sustainabilityAndHighlights,
     reviewAndSubmit,
