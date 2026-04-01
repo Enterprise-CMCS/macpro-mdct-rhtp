@@ -1,11 +1,13 @@
 import {
+  ActionAnswerShape,
+  ActionTableTemplate,
   ElementType,
   InitiativePageTemplate,
   PageStatus,
   PageType,
   Report,
   TextboxTemplate,
-} from "../../types/reports";
+} from "@rhtp/shared";
 import { validReport } from "../tests/mockReport";
 import { copyReport } from "./copyReport";
 
@@ -16,6 +18,17 @@ vi.mock("../../storage/reports", () => ({
 }));
 
 const mockInitiativeAnswer = "mock text answer";
+const metricStartingCurrentValue = "1000";
+
+const metricAnswers: ActionAnswerShape[] = [
+  [
+    { id: "status", value: "active" },
+    { id: "metric", value: "hello" },
+    { id: "prevValue", value: "" },
+    { id: "currValue", value: metricStartingCurrentValue },
+    { id: "date", value: "2/2/2025" },
+  ],
+];
 
 const mockAddedInitiatives = [
   {
@@ -30,6 +43,13 @@ const mockAddedInitiatives = [
         required: true,
         answer: mockInitiativeAnswer,
       } as TextboxTemplate,
+      {
+        id: "metrics-table", // id match for specific logic
+        type: ElementType.ActionTable,
+        label: "Metric table element",
+        required: true,
+        answer: metricAnswers,
+      } as unknown as ActionTableTemplate,
     ],
   },
   {
@@ -67,6 +87,13 @@ const mockOldReport: Report = {
           required: true,
           answer: "mock answer",
         },
+        {
+          id: "metrics-table", // id match for specific logic
+          type: ElementType.ActionTable,
+          label: "Metric table element",
+          required: true,
+          answer: metricAnswers,
+        } as unknown as ActionTableTemplate,
       ],
     },
   ],
@@ -83,15 +110,59 @@ mockOldReport.pages.push(...mockAddedInitiatives);
 describe("copyReport util", () => {
   test("copyReport copies data from old report into new one, including initiative pages and answers", async () => {
     mockGetReport.mockReturnValue(mockOldReport);
+    // no answer in report before copy
     expect(mockNewReport.pages[1].elements[1].answer).toBeUndefined();
+
     await copyReport(mockNewReport);
+
+    // textbox answer copies
     expect(mockNewReport.pages[1].elements[1].answer).toEqual("mock answer");
+
+    // added initiative pages copy
     expect(mockNewReport.pages[2].initiativeNumber).toEqual(
       mockAddedInitiatives[0].initiativeNumber
     );
+    expect(mockNewReport.pages[3].initiativeNumber).toEqual(
+      mockAddedInitiatives[1].initiativeNumber
+    );
+
+    // added initiative answers copy
     expect(mockNewReport.pages[2].elements[0].answer).toEqual(
       mockInitiativeAnswer
     );
+
+    // metrics in added initiative — current values get copied to previous value, then cleared
+    const newMetricAnswerRow = mockNewReport.pages[2].elements[1].answer[0];
+    expect(newMetricAnswerRow).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "prevValue",
+          value: metricStartingCurrentValue,
+        }),
+        expect.objectContaining({
+          id: "currValue",
+          value: "",
+        }),
+      ])
+    );
+
+    // initiative page status copies
     expect(mockNewReport.pages[3].status).toEqual(PageStatus.ABANDONED);
+
+    // metric current values get copied to previous value, then cleared
+    const existingMetricAnswerRow =
+      mockNewReport.pages[1].elements[2].answer[0];
+    expect(existingMetricAnswerRow).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "prevValue",
+          value: metricStartingCurrentValue,
+        }),
+        expect.objectContaining({
+          id: "currValue",
+          value: "",
+        }),
+      ])
+    );
   });
 });
