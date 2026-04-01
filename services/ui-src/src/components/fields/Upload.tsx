@@ -32,11 +32,9 @@ export const Upload = ({
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
-        await onUploadFiles().then(() => {
-          retrieveUploadedFiles(year, state, uploadId).then((response) => {
-            setFilesToUpload([]);
-            saveToReport(response);
-          });
+        await onUploadFiles().then((response) => {
+          setFilesToUpload([]);
+          saveToReport(response);
         });
       fetchData();
     }
@@ -75,16 +73,15 @@ export const Upload = ({
       throw new Error("Undefined year or state parameter");
     }
     const files = filesToUpload ?? [];
+    const savedFiles = [];
     for (var i = 0; i < files.length; i++) {
       const file = files[i];
-      const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
-        year,
-        state,
-        file,
-        uploadId
-      );
-      await uploadFileToS3(presignedPostData, file);
+      const { presignedUploadUrl, fileId } =
+        await recordFileInDatabaseAndGetUploadUrl(year, state, file, uploadId);
+      savedFiles.push({ name: file.name, fileId: fileId, size: file.size });
+      await uploadFileToS3({ presignedUploadUrl }, file);
     }
+    return savedFiles;
   };
 
   return (

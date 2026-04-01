@@ -463,9 +463,9 @@ export type AttachmentTableTemplate = {
   type: ElementType.AttachmentTable;
   id: string;
   answer?: {
-    attachment: { id: string; name: string };
+    attachment: UploadListProp;
     initiatives: string[];
-    stage: number;
+    stage: string;
     checkpoints: string;
     status: string;
     comments: { name: string; date: string }[];

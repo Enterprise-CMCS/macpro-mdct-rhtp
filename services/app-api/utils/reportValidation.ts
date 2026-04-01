@@ -396,17 +396,20 @@ const attachmentTableSchema = object().shape({
     .of(
       object().shape({
         attachment: object().shape({
-          id: string().required(),
           name: string().required(),
+          size: number().required(),
+          fileId: string().required(),
         }),
         initiatives: array().of(string()).required(),
-        stage: number().required(),
+        stage: string().required(),
         checkpoints: string().required(),
         status: string().required(),
-        comments: object().shape({
-          name: string().required(),
-          date: string().required(),
-        }),
+        comments: array().of(
+          object().shape({
+            name: string().required(),
+            date: string().required(),
+          })
+        ),
       })
     )
     .notRequired(),

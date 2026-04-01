@@ -7,6 +7,7 @@ import {
   Th,
   Thead,
   Tr,
+  Image,
 } from "@chakra-ui/react";
 import {
   ChoiceList,
@@ -23,8 +24,10 @@ import {
   UploadListProp,
 } from "types";
 import { useStore } from "utils";
-import { retrieveUploadedFiles } from "utils/other/upload";
+import { downloadFile, removeFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
+import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import commentIcon from "assets/icons/comment/icon_comment.svg";
 
 const header = [
   "Attachment name",
@@ -35,29 +38,31 @@ const header = [
   "Actions",
 ];
 
+type Options = { label: string; value: string; checked?: boolean };
+
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
 ) => {
   const { id, answer } = props.element;
   const displayValue = answer ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [files, setFiles] = useState<UploadListProp[]>([]);
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([]);
-  const [stageOption, setStageOption] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [checkpointOption, setCheckpointOption] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [stageOption, setStageOption] = useState<Options[]>([]);
+  const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
   const [selection, setSelection] = useState<{
     stage: string;
     checkpoint: string;
   }>({ stage: "", checkpoint: "" });
+
+  const [initiativeNumbers, setInitiativeNumbers] = useState<Options[]>([]);
+  const [checkpointsArr, setCheckpointsArr] = useState<
+    { id: string; label: string }[]
+  >([]);
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -76,13 +81,16 @@ export const AttachmentTable = (
         checked: false,
       }))
     );
+    setInitiativeNumbers(
+      initiatives.map((initiative) => ({
+        label: initiative.initiativeNumber,
+        value: initiative.id,
+      }))
+    );
+    setCheckpointsArr(checkpointsList.flatMap((list) => list.checkpoints));
   }, [report]);
 
   useEffect(() => {
-    retrieveUploadedFiles(year, state, id).then((response) => {
-      console.log("response", response);
-      setFiles(response);
-    });
     setStageOption(
       checkpointsList.map((checks) => ({
         label: `${checks.stage} ${checks.label}`,
@@ -110,7 +118,6 @@ export const AttachmentTable = (
 
     setCheckpointOption(checkpoints);
     setSelection({ stage: value, checkpoint: checkpoints[0].value });
-    console.log(initiativeOptions);
   };
 
   const onChoiceChangeHandler = (
@@ -126,7 +133,31 @@ export const AttachmentTable = (
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
-    console.log(uploads);
+    const formattedUploads = uploads.map((upload) => ({
+      attachment: upload,
+      initiatives: initiativeOptions
+        .filter((options) => options.checked)
+        .map((option) => option.value),
+      stage: selection.stage,
+      checkpoints: selection.checkpoint,
+      status: "Under Review",
+      comments: [],
+    }));
+
+    const newValues = [...displayValue, ...formattedUploads];
+    props.updateElement({ answer: newValues });
+  };
+
+  const removeAttachment = (file: UploadListProp, index: number) => {
+    removeFile(file, year, state, () => {
+      const newValue = [...displayValue];
+      newValue.splice(index, 1);
+      props.updateElement({ answer: newValue });
+    });
+  };
+
+  const onEdit = () => {
+    setModalOpen(true);
   };
 
   return (
@@ -148,19 +179,49 @@ export const AttachmentTable = (
           </Tr>
         </Thead>
         <Tbody>
-          {displayValue.map((row) => (
+          {displayValue.map((row, rowIndex) => (
             <Tr>
               <Td>
-                <Button variant="link">{row.attachment.name}</Button>
+                <Button
+                  variant="link"
+                  onClick={() => downloadFile(year, state, row.attachment)}
+                >
+                  {row.attachment.name}
+                </Button>
               </Td>
-              <Td>{row.initiatives.join(" ")}</Td>
-              <Td>{row.stage}</Td>
-              <Td>{row.checkpoints}</Td>
+              <Td>
+                Initiatives{" "}
+                {row.initiatives
+                  .map(
+                    (id) =>
+                      `#${initiativeNumbers.find((opt) => opt.value === id)?.label}`
+                  )
+                  .join(", ")}
+              </Td>
+              <Td>
+                {stageOption.find((opt) => opt.value === row.stage)?.label}
+              </Td>
+              <Td>
+                {
+                  checkpointsArr.find((check) => check.id === row?.checkpoints)
+                    ?.label
+                }
+              </Td>
               <Td>{row.status}</Td>
               <Td>
-                <Button variant="outline">Edit</Button>
-                <Button variant="link">message</Button>
-                <Button variant="link">cancel</Button>
+                <Button variant="outline" onClick={() => onEdit()}>
+                  Edit
+                </Button>
+                <Button variant="link">
+                  <Image src={commentIcon} alt="Comment" />
+                </Button>
+                <Button
+                  variant="link"
+                  onClick={() => removeAttachment(row.attachment, rowIndex)}
+                  aria-label={`Remove ${row.attachment.name}`}
+                >
+                  <Image src={cancelIcon} alt="Remove" />
+                </Button>
               </Td>
             </Tr>
           ))}
@@ -175,7 +236,7 @@ export const AttachmentTable = (
         }}
         state={state}
         year={year}
-        answer={files}
+        answer={[]}
         id={id}
         selections={
           <Stack gap="1.5rem">
