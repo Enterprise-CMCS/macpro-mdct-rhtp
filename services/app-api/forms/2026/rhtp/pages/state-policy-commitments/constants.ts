@@ -1,7 +1,7 @@
 // oxlint-disable unicorn/no-useless-switch-case
 // disabling this rule so we explicitly see how each commitment maps
 
-export const statePolicyCommitments = [
+export const STATE_POLICY_COMMITMENT_NAMES = [
   "B.2. Presidential Fitness Test",
   "B.3. SNAP Food Restriction Waiver Policy",
   "B.4. Nutrition Continuing Medical Education",
@@ -504,7 +504,8 @@ export const getDropdownOptions = (label: string) => {
           value: "Commitment abandoned",
         },
       ];
-    case "F.1. Telehealth License/Registration Process (including special licenses)": // TODO waiting to see what options are
+    // TODO waiting to see what options are
+    case "F.1. Telehealth License/Registration Process (including special licenses)":
     default:
       return [];
   }

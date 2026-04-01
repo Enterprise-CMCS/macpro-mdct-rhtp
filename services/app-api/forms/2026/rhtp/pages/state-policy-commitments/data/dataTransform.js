@@ -6,7 +6,7 @@
  * in this directory, run `node dataTransform.js`
  */
 
-const { statePolicyCommitments } = require("../constants.ts");
+const { STATE_POLICY_COMMITMENT_NAMES } = require("../constants.ts");
 const fs = require("node:fs");
 
 const headingMap = {
@@ -21,7 +21,6 @@ function main() {
   const file = fs.readFileSync("./commitments.csv").toLocaleString();
   const rows = file.split("\n"); // SPLIT ROWS
   const headings = rows.shift().split(",");
-  console.log("test", statePolicyCommitments);
   rows.forEach((row, rowIndex) => {
     const commitment = {};
     let state = "";
@@ -32,7 +31,7 @@ function main() {
         state = col;
       } else if (
         key === "label" &&
-        !statePolicyCommitments.includes(col.trim())
+        !STATE_POLICY_COMMITMENT_NAMES.includes(col.trim())
       ) {
         throw new Error(
           `Unexpected commitment name found in row ${rowIndex + 1}: ${col}. Please correct and rerun`

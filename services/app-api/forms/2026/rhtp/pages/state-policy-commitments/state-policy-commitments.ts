@@ -8,24 +8,17 @@ import {
   TextAreaBoxTemplate,
 } from "@rhtp/shared";
 import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
+import { getDropdownOptions } from "./constants";
 
-// TODO build out multiple dropdown types once we know more
 const commitmentStatusDropdown = (
+  label: string,
   status: string = "Not yet started"
 ): DropdownTemplate => ({
   type: ElementType.Dropdown,
   id: "commitment-status",
   label: "Current Status",
   helperText: "This is the hint text",
-  options: [
-    { label: "Not yet started", value: "Not yet started" },
-    { label: "In progress", value: "In progress" },
-    { label: "Implemented", value: "Implemented" },
-    {
-      label: "Commitment abandoned",
-      value: "Commitment abandoned",
-    },
-  ],
+  options: getDropdownOptions(label),
   required: true,
   answer: status,
 });
@@ -68,7 +61,7 @@ const buildCommitments = (
     commitments.push({
       label,
       children: [
-        commitmentStatusDropdown(status),
+        commitmentStatusDropdown(label, status),
         commitmentLinkListInput,
         commitmentAttachmentArea,
         commitmentComments,
