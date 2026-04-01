@@ -51,19 +51,22 @@ describe("test state policy commitment functions", () => {
     );
   });
 
-  test("getDropdownOptions() for known name returns global options at a minimum", () => {
-    const options = getDropdownOptions(sampleCommitmentName);
-    expect(options).toEqual(
-      // all known commitments have these options
-      expect.arrayContaining([
-        { label: "Not yet started", value: "Not yet started" },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
-      ])
-    );
-  });
+  test.each(STATE_POLICY_COMMITMENT_NAMES)(
+    "getDropdownOptions() returns two options minimum for all commitments",
+    (commitmentName) => {
+      const options = getDropdownOptions(commitmentName);
+      expect(options).toEqual(
+        // all known commitments have these options
+        expect.arrayContaining([
+          { label: "Not yet started", value: "Not yet started" },
+          {
+            label: "Commitment abandoned",
+            value: "Commitment abandoned",
+          },
+        ])
+      );
+    }
+  );
 
   test("getDropdownOptions() for unknown name returns empty array", () => {
     const options = getDropdownOptions("test does not exist");

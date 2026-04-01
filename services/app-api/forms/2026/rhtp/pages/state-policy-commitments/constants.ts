@@ -506,6 +506,13 @@ export const getDropdownOptions = (label: string) => {
       ];
     // TODO waiting to see what options are
     case "F.1. Telehealth License/Registration Process (including special licenses)":
+      return [
+        { label: "Not yet started", value: "Not yet started" },
+        {
+          label: "Commitment abandoned",
+          value: "Commitment abandoned",
+        },
+      ];
     default:
       return [];
   }
