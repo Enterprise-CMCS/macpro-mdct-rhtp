@@ -14,8 +14,8 @@ const headingMap = {
   "initiative number": "initiativeNumber",
   "initiative narrative": "narrative",
   "initiative status": "status",
-  "initiative - metrics name(s) (comma-separated)": "metrics",
-  "metric status(es) (comma-separated)": "metricStatuses",
+  "initiative - metrics name(s) (semicolon-separated)": "metrics",
+  "metric status(es) (semicolon-separated)": "metricStatuses",
 };
 
 const initiativesMap = new Map();
@@ -23,7 +23,7 @@ const initiativesMap = new Map();
 function main() {
   const file = fs.readFileSync("./initiatives.csv").toLocaleString();
   const rows = file.split("\n"); // SPLIT ROWS
-  const headings = rows.shift().split(";");
+  const headings = rows.shift().split(",");
   rows.forEach((row) => {
     const initiative = {
       id: crypto.randomUUID(),
@@ -32,15 +32,15 @@ function main() {
     let metrics = [];
     let metricList = [];
     let metricStatuses = [];
-    columns = row.split(";"); //SPLIT COLUMNS
+    columns = row.split(","); //SPLIT COLUMNS
     columns.forEach((col, index) => {
       const key = headingMap[headings[index].trim()];
       if (key === "state") {
         state = col;
       } else if (key === "metrics") {
-        metricList = col.split(",");
+        metricList = col.split(";");
       } else if (key === "metricStatuses") {
-        metricStatuses = col.split(",");
+        metricStatuses = col.split(";");
       } else {
         initiative[key] = col.trim();
       }
