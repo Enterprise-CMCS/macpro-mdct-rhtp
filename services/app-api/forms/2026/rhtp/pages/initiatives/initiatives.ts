@@ -6,24 +6,12 @@ import {
   HeaderTemplate,
   NumberFieldTemplate,
   PageElement,
+  PageStatus,
   PageType,
   ParagraphTemplate,
   TextAreaBoxTemplate,
 } from "@rhtp/shared";
-
-// TODO build out list by state
-export const INITIATIVES = [
-  {
-    id: "416c4eab-7658-4f5d-a559-a8ef616f86df",
-    name: "First Initiative",
-    initiativeNumber: "123",
-  },
-  {
-    id: "47129b18-a036-46ae-9e24-ecf3ed666bc5",
-    name: "Second Initiative",
-    initiativeNumber: "456",
-  },
-];
+import INITIATIVES from "./data/initiatives.json";
 
 const returnToInitiativesDashboard: ButtonLinkTemplate = {
   type: ElementType.ButtonLink,
@@ -53,12 +41,13 @@ const initiativeInstructionsAccordion: AccordionTemplate = {
   value: "More coming soon...",
 };
 
-const initiativeNarrative: TextAreaBoxTemplate = {
+const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   type: ElementType.TextAreaField,
   id: "initiative-narrative",
   label: "Narrative",
   required: true,
-};
+  answer: narrative,
+});
 
 const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   type: ElementType.NumberField,
@@ -67,45 +56,66 @@ const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   required: true,
 };
 
-export const metricTable: ActionTableTemplate = {
-  type: ElementType.ActionTable,
-  id: "metrics-table",
-  label: "Metrics",
-  hintText:
-    "To add an metric, click button below. [Hint text here to let users know they must report on 4 metrics per initative]",
-  modal: {
-    title: "Metric",
-    hintText: "[hint text]",
-    elements: [
-      {
-        id: "status",
-        type: ElementType.Dropdown,
-        editOnly: true,
-        children: [
-          { label: "Active", value: "Active" },
-          { label: "Abandoned", value: "Abandoned" },
-        ],
-        required: true,
-      },
-      { id: "metric", type: ElementType.TextAreaField, required: true },
-      { id: "currValue", type: ElementType.NumberField, required: true },
-      { id: "date", type: ElementType.Date, required: true },
-    ],
-  },
-  rows: [
-    { id: "no", header: "#", type: ElementType.Paragraph },
-    { id: "status", header: "Status", type: ElementType.Paragraph },
-    { id: "metric", header: "Metric", type: ElementType.Paragraph },
-    {
-      id: "prevValue",
-      header: "Previous Value",
-      type: ElementType.NumberField,
-      disabled: true,
+export const metricTable = (metrics: any[]): ActionTableTemplate => {
+  const table: ActionTableTemplate = {
+    type: ElementType.ActionTable,
+    id: "metrics-table",
+    label: "Metrics",
+    hintText:
+      "To add an metric, click button below. [Hint text here to let users know they must report on 4 metrics per initative]",
+    modal: {
+      title: "Metric",
+      hintText: "[hint text]",
+      elements: [
+        {
+          id: "status",
+          type: ElementType.Dropdown,
+          editOnly: true,
+          children: [
+            { label: "Active", value: "Active" },
+            { label: "Abandoned", value: "Abandoned" },
+          ],
+          required: true,
+        },
+        { id: "metric", type: ElementType.TextAreaField, required: true },
+        { id: "currValue", type: ElementType.NumberField, required: true },
+        { id: "date", type: ElementType.Date, required: true },
+      ],
     },
-    { id: "currValue", header: "Current Value", type: ElementType.NumberField },
-    { id: "date", header: "As of Date", type: ElementType.Date },
-  ],
-  answer: [],
+    rows: [
+      { id: "no", header: "#", type: ElementType.Paragraph },
+      { id: "status", header: "Status", type: ElementType.Paragraph },
+      { id: "metric", header: "Metric", type: ElementType.Paragraph },
+      {
+        id: "prevValue",
+        header: "Previous Value",
+        type: ElementType.NumberField,
+        disabled: true,
+      },
+      {
+        id: "currValue",
+        header: "Current Value",
+        type: ElementType.NumberField,
+      },
+      { id: "date", header: "As of Date", type: ElementType.Date },
+    ],
+    answer: [],
+  };
+
+  const metricAnswers: any[] = [];
+  metrics.map((metric) => {
+    const answer = [
+      { id: "status", value: metric.status },
+      { id: "metric", value: metric.name },
+      { id: "prevValue", value: "" },
+      { id: "currValue", value: "" },
+      { id: "date", value: "" },
+    ];
+    metricAnswers.push(answer);
+  });
+  table.answer = metricAnswers;
+
+  return table;
 };
 
 const checkpointsTables: PageElement[] = [
@@ -251,23 +261,36 @@ const checkpointsTables: PageElement[] = [
 ];
 
 // TODO - better array typing and parsing once we have initiatives by state
-export const buildInitiativePages = (initiatives: any[] = INITIATIVES) => {
+export const buildInitiativePages = (
+  state: string,
+  initiatives: any = INITIATIVES
+) => {
+  if (!(state in initiatives)) return [];
+  const initiativesForState = initiatives[state];
   const initiativePages = [];
-  for (const { id, name, initiativeNumber } of initiatives) {
+  for (const {
+    id,
+    title,
+    initiativeNumber,
+    status,
+    narrative,
+    metrics,
+  } of initiativesForState) {
     initiativePages.push({
       id,
-      title: name,
+      title,
       initiativeNumber,
+      status: status ?? PageStatus.NOT_STARTED,
       type: PageType.Standard,
       sidebar: false,
       elements: [
         returnToInitiativesDashboard,
-        initiativeHeader(name),
+        initiativeHeader(title),
         initiativeInstructions,
         initiativeInstructionsAccordion,
-        initiativeNarrative,
+        initiativeNarrative(narrative),
         initiativeNumberOfPeopleServed,
-        metricTable,
+        metricTable(metrics),
         ...checkpointsTables,
       ],
     });

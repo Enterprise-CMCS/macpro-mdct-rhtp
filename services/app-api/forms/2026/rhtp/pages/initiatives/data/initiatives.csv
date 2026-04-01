@@ -1,0 +1,7 @@
+state,initiative name,initiative number,initiative narrative,initiative status,initiative - metrics name(s) (semicolon-separated),metric status(es) (semicolon-separated)
+PA,First Initiative,123,First Initiative for the state of PA,In progress,PAFI - Metric 1;PAFI - Metric 2,Active;Abandoned
+PA,Second Initiative,456,Second Initiative for the state of PA,In progress,PASI - Metric 1;PASI - Metric 2,Active;Active
+NY,First Initiative,123,First Initiative for the state of NY,In progress,NYFI - Metric 1,Active
+WA,First Initiative,123,First Initiative for the state of WA,In progress,WAFI - Metric 1,Active
+GA,First Initiative,123,First Initiative for the state of GA,In progress,GAFI - Metric 1,Active
+WI,First Initiative,123,First Initiative for the state of WI,In progress,WIFI - Metric 1,Active
