@@ -166,16 +166,7 @@ const elements: PageElement[] = [
   },
   {
     type: ElementType.TableCheckpoint,
-    id: "mockod",
-    label: "mock label",
-    stage: 0,
-    checkpoints: [
-      {
-        id: "mock id",
-        label: "label",
-        attachable: false,
-      },
-    ],
+    id: "mock-checkpoint-id",
     required: false,
   },
 ];
