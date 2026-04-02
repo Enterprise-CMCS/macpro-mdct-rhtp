@@ -20,6 +20,14 @@ const returnToInitiativesDashboard: ButtonLinkTemplate = {
   label: "Return to initiatives dashboard",
 };
 
+const BackToInitiativesButton: ButtonLinkTemplate = {
+  type: ElementType.ButtonLink,
+  id: "back-button",
+  to: "initiatives",
+  label: "Back to Initiatives",
+  style: "alt-continue",
+};
+
 const initiativeHeader: (initiativeName: string) => HeaderTemplate = (
   initiativeName: string
 ) => ({
@@ -292,6 +300,7 @@ export const buildInitiativePages = (
         initiativeNumberOfPeopleServed,
         metricTable(metrics),
         ...checkpointsTables,
+        BackToInitiativesButton,
       ],
     });
   }
