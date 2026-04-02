@@ -47,7 +47,7 @@ export const createInitiative = handler(
       [state]: [
         {
           id: crypto.randomUUID(),
-          name: initiativeName,
+          title: initiativeName,
           initiativeNumber,
         },
       ],
