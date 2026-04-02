@@ -1,31 +1,19 @@
+import { MockedFunction } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentTable } from "components";
 import { ElementType, AttachmentTableTemplate } from "types";
+import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 
 vi.mock("react-router-dom", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA" }),
 }));
 
-vi.mock("utils", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useStore: vi.fn().mockReturnValue({
-    report: {
-      year: "2026",
-      pages: [
-        {
-          id: "mock-init-1",
-          initiativeNumber: "123",
-          title: "Init Title",
-        },
-      ],
-    },
-  }),
-}));
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
-vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
-  ...(await importOriginal()),
+vi.mock("utils/api/requestMethods/upload", () => ({
   uploadFileToS3: vi.fn(),
   recordFileInDatabaseAndGetUploadUrl: vi
     .fn()
@@ -76,6 +64,18 @@ const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 describe("<AttachmentTable />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUseStore.mockReturnValue({
+      report: {
+        year: "2026",
+        pages: [
+          {
+            id: "mock-init-1",
+            initiativeNumber: "123",
+            title: "Init Title",
+          },
+        ],
+      },
+    });
   });
   it("AttachmentTable renders with no attachments", () => {
     render(AttachmentTableComponent(mockAttachmentAreaElementEmpty));
