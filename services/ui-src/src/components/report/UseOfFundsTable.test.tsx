@@ -5,23 +5,36 @@ import { testA11y } from "utils/testing/commonTests";
 import { useState } from "react";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
 
+vi.mock("utils", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      pages: [
+        { initiativeNumber: "1", title: "Initiative 1" },
+        { initiativeNumber: "2", title: "Initiative 2" },
+      ],
+    },
+  }),
+}));
+
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
 const mockedElement: UseOfFundsTableTemplate = {
   id: "mock-id",
   type: ElementType.UseOfFundsTable,
   dropDownOptions: {
     budgetPeriodOptions: [
+      { label: "- Select an option -", value: "" },
       { label: "Budget Period 1", value: "budget-period-1" },
       { label: "Budget Period 2", value: "budget-period-2" },
     ],
-    initiativeOptions: [
-      { label: "Initiative 1", value: "initiative-1" },
-      { label: "Initiative 2", value: "initiative-2" },
-    ],
     useOfFundsOptions: [
+      { label: "- Select an option -", value: "" },
       { label: "Use of Funds 1", value: "use-of-funds-1" },
       { label: "Use of Funds 2", value: "use-of-funds-2" },
     ],
     recipientCategoryOptions: [
+      { label: "- Select an option -", value: "" },
       { label: "Recipient Category 1", value: "recipient-category-1" },
       { label: "Recipient Category 2", value: "recipient-category-2" },
     ],
@@ -83,9 +96,7 @@ describe("<UseOfFundsTableElement />", () => {
       const addButton = screen.getByText("Add use of funds");
       await userEvent.click(addButton);
 
-      const budgetPeriodButton = screen.getByRole("button", {
-        name: "Budget Period",
-      });
+      const budgetPeriodButton = screen.getAllByLabelText("Budget Period")[1];
       await userEvent.click(budgetPeriodButton);
       await userEvent.click(
         screen.getByRole("option", { name: "Budget Period 2" })
@@ -97,17 +108,13 @@ describe("<UseOfFundsTableElement />", () => {
       const description = screen.getByRole("textbox", { name: "Description" });
       await userEvent.type(description, "Test description");
 
-      const initiativeButton = screen.getByRole("button", {
-        name: "Initiative",
-      });
+      const initiativeButton = screen.getAllByLabelText("Initiative")[1];
       await userEvent.click(initiativeButton);
       await userEvent.click(
-        screen.getByRole("option", { name: "Initiative 2" })
+        screen.getByRole("option", { name: "2: Initiative 2" })
       );
 
-      const useOfFundsButton = screen.getByRole("button", {
-        name: "Use of Funds",
-      });
+      const useOfFundsButton = screen.getAllByLabelText("Use of Funds")[1];
       await userEvent.click(useOfFundsButton);
       await userEvent.click(
         screen.getByRole("option", { name: "Use of Funds 2" })
@@ -118,9 +125,8 @@ describe("<UseOfFundsTableElement />", () => {
       });
       await userEvent.type(recipientName, "Test Recipient");
 
-      const recipientCategoryButton = screen.getByRole("button", {
-        name: "Recipient Category",
-      });
+      const recipientCategoryButton =
+        screen.getAllByLabelText("Recipient Category")[1];
       await userEvent.click(recipientCategoryButton);
       await userEvent.click(
         screen.getByRole("option", { name: "Recipient Category 2" })

@@ -7,7 +7,6 @@ import {
 
 const useOfFundsOptions = {
   dropDownOptions: {
-    // These are placeholder
     budgetPeriodOptions: [
       { label: "- Select an option -", value: "" },
       { label: "Budget Period 1", value: "Budget Period 1" },
@@ -15,14 +14,6 @@ const useOfFundsOptions = {
       { label: "Budget Period 3", value: "Budget Period 3" },
       { label: "Budget Period 4", value: "Budget Period 4" },
       { label: "Budget Period 5", value: "Budget Period 5" },
-    ],
-    // These are placeholder, the initiatives will be come from a previous question in the report
-    initiativeOptions: [
-      { label: "- Select an option -", value: "" },
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
     ],
     useOfFundsOptions: [
       { label: "- Select an option -", value: "" },
