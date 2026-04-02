@@ -146,6 +146,18 @@ export const ReportPageWrapper = () => {
               )}
             </>
           )}
+          {"initiativeNumber" in currentPage && (
+            <Button
+              onClick={() =>
+                navigate(
+                  `/report/${reportType}/${state}/${reportId}/initiatives`
+                )
+              }
+              marginLeft="auto"
+            >
+              Back to Initiatives
+            </Button>
+          )}
         </VStack>
         <ReportModal />
       </HStack>

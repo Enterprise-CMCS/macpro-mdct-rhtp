@@ -1,7 +1,14 @@
 import { MockedFunction } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ElementType, PageType, Report, ReportStatus, ReportType } from "types";
+import {
+  ElementType,
+  InitiativePageTemplate,
+  PageType,
+  Report,
+  ReportStatus,
+  ReportType,
+} from "types";
 import { ReportPageWrapper } from "./ReportPageWrapper";
 import { useStore } from "utils";
 
@@ -151,6 +158,39 @@ describe("ReportPageWrapper", () => {
     await userEvent.click(continueBtn);
     expect(mockNavigate).toHaveBeenCalledWith(
       "/report/RHTP/NJ/RHTPNJ123/mock-report-page"
+    );
+  });
+
+  test("should render return to initiatives button when on initiative page", async () => {
+    setupMockStore({
+      report: {
+        ...testReport,
+        pages: [
+          ...testReport.pages,
+          {
+            id: "initiative-page",
+            initiativeNumber: "123",
+          } as InitiativePageTemplate,
+        ],
+      },
+      pageMap: new Map([
+        ["root", 0],
+        ["general-info", 1],
+        ["mock-report-page", 2],
+        ["initiative-page", 3],
+      ]),
+      currentPageId: "initiative-page",
+    });
+    await act(async () => {
+      render(<ReportPageWrapper />);
+    });
+
+    const returnButton = screen.getByRole("button", {
+      name: "Back to Initiatives",
+    });
+    await userEvent.click(returnButton);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/report/RHTP/NJ/RHTPNJ123/initiatives"
     );
   });
 });
