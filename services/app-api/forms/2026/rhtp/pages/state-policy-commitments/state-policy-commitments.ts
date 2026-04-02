@@ -52,7 +52,9 @@ const commitmentComments: TextAreaBoxTemplate = {
 
 const buildCommitments = (
   state: string,
-  statePolicyCommitments: any = STATE_POLICY_COMMITMENTS
+  statePolicyCommitments: {
+    [key: string]: { label: string; status: string }[];
+  } = STATE_POLICY_COMMITMENTS
 ) => {
   if (!(state in statePolicyCommitments)) return [];
   const commitmentsForState = statePolicyCommitments[state];
