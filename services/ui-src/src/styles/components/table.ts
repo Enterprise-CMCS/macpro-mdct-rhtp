@@ -18,8 +18,6 @@ const baseStyles = {
     },
     td: {
       paddingLeft: 0,
-      borderTop: "1px solid",
-      borderBottom: "1px solid",
       borderColor: "gray_light",
       textAlign: "left",
       "&:last-of-type": {
@@ -179,8 +177,8 @@ const initiativeVariant = {
       ".chakra-link": {
         width: "5rem",
       },
-      ".chakra-button": {
-        padding: "0 1rem",
+      "&.actions": {
+        width: "152px",
       },
     },
   },

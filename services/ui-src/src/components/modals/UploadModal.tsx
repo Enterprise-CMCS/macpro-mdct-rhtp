@@ -2,15 +2,17 @@ import { Stack } from "@chakra-ui/react";
 import { Dropdown, DropdownChangeObject } from "@cmsgov/design-system";
 import { Modal } from "components";
 import { Upload } from "components/fields/Upload";
-import { useState } from "react";
+import { JSX, useState } from "react";
 import { UploadListProp } from "types";
 
 export const UploadModal = ({
   modalDisclosure,
   id,
+  hint,
   year,
   state,
   dropdowns,
+  selections,
   answer,
   saveToReport,
   onChangeExpanded,
@@ -43,7 +45,7 @@ export const UploadModal = ({
       onConfirmHandler={() => modalDisclosure.onClose()}
       content={{
         heading: "Upload Attachments",
-        subheading: undefined,
+        subheading: hint,
         actionButtonText: "Done",
         closeButtonText: undefined,
       }}
@@ -58,6 +60,7 @@ export const UploadModal = ({
             onChange={(change) => onChange(change, index)}
           ></Dropdown>
         ))}
+        {selections ?? ""}
         <Upload
           id={id}
           year={year}
@@ -76,9 +79,11 @@ interface Props {
     onClose: () => void;
   };
   id: string;
+  hint?: string;
   year: string;
   state: string;
   answer: UploadListProp[];
+  selections?: JSX.Element;
   dropdowns?: { label: string; options: { label: string; value: string }[] }[];
   onChangeExpanded?: (change: string) => void;
   saveToReport: (uploads: UploadListProp[], key: string) => void;

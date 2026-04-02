@@ -1,5 +1,6 @@
 import { ReportType, ReportBase } from "../../../types/reports";
 import { generalInformation } from "./pages/general-information";
+import { initiativeAttachments } from "./pages/initiative-attachments";
 import { buildInitiativePages } from "./pages/initiatives/initiatives";
 import { initiativesTable } from "./pages/initiatives-table";
 import { reviewAndSubmit } from "./pages/review-and-submit";
@@ -15,6 +16,7 @@ export const rhtpReportTemplate = (state: string): ReportBase => ({
       id: "root",
       childPageIds: [
         "general-information",
+        "initiative-attachments",
         "initiatives",
         "state-policy-commitments",
         "use-of-funds",
@@ -23,6 +25,7 @@ export const rhtpReportTemplate = (state: string): ReportBase => ({
       ],
     },
     generalInformation,
+    initiativeAttachments,
     initiativesTable,
     statePolicyCommitments,
     useOfFunds,

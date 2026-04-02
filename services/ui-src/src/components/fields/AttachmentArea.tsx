@@ -1,4 +1,4 @@
-import { AttachmentAreaTemplate, UploadListProp } from "types";
+import { AttachmentAreaTemplate } from "types";
 import { PageElementProps } from "components/report/Elements";
 import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
@@ -35,21 +35,17 @@ export const AttachmentArea = (
     setModalOpen(false);
   };
 
-  const onRemove = () => {
+  const saveToReport = () => {
     retrieveUploadedFiles(year, state, id).then((response) => {
-      saveToReport(response);
+      updateElement({ answer: response });
     });
-  };
-
-  const saveToReport = (uploads: UploadListProp[]) => {
-    updateElement({ answer: uploads });
   };
 
   return (
     <Stack gap="0">
       <Label fieldId={id}>{label}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
-      {uploadListRender(files, year, state, onRemove, downloadFile)}
+      {uploadListRender(files, year, state, saveToReport, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}

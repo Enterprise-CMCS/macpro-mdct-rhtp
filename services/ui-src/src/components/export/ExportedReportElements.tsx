@@ -44,6 +44,8 @@ export const renderElements = (element: PageElement) => {
       return "TBD";
     case ElementType.ActionTable:
       return "TBD";
+    case ElementType.AttachmentTable:
+      return "TBD";
   }
 
   if (!("answer" in element)) {
