@@ -63,6 +63,7 @@ export const AttachmentTable = (
   const [checkpointsArr, setCheckpointsArr] = useState<
     { id: string; label: string }[]
   >([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -146,6 +147,7 @@ export const AttachmentTable = (
 
     const newValues = [...displayValue, ...formattedUploads];
     props.updateElement({ answer: newValues });
+    setUploadedFiles(uploads);
   };
 
   const removeAttachment = (file: UploadListProp, index: number) => {
@@ -238,11 +240,12 @@ export const AttachmentTable = (
           isOpen: isModalOpen,
           onClose: () => {
             setModalOpen(false);
+            setUploadedFiles([]);
           },
         }}
         state={state}
         year={year}
-        answer={[]}
+        answer={uploadedFiles}
         id={id}
         hint="[hint text]"
         selections={
