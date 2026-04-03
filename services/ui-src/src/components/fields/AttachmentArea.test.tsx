@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { ElementType, AttachmentAreaTemplate } from "types";
 import {
   deleteUploadedFile,
@@ -10,7 +10,7 @@ import {
 import { testA11y } from "utils/testing/commonTests";
 import { Mock } from "vitest";
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA" }),
 }));
 

@@ -1,0 +1,36 @@
+{
+  "PA": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started"
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started"
+    }
+  ],
+  "NY": [
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started"
+    }
+  ],
+  "WA": [
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started"
+    }
+  ],
+  "GA": [
+    {
+      "label": "C.3. Overall CON Score",
+      "status": "Not yet started"
+    }
+  ],
+  "WI": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started"
+    }
+  ]
+}

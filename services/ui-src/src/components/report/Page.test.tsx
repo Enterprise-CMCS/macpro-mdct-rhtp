@@ -3,14 +3,14 @@ import {
   mockUseReadOnlyUserStore,
   mockUseStore,
 } from "utils/testing/setupTest";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import { useStore } from "utils";
 import { Page } from "./Page";
 import { AlertTypes, ElementType, PageElement } from "types";
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useNavigate: vi.fn(),
   useParams: vi.fn(),
 }));

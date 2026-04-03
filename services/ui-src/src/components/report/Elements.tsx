@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router";
 import {
   Button,
   Heading,
@@ -155,6 +155,15 @@ export const ButtonLinkElement = ({
           },
         };
 
+      case "alt-continue":
+        return {
+          prop: {
+            marginLeft: "auto",
+            variant: "primary",
+            onClick: () => nav(),
+          },
+        };
+
       default:
         return {
           prop: {
@@ -173,7 +182,7 @@ export const ButtonLinkElement = ({
 
   return (
     <Button {...propObj.prop}>
-      <Image {...propObj.style} className="icon" />
+      {propObj.style ? <Image {...propObj.style} className="icon" /> : null}
       {button.label}
     </Button>
   );

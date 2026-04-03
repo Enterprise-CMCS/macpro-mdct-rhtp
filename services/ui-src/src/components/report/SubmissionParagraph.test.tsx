@@ -1,7 +1,7 @@
 import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockUseStore } from "utils/testing/setupTest";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
 

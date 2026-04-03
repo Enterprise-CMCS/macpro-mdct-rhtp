@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { ElementType, TableCheckpointTemplate } from "types";
 import { recordFileInDatabaseAndGetUploadUrl } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
@@ -17,8 +17,8 @@ import { useStore } from "utils";
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
-vi.mock("react-router-dom", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
+vi.mock("react-router", () => ({
+  useParams: vi.fn().mockReturnValue({ state: "PA" }),
 }));
 
 vi.mock("utils", async (importOriginal) => ({

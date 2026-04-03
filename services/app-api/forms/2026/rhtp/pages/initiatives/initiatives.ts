@@ -13,11 +13,33 @@ import {
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
 
+type MetricData = {
+  name: string;
+  status: string;
+};
+
+type InitiativeData = {
+  id: string;
+  title: string;
+  initiativeNumber: string;
+  narrative?: string;
+  status?: PageStatus | undefined;
+  metrics?: MetricData[];
+};
+
 const returnToInitiativesDashboard: ButtonLinkTemplate = {
   type: ElementType.ButtonLink,
   id: "return-button",
   to: "initiatives",
   label: "Return to initiatives dashboard",
+};
+
+const BackToInitiativesButton: ButtonLinkTemplate = {
+  type: ElementType.ButtonLink,
+  id: "back-button",
+  to: "initiatives",
+  label: "Back to Initiatives",
+  style: "alt-continue",
 };
 
 const initiativeHeader: (initiativeName: string) => HeaderTemplate = (
@@ -56,7 +78,9 @@ const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   required: true,
 };
 
-export const metricTable = (metrics: any[]): ActionTableTemplate => {
+export const metricTable = (
+  metrics: MetricData[] = []
+): ActionTableTemplate => {
   const table: ActionTableTemplate = {
     type: ElementType.ActionTable,
     id: "metrics-table",
@@ -127,7 +151,9 @@ const checkpointsTables: TableCheckpointTemplate = {
 // TODO - better array typing and parsing once we have initiatives by state
 export const buildInitiativePages = (
   state: string,
-  initiatives: any = INITIATIVES
+  initiatives: { [key: string]: InitiativeData[] } = INITIATIVES as {
+    [key: string]: InitiativeData[];
+  }
 ) => {
   if (!(state in initiatives)) return [];
   const initiativesForState = initiatives[state];
@@ -156,6 +182,7 @@ export const buildInitiativePages = (
         initiativeNumberOfPeopleServed,
         metricTable(metrics),
         checkpointsTables,
+        BackToInitiativesButton,
       ],
     });
   }

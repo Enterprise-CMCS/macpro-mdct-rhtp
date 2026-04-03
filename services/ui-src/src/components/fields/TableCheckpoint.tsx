@@ -21,7 +21,7 @@ import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useStore } from "utils";
 import { downloadFile, Options } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
