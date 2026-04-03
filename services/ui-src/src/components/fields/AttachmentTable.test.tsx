@@ -6,7 +6,7 @@ import { ElementType, AttachmentTableTemplate } from "types";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA" }),
 }));
 

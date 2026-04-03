@@ -17,7 +17,7 @@ import {
 import { UploadModal } from "components/modals/UploadModal";
 import { PageElementProps } from "components/report/Elements";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import {
   AttachmentTableTemplate,
   InitiativePageTemplate,
