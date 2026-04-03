@@ -1,8 +1,7 @@
 import { Stack } from "@chakra-ui/react";
-import { Dropdown, DropdownChangeObject } from "@cmsgov/design-system";
 import { Modal } from "components";
 import { Upload } from "components/fields/Upload";
-import { JSX, useState } from "react";
+import { JSX } from "react";
 import { UploadListProp } from "types";
 
 export const UploadModal = ({
@@ -11,32 +10,12 @@ export const UploadModal = ({
   hint,
   year,
   state,
-  dropdowns,
   selections,
   answer,
   saveToReport,
-  onChangeExpanded,
 }: Props) => {
-  const [values, setDropdownValues] = useState<string[]>(
-    dropdowns?.map((dropdown) => dropdown.options[0]?.value) ?? []
-  );
-
-  const onChange = (change: DropdownChangeObject, index: number) => {
-    const newValues = [...values];
-    newValues[index] = change.target.value;
-
-    //if their are multiple dropdowns, we want the value of the last dropdown
-    if (onChangeExpanded) {
-      const index = newValues.length - 1;
-      onChangeExpanded(newValues.at(index) ?? "");
-    }
-    setDropdownValues(newValues);
-  };
-
   const saveToModal = (uploads: UploadListProp[]) => {
-    const dropdownIndex = values.length - 1;
-    const value = values.at(dropdownIndex) ?? "";
-    saveToReport(uploads, value);
+    saveToReport(uploads);
   };
 
   return (
@@ -51,15 +30,6 @@ export const UploadModal = ({
       }}
     >
       <Stack gap="1.5rem">
-        {dropdowns?.map((dropdown, index) => (
-          <Dropdown
-            name={dropdown.label}
-            label={dropdown.label}
-            value={values[index]}
-            options={dropdown.options}
-            onChange={(change) => onChange(change, index)}
-          ></Dropdown>
-        ))}
         {selections ?? ""}
         <Upload
           id={id}
@@ -84,7 +54,5 @@ interface Props {
   state: string;
   answer: UploadListProp[];
   selections?: JSX.Element;
-  dropdowns?: { label: string; options: { label: string; value: string }[] }[];
-  onChangeExpanded?: (change: string) => void;
-  saveToReport: (uploads: UploadListProp[], key: string) => void;
+  saveToReport: (uploads: UploadListProp[]) => void;
 }

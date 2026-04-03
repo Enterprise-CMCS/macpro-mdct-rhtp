@@ -29,6 +29,8 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
+export type Options = { label: string; value: string; checked?: boolean };
+
 export const retrieveUploadedFiles = async (
   year: string,
   state: string,
