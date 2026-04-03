@@ -106,7 +106,7 @@ describe("Test create initiative handler", () => {
     expect(mockBuildInitiatives).toHaveBeenCalledWith("PA", {
       PA: [
         expect.objectContaining({
-          name: "Mock Initiative Name",
+          title: "Mock Initiative Name",
           initiativeNumber: "123",
         }),
       ],
