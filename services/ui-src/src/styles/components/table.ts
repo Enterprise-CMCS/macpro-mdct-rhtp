@@ -177,6 +177,9 @@ const initiativeVariant = {
       ".chakra-link": {
         width: "5rem",
       },
+      ".chakra-button": {
+        padding: "0 1rem",
+      },
       "&.actions": {
         width: "152px",
       },

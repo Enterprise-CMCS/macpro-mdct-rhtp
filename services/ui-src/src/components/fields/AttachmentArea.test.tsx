@@ -72,12 +72,16 @@ describe("<AttachmentArea />", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Add attachment" })
     );
-    expect(screen.getByText("Upload Attachments")).toBeInTheDocument();
+    expect(
+      screen.getByText("Upload Initiative Attachments")
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Select a file or files to upload")
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(screen.queryByText("Upload Attachments")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Upload Initiative Attachments")
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByText("Select a file or files to upload")
     ).not.toBeInTheDocument();

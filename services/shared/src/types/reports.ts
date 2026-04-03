@@ -464,8 +464,8 @@ export type AttachmentTableTemplate = {
   answer?: {
     attachment: UploadListProp;
     initiatives: string[];
-    stage: string;
-    checkpoints: string;
+    stage?: string;
+    checkpoints?: string;
     status: string;
     comments: { name: string; date: string }[];
   }[];

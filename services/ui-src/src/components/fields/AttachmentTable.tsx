@@ -49,21 +49,32 @@ export const AttachmentTable = (
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
+
+  const initiatives = (report?.pages.filter(
+    (page) => "initiativeNumber" in page
+  ) || []) as InitiativePageTemplate[];
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([]);
+
   const [stageOption, setStageOption] = useState<Options[]>([]);
   const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
+
+  const initialValues = {
+    stage: "",
+    checkpoint: "",
+  };
   const [selection, setSelection] = useState<{
     stage: string;
     checkpoint: string;
-  }>({ stage: "", checkpoint: "" });
+  }>(initialValues);
 
-  const [initiativeNumbers, setInitiativeNumbers] = useState<Options[]>([]);
   const [checkpointsArr, setCheckpointsArr] = useState<
     { id: string; label: string }[]
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
+
+  const [modalMode, setModalMode] = useState<"Upload" | "Edit">("Upload");
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -71,10 +82,6 @@ export const AttachmentTable = (
   }
 
   useEffect(() => {
-    const initiatives = (report?.pages.filter(
-      (page) => "initiativeNumber" in page
-    ) || []) as InitiativePageTemplate[];
-
     setInitiativeOptions(
       initiatives.map((initiative) => ({
         label: `${initiative.initiativeNumber}: ${initiative.title}`,
@@ -82,34 +89,17 @@ export const AttachmentTable = (
         checked: false,
       }))
     );
-    setInitiativeNumbers(
-      initiatives.map((initiative) => ({
-        label: initiative.initiativeNumber,
-        value: initiative.id,
-      }))
-    );
+    setStageOption([
+      { label: "- Select an option -", value: "" },
+      ...checkpointsList.map((checks) => ({
+        label: `${checks.stage} ${checks.label}`,
+        value: checks.id,
+      })),
+    ]);
     setCheckpointsArr(checkpointsList.flatMap((list) => list.checkpoints));
   }, [report]);
 
-  useEffect(() => {
-    setStageOption(
-      checkpointsList.map((checks) => ({
-        label: `${checks.stage} ${checks.label}`,
-        value: checks.id,
-      }))
-    );
-    setCheckpointOption(
-      checkpointsList[0].checkpoints
-        .filter((checks) => checks.attachable)
-        .map((check) => ({ label: check.label, value: check.id }))
-    );
-    setSelection({
-      stage: checkpointsList[0].id,
-      checkpoint: checkpointsList[0].checkpoints[0].id,
-    });
-  }, []);
-
-  const onChangeHandler = (event: DropdownChangeObject) => {
+  const onStageChangeHandler = (event: DropdownChangeObject) => {
     const value = event.target.value;
     const checkpoints =
       checkpointsList
@@ -117,8 +107,11 @@ export const AttachmentTable = (
         ?.checkpoints.filter((checks) => checks.attachable)
         .map((check) => ({ label: check.label, value: check.id })) ?? [];
 
-    setCheckpointOption(checkpoints);
-    setSelection({ stage: value, checkpoint: checkpoints[0].value });
+    setCheckpointOption([
+      { label: "- Select an option -", value: "" },
+      ...checkpoints,
+    ]);
+    setSelection({ stage: value, checkpoint: "" });
   };
 
   const onChoiceChangeHandler = (
@@ -134,6 +127,7 @@ export const AttachmentTable = (
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
+    console.log("SAVE TO REPORT", uploads);
     const formattedUploads = uploads.map((upload) => ({
       attachment: upload,
       initiatives: initiativeOptions
@@ -144,22 +138,33 @@ export const AttachmentTable = (
       status: "Under Review",
       comments: [],
     }));
-
+    console.log("formatted uploads", formattedUploads);
     const newValues = [...displayValue, ...formattedUploads];
     props.updateElement({ answer: newValues });
-    setUploadedFiles(uploads);
+    setUploadedFiles([...uploadedFiles, ...uploads]);
   };
 
   const removeAttachment = (file: UploadListProp, index: number) => {
     removeFile(file, year, state, () => {
-      const newValue = [...displayValue];
-      newValue.splice(index, 1);
-      props.updateElement({ answer: newValue });
+      // const newValue = [...displayValue];
+      // newValue.splice(index, 1);
+      // props.updateElement({ answer: newValue });
     });
+    const newValue = [...displayValue];
+    newValue.splice(index, 1);
+    props.updateElement({ answer: newValue });
+  };
+
+  const onAddClick = () => {
+    setModalMode("Upload");
+    setSelection(initialValues);
+    // setSelectedItemID("");
+    setModalOpen(true);
   };
 
   const onEdit = () => {
     /** TODO: add editting in modal */
+    setModalMode("Edit");
     setModalOpen(true);
   };
 
@@ -169,7 +174,7 @@ export const AttachmentTable = (
         aria-label="Add Attachment"
         variant="outline"
         alignSelf="flex-start"
-        onClick={() => setModalOpen(true)}
+        onClick={() => onAddClick()}
       >
         Add Attachment
       </Button>
@@ -196,23 +201,21 @@ export const AttachmentTable = (
                   </Button>
                 </Td>
                 <Td>
-                  Initiatives{" "}
-                  {row.initiatives
-                    .map(
-                      (id) =>
-                        `#${initiativeNumbers.find((opt) => opt.value === id)?.label}`
-                    )
-                    .join(", ")}
+                  {row.initiatives.length === 0
+                    ? ""
+                    : `Initiatives ${row.initiatives.map((id) => `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`).join(", ")}`}
                 </Td>
                 <Td>
-                  {stageOption.find((opt) => opt.value === row.stage)?.label}
+                  {row.stage
+                    ? stageOption.find((opt) => opt.value === row.stage)?.label
+                    : ""}
                 </Td>
                 <Td>
-                  {
-                    checkpointsArr.find(
-                      (check) => check.id === row?.checkpoints
-                    )?.label
-                  }
+                  {row.checkpoints
+                    ? checkpointsArr.find(
+                        (check) => check.id === row.checkpoints
+                      )?.label
+                    : ""}
                 </Td>
                 <Td>{row.status}</Td>
                 <Td className="actions" display="flex">
@@ -248,6 +251,11 @@ export const AttachmentTable = (
         answer={uploadedFiles}
         id={id}
         hint="[hint text]"
+        modalHeading={
+          modalMode === "Upload"
+            ? "Upload Initiative Attachments"
+            : "Edit Attachment"
+        }
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">
             <ChoiceList
@@ -263,7 +271,7 @@ export const AttachmentTable = (
               label={"Stage"}
               value={selection?.stage}
               options={stageOption}
-              onChange={onChangeHandler}
+              onChange={onStageChangeHandler}
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
