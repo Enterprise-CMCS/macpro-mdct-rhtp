@@ -5,8 +5,6 @@ import {
 } from "../constants";
 import { buildStatePolicyCommitments } from "../state-policy-commitments";
 
-const sampleCommitmentName = STATE_POLICY_COMMITMENT_NAMES[0];
-
 describe("test state policy commitment functions", () => {
   test("buildStatePolicyCommitments()", () => {
     const page = buildStatePolicyCommitments("PA");
@@ -25,7 +23,6 @@ describe("test state policy commitment functions", () => {
             // expected accordion groups
             accordions: expect.arrayContaining([
               expect.objectContaining({
-                label: sampleCommitmentName,
                 // expected accordion fields
                 children: expect.arrayContaining([
                   expect.objectContaining({

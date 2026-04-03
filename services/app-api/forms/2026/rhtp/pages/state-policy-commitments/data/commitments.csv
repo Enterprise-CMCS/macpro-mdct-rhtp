@@ -1,7 +1,166 @@
-state,state policy commitment,status
-PA,B.2. Presidential Fitness Test,Not yet started
-PA,B.3. SNAP Food Restriction Waiver Policy,Not yet started
-NY,B.3. SNAP Food Restriction Waiver Policy,Not yet started
-WA,B.4. Nutrition Continuing Medical Education,Not yet started
-GA,C.3. Overall CON Score,Not yet started
-WI,B.2. Presidential Fitness Test,Not yet started
+State,State policy commitment name,Status
+AL,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+AK,B.2. Presidential Fitness Test,Not yet started
+AK,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+AK,B.4. Nutrition Continuing Medical Education,Not yet started
+AK,C.3. CON - Ancillaries,Not yet started
+AK,D.2. Physician - Medical Licensure Compact,Not yet started
+AK,D.2. Nurse - Nurse Licensure Compact,Not yet started
+AK,D.2. EMS - EMS Compact,Not yet started
+AK,D.2. Psychology - PSYPACT,Not yet started
+AK,D.2. Physician Assistant - PA Compact,Not yet started
+AK,D.3. Pharmacist - Overall Score,Not yet started
+AK,D.3. Pharmacist - Lab Testing,Not yet started
+AK,D.3. Pharmacist - Independent Prescribing,Not yet started
+AZ,D.2. EMS - EMS Compact,Not yet started
+AZ,D.2. Physician Assistant - PA Compact,Not yet started
+AR,B.2. Presidential Fitness Test,Not yet started
+AR,B.4. Nutrition Continuing Medical Education,Not yet started
+AR,D.2. Physician - Medical Licensure Compact,Not yet started
+AR,D.3. Pharmacist - Overall Score,Not yet started
+CT,B.2. Presidential Fitness Test,Not yet started
+CT,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+DE,B.2. Presidential Fitness Test,Not yet started
+DE,B.4. Nutrition Continuing Medical Education,Not yet started
+DE,C.3. Overall CON Score,Not yet started
+DE,D.3. PA - Scope of Practice,Not yet started
+DE,D.3. Pharmacist - Overall Score,Not yet started
+DE,D.3. Dental Hygienist - Overall Score,Not yet started
+GA,B.4. Nutrition Continuing Medical Education,Not yet started
+GA,D.3. Dental Hygienist - Supervision of Dental Assistants,Not yet started
+GA,F.1. Medicaid Payment for Remote Patient Monitoring (RPM),Not yet started
+HI,B.2. Presidential Fitness Test,Not yet started
+HI,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+HI,B.4. Nutrition Continuing Medical Education,Not yet started
+HI,D.2. Nurse - Nurse Licensure Compact,Not yet started
+HI,D.2. Psychology - PSYPACT,Not yet started
+HI,D.2. Physician Assistant - PA Compact,Not yet started
+IL,D.2. Nurse - Nurse Licensure Compact,Not yet started
+IL,D.2. Physician Assistant - PA Compact,Not yet started
+IN,B.4. Nutrition Continuing Medical Education,Not yet started
+IA,B.2. Presidential Fitness Test,Not yet started
+IA,B.4. Nutrition Continuing Medical Education,Not yet started
+IA,C.3. CON - Behavioral Outpatient,Not yet started
+IA,D.2. Psychology - PSYPACT,Not yet started
+KS,B.2. Presidential Fitness Test,Not yet started
+KS,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+KS,B.4. Nutrition Continuing Medical Education,Not yet started
+KS,F.1. Medicaid Payment for Store and Forward,Not yet started
+LA,B.2. Presidential Fitness Test,Not yet started
+LA,B.4. Nutrition Continuing Medical Education,Not yet started
+MA,D.2. Nurse - Nurse Licensure Compact,Not yet started
+MA,D.2. Psychology - PSYPACT,Not yet started
+MA,D.2. Physician Assistant - PA Compact,Not yet started
+MI,D.3. Pharmacist - Overall Score,Not yet started
+MI,D.3. Pharmacist - Drug Administration,Not yet started
+MI,D.3. Pharmacist - Lab Testing,Not yet started
+MI,D.3. Pharmacist - Independent Prescribing,Not yet started
+MS,B.2. Presidential Fitness Test,Not yet started
+MS,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+MO,B.2. Presidential Fitness Test,Not yet started
+MO,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+MO,B.4. Nutrition Continuing Medical Education,Not yet started
+MO,D.2. Physician Assistant - PA Compact,Not yet started
+MO,F.1. Telehealth License/Registration Process (including special licenses),Not yet started
+MT,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+MT,B.4. Nutrition Continuing Medical Education,Not yet started
+MT,D.2. EMS - EMS Compact,Not yet started
+MT,D.3. Dental Hygienist - Overall Score,Not yet started
+MT,D.3. Dental Hygienist - Dental Hygiene Diagnosis,Not yet started
+MT,D.3. Dental Hygienist - Dental Hygiene Treatment Planning,Not yet started
+MT,F.1. Medicaid Payment for Store and Forward,Not yet started
+MT,F.1. Medicaid Payment for Remote Patient Monitoring (RPM),Not yet started
+NE,B.2. Presidential Fitness Test,Not yet started
+NE,C.3. CON - Long-term Care Facilities,Not yet started
+NV,B.2. Presidential Fitness Test,Not yet started
+NV,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+NV,B.4. Nutrition Continuing Medical Education,Not yet started
+NV,D.2. Physician Assistant - PA Compact,Not yet started
+NH,B.2. Presidential Fitness Test,Not yet started
+NH,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+NH,B.4. Nutrition Continuing Medical Education,Not yet started
+NH,D.2. EMS - EMS Compact,Not yet started
+NH,D.2. Physician Assistant - PA Compact,Not yet started
+NH,D.3. Pharmacist - Overall Score,Not yet started
+NH,D.3. Pharmacist - Lab Testing,Not yet started
+NH,D.3. Pharmacist - Independent Prescribing,Not yet started
+NH,D.3. Dental Hygienist - Dental Hygiene Diagnosis,Not yet started
+NH,D.3. Dental Hygienist - Direct Medicaid Reimbursement,Not yet started
+NJ,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+NJ,D.2. EMS - EMS Compact,Not yet started
+NJ,D.2. Physician Assistant - PA Compact,Not yet started
+NJ,D.3. NP - Scope of Practice,Not yet started
+NM,B.2. Presidential Fitness Test,Not yet started
+NM,B.4. Nutrition Continuing Medical Education,Not yet started
+NM,D.2. Physician - Medical Licensure Compact,Not yet started
+NM,D.2. EMS - EMS Compact,Not yet started
+NM,D.2. Psychology - PSYPACT,Not yet started
+NM,D.2. Physician Assistant - PA Compact,Not yet started
+NC,B.2. Presidential Fitness Test,Not yet started
+NC,B.4. Nutrition Continuing Medical Education,Not yet started
+NC,D.2. EMS - EMS Compact,Not yet started
+ND,B.2. Presidential Fitness Test,Not yet started
+ND,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+ND,B.4. Nutrition Continuing Medical Education,Not yet started
+ND,D.2. Physician Assistant - PA Compact,Not yet started
+OH,B.2. Presidential Fitness Test,Not yet started
+OH,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+OH,B.4. Nutrition Continuing Medical Education,Not yet started
+OK,B.2. Presidential Fitness Test,Not yet started
+OK,B.4. Nutrition Continuing Medical Education,Not yet started
+OR,B.4. Nutrition Continuing Medical Education,Not yet started
+OR,D.2. EMS - EMS Compact,Not yet started
+OR,D.3. Pharmacist - Overall Score,Not yet started
+OR,D.3. Pharmacist - Lab Testing,Not yet started
+OR,D.3. Pharmacist - Independent Prescribing,Not yet started
+PA,D.2. Physician Assistant - PA Compact,Not yet started
+RI,B.4. Nutrition Continuing Medical Education,Not yet started
+RI,C.3. Overall CON Score,Not yet started
+RI,D.2. Physician - Medical Licensure Compact,Not yet started
+RI,D.2. Physician Assistant - PA Compact,Not yet started
+RI,D.3. Pharmacist - Overall Score,Not yet started
+RI,D.3. Dental Hygienist - Overall Score,Not yet started
+SC,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+SC,C.3. Overall CON Score,Not yet started
+SC,D.3. Dental Hygienist - Provision of Sealants,Not yet started
+SC,D.3. Dental Hygienist - Direct Access to Prophylaxis,Not yet started
+SD,B.2. Presidential Fitness Test,Not yet started
+SD,D.2. Physician Assistant - PA Compact,Not yet started
+TN,B.2. Presidential Fitness Test,Not yet started
+TN,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+TN,B.4. Nutrition Continuing Medical Education,Not yet started
+TN,C.3. Overall CON Score,Not yet started
+TN,C.3. CON - Behavioral Outpatient,Not yet started
+TN,C.3. CON - Medical Outpatient,Not yet started
+TN,C.3. CON - Medical Inpatient,Not yet started
+TN,C.3. CON - Day Services,Not yet started
+TN,C.3. CON - Long-term Care Facilities,Not yet started
+TN,C.3. CON - Ancillaries,Not yet started
+TN,C.3. CON - Other,Not yet started
+TN,D.3. PA - Scope of Practice,Not yet started
+TN,D.3. NP - Scope of Practice,Not yet started
+TN,D.3. Pharmacist - Overall Score,Not yet started
+TN,D.3. Pharmacist - Lab Testing,Not yet started
+TN,D.3. Pharmacist - Independent Prescribing,Not yet started
+TN,D.3. Dental Hygienist - Overall Score,Not yet started
+TX,B.2. Presidential Fitness Test,Not yet started
+TX,B.4. Nutrition Continuing Medical Education,Not yet started
+UT,B.2. Presidential Fitness Test,Not yet started
+VT,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+VT,C.3. Overall CON Score,Not yet started
+VA,B.2. Presidential Fitness Test,Not yet started
+VA,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+VA,B.4. Nutrition Continuing Medical Education,Not yet started
+WV,B.2. Presidential Fitness Test,Not yet started
+WV,B.4. Nutrition Continuing Medical Education,Not yet started
+WV,F.1. Medicaid Payment for Remote Patient Monitoring (RPM),Not yet started
+WI,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+WY,B.2. Presidential Fitness Test,Not yet started
+WY,B.3. SNAP Food Restriction Waiver Policy,Not yet started
+WY,B.4. Nutrition Continuing Medical Education,Not yet started
+WY,D.2. Physician Assistant - PA Compact,Not yet started
+WY,D.3. Pharmacist - Overall Score,Not yet started
+WY,D.3. Pharmacist - Drug Administration,Not yet started
+WY,D.3. Pharmacist - Lab Testing,Not yet started
+WY,D.3. Pharmacist - Independent Prescribing,Not yet started
+WY,D.3. Dental Hygienist - Overall Score,Not yet started
