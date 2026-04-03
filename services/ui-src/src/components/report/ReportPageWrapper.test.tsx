@@ -60,7 +60,7 @@ const mockUseParams = vi.fn();
 const mockNavigate = vi.fn();
 const mockSaveReport = vi.fn();
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useParams: () => mockUseParams(),
   useNavigate: () => mockNavigate,
 }));

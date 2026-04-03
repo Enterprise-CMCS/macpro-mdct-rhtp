@@ -17,7 +17,7 @@ mockedUseStore.mockReturnValue(mockUseStore);
 
 const mockUseNavigate = vi.fn();
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useNavigate: () => mockUseNavigate,
 }));
 

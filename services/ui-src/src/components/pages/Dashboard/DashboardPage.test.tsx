@@ -10,7 +10,7 @@ import {
 import { useStore } from "utils";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Report } from "types";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import userEvent from "@testing-library/user-event";
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
@@ -26,7 +26,7 @@ vi.mock("utils/state/useStore", () => ({
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
-vi.mock("react-router-dom", async (importOriginal) => ({
+vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => vi.fn(),
   useParams: vi.fn(() => ({

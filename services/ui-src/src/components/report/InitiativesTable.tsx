@@ -19,7 +19,7 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { AddEditInitiativeModal } from "components/modals/AddEditInitiativeModal";
