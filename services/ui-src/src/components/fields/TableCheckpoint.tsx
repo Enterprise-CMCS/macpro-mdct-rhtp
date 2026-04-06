@@ -1,4 +1,5 @@
 import {
+  Stack,
   Flex,
   Button,
   Checkbox,
@@ -11,20 +12,22 @@ import {
   Image,
   Text,
 } from "@chakra-ui/react";
-import { PageElementProps } from "components/report/Elements";
 import {
+  AttachmentTableTemplate,
   InitiativeAnswerProp,
   TableCheckpointTemplate,
   UploadListProp,
 } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router";
 import { useStore } from "utils";
 import { downloadFile, Options } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
+import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
+import { PageElementProps } from "components/report/Elements";
 
 /** Formatting the the data from the elements into renderable rows for the table */
 const buildRows = (
@@ -99,13 +102,12 @@ type TableShape = {
 };
 
 export const TableCheckpoint = (
-  props: PageElementProps<TableCheckpointTemplate>
+  _props: PageElementProps<TableCheckpointTemplate>
 ) => {
-  console.log(props);
-
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { state, pageId } = useParams();
-  const { report } = useStore();
+  const { report, setAnswers } = useStore();
+  const { autosave } = useContext(ReportAutosaveContext);
   const year = report?.year.toString();
   //if there is answer on load, we need to build the shape from the checkpoints data
   const initialDisplayValue = checkpointsList.flatMap((list) =>
@@ -120,9 +122,11 @@ export const TableCheckpoint = (
   const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
   const [selection, setSelection] = useState<{
     stage: string;
-    checkpoint: string;
-  }>({ stage: "", checkpoint: "" });
+    checkpoints: string;
+  }>({ stage: "", checkpoints: "" });
   const [files, setFiles] = useState<UploadListProp[]>([]);
+
+  console.log(state, year, pageId);
 
   if (!state || !year || !pageId) {
     console.error("Can't retrieve uploads with missing state, year or id");
@@ -152,15 +156,15 @@ export const TableCheckpoint = (
     );
     setSelection({
       stage: checkpointsList[0].id,
-      checkpoint: checkpointsList[0].checkpoints[0].id,
+      checkpoints: checkpointsList[0].checkpoints[0].id,
     });
-  }, []);
+  }, [report]);
 
   useEffect(() => {
-    const { checkpoint } = selection;
+    const { checkpoints } = selection;
     const filtered = tables
       .flatMap((tables) => tables.rows)
-      .filter((row) => row.id === checkpoint && row.file.fileId)
+      .filter((row) => row.id === checkpoints && row.file.fileId)
       .map((filter) => filter.file);
 
     setFiles(filtered);
@@ -181,25 +185,62 @@ export const TableCheckpoint = (
         .map((check) => ({ label: check.label, value: check.id })) ?? [];
 
     setCheckpointOption(checkpoints);
-    setSelection({ stage: value, checkpoint: checkpoints[0].value });
+    setSelection({ stage: value, checkpoints: checkpoints[0].value });
   };
 
   const onModalClose = () => {
     setModalOpen(false);
   };
 
-  const saveToReport = (uploads: UploadListProp[]) => {
-    console.log(uploads);
+  const writeToReport = (updatedElement: InitiativeAnswerProp[]) => {
+    const page = structuredClone(
+      report?.pages.find((page) => page.id === "initiative-attachments")
+    );
+    const elements = page?.elements ?? [];
+    const index = elements.findIndex(
+      (element) => element.type === "attachmentTable"
+    );
+    const answer = (elements[index] as AttachmentTableTemplate).answer ?? [];
+    const newAnswer = [...answer, ...updatedElement];
+
+    if ("answer" in elements[index]) elements[index].answer = newAnswer;
+    setAnswers(page, page?.id);
+    autosave();
   };
 
-  const removeAttachment = async (file: UploadListProp) => {
-    console.log(file);
+  const saveToReport = (uploads: UploadListProp[]) => {
+    const newElements = uploads.map((file) => ({
+      initiatives: [pageId],
+      ...selection,
+      comments: [],
+      attachment: file,
+      status: "Under Review",
+    }));
+
+    writeToReport(newElements);
+  };
+
+  const removeAttachment = (fileId: string) => {
+    const page = structuredClone(
+      report?.pages.find((page) => page.id === "initiative-attachments")
+    );
+    const elements = page?.elements ?? [];
+    const index = elements.findIndex(
+      (element) => element.type === "attachmentTable"
+    );
+    const answer = (elements[index] as AttachmentTableTemplate).answer ?? [];
+    const filtered = answer.filter((item) => item.attachment.fileId != fileId);
+    const newAnswer = [...filtered];
+
+    if ("answer" in elements[index]) elements[index].answer = newAnswer;
+    setAnswers(page, page?.id);
+    autosave();
   };
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
       {tables.map((table, tableIndex) => (
-        <>
+        <Stack key={`checkpoint-${tableIndex}`} gap="1.25rem">
           <Label>{`Stage ${table.stage}: ${table.label}`}</Label>
           <Text>To upload attachments, click the button below.</Text>
           <Button
@@ -213,17 +254,17 @@ export const TableCheckpoint = (
           >
             Upload attachments
           </Button>
-          <Table variant="metric">
+          <Table variant="metric" key={table.label}>
             <Thead>
               <Tr>
                 {header.map((item) => (
-                  <Th>{item}</Th>
+                  <Th key={item}>{item}</Th>
                 ))}
               </Tr>
             </Thead>
             <Tbody>
-              {table.rows.map((row) => (
-                <Tr>
+              {table.rows.map((row, rowIndex) => (
+                <Tr key={`checkpoint-row-${rowIndex}`}>
                   <Td>{row.stageNo}</Td>
                   <Td>{row.label}</Td>
                   <Td>
@@ -254,7 +295,7 @@ export const TableCheckpoint = (
                     {"file" in row && row.file.fileId && (
                       <Button
                         variant="unstyled"
-                        onClick={() => removeAttachment(row.file)}
+                        onClick={() => removeAttachment(row.file.fileId)}
                         aria-label={`Remove ${row.file.name}`}
                       >
                         <Image src={cancelIcon} alt="Remove" />
@@ -265,7 +306,7 @@ export const TableCheckpoint = (
               ))}
             </Tbody>
           </Table>
-        </>
+        </Stack>
       ))}
       <UploadModal
         modalDisclosure={{
@@ -289,10 +330,10 @@ export const TableCheckpoint = (
               name={"checkpoint"}
               label={"Checkpoint #"}
               options={checkpointOption}
-              value={selection?.checkpoint}
+              value={selection?.checkpoints}
               onChange={(dropdown) => {
                 const value = dropdown.target.value;
-                setSelection({ ...selection, checkpoint: value });
+                setSelection({ ...selection, checkpoints: value });
               }}
             ></Dropdown>
           </>

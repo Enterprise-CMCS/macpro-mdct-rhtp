@@ -95,14 +95,17 @@ export const deepEquals = (obj1: any, obj2: any): boolean => {
   }
 };
 
-export const mergeAnswers = (answers: any, state: ReportState) => {
-  if (!state.report || !state.currentPageId) {
+export const mergeAnswers = (
+  answers: any,
+  state: ReportState,
+  pageId?: string
+) => {
+  const refId = pageId ?? state.currentPageId;
+  if (!state.report || !refId) {
     return {};
   }
   const report = structuredClone(state.report);
-  const pageIndex = state.report.pages.findIndex(
-    (page) => page.id === state.currentPageId
-  );
+  const pageIndex = state.report.pages.findIndex((page) => page.id === refId);
 
   const result = deepMerge(report.pages[pageIndex], answers);
 

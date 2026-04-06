@@ -23,7 +23,18 @@ vi.mock("react-router", () => ({
 
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),
-  useStore: vi.fn().mockReturnValue({ report: { year: "2026" } }),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      year: "2026",
+      pages: [
+        {
+          id: "mock-init-1",
+          initiativeNumber: "123",
+          title: "Init Title",
+        },
+      ],
+    },
+  }),
 }));
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
