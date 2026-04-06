@@ -19,6 +19,7 @@ import {
   UploadListProp,
 } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
@@ -102,20 +103,23 @@ type TableShape = {
 };
 
 export const TableCheckpoint = (
-  _props: PageElementProps<TableCheckpointTemplate>
+  props: PageElementProps<TableCheckpointTemplate>
 ) => {
+  const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { state, pageId } = useParams();
   const { report, setAnswers } = useStore();
   const { autosave } = useContext(ReportAutosaveContext);
   const year = report?.year.toString();
   //if there is answer on load, we need to build the shape from the checkpoints data
-  const initialDisplayValue = checkpointsList.flatMap((list) =>
-    list.checkpoints.map((checkpoint) => ({
-      id: checkpoint.id,
-      completed: false,
-    }))
-  );
+  const initialDisplayValue =
+    answer ??
+    checkpointsList.flatMap((list) =>
+      list.checkpoints.map((checkpoint) => ({
+        id: checkpoint.id,
+        checked: false,
+      }))
+    );
   const uploadId = "initiative-attachments-table";
   const [tables, setTables] = useState<TableShape[]>([]);
   const [stageOption, setStageOption] = useState<Options[]>([]);
@@ -125,8 +129,6 @@ export const TableCheckpoint = (
     checkpoints: string;
   }>({ stage: "", checkpoints: "" });
   const [files, setFiles] = useState<UploadListProp[]>([]);
-
-  console.log(state, year, pageId);
 
   if (!state || !year || !pageId) {
     console.error("Can't retrieve uploads with missing state, year or id");
@@ -172,9 +174,9 @@ export const TableCheckpoint = (
 
   const onCheckboxeHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
-    for (var i = 0; i < newValue.length; i++) {
-      if (newValue[i].id == id) newValue[i].completed = !newValue[i].completed;
-    }
+    const checkbox = newValue.find((value) => value.id === id);
+    if (checkbox) checkbox.checked = !checkbox.checked;
+    props.updateElement({ answer: newValue });
   };
 
   const onChangeHandler = (value: string) => {
@@ -193,6 +195,10 @@ export const TableCheckpoint = (
   };
 
   const writeToReport = (updatedElement: InitiativeAnswerProp[]) => {
+    console.log(
+      report?.pages.find((page) => page.id === "initiative-attachments")
+    );
+
     const page = structuredClone(
       report?.pages.find((page) => page.id === "initiative-attachments")
     );
@@ -221,6 +227,10 @@ export const TableCheckpoint = (
   };
 
   const removeAttachment = (fileId: string) => {
+    console.log(
+      report?.pages.find((page) => page.id === "initiative-attachments")
+    );
+
     const page = structuredClone(
       report?.pages.find((page) => page.id === "initiative-attachments")
     );
@@ -247,6 +257,7 @@ export const TableCheckpoint = (
             aria-label="Upload attachments"
             variant="outline"
             alignSelf="flex-start"
+            leftIcon={<Image src={addIconPrimary} />}
             onClick={() => {
               setModalOpen(true);
               onChangeHandler(stageOption[tableIndex].value);
@@ -271,7 +282,11 @@ export const TableCheckpoint = (
                     {row.label != "" ? (
                       <Checkbox
                         aria-label={`Check if ${row.label} is complete`}
-                        isChecked={false}
+                        isChecked={
+                          initialDisplayValue.find(
+                            (value) => value.id === row.id
+                          )!.checked
+                        }
                         onChange={() => onCheckboxeHandler(row.id)}
                       ></Checkbox>
                     ) : (

@@ -18,7 +18,7 @@ vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("react-router", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA" }),
+  useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
 }));
 
 vi.mock("utils", async (importOriginal) => ({
@@ -60,7 +60,10 @@ const mockTableCheckpointElement: TableCheckpointTemplate = {
 
 const TableCheckpointComponent = (
   <div data-testid="test-checkbox-list">
-    <TableCheckpoint element={mockTableCheckpointElement} />
+    <TableCheckpoint
+      element={mockTableCheckpointElement}
+      updateElement={vi.fn()}
+    />
   </div>
 );
 

@@ -407,6 +407,7 @@ export interface TableCheckpointTemplate {
   type: ElementType.TableCheckpoint;
   id: string;
   required: boolean;
+  answer?: { id: string; checked: boolean }[];
 }
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {

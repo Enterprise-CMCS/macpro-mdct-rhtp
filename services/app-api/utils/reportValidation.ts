@@ -265,6 +265,11 @@ const tableCheckpointTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.TableCheckpoint)),
   id: string().required(),
   required: boolean().required(),
+  answer: array()
+    .of(
+      object().shape({ id: string().required(), checked: boolean().required() })
+    )
+    .notRequired(),
 });
 
 const accordionGroupTemplateSchema = object().shape({

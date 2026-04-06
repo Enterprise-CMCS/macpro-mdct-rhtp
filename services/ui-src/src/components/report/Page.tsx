@@ -92,7 +92,7 @@ export const Page = ({ id, setElements, elements }: Props) => {
       case ElementType.ListInput:
         return <ListInput {...{ updateElement, disabled, element }} />;
       case ElementType.TableCheckpoint:
-        return <TableCheckpoint {...{ element }} />;
+        return <TableCheckpoint {...{ updateElement, disabled, element }} />;
       case ElementType.UseOfFundsTable:
         return (
           <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
