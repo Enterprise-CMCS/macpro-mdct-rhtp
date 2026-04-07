@@ -16,7 +16,9 @@ export const UploadModal = ({
   answer,
   saveToReport,
   onChangeExpanded,
-  modalHeading,
+  modalHeading = "Upload attachments",
+  onModalSubmit = modalDisclosure.onClose,
+  actionButtonText = "Done",
 }: Props) => {
   const [values, setDropdownValues] = useState<string[]>(
     dropdowns?.map((dropdown) => dropdown.options[0]?.value) ?? []
@@ -40,19 +42,14 @@ export const UploadModal = ({
     saveToReport(uploads, value);
   };
 
-  const onConfirm = () => {
-    console.log("ON CONFIRM");
-    modalDisclosure.onClose();
-  };
-
   return (
     <Modal
       modalDisclosure={modalDisclosure}
-      onConfirmHandler={onConfirm}
+      onConfirmHandler={onModalSubmit}
       content={{
         heading: modalHeading,
         subheading: hint,
-        actionButtonText: "Done",
+        actionButtonText: actionButtonText,
         closeButtonText: undefined,
       }}
     >
@@ -93,5 +90,7 @@ interface Props {
   dropdowns?: { label: string; options: { label: string; value: string }[] }[];
   onChangeExpanded?: (change: string) => void;
   saveToReport: (uploads: UploadListProp[], key: string) => void;
-  modalHeading: string;
+  modalHeading?: string;
+  onModalSubmit?: () => void;
+  actionButtonText?: string;
 }

@@ -458,17 +458,19 @@ export type UseOfFundsTableTemplate = {
   answer?: UseOfFundsTableItem[];
 };
 
+export type AttachmentTableAnswerItem = {
+  attachment: UploadListProp;
+  initiatives: string[];
+  stage?: string;
+  checkpoints?: string;
+  status: string;
+  comments: { name: string; date: string }[];
+};
+
 export type AttachmentTableTemplate = {
   type: ElementType.AttachmentTable;
   id: string;
-  answer?: {
-    attachment: UploadListProp;
-    initiatives: string[];
-    stage?: string;
-    checkpoints?: string;
-    status: string;
-    comments: { name: string; date: string }[];
-  }[];
+  answer?: AttachmentTableAnswerItem[];
 };
 
 export interface ActionElement {

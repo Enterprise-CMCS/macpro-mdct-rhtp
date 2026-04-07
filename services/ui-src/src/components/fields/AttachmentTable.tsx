@@ -22,12 +22,15 @@ import {
   AttachmentTableTemplate,
   InitiativePageTemplate,
   UploadListProp,
+  AttachmentTableAnswerItem,
+  AlertTypes,
 } from "types";
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
+import { Alert } from "components";
 
 const header = [
   "Attachment name",
@@ -44,7 +47,7 @@ export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
 ) => {
   const { id, answer } = props.element;
-  const displayValue = answer ?? [];
+  const displayValue = structuredClone(answer) ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { state } = useParams();
   const { report } = useStore();
@@ -74,7 +77,17 @@ export const AttachmentTable = (
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
 
-  const [modalMode, setModalMode] = useState<"Upload" | "Edit">("Upload");
+  const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">("Upload");
+  const actionButtonText = {
+    "Upload": "Done",
+    "Edit": "Save",
+    "Delete": "Delete"
+  }
+  const modalHeading = {
+    "Upload": "Upload Initiative Attachments",
+    "Edit": "Edit Attachment",
+    "Delete": "Delete Attachment"
+  }
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -99,18 +112,21 @@ export const AttachmentTable = (
     setCheckpointsArr(checkpointsList.flatMap((list) => list.checkpoints));
   }, [report]);
 
-  const onStageChangeHandler = (event: DropdownChangeObject) => {
-    const value = event.target.value;
+  useEffect(() => {
     const checkpoints =
       checkpointsList
-        .find((checks) => checks.id === value)
+        .find((checks) => checks.id === selection.stage)
         ?.checkpoints.filter((checks) => checks.attachable)
         .map((check) => ({ label: check.label, value: check.id })) ?? [];
-
     setCheckpointOption([
       { label: "- Select an option -", value: "" },
       ...checkpoints,
     ]);
+  }, [selection]);
+
+  const onStageChangeHandler = (event: DropdownChangeObject) => {
+    const value = event.target.value;
+
     setSelection({ stage: value, checkpoint: "" });
   };
 
@@ -130,6 +146,38 @@ export const AttachmentTable = (
     console.log("SAVE TO REPORT", uploads);
     const formattedUploads = uploads.map((upload) => ({
       attachment: upload,
+      initiatives: [],
+      stage: "",
+      checkpoints: "",
+      status: "Under Review",
+      comments: [],
+    }));
+    console.log("formatted uploads", formattedUploads);
+
+    const newValues = [...displayValue, ...formattedUploads];
+    console.log('new values', newValues);
+    props.updateElement({ answer: newValues });
+    setUploadedFiles([...uploadedFiles, ...uploads]);
+  };
+
+  const removeAttachment = (file: UploadListProp) => {
+    const newValue = displayValue.filter(
+      (item) => item.attachment.fileId !== file.fileId
+    );
+    props.updateElement({ answer: newValue });
+    removeFile(file, year, state, () => {
+      return;
+    });
+  };
+
+  const onModalSubmit = () => {
+    if (modalMode === "Delete") {
+      removeAttachment(uploadedFiles[0]);
+      return onClose();
+    }
+
+    const formattedUploadsToSave = uploadedFiles.map((upload) => ({
+      attachment: upload,
       initiatives: initiativeOptions
         .filter((options) => options.checked)
         .map((option) => option.value),
@@ -138,35 +186,63 @@ export const AttachmentTable = (
       status: "Under Review",
       comments: [],
     }));
-    console.log("formatted uploads", formattedUploads);
-    const newValues = [...displayValue, ...formattedUploads];
-    props.updateElement({ answer: newValues });
-    setUploadedFiles([...uploadedFiles, ...uploads]);
-  };
 
-  const removeAttachment = (file: UploadListProp, index: number) => {
-    removeFile(file, year, state, () => {
-      // const newValue = [...displayValue];
-      // newValue.splice(index, 1);
-      // props.updateElement({ answer: newValue });
+    const newValues = displayValue.map(item => {
+      const updatedItem = formattedUploadsToSave.find(upload => upload.attachment.fileId === item.attachment.fileId);
+      return updatedItem || item;
     });
-    const newValue = [...displayValue];
-    newValue.splice(index, 1);
-    props.updateElement({ answer: newValue });
-  };
+
+    props.updateElement({ answer: newValues });
+    onClose();
+  }
 
   const onAddClick = () => {
     setModalMode("Upload");
-    setSelection(initialValues);
-    // setSelectedItemID("");
     setModalOpen(true);
+    setSelection(initialValues);
+    setUploadedFiles([]);
   };
 
-  const onEdit = () => {
-    /** TODO: add editting in modal */
+  const onEditClick = (selectedFile: AttachmentTableAnswerItem) => {
+    console.log('SELECTED FILE', selectedFile);
     setModalMode("Edit");
     setModalOpen(true);
+
+    setSelection({
+      stage: selectedFile.stage ?? "",
+      checkpoint: selectedFile.checkpoints ?? "",
+    });
+    setUploadedFiles([selectedFile.attachment]);
+
+    const initiativeChoices = initiativeOptions.map((option) => ({
+      ...option,
+      checked: selectedFile.initiatives.includes(option.value),
+    }));
+    setInitiativeOptions(initiativeChoices);
   };
+
+  const onDeleteClick = (selectedFile: AttachmentTableAnswerItem) => {
+    setModalMode("Delete");
+    setModalOpen(true);
+
+    setSelection({
+      stage: selectedFile.stage ?? "",
+      checkpoint: selectedFile.checkpoints ?? "",
+    });
+    setUploadedFiles([selectedFile.attachment]);
+
+    const initiativeChoices = initiativeOptions.map((option) => ({
+      ...option,
+      checked: selectedFile.initiatives.includes(option.value),
+    }));
+    setInitiativeOptions(initiativeChoices);
+  }
+
+  const onClose = () => {
+    setModalOpen(false);
+    setSelection(initialValues);
+    setUploadedFiles([]);
+  }
 
   return (
     <Stack width="100%" gap="1.5rem">
@@ -213,13 +289,13 @@ export const AttachmentTable = (
                 <Td>
                   {row.checkpoints
                     ? checkpointsArr.find(
-                        (check) => check.id === row.checkpoints
-                      )?.label
+                      (check) => check.id === row.checkpoints
+                    )?.label
                     : ""}
                 </Td>
                 <Td>{row.status}</Td>
                 <Td className="actions" display="flex">
-                  <Button variant="outline" onClick={() => onEdit()}>
+                  <Button variant="outline" onClick={() => onEditClick(row)}>
                     Edit
                   </Button>
                   <Button variant="link">
@@ -227,7 +303,7 @@ export const AttachmentTable = (
                   </Button>
                   <Button
                     variant="link"
-                    onClick={() => removeAttachment(row.attachment, rowIndex)}
+                    onClick={() => onDeleteClick(row)}
                     aria-label={`Remove ${row.attachment.name}`}
                   >
                     <Image src={cancelIcon} alt="Remove" />
@@ -241,23 +317,20 @@ export const AttachmentTable = (
       <UploadModal
         modalDisclosure={{
           isOpen: isModalOpen,
-          onClose: () => {
-            setModalOpen(false);
-            setUploadedFiles([]);
-          },
+          onClose: onClose,
         }}
         state={state}
         year={year}
         answer={uploadedFiles}
         id={id}
         hint="[hint text]"
-        modalHeading={
-          modalMode === "Upload"
-            ? "Upload Initiative Attachments"
-            : "Edit Attachment"
-        }
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">
+            {modalMode === "Delete" ? (
+              <Alert status={AlertTypes.WARNING} title="Warning">
+                Deleting attachment will remove it from all initiatives, stages and checkpoints below.
+              </Alert>
+            ) : null}
             <ChoiceList
               choices={initiativeOptions}
               name={"initiative-choice-list"}
@@ -265,6 +338,7 @@ export const AttachmentTable = (
               label={"Initiative"}
               onChange={onChoiceChangeHandler}
               hint={"This is the hint text"}
+              disabled={modalMode === "Delete"}
             ></ChoiceList>
             <Dropdown
               name={"stage"}
@@ -272,6 +346,7 @@ export const AttachmentTable = (
               value={selection?.stage}
               options={stageOption}
               onChange={onStageChangeHandler}
+              disabled={modalMode === "Delete"}
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
@@ -282,10 +357,14 @@ export const AttachmentTable = (
                 const value = dropdown.target.value;
                 setSelection({ ...selection, checkpoint: value });
               }}
+              disabled={modalMode === "Delete"}
             ></Dropdown>
           </Stack>
         }
         saveToReport={saveToReport}
+        onModalSubmit={onModalSubmit}
+        actionButtonText={actionButtonText[modalMode]}
+        modalHeading={modalHeading[modalMode]}
       ></UploadModal>
     </Stack>
   );

@@ -63,8 +63,10 @@ export const Upload = ({
   };
 
   const onRemove = () => {
+
     retrieveUploadedFiles(year, state, uploadId).then((response) => {
       saveToReport(response);
+      console.log('ON REMOVE CALLED', response);
     });
   };
 
