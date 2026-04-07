@@ -147,3 +147,22 @@ export const saveReport = async (state: ReportState) => {
   }
   return { lastSavedTime: getLocalHourMinuteTime() };
 };
+
+/** Function to set an answer from another element*/
+export const SetAnswerInElement = (
+  report: Report,
+  pageId: string,
+  elementId: string,
+  getAnswer: (answer: any) => any,
+  setAnswers: (answers: any, pageId: string | undefined) => void
+) => {
+  const page = structuredClone(report.pages.find((page) => page.id === pageId));
+  const elements = page?.elements ?? [];
+  const element = elements.find((element) => element.id === elementId);
+  if (!element) console.error("element does not exist");
+
+  if (element && "answer" in element) {
+    element.answer = getAnswer(element.answer);
+  }
+  setAnswers(page, pageId);
+};

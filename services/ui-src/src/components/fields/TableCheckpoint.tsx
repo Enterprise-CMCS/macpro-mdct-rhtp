@@ -13,7 +13,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
-  AttachmentTableTemplate,
   InitiativeAnswerProp,
   TableCheckpointTemplate,
   UploadListProp,
@@ -29,6 +28,7 @@ import { downloadFile, Options } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { PageElementProps } from "components/report/Elements";
+import { SetAnswerInElement } from "utils/state/reportLogic/reportActions";
 
 /** Formatting the the data from the elements into renderable rows for the table */
 const buildRows = (
@@ -36,16 +36,14 @@ const buildRows = (
   values: {
     label: string;
     id: string;
-    completed: boolean;
     attachments: UploadListProp[] | undefined;
   }[]
 ) => {
   return values.reduce((prev: any[], curr, index) => {
-    const { id, completed, label, attachments } = curr;
+    const { id, label, attachments } = curr;
     const row = {
       id,
       stageNo: `${stage}.${index + 1}`,
-      completed,
       label,
     };
     if (attachments) {
@@ -74,7 +72,6 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
       return {
         label: checkpoint.label,
         id: checkpoint.id,
-        completed: false,
         attachments: checkpoint.attachable ? files : undefined,
       };
     });
@@ -144,23 +141,17 @@ export const TableCheckpoint = (
       attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
 
     setTables(buildTables(files));
+  }, [report]);
 
+  useEffect(() => {
     setStageOption(
       checkpointsList.map((checks) => ({
         label: `${checks.stage} ${checks.label}`,
         value: checks.id,
       }))
     );
-    setCheckpointOption(
-      checkpointsList[0].checkpoints
-        .filter((checks) => checks.attachable)
-        .map((check) => ({ label: check.label, value: check.id }))
-    );
-    setSelection({
-      stage: checkpointsList[0].id,
-      checkpoints: checkpointsList[0].checkpoints[0].id,
-    });
-  }, [report]);
+    onChangeHandler(checkpointsList[0].id);
+  }, []);
 
   useEffect(() => {
     const { checkpoints } = selection;
@@ -179,71 +170,49 @@ export const TableCheckpoint = (
     props.updateElement({ answer: newValue });
   };
 
-  const onChangeHandler = (value: string) => {
+  const onChangeHandler = (stageId: string) => {
     const checkpoints =
       checkpointsList
-        .find((checks) => checks.id === value)
+        .find((checks) => checks.id === stageId)
         ?.checkpoints.filter((checks) => checks.attachable)
         .map((check) => ({ label: check.label, value: check.id })) ?? [];
 
     setCheckpointOption(checkpoints);
-    setSelection({ stage: value, checkpoints: checkpoints[0].value });
+    setSelection({ stage: stageId, checkpoints: checkpoints[0].value });
   };
 
-  const onModalClose = () => {
-    setModalOpen(false);
-  };
-
-  const writeToReport = (updatedElement: InitiativeAnswerProp[]) => {
-    console.log(
-      report?.pages.find((page) => page.id === "initiative-attachments")
-    );
-
-    const page = structuredClone(
-      report?.pages.find((page) => page.id === "initiative-attachments")
-    );
-    const elements = page?.elements ?? [];
-    const index = elements.findIndex(
-      (element) => element.type === "attachmentTable"
-    );
-    const answer = (elements[index] as AttachmentTableTemplate).answer ?? [];
-    const newAnswer = [...answer, ...updatedElement];
-
-    if ("answer" in elements[index]) elements[index].answer = newAnswer;
-    setAnswers(page, page?.id);
-    autosave();
-  };
-
-  const saveToReport = (uploads: UploadListProp[]) => {
-    const newElements = uploads.map((file) => ({
+  const formatUploads = (uploads: UploadListProp[]) => {
+    return uploads.map((file) => ({
       initiatives: [pageId],
       ...selection,
       comments: [],
       attachment: file,
       status: "Under Review",
     }));
-
-    writeToReport(newElements);
   };
 
-  const removeAttachment = (fileId: string) => {
-    console.log(
-      report?.pages.find((page) => page.id === "initiative-attachments")
+  const writeToReport = (newValue: UploadListProp[] | string) => {
+    if (!report) return;
+    //the type of element being passed in determines whether it's an add or remove
+    const generateAnswer = (answer: any) => {
+      //if it's a string, we're removing a file
+      if (typeof newValue === "string") {
+        const filtered = answer.filter(
+          (item: any) => item.attachment.fileId != newValue
+        );
+        return [...filtered];
+      } else {
+        return [...answer, ...formatUploads(newValue)];
+      }
+    };
+    //setting an answer and saving are split, we have to run autosave after if we want it saved to the report
+    SetAnswerInElement(
+      report,
+      "initiative-attachments",
+      "initiative-attachments-table",
+      generateAnswer,
+      setAnswers
     );
-
-    const page = structuredClone(
-      report?.pages.find((page) => page.id === "initiative-attachments")
-    );
-    const elements = page?.elements ?? [];
-    const index = elements.findIndex(
-      (element) => element.type === "attachmentTable"
-    );
-    const answer = (elements[index] as AttachmentTableTemplate).answer ?? [];
-    const filtered = answer.filter((item) => item.attachment.fileId != fileId);
-    const newAnswer = [...filtered];
-
-    if ("answer" in elements[index]) elements[index].answer = newAnswer;
-    setAnswers(page, page?.id);
     autosave();
   };
 
@@ -310,7 +279,7 @@ export const TableCheckpoint = (
                     {"file" in row && row.file.fileId && (
                       <Button
                         variant="unstyled"
-                        onClick={() => removeAttachment(row.file.fileId)}
+                        onClick={() => writeToReport(row.file.fileId)}
                         aria-label={`Remove ${row.file.name}`}
                       >
                         <Image src={cancelIcon} alt="Remove" />
@@ -326,7 +295,7 @@ export const TableCheckpoint = (
       <UploadModal
         modalDisclosure={{
           isOpen: isModalOpen,
-          onClose: onModalClose,
+          onClose: () => setModalOpen(false),
         }}
         state={state}
         year={year}
@@ -353,7 +322,7 @@ export const TableCheckpoint = (
             ></Dropdown>
           </>
         }
-        saveToReport={saveToReport}
+        saveToReport={writeToReport}
       ></UploadModal>
     </Flex>
   );
