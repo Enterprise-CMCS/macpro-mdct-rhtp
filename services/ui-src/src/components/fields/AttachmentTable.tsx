@@ -15,6 +15,7 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
+import { CommentModal } from "components/modals/CommentModal";
 import { PageElementProps } from "components/report/Elements";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -46,6 +47,7 @@ export const AttachmentTable = (
   const { id, answer } = props.element;
   const displayValue = answer ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
@@ -219,7 +221,7 @@ export const AttachmentTable = (
                   <Button variant="outline" onClick={() => onEdit()}>
                     Edit
                   </Button>
-                  <Button variant="link">
+                  <Button variant="link" onClick={() => setCommentsOpen(true)}>
                     <Image src={commentIcon} alt="Comment" />
                   </Button>
                   <Button
@@ -279,6 +281,14 @@ export const AttachmentTable = (
         }
         saveToReport={saveToReport}
       ></UploadModal>
+      <CommentModal
+        modalDisclosure={{
+          isOpen: isCommentsOpen,
+          onClose: () => {
+            setCommentsOpen(false);
+          },
+        }}
+      />
     </Stack>
   );
 };
