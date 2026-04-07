@@ -10,6 +10,8 @@ export const STATE_POLICY_COMMITMENT_NAMES = [
   "C.3. CON - Medical Outpatient",
   "C.3. CON - Behavioral Inpatient",
   "C.3. CON - Imaging",
+  "C.3. CON - Medical Inpatient",
+  "C.3. CON - Day Services",
   "C.3. CON - Long-term Care Facilities",
   "C.3. CON - Ancillaries",
   "C.3. CON - Other",
@@ -135,6 +137,8 @@ export const getDropdownOptions = (label: string) => {
     case "C.3. CON - Medical Outpatient":
     case "C.3. CON - Behavioral Inpatient":
     case "C.3. CON - Imaging":
+    case "C.3. CON - Medical Inpatient":
+    case "C.3. CON - Day Services":
     case "C.3. CON - Long-term Care Facilities":
     case "C.3. CON - Ancillaries":
     case "C.3. CON - Other":
@@ -504,10 +508,19 @@ export const getDropdownOptions = (label: string) => {
           value: "Commitment abandoned",
         },
       ];
-    // TODO waiting to see what options are
     case "F.1. Telehealth License/Registration Process (including special licenses)":
       return [
         { label: "Not yet started", value: "Not yet started" },
+        { label: "In progress", value: "In progress" },
+        {
+          label: "0 Points: No registration process in place.",
+          value: "0 Points: No registration process in place.",
+        },
+        {
+          label: "100 Points: A registration process is in place.",
+          value: "100 Points: A registration process is in place.",
+        },
+        { label: "Implemented", value: "Implemented" },
         {
           label: "Commitment abandoned",
           value: "Commitment abandoned",
