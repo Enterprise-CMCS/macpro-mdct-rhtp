@@ -372,8 +372,8 @@ const attachmentTableSchema = object().shape({
           fileId: string().required(),
         }),
         initiatives: array().of(string()).required(),
-        stage: string().required(),
-        checkpoints: string().required(),
+        stage: string().notRequired(),
+        checkpoints: string().notRequired(),
         status: string().required(),
         comments: array().of(
           object().shape({

@@ -147,7 +147,7 @@ export const TableCheckpoint = (
     return;
   }
 
-  //This is for generating the checkpoints dropdown list after a stage has been selected
+  //This is for generating the stage options when the page loads
   useEffect(() => {
     setStageOption(
       checkpointsList.map((checks) => ({
@@ -155,8 +155,13 @@ export const TableCheckpoint = (
         value: checks.id,
       }))
     );
-    onChangeHandler(checkpointsList[0].id);
   }, []);
+
+  //This populates the uploaded area of the uploads modal when the dropdown selection has changed
+  useEffect(() => {
+    const { checkpoints } = selection;
+    setFiles(getFilesFromTable(tables, checkpoints));
+  }, [selection]);
 
   //Updates when the report has been updated, so when a file has been added or removed from the table
   useEffect(() => {
@@ -171,12 +176,6 @@ export const TableCheckpoint = (
     setTables(newTables);
     setFiles(getFilesFromTable(newTables, selection.checkpoints));
   }, [report]);
-
-  //This populates the uploaded area of the uploads modal when the dropdown selection has changed
-  useEffect(() => {
-    const { checkpoints } = selection;
-    setFiles(getFilesFromTable(tables, checkpoints));
-  }, [selection]);
 
   const onCheckboxeHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
