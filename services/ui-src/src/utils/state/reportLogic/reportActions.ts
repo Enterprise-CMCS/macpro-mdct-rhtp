@@ -149,12 +149,12 @@ export const saveReport = async (state: ReportState) => {
 };
 
 /** Function to set an answer from another element*/
-export const SetAnswerInElement = (
+export const SetAnswerInElement = <T>(
   report: Report,
   pageId: string,
   elementId: string,
-  getAnswer: (answer: any) => any,
-  setAnswers: (answers: any, pageId: string | undefined) => void
+  getAnswer: (answer: T) => T,
+  setAnswers: (answers: any, pageId: string) => void
 ) => {
   const page = structuredClone(report.pages.find((page) => page.id === pageId));
   const elements = page?.elements ?? [];
@@ -162,7 +162,7 @@ export const SetAnswerInElement = (
   if (!element) console.error("element does not exist");
 
   if (element && "answer" in element) {
-    element.answer = getAnswer(element.answer);
+    (element.answer as T) = getAnswer(element.answer as T);
   }
   setAnswers(page, pageId);
 };

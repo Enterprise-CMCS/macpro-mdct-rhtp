@@ -1,6 +1,5 @@
 import {
   Stack,
-  Flex,
   Button,
   Checkbox,
   Table,
@@ -13,6 +12,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
+  DropdownOptions,
+  ElementType,
   InitiativeAnswerProp,
   TableCheckpointTemplate,
   UploadListProp,
@@ -24,11 +25,28 @@ import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router";
 import { useStore } from "utils";
-import { downloadFile, Options } from "utils/other/upload";
+import { downloadFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { PageElementProps } from "components/report/Elements";
 import { SetAnswerInElement } from "utils/state/reportLogic/reportActions";
+import { attachmentTableId } from "../../constants";
+
+type TableShape = {
+  stage: number;
+  label: string;
+  checkpoints: {
+    id: string;
+    label: string;
+    attachable: boolean;
+  }[];
+  rows: {
+    id: string;
+    stageNo: string;
+    label: string;
+    file: { name: string; fileId: string; size: number };
+  }[];
+};
 
 /** Formatting the the data from the elements into renderable rows for the table */
 const buildRows = (
@@ -88,17 +106,6 @@ const header = [
   "Actions",
 ];
 
-type TableShape = {
-  stage: number;
-  label: string;
-  checkpoints: {
-    id: string;
-    label: string;
-    attachable: boolean;
-  }[];
-  rows: any[];
-};
-
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
 ) => {
@@ -117,10 +124,11 @@ export const TableCheckpoint = (
         checked: false,
       }))
     );
-  const uploadId = "initiative-attachments-table";
   const [tables, setTables] = useState<TableShape[]>([]);
-  const [stageOption, setStageOption] = useState<Options[]>([]);
-  const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
+  const [stageOption, setStageOption] = useState<DropdownOptions[]>([]);
+  const [checkpointOption, setCheckpointOption] = useState<DropdownOptions[]>(
+    []
+  );
   const [selection, setSelection] = useState<{
     stage: string;
     checkpoints: string;
@@ -132,10 +140,11 @@ export const TableCheckpoint = (
     return;
   }
 
+  //Updates when the report has been updated, so when a file has been added or removed from the table
   useEffect(() => {
     const attachments = report?.pages
       .flatMap((page) => page.elements)
-      .find((element) => element?.type === "attachmentTable")?.answer;
+      .find((element) => element?.type === ElementType.AttachmentTable)?.answer;
 
     const files =
       attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
@@ -143,6 +152,7 @@ export const TableCheckpoint = (
     setTables(buildTables(files));
   }, [report]);
 
+  //This is for generating the checkpoints dropdown list after a stage has been selected
   useEffect(() => {
     setStageOption(
       checkpointsList.map((checks) => ({
@@ -153,6 +163,7 @@ export const TableCheckpoint = (
     onChangeHandler(checkpointsList[0].id);
   }, []);
 
+  //This populates the uploaded area of the uploads modal when the dropdown selection has changed
   useEffect(() => {
     const { checkpoints } = selection;
     const filtered = tables
@@ -187,14 +198,14 @@ export const TableCheckpoint = (
       ...selection,
       comments: [],
       attachment: file,
-      status: "Under Review",
+      status: "Under Review", //TODO: update status when status has been added to initiatives
     }));
   };
 
   const writeToReport = (newValue: UploadListProp[] | string) => {
     if (!report) return;
     //the type of element being passed in determines whether it's an add or remove
-    const generateAnswer = (answer: any) => {
+    const generateAnswer = (answer: InitiativeAnswerProp[]) => {
       //if it's a string, we're removing a file
       if (typeof newValue === "string") {
         const filtered = answer.filter(
@@ -206,10 +217,10 @@ export const TableCheckpoint = (
       }
     };
     //setting an answer and saving are split, we have to run autosave after if we want it saved to the report
-    SetAnswerInElement(
+    SetAnswerInElement<InitiativeAnswerProp[]>(
       report,
       "initiative-attachments",
-      "initiative-attachments-table",
+      attachmentTableId,
       generateAnswer,
       setAnswers
     );
@@ -217,7 +228,7 @@ export const TableCheckpoint = (
   };
 
   return (
-    <Flex gap="1.25rem" flexDirection="column" width="100%">
+    <Stack gap="1.25rem" width="100%">
       {tables.map((table, tableIndex) => (
         <Stack key={`checkpoint-${tableIndex}`} gap="1.25rem">
           <Label>{`Stage ${table.stage}: ${table.label}`}</Label>
@@ -300,7 +311,7 @@ export const TableCheckpoint = (
         state={state}
         year={year}
         answer={files}
-        id={uploadId}
+        id={attachmentTableId}
         selections={
           <>
             <Dropdown
@@ -324,6 +335,6 @@ export const TableCheckpoint = (
         }
         saveToReport={writeToReport}
       ></UploadModal>
-    </Flex>
+    </Stack>
   );
 };
