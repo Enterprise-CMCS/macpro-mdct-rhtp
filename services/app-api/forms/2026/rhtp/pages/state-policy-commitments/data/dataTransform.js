@@ -10,9 +10,9 @@ const { STATE_POLICY_COMMITMENT_NAMES } = require("../constants.ts");
 const fs = require("node:fs");
 
 const headingMap = {
-  state: "state",
-  "state policy commitment": "label",
-  status: "status",
+  State: "state",
+  "State policy commitment name": "label",
+  Status: "status",
 };
 
 const commitmentMap = new Map();
