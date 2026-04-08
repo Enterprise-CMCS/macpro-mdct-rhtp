@@ -1,4 +1,4 @@
-import { Mock } from "vitest";
+import { Mock, MockedFunction } from "vitest";
 import {
   act,
   fireEvent,
@@ -10,32 +10,32 @@ import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
 import { useParams } from "react-router";
 import { ElementType, TableCheckpointTemplate } from "types";
-import { recordFileInDatabaseAndGetUploadUrl } from "utils/api/requestMethods/upload";
+import {
+  getFileDownloadUrl,
+  recordFileInDatabaseAndGetUploadUrl,
+} from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
+import { useStore } from "utils";
+
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
 }));
 
-vi.mock("utils/state/reportLogic/reportActions", () => ({
-  setAnswerInElement: vi.fn(),
-}));
+const mockGetAnswer = vi.fn();
+const updateSpy = vi.fn();
 
-vi.mock("utils", async (importOriginal) => ({
-  ...(await importOriginal()),
-  setAnswers: vi.fn(),
-  useStore: vi.fn().mockReturnValue({
-    report: {
-      year: "2026",
-      pages: [
-        {
-          id: "mock-init-1",
-          initiativeNumber: "123",
-          title: "Init Title",
-        },
-      ],
-    },
-  }),
+vi.mock("utils/state/reportLogic/reportActions", () => ({
+  setAnswerInElement: vi
+    .fn()
+    .mockImplementation(
+      (_report, _pageId, _elementId, getAnswer, _setAnswers) => {
+        getAnswer([]);
+        mockGetAnswer();
+      }
+    ),
 }));
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
@@ -63,7 +63,7 @@ const TableCheckpointComponent = (
   <div data-testid="test-checkbox-list">
     <TableCheckpoint
       element={mockTableCheckpointElement}
-      updateElement={vi.fn()}
+      updateElement={updateSpy}
     />
   </div>
 );
@@ -74,6 +74,42 @@ const consoleMock = vi.spyOn(console, "error");
 describe("<TableCheckpoint />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUseStore.mockReturnValue({
+      report: {
+        year: "2026",
+        pages: [
+          {
+            id: "mock-init-1",
+            initiativeNumber: "123",
+            title: "Init Title",
+          },
+          {
+            id: "initiative-attachments",
+            elements: [
+              {
+                id: "initiative-attachments-table",
+                type: ElementType.AttachmentTable,
+                answer: [
+                  {
+                    initiatives: ["mock-init-1"],
+                    checkpoints: "project-prop-2",
+                    comments: [],
+                    attachment: {
+                      name: "orange.png",
+                      size: 1544,
+                      fileId:
+                        "initiative-attachments-table_2026-3Bzl8A01YameFBwcE5AzBUrYkjZ_orange.png",
+                    },
+                    stage: "checkpoint-1",
+                    status: "Under Review",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
   });
   test("TableCheckpoint renders a table", () => {
     render(TableCheckpointComponent);
@@ -101,13 +137,20 @@ describe("<TableCheckpoint />", () => {
     });
     expect(checkbox);
     await userEvent.click(checkbox);
+    expect(updateSpy).toHaveBeenCalled();
   });
   test("download file", async () => {
     render(TableCheckpointComponent);
-    // const fileBtn = screen.getByRole("button", { name: "Download mock-file" });
-    // expect(fileBtn).toBeVisible();
-    // await userEvent.click(fileBtn);
-    // expect(getFileDownloadUrl).toHaveBeenCalled();
+    const fileBtn = screen.getByRole("button", { name: "Download orange.png" });
+    expect(fileBtn).toBeVisible();
+    await userEvent.click(fileBtn);
+    expect(getFileDownloadUrl).toHaveBeenCalled();
+  });
+  test("delete file", async () => {
+    render(TableCheckpointComponent);
+    const fileBtn = screen.getByRole("button", { name: "Remove orange.png" });
+    await userEvent.click(fileBtn);
+    expect(mockGetAnswer).toHaveBeenCalled();
   });
   testA11y(TableCheckpointComponent);
 });
