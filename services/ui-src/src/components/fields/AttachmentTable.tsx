@@ -99,13 +99,6 @@ export const AttachmentTable = (
   }
 
   useEffect(() => {
-    setInitiativeOptions(
-      initiatives.map((initiative) => ({
-        label: `${initiative.initiativeNumber}: ${initiative.title}`,
-        value: initiative.id,
-        checked: false,
-      }))
-    );
     setStageOption([
       { label: "- Select an option -", value: "" },
       ...checkpointsList.map((checks) => ({
@@ -147,7 +140,6 @@ export const AttachmentTable = (
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
-    console.log("SAVE TO REPORT", uploads);
     const formattedUploads = uploads.map((upload) => ({
       attachment: upload,
       initiatives: [],
@@ -156,10 +148,9 @@ export const AttachmentTable = (
       status: "Under Review",
       comments: [],
     }));
-    console.log("formatted uploads", formattedUploads);
 
     const newValues = [...displayValue, ...formattedUploads];
-    console.log("new values", newValues);
+
     props.updateElement({ answer: newValues });
     setUploadedFiles([...uploadedFiles, ...uploads]);
   };
@@ -207,10 +198,16 @@ export const AttachmentTable = (
     setModalOpen(true);
     setSelection(initialValues);
     setUploadedFiles([]);
+    setInitiativeOptions(
+      initiatives.map((initiative) => ({
+        label: `${initiative.initiativeNumber}: ${initiative.title}`,
+        value: initiative.id,
+        checked: false,
+      }))
+    );
   };
 
   const onEditClick = (selectedFile: AttachmentTableAnswerItem) => {
-    console.log("SELECTED FILE", selectedFile);
     setModalMode("Edit");
     setModalOpen(true);
 
@@ -272,7 +269,7 @@ export const AttachmentTable = (
             </Tr>
           </Thead>
           <Tbody>
-            {displayValue.map((row, rowIndex) => (
+            {displayValue.map((row) => (
               <Tr>
                 <Td>
                   <Button
