@@ -207,38 +207,34 @@ export const AttachmentTable = (
     );
   };
 
-  const onEditClick = (selectedFile: AttachmentTableAnswerItem) => {
-    setModalMode("Edit");
-    setModalOpen(true);
-
+  const setCurrentValues = (selectedFile: AttachmentTableAnswerItem) => {
     setSelection({
       stage: selectedFile.stage ?? "",
       checkpoint: selectedFile.checkpoints ?? "",
     });
     setUploadedFiles([selectedFile.attachment]);
 
-    const initiativeChoices = initiativeOptions.map((option) => ({
-      ...option,
-      checked: selectedFile.initiatives.includes(option.value),
+    const initiativeOptions = initiatives.map((initiative) => ({
+      label: `${initiative.initiativeNumber}: ${initiative.title}`,
+      value: initiative.id,
+      checked: selectedFile.initiatives.includes(initiative.id),
     }));
-    setInitiativeOptions(initiativeChoices);
+
+    setInitiativeOptions(initiativeOptions);
+  };
+
+  const onEditClick = (selectedFile: AttachmentTableAnswerItem) => {
+    setModalMode("Edit");
+    setModalOpen(true);
+
+    setCurrentValues(selectedFile);
   };
 
   const onDeleteClick = (selectedFile: AttachmentTableAnswerItem) => {
     setModalMode("Delete");
     setModalOpen(true);
 
-    setSelection({
-      stage: selectedFile.stage ?? "",
-      checkpoint: selectedFile.checkpoints ?? "",
-    });
-    setUploadedFiles([selectedFile.attachment]);
-
-    const initiativeChoices = initiativeOptions.map((option) => ({
-      ...option,
-      checked: selectedFile.initiatives.includes(option.value),
-    }));
-    setInitiativeOptions(initiativeChoices);
+    setCurrentValues(selectedFile);
   };
 
   const onClose = () => {
