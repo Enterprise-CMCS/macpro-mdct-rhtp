@@ -27,12 +27,23 @@ vi.mock("react-router", () => ({
 const mockGetAnswer = vi.fn();
 const updateSpy = vi.fn();
 
+const mockFiles = {
+  name: "orange.png",
+  size: 1544,
+  fileId: "mock_orange.png",
+};
+
 vi.mock("utils/state/reportLogic/reportActions", () => ({
   setAnswerInElement: vi
     .fn()
     .mockImplementation(
       (_report, _pageId, _elementId, getAnswer, _setAnswers) => {
-        getAnswer([]);
+        getAnswer([
+          {
+            initiatives: ["mock-init-1"],
+            attachment: mockFiles,
+          },
+        ]);
         mockGetAnswer();
       }
     ),
@@ -94,12 +105,7 @@ describe("<TableCheckpoint />", () => {
                     initiatives: ["mock-init-1"],
                     checkpoints: "project-prop-2",
                     comments: [],
-                    attachment: {
-                      name: "orange.png",
-                      size: 1544,
-                      fileId:
-                        "initiative-attachments-table_2026-3Bzl8A01YameFBwcE5AzBUrYkjZ_orange.png",
-                    },
+                    attachment: mockFiles,
                     stage: "checkpoint-1",
                     status: "Under Review",
                   },

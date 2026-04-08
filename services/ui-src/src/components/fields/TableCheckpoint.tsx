@@ -98,6 +98,13 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
   });
 };
 
+const getFilesFromTable = (tables: TableShape[], checkpoints: string) => {
+  return tables
+    .flatMap((tables) => tables.rows)
+    .filter((row) => row.id === checkpoints && row.file.fileId)
+    .map((filter) => filter.file);
+};
+
 const header = [
   "#",
   "Checkpoint",
@@ -140,18 +147,6 @@ export const TableCheckpoint = (
     return;
   }
 
-  //Updates when the report has been updated, so when a file has been added or removed from the table
-  useEffect(() => {
-    const attachments = report?.pages
-      .flatMap((page) => page.elements)
-      .find((element) => element?.type === ElementType.AttachmentTable)?.answer;
-
-    const files =
-      attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
-
-    setTables(buildTables(files));
-  }, [report]);
-
   //This is for generating the checkpoints dropdown list after a stage has been selected
   useEffect(() => {
     setStageOption(
@@ -163,15 +158,24 @@ export const TableCheckpoint = (
     onChangeHandler(checkpointsList[0].id);
   }, []);
 
+  //Updates when the report has been updated, so when a file has been added or removed from the table
+  useEffect(() => {
+    const attachments = report?.pages
+      .flatMap((page) => page.elements)
+      .find((element) => element?.type === ElementType.AttachmentTable)?.answer;
+
+    const files =
+      attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
+
+    const newTables = buildTables(files);
+    setTables(newTables);
+    setFiles(getFilesFromTable(newTables, selection.checkpoints));
+  }, [report]);
+
   //This populates the uploaded area of the uploads modal when the dropdown selection has changed
   useEffect(() => {
     const { checkpoints } = selection;
-    const filtered = tables
-      .flatMap((tables) => tables.rows)
-      .filter((row) => row.id === checkpoints && row.file.fileId)
-      .map((filter) => filter.file);
-
-    setFiles(filtered);
+    setFiles(getFilesFromTable(tables, checkpoints));
   }, [selection]);
 
   const onCheckboxeHandler = (id: string) => {
@@ -208,10 +212,14 @@ export const TableCheckpoint = (
     const generateAnswer = (answer: InitiativeAnswerProp[]) => {
       //if it's a string, we're removing a file
       if (typeof newValue === "string") {
-        const filtered = answer.filter(
-          (item: any) => item.attachment.fileId != newValue
+        const index = answer.findIndex(
+          (item) => item.attachment.fileId == newValue
         );
-        return [...filtered];
+        const newInitiatives = answer[index].initiatives.filter(
+          (id) => id != pageId
+        );
+        answer[index].initiatives = newInitiatives;
+        return [...answer];
       } else {
         return [...answer, ...formatUploads(newValue)];
       }
