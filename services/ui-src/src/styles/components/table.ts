@@ -180,9 +180,6 @@ const initiativeVariant = {
       ".chakra-button": {
         padding: "0 1rem",
       },
-      "&.actions": {
-        width: "152px",
-      },
     },
   },
 };

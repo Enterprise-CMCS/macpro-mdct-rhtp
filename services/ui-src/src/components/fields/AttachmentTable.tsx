@@ -15,6 +15,7 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
+import { CommentModal } from "components/modals/CommentModal";
 import { PageElementProps } from "components/report/Elements";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -49,6 +50,7 @@ export const AttachmentTable = (
   const { id, answer } = props.element;
   const displayValue = structuredClone(answer) ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const { state } = useParams();
   const { report } = useStore();
   const year = report?.year.toString();
@@ -77,17 +79,19 @@ export const AttachmentTable = (
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
 
-  const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">("Upload");
+  const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
+    "Upload"
+  );
   const actionButtonText = {
-    "Upload": "Done",
-    "Edit": "Save",
-    "Delete": "Delete"
-  }
+    Upload: "Done",
+    Edit: "Save",
+    Delete: "Delete",
+  };
   const modalHeading = {
-    "Upload": "Upload Initiative Attachments",
-    "Edit": "Edit Attachment",
-    "Delete": "Delete Attachment"
-  }
+    Upload: "Upload Initiative Attachments",
+    Edit: "Edit Attachment",
+    Delete: "Delete Attachment",
+  };
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -155,7 +159,7 @@ export const AttachmentTable = (
     console.log("formatted uploads", formattedUploads);
 
     const newValues = [...displayValue, ...formattedUploads];
-    console.log('new values', newValues);
+    console.log("new values", newValues);
     props.updateElement({ answer: newValues });
     setUploadedFiles([...uploadedFiles, ...uploads]);
   };
@@ -187,14 +191,16 @@ export const AttachmentTable = (
       comments: [],
     }));
 
-    const newValues = displayValue.map(item => {
-      const updatedItem = formattedUploadsToSave.find(upload => upload.attachment.fileId === item.attachment.fileId);
+    const newValues = displayValue.map((item) => {
+      const updatedItem = formattedUploadsToSave.find(
+        (upload) => upload.attachment.fileId === item.attachment.fileId
+      );
       return updatedItem || item;
     });
 
     props.updateElement({ answer: newValues });
     onClose();
-  }
+  };
 
   const onAddClick = () => {
     setModalMode("Upload");
@@ -204,7 +210,7 @@ export const AttachmentTable = (
   };
 
   const onEditClick = (selectedFile: AttachmentTableAnswerItem) => {
-    console.log('SELECTED FILE', selectedFile);
+    console.log("SELECTED FILE", selectedFile);
     setModalMode("Edit");
     setModalOpen(true);
 
@@ -236,13 +242,13 @@ export const AttachmentTable = (
       checked: selectedFile.initiatives.includes(option.value),
     }));
     setInitiativeOptions(initiativeChoices);
-  }
+  };
 
   const onClose = () => {
     setModalOpen(false);
     setSelection(initialValues);
     setUploadedFiles([]);
-  }
+  };
 
   return (
     <Stack width="100%" gap="1.5rem">
@@ -289,8 +295,8 @@ export const AttachmentTable = (
                 <Td>
                   {row.checkpoints
                     ? checkpointsArr.find(
-                      (check) => check.id === row.checkpoints
-                    )?.label
+                        (check) => check.id === row.checkpoints
+                      )?.label
                     : ""}
                 </Td>
                 <Td>{row.status}</Td>
@@ -298,7 +304,7 @@ export const AttachmentTable = (
                   <Button variant="outline" onClick={() => onEditClick(row)}>
                     Edit
                   </Button>
-                  <Button variant="link">
+                  <Button variant="link" onClick={() => setCommentsOpen(true)}>
                     <Image src={commentIcon} alt="Comment" />
                   </Button>
                   <Button
@@ -328,7 +334,8 @@ export const AttachmentTable = (
           <Stack gap="1.5rem" marginTop="1.5rem">
             {modalMode === "Delete" ? (
               <Alert status={AlertTypes.WARNING} title="Warning">
-                Deleting attachment will remove it from all initiatives, stages and checkpoints below.
+                Deleting attachment will remove it from all initiatives, stages
+                and checkpoints below.
               </Alert>
             ) : null}
             <ChoiceList
@@ -366,6 +373,14 @@ export const AttachmentTable = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
       ></UploadModal>
+      <CommentModal
+        modalDisclosure={{
+          isOpen: isCommentsOpen,
+          onClose: () => {
+            setCommentsOpen(false);
+          },
+        }}
+      />
     </Stack>
   );
 };
