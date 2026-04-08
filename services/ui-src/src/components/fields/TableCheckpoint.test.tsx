@@ -1,4 +1,4 @@
-import { Mock, MockedFunction } from "vitest";
+import { Mock } from "vitest";
 import {
   act,
   fireEvent,
@@ -12,17 +12,18 @@ import { useParams } from "react-router";
 import { ElementType, TableCheckpointTemplate } from "types";
 import { recordFileInDatabaseAndGetUploadUrl } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
-import { useStore } from "utils";
-
-vi.mock("utils/state/useStore");
-const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
 }));
 
+vi.mock("utils/state/reportLogic/reportActions", () => ({
+  setAnswerInElement: vi.fn(),
+}));
+
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),
+  setAnswers: vi.fn(),
   useStore: vi.fn().mockReturnValue({
     report: {
       year: "2026",
@@ -73,18 +74,6 @@ const consoleMock = vi.spyOn(console, "error");
 describe("<TableCheckpoint />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockedUseStore.mockReturnValue({
-      report: {
-        year: "2026",
-        pages: [
-          {
-            id: "mock-init-1",
-            initiativeNumber: "123",
-            title: "Init Title",
-          },
-        ],
-      },
-    });
   });
   test("TableCheckpoint renders a table", () => {
     render(TableCheckpointComponent);
@@ -114,7 +103,11 @@ describe("<TableCheckpoint />", () => {
     await userEvent.click(checkbox);
   });
   test("download file", async () => {
-    console.log("need to be rewritten");
+    render(TableCheckpointComponent);
+    // const fileBtn = screen.getByRole("button", { name: "Download mock-file" });
+    // expect(fileBtn).toBeVisible();
+    // await userEvent.click(fileBtn);
+    // expect(getFileDownloadUrl).toHaveBeenCalled();
   });
   testA11y(TableCheckpointComponent);
 });

@@ -16,6 +16,7 @@ import {
   saveReport,
   deepEquals,
   deepMerge,
+  setAnswerInElement,
 } from "./reportActions";
 
 vi.mock("../../api/requestMethods/report", () => ({
@@ -66,6 +67,15 @@ const testReport: Report = {
           type: ElementType.Header,
           id: "",
           text: "Mock Report Page",
+        },
+        {
+          type: ElementType.Textbox,
+          id: "mock-textbox-id",
+          label: "Contact title",
+          required: true,
+          helperText:
+            "Enter person's title or a position title for CMS to contact with questions about this request.",
+          answer: "",
         },
       ],
     },
@@ -212,6 +222,23 @@ describe("reportActions", () => {
       const state = buildState(testReport, false) as ReportState;
       const result = await saveReport(state);
       expect(result?.lastSavedTime).toBeTruthy();
+    });
+  });
+
+  describe("state/management/reportState: SetAnswerInElement", () => {
+    test("update setAnswer on success", () => {
+      const mockGetAnswer = vi.fn();
+      const mockSetAnswer = vi.fn();
+
+      setAnswerInElement(
+        testReport,
+        "mock-report-page",
+        "mock-textbox-id",
+        mockGetAnswer,
+        mockSetAnswer
+      );
+      expect(mockGetAnswer).toHaveBeenCalled();
+      expect(mockSetAnswer).toHaveBeenCalled();
     });
   });
 });

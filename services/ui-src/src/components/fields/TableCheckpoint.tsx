@@ -29,7 +29,7 @@ import { downloadFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { PageElementProps } from "components/report/Elements";
-import { SetAnswerInElement } from "utils/state/reportLogic/reportActions";
+import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
 
 type TableShape = {
@@ -217,7 +217,7 @@ export const TableCheckpoint = (
       }
     };
     //setting an answer and saving are split, we have to run autosave after if we want it saved to the report
-    SetAnswerInElement<InitiativeAnswerProp[]>(
+    setAnswerInElement<InitiativeAnswerProp[]>(
       report,
       "initiative-attachments",
       attachmentTableId,

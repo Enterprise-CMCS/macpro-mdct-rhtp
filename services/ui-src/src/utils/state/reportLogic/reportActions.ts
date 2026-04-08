@@ -149,7 +149,7 @@ export const saveReport = async (state: ReportState) => {
 };
 
 /** Function to set an answer from another element*/
-export const SetAnswerInElement = <T>(
+export const setAnswerInElement = <T>(
   report: Report,
   pageId: string,
   elementId: string,
