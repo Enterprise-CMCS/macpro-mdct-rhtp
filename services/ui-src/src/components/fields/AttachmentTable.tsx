@@ -224,12 +224,8 @@ export const AttachmentTable = (
                   <Button variant="outline" onClick={() => onEdit()}>
                     Edit
                   </Button>
-                  <Button
-                    variant="link"
-                    onClick={() => setCommentsOpen(true)}
-                    minWidth="26px"
-                  >
-                    <Image src={commentIcon} alt="Comment" />
+                  <Button variant="link" onClick={() => setCommentsOpen(true)}>
+                    <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
                   <Button
                     variant="link"
