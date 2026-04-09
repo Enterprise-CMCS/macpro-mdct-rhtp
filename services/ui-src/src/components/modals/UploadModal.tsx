@@ -18,10 +18,6 @@ export const UploadModal = ({
   actionButtonText = "Done",
   deleteFromReport,
 }: Props) => {
-  const saveToModal = (uploads: UploadListProp[]) => {
-    saveToReport(uploads);
-  };
-
   return (
     <Modal
       modalDisclosure={modalDisclosure}
@@ -40,7 +36,7 @@ export const UploadModal = ({
           year={year}
           state={state}
           answer={answer}
-          saveToReport={saveToModal}
+          saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
         />
       </Stack>
