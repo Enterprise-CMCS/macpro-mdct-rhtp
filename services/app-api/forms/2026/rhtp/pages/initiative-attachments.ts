@@ -19,6 +19,7 @@ export const initiativeAttachments: FormPageTemplate = {
     {
       type: ElementType.AttachmentTable,
       id: "initiative-attachments-table",
+      answer: [],
     },
   ],
 };

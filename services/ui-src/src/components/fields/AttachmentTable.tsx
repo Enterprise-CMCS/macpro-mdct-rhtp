@@ -32,6 +32,7 @@ import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
+import { dropdownEmptyOption } from "../../constants";
 
 const header = [
   "Attachment name",
@@ -271,41 +272,47 @@ export const AttachmentTable = (
                   <Button
                     variant="link"
                     onClick={() => downloadFile(year, state, row.attachment)}
+                    fontWeight="bold"
                   >
                     {row.attachment.name}
                   </Button>
                 </Td>
                 <Td>
                   {row.initiatives.length === 0
-                    ? ""
-                    : `Initiatives ${row.initiatives.map((id) => `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`).join(", ")}`}
+                    ? "N/A"
+                    : row.initiatives
+                      .map(
+                        (id) =>
+                          `#${initiativeNumbers.find((opt) => opt.value === id)?.label}`
+                      )
+                      .join(", ")}
                 </Td>
                 <Td>
-                  {row.stage
-                    ? stageOption.find((opt) => opt.value === row.stage)?.label
-                    : ""}
+                  {row.stage == ""
+                    ? "N/A"
+                    : stageOption.find((opt) => opt.value === row.stage)?.label}
                 </Td>
                 <Td>
-                  {row.checkpoints
-                    ? checkpointsArr.find(
-                        (check) => check.id === row.checkpoints
-                      )?.label
-                    : ""}
+                  {row.checkpoints == ""
+                    ? "N/A"
+                    : checkpointsArr.find(
+                      (check) => check.id === row.checkpoints
+                    )?.label}
                 </Td>
                 <Td>{row.status}</Td>
-                <Td className="actions" display="flex">
+                <Td className="actions" display="flex" width="152px">
                   <Button variant="outline" onClick={() => onEditClick(row)}>
                     Edit
                   </Button>
                   <Button variant="link" onClick={() => setCommentsOpen(true)}>
-                    <Image src={commentIcon} alt="Comment" />
+                    <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
                   <Button
                     variant="link"
                     onClick={() => onDeleteClick(row)}
                     aria-label={`Remove ${row.attachment.name}`}
                   >
-                    <Image src={cancelIcon} alt="Remove" />
+                    <Image src={cancelIcon} alt="Remove" minWidth="24px" />
                   </Button>
                 </Td>
               </Tr>

@@ -8,6 +8,7 @@ import {
 import {
   acceptedFileTypes,
   downloadFile,
+  removeFile,
   retrieveUploadedFiles,
   uploadListRender,
 } from "utils/other/upload";
@@ -18,6 +19,7 @@ interface Props {
   year: string;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
+  deleteFromReport?: (file: UploadListProp) => void;
 }
 
 export const Upload = ({
@@ -26,6 +28,7 @@ export const Upload = ({
   year,
   answer,
   saveToReport,
+  deleteFromReport,
 }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
@@ -62,10 +65,16 @@ export const Upload = ({
     }
   };
 
-  const onRemove = () => {
-    retrieveUploadedFiles(year, state, uploadId).then((response) => {
-      saveToReport(response);
-    });
+  const onRemove = (file: UploadListProp) => {
+    if (deleteFromReport) {
+      deleteFromReport(file);
+    } else {
+      removeFile(file, year, state, () => {
+        retrieveUploadedFiles(year, state, uploadId).then((response) => {
+          saveToReport(response);
+        });
+      });
+    }
   };
 
   const onUploadFiles = async () => {

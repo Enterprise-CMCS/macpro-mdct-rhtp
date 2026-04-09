@@ -195,19 +195,6 @@ export type UploadListProp = {
   fileId: string;
 };
 
-export type CheckpointShape = {
-  id: string;
-  label: string;
-  attachable: boolean;
-};
-
-export type CheckpointAnswerShape = {
-  id: string;
-  label: string;
-  completed: boolean;
-  attachments?: UploadListProp[];
-};
-
 export enum PageType {
   Standard = "standard",
   Modal = "modal",
@@ -416,11 +403,11 @@ export interface TextboxTemplate extends InputElementTemplate {
   hideCondition?: HideCondition;
 }
 
-export interface TableCheckpointTemplate extends InputElementTemplate {
+export interface TableCheckpointTemplate {
   type: ElementType.TableCheckpoint;
-  stage: number;
-  checkpoints: CheckpointShape[];
-  answer?: CheckpointAnswerShape[];
+  id: string;
+  required: boolean;
+  answer?: { id: string; checked: boolean }[];
 }
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
@@ -458,7 +445,7 @@ export type UseOfFundsTableTemplate = {
   answer?: UseOfFundsTableItem[];
 };
 
-export type AttachmentTableAnswerItem = {
+export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
   stage?: string;
@@ -470,7 +457,7 @@ export type AttachmentTableAnswerItem = {
 export type AttachmentTableTemplate = {
   type: ElementType.AttachmentTable;
   id: string;
-  answer?: AttachmentTableAnswerItem[];
+  answer?: InitiativeAnswerProp[];
 };
 
 export interface ActionElement {

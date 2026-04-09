@@ -1,5 +1,7 @@
 // BANNERS
 export const bannerId = "admin-banner-id";
+export const attachmentTableId = "initiative-attachments-table";
+export const dropdownEmptyOption = { label: "- Select an option -", value: "" };
 
 export const ErrorMessages = {
   endDateBeforeStartDate: "End date can't be before start date",

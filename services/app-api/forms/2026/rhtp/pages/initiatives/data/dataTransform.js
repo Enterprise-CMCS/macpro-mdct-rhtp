@@ -4,58 +4,76 @@
  * format in order for the transformation to happen properly.
  *
  * in this directory, run `node dataTransform.js`
+ * 
+ * Headings (csv: json)
+ *  State: state
+ *  Initiative name: title
+ *  Initiative Number: initiativeNumber
+ *  Initiative status: status
+ *  Initiative Narrative: narrative
+ *  Initiative Metrics (Semicolon Separated): metrics
+ *  Metric Statuses (Semicolon-Separated): metricStatuses
+ * 
+ * papaparse returns data in a data array with objects of header keys and cell values
+  {
+    "State": "AL",
+    "Initiative name": "Sample name",
+    "Initiative Number": "1",
+    "Initiative status": "In progress",
+    "Initiative Narrative": "Sample narrative",
+    "Initiative Metrics (Semicolon Separated)": "Sample metric 1;Sample Metric 2",
+    "Metric Statuses (Semicolon-Separated)": "Active;Active"
+  },
  */
 
+const { exit } = require("node:process");
 const fs = require("node:fs");
-
-const headingMap = {
-  state: "state",
-  "initiative name": "title",
-  "initiative number": "initiativeNumber",
-  "initiative narrative": "narrative",
-  "initiative status": "status",
-  "initiative - metrics name(s) (semicolon-separated)": "metrics",
-  "metric status(es) (semicolon-separated)": "metricStatuses",
-};
+const Papa = require("papaparse");
 
 const initiativesMap = new Map();
 
+function stripNewlineAndTrim(input) {
+  return input.replaceAll("\n", " ").trim();
+}
+
 function main() {
-  const file = fs.readFileSync("./initiatives.csv").toLocaleString();
-  const rows = file.split("\n"); // SPLIT ROWS
-  const headings = rows.shift().split(",");
-  rows.forEach((row) => {
+  const csvData = fs.readFileSync("./initiatives.csv").toLocaleString();
+  const { data: dataSet, errors } = Papa.parse(csvData, { header: true });
+  if (errors.length > 0) {
+    console.log("ERRORS:", result.errors);
+    exit(1);
+  }
+
+  for (const initiativeData of dataSet) {
+    const state = stripNewlineAndTrim(initiativeData.State);
+    const metricList = stripNewlineAndTrim(
+      initiativeData["Initiative Metrics (Semicolon Separated)"]
+    ).split(";");
+    const metricStatuses =
+      initiativeData["Metric Statuses (Semicolon-Separated)"].split(";");
     const initiative = {
       id: crypto.randomUUID(),
+      title: stripNewlineAndTrim(initiativeData["Initiative name"]),
+      initiativeNumber: stripNewlineAndTrim(
+        initiativeData["Initiative Number"]
+      ),
+      narrative: initiativeData["Initiative Narrative"],
+      status: stripNewlineAndTrim(initiativeData["Initiative status"]),
     };
-    let state = "";
-    let metrics = [];
-    let metricList = [];
-    let metricStatuses = [];
-    columns = row.split(","); //SPLIT COLUMNS
-    columns.forEach((col, index) => {
-      const key = headingMap[headings[index].trim()];
-      if (key === "state") {
-        state = col;
-      } else if (key === "metrics") {
-        metricList = col.split(";");
-      } else if (key === "metricStatuses") {
-        metricStatuses = col.split(";");
-      } else {
-        initiative[key] = col.trim();
-      }
-    });
+
+    const metrics = [];
     metricList.forEach((metricName, index) => {
       const metric = {
         name: metricName.trim(),
-        status: metricStatuses[index].trim(),
+        status: metricStatuses[index]?.trim() || "Active",
       };
       metrics.push(metric);
     });
+
     initiative.metrics = metrics;
     const initiativesByState = initiativesMap.get(state) || [];
     initiativesMap.set(state, [...initiativesByState, initiative]);
-  });
+  }
 
   const initiativeObj = {};
   for (const [state, initiatives] of initiativesMap.entries()) {

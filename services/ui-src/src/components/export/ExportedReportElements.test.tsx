@@ -16,9 +16,6 @@ describe("Test ExportedReportElements", () => {
     const element = renderElements({
       type: ElementType.TableCheckpoint,
       id: "mock-table-checkpoint",
-      stage: 0,
-      label: "",
-      checkpoints: [],
       required: true,
     });
     render(element);
