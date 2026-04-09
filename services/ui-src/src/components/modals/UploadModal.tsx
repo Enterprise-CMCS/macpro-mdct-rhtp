@@ -13,7 +13,6 @@ export const UploadModal = ({
   selections,
   answer,
   saveToReport,
-  onChangeExpanded,
   modalHeading = "Upload attachments",
   onModalSubmit = modalDisclosure.onClose,
   actionButtonText = "Done",
@@ -61,7 +60,6 @@ interface Props {
   answer: UploadListProp[];
   selections?: JSX.Element;
   dropdowns?: { label: string; options: { label: string; value: string }[] }[];
-  onChangeExpanded?: (change: string) => void;
   modalHeading?: string;
   onModalSubmit?: () => void;
   actionButtonText?: string;
