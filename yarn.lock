@@ -7584,6 +7584,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/papaparse@npm:^5":
+  version: 5.5.2
+  resolution: "@types/papaparse@npm:5.5.2"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/27b097b6f8f204b20ade1f2cbf4798eb38caa5fbfa3180fd0faa5e3f9aea371c1786ae180d56f3287556463eefe3100c953e316ea6ee99d7ae1d04111cfc9e50
+  languageName: node
+  linkType: hard
+
 "@types/parse-json@npm:^4.0.0":
   version: 4.0.2
   resolution: "@types/parse-json@npm:4.0.2"
@@ -7921,6 +7930,7 @@ __metadata:
     "@rhtp/shared": "workspace:*"
     "@types/jsdom": "npm:^27.0.0"
     "@types/node": "npm:^24.10.1"
+    "@types/papaparse": "npm:^5"
     "@vitest/coverage-v8": "npm:4.0.18"
     aws-sdk-client-mock: "npm:~4.1.0"
     dompurify: "npm:^3.3.2"
@@ -7928,6 +7938,7 @@ __metadata:
     jwt-decode: "npm:3.1.2"
     kafkajs: "npm:^2.2.4"
     ksuid: "npm:^3.0.0"
+    papaparse: "npm:^5.5.3"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
     util: "npm:^0.12.5"
@@ -10955,6 +10966,13 @@ __metadata:
   version: 7.0.4
   resolution: "p-map@npm:7.0.4"
   checksum: 10c0/a5030935d3cb2919d7e89454d1ce82141e6f9955413658b8c9403cfe379283770ed3048146b44cde168aa9e8c716505f196d5689db0ae3ce9a71521a2fef3abd
+  languageName: node
+  linkType: hard
+
+"papaparse@npm:^5.5.3":
+  version: 5.5.3
+  resolution: "papaparse@npm:5.5.3"
+  checksum: 10c0/623aae6a35703308fd5a39d616fb3837231ebc70697346355ea508154d3f24df75b6554b736afc1924192205518a5db14e75f5e1cf35d154326050a37cdd9447
   languageName: node
   linkType: hard
 
