@@ -29,6 +29,7 @@ import { downloadFile, removeFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
+import { dropdownEmptyOption } from "../../constants";
 
 const header = [
   "Attachment name",
@@ -94,21 +95,19 @@ export const AttachmentTable = (
   }, [report]);
 
   useEffect(() => {
-    setStageOption(
-      checkpointsList.map((checks) => ({
+    setStageOption([
+      dropdownEmptyOption,
+      ...checkpointsList.map((checks) => ({
         label: `${checks.stage} ${checks.label}`,
         value: checks.id,
-      }))
-    );
-    setCheckpointOption(
-      checkpointsList[0].checkpoints
+      })),
+    ]);
+    setCheckpointOption([
+      dropdownEmptyOption,
+      ...checkpointsList[0].checkpoints
         .filter((checks) => checks.attachable)
-        .map((check) => ({ label: check.label, value: check.id }))
-    );
-    setSelection({
-      stage: checkpointsList[0].id,
-      checkpoint: checkpointsList[0].checkpoints[0].id,
-    });
+        .map((check) => ({ label: check.label, value: check.id })),
+    ]);
   }, []);
 
   const onChangeHandler = (event: DropdownChangeObject) => {
@@ -119,8 +118,8 @@ export const AttachmentTable = (
         ?.checkpoints.filter((checks) => checks.attachable)
         .map((check) => ({ label: check.label, value: check.id })) ?? [];
 
-    setCheckpointOption(checkpoints);
-    setSelection({ stage: value, checkpoint: checkpoints[0].value });
+    setCheckpointOption([dropdownEmptyOption, ...checkpoints]);
+    setSelection({ stage: value, checkpoint: "" });
   };
 
   const onChoiceChangeHandler = (
@@ -193,43 +192,47 @@ export const AttachmentTable = (
                   <Button
                     variant="link"
                     onClick={() => downloadFile(year, state, row.attachment)}
+                    fontWeight="bold"
                   >
                     {row.attachment.name}
                   </Button>
                 </Td>
                 <Td>
-                  Initiatives{" "}
-                  {row.initiatives
-                    .map(
-                      (id) =>
-                        `#${initiativeNumbers.find((opt) => opt.value === id)?.label}`
-                    )
-                    .join(", ")}
+                  {row.initiatives.length === 0
+                    ? "N/A"
+                    : row.initiatives
+                        .map(
+                          (id) =>
+                            `#${initiativeNumbers.find((opt) => opt.value === id)?.label}`
+                        )
+                        .join(", ")}
                 </Td>
                 <Td>
-                  {stageOption.find((opt) => opt.value === row.stage)?.label}
+                  {row.stage == ""
+                    ? "N/A"
+                    : stageOption.find((opt) => opt.value === row.stage)?.label}
                 </Td>
                 <Td>
-                  {
-                    checkpointsArr.find(
-                      (check) => check.id === row?.checkpoints
-                    )?.label
-                  }
+                  {row.checkpoints == ""
+                    ? "N/A"
+                    : checkpointsArr.find(
+                        (check) => check.id === row.checkpoints
+                      )?.label}
                 </Td>
                 <Td>{row.status}</Td>
-                <Td className="actions" display="flex">
+                <Td className="actions" display="flex" width="152px">
                   <Button variant="outline" onClick={() => onEdit()}>
                     Edit
                   </Button>
                   <Button variant="link" onClick={() => setCommentsOpen(true)}>
-                    <Image src={commentIcon} alt="Comment" />
+                    <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
                   <Button
                     variant="link"
                     onClick={() => removeAttachment(row.attachment, rowIndex)}
                     aria-label={`Remove ${row.attachment.name}`}
                   >
-                    <Image src={cancelIcon} alt="Remove" />
+                    <Image src={cancelIcon} alt="Remove" minWidth="24px" />
                   </Button>
                 </Td>
               </Tr>

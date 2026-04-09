@@ -7,7 +7,7 @@ import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 
 vi.mock("react-router", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA" }),
+  useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
 }));
 
 vi.mock("utils/state/useStore");

@@ -264,35 +264,12 @@ const checkboxTemplateSchema = object().shape({
 const tableCheckpointTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.TableCheckpoint)),
   id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
-  stage: number().required(),
-  checkpoints: array().of(
-    object().shape({
-      id: string().required(),
-      label: string().required(),
-      attachable: boolean().notRequired(),
-    })
-  ),
+  required: boolean().required(),
   answer: array()
     .of(
-      object().shape({
-        id: string().required(),
-        label: string().required(),
-        completed: boolean().required(),
-        attachments: array()
-          .of(
-            object().shape({
-              name: string().required(),
-              size: number().required(),
-              fileId: string().required(),
-            })
-          )
-          .notRequired(),
-      })
+      object().shape({ id: string().required(), checked: boolean().required() })
     )
     .notRequired(),
-  required: boolean().required(),
 });
 
 const accordionGroupTemplateSchema = object().shape({
@@ -395,8 +372,8 @@ const attachmentTableSchema = object().shape({
           fileId: string().required(),
         }),
         initiatives: array().of(string()).required(),
-        stage: string().required(),
-        checkpoints: string().required(),
+        stage: string().notRequired(),
+        checkpoints: string().notRequired(),
         status: string().required(),
         comments: array().of(
           object().shape({
