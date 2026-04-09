@@ -93,7 +93,7 @@ export const uploadListRender = (
               <Button
                 variant="unstyled"
                 aria-label={`delete ${file.name}`}
-                onClick={() => removeFile(file, year, state, onRemove)}
+                onClick={() => onRemove(file)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
               />
             </HStack>

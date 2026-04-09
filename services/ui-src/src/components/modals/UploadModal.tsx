@@ -13,6 +13,7 @@ export const UploadModal = ({
   selections,
   answer,
   saveToReport,
+  deleteFromReport,
 }: Props) => {
   const saveToModal = (uploads: UploadListProp[]) => {
     saveToReport(uploads);
@@ -37,6 +38,7 @@ export const UploadModal = ({
           state={state}
           answer={answer}
           saveToReport={saveToModal}
+          deleteFromReport={deleteFromReport}
         />
       </Stack>
     </Modal>
@@ -55,4 +57,5 @@ interface Props {
   answer: UploadListProp[];
   selections?: JSX.Element;
   saveToReport: (uploads: UploadListProp[]) => void;
+  deleteFromReport?: (file: UploadListProp) => void;
 }

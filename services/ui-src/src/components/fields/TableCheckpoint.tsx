@@ -205,6 +205,10 @@ export const TableCheckpoint = (
     }));
   };
 
+  const onUploadDelete = (file: UploadListProp) => {
+    writeToReport(file.fileId);
+  };
+
   const writeToReport = (newValue: UploadListProp[] | string) => {
     if (!report) return;
     //the type of element being passed in determines whether it's an add or remove
@@ -341,6 +345,7 @@ export const TableCheckpoint = (
           </>
         }
         saveToReport={writeToReport}
+        deleteFromReport={onUploadDelete}
       ></UploadModal>
     </Stack>
   );
