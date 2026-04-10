@@ -25,6 +25,7 @@
     "dompurify": "^3.3.2",
     "framer-motion": "^11",
     "html-react-parser": "^3.0.16",
+    "jszip": "3.10.1",
     "launchdarkly-react-client-sdk": "^3.3.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

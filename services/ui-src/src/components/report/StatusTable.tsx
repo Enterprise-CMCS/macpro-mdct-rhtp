@@ -21,6 +21,7 @@ import { reportBasePath } from "utils/other/routing";
 import { SubmitReportModal } from "./SubmitReportModal";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { useFlags } from "launchdarkly-react-client-sdk";
+import { testZip } from "utils/other/zip";
 
 export const StatusTableElement = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =
@@ -114,6 +115,14 @@ export const StatusTableElement = () => {
             Review PDF
           </Button>
         )}
+        <Button
+          colorScheme="blue"
+          variant="outline"
+          leftIcon={<Image src={lookupIconPrimary} />}
+          onClick={() => testZip(state!)}
+        >
+          ZIP Files
+        </Button>
         {user?.userIsEndUser && (
           <Button
             alignSelf="flex-end"
