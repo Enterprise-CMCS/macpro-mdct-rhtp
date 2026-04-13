@@ -389,6 +389,7 @@ export const TableCheckpoint = (
         updateElement={handleCommentSave}
         selectedFile={selectedFile}
         allFiles={attachments}
+        disabled={props.disabled}
       />
     </Stack>
   );
