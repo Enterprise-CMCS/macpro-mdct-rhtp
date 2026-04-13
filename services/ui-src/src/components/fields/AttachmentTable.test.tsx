@@ -92,8 +92,8 @@ describe("<AttachmentTable />", () => {
     render(AttachmentTableComponent(mockAttachmentAreaElementEmpty));
     const addBtn = screen.getByRole("button", { name: "Add Attachment" });
     await userEvent.click(addBtn);
-    waitFor(() => {
-      expect(screen.getByText("Upload Attachments")).toBeVisible();
+    await waitFor(() => {
+      expect(screen.getByText("Upload Initiative Attachments")).toBeVisible();
     });
 
     await userEvent.click(
@@ -112,7 +112,9 @@ describe("<AttachmentTable />", () => {
     });
 
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(screen.queryByText("Upload Attachments")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Upload Initiative Attachments")
+    ).not.toBeInTheDocument();
   });
   it("Mock on remove file call", async () => {
     /**TODO: This is a placeholder, it needs to be changed for when we have the user go delete in a modal */

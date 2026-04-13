@@ -13,20 +13,20 @@ export const UploadModal = ({
   selections,
   answer,
   saveToReport,
+  modalHeading = "Upload attachments",
+  onModalSubmit = modalDisclosure.onClose,
+  actionButtonText = "Done",
   deleteFromReport,
+  uploadAreaHidden = false,
 }: Props) => {
-  const saveToModal = (uploads: UploadListProp[]) => {
-    saveToReport(uploads);
-  };
-
   return (
     <Modal
       modalDisclosure={modalDisclosure}
-      onConfirmHandler={() => modalDisclosure.onClose()}
+      onConfirmHandler={onModalSubmit}
       content={{
-        heading: "Upload Attachments",
+        heading: modalHeading,
         subheading: hint,
-        actionButtonText: "Done",
+        actionButtonText: actionButtonText,
         closeButtonText: undefined,
       }}
     >
@@ -37,8 +37,9 @@ export const UploadModal = ({
           year={year}
           state={state}
           answer={answer}
-          saveToReport={saveToModal}
+          saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
+          uploadAreaHidden={uploadAreaHidden}
         />
       </Stack>
     </Modal>
@@ -56,6 +57,11 @@ interface Props {
   state: string;
   answer: UploadListProp[];
   selections?: JSX.Element;
+  dropdowns?: { label: string; options: { label: string; value: string }[] }[];
+  modalHeading?: string;
+  onModalSubmit?: () => void;
+  actionButtonText?: string;
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport?: (file: UploadListProp) => void;
+  uploadAreaHidden?: boolean;
 }
