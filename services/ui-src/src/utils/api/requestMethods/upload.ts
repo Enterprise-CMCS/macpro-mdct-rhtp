@@ -6,6 +6,11 @@ interface PathURL {
   fileId: string;
 }
 
+interface ZipData {
+  name: string;
+  bytes: string;
+}
+
 export interface UploadData {
   uploadedState: string;
   awsFilename: string;
@@ -43,7 +48,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   return { presignedUploadUrl: psurl, fileId };
 };
 
-export const getZip = async (
+export const geFileBytes = async (
   year: string,
   stateCode: string,
   fileId: string
@@ -52,7 +57,7 @@ export const getZip = async (
   const options = {
     headers: { ...requestHeaders },
   };
-  const response = await apiLib.get<any>(
+  const response = await apiLib.get<ZipData[]>(
     `/uploads/${year}/${stateCode}/${fileId}/zip`,
     options
   );

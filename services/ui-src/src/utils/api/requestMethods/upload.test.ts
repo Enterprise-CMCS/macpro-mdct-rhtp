@@ -6,6 +6,7 @@ import {
   getFileDownloadUrl,
   getUploadedFiles,
   deleteUploadedFile,
+  geFileBytes,
 } from "./upload";
 
 vi.mock("../apiLib", () => ({
@@ -78,5 +79,11 @@ describe("Test fileApi functions", () => {
         headers: { "x-api-key": undefined },
       }
     );
+  });
+  test("geFileBytes", async () => {
+    const zipData = [{ name: "file-name", bytes: "abced" }];
+    (apiLib.get as Mock).mockReturnValue(zipData);
+    const result = await geFileBytes("2025", "PA", "mock-id");
+    expect(result).toBe(zipData);
   });
 });
