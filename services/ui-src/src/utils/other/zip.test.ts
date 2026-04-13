@@ -3,7 +3,7 @@ import { createZipFile } from "./zip";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
-  getZip: vi.fn().mockReturnValue([{ name: "filename", bytes: [] }]),
+  geFileBytes: vi.fn().mockReturnValue([{ name: "filename", bytes: [] }]),
 }));
 
 const report: Report = {
