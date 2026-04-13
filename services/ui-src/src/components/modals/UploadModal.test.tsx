@@ -52,6 +52,7 @@ const modalComponent = (
       </>
     }
     saveToReport={mockSaveToReport}
+    modalHeading={"Upload Attachments"}
   />
 );
 

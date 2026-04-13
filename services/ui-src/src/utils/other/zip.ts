@@ -2,7 +2,7 @@ import { getZip } from "utils/api/requestMethods/upload";
 import JSZip from "jszip";
 import { Report, RhtpSubType } from "types";
 
-export const onZipFiles = async (report: Report) => {
+export const createZipFile = async (report: Report) => {
   const { state, year, subType } = report;
   const quarter = RhtpSubType[subType!];
 
