@@ -308,16 +308,24 @@ export const AttachmentTable = (
                 </Td>
                 <Td>{row.status}</Td>
                 <Td className="actions" display="flex" width="152px">
-                  <Button variant="outline" onClick={() => onEditClick(row)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => onEditClick(row)}
+                    aria-label={`Edit file or info for ${row.attachment.name}`}
+                  >
                     Edit
                   </Button>
-                  <Button variant="link" onClick={() => onCommentClick(row)}>
+                  <Button
+                    variant="link"
+                    onClick={() => onCommentClick(row)}
+                    aria-label={`Add and view comments on ${row.attachment.name}`}
+                  >
                     <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
                   <Button
                     variant="link"
                     onClick={() => onDeleteClick(row)}
-                    aria-label={`Remove ${row.attachment.name}`}
+                    aria-label={`Delete ${row.attachment.name}`}
                   >
                     <Image src={cancelIcon} alt="Remove" minWidth="24px" />
                   </Button>

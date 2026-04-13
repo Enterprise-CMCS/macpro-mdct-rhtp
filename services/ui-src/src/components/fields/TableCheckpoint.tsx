@@ -184,7 +184,7 @@ export const TableCheckpoint = (
     setFiles(getFilesFromTable(newTables, selection.checkpoints));
   }, [report]);
 
-  const onCheckboxeHandler = (id: string) => {
+  const onCheckboxHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
     const checkbox = newValue.find((value) => value.id === id);
     if (checkbox) checkbox.checked = !checkbox.checked;
@@ -297,7 +297,7 @@ export const TableCheckpoint = (
                             (value) => value.id === row.id
                           )?.checked
                         }
-                        onChange={() => onCheckboxeHandler(row.id)}
+                        onChange={() => onCheckboxHandler(row.id)}
                       ></Checkbox>
                     ) : (
                       <></>
@@ -333,7 +333,7 @@ export const TableCheckpoint = (
                         <Button
                           variant="unstyled"
                           onClick={() => handleFileAddDelete(row.file.fileId)}
-                          aria-label={`Remove ${row.file.name}`}
+                          aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
                         >
                           <Image src={cancelIcon} alt="Remove" />
                         </Button>
