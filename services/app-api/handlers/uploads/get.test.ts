@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
-import { viewUploadsForState, getUpload } from "./get";
+import { viewUploadsForState, getUpload, getByStateAndId } from "./get";
 import { queryViewUploads, queryUpload } from "../../storage/upload";
 
 vi.mock("../../utils/authentication", () => ({
@@ -24,6 +24,7 @@ vi.mock("../../storage/upload", () => ({
 vi.mock("../../libs/s3-lib", () => ({
   default: {
     getSignedDownloadUrl: vi.fn(),
+    getObject: vi.fn().mockReturnValue([]),
   },
 }));
 
@@ -42,7 +43,20 @@ const mockGetUploadEvent: APIGatewayProxyEvent = {
 };
 
 const mockUploadRespond = {
-  Items: [{ uploadedState: "PA", fileId: "mock-id", awsFilename: "mockname" }],
+  Items: [
+    {
+      uploadedState: "PA",
+      name: "name",
+      fileId: "mock-id",
+      awsFilename: "mockname",
+    },
+    {
+      uploadedState: "PA",
+      name: "name 2",
+      fileId: "mock-id-2",
+      awsFilename: "mockname 2",
+    },
+  ],
 };
 
 describe("Test get API methods", () => {
@@ -78,6 +92,19 @@ describe("Test get API methods", () => {
   test("getUpload successful create download ps url", async () => {
     (queryUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
     const res = await getUpload(mockGetUploadEvent);
+    expect(res.statusCode).toBe(StatusCodes.Ok);
+  });
+  test("getByStateAndId missing path params", async () => {
+    const badTestEvent = {
+      ...proxyEvent,
+      pathParameters: {},
+    } as APIGatewayProxyEvent;
+    const res = await getByStateAndId(badTestEvent);
+    expect(res.statusCode).toBe(StatusCodes.BadRequest);
+  });
+  test("getByStateAndId successful uploads fetch", async () => {
+    (queryViewUploads as Mock).mockResolvedValueOnce(mockUploadRespond.Items);
+    const res = await getByStateAndId(mockViewUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });
 });
