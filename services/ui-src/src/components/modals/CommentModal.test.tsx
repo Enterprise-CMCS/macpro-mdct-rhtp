@@ -2,42 +2,125 @@ import { render, screen } from "@testing-library/react";
 import { CommentModal } from "./CommentModal";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
+import { InitiativeAnswerProp } from "types";
 
 const mockCloseHandler = vi.fn();
+const mockUpdateElement = vi.fn();
+
+const mockSelectedFile = {
+  name: "test.png",
+  size: 100,
+  fileId: "testfile123",
+};
+
+const mockAllFiles = [
+  {
+    attachment: mockSelectedFile,
+    initiatives: ["test 1", "test 2"],
+    status: "Under review",
+    comments: [],
+  },
+];
 
 const CommentModalComponent = (
-  <CommentModal
-    modalDisclosure={{
-      isOpen: true,
-      onClose: mockCloseHandler,
-    }}
-  />
-);
+  allFiles: InitiativeAnswerProp[] = mockAllFiles
+) => {
+  return (
+    <CommentModal
+      modalDisclosure={{
+        isOpen: true,
+        onClose: mockCloseHandler,
+      }}
+      selectedFile={mockSelectedFile}
+      updateElement={mockUpdateElement}
+      allFiles={allFiles}
+    />
+  );
+};
 
 describe("CommentModal component", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    render(CommentModalComponent);
+  describe("with no comments", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      render(CommentModalComponent());
+    });
+
+    test("shows the contents", () => {
+      expect(
+        screen.getByRole("heading", { name: "Add Comment to test.png" })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("textbox", { name: "Comment" })
+      ).toBeInTheDocument();
+    });
+
+    test("Modals action button can be clicked", async () => {
+      await userEvent.click(screen.getByText("Save"));
+      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+    });
+
+    test("Modals close button can be clicked", async () => {
+      await userEvent.click(screen.getByText("Close"));
+      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+    });
+
+    test("Fill and save comment", async () => {
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Save"));
+      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+      expect(mockUpdateElement).toHaveBeenCalledWith(
+        expect.objectContaining({
+          answer: expect.arrayContaining([
+            expect.objectContaining({
+              comments: [
+                expect.objectContaining({
+                  name: "CMS user",
+                  comment: "Test comment",
+                }),
+              ],
+            }),
+          ]),
+        })
+      );
+    });
   });
 
-  test("shows the contents", () => {
-    expect(
-      screen.getByRole("heading", { name: /Add Comment/ })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("textbox", { name: "Comment" })
-    ).toBeInTheDocument();
+  describe("with previous comments", () => {
+    const mockPreviousCommentsInFile = [
+      {
+        attachment: mockSelectedFile,
+        initiatives: ["test 1", "test 2"],
+        status: "Under review",
+        comments: [
+          {
+            name: "CMS User",
+            date: "Thu Jan 1 2026 00:00:00 GMT-0400 (Eastern Daylight Time)",
+            comment: "First comment from cms user",
+          },
+          {
+            name: "CMS User",
+            date: "Thu Feb 5 2026 00:00:00 GMT-0400 (Eastern Daylight Time)",
+            comment: "Second comment from cms user",
+          },
+        ],
+      },
+    ];
+    beforeEach(() => {
+      vi.clearAllMocks();
+      render(CommentModalComponent(mockPreviousCommentsInFile));
+    });
+
+    test("Shows previous comments", async () => {
+      const previousComments = screen.getAllByRole("textbox", {
+        name: "CMS User",
+      });
+      expect(previousComments).toHaveLength(2);
+      // most recent comment should be first in the list
+      expect(previousComments[0]).toHaveValue("Second comment from cms user");
+      expect(previousComments[1]).toHaveValue("First comment from cms user");
+    });
   });
 
-  test("Modals action button can be clicked", async () => {
-    await userEvent.click(screen.getByText("Save"));
-    expect(mockCloseHandler).toHaveBeenCalledTimes(1);
-  });
-
-  test("Modals close button can be clicked", async () => {
-    await userEvent.click(screen.getByText("Close"));
-    expect(mockCloseHandler).toHaveBeenCalledTimes(1);
-  });
-
-  testA11y(CommentModalComponent);
+  testA11y(CommentModalComponent());
 });
