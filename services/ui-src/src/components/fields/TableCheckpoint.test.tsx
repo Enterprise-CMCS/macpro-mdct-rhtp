@@ -167,8 +167,10 @@ describe("<TableCheckpoint />", () => {
   });
   test("delete file", async () => {
     render(TableCheckpointComponent);
-    const fileBtn = screen.getByRole("button", { name: "Remove orange.png" });
-    await userEvent.click(fileBtn);
+    const deleteButton = screen.getByRole("button", {
+      name: "Remove orange.png from checkpoint Launch initiative",
+    });
+    await userEvent.click(deleteButton);
     expect(mockGetAnswer).toHaveBeenCalled();
   });
   testA11y(TableCheckpointComponent);
