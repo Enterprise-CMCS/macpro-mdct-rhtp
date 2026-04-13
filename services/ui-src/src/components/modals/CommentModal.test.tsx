@@ -1,8 +1,26 @@
+import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { CommentModal } from "./CommentModal";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
 import { InitiativeAnswerProp } from "types";
+import { useStore } from "utils";
+import {
+  mockAdminUserStore,
+  mockHelpDeskUserStore,
+  mockUseStore,
+} from "utils/testing/setupTest";
+import { useFlags } from "launchdarkly-react-client-sdk";
+
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
+mockedUseStore.mockReturnValue(mockUseStore);
+
+vi.mock("launchdarkly-react-client-sdk");
+const mockFlags = vi.mocked(useFlags);
+mockFlags.mockReturnValue({
+  adminCommentsEnabled: true,
+});
 
 const mockCloseHandler = vi.fn();
 const mockUpdateElement = vi.fn();
@@ -75,7 +93,7 @@ describe("CommentModal component", () => {
             expect.objectContaining({
               comments: [
                 expect.objectContaining({
-                  name: "CMS user",
+                  name: mockUseStore.user?.full_name,
                   comment: "Test comment",
                 }),
               ],
@@ -119,6 +137,49 @@ describe("CommentModal component", () => {
       // most recent comment should be first in the list
       expect(previousComments[0]).toHaveValue("Second comment from cms user");
       expect(previousComments[1]).toHaveValue("First comment from cms user");
+    });
+  });
+
+  describe("test permissions", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    test("state user can edit always", () => {
+      mockedUseStore.mockReturnValue(mockUseStore);
+      render(CommentModalComponent());
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeEnabled();
+    });
+
+    test("admin user can edit when flag true", () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockAdminUserStore);
+      render(CommentModalComponent());
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeEnabled();
+    });
+
+    test("admin user cannot edit when flag false", () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: false,
+      });
+      mockedUseStore.mockReturnValue(mockAdminUserStore);
+      render(CommentModalComponent());
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeDisabled();
+    });
+
+    test("other users can never edit", () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
+      render(CommentModalComponent());
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeDisabled();
     });
   });
 

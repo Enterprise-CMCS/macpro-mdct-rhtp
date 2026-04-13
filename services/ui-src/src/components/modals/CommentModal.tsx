@@ -4,6 +4,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { Modal } from "./Modal";
 import { InitiativeAnswerProp, InitiativeComment, UploadListProp } from "types";
 import { useStore } from "utils";
+import { useFlags } from "launchdarkly-react-client-sdk";
 
 const PreviousComments = ({ comments }: { comments: InitiativeComment[] }) => {
   const timeSortedComments = comments.toSorted(
@@ -35,9 +36,11 @@ export const CommentModal = ({
   updateElement,
   allFiles,
 }: Props) => {
-  const { full_name } = useStore().user ?? {};
+  const { full_name, userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const [displayValue, setDisplayValue] = useState("");
   const [pastComments, setPastComments] = useState<InitiativeComment[]>([]);
+  const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
+  const canAddComment = userIsEndUser || (userIsAdmin && adminCommentsEnabled);
   const fileName = selectedFile?.name || "attachment";
   const selectedAttachmentIndex = allFiles.findIndex(
     (file) => file.attachment.fileId === selectedFile?.fileId
@@ -59,7 +62,11 @@ export const CommentModal = ({
   };
 
   const onSubmit = () => {
-    if (selectedAttachmentIndex === -1 || displayValue.trim() === "")
+    if (
+      selectedAttachmentIndex === -1 ||
+      displayValue.trim() === "" ||
+      !canAddComment
+    )
       return modalDisclosure.onClose();
 
     allFiles[selectedAttachmentIndex] = {
@@ -92,7 +99,7 @@ export const CommentModal = ({
         label={"Comment"}
         onChange={onChange}
         value={displayValue}
-        disabled={false}
+        disabled={!canAddComment}
         multiline
         rows={3}
       />
