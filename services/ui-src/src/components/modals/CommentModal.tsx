@@ -35,12 +35,15 @@ export const CommentModal = ({
   selectedFile,
   updateElement,
   allFiles,
+  disabled,
 }: Props) => {
   const { full_name, userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const [displayValue, setDisplayValue] = useState("");
   const [pastComments, setPastComments] = useState<InitiativeComment[]>([]);
   const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
-  const canAddComment = userIsEndUser || (userIsAdmin && adminCommentsEnabled);
+  const userCanAddComment =
+    userIsEndUser || (userIsAdmin && adminCommentsEnabled);
+  const commentsDisabled = disabled ? true : !userCanAddComment;
   const fileName = selectedFile?.name || "attachment";
   const selectedAttachmentIndex = allFiles.findIndex(
     (file) => file.attachment.fileId === selectedFile?.fileId
@@ -65,7 +68,7 @@ export const CommentModal = ({
     if (
       selectedAttachmentIndex === -1 ||
       displayValue.trim() === "" ||
-      !canAddComment
+      commentsDisabled
     )
       return modalDisclosure.onClose();
 
@@ -99,7 +102,7 @@ export const CommentModal = ({
         label={"Comment"}
         onChange={onChange}
         value={displayValue}
-        disabled={!canAddComment}
+        disabled={commentsDisabled}
         multiline
         rows={3}
       />
@@ -115,7 +118,8 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
-  selectedFile: UploadListProp;
+  selectedFile: UploadListProp | undefined;
   updateElement: Function;
   allFiles: InitiativeAnswerProp[];
+  disabled?: boolean;
 }

@@ -41,7 +41,8 @@ const mockAllFiles = [
 ];
 
 const CommentModalComponent = (
-  allFiles: InitiativeAnswerProp[] = mockAllFiles
+  allFiles: InitiativeAnswerProp[] = mockAllFiles,
+  disabled: boolean = false
 ) => {
   return (
     <CommentModal
@@ -52,6 +53,7 @@ const CommentModalComponent = (
       selectedFile={mockSelectedFile}
       updateElement={mockUpdateElement}
       allFiles={allFiles}
+      disabled={disabled}
     />
   );
 };
@@ -178,6 +180,16 @@ describe("CommentModal component", () => {
       });
       mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
       render(CommentModalComponent());
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeDisabled();
+    });
+
+    test("cannot add comments when disabled", () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockUseStore); // state user
+      render(CommentModalComponent(mockAllFiles, true)); // set disabled true
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
     });
