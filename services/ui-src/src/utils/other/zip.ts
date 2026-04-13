@@ -1,13 +1,20 @@
 import { getZip } from "utils/api/requestMethods/upload";
 import JSZip from "jszip";
+import { Report, RhtpSubType } from "types";
 
-export const testZip = async (state: string) => {
-  const test = await getZip("2026", state!);
+export const onZipFiles = async (report: Report) => {
+  const { state, year, subType } = report;
+  const quarter = RhtpSubType[subType!];
+
+  const fileId = `${quarter}_${year}`;
+  const files = await getZip(year.toString(), state, fileId);
   var zip = new JSZip();
-  for (var i = 0; i < test.bytes.length; i++) {
-    zip.file("nested/image" + i + ".png", test.bytes[i], { base64: true });
-  }
 
+  for (var i = 0; i < files.length; i++) {
+    zip.file(`${state}/${year}/${quarter}/${files[i].name}`, files[i].bytes, {
+      base64: true,
+    });
+  }
   zip.generateAsync({ type: "base64" }).then(function (base64) {
     location.href = "data:application/zip;base64," + base64;
   });

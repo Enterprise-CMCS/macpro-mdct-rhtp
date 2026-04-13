@@ -219,10 +219,10 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "getStateZip", {
-    entry: "services/app-api/handlers/uploads/download.ts",
-    handler: "getStateZip",
-    path: "/uploads/{year}/{state}/zip",
+  new Lambda(scope, "getByStateAndId", {
+    entry: "services/app-api/handlers/uploads/get.ts",
+    handler: "getByStateAndId",
+    path: "/uploads/{year}/{state}/{fileId}/zip",
     method: "GET",
     ...commonProps,
   });

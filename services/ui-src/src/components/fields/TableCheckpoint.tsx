@@ -15,6 +15,7 @@ import {
   DropdownOptions,
   ElementType,
   InitiativeAnswerProp,
+  RhtpSubType,
   TableCheckpointTemplate,
   UploadListProp,
 } from "types";
@@ -30,7 +31,6 @@ import { checkpointsList } from "verbiage/checkpoints";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
-import { attachmentTableId } from "../../constants";
 
 type TableShape = {
   stage: number;
@@ -141,6 +141,7 @@ export const TableCheckpoint = (
     checkpoints: string;
   }>({ stage: "", checkpoints: "" });
   const [files, setFiles] = useState<UploadListProp[]>([]);
+  const attachmentTableId = RhtpSubType[report!.subType!];
 
   if (!state || !year || !pageId) {
     console.error("Can't retrieve uploads with missing state, year or id");

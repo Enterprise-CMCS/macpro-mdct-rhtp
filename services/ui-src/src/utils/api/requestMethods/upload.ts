@@ -43,13 +43,17 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   return { presignedUploadUrl: psurl, fileId };
 };
 
-export const getZip = async (year: string, stateCode: string) => {
+export const getZip = async (
+  year: string,
+  stateCode: string,
+  fileId: string
+) => {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
   };
   const response = await apiLib.get<any>(
-    `/uploads/${year}/${stateCode}/zip`,
+    `/uploads/${year}/${stateCode}/${fileId}/zip`,
     options
   );
   return response ?? [];

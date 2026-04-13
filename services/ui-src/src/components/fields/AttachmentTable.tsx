@@ -22,6 +22,7 @@ import { useParams } from "react-router";
 import {
   AttachmentTableTemplate,
   InitiativePageTemplate,
+  RhtpSubType,
   UploadListProp,
 } from "types";
 import { useStore } from "utils";
@@ -45,7 +46,7 @@ type Options = { label: string; value: string; checked?: boolean };
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
 ) => {
-  const { id, answer } = props.element;
+  const { answer } = props.element;
   const displayValue = answer ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
@@ -67,6 +68,8 @@ export const AttachmentTable = (
     { id: string; label: string }[]
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
+
+  const quarter = RhtpSubType[report!.subType!];
 
   if (!state || !year) {
     console.error("Can't retrieve uploads with missing state or year");
@@ -251,7 +254,7 @@ export const AttachmentTable = (
         state={state}
         year={year}
         answer={uploadedFiles}
-        id={id}
+        id={quarter}
         hint="[hint text]"
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">

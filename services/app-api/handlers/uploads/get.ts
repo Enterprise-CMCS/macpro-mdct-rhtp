@@ -45,3 +45,36 @@ export const getUpload = handler(parseUploadParameters, async (request) => {
 
   return ok({ psurl: psurl });
 });
+
+export const getByStateAndId = handler(
+  parseUploadParameters,
+  async (request) => {
+    const { state, fileId } = request.parameters;
+    if (!state || !fileId) {
+      return forbidden(error.MISSING_DATA);
+    }
+
+    const uploads = await queryViewUploads(state, `${fileId}`);
+    const files = uploads.map((upload) => ({
+      name: upload.filename,
+      key: upload.awsFilename,
+    }));
+
+    const s3Objects = [];
+    for (var i = 0; i < files.length; i++) {
+      const file = files[i];
+      const item = await s3.getObject({
+        Bucket: process.env.attachmentsBucketName,
+        Key: file.key,
+      });
+      s3Objects.push(item);
+    }
+
+    const data = [];
+    for (var j = 0; j < s3Objects.length; j++) {
+      const item = await s3Objects[j].Body?.transformToString("base64");
+      data.push({ name: files[j].name, bytes: item });
+    }
+    return ok(data);
+  }
+);
