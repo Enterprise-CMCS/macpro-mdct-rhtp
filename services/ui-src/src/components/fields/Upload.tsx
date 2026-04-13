@@ -20,6 +20,7 @@ interface Props {
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport?: (file: UploadListProp) => void;
+  uploadAreaHidden?: boolean;
 }
 
 export const Upload = ({
@@ -29,6 +30,7 @@ export const Upload = ({
   answer,
   saveToReport,
   deleteFromReport,
+  uploadAreaHidden = false,
 }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
@@ -95,35 +97,39 @@ export const Upload = ({
 
   return (
     <VStack sx={sx.container} gap="1rem" alignItems="flex-start">
-      <div>
-        <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
-        <Text sx={sx.uploadedSubLabel}>
-          Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
-        </Text>
-      </div>
-      <Box
-        sx={sx.uploadBox}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        width="100%"
-        aria-label="file drop area"
-      >
-        <span>
-          Drag files here or
-          <label id="drop-zone">
-            Choose from folder
-            <input
-              type="file"
-              id="file-input"
-              multiple
-              accept={acceptedFileTypes.join(",")}
-              onChange={onFileChange}
-            />
-          </label>
-        </span>
-      </Box>
-      <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+      {!uploadAreaHidden && (
+        <>
+          <div>
+            <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
+            <Text sx={sx.uploadedSubLabel}>
+              Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
+            </Text>
+          </div>
+          <Box
+            sx={sx.uploadBox}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            width="100%"
+            aria-label="file drop area"
+          >
+            <span>
+              Drag files here or
+              <label id="drop-zone">
+                Choose from folder
+                <input
+                  type="file"
+                  id="file-input"
+                  multiple
+                  accept={acceptedFileTypes.join(",")}
+                  onChange={onFileChange}
+                />
+              </label>
+            </span>
+          </Box>
+          <Text sx={sx.uploadedLabel}>Selected Files</Text>
+          {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+        </>
+      )}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>

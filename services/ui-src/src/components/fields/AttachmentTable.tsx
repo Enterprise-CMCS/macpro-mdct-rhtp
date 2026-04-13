@@ -375,6 +375,7 @@ export const AttachmentTable = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         deleteFromReport={removeAttachment}
+        uploadAreaHidden={modalMode === "Delete"}
       ></UploadModal>
       <CommentModal
         modalDisclosure={{
