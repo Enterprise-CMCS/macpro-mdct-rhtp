@@ -16,6 +16,7 @@ import {
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
+import { CommentModal } from "components/modals/CommentModal";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
@@ -63,6 +64,9 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
       { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
     ]),
 }));
+
+vi.mock("components/modals/CommentModal");
+const mockCommentModal = vi.mocked(CommentModal);
 
 const mockTableCheckpointElement: TableCheckpointTemplate = {
   id: "mock-TableCheckpoint-id",
@@ -151,6 +155,15 @@ describe("<TableCheckpoint />", () => {
     expect(fileBtn).toBeVisible();
     await userEvent.click(fileBtn);
     expect(getFileDownloadUrl).toHaveBeenCalled();
+  });
+  test("add comment to file", async () => {
+    render(TableCheckpointComponent);
+    const commentButton = screen.getByRole("button", {
+      name: "Add comment to orange.png",
+    });
+    expect(commentButton).toBeVisible();
+    await userEvent.click(commentButton);
+    expect(mockCommentModal).toHaveBeenCalled();
   });
   test("delete file", async () => {
     render(TableCheckpointComponent);
