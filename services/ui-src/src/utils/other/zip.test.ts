@@ -1,5 +1,5 @@
 import { Report, ReportStatus, ReportType, RhtpSubType } from "types";
-import { createZipFile } from "./zip";
+import { convertBase64ToBlob, createZipFile } from "./zip";
 import JSZip from "jszip";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
@@ -35,5 +35,11 @@ describe("utils/zip", () => {
     zip.file("hello.txt", "Hello World\n");
     const content = await zip.generateAsync({ type: "base64" });
     expect(content).toBeDefined();
+  });
+  test("convertBase64ToBlob function", () => {
+    //This is a transparent pixel
+    const base64string = "R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+    const blob = convertBase64ToBlob(base64string);
+    expect(blob.size).toBe(37);
   });
 });
