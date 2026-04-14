@@ -10,6 +10,7 @@ import {
   Tr,
   Image,
   Text,
+  Flex,
 } from "@chakra-ui/react";
 import {
   DropdownOptions,
@@ -20,6 +21,7 @@ import {
 } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
+import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
@@ -31,6 +33,7 @@ import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider"
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
+import { CommentModal } from "components/modals/CommentModal";
 
 type TableShape = {
   stage: number;
@@ -118,6 +121,8 @@ export const TableCheckpoint = (
 ) => {
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
+  const [selectedFile, setSelectedFile] = useState<UploadListProp>();
   const { state, pageId } = useParams();
   const { report, setAnswers } = useStore();
   const { autosave } = useContext(ReportAutosaveContext);
@@ -141,6 +146,7 @@ export const TableCheckpoint = (
     checkpoints: string;
   }>({ stage: "", checkpoints: "" });
   const [files, setFiles] = useState<UploadListProp[]>([]);
+  const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
 
   if (!state || !year || !pageId) {
     console.error("Can't retrieve uploads with missing state, year or id");
@@ -173,6 +179,7 @@ export const TableCheckpoint = (
       attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
 
     const newTables = buildTables(files);
+    setAttachments(attachments || []);
     setTables(newTables);
     setFiles(getFilesFromTable(newTables, selection.checkpoints));
   }, [report]);
@@ -206,11 +213,31 @@ export const TableCheckpoint = (
   };
 
   const onUploadDelete = (file: UploadListProp) => {
-    writeToReport(file.fileId);
+    handleFileAddDelete(file.fileId);
   };
 
-  const writeToReport = (newValue: UploadListProp[] | string) => {
+  const onCommentClick = (file: UploadListProp) => {
+    setSelectedFile(file);
+    setCommentsOpen(true);
+  };
+
+  const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
+    writeToAttachmentsTable(() => data.answer);
+  };
+
+  const writeToAttachmentsTable = (generateAnswer: (answer: any) => any) => {
     if (!report) return;
+    setAnswerInElement<InitiativeAnswerProp[]>(
+      report,
+      "initiative-attachments",
+      attachmentTableId,
+      generateAnswer,
+      setAnswers
+    );
+    autosave();
+  };
+
+  const handleFileAddDelete = (newValue: UploadListProp[] | string) => {
     //the type of element being passed in determines whether it's an add or remove
     const generateAnswer = (answer: InitiativeAnswerProp[]) => {
       //if it's a string, we're removing a file
@@ -227,15 +254,7 @@ export const TableCheckpoint = (
         return [...answer, ...formatUploads(newValue)];
       }
     };
-    //setting an answer and saving are split, we have to run autosave after if we want it saved to the report
-    setAnswerInElement<InitiativeAnswerProp[]>(
-      report,
-      "initiative-attachments",
-      attachmentTableId,
-      generateAnswer,
-      setAnswers
-    );
-    autosave();
+    writeToAttachmentsTable(generateAnswer);
   };
 
   return (
@@ -276,7 +295,7 @@ export const TableCheckpoint = (
                         isChecked={
                           initialDisplayValue.find(
                             (value) => value.id === row.id
-                          )!.checked
+                          )?.checked
                         }
                         onChange={() => onCheckboxeHandler(row.id)}
                       ></Checkbox>
@@ -299,13 +318,26 @@ export const TableCheckpoint = (
                   </Td>
                   <Td>
                     {"file" in row && row.file.fileId && (
-                      <Button
-                        variant="unstyled"
-                        onClick={() => writeToReport(row.file.fileId)}
-                        aria-label={`Remove ${row.file.name}`}
-                      >
-                        <Image src={cancelIcon} alt="Remove" />
-                      </Button>
+                      <Flex>
+                        <Button
+                          variant="link"
+                          onClick={() => onCommentClick(row.file)}
+                          aria-label={`Comment on ${row.file.name}`}
+                        >
+                          <Image
+                            src={commentIcon}
+                            alt="Comment"
+                            minWidth="26px"
+                          />
+                        </Button>
+                        <Button
+                          variant="unstyled"
+                          onClick={() => handleFileAddDelete(row.file.fileId)}
+                          aria-label={`Remove ${row.file.name}`}
+                        >
+                          <Image src={cancelIcon} alt="Remove" />
+                        </Button>
+                      </Flex>
                     )}
                   </Td>
                 </Tr>
@@ -344,9 +376,21 @@ export const TableCheckpoint = (
             ></Dropdown>
           </>
         }
-        saveToReport={writeToReport}
+        saveToReport={handleFileAddDelete}
         deleteFromReport={onUploadDelete}
       ></UploadModal>
+      <CommentModal
+        modalDisclosure={{
+          isOpen: isCommentsOpen,
+          onClose: () => {
+            setCommentsOpen(false);
+          },
+        }}
+        updateElement={handleCommentSave}
+        selectedFile={selectedFile}
+        allFiles={attachments}
+        disabled={props.disabled}
+      />
     </Stack>
   );
 };
