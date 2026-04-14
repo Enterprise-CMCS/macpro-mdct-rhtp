@@ -159,7 +159,7 @@ describe("<TableCheckpoint />", () => {
   test("add comment to file", async () => {
     render(TableCheckpointComponent);
     const commentButton = screen.getByRole("button", {
-      name: "Add comment to orange.png",
+      name: "Comment on orange.png",
     });
     expect(commentButton).toBeVisible();
     await userEvent.click(commentButton);

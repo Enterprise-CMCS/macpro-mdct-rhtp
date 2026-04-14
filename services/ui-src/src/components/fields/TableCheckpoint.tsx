@@ -322,7 +322,7 @@ export const TableCheckpoint = (
                         <Button
                           variant="link"
                           onClick={() => onCommentClick(row.file)}
-                          aria-label={`Add comment to ${row.file.name}`}
+                          aria-label={`Comment on ${row.file.name}`}
                         >
                           <Image
                             src={commentIcon}
