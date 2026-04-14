@@ -18,8 +18,6 @@ const baseStyles = {
     },
     td: {
       paddingLeft: 0,
-      borderTop: "1px solid",
-      borderBottom: "1px solid",
       borderColor: "gray_light",
       textAlign: "left",
       "&:last-of-type": {

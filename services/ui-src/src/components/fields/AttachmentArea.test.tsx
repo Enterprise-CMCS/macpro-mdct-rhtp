@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { ElementType, AttachmentAreaTemplate } from "types";
 import {
   deleteUploadedFile,
@@ -10,7 +10,7 @@ import {
 import { testA11y } from "utils/testing/commonTests";
 import { Mock } from "vitest";
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA" }),
 }));
 
@@ -72,12 +72,12 @@ describe("<AttachmentArea />", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "Add attachment" })
     );
-    expect(screen.getByText("Upload Attachments")).toBeInTheDocument();
+    expect(screen.getByText("Upload attachments")).toBeInTheDocument();
     expect(
       screen.getByText("Select a file or files to upload")
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(screen.queryByText("Upload Attachments")).not.toBeInTheDocument();
+    expect(screen.queryByText("Upload attachments")).not.toBeInTheDocument();
     expect(
       screen.queryByText("Select a file or files to upload")
     ).not.toBeInTheDocument();

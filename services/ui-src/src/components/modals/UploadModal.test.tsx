@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
+import { Dropdown } from "@cmsgov/design-system";
 
 const mockCloseHandler = vi.fn();
 const mockChangedExpanded = vi.fn();
@@ -14,7 +15,9 @@ vi.mock("utils/other/upload", async (importOriginal) => ({
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   uploadFileToS3: vi.fn(),
-  recordFileInDatabaseAndGetUploadUrl: vi.fn(),
+  recordFileInDatabaseAndGetUploadUrl: vi
+    .fn()
+    .mockReturnValue({ presignedUploadUrl: "", fileId: "" }),
   getUploadedFiles: vi
     .fn()
     .mockReturnValue([
@@ -34,17 +37,22 @@ const modalComponent = (
     year={"2026"}
     state={"PA"}
     answer={[]}
-    dropdowns={[
-      {
-        label: "mock label",
-        options: [
-          { label: "option 1", value: "opt1" },
-          { label: "option 2", value: "opt2" },
-        ],
-      },
-    ]}
+    selections={
+      <>
+        <Dropdown
+          name={"mock label"}
+          label={"mock label"}
+          options={[
+            { label: "option 1", value: "opt1" },
+            { label: "option 2", value: "opt2" },
+          ]}
+          value={""}
+          onChange={mockChangedExpanded}
+        ></Dropdown>
+      </>
+    }
     saveToReport={mockSaveToReport}
-    onChangeExpanded={mockChangedExpanded}
+    modalHeading={"Upload Attachments"}
   />
 );
 

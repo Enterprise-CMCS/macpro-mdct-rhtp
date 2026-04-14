@@ -138,12 +138,6 @@ const useOfFundsTableSchema = object().shape({
         value: string().notRequired(),
       })
     ),
-    initiativeOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
     useOfFundsOptions: array().of(
       object().shape({
         label: string().required(),
@@ -222,6 +216,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return attachmentAreaSchema;
     case ElementType.AccordionGroup:
       return accordionGroupTemplateSchema;
+    case ElementType.AttachmentTable:
+      return attachmentTableSchema;
     case ElementType.ActionTable:
       return actionTableSchema;
     default:
@@ -268,35 +264,12 @@ const checkboxTemplateSchema = object().shape({
 const tableCheckpointTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.TableCheckpoint)),
   id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
-  stage: number().required(),
-  checkpoints: array().of(
-    object().shape({
-      id: string().required(),
-      label: string().required(),
-      attachable: boolean().notRequired(),
-    })
-  ),
+  required: boolean().required(),
   answer: array()
     .of(
-      object().shape({
-        id: string().required(),
-        label: string().required(),
-        completed: boolean().required(),
-        attachments: array()
-          .of(
-            object().shape({
-              name: string().required(),
-              size: number().required(),
-              fileId: string().required(),
-            })
-          )
-          .notRequired(),
-      })
+      object().shape({ id: string().required(), checked: boolean().required() })
     )
     .notRequired(),
-  required: boolean().required(),
 });
 
 const accordionGroupTemplateSchema = object().shape({
@@ -385,6 +358,33 @@ const actionTableSchema = object().shape({
 const initiativesTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.InitiativesTable)),
   id: string().required(),
+});
+
+const attachmentTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AttachmentTable)),
+  id: string().required(),
+  answer: array()
+    .of(
+      object().shape({
+        attachment: object().shape({
+          name: string().required(),
+          size: number().required(),
+          fileId: string().required(),
+        }),
+        initiatives: array().of(string().notRequired()).required(),
+        stage: string().notRequired(),
+        checkpoints: string().notRequired(),
+        status: string().required(),
+        comments: array().of(
+          object().shape({
+            name: string().required(),
+            date: string().required(),
+            comment: string().required(),
+          })
+        ),
+      })
+    )
+    .notRequired(),
 });
 
 const dividerSchema = object().shape({

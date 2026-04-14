@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { signIn } from "aws-amplify/auth";
 import { Box, Button, Heading, Input, Stack, Text } from "@chakra-ui/react";
 import { Alert } from "components";

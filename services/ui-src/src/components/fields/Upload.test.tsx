@@ -20,7 +20,9 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),
   uploadFileToS3: vi.fn(),
-  recordFileInDatabaseAndGetUploadUrl: vi.fn(),
+  recordFileInDatabaseAndGetUploadUrl: vi
+    .fn()
+    .mockReturnValue({ presignedUploadUrl: "", fileId: "" }),
   getUploadedFiles: vi
     .fn()
     .mockReturnValue([

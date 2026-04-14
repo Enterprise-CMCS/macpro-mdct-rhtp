@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AdminDashSelector } from "./AdminDashSelector";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import assert from "node:assert";
 
 type DropdownProps = {
@@ -53,7 +53,7 @@ vi.mock("@cmsgov/design-system", () => ({
   ),
 }));
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useNavigate: vi.fn(),
 }));
 

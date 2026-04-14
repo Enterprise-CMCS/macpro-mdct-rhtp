@@ -195,19 +195,6 @@ export type UploadListProp = {
   fileId: string;
 };
 
-export type CheckpointShape = {
-  id: string;
-  label: string;
-  attachable: boolean;
-};
-
-export type CheckpointAnswerShape = {
-  id: string;
-  label: string;
-  completed: boolean;
-  attachments?: UploadListProp[];
-};
-
 export enum PageType {
   Standard = "standard",
   Modal = "modal",
@@ -245,6 +232,7 @@ export enum ElementType {
   AccordionGroup = "accordionGroup",
   UseOfFundsTable = "useOfFundsTable",
   ActionTable = "actionTable",
+  AttachmentTable = "attachmentTable",
 }
 
 export type PageElement =
@@ -270,6 +258,7 @@ export type PageElement =
   | AccordionGroupTemplate
   | UseOfFundsTableTemplate
   | AttachmentAreaTemplate
+  | AttachmentTableTemplate
   | ActionTableTemplate;
 
 export type HideCondition = {
@@ -414,11 +403,11 @@ export interface TextboxTemplate extends InputElementTemplate {
   hideCondition?: HideCondition;
 }
 
-export interface TableCheckpointTemplate extends InputElementTemplate {
+export interface TableCheckpointTemplate {
   type: ElementType.TableCheckpoint;
-  stage: number;
-  checkpoints: CheckpointShape[];
-  answer?: CheckpointAnswerShape[];
+  id: string;
+  required: boolean;
+  answer?: { id: string; checked: boolean }[];
 }
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
@@ -450,11 +439,31 @@ export type UseOfFundsTableTemplate = {
   id: string;
   dropDownOptions: {
     budgetPeriodOptions: { label: string; value: string }[];
-    initiativeOptions: { label: string; value: string }[];
     useOfFundsOptions: { label: string; value: string }[];
     recipientCategoryOptions: { label: string; value: string }[];
   };
   answer?: UseOfFundsTableItem[];
+};
+
+export type InitiativeComment = {
+  name: string;
+  date: string;
+  comment: string;
+};
+
+export type InitiativeAnswerProp = {
+  attachment: UploadListProp;
+  initiatives: string[];
+  stage?: string;
+  checkpoints?: string;
+  status: string;
+  comments: InitiativeComment[];
+};
+
+export type AttachmentTableTemplate = {
+  type: ElementType.AttachmentTable;
+  id: string;
+  answer?: InitiativeAnswerProp[];
 };
 
 export interface ActionElement {

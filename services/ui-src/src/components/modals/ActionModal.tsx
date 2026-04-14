@@ -23,11 +23,16 @@ export const ActionModal = ({
   const [errorMessages, setErrorMessages] = useState<string[]>(
     renderElements.map(() => "")
   );
+
   const [formData, setFormData] = useState<ActionAnswerShape>(form.data);
   const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     setFormData(form.data);
   }, [form.data]);
+
+  useEffect(() => {
+    setErrorMessages(renderElements.map(() => ""));
+  }, [modalDisclosure.isOpen]);
 
   /* general functions */
   const fieldLabel = (id: string) => {
@@ -52,7 +57,6 @@ export const ActionModal = ({
 
   const onModalClose = () => {
     modalDisclosure.onClose();
-    setErrorMessages(renderElements.map(() => ""));
   };
 
   const onSubmit = (event: SubmitEvent) => {
@@ -69,7 +73,6 @@ export const ActionModal = ({
         : errorMessages[index]
     );
     setErrorMessages(errors);
-
     if (errors.some((error) => error != "")) return;
 
     setSubmitting(true);

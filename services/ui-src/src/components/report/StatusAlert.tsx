@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { useStore } from "utils";
 import { Alert } from "components/alerts/Alert";
 import { PageElementProps } from "./Elements";

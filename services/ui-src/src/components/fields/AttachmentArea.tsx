@@ -4,10 +4,11 @@ import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
   downloadFile,
+  removeFile,
   retrieveUploadedFiles,
   uploadListRender,
 } from "utils/other/upload";
@@ -35,14 +36,16 @@ export const AttachmentArea = (
     setModalOpen(false);
   };
 
-  const onRemove = () => {
-    retrieveUploadedFiles(year, state, id).then((response) => {
-      saveToReport(response);
+  const onRemove = (file: UploadListProp) => {
+    removeFile(file, year, state, () => {
+      saveToReport();
     });
   };
 
-  const saveToReport = (uploads: UploadListProp[]) => {
-    updateElement({ answer: uploads });
+  const saveToReport = () => {
+    retrieveUploadedFiles(year, state, id).then((response) => {
+      updateElement({ answer: response });
+    });
   };
 
   return (

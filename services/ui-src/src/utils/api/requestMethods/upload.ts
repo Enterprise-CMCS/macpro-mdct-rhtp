@@ -35,12 +35,12 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
     body: { ...body },
   };
 
-  const { psurl } = await apiLib.post<PathURL>(
+  const { psurl, fileId } = await apiLib.post<PathURL>(
     `/uploads/${year}/${stateCode}`,
     options
   );
 
-  return { presignedUploadUrl: psurl };
+  return { presignedUploadUrl: psurl, fileId };
 };
 
 export const uploadFileToS3 = async (

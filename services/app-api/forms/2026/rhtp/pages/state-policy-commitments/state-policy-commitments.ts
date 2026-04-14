@@ -7,39 +7,21 @@ import {
   PageType,
   TextAreaBoxTemplate,
 } from "@rhtp/shared";
+import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
+import { getDropdownOptions } from "./constants";
 
-const STATE_POLICY_COMMITMENTS = [
-  {
-    label: "B.2 Presidential Fitness Test",
-  },
-  {
-    label: "B.3 SNAP Food Restriction Waiver Policy",
-  },
-  {
-    label: "B.4 Nutrition Continuing Medical Education",
-  },
-  {
-    label: "C.2: Overall CON Score",
-  },
-];
-
-// TODO build out multiple dropdown types once we know more
-const commitmentStatusDropdown: DropdownTemplate = {
+const commitmentStatusDropdown = (
+  label: string,
+  status: string = "Not yet started"
+): DropdownTemplate => ({
   type: ElementType.Dropdown,
   id: "commitment-status",
   label: "Current Status",
   helperText: "This is the hint text",
-  options: [
-    { label: "Not yet started", value: "Not yet started" },
-    { label: "In progress", value: "In progress" },
-    { label: "Implemented", value: "Implemented" },
-    {
-      label: "Commitment abandoned",
-      value: "Commitment abandoned",
-    },
-  ],
+  options: getDropdownOptions(label),
   required: true,
-};
+  answer: status,
+});
 
 const commitmentLinkListInput: ListInputTemplate = {
   type: ElementType.ListInput,
@@ -68,13 +50,20 @@ const commitmentComments: TextAreaBoxTemplate = {
   required: false,
 };
 
-const buildCommitments = () => {
+const buildCommitments = (
+  state: string,
+  statePolicyCommitments: {
+    [key: string]: { label: string; status: string }[];
+  } = STATE_POLICY_COMMITMENTS
+) => {
+  if (!(state in statePolicyCommitments)) return [];
+  const commitmentsForState = statePolicyCommitments[state];
   const commitments = [];
-  for (const { label } of STATE_POLICY_COMMITMENTS) {
+  for (const { label, status } of commitmentsForState) {
     commitments.push({
       label,
       children: [
-        commitmentStatusDropdown,
+        commitmentStatusDropdown(label, status),
         commitmentLinkListInput,
         commitmentAttachmentArea,
         commitmentComments,
@@ -84,7 +73,9 @@ const buildCommitments = () => {
   return commitments;
 };
 
-export const statePolicyCommitments: FormPageTemplate = {
+export const buildStatePolicyCommitments = (
+  state: string
+): FormPageTemplate => ({
   id: "state-policy-commitments",
   title: "State Policy Commitments",
   type: PageType.Standard,
@@ -103,8 +94,8 @@ export const statePolicyCommitments: FormPageTemplate = {
     {
       type: ElementType.AccordionGroup,
       id: "state-policy-commitments-group",
-      accordions: [...buildCommitments()],
+      accordions: [...buildCommitments(state)],
       required: true,
     },
   ],
-};
+});

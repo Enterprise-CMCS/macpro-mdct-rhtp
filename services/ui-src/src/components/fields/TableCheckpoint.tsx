@@ -1,5 +1,5 @@
 import {
-  Flex,
+  Stack,
   Button,
   Checkbox,
   Table,
@@ -11,71 +11,57 @@ import {
   Image,
   Text,
 } from "@chakra-ui/react";
-import { PageElementProps } from "components/report/Elements";
 import {
-  CheckpointAnswerShape,
-  CheckpointShape,
+  DropdownOptions,
+  ElementType,
+  InitiativeAnswerProp,
   TableCheckpointTemplate,
   UploadListProp,
 } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
-import { Label } from "@cmsgov/design-system";
-import { useState } from "react";
+import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
+import { Dropdown, Label } from "@cmsgov/design-system";
+import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useStore } from "utils";
-import {
-  downloadFile,
-  removeFile,
-  retrieveUploadedFiles,
-} from "utils/other/upload";
+import { downloadFile } from "utils/other/upload";
+import { checkpointsList } from "verbiage/checkpoints";
+import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
+import { PageElementProps } from "components/report/Elements";
+import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
+import { attachmentTableId } from "../../constants";
 
-/** This builds a default data structure for the checkpoint table if there's no answer set */
-const formatCheckpoints = (checkpoints: CheckpointShape[]) => {
-  return checkpoints.map((checkpoint) => ({
-    label: checkpoint.label,
-    id: checkpoint.id,
-    completed: false,
-    ...(checkpoint.attachable && { attachments: [] }),
-  }));
-};
-
-/** Builds the dropdowns for the checkpoint in the uploads modal */
-const uploadDropdownOptions = (
-  id: string,
-  stage: number,
-  label: string,
-  checkpoints: CheckpointShape[]
-) => {
-  return [
-    {
-      label: "Stage",
-      options: [{ label: `${stage} ${label}`, value: id }],
-    },
-    {
-      label: "Checkpoint #",
-      options: checkpoints
-        .map((checkpoint, index) => ({
-          ...checkpoint,
-          label: `${stage}.${index + 1} ${checkpoint.label}`,
-        }))
-        .filter((checkpoint) => checkpoint.attachable)
-        .map((checkpoint) => ({
-          label: checkpoint.label,
-          value: checkpoint.id,
-        })),
-    },
-  ];
+type TableShape = {
+  stage: number;
+  label: string;
+  checkpoints: {
+    id: string;
+    label: string;
+    attachable: boolean;
+  }[];
+  rows: {
+    id: string;
+    stageNo: string;
+    label: string;
+    file: { name: string; fileId: string; size: number };
+  }[];
 };
 
 /** Formatting the the data from the elements into renderable rows for the table */
-const buildRows = (stage: number, values: CheckpointAnswerShape[]) => {
+const buildRows = (
+  stage: number,
+  values: {
+    label: string;
+    id: string;
+    attachments: UploadListProp[] | undefined;
+  }[]
+) => {
   return values.reduce((prev: any[], curr, index) => {
-    const { id, completed, label, attachments } = curr;
+    const { id, label, attachments } = curr;
     const row = {
       id,
       stageNo: `${stage}.${index + 1}`,
-      completed,
       label,
     };
     if (attachments) {
@@ -91,6 +77,34 @@ const buildRows = (stage: number, values: CheckpointAnswerShape[]) => {
   }, []);
 };
 
+const buildTables = (answers: InitiativeAnswerProp[]) => {
+  return checkpointsList.map((list) => {
+    const { stage, label, checkpoints, id } = list;
+    const values = checkpoints.map((checkpoint) => {
+      const files = answers
+        .filter(
+          (answer) =>
+            answer.stage === id && answer.checkpoints === checkpoint.id
+        )
+        .map((upload) => upload.attachment);
+      return {
+        label: checkpoint.label,
+        id: checkpoint.id,
+        attachments: checkpoint.attachable ? files : undefined,
+      };
+    });
+    const rows = buildRows(stage, values);
+    return { stage, label, checkpoints, rows };
+  });
+};
+
+const getFilesFromTable = (tables: TableShape[], checkpoints: string) => {
+  return tables
+    .flatMap((tables) => tables.rows)
+    .filter((row) => row.id === checkpoints && row.file.fileId)
+    .map((filter) => filter.file);
+};
+
 const header = [
   "#",
   "Checkpoint",
@@ -102,144 +116,237 @@ const header = [
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
 ) => {
-  const { id, checkpoints, label, stage, answer } = props.element;
+  const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const { state } = useParams();
-  const { report } = useStore();
+  const { state, pageId } = useParams();
+  const { report, setAnswers } = useStore();
+  const { autosave } = useContext(ReportAutosaveContext);
   const year = report?.year.toString();
-
   //if there is answer on load, we need to build the shape from the checkpoints data
-  const initialDisplayValue = answer ?? formatCheckpoints(checkpoints);
-  const [uploadId, setUploadId] = useState<string>(initialDisplayValue[0].id);
-  const [files, setFiles] = useState<UploadListProp[]>(
-    initialDisplayValue[0].attachments ?? []
+  const initialDisplayValue =
+    answer ??
+    checkpointsList.flatMap((list) =>
+      list.checkpoints.map((checkpoint) => ({
+        id: checkpoint.id,
+        checked: false,
+      }))
+    );
+  const [tables, setTables] = useState<TableShape[]>([]);
+  const [stageOption, setStageOption] = useState<DropdownOptions[]>([]);
+  const [checkpointOption, setCheckpointOption] = useState<DropdownOptions[]>(
+    []
   );
+  const [selection, setSelection] = useState<{
+    stage: string;
+    checkpoints: string;
+  }>({ stage: "", checkpoints: "" });
+  const [files, setFiles] = useState<UploadListProp[]>([]);
 
-  if (!state || !year) {
-    console.error("Can't retrieve uploads with missing state or year");
+  if (!state || !year || !pageId) {
+    console.error("Can't retrieve uploads with missing state, year or id");
     return;
   }
 
-  const rows = buildRows(stage, initialDisplayValue);
+  //This is for generating the stage options when the page loads
+  useEffect(() => {
+    setStageOption(
+      checkpointsList.map((checks) => ({
+        label: `${checks.stage} ${checks.label}`,
+        value: checks.id,
+      }))
+    );
+  }, []);
+
+  //This populates the uploaded area of the uploads modal when the dropdown selection has changed
+  useEffect(() => {
+    const { checkpoints } = selection;
+    setFiles(getFilesFromTable(tables, checkpoints));
+  }, [selection]);
+
+  //Updates when the report has been updated, so when a file has been added or removed from the table
+  useEffect(() => {
+    const attachments = report?.pages
+      .flatMap((page) => page.elements)
+      .find((element) => element?.type === ElementType.AttachmentTable)?.answer;
+
+    const files =
+      attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
+
+    const newTables = buildTables(files);
+    setTables(newTables);
+    setFiles(getFilesFromTable(newTables, selection.checkpoints));
+  }, [report]);
 
   const onCheckboxeHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
-    for (var i = 0; i < newValue.length; i++) {
-      if (newValue[i].id == id) newValue[i].completed = !newValue[i].completed;
-    }
+    const checkbox = newValue.find((value) => value.id === id);
+    if (checkbox) checkbox.checked = !checkbox.checked;
     props.updateElement({ answer: newValue });
   };
 
-  const onDropdownHandler = (change: string) => {
-    setUploadId(change);
-    if (answer) {
-      const data = answer.filter((data) => data.id === change);
-      if (data.length > 0) {
-        setFiles(data[0].attachments ?? []);
+  const onChangeHandler = (stageId: string) => {
+    const checkpoints =
+      checkpointsList
+        .find((checks) => checks.id === stageId)
+        ?.checkpoints.filter((checks) => checks.attachable)
+        .map((check) => ({ label: check.label, value: check.id })) ?? [];
+
+    setCheckpointOption(checkpoints);
+    setSelection({ stage: stageId, checkpoints: checkpoints[0].value });
+  };
+
+  const formatUploads = (uploads: UploadListProp[]) => {
+    return uploads.map((file) => ({
+      initiatives: [pageId],
+      ...selection,
+      comments: [],
+      attachment: file,
+      status: "Under Review", //TODO: update status when status has been added to initiatives
+    }));
+  };
+
+  const onUploadDelete = (file: UploadListProp) => {
+    writeToReport(file.fileId);
+  };
+
+  const writeToReport = (newValue: UploadListProp[] | string) => {
+    if (!report) return;
+    //the type of element being passed in determines whether it's an add or remove
+    const generateAnswer = (answer: InitiativeAnswerProp[]) => {
+      //if it's a string, we're removing a file
+      if (typeof newValue === "string") {
+        const index = answer.findIndex(
+          (item) => item.attachment.fileId == newValue
+        );
+        const newInitiatives = answer[index].initiatives.filter(
+          (id) => id != pageId
+        );
+        answer[index].initiatives = newInitiatives;
+        return [...answer];
+      } else {
+        return [...answer, ...formatUploads(newValue)];
       }
-    }
-  };
-
-  const onModalClose = () => {
-    setModalOpen(false);
-  };
-
-  const saveToReport = (uploads: UploadListProp[], dropdownValue: string) => {
-    const newValue = [...initialDisplayValue];
-    const checkpoint = newValue.findIndex((value) => value.id == dropdownValue);
-
-    if (checkpoint !== -1) {
-      newValue[checkpoint].attachments = uploads;
-      props.updateElement({ answer: newValue });
-      setFiles(newValue[checkpoint].attachments);
-    }
-  };
-
-  const removeAttachment = async (file: UploadListProp) => {
-    const onRemove = () =>
-      retrieveUploadedFiles(year, state, uploadId).then((response) => {
-        saveToReport(response, uploadId);
-      });
-    await removeFile(file, year, state, onRemove);
+    };
+    //setting an answer and saving are split, we have to run autosave after if we want it saved to the report
+    setAnswerInElement<InitiativeAnswerProp[]>(
+      report,
+      "initiative-attachments",
+      attachmentTableId,
+      generateAnswer,
+      setAnswers
+    );
+    autosave();
   };
 
   return (
-    <Flex gap="1.25rem" flexDirection="column" width="100%">
-      <Label>{`Stage ${stage}: ${label}`}</Label>
-      <Text>To upload attachments, click the button below.</Text>
-      <Button
-        aria-label="Upload attachments"
-        variant="outline"
-        alignSelf="flex-start"
-        onClick={() => setModalOpen(true)}
-      >
-        Upload attachments
-      </Button>
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            {header.map((item) => (
-              <Th>{item}</Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {rows.map((row) => (
-            <Tr>
-              <Td>{row.stageNo}</Td>
-              <Td>{row.label}</Td>
-              <Td>
-                {row.completed != undefined ? (
-                  <Checkbox
-                    aria-label={`Check if ${row.label} is complete`}
-                    isChecked={row.completed}
-                    onChange={() => onCheckboxeHandler(row.id)}
-                  ></Checkbox>
-                ) : (
-                  <></>
-                )}
-              </Td>
-              <Td>
-                {"file" in row ? (
-                  <Button
-                    aria-label={`Download ${row.file.name}`}
-                    variant="link"
-                    onClick={() => downloadFile(year, state, row.file)}
-                  >
-                    {row.file.name}
-                  </Button>
-                ) : (
-                  "Not applicable"
-                )}
-              </Td>
-              <Td>
-                {"file" in row && row.file.fileId && (
-                  <Button
-                    variant="unstyled"
-                    onClick={() => removeAttachment(row.file)}
-                    aria-label={`Remove ${row.file.name}`}
-                  >
-                    <Image src={cancelIcon} alt="Remove" />
-                  </Button>
-                )}
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+    <Stack gap="1.25rem" width="100%">
+      {tables.map((table, tableIndex) => (
+        <Stack key={`checkpoint-${tableIndex}`} gap="1.25rem">
+          <Label>{`Stage ${table.stage}: ${table.label}`}</Label>
+          <Text>To upload attachments, click the button below.</Text>
+          <Button
+            aria-label="Upload attachments"
+            variant="outline"
+            alignSelf="flex-start"
+            leftIcon={<Image src={addIconPrimary} />}
+            onClick={() => {
+              setModalOpen(true);
+              onChangeHandler(stageOption[tableIndex].value);
+            }}
+          >
+            Upload attachments
+          </Button>
+          <Table variant="metric" key={table.label}>
+            <Thead>
+              <Tr>
+                {header.map((item) => (
+                  <Th key={item}>{item}</Th>
+                ))}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {table.rows.map((row, rowIndex) => (
+                <Tr key={`checkpoint-row-${rowIndex}`}>
+                  <Td>{row.stageNo}</Td>
+                  <Td>{row.label}</Td>
+                  <Td>
+                    {row.label != "" ? (
+                      <Checkbox
+                        aria-label={`Check if ${row.label} is complete`}
+                        isChecked={
+                          initialDisplayValue.find(
+                            (value) => value.id === row.id
+                          )!.checked
+                        }
+                        onChange={() => onCheckboxeHandler(row.id)}
+                      ></Checkbox>
+                    ) : (
+                      <></>
+                    )}
+                  </Td>
+                  <Td>
+                    {"file" in row ? (
+                      <Button
+                        aria-label={`Download ${row.file.name}`}
+                        variant="link"
+                        onClick={() => downloadFile(year, state, row.file)}
+                      >
+                        {row.file.name}
+                      </Button>
+                    ) : (
+                      "Not applicable"
+                    )}
+                  </Td>
+                  <Td>
+                    {"file" in row && row.file.fileId && (
+                      <Button
+                        variant="unstyled"
+                        onClick={() => writeToReport(row.file.fileId)}
+                        aria-label={`Remove ${row.file.name}`}
+                      >
+                        <Image src={cancelIcon} alt="Remove" />
+                      </Button>
+                    )}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Stack>
+      ))}
       <UploadModal
         modalDisclosure={{
           isOpen: isModalOpen,
-          onClose: onModalClose,
+          onClose: () => setModalOpen(false),
         }}
         state={state}
         year={year}
         answer={files}
-        id={uploadId}
-        dropdowns={uploadDropdownOptions(id, stage, label, checkpoints)}
-        onChangeExpanded={onDropdownHandler}
-        saveToReport={saveToReport}
+        id={attachmentTableId}
+        selections={
+          <>
+            <Dropdown
+              name={"stage"}
+              label={"Stage"}
+              options={stageOption}
+              value={selection?.stage}
+              onChange={(event) => onChangeHandler(event.target.value)}
+            ></Dropdown>
+            <Dropdown
+              name={"checkpoint"}
+              label={"Checkpoint #"}
+              options={checkpointOption}
+              value={selection?.checkpoints}
+              onChange={(dropdown) => {
+                const value = dropdown.target.value;
+                setSelection({ ...selection, checkpoints: value });
+              }}
+            ></Dropdown>
+          </>
+        }
+        saveToReport={writeToReport}
+        deleteFromReport={onUploadDelete}
       ></UploadModal>
-    </Flex>
+    </Stack>
   );
 };

@@ -8,6 +8,7 @@ import {
 import {
   acceptedFileTypes,
   downloadFile,
+  removeFile,
   retrieveUploadedFiles,
   uploadListRender,
 } from "utils/other/upload";
@@ -18,6 +19,8 @@ interface Props {
   year: string;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
+  deleteFromReport?: (file: UploadListProp) => void;
+  uploadAreaHidden?: boolean;
 }
 
 export const Upload = ({
@@ -26,17 +29,17 @@ export const Upload = ({
   year,
   answer,
   saveToReport,
+  deleteFromReport,
+  uploadAreaHidden = false,
 }: Props) => {
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
-        await onUploadFiles().then(() => {
-          retrieveUploadedFiles(year, state, uploadId).then((response) => {
-            setFilesToUpload([]);
-            saveToReport(response);
-          });
+        await onUploadFiles().then((response) => {
+          setFilesToUpload([]);
+          saveToReport(response);
         });
       fetchData();
     }
@@ -64,10 +67,16 @@ export const Upload = ({
     }
   };
 
-  const onRemove = () => {
-    retrieveUploadedFiles(year, state, uploadId).then((response) => {
-      saveToReport(response);
-    });
+  const onRemove = (file: UploadListProp) => {
+    if (deleteFromReport) {
+      deleteFromReport(file);
+    } else {
+      removeFile(file, year, state, () => {
+        retrieveUploadedFiles(year, state, uploadId).then((response) => {
+          saveToReport(response);
+        });
+      });
+    }
   };
 
   const onUploadFiles = async () => {
@@ -75,49 +84,52 @@ export const Upload = ({
       throw new Error("Undefined year or state parameter");
     }
     const files = filesToUpload ?? [];
+    const savedFiles = [];
     for (var i = 0; i < files.length; i++) {
       const file = files[i];
-      const presignedPostData = await recordFileInDatabaseAndGetUploadUrl(
-        year,
-        state,
-        file,
-        uploadId
-      );
-      await uploadFileToS3(presignedPostData, file);
+      const { presignedUploadUrl, fileId } =
+        await recordFileInDatabaseAndGetUploadUrl(year, state, file, uploadId);
+      savedFiles.push({ name: file.name, fileId: fileId, size: file.size });
+      await uploadFileToS3({ presignedUploadUrl }, file);
     }
+    return savedFiles;
   };
 
   return (
     <VStack sx={sx.container} gap="1rem" alignItems="flex-start">
-      <div>
-        <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
-        <Text sx={sx.uploadedSubLabel}>
-          Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
-        </Text>
-      </div>
-      <Box
-        sx={sx.uploadBox}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        width="100%"
-        aria-label="file drop area"
-      >
-        <span>
-          Drag files here or
-          <label id="drop-zone">
-            Choose from folder
-            <input
-              type="file"
-              id="file-input"
-              multiple
-              accept={acceptedFileTypes.join(",")}
-              onChange={onFileChange}
-            />
-          </label>
-        </span>
-      </Box>
-      <Text sx={sx.uploadedLabel}>Selected Files</Text>
-      {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+      {!uploadAreaHidden && (
+        <>
+          <div>
+            <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
+            <Text sx={sx.uploadedSubLabel}>
+              Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
+            </Text>
+          </div>
+          <Box
+            sx={sx.uploadBox}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            width="100%"
+            aria-label="file drop area"
+          >
+            <span>
+              Drag files here or
+              <label id="drop-zone">
+                Choose from folder
+                <input
+                  type="file"
+                  id="file-input"
+                  multiple
+                  accept={acceptedFileTypes.join(",")}
+                  onChange={onFileChange}
+                />
+              </label>
+            </span>
+          </Box>
+          <Text sx={sx.uploadedLabel}>Selected Files</Text>
+          {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+        </>
+      )}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
         <Text sx={sx.uploadedSubLabel}>

@@ -97,8 +97,8 @@ const reportStore = (set: Set<ReportState>, get: Get<ReportState>) => ({
     set(() => ({ modalComponent, modalOpen: true, modalHeader }), false, {
       type: "setModalComponent",
     }),
-  setAnswers: (answers: any) =>
-    set((state: ReportState) => mergeAnswers(answers, state), false, {
+  setAnswers: (answers: any, pageId?: string) =>
+    set((state: ReportState) => mergeAnswers(answers, state, pageId), false, {
       type: "setAnswers",
     }),
   setSidebar: (sidebarOpen: boolean) => {

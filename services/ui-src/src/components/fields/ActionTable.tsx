@@ -40,11 +40,10 @@ const buildRows = (
   answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: JSX.Element[] = [];
     const disabled = isRowDisabled(rows, answerRow);
-
-    rows.map((column) => {
+    rows.map((column, columnIndex) => {
       //autogenerate next # column
       if (column.id === "no") {
-        rowElement.push(<Td>{answerRowIndex + 1}</Td>);
+        rowElement.push(<Td key={column.id}>{answerRowIndex + 1}</Td>);
       } else {
         const element = answerRow.find((item) => item.id === column.id);
         const formattedCol = {
@@ -54,11 +53,11 @@ const buildRows = (
         const value = buildElement(formattedCol, element?.value!, (value) =>
           onChange(value, answerRowIndex, column.id)
         );
-        rowElement.push(<Td>{value}</Td>);
+        rowElement.push(<Td key={`action-column-${columnIndex}`}>{value}</Td>);
       }
     });
     rowElement.push(
-      <Td>
+      <Td key={`row.element.${answerRowIndex}`}>
         <Button
           variant="link"
           onClick={() => onEdit(answerRowIndex)}
@@ -143,14 +142,14 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         <Thead>
           <Tr>
             {rows.map((row) => (
-              <Th>{row.header}</Th>
+              <Th key={row.header}>{row.header}</Th>
             ))}
             <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {formattedRows.map((row: any) => (
-            <Tr>{row}</Tr>
+          {formattedRows.map((row, rowIndex) => (
+            <Tr key={`action-row-${rowIndex}`}>{row}</Tr>
           ))}
         </Tbody>
       </Table>

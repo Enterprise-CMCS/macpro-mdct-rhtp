@@ -39,6 +39,7 @@ export { AttachmentArea } from "./fields/AttachmentArea";
 export { AccordionGroup } from "./fields/AccordionGroup";
 export { TableCheckpoint } from "./fields/TableCheckpoint";
 export { ActionTable } from "./fields/ActionTable";
+export { AttachmentTable } from "./fields/AttachmentTable";
 // forms
 export { AdminBannerForm } from "./forms/AdminBannerForm";
 export { AdminDashSelector } from "./forms/AdminDashSelector";
