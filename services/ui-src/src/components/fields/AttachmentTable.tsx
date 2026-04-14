@@ -233,6 +233,11 @@ export const AttachmentTable = (
     setCurrentValues(selectedFile);
   };
 
+  const onCommentClick = (selectedFile: InitiativeAnswerProp) => {
+    setCommentsOpen(true);
+    setCurrentValues(selectedFile);
+  };
+
   const onDeleteClick = (selectedFile: InitiativeAnswerProp) => {
     setModalMode("Delete");
     setModalOpen(true);
@@ -306,7 +311,7 @@ export const AttachmentTable = (
                   <Button variant="outline" onClick={() => onEditClick(row)}>
                     Edit
                   </Button>
-                  <Button variant="link" onClick={() => setCommentsOpen(true)}>
+                  <Button variant="link" onClick={() => onCommentClick(row)}>
                     <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
                   <Button
@@ -384,6 +389,10 @@ export const AttachmentTable = (
             setCommentsOpen(false);
           },
         }}
+        selectedFile={uploadedFiles[0]}
+        updateElement={props.updateElement}
+        allFiles={displayValue}
+        disabled={props.disabled}
       />
     </Stack>
   );

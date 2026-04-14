@@ -445,13 +445,19 @@ export type UseOfFundsTableTemplate = {
   answer?: UseOfFundsTableItem[];
 };
 
+export type InitiativeComment = {
+  name: string;
+  date: string;
+  comment: string;
+};
+
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
   stage?: string;
   checkpoints?: string;
   status: string;
-  comments: { name: string; date: string }[];
+  comments: InitiativeComment[];
 };
 
 export type AttachmentTableTemplate = {
