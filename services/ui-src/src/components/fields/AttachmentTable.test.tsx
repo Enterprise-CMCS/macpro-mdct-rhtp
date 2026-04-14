@@ -5,6 +5,7 @@ import { AttachmentTable } from "components";
 import { ElementType, AttachmentTableTemplate, AttachmentStatus } from "types";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
+import { removeFile } from "utils/other/upload";
 
 vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
@@ -126,6 +127,14 @@ describe("<AttachmentTable />", () => {
     render(AttachmentTableComponent(mockAttachmentAreaElement));
     const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });
     await userEvent.click(deleteBtn);
+    await waitFor(() => {
+      expect(screen.getByText("Delete Attachment")).toBeVisible();
+    });
+    const confirmDeleteBtn = screen.getByRole("button", { name: "Delete" });
+    await userEvent.click(confirmDeleteBtn);
+    expect(vi.mocked(removeFile)).toHaveBeenCalled();
+    expect(mockUpdateElement).toHaveBeenCalled();
+    expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
   });
   it("Mock edit call", async () => {
     /**TODO: This is a placeholder, it needs to be changed for when we have the user go edit in the modal */
@@ -134,6 +143,21 @@ describe("<AttachmentTable />", () => {
       name: "Edit file or info for mock-file",
     });
     await userEvent.click(editBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit Attachment")).toBeVisible();
+    });
+
+    const dropdown = screen.getAllByLabelText("Stage")[0];
+    await userEvent.selectOptions(dropdown, "2 Early Implementation");
+
+    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
+    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
+    expect(mockUpdateElement).toHaveBeenCalled();
   });
+
   testA11y(AttachmentTableComponent(mockAttachmentAreaElement));
 });
