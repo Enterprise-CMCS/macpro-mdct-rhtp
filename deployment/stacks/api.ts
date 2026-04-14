@@ -257,6 +257,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     retryAttempts: 2,
     vpc,
     vpcSubnets: { subnets: kafkaAuthorizedSubnets },
+    allowPublicSubnet: true,
     securityGroups: [kafkaSecurityGroup],
     ...commonProps,
     environment: {
