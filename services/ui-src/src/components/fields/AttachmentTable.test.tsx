@@ -124,13 +124,15 @@ describe("<AttachmentTable />", () => {
   it("Mock on remove file call", async () => {
     /**TODO: This is a placeholder, it needs to be changed for when we have the user go delete in a modal */
     render(AttachmentTableComponent(mockAttachmentAreaElement));
-    const deleteBtn = screen.getByRole("button", { name: "Remove mock-file" });
+    const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });
     await userEvent.click(deleteBtn);
   });
   it("Mock edit call", async () => {
     /**TODO: This is a placeholder, it needs to be changed for when we have the user go edit in the modal */
     render(AttachmentTableComponent(mockAttachmentAreaElement));
-    const editBtn = screen.getByRole("button", { name: "Edit" });
+    const editBtn = screen.getByRole("button", {
+      name: "Edit file or info for mock-file",
+    });
     await userEvent.click(editBtn);
   });
   testA11y(AttachmentTableComponent(mockAttachmentAreaElement));
