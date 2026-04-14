@@ -2,7 +2,7 @@ import { MockedFunction } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentTable } from "components";
-import { ElementType, AttachmentTableTemplate } from "types";
+import { ElementType, AttachmentTableTemplate, AttachmentStatus } from "types";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 
@@ -49,14 +49,18 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
       initiatives: ["mock-init-1"],
       stage: "checkpoint-1",
       checkpoints: "project-prop-2",
-      status: "Under Approval",
+      status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     },
   ],
 };
 
+const mockUpdateElement = vi.fn();
+
 const AttachmentTableComponent = (element: AttachmentTableTemplate) => {
-  return <AttachmentTable element={element} updateElement={vi.fn()} />;
+  return (
+    <AttachmentTable element={element} updateElement={mockUpdateElement} />
+  );
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
@@ -115,6 +119,7 @@ describe("<AttachmentTable />", () => {
     expect(
       screen.queryByText("Upload Initiative Attachments")
     ).not.toBeInTheDocument();
+    expect(mockUpdateElement).toHaveBeenCalled();
   });
   it("Mock on remove file call", async () => {
     /**TODO: This is a placeholder, it needs to be changed for when we have the user go delete in a modal */

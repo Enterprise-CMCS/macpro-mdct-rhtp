@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
+  AttachmentStatus,
   DropdownOptions,
   ElementType,
   InitiativeAnswerProp,
@@ -201,7 +202,7 @@ export const TableCheckpoint = (
       ...selection,
       comments: [],
       attachment: file,
-      status: "Under Review", //TODO: update status when status has been added to initiatives
+      status: AttachmentStatus.PENDING_REVIEW,
     }));
   };
 
