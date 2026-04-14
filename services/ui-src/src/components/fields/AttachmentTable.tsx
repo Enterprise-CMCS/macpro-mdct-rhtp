@@ -318,7 +318,7 @@ export const AttachmentTable = (
                   <Button
                     variant="link"
                     onClick={() => onCommentClick(row)}
-                    aria-label={`Add and view comments on ${row.attachment.name}`}
+                    aria-label={`Comment on ${row.attachment.name}`}
                   >
                     <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
