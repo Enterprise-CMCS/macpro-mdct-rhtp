@@ -1,6 +1,7 @@
 import { geFileBytes } from "utils/api/requestMethods/upload";
 import JSZip from "jszip";
 import { Report, RhtpSubType } from "types";
+import { saveAs } from "file-saver";
 
 export const createZipFile = async (report: Report) => {
   const { state, year, subType } = report;
@@ -15,7 +16,8 @@ export const createZipFile = async (report: Report) => {
       base64: true,
     });
   }
-  zip.generateAsync({ type: "base64" }).then(function (base64) {
-    location.href = "data:application/zip;base64," + base64;
+
+  zip.generateAsync({ type: "base64" }).then((blob) => {
+    saveAs(blob, `RHTP_${state}_${year}.zip`);
   });
 };
