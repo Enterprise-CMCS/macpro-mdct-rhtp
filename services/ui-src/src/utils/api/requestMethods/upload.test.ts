@@ -4,7 +4,6 @@ import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
   getFileDownloadUrl,
-  getUploadedFiles,
   deleteUploadedFile,
   geFileBytes,
 } from "./upload";
@@ -19,17 +18,6 @@ vi.mock("../apiLib", () => ({
 }));
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
-const mockData = [
-  {
-    uploadedState: "PA",
-    awsFilename: "mock-aws-filename",
-    filename: "mock-name",
-    uploadedDate: "2/2/2",
-    uploadedUsername: "mock@mail.com",
-    fileId: "question-0001",
-    filesize: 40,
-  },
-];
 
 let originalFetch = window.fetch;
 
@@ -64,11 +52,6 @@ describe("Test fileApi functions", () => {
     (apiLib.get as Mock).mockReturnValue({ psurl: "mock.s3/url" });
     const result = await getFileDownloadUrl("2025", "PA", "mock-id");
     expect(result).toBe("mock.s3/url");
-  });
-  test("getUploadedFiles", async () => {
-    (apiLib.get as Mock).mockReturnValue(mockData);
-    const result = await getUploadedFiles("2025", "PA", "mock-id");
-    expect(result).toBe(mockData);
   });
   test("deleteUploadedFile", async () => {
     (apiLib.del as Mock).mockReturnValue(Promise.resolve());

@@ -91,23 +91,6 @@ export const getFileDownloadUrl = async (
   return response.psurl;
 };
 
-export const getUploadedFiles = async (
-  year: string,
-  stateCode: string,
-  uploadId: string
-) => {
-  const requestHeaders = await getRequestHeaders();
-  const options = {
-    headers: { ...requestHeaders },
-  };
-
-  const response = await apiLib.get<UploadData[]>(
-    `/uploads/${year}/${stateCode}/view/${uploadId}`,
-    options
-  );
-  return response ?? [];
-};
-
 export const deleteUploadedFile = async (
   year: string,
   stateCode: string,

@@ -165,9 +165,7 @@ export const AttachmentTable = (
       (item) => item.attachment.fileId !== file.fileId
     );
     props.updateElement({ answer: newAnswerValue });
-    removeFile(file, year, state, () => {
-      return;
-    });
+    removeFile(file, year, state);
   };
 
   const onModalSubmit = () => {

@@ -6,12 +6,7 @@ import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useParams } from "react-router";
 import { useStore } from "utils";
-import {
-  downloadFile,
-  removeFile,
-  retrieveUploadedFiles,
-  uploadListRender,
-} from "utils/other/upload";
+import { downloadFile, uploadListRender } from "utils/other/upload";
 import { Hint, Label } from "@cmsgov/design-system";
 
 export const AttachmentArea = (
@@ -36,16 +31,13 @@ export const AttachmentArea = (
     setModalOpen(false);
   };
 
-  const onRemove = (file: UploadListProp) => {
-    removeFile(file, year, state, () => {
-      saveToReport();
-    });
+  const onRemove = async (removeFile: UploadListProp) => {
+    const newFiles = files.filter((file) => file.fileId != removeFile.fileId);
+    updateElement({ answer: newFiles });
   };
 
-  const saveToReport = () => {
-    retrieveUploadedFiles(year, state, id).then((response) => {
-      updateElement({ answer: response });
-    });
+  const saveToReport = (newFiles: UploadListProp[]) => {
+    updateElement({ answer: [...files, ...newFiles] });
   };
 
   return (
@@ -70,6 +62,7 @@ export const AttachmentArea = (
         year={year}
         answer={files}
         saveToReport={saveToReport}
+        deleteFromReport={onRemove}
         id={id}
       />
     </Stack>

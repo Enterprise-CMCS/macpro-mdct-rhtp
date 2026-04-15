@@ -6,11 +6,7 @@ import { Dropdown } from "@cmsgov/design-system";
 const mockCloseHandler = vi.fn();
 const mockChangedExpanded = vi.fn();
 const mockSaveToReport = vi.fn();
-
-vi.mock("utils/other/upload", async (importOriginal) => ({
-  ...(await importOriginal()),
-  retrieveUploadedFiles: vi.fn().mockReturnValue(Promise.resolve([])),
-}));
+const mockDeleteFromReport = vi.fn();
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -52,6 +48,7 @@ const modalComponent = (
       </>
     }
     saveToReport={mockSaveToReport}
+    deleteFromReport={mockDeleteFromReport}
     modalHeading={"Upload Attachments"}
   />
 );

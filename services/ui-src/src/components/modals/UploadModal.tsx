@@ -13,10 +13,10 @@ export const UploadModal = ({
   selections,
   answer,
   saveToReport,
+  deleteFromReport,
   modalHeading = "Upload attachments",
   onModalSubmit = modalDisclosure.onClose,
   actionButtonText = "Done",
-  deleteFromReport,
   uploadAreaHidden = false,
 }: Props) => {
   return (
@@ -62,6 +62,6 @@ interface Props {
   onModalSubmit?: () => void;
   actionButtonText?: string;
   saveToReport: (uploads: UploadListProp[]) => void;
-  deleteFromReport?: (file: UploadListProp) => void;
+  deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
 }

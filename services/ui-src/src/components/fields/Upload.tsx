@@ -8,8 +8,6 @@ import {
 import {
   acceptedFileTypes,
   downloadFile,
-  removeFile,
-  retrieveUploadedFiles,
   uploadListRender,
 } from "utils/other/upload";
 
@@ -19,7 +17,7 @@ interface Props {
   year: string;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
-  deleteFromReport?: (file: UploadListProp) => void;
+  deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
 }
 
@@ -64,18 +62,6 @@ export const Upload = ({
     if (event.target.files) {
       const file = event.target.files;
       setFilesToUpload([...(filesToUpload ?? []), ...file]);
-    }
-  };
-
-  const onRemove = (file: UploadListProp) => {
-    if (deleteFromReport) {
-      deleteFromReport(file);
-    } else {
-      removeFile(file, year, state, () => {
-        retrieveUploadedFiles(year, state, uploadId).then((response) => {
-          saveToReport(response);
-        });
-      });
     }
   };
 
@@ -127,7 +113,7 @@ export const Upload = ({
             </span>
           </Box>
           <Text sx={sx.uploadedLabel}>Selected Files</Text>
-          {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+          {uploadListRender(filesToUpload ?? [], year, state, deleteFromReport)}
         </>
       )}
       <div>
@@ -137,7 +123,13 @@ export const Upload = ({
           above.
         </Text>
       </div>
-      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
+      {uploadListRender(
+        answer ?? [],
+        year,
+        state,
+        deleteFromReport,
+        downloadFile
+      )}
     </VStack>
   );
 };

@@ -11,7 +11,6 @@ import {
 import {
   deleteUploadedFile,
   getFileDownloadUrl,
-  getUploadedFiles,
 } from "../api/requestMethods/upload";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
@@ -29,19 +28,6 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
-export const retrieveUploadedFiles = async (
-  year: string,
-  state: string,
-  uploadId: string
-) => {
-  const uploadedFiles = await getUploadedFiles(year, state, uploadId);
-  return uploadedFiles.map((file) => ({
-    name: file.filename,
-    size: file.filesize,
-    fileId: file.fileId,
-  }));
-};
-
 export const downloadFile = async (
   year: string,
   state: string,
@@ -55,13 +41,10 @@ export const downloadFile = async (
 export const removeFile = async (
   file: File | UploadListProp,
   year: string,
-  state: string,
-  onRemove: Function
+  state: string
 ) => {
   if (!("fileId" in file)) return;
-  await deleteUploadedFile(year, state, file.fileId).then(() => {
-    onRemove();
-  });
+  return deleteUploadedFile(year, state, file.fileId);
 };
 
 export const uploadListRender = (

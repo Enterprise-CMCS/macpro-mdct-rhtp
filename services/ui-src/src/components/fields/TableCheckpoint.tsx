@@ -213,7 +213,7 @@ export const TableCheckpoint = (
     }));
   };
 
-  const onUploadDelete = (file: UploadListProp) => {
+  const deleteFromReport = (file: UploadListProp) => {
     handleFileAddDelete(file.fileId);
   };
 
@@ -378,7 +378,7 @@ export const TableCheckpoint = (
           </>
         }
         saveToReport={handleFileAddDelete}
-        deleteFromReport={onUploadDelete}
+        deleteFromReport={deleteFromReport}
       ></UploadModal>
       <CommentModal
         modalDisclosure={{
