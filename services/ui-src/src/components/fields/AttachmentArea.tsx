@@ -12,17 +12,17 @@ import { Hint, Label } from "@cmsgov/design-system";
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
-  const { id, label, helperText, answer } = props.element;
+  const { label, helperText, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   const { state } = useParams();
   const { report } = useStore();
-  const year = report?.year.toString();
+  const { id, type } = report!;
 
   const updateElement = props.updateElement;
   const files = answer ?? [];
 
-  if (!state || !year) {
+  if (!state || !id || !type) {
     console.error("Can't retrieve uploads with missing state or year");
     return;
   }
@@ -44,7 +44,7 @@ export const AttachmentArea = (
     <Stack gap="0">
       <Label fieldId={id}>{label}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
-      {uploadListRender(files, year, state, onRemove, downloadFile)}
+      {uploadListRender(id, type, files, state, onRemove, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}
@@ -59,11 +59,11 @@ export const AttachmentArea = (
           onClose: onModalClose,
         }}
         state={state}
-        year={year}
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
         id={id}
+        reportType={type}
       />
     </Stack>
   );

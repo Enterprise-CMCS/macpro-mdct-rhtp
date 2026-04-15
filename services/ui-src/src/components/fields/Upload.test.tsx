@@ -13,6 +13,7 @@ import {
   recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
+import { ReportType } from "types";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -34,6 +35,7 @@ const mockDeleteFromReport = vi.fn();
 const props = {
   state: "PA",
   year: "2026",
+  reportType: ReportType.RHTP,
   id: "mock-id",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   saveToReport: vi.fn(),

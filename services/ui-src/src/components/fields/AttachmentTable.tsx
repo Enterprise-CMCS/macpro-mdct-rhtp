@@ -22,7 +22,6 @@ import { useParams } from "react-router";
 import {
   AttachmentTableTemplate,
   InitiativePageTemplate,
-  RhtpSubType,
   UploadListProp,
   AlertTypes,
   InitiativeAnswerProp,
@@ -55,7 +54,7 @@ export const AttachmentTable = (
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const { state } = useParams();
   const { report } = useStore();
-  const year = report?.year.toString();
+  const { id, type: reportType } = report!;
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -94,12 +93,10 @@ export const AttachmentTable = (
     Delete: "Delete Attachment",
   };
 
-  if (!state || !year) {
-    console.error("Can't retrieve uploads with missing state or year");
+  if (!state || !id || !reportType) {
+    console.error("Can't retrieve uploads with missing state, id or type");
     return;
   }
-
-  const quarter = RhtpSubType[report!.subType!];
 
   useEffect(() => {
     setStageOption([
@@ -165,7 +162,7 @@ export const AttachmentTable = (
       (item) => item.attachment.fileId !== file.fileId
     );
     props.updateElement({ answer: newAnswerValue });
-    removeFile(file, year, state);
+    removeFile(file, reportType, id, state);
   };
 
   const onModalSubmit = () => {
@@ -278,7 +275,9 @@ export const AttachmentTable = (
                 <Td>
                   <Button
                     variant="link"
-                    onClick={() => downloadFile(year, state, row.attachment)}
+                    onClick={() =>
+                      downloadFile(reportType, state, id, row.attachment)
+                    }
                     fontWeight="bold"
                   >
                     {row.attachment.name}
@@ -341,9 +340,9 @@ export const AttachmentTable = (
           onClose: onClose,
         }}
         state={state}
-        year={year}
         answer={uploadedFiles}
-        id={quarter}
+        id={id}
+        reportType={reportType}
         hint="[hint text]"
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">

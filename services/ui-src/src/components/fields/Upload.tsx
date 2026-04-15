@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { UploadListProp } from "types";
+import { ReportType, UploadListProp } from "types";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
@@ -14,7 +14,7 @@ import {
 interface Props {
   id: string;
   state: string;
-  year: string;
+  reportType: ReportType;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
@@ -22,9 +22,9 @@ interface Props {
 }
 
 export const Upload = ({
-  id: uploadId,
+  id,
   state,
-  year,
+  reportType,
   answer,
   saveToReport,
   deleteFromReport,
@@ -66,7 +66,7 @@ export const Upload = ({
   };
 
   const onUploadFiles = async () => {
-    if (!year || !state) {
+    if (!state) {
       throw new Error("Undefined year or state parameter");
     }
     const files = filesToUpload ?? [];
@@ -74,7 +74,7 @@ export const Upload = ({
     for (var i = 0; i < files.length; i++) {
       const file = files[i];
       const { presignedUploadUrl, fileId } =
-        await recordFileInDatabaseAndGetUploadUrl(year, state, file, uploadId);
+        await recordFileInDatabaseAndGetUploadUrl(id, reportType, state, file);
       savedFiles.push({ name: file.name, fileId: fileId, size: file.size });
       await uploadFileToS3({ presignedUploadUrl }, file);
     }
@@ -113,7 +113,13 @@ export const Upload = ({
             </span>
           </Box>
           <Text sx={sx.uploadedLabel}>Selected Files</Text>
-          {uploadListRender(filesToUpload ?? [], year, state, deleteFromReport)}
+          {uploadListRender(
+            id,
+            reportType,
+            filesToUpload ?? [],
+            state,
+            deleteFromReport
+          )}
         </>
       )}
       <div>
@@ -124,8 +130,9 @@ export const Upload = ({
         </Text>
       </div>
       {uploadListRender(
+        id,
+        reportType,
         answer ?? [],
-        year,
         state,
         deleteFromReport,
         downloadFile

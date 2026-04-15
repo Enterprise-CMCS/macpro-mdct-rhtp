@@ -21,7 +21,6 @@ vi.mock("utils", async (importOriginal) => ({
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
-  // deleteUploadedFile: vi.fn(),
   getUploadedFiles: vi
     .fn()
     .mockReturnValue([

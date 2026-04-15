@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
 import { Dropdown } from "@cmsgov/design-system";
+import { ReportType } from "types";
 
 const mockCloseHandler = vi.fn();
 const mockChangedExpanded = vi.fn();
@@ -30,7 +31,7 @@ const modalComponent = (
       onClose: mockCloseHandler,
     }}
     id={"mock-id"}
-    year={"2026"}
+    reportType={ReportType.RHTP}
     state={"PA"}
     answer={[]}
     selections={

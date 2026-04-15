@@ -190,15 +190,23 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "createUpload", {
     entry: "services/app-api/handlers/uploads/create.ts",
     handler: "createUpload",
-    path: "/uploads/{year}/{state}",
+    path: "/reports/{reportType}/{state}/{id}/files",
     method: "POST",
     ...commonProps,
   });
 
-  new Lambda(scope, "getUpload", {
+  new Lambda(scope, "getUploadsByFileId", {
     entry: "services/app-api/handlers/uploads/get.ts",
-    handler: "getUpload",
-    path: "/uploads/{year}/{state}/{fileId}",
+    handler: "getUploadsByFileId",
+    path: "/reports/{reportType}/{state}/{id}/files/{fileId}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getUploadsByReportId", {
+    entry: "services/app-api/handlers/uploads/get.ts",
+    handler: "getUploadsByReportId",
+    path: "/reports/{reportType}/{state}/{id}/files/",
     method: "GET",
     ...commonProps,
   });
@@ -206,7 +214,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
     handler: "deleteUploadedFile",
-    path: "/uploads/{year}/{state}/{fileId}",
+    path: "/reports/{reportType}/{state}/{id}/files/{fileId}",
     method: "DELETE",
     ...commonProps,
   });

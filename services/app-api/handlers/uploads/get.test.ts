@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
-import { getUpload } from "./get";
+import { getUploadsByFileId } from "./get";
 import { queryUpload } from "../../storage/upload";
 
 vi.mock("../../utils/authentication", () => ({
@@ -61,17 +61,17 @@ describe("Test get API methods", () => {
       ...proxyEvent,
       pathParameters: {},
     } as APIGatewayProxyEvent;
-    const res = await getUpload(badTestEvent);
+    const res = await getUploadsByFileId(badTestEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
   test("getUpload undefined query returns error", async () => {
     (queryUpload as Mock).mockResolvedValueOnce({});
-    const res = await getUpload(mockGetUploadEvent);
+    const res = await getUploadsByFileId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Forbidden);
   });
   test("getUpload successful create download ps url", async () => {
     (queryUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
-    const res = await getUpload(mockGetUploadEvent);
+    const res = await getUploadsByFileId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });
 });

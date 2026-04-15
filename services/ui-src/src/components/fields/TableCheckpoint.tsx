@@ -125,8 +125,8 @@ export const TableCheckpoint = (
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
   const { state, pageId } = useParams();
   const { report, setAnswers } = useStore();
+  const { id, type: reportType } = report!;
   const { autosave } = useContext(ReportAutosaveContext);
-  const year = report?.year.toString();
   //if there is answer on load, we need to build the shape from the checkpoints data
   const initialDisplayValue =
     answer ??
@@ -149,7 +149,7 @@ export const TableCheckpoint = (
   const attachmentTableId = RhtpSubType[report!.subType!];
   const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
 
-  if (!state || !year || !pageId) {
+  if (!state || !id || !reportType || !pageId) {
     console.error("Can't retrieve uploads with missing state, year or id");
     return;
   }
@@ -309,7 +309,9 @@ export const TableCheckpoint = (
                       <Button
                         aria-label={`Download ${row.file.name}`}
                         variant="link"
-                        onClick={() => downloadFile(year, state, row.file)}
+                        onClick={() =>
+                          downloadFile(reportType, state, id, row.file)
+                        }
                       >
                         {row.file.name}
                       </Button>
@@ -353,9 +355,9 @@ export const TableCheckpoint = (
           onClose: () => setModalOpen(false),
         }}
         state={state}
-        year={year}
         answer={files}
         id={attachmentTableId}
+        reportType={reportType}
         selections={
           <>
             <Dropdown

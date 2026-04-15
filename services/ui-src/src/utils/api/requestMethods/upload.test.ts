@@ -7,6 +7,7 @@ import {
   deleteUploadedFile,
   geFileBytes,
 } from "./upload";
+import { ReportType } from "types";
 
 vi.mock("../apiLib", () => ({
   apiLib: {
@@ -36,10 +37,10 @@ describe("Test fileApi functions", () => {
     (apiLib.post as Mock).mockReturnValue({ psurl: "https://mock.url" });
 
     const result = await recordFileInDatabaseAndGetUploadUrl(
-      "2025",
-      "PA",
-      mockPng,
-      "mock-id"
+      "abc",
+      ReportType.RHTP,
+      "mock-id",
+      mockPng
     );
     expect(result).toEqual({ presignedUploadUrl: "https://mock.url" });
   });
@@ -50,12 +51,12 @@ describe("Test fileApi functions", () => {
   });
   test("getFileDownloadUrl", async () => {
     (apiLib.get as Mock).mockReturnValue({ psurl: "mock.s3/url" });
-    const result = await getFileDownloadUrl("2025", "PA", "mock-id");
+    const result = await getFileDownloadUrl("RHTP", "2025", "PA", "mock-id");
     expect(result).toBe("mock.s3/url");
   });
   test("deleteUploadedFile", async () => {
     (apiLib.del as Mock).mockReturnValue(Promise.resolve());
-    await deleteUploadedFile("2025", "PA", "mock-id");
+    await deleteUploadedFile("", "2025", "PA", "mock-id");
     expect(apiLib.del as Mock).toHaveBeenCalledWith(
       "/uploads/2025/PA/mock-id",
       {

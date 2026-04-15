@@ -15,7 +15,7 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
-import { UploadListProp } from "types";
+import { ReportType, UploadListProp } from "types";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -29,27 +29,30 @@ export const acceptedFileTypes = [
 ];
 
 export const downloadFile = async (
-  year: string,
+  reportType: ReportType,
   state: string,
+  id: string,
   file: UploadListProp
 ) => {
-  const fileLink = await getFileDownloadUrl(year, state, file.fileId);
+  const fileLink = await getFileDownloadUrl(reportType, state, id, file.fileId);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
   window.open(sanitizeLink);
 };
 
 export const removeFile = async (
   file: File | UploadListProp,
-  year: string,
+  reportType: ReportType,
+  id: string,
   state: string
 ) => {
   if (!("fileId" in file)) return;
-  return deleteUploadedFile(year, state, file.fileId);
+  return deleteUploadedFile(reportType, state, id, file.fileId);
 };
 
 export const uploadListRender = (
+  id: string,
+  reportType: ReportType,
   files: File[] | UploadListProp[],
-  year: string,
   state: string,
   onRemove: Function,
   onClick?: Function
@@ -66,7 +69,7 @@ export const uploadListRender = (
                 ) : (
                   <Button
                     variant="link"
-                    onClick={() => onClick(year, state, file)}
+                    onClick={() => onClick(reportType, state, id, file)}
                   >
                     {file.name}
                   </Button>

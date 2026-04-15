@@ -22,17 +22,16 @@ export interface UploadData {
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
-  year: string,
+  id: string,
+  reportType: string,
   stateCode: string,
-  uploadedFile: File,
-  uploadId: string
+  uploadedFile: File
 ) => {
   const requestHeaders = await getRequestHeaders();
   const body = {
     uploadedFileName: uploadedFile.name,
     uploadedFileType: uploadedFile.type,
     uploadedFileSize: uploadedFile.size,
-    uploadId,
   };
 
   const options = {
@@ -41,7 +40,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   };
 
   const { psurl, fileId } = await apiLib.post<PathURL>(
-    `/uploads/${year}/${stateCode}`,
+    `/reports/${reportType}/${stateCode}/${id}/files`,
     options
   );
 
@@ -49,16 +48,16 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
 };
 
 export const geFileBytes = async (
-  year: string,
+  reportType: string,
   stateCode: string,
-  fileId: string
+  id: string
 ) => {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
   };
   const response = await apiLib.get<ZipData[]>(
-    `/uploads/${year}/${stateCode}/${fileId}/zip`,
+    `/reports/${reportType}/${stateCode}/${id}/files/`,
     options
   );
   return response ?? [];
@@ -75,8 +74,9 @@ export const uploadFileToS3 = async (
 };
 
 export const getFileDownloadUrl = async (
-  year: string,
+  reportType: string,
   stateCode: string,
+  id: string,
   fileId: string
 ) => {
   const requestHeaders = await getRequestHeaders();
@@ -85,20 +85,24 @@ export const getFileDownloadUrl = async (
   };
 
   const response = await apiLib.get<PathURL>(
-    `/uploads/${year}/${stateCode}/${fileId}`,
+    `/reports/${reportType}/${stateCode}/${id}/files/${fileId}`,
     options
   );
   return response.psurl;
 };
 
 export const deleteUploadedFile = async (
-  year: string,
+  reportType: string,
   stateCode: string,
+  id: string,
   fileId: string
 ) => {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
   };
-  await apiLib.del(`/uploads/${year}/${stateCode}/${fileId}`, options);
+  await apiLib.del(
+    `/reports/${reportType}/${stateCode}/${id}/files/${fileId}`,
+    options
+  );
 };
