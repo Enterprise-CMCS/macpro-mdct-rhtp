@@ -235,6 +235,11 @@ export const AttachmentTable = (
     setCurrentValues(selectedFile);
   };
 
+  const onCommentClick = (selectedFile: InitiativeAnswerProp) => {
+    setCommentsOpen(true);
+    setCurrentValues(selectedFile);
+  };
+
   const onDeleteClick = (selectedFile: InitiativeAnswerProp) => {
     setModalMode("Delete");
     setModalOpen(true);
@@ -305,16 +310,24 @@ export const AttachmentTable = (
                 </Td>
                 <Td>{row.status}</Td>
                 <Td className="actions" display="flex" width="152px">
-                  <Button variant="outline" onClick={() => onEditClick(row)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => onEditClick(row)}
+                    aria-label={`Edit file or info for ${row.attachment.name}`}
+                  >
                     Edit
                   </Button>
-                  <Button variant="link" onClick={() => setCommentsOpen(true)}>
+                  <Button
+                    variant="link"
+                    onClick={() => onCommentClick(row)}
+                    aria-label={`Comment on ${row.attachment.name}`}
+                  >
                     <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
                   <Button
                     variant="link"
                     onClick={() => onDeleteClick(row)}
-                    aria-label={`Remove ${row.attachment.name}`}
+                    aria-label={`Delete ${row.attachment.name}`}
                   >
                     <Image src={cancelIcon} alt="Remove" minWidth="24px" />
                   </Button>
@@ -386,6 +399,10 @@ export const AttachmentTable = (
             setCommentsOpen(false);
           },
         }}
+        selectedFile={uploadedFiles[0]}
+        updateElement={props.updateElement}
+        allFiles={displayValue}
+        disabled={props.disabled}
       />
     </Stack>
   );
