@@ -4,7 +4,7 @@ import JSZip from "jszip";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
-  geFileBytes: vi.fn().mockReturnValue([{ name: "filename", bytes: [] }]),
+  getFileBytes: vi.fn().mockReturnValue([{ name: "filename", bytes: [] }]),
 }));
 
 const report: Report = {

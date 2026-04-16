@@ -32,6 +32,7 @@ import { checkpointsList } from "verbiage/checkpoints";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
+import { attachmentTableId } from "../../constants";
 import { CommentModal } from "components/modals/CommentModal";
 
 type TableShape = {
@@ -229,7 +230,7 @@ export const TableCheckpoint = (
     setAnswerInElement<InitiativeAnswerProp[]>(
       report,
       "initiative-attachments",
-      id,
+      attachmentTableId,
       generateAnswer,
       setAnswers
     );
