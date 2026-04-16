@@ -16,7 +16,6 @@ import {
   DropdownOptions,
   ElementType,
   InitiativeAnswerProp,
-  RhtpSubType,
   TableCheckpointTemplate,
   UploadListProp,
 } from "types";
@@ -146,7 +145,6 @@ export const TableCheckpoint = (
     checkpoints: string;
   }>({ stage: "", checkpoints: "" });
   const [files, setFiles] = useState<UploadListProp[]>([]);
-  const attachmentTableId = RhtpSubType[report!.subType!];
   const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
 
   if (!state || !id || !reportType || !pageId) {
@@ -231,7 +229,7 @@ export const TableCheckpoint = (
     setAnswerInElement<InitiativeAnswerProp[]>(
       report,
       "initiative-attachments",
-      attachmentTableId,
+      id,
       generateAnswer,
       setAnswers
     );
@@ -356,7 +354,7 @@ export const TableCheckpoint = (
         }}
         state={state}
         answer={files}
-        id={attachmentTableId}
+        id={id}
         reportType={reportType}
         selections={
           <>

@@ -4,11 +4,10 @@ import { Report, RhtpSubType } from "types";
 import { saveAs } from "file-saver";
 
 export const createZipFile = async (report: Report) => {
-  const { state, year, subType } = report;
+  const { state, year, subType, id, type } = report;
   const quarter = RhtpSubType[subType!];
 
-  const fileId = `${quarter}_${year}`;
-  const files = await geFileBytes(year.toString(), state, fileId);
+  const files = await geFileBytes(type, state, id);
   var zip = new JSZip();
 
   for (var i = 0; i < files.length; i++) {
