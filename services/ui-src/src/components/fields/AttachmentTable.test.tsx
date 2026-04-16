@@ -2,7 +2,12 @@ import { MockedFunction } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentTable } from "components";
-import { ElementType, AttachmentTableTemplate, AttachmentStatus } from "types";
+import {
+  ElementType,
+  AttachmentTableTemplate,
+  AttachmentStatus,
+  InitiativeAnswerProp,
+} from "types";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 import { removeFile } from "utils/other/upload";
@@ -123,7 +128,6 @@ describe("<AttachmentTable />", () => {
     expect(mockUpdateElement).toHaveBeenCalled();
   });
   it("Mock on remove file call", async () => {
-    /**TODO: This is a placeholder, it needs to be changed for when we have the user go delete in a modal */
     render(AttachmentTableComponent(mockAttachmentAreaElement));
     const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });
     await userEvent.click(deleteBtn);
@@ -137,7 +141,6 @@ describe("<AttachmentTable />", () => {
     expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
   });
   it("Mock edit call", async () => {
-    /**TODO: This is a placeholder, it needs to be changed for when we have the user go edit in the modal */
     render(AttachmentTableComponent(mockAttachmentAreaElement));
     const editBtn = screen.getByRole("button", {
       name: "Edit file or info for mock-file",
@@ -157,6 +160,53 @@ describe("<AttachmentTable />", () => {
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
     expect(mockUpdateElement).toHaveBeenCalled();
+  });
+
+  it("Verify that editing sets the status to Pending", async () => {
+    const existingAttachment = mockAttachmentAreaElement
+      .answer?.[0] as InitiativeAnswerProp;
+
+    render(
+      AttachmentTableComponent({
+        ...mockAttachmentAreaElement,
+        answer: [
+          {
+            ...existingAttachment,
+            status: AttachmentStatus.LOCKED_FOR_SCORING,
+          },
+        ],
+      })
+    );
+    expect(
+      screen.queryByText(AttachmentStatus.LOCKED_FOR_SCORING)
+    ).toBeInTheDocument();
+
+    const editBtn = screen.getByRole("button", {
+      name: "Edit file or info for mock-file",
+    });
+    await userEvent.click(editBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit Attachment")).toBeVisible();
+    });
+
+    const dropdown = screen.getAllByLabelText("Stage")[0];
+    await userEvent.selectOptions(dropdown, "2 Early Implementation");
+
+    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
+    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
+    expect(mockUpdateElement).toHaveBeenCalledWith(
+      expect.objectContaining({
+        answer: expect.arrayContaining([
+          expect.objectContaining({
+            status: AttachmentStatus.PENDING_REVIEW,
+          }),
+        ]),
+      })
+    );
   });
 
   testA11y(AttachmentTableComponent(mockAttachmentAreaElement));

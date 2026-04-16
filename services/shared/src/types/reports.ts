@@ -448,7 +448,8 @@ export type UseOfFundsTableTemplate = {
 export type InitiativeComment = {
   name: string;
   date: string;
-  comment: string;
+  comment?: string;
+  statusChange?: string;
 };
 
 export enum AttachmentStatus {
