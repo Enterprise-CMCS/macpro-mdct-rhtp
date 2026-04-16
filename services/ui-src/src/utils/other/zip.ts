@@ -1,4 +1,4 @@
-import { geFileBytes } from "utils/api/requestMethods/upload";
+import { getFileBytes } from "utils/api/requestMethods/upload";
 import JSZip from "jszip";
 import { Report, RhtpSubType } from "types";
 import { saveAs } from "file-saver";
@@ -7,7 +7,7 @@ export const createZipFile = async (report: Report) => {
   const { state, year, subType, id, type } = report;
   const quarter = RhtpSubType[subType!];
 
-  const files = await geFileBytes(type, state, id);
+  const files = await getFileBytes(type, state, id);
   var zip = new JSZip();
 
   for (var i = 0; i < files.length; i++) {

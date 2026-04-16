@@ -5,7 +5,7 @@ import {
   uploadFileToS3,
   getFileDownloadUrl,
   deleteUploadedFile,
-  geFileBytes,
+  getFileBytes,
 } from "./upload";
 import { ReportType } from "types";
 
@@ -56,9 +56,9 @@ describe("Test fileApi functions", () => {
   });
   test("deleteUploadedFile", async () => {
     (apiLib.del as Mock).mockReturnValue(Promise.resolve());
-    await deleteUploadedFile("", "2025", "PA", "mock-id");
+    await deleteUploadedFile("RHTP", "PA", "mock-id", "mock-file-id");
     expect(apiLib.del as Mock).toHaveBeenCalledWith(
-      "/uploads/2025/PA/mock-id",
+      "/reports/RHTP/PA/mock-id/files/mock-file-id",
       {
         headers: { "x-api-key": undefined },
       }
@@ -67,7 +67,7 @@ describe("Test fileApi functions", () => {
   test("geFileBytes", async () => {
     const zipData = [{ name: "file-name", bytes: "abced" }];
     (apiLib.get as Mock).mockReturnValue(zipData);
-    const result = await geFileBytes("2025", "PA", "mock-id");
+    const result = await getFileBytes("2025", "PA", "mock-id");
     expect(result).toBe(zipData);
   });
 });

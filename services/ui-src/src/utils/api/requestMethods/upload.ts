@@ -46,7 +46,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   return { presignedUploadUrl: psurl, fileId };
 };
 
-export const geFileBytes = async (
+export const getFileBytes = async (
   reportType: string,
   stateCode: string,
   id: string
