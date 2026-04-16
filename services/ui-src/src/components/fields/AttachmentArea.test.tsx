@@ -1,3 +1,4 @@
+import { Mock } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
@@ -5,7 +6,6 @@ import { useParams } from "react-router";
 import { ElementType, AttachmentAreaTemplate } from "types";
 import { getFileDownloadUrl } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
-import { Mock } from "vitest";
 
 const updateSpy = vi.fn();
 
@@ -15,17 +15,18 @@ vi.mock("react-router", () => ({
 
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),
-  useStore: vi.fn().mockReturnValue({ report: { year: "2026" } }),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      id: "mock-report-id",
+      type: "RHTP",
+    },
+  }),
 }));
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
-  getUploadedFiles: vi
-    .fn()
-    .mockReturnValue([
-      { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
-    ]),
+  deleteUploadedFile: vi.fn(),
 }));
 
 const mockAttachmentAreaElement: AttachmentAreaTemplate = {
@@ -53,6 +54,7 @@ describe("<AttachmentArea />", () => {
     await act(async () => {
       render(AttachmentAreaComponent);
     });
+
     expect(screen.getByText("mock attachment area")).toBeVisible();
     expect(screen.getByRole("button", { name: "Add attachment" }));
   });
@@ -63,7 +65,7 @@ describe("<AttachmentArea />", () => {
     });
     expect(screen.queryByText("mock attachment area")).not.toBeInTheDocument();
     expect(consoleMock).toHaveBeenLastCalledWith(
-      "Can't retrieve uploads with missing state or year"
+      "Can't retrieve uploads with missing state, id or type"
     );
   });
   test("open and close the upload modal", async () => {

@@ -46,13 +46,11 @@ const mockUploadRespond = {
       uploadedState: "PA",
       name: "name",
       fileId: "mock-id",
-      awsFilename: "mockname",
     },
     {
       uploadedState: "PA",
       name: "name 2",
       fileId: "mock-id-2",
-      awsFilename: "mockname 2",
     },
   ],
 };

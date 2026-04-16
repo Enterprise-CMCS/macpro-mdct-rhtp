@@ -57,7 +57,6 @@ interface Props {
   state: string;
   answer: UploadListProp[];
   selections?: JSX.Element;
-  dropdowns?: { label: string; options: { label: string; value: string }[] }[];
   modalHeading?: string;
   onModalSubmit?: () => void;
   actionButtonText?: string;

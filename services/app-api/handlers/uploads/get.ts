@@ -22,7 +22,7 @@ export const getUploadsByFileId = handler(
     // Pre-sign url
     let psurl = await s3.getSignedDownloadUrl({
       Bucket: process.env.attachmentsBucketName,
-      Key: `${reportType}/${state}/${id}/${document.awsFilename}`,
+      Key: `${reportType}/${state}/${id}/${document.fileId}`,
       ResponseContentDisposition: `attachment; filename = ${document.filename}`,
     });
     psurl = fixLocalstackUrl(psurl);

@@ -23,7 +23,7 @@ export const AttachmentArea = (
   const files = answer ?? [];
 
   if (!state || !id || !type) {
-    console.error("Can't retrieve uploads with missing state or year");
+    console.error("Can't retrieve uploads with missing state, id or type");
     return;
   }
 

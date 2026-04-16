@@ -13,7 +13,6 @@ interface ZipData {
 
 export interface UploadData {
   uploadedState: string;
-  awsFilename: string;
   filename: string;
   uploadedDate: string;
   uploadedUsername: string;

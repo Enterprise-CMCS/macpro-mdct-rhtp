@@ -21,7 +21,7 @@ export const deleteUpload = async (
 ) => {
   var params = {
     Bucket: process.env.attachmentsBucketName,
-    Key: `${reportType}/${state}/${id}/${document.awsFilename}`,
+    Key: `${reportType}/${state}/${id}/${document.fileId}`,
   };
   await s3.deleteObject(params);
 
@@ -40,7 +40,6 @@ export const updateUpload = async (
   state: string,
   username: string,
   uploadedFileName: string,
-  awsFilename: string,
   fileId: string,
   uploadedFileSize: number
 ) => {
@@ -51,12 +50,11 @@ export const updateUpload = async (
       fileId: fileId,
     },
     UpdateExpression:
-      "SET uploadedUsername = :uploadedUsername, uploadedDate = :uploadedDate, filename = :filename, awsFilename = :awsFilename, filesize = :filesize",
+      "SET uploadedUsername = :uploadedUsername, uploadedDate = :uploadedDate, filename = :filename, filesize = :filesize",
     ExpressionAttributeValues: {
       ":uploadedUsername": username,
       ":uploadedDate": new Date().toISOString(),
       ":filename": uploadedFileName,
-      ":awsFilename": awsFilename,
       ":filesize": uploadedFileSize,
     },
   };

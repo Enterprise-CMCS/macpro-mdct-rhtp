@@ -66,7 +66,8 @@ describe("<AttachmentTable />", () => {
     vi.clearAllMocks();
     mockedUseStore.mockReturnValue({
       report: {
-        year: "2026",
+        id: "mock-report-id",
+        type: "RHTP",
         pages: [
           {
             id: "mock-init-1",

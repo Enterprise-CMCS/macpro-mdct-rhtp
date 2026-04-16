@@ -39,7 +39,7 @@ const testEvent: APIGatewayProxyEvent = {
 };
 
 const mockUploadRespond = {
-  Items: [{ uploadedState: "PA", fileId: "mock-id", awsFilename: "mockname" }],
+  Items: [{ uploadedState: "PA", fileId: "mock-id" }],
 };
 
 describe("Test createUpload API method", () => {
