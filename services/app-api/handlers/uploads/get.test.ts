@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
-import { getUploadsByFileId } from "./get";
+import { getUploadsByFileId, getUploadsByReportId } from "./get";
 import { queryUpload } from "../../storage/upload";
 
 vi.mock("../../utils/authentication", () => ({
@@ -26,6 +26,24 @@ vi.mock("../../libs/s3-lib", () => ({
     getSignedDownloadUrl: vi.fn(),
     getObject: vi.fn().mockReturnValue([]),
   },
+}));
+
+vi.mock("../../storage/reports", () => ({
+  getReport: vi.fn().mockReturnValue({
+    pages: [
+      { elements: [{ type: "attachmentTable", answer: [{ attachment: [] }] }] },
+      {
+        elements: [
+          {
+            type: "accordionGroup",
+            accordions: [
+              { children: [{ type: "attachmentArea", answer: [] }] },
+            ],
+          },
+        ],
+      },
+    ],
+  }),
 }));
 
 const mockGetUploadEvent: APIGatewayProxyEvent = {
@@ -59,7 +77,7 @@ describe("Test get API methods", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  test("getUpload missing path params", async () => {
+  test("getUploadsByFileId missing path params", async () => {
     const badTestEvent = {
       ...proxyEvent,
       pathParameters: {},
@@ -67,14 +85,27 @@ describe("Test get API methods", () => {
     const res = await getUploadsByFileId(badTestEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
-  test("getUpload undefined query returns error", async () => {
+  test("getUploadsByFileId undefined query returns error", async () => {
     (queryUpload as Mock).mockResolvedValueOnce({});
     const res = await getUploadsByFileId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Forbidden);
   });
-  test("getUpload successful create download ps url", async () => {
+  test("getUploadsByFileId successful create download ps url", async () => {
     (queryUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
     const res = await getUploadsByFileId(mockGetUploadEvent);
+    expect(res.statusCode).toBe(StatusCodes.Ok);
+  });
+
+  test("getUploadsByReportId missing path params", async () => {
+    const badTestEvent = {
+      ...proxyEvent,
+      pathParameters: {},
+    } as APIGatewayProxyEvent;
+    const res = await getUploadsByReportId(badTestEvent);
+    expect(res.statusCode).toBe(StatusCodes.BadRequest);
+  });
+  test("getUploadsByReportId is successful ", async () => {
+    const res = await getUploadsByReportId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });
 });

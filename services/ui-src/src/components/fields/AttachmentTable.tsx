@@ -265,7 +265,7 @@ export const AttachmentTable = (
           <Thead>
             <Tr>
               {header.map((item) => (
-                <Th>{item}</Th>
+                <Th key={item}>{item}</Th>
               ))}
             </Tr>
           </Thead>
