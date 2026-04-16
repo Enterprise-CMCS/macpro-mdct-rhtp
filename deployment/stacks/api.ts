@@ -167,7 +167,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     entry: "services/app-api/handlers/reports/submit.ts",
     handler: "submitReport",
     path: "reports/submit/{reportType}/{state}/{id}",
-    method: "POST",
+    method: "PUT",
     ...commonProps,
   });
 

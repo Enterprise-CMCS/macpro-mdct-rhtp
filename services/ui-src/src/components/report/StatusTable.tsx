@@ -13,7 +13,7 @@ import {
   Text,
   Spinner,
 } from "@chakra-ui/react";
-import { postSubmitReport, useStore } from "utils";
+import { submitReport, useStore } from "utils";
 import editIconPrimary from "assets/icons/edit/icon_edit_primary.svg";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import { TableStatusIcon } from "components/tables/TableStatusIcon";
@@ -43,7 +43,7 @@ export const StatusTableElement = () => {
   const onSubmit = async () => {
     setModalOpen(false);
     setSubmitting(true);
-    const submittedReport = await postSubmitReport(report);
+    const submittedReport = await submitReport(report);
     updateReport(submittedReport);
     setSubmitting(false);
   };
