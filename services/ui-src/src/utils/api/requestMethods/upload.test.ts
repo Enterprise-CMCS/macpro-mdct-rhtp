@@ -64,7 +64,7 @@ describe("Test fileApi functions", () => {
       }
     );
   });
-  test("geFileBytes", async () => {
+  test("getFileBytes", async () => {
     const zipData = [{ name: "file-name", bytes: "abced" }];
     (apiLib.get as Mock).mockReturnValue(zipData);
     const result = await getFileBytes("2025", "PA", "mock-id");

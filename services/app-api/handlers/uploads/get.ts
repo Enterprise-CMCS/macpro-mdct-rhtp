@@ -46,9 +46,8 @@ export const getUploadsByReportId = handler(
     const initAttachment = flattenElements?.find(
       (element) => element?.type === ElementType.AttachmentTable
     );
-    const initAttachmentFiles = initAttachment?.answer?.map(
-      (answer) => answer.attachment
-    );
+    const initAttachmentFiles =
+      initAttachment?.answer?.map((answer) => answer.attachment) ?? [];
 
     const accordionGroups = flattenElements
       ?.filter((element) => element?.type === ElementType.AccordionGroup)
@@ -57,9 +56,12 @@ export const getUploadsByReportId = handler(
       )
       .filter((element) => element.type === ElementType.AttachmentArea);
 
-    const accordionFiles = accordionGroups?.flatMap((group) => group.answer);
+    const accordionFiles =
+      accordionGroups?.flatMap((group) => group.answer) ?? [];
 
-    const files = [...(initAttachmentFiles ?? []), ...(accordionFiles ?? [])];
+    const files = [...initAttachmentFiles, ...accordionFiles].filter(
+      (files) => files != undefined
+    );
 
     const s3Objects = [];
     for (var i = 0; i < files.length; i++) {

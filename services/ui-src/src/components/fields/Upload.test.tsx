@@ -34,7 +34,6 @@ const mockDeleteFromReport = vi.fn();
 
 const props = {
   state: "PA",
-  year: "2026",
   reportType: ReportType.RHTP,
   id: "mock-id",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],

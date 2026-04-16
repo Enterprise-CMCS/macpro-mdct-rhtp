@@ -31,7 +31,7 @@ export const AttachmentArea = (
     setModalOpen(false);
   };
 
-  const onRemove = async (exfile: UploadListProp) => {
+  const onRemove = (exfile: UploadListProp) => {
     const newFiles = files.filter((file) => file.fileId != exfile.fileId);
     updateElement({ answer: newFiles });
     removeFile(exfile, type, id, state);
