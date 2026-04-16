@@ -134,6 +134,7 @@ export const CommentModal = ({
         heading: `Add Comment to ${fileName}`,
         actionButtonText: "Save",
       }}
+      disableConfirm={commentsDisabled}
     >
       {userIsAdmin && (
         <Dropdown
@@ -142,6 +143,7 @@ export const CommentModal = ({
           onChange={onChange}
           options={statusOptions}
           value={displayValue.status}
+          disabled={commentsDisabled}
         />
       )}
       <TextField

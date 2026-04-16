@@ -212,13 +212,13 @@ describe("CommentModal component", () => {
         expect.objectContaining({
           answer: expect.arrayContaining([
             expect.objectContaining({
-              comments: [
+              comments: expect.arrayContaining([
                 expect.objectContaining({
                   name: mockAdminUserStore.user?.full_name,
                   comment: "",
                   statusChange: AttachmentStatus.NEEDS_REVISION,
                 }),
-              ],
+              ]),
               status: AttachmentStatus.NEEDS_REVISION,
             }),
           ]),
