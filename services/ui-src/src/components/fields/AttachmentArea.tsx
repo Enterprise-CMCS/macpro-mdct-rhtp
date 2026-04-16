@@ -6,7 +6,7 @@ import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useParams } from "react-router";
 import { useStore } from "utils";
-import { downloadFile, uploadListRender } from "utils/other/upload";
+import { downloadFile, uploadListRender, removeFile } from "utils/other/upload";
 import { Hint, Label } from "@cmsgov/design-system";
 
 export const AttachmentArea = (
@@ -31,9 +31,10 @@ export const AttachmentArea = (
     setModalOpen(false);
   };
 
-  const onRemove = async (removeFile: UploadListProp) => {
-    const newFiles = files.filter((file) => file.fileId != removeFile.fileId);
+  const onRemove = async (exfile: UploadListProp) => {
+    const newFiles = files.filter((file) => file.fileId != exfile.fileId);
     updateElement({ answer: newFiles });
+    removeFile(exfile, type, id, state);
   };
 
   const saveToReport = (newFiles: UploadListProp[]) => {

@@ -31,7 +31,12 @@ vi.mock("../../libs/s3-lib", () => ({
 const mockGetUploadEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   body: `{}`,
-  pathParameters: { state: "PA", year: "2025", fileId: "mock-id" },
+  pathParameters: {
+    state: "PA",
+    reportType: "RHTP",
+    id: "mock-id",
+    fileId: "mock-id",
+  },
   headers: { "cognito-identity-id": "test" },
 };
 
