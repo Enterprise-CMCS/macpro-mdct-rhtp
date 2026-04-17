@@ -5,6 +5,7 @@ import { UserRoles } from "../../types/types";
 import { canWriteState } from "../../utils/authorization";
 import { createReport } from "./create";
 import { ReportStatus, RhtpSubType } from "../../types/reports";
+import { RhtpSubTypeMap } from "../../utils/constants";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
@@ -61,11 +62,15 @@ describe("Test create report handler", () => {
   });
 
   test("Test successful create report after the first", async () => {
+    // set date to after allowed date to copy
+    const date = new Date(RhtpSubTypeMap.Q1.startDate + 1);
+    vi.setSystemTime(date);
     (queryReportsForState as Mock).mockReturnValueOnce([
       {
         id: "123",
         year: 2026,
         subType: RhtpSubType.ANNUAL,
+        subTypeKey: "A1",
         status: ReportStatus.SUBMITTED,
       },
     ]);
