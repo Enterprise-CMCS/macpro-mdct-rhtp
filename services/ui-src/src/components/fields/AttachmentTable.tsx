@@ -184,7 +184,9 @@ export const AttachmentTable = (
       stage: selection.stage,
       checkpoints: selection.checkpoint,
       status: AttachmentStatus.PENDING_REVIEW,
-      comments: [],
+      comments:
+        displayValue.find((item) => item.attachment.fileId === upload.fileId)
+          ?.comments ?? [],
     }));
 
     const newValues = displayValue.map((item) => {
