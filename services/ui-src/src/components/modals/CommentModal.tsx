@@ -97,15 +97,18 @@ export const CommentModal = ({
   };
 
   const onSubmit = () => {
-    if (
-      selectedAttachmentIndex === -1 ||
-      (!commentsOptional && displayValue.comment.trim() === "") ||
-      commentsDisabled
-    )
+    if (selectedAttachmentIndex === -1 || commentsDisabled) {
       return modalDisclosure.onClose();
+    }
 
     const didStatusChange =
       displayValue.status !== allFiles[selectedAttachmentIndex].status;
+    const commentsEmpty = displayValue.comment.trim() === "";
+
+    // Comments are optional for admins
+    if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
+      return modalDisclosure.onClose();
+    }
 
     allFiles[selectedAttachmentIndex] = {
       ...allFiles[selectedAttachmentIndex],
