@@ -25,6 +25,7 @@ import {
   UploadListProp,
   AlertTypes,
   InitiativeAnswerProp,
+  AttachmentStatus,
 } from "types";
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/upload";
@@ -142,7 +143,7 @@ export const AttachmentTable = (
       initiatives: [],
       stage: "",
       checkpoints: "",
-      status: "Under Review",
+      status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     }));
 
@@ -165,6 +166,7 @@ export const AttachmentTable = (
     removeFile(file, reportType, id, state);
   };
 
+  // TODO: When we have file replacement on edit logic in, make sure to set status to PENDING_REVIEW
   const onModalSubmit = () => {
     if (modalMode === "Delete") {
       removeAttachment(uploadedFiles[0]);
@@ -178,7 +180,7 @@ export const AttachmentTable = (
         .map((option) => option.value),
       stage: selection.stage,
       checkpoints: selection.checkpoint,
-      status: "Under Review",
+      status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     }));
 

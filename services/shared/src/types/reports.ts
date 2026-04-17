@@ -451,12 +451,19 @@ export type InitiativeComment = {
   comment: string;
 };
 
+export enum AttachmentStatus {
+  PENDING_REVIEW = "Pending Review", // State driven
+  NEEDS_REVISION = "Needs Revision", // CMS driven
+  LOCKED_FOR_SCORING = "Locked for Scoring", // CMS driven
+  INFORMATIONAL = "Informational", // CMS driven
+}
+
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
   stage?: string;
   checkpoints?: string;
-  status: string;
+  status: AttachmentStatus;
   comments: InitiativeComment[];
 };
 

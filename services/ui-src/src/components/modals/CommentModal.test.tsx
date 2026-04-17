@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { CommentModal } from "./CommentModal";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
-import { InitiativeAnswerProp } from "types";
+import { AttachmentStatus, InitiativeAnswerProp } from "types";
 import { useStore } from "utils";
 import {
   mockAdminUserStore,
@@ -35,7 +35,7 @@ const mockAllFiles = [
   {
     attachment: mockSelectedFile,
     initiatives: ["test 1", "test 2"],
-    status: "Under review",
+    status: AttachmentStatus.PENDING_REVIEW,
     comments: [],
   },
 ];
@@ -111,7 +111,7 @@ describe("CommentModal component", () => {
       {
         attachment: mockSelectedFile,
         initiatives: ["test 1", "test 2"],
-        status: "Under review",
+        status: AttachmentStatus.PENDING_REVIEW,
         comments: [
           {
             name: "CMS User",
