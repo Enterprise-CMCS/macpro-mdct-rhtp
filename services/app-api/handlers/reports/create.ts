@@ -56,16 +56,16 @@ export const createReport = handler(
 
       const nextReportKey =
         RhtpSubTypeMap[latestReport.subTypeKey].nextReportSubType;
-      const { name, dateRangeString, type, budgetPeriod } =
+      const { name, dateRangeString, type, startDate, budgetPeriod } =
         RhtpSubTypeMap[nextReportKey];
 
-      // if (Date.now() < startDate) {
-      //   return badRequest(
-      //     `The next report cannot be created until ${new Date(
-      //       startDate
-      //     ).toLocaleDateString()}.`
-      //   );
-      // }
+      if (Date.now() < startDate) {
+        return badRequest(
+          `The next report cannot be created until ${new Date(
+            startDate
+          ).toLocaleDateString()}.`
+        );
+      }
 
       reportOptions = {
         year: 2026, // TODO: figure out year assignment and filtering for reports that span years
