@@ -48,13 +48,13 @@ type Options = { label: string; value: string; checked?: boolean };
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
 ) => {
-  const { id, answer } = props.element;
+  const { answer } = props.element;
   const displayValue = structuredClone(answer) ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const { state } = useParams();
   const { report } = useStore();
-  const year = report?.year.toString();
+  const { id, type: reportType } = report!;
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -79,7 +79,6 @@ export const AttachmentTable = (
     { id: string; label: string }[]
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
-
   const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
     "Upload"
   );
@@ -94,8 +93,8 @@ export const AttachmentTable = (
     Delete: "Delete Attachment",
   };
 
-  if (!state || !year) {
-    console.error("Can't retrieve uploads with missing state or year");
+  if (!state || !id || !reportType) {
+    console.error("Can't retrieve uploads with missing state, id or type");
     return;
   }
 
@@ -163,9 +162,7 @@ export const AttachmentTable = (
       (item) => item.attachment.fileId !== file.fileId
     );
     props.updateElement({ answer: newAnswerValue });
-    removeFile(file, year, state, () => {
-      return;
-    });
+    removeFile(file, reportType, id, state);
   };
 
   const onModalSubmit = () => {
@@ -268,7 +265,7 @@ export const AttachmentTable = (
           <Thead>
             <Tr>
               {header.map((item) => (
-                <Th>{item}</Th>
+                <Th key={item}>{item}</Th>
               ))}
             </Tr>
           </Thead>
@@ -278,7 +275,9 @@ export const AttachmentTable = (
                 <Td>
                   <Button
                     variant="link"
-                    onClick={() => downloadFile(year, state, row.attachment)}
+                    onClick={() =>
+                      downloadFile(reportType, state, id, row.attachment)
+                    }
                     fontWeight="bold"
                   >
                     {row.attachment.name}
@@ -341,9 +340,9 @@ export const AttachmentTable = (
           onClose: onClose,
         }}
         state={state}
-        year={year}
         answer={uploadedFiles}
         id={id}
+        reportType={reportType}
         hint="[hint text]"
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">

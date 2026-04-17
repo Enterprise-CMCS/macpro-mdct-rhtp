@@ -86,40 +86,43 @@ const TableCheckpointComponent = (
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 const consoleMock = vi.spyOn(console, "error");
 
-describe("<TableCheckpoint />", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockedUseStore.mockReturnValue({
-      report: {
-        year: "2026",
-        pages: [
+const mockReport = {
+  report: {
+    id: "mock-report-id",
+    type: "RHTP",
+    pages: [
+      {
+        id: "mock-init-1",
+        initiativeNumber: "123",
+        title: "Init Title",
+      },
+      {
+        id: "initiative-attachments",
+        elements: [
           {
-            id: "mock-init-1",
-            initiativeNumber: "123",
-            title: "Init Title",
-          },
-          {
-            id: "initiative-attachments",
-            elements: [
+            id: "initiative-attachments-table",
+            type: ElementType.AttachmentTable,
+            answer: [
               {
-                id: "initiative-attachments-table",
-                type: ElementType.AttachmentTable,
-                answer: [
-                  {
-                    initiatives: ["mock-init-1"],
-                    checkpoints: "project-prop-2",
-                    comments: [],
-                    attachment: mockFiles,
-                    stage: "checkpoint-1",
-                    status: "Under Review",
-                  },
-                ],
+                initiatives: ["mock-init-1"],
+                checkpoints: "project-prop-2",
+                comments: [],
+                attachment: mockFiles,
+                stage: "checkpoint-1",
+                status: "Under Review",
               },
             ],
           },
         ],
       },
-    });
+    ],
+  },
+};
+
+describe("<TableCheckpoint />", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedUseStore.mockReturnValue(mockReport);
   });
   test("TableCheckpoint renders a table", () => {
     render(TableCheckpointComponent);
@@ -178,6 +181,9 @@ describe("<TableCheckpoint />", () => {
 
 describe("TableCheckpoint upload modal", () => {
   beforeEach(async () => {
+    vi.clearAllMocks();
+    mockedUseStore.mockReturnValue(mockReport);
+
     render(TableCheckpointComponent);
     const uploadBtn = screen.getAllByRole("button", {
       name: "Upload attachments",

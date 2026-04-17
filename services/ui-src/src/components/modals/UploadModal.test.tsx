@@ -2,15 +2,12 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
 import { Dropdown } from "@cmsgov/design-system";
+import { ReportType } from "types";
 
 const mockCloseHandler = vi.fn();
 const mockChangedExpanded = vi.fn();
 const mockSaveToReport = vi.fn();
-
-vi.mock("utils/other/upload", async (importOriginal) => ({
-  ...(await importOriginal()),
-  retrieveUploadedFiles: vi.fn().mockReturnValue(Promise.resolve([])),
-}));
+const mockDeleteFromReport = vi.fn();
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -34,7 +31,7 @@ const modalComponent = (
       onClose: mockCloseHandler,
     }}
     id={"mock-id"}
-    year={"2026"}
+    reportType={ReportType.RHTP}
     state={"PA"}
     answer={[]}
     selections={
@@ -52,6 +49,7 @@ const modalComponent = (
       </>
     }
     saveToReport={mockSaveToReport}
+    deleteFromReport={mockDeleteFromReport}
     modalHeading={"Upload Attachments"}
   />
 );
