@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useParams, useSearchParams } from "react-router";
 import { StateNames } from "../../../constants";
-import {
-  getReportName,
-  isReportType,
-  isStateAbbr,
-  LiteReport,
-  ReportStatus,
-} from "types";
+import { getReportName, isReportType, isStateAbbr, LiteReport } from "types";
 import {
   PageTemplate,
   DashboardTable,
@@ -53,9 +47,7 @@ export const DashboardPage = () => {
     { label: "All", value: "All" },
     { label: "2026", value: "2026" },
   ];
-  const hasSubmittedReport = reports.some(
-    (report) => report.status === ReportStatus.SUBMITTED
-  );
+  const hasOneReport = reports.length > 0;
 
   useEffect(() => {
     if (!isReportType(reportType) || !isStateAbbr(state)) {
@@ -243,7 +235,7 @@ export const DashboardPage = () => {
         {userIsEndUser && (
           <Flex justifyContent="center">
             <Button onClick={() => openAddEditReportModal()} type="submit">
-              {hasSubmittedReport
+              {hasOneReport
                 ? `Copy ${reportName} Submission`
                 : `Start ${reportName} Report`}
             </Button>

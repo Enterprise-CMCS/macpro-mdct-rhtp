@@ -9,12 +9,6 @@ import {
   Text,
   Link,
   Image,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  ModalBody,
-  ModalFooter,
   Flex,
 } from "@chakra-ui/react";
 import { UseOfFundsTableTemplate, UseOfFundsTableItem } from "types";
@@ -22,7 +16,6 @@ import { PageElementProps } from "./Elements";
 import { Fragment, useState, ChangeEvent, useEffect } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
-import closeIcon from "assets/icons/close/icon_close_primary.svg";
 import {
   TextField,
   Dropdown,
@@ -31,6 +24,7 @@ import {
 import { ErrorMessages } from "../../constants";
 import { isValidCurrency } from "utils/validation/inputValidation";
 import { useStore } from "utils";
+import { Modal } from "components/modals/Modal";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
@@ -219,106 +213,97 @@ export const UseOfFundsTableElement = (
         <Image src={addIcon} alt={"Add Item"} sx={sx.addIcon} />
         Add use of funds
       </Button>
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            <Th>Budget Period</Th>
-            <Th>Spent Funds ($)</Th>
-            <Th>Description</Th>
-            <Th>Init #</Th>
-            <Th>Use of Funds</Th>
-            <Th>Recipient name and category</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>{rows}</Tbody>
-      </Table>
+      {rows.length > 0 && (
+        <Table variant="metric">
+          <Thead>
+            <Tr>
+              <Th>Budget Period</Th>
+              <Th>Spent Funds ($)</Th>
+              <Th>Description</Th>
+              <Th>Init #</Th>
+              <Th>Use of Funds</Th>
+              <Th>Recipient name and category</Th>
+              <Th>Actions</Th>
+            </Tr>
+          </Thead>
+          <Tbody>{rows}</Tbody>
+        </Table>
+      )}
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{modalMode} Use of Funds</ModalHeader>
-          <Button
-            className="close"
-            leftIcon={<Image src={closeIcon} alt="Close" />}
-            variant="link"
-            onClick={() => setModalOpen(false)}
-          >
-            Close
-          </Button>
-          <ModalBody>
-            <Flex direction="column" gap="2rem">
-              <Text>hint text</Text>
-              <Dropdown
-                label="Budget Period"
-                name="budgetPeriod"
-                onChange={handleChange}
-                errorMessage={errorMessages.budgetPeriod}
-                options={budgetPeriodOptions}
-                value={formValues.budgetPeriod}
-              />
-              <TextField
-                label="Spent Funds"
-                name="spentFunds"
-                onBlur={handleChange}
-                onChange={handleChange}
-                errorMessage={errorMessages.spentFunds}
-                value={formValues.spentFunds}
-                mask="currency"
-                numeric={true}
-              />
-              <TextField
-                label="Description"
-                name="description"
-                onBlur={handleChange}
-                onChange={handleChange}
-                errorMessage={errorMessages.description}
-                value={formValues.description}
-                multiline={true}
-              />
-              <Dropdown
-                label="Initiative"
-                name="initiative"
-                onChange={handleChange}
-                errorMessage={errorMessages.initiative}
-                options={initiativeOptions}
-                value={formValues.initiative}
-              />
-              <Dropdown
-                label="Use of Funds"
-                name="useOfFunds"
-                onChange={handleChange}
-                errorMessage={errorMessages.useOfFunds}
-                options={useOfFundsOptions}
-                value={formValues.useOfFunds}
-              />
-              <TextField
-                label="Recipient Name"
-                name="recipientName"
-                onBlur={handleChange}
-                onChange={handleChange}
-                errorMessage={errorMessages.recipientName}
-                value={formValues.recipientName}
-              />
-              <Dropdown
-                label="Recipient Category"
-                name="recipientCategory"
-                onChange={handleChange}
-                errorMessage={errorMessages.recipientCategory}
-                options={recipientCategoryOptions}
-                value={formValues.recipientCategory}
-              />
-            </Flex>
-          </ModalBody>
-          <ModalFooter gap="4">
-            <Button colorScheme="blue" mr={3} onClick={() => onSubmit()}>
-              Save
-            </Button>
-            <Button variant="link" onClick={() => setModalOpen(false)}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
+      <Modal
+        modalDisclosure={{
+          isOpen: modalOpen,
+          onClose: () => setModalOpen(false),
+        }}
+        content={{
+          heading: `${modalMode} Use of Funds`,
+          subheading: "hint text",
+          actionButtonText: "Save",
+          closeButtonText: "Cancel",
+        }}
+        onConfirmHandler={onSubmit}
+      >
+        <Flex direction="column" gap="2rem" marginTop="1.5rem">
+          <Dropdown
+            label="Budget Period"
+            name="budgetPeriod"
+            onChange={handleChange}
+            errorMessage={errorMessages.budgetPeriod}
+            options={budgetPeriodOptions}
+            value={formValues.budgetPeriod}
+          />
+          <TextField
+            label="Spent Funds"
+            name="spentFunds"
+            onBlur={handleChange}
+            onChange={handleChange}
+            errorMessage={errorMessages.spentFunds}
+            value={formValues.spentFunds}
+            mask="currency"
+            numeric={true}
+          />
+          <TextField
+            label="Description"
+            name="description"
+            onBlur={handleChange}
+            onChange={handleChange}
+            errorMessage={errorMessages.description}
+            value={formValues.description}
+            multiline={true}
+          />
+          <Dropdown
+            label="Initiative"
+            name="initiative"
+            onChange={handleChange}
+            errorMessage={errorMessages.initiative}
+            options={initiativeOptions}
+            value={formValues.initiative}
+          />
+          <Dropdown
+            label="Use of Funds"
+            name="useOfFunds"
+            onChange={handleChange}
+            errorMessage={errorMessages.useOfFunds}
+            options={useOfFundsOptions}
+            value={formValues.useOfFunds}
+          />
+          <TextField
+            label="Recipient Name"
+            name="recipientName"
+            onBlur={handleChange}
+            onChange={handleChange}
+            errorMessage={errorMessages.recipientName}
+            value={formValues.recipientName}
+          />
+          <Dropdown
+            label="Recipient Category"
+            name="recipientCategory"
+            onChange={handleChange}
+            errorMessage={errorMessages.recipientCategory}
+            options={recipientCategoryOptions}
+            value={formValues.recipientCategory}
+          />
+        </Flex>
       </Modal>
     </Fragment>
   );

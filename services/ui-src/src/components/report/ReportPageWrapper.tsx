@@ -8,6 +8,7 @@ import {
   VStack,
   Image,
   Spinner,
+  Divider,
 } from "@chakra-ui/react";
 import { getReport, useStore } from "utils";
 import { ReportModal, Sidebar, Page, PraDisclosure } from "components";
@@ -119,6 +120,7 @@ export const ReportPageWrapper = () => {
           </Box>
           {!currentPage.hideNavButtons && parentPage && (
             <>
+              <Divider></Divider>
               <Flex width="100%" marginTop="spacer3">
                 {parentPage.index > 0 && (
                   <Button

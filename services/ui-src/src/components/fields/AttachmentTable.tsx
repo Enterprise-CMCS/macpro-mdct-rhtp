@@ -33,6 +33,7 @@ import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
 import { dropdownEmptyOption } from "../../constants";
+import addPrimary from "assets/icons/add/icon_add_blue.svg";
 
 const header = [
   "Attachment name",
@@ -254,7 +255,8 @@ export const AttachmentTable = (
         aria-label="Add Attachment"
         variant="outline"
         alignSelf="flex-start"
-        onClick={() => onAddClick()}
+        leftIcon={<Image src={addPrimary} alt="Add icon" />}
+        onClick={onAddClick}
       >
         Add Attachment
       </Button>
