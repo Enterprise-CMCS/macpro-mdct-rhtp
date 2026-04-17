@@ -7940,7 +7940,7 @@ __metadata:
     "@types/papaparse": "npm:^5"
     "@vitest/coverage-v8": "npm:4.0.18"
     aws-sdk-client-mock: "npm:~4.1.0"
-    dompurify: "npm:^3.3.2"
+    dompurify: "npm:^3.4.0"
     jsdom: "npm:^26.0.0"
     jwt-decode: "npm:3.1.2"
     kafkajs: "npm:^2.2.4"
@@ -8829,15 +8829,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.3.2":
-  version: 3.3.2
-  resolution: "dompurify@npm:3.3.2"
+"dompurify@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "dompurify@npm:3.4.0"
   dependencies:
     "@types/trusted-types": "npm:^2.0.7"
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 10c0/8989525f003dd062e829137982b5412143421342991b2732bd621a1efd98b2c3cdc4f37547601d0727d3bc20f1d0eb2a0ecca287d3688f168cdb54ced867ca8f
+  checksum: 10c0/5593ac44ee20b9aa521c2120884effc98927fb9128c548183c75e79e0a04357c62ee913a049a267c8f396cb8c9d520ecf72562826c5524c46d4fe03c12063638
   languageName: node
   linkType: hard
 
@@ -12568,7 +12568,7 @@ __metadata:
     core-js: "npm:^3.41.0"
     date-fns: "npm:^4.1.0"
     date-fns-tz: "npm:^3.2.0"
-    dompurify: "npm:^3.3.2"
+    dompurify: "npm:^3.4.0"
     file-saver: "npm:2.0.5"
     framer-motion: "npm:^11"
     html-react-parser: "npm:^3.0.16"
