@@ -6,9 +6,13 @@ interface PathURL {
   fileId: string;
 }
 
+interface ZipData {
+  name: string;
+  bytes: string;
+}
+
 export interface UploadData {
   uploadedState: string;
-  awsFilename: string;
   filename: string;
   uploadedDate: string;
   uploadedUsername: string;
@@ -17,17 +21,16 @@ export interface UploadData {
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
-  year: string,
+  id: string,
+  reportType: string,
   stateCode: string,
-  uploadedFile: File,
-  uploadId: string
+  uploadedFile: File
 ) => {
   const requestHeaders = await getRequestHeaders();
   const body = {
     uploadedFileName: uploadedFile.name,
     uploadedFileType: uploadedFile.type,
     uploadedFileSize: uploadedFile.size,
-    uploadId,
   };
 
   const options = {
@@ -36,11 +39,27 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   };
 
   const { psurl, fileId } = await apiLib.post<PathURL>(
-    `/uploads/${year}/${stateCode}`,
+    `/reports/${reportType}/${stateCode}/${id}/files`,
     options
   );
 
   return { presignedUploadUrl: psurl, fileId };
+};
+
+export const getFileBytes = async (
+  reportType: string,
+  stateCode: string,
+  id: string
+) => {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+  const response = await apiLib.get<ZipData[]>(
+    `/reports/${reportType}/${stateCode}/${id}/files/`,
+    options
+  );
+  return response ?? [];
 };
 
 export const uploadFileToS3 = async (
@@ -54,8 +73,9 @@ export const uploadFileToS3 = async (
 };
 
 export const getFileDownloadUrl = async (
-  year: string,
+  reportType: string,
   stateCode: string,
+  id: string,
   fileId: string
 ) => {
   const requestHeaders = await getRequestHeaders();
@@ -64,37 +84,24 @@ export const getFileDownloadUrl = async (
   };
 
   const response = await apiLib.get<PathURL>(
-    `/uploads/${year}/${stateCode}/${fileId}`,
+    `/reports/${reportType}/${stateCode}/${id}/files/${fileId}`,
     options
   );
   return response.psurl;
 };
 
-export const getUploadedFiles = async (
-  year: string,
-  stateCode: string,
-  uploadId: string
-) => {
-  const requestHeaders = await getRequestHeaders();
-  const options = {
-    headers: { ...requestHeaders },
-  };
-
-  const response = await apiLib.get<UploadData[]>(
-    `/uploads/${year}/${stateCode}/view/${uploadId}`,
-    options
-  );
-  return response ?? [];
-};
-
 export const deleteUploadedFile = async (
-  year: string,
+  reportType: string,
   stateCode: string,
+  id: string,
   fileId: string
 ) => {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
   };
-  await apiLib.del(`/uploads/${year}/${stateCode}/${fileId}`, options);
+  await apiLib.del(
+    `/reports/${reportType}/${stateCode}/${id}/files/${fileId}`,
+    options
+  );
 };

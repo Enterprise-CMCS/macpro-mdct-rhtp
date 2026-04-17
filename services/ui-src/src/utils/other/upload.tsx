@@ -11,12 +11,11 @@ import {
 import {
   deleteUploadedFile,
   getFileDownloadUrl,
-  getUploadedFiles,
 } from "../api/requestMethods/upload";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
-import { UploadListProp } from "types";
+import { ReportType, UploadListProp } from "types";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -29,44 +28,31 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
-export const retrieveUploadedFiles = async (
-  year: string,
-  state: string,
-  uploadId: string
-) => {
-  const uploadedFiles = await getUploadedFiles(year, state, uploadId);
-  return uploadedFiles.map((file) => ({
-    name: file.filename,
-    size: file.filesize,
-    fileId: file.fileId,
-  }));
-};
-
 export const downloadFile = async (
-  year: string,
+  reportType: ReportType,
   state: string,
+  id: string,
   file: UploadListProp
 ) => {
-  const fileLink = await getFileDownloadUrl(year, state, file.fileId);
+  const fileLink = await getFileDownloadUrl(reportType, state, id, file.fileId);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
   window.open(sanitizeLink);
 };
 
 export const removeFile = async (
   file: File | UploadListProp,
-  year: string,
-  state: string,
-  onRemove: Function
+  reportType: ReportType,
+  id: string,
+  state: string
 ) => {
   if (!("fileId" in file)) return;
-  await deleteUploadedFile(year, state, file.fileId).then(() => {
-    onRemove();
-  });
+  return deleteUploadedFile(reportType, state, id, file.fileId);
 };
 
 export const uploadListRender = (
+  id: string,
+  reportType: ReportType,
   files: File[] | UploadListProp[],
-  year: string,
   state: string,
   onRemove: Function,
   onClick?: Function
@@ -83,7 +69,7 @@ export const uploadListRender = (
                 ) : (
                   <Button
                     variant="link"
-                    onClick={() => onClick(year, state, file)}
+                    onClick={() => onClick(reportType, state, id, file)}
                   >
                     {file.name}
                   </Button>

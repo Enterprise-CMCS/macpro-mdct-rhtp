@@ -21,6 +21,7 @@ import { reportBasePath } from "utils/other/routing";
 import { SubmitReportModal } from "./SubmitReportModal";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { useFlags } from "launchdarkly-react-client-sdk";
+import { createZipFile } from "utils/other/zip";
 
 export const StatusTableElement = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =
@@ -102,6 +103,13 @@ export const StatusTableElement = () => {
         justifyContent="space-between"
         mt={5}
       >
+        <Button
+          colorScheme="blue"
+          variant="outline"
+          onClick={() => createZipFile(report)}
+        >
+          ZIP Files
+        </Button>
         {isPdfActive && (
           <Button
             as={RouterLink}
