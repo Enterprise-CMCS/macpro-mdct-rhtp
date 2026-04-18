@@ -4,6 +4,7 @@ import { ElementType, UseOfFundsTableTemplate } from "types";
 import { testA11y } from "utils/testing/commonTests";
 import { useState } from "react";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
+import { dropdownEmptyOption } from "@rhtp/shared";
 
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -24,17 +25,17 @@ const mockedElement: UseOfFundsTableTemplate = {
   type: ElementType.UseOfFundsTable,
   dropDownOptions: {
     budgetPeriodOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Budget Period 1", value: "budget-period-1" },
       { label: "Budget Period 2", value: "budget-period-2" },
     ],
     useOfFundsOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Use of Funds 1", value: "use-of-funds-1" },
       { label: "Use of Funds 2", value: "use-of-funds-2" },
     ],
     recipientCategoryOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Recipient Category 1", value: "recipient-category-1" },
       { label: "Recipient Category 2", value: "recipient-category-2" },
     ],

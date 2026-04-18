@@ -31,6 +31,7 @@ import {
 import { ErrorMessages } from "../../constants";
 import { isValidCurrency } from "utils/validation/inputValidation";
 import { useStore } from "utils";
+import { dropdownEmptyOption } from "@rhtp/shared";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
@@ -45,7 +46,7 @@ export const UseOfFundsTableElement = (
     (page) => "initiativeNumber" in page
   );
   const initiativeOptions = [
-    { label: "- Select an option -", value: "" },
+    dropdownEmptyOption,
     ...(initiatives ?? []).map((initiative) => ({
       label: `${initiative.initiativeNumber}: ${initiative.title}`,
       value: initiative.initiativeNumber,

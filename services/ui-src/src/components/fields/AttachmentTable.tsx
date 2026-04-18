@@ -33,7 +33,7 @@ import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
-import { dropdownEmptyOption } from "../../constants";
+import { dropdownEmptyOption } from "@rhtp/shared";
 
 const header = [
   "Attachment name",
