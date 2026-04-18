@@ -1,4 +1,4 @@
-import { ReportType, RhtpSubType } from "../types/reports";
+import { ReportType, RhtpSubType } from "@rhtp/shared";
 export * from "@rhtp/shared";
 
 // TODO: These are the generic quarter start dates. Update when actual dates get decided on

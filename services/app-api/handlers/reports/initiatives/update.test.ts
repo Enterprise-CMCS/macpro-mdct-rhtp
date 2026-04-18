@@ -9,7 +9,7 @@ import {
   PageStatus,
   PageType,
   ReportStatus,
-} from "../../../types/reports";
+} from "@rhtp/shared";
 import { APIGatewayProxyEvent, User, UserRoles } from "../../../types/types";
 import { getReport, putReport } from "../../../storage/reports";
 

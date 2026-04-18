@@ -1,6 +1,6 @@
 import { getFileBytes } from "utils/api/requestMethods/upload";
 import JSZip from "jszip";
-import { Report, RhtpSubType } from "types";
+import { Report, RhtpSubType } from "@rhtp/shared";
 import { saveAs } from "file-saver";
 
 export const createZipFile = async (report: Report) => {

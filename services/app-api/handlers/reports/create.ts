@@ -5,7 +5,7 @@ import { canWriteState } from "../../utils/authorization";
 import { error, reportStartDates } from "../../utils/constants";
 import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
-import { RhtpSubType, ReportStatus } from "../../types/reports";
+import { RhtpSubType, ReportStatus } from "@rhtp/shared";
 import { getNextReportOptions } from "../../utils/reports/reportOptions";
 import { isCreateReportOptions } from "../../utils/reportValidation";
 

@@ -4,7 +4,7 @@ import { putReport, queryReportsForState } from "../../storage/reports";
 import { UserRoles } from "../../types/types";
 import { canWriteState } from "../../utils/authorization";
 import { createReport } from "./create";
-import { ReportStatus, RhtpSubType } from "../../types/reports";
+import { ReportStatus, RhtpSubType } from "@rhtp/shared";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({

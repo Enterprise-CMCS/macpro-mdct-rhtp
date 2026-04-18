@@ -4,7 +4,7 @@ import { APIGatewayProxyEvent, User, UserRoles } from "../../types/types";
 import { canReleaseReport } from "../../utils/authorization";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { ReportStatus } from "../../types/reports";
+import { ReportStatus } from "@rhtp/shared";
 import { authenticatedUser } from "../../utils/authentication";
 
 vi.mock("../../utils/authentication");

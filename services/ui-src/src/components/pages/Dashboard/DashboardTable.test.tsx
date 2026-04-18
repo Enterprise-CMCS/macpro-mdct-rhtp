@@ -2,7 +2,7 @@ import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DashboardTable } from "components";
-import { ReportStatus, Report } from "types";
+import { ReportStatus, Report } from "@rhtp/shared";
 import { useStore } from "utils";
 import {
   mockUseAdminStore,

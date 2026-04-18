@@ -15,7 +15,7 @@ import {
   isReportType,
   LiteReport,
   ReportStatus,
-} from "types";
+} from "@rhtp/shared";
 
 const verbiage = {
   addReportHeader: "Add new RHTP submission",

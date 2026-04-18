@@ -1,4 +1,4 @@
-import { LiteReport, ReportOptions, RhtpSubType } from "../../types/reports";
+import { LiteReport, ReportOptions, RhtpSubType } from "@rhtp/shared";
 
 export const getNextReportOptions = (report: LiteReport): ReportOptions => {
   let nextSubType: RhtpSubType | undefined = report.subType;
