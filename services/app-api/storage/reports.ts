@@ -10,8 +10,7 @@ import {
   createClient as createDynamoClient,
 } from "./dynamo/dynamodb-lib";
 import { reportTables } from "../utils/constants";
-import { StateAbbr } from "@rhtp/shared";
-import { Report, ReportType, LiteReport } from "../types/reports";
+import { StateAbbr, Report, ReportType, LiteReport } from "@rhtp/shared";
 
 const dynamoClient = createDynamoClient();
 

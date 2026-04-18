@@ -1,7 +1,13 @@
 import { MockedFunction } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ElementType, PageType, Report, ReportStatus, ReportType } from "types";
+import {
+  ElementType,
+  PageType,
+  Report,
+  ReportStatus,
+  ReportType,
+} from "@rhtp/shared";
 import { ReportPageWrapper } from "./ReportPageWrapper";
 import { useStore } from "utils";
 

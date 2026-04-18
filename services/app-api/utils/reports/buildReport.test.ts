@@ -7,9 +7,9 @@ import {
   ReportOptions,
   ReportType,
   RhtpSubType,
-} from "../../types/reports";
+  StateAbbr,
+} from "@rhtp/shared";
 import { User } from "../../types/types";
-import { StateAbbr } from "@rhtp/shared";
 import { validateReportPayload } from "../../utils/reportValidation";
 import { buildReport, makeQuarterlyChanges } from "./buildReport";
 

@@ -18,7 +18,7 @@ import {
   CreateReportOptions,
   CreateInitiativeOptions,
   UpdateInitiativeOptions,
-} from "../types/reports";
+} from "@rhtp/shared";
 import { error } from "./constants";
 
 const hideConditionSchema = object()

@@ -1,5 +1,5 @@
 import { getReport, putReport, queryReportsForState } from "./reports";
-import { Report, ReportType } from "../types/reports";
+import { Report, ReportType } from "@rhtp/shared";
 import {
   DynamoDBDocumentClient,
   GetCommand,

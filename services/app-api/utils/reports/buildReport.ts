@@ -9,11 +9,11 @@ import {
   FormPageTemplate,
   ReviewSubmitTemplate,
   RhtpSubType,
-} from "../../types/reports";
+  StateAbbr,
+} from "@rhtp/shared";
 import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
-import { StateAbbr } from "@rhtp/shared";
 import { copyReport } from "./copyReport";
 
 export const makeQuarterlyChanges = (

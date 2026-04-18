@@ -7,7 +7,7 @@ import {
   submitReport,
 } from "./report";
 // types
-import { FormPageTemplate, Report, ReportType } from "types";
+import { FormPageTemplate, Report, ReportType } from "@rhtp/shared";
 
 const report = {
   type: ReportType.RHTP,

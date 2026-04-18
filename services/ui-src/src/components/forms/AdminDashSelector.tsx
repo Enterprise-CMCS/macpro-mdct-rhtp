@@ -6,8 +6,8 @@ import {
   ChoiceList,
   DropdownChangeObject,
 } from "@cmsgov/design-system";
-import { DropdownOptions, ReportType, getReportName } from "types";
-import { StateNames } from "@rhtp/shared";
+import { DropdownOptions, getReportName } from "types";
+import { StateNames, ReportType } from "@rhtp/shared";
 
 const reportChoices = Object.values(ReportType).map((type) => {
   return {

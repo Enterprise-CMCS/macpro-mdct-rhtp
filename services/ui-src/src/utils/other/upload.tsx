@@ -15,7 +15,7 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
-import { ReportType, UploadListProp } from "types";
+import { ReportType, UploadListProp } from "@rhtp/shared";
 
 export const acceptedFileTypes = [
   ".ppt",
