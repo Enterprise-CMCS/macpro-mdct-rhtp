@@ -8,7 +8,7 @@ import {
   Link,
   Text,
 } from "@chakra-ui/react";
-import { AlertTypes } from "types";
+import { AlertTypes } from "@rhtp/shared";
 import { ReactNode, useRef } from "react";
 import infoIcon from "assets/icons/alert/icon_info.svg";
 import errorIcon from "assets/icons/alert/icon_error.svg";
