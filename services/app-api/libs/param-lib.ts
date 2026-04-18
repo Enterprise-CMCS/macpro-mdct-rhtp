@@ -1,6 +1,6 @@
 import { isReportType } from "../types/reports";
 import { APIGatewayProxyEvent } from "../types/types";
-import { isStateAbbreviation } from "../utils/constants";
+import { isStateAbbr } from "@rhtp/shared";
 import { logger } from "./debug-lib";
 
 export const parseReportTypeAndState = (event: APIGatewayProxyEvent) => {
@@ -10,7 +10,7 @@ export const parseReportTypeAndState = (event: APIGatewayProxyEvent) => {
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -25,7 +25,7 @@ export const parseReportParameters = (event: APIGatewayProxyEvent) => {
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -46,7 +46,7 @@ export const parseInitiativeUpdateParameters = (
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -78,7 +78,7 @@ export const parseUploadParameters = (event: APIGatewayProxyEvent) => {
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -92,7 +92,7 @@ export const parseUploadParameters = (event: APIGatewayProxyEvent) => {
 
 export const parseCreateUploadParameters = (event: APIGatewayProxyEvent) => {
   const { state, reportType, id } = event.pathParameters ?? {};
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -112,7 +112,7 @@ export const parseUploadFiles = (event: APIGatewayProxyEvent) => {
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }

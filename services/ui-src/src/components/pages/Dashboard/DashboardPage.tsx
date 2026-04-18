@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useParams, useSearchParams } from "react-router";
-import { StateNames } from "../../../constants";
+import { StateNames } from "@rhtp/shared";
 import {
   getReportName,
   isReportType,

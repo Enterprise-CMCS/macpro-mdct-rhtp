@@ -13,7 +13,7 @@ import {
 import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
-import { StateAbbr } from "../constants";
+import { StateAbbr } from "@rhtp/shared";
 import { copyReport } from "./copyReport";
 
 export const makeQuarterlyChanges = (

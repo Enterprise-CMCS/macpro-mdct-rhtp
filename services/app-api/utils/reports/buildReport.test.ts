@@ -9,7 +9,7 @@ import {
   RhtpSubType,
 } from "../../types/reports";
 import { User } from "../../types/types";
-import { StateAbbr } from "../../utils/constants";
+import { StateAbbr } from "@rhtp/shared";
 import { validateReportPayload } from "../../utils/reportValidation";
 import { buildReport, makeQuarterlyChanges } from "./buildReport";
 

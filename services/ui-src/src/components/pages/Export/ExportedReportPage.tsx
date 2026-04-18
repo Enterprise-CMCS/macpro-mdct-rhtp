@@ -23,7 +23,7 @@ import {
   ReviewSubmitTemplate,
 } from "types";
 import { ExportedReportBanner, ExportedReportWrapper } from "components";
-import { StateNames } from "../../../constants";
+import { StateNames } from "@rhtp/shared";
 import { shouldRender } from "./ExportedReportPageHelpers";
 
 export const ExportedReportPage = () => {

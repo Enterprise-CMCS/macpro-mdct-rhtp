@@ -1,5 +1,5 @@
 import { HttpResponse } from "../libs/response-lib";
-import { StateAbbr } from "../utils/constants";
+import { StateAbbr } from "@rhtp/shared";
 
 export enum UserRoles {
   ADMIN = "mdctrhtp-bor", // "MDCT RHTP Business Owner Representative"

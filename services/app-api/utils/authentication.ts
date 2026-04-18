@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, isUserRole, User } from "../types/types";
 import jwtDecode from "jwt-decode";
-import { isStateAbbreviation } from "./constants";
+import { isStateAbbr } from "@rhtp/shared";
 import { logger } from "../libs/debug-lib";
 
 export interface DecodedToken {
@@ -61,7 +61,7 @@ const parseStateFromToken = (token: DecodedToken) => {
     return undefined;
   }
   const state = token["custom:cms_state"] as string;
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     throw new Error(`Invalid state abbreviation: ${state}`);
   }
   return state;
