@@ -9,7 +9,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
 import { useParams } from "react-router";
-import { ElementType, TableCheckpointTemplate } from "types";
+import { AttachmentStatus, ElementType, TableCheckpointTemplate } from "types";
 import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
@@ -167,6 +167,17 @@ describe("<TableCheckpoint />", () => {
     expect(commentButton).toBeVisible();
     await userEvent.click(commentButton);
     expect(mockCommentModal).toHaveBeenCalled();
+  });
+  test("delete disabled when file status locked", async () => {
+    const lockedFileReport = structuredClone(mockReport);
+    lockedFileReport.report.pages[1].elements![0].answer[0].status =
+      AttachmentStatus.LOCKED_FOR_SCORING;
+    mockedUseStore.mockReturnValue(lockedFileReport);
+    render(TableCheckpointComponent);
+    const deleteButton = screen.getByRole("button", {
+      name: "Remove orange.png from checkpoint Launch initiative",
+    });
+    expect(deleteButton).toBeDisabled();
   });
   test("delete file", async () => {
     render(TableCheckpointComponent);
