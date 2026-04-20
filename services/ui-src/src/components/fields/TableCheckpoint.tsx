@@ -1,17 +1,4 @@
-import {
-  Stack,
-  Button,
-  Checkbox,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Image,
-  Text,
-  Flex,
-} from "@chakra-ui/react";
+import { Stack, Button, Checkbox, Image, Text, Flex } from "@chakra-ui/react";
 import {
   AttachmentStatus,
   DropdownOptions,
@@ -35,6 +22,7 @@ import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
 import { CommentModal } from "components/modals/CommentModal";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 type TableShape = {
   stage: number;
@@ -108,14 +96,6 @@ const getFilesFromTable = (tables: TableShape[], checkpoints: string) => {
     .filter((row) => row.id === checkpoints && row.file.fileId)
     .map((filter) => filter.file);
 };
-
-const header = [
-  "#",
-  "Checkpoint",
-  "Check if Complete",
-  "Attachments",
-  "Actions",
-];
 
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
@@ -258,6 +238,83 @@ export const TableCheckpoint = (
     writeToAttachmentsTable(generateAnswer);
   };
 
+  const header = [
+    "#",
+    "Checkpoint",
+    "Check if Complete",
+    "Attachments",
+    "Actions",
+  ];
+
+  const buildRows = (
+    rows: {
+      id: string;
+      stageNo: string;
+      label: string;
+      file: {
+        name: string;
+        fileId: string;
+        size: number;
+      };
+    }[]
+  ) => {
+    return rows.map((row) => {
+      const columnCompleted =
+        row.label != "" ? (
+          <Checkbox
+            aria-label={`Check if ${row.label} is complete`}
+            isChecked={
+              initialDisplayValue.find((value) => value.id === row.id)?.checked
+            }
+            onChange={() => onCheckboxHandler(row.id)}
+          ></Checkbox>
+        ) : (
+          <></>
+        );
+
+      const columnFile =
+        "file" in row ? (
+          <Button
+            aria-label={`Download ${row.file.name}`}
+            variant="link"
+            onClick={() => downloadFile(reportType, state, id, row.file)}
+          >
+            {row.file.name}
+          </Button>
+        ) : (
+          "Not applicable"
+        );
+
+      const columnAction = "file" in row && row.file.fileId && (
+        <Flex>
+          <Button
+            variant="link"
+            onClick={() => onCommentClick(row.file)}
+            aria-label={`Comment on ${row.file.name}`}
+          >
+            <Image src={commentIcon} alt="Comment" minWidth="26px" />
+          </Button>
+          <Button
+            variant="unstyled"
+            onClick={() => handleFileAddDelete(row.file.fileId)}
+            aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
+          >
+            <Image src={cancelIcon} alt="Remove" />
+          </Button>
+        </Flex>
+      );
+
+      console.log("columnCompleted", columnCompleted);
+      return [
+        row.stageNo,
+        row.label,
+        columnCompleted,
+        columnFile,
+        columnAction,
+      ];
+    });
+  };
+
   return (
     <Stack gap="1.25rem" width="100%">
       {tables.map((table, tableIndex) => (
@@ -276,7 +333,8 @@ export const TableCheckpoint = (
           >
             Upload attachments
           </Button>
-          <Table variant="metric" key={table.label}>
+          {ResponsiveTable(header, buildRows(table.rows))}
+          {/* <Table variant="metric" key={table.label}>
             <Thead>
               <Tr>
                 {header.map((item) => (
@@ -295,7 +353,7 @@ export const TableCheckpoint = (
                         aria-label={`Check if ${row.label} is complete`}
                         isChecked={
                           initialDisplayValue.find(
-                            (value) => value.id === row.id
+                            (value) => value.id === row.id,
                           )?.checked
                         }
                         onChange={() => onCheckboxHandler(row.id)}
@@ -346,7 +404,7 @@ export const TableCheckpoint = (
                 </Tr>
               ))}
             </Tbody>
-          </Table>
+          </Table> */}
         </Stack>
       ))}
       <UploadModal

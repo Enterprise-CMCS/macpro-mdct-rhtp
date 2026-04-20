@@ -1,14 +1,4 @@
-import {
-  Button,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Image,
-} from "@chakra-ui/react";
+import { Button, Stack, Image, HStack } from "@chakra-ui/react";
 import {
   ChoiceList,
   Dropdown,
@@ -34,15 +24,7 @@ import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
 import { dropdownEmptyOption } from "../../constants";
-
-const header = [
-  "Attachment name",
-  "Initiatives",
-  "Stage",
-  "Checkpoints",
-  "Status",
-  "Actions",
-];
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 type Options = { label: string; value: string; checked?: boolean };
 
@@ -250,6 +232,69 @@ export const AttachmentTable = (
     setUploadedFiles([]);
   };
 
+  const rows = displayValue.map((row) => {
+    const columnAttachmentName = (
+      <Button
+        variant="link"
+        onClick={() => downloadFile(reportType, state, id, row.attachment)}
+        fontWeight="bold"
+      >
+        {row.attachment.name}
+      </Button>
+    );
+    const columnInitiatives =
+      row.initiatives.length === 0
+        ? "N/A"
+        : row.initiatives
+            .map(
+              (id) =>
+                `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
+            )
+            .join(", ");
+    const columnStage =
+      row.stage == ""
+        ? "N/A"
+        : stageOption.find((opt) => opt.value === row.stage)?.label;
+    const colummCheckpoints =
+      row.checkpoints == ""
+        ? "N/A"
+        : checkpointsArr.find((check) => check.id === row.checkpoints)?.label;
+    const columnActions = (
+      <HStack>
+        <Button
+          variant="outline"
+          onClick={() => onEditClick(row)}
+          aria-label={`Edit file or info for ${row.attachment.name}`}
+        >
+          Edit
+        </Button>
+        <Button
+          variant="link"
+          onClick={() => onCommentClick(row)}
+          aria-label={`Comment on ${row.attachment.name}`}
+        >
+          <Image src={commentIcon} alt="Comment" minWidth="26px" />
+        </Button>
+        <Button
+          variant="link"
+          onClick={() => onDeleteClick(row)}
+          aria-label={`Delete ${row.attachment.name}`}
+        >
+          <Image src={cancelIcon} alt="Remove" minWidth="24px" />
+        </Button>
+      </HStack>
+    );
+
+    return [
+      columnAttachmentName,
+      columnInitiatives,
+      columnStage,
+      colummCheckpoints,
+      row.status,
+      columnActions,
+    ];
+  });
+
   return (
     <Stack width="100%" gap="1.5rem">
       <Button
@@ -263,78 +308,17 @@ export const AttachmentTable = (
       {displayValue.length === 0 ? (
         <p>No attachments found. Click 'Add Attachment' to get started</p>
       ) : (
-        <Table variant="initiative" width="800px">
-          <Thead>
-            <Tr>
-              {header.map((item) => (
-                <Th key={item}>{item}</Th>
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {displayValue.map((row) => (
-              <Tr>
-                <Td>
-                  <Button
-                    variant="link"
-                    onClick={() =>
-                      downloadFile(reportType, state, id, row.attachment)
-                    }
-                    fontWeight="bold"
-                  >
-                    {row.attachment.name}
-                  </Button>
-                </Td>
-                <Td>
-                  {row.initiatives.length === 0
-                    ? "N/A"
-                    : row.initiatives
-                        .map(
-                          (id) =>
-                            `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
-                        )
-                        .join(", ")}
-                </Td>
-                <Td>
-                  {row.stage == ""
-                    ? "N/A"
-                    : stageOption.find((opt) => opt.value === row.stage)?.label}
-                </Td>
-                <Td>
-                  {row.checkpoints == ""
-                    ? "N/A"
-                    : checkpointsArr.find(
-                        (check) => check.id === row.checkpoints
-                      )?.label}
-                </Td>
-                <Td>{row.status}</Td>
-                <Td className="actions" display="flex" width="152px">
-                  <Button
-                    variant="outline"
-                    onClick={() => onEditClick(row)}
-                    aria-label={`Edit file or info for ${row.attachment.name}`}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="link"
-                    onClick={() => onCommentClick(row)}
-                    aria-label={`Comment on ${row.attachment.name}`}
-                  >
-                    <Image src={commentIcon} alt="Comment" minWidth="26px" />
-                  </Button>
-                  <Button
-                    variant="link"
-                    onClick={() => onDeleteClick(row)}
-                    aria-label={`Delete ${row.attachment.name}`}
-                  >
-                    <Image src={cancelIcon} alt="Remove" minWidth="24px" />
-                  </Button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
+        ResponsiveTable(
+          [
+            "Attachment name",
+            "Initiatives",
+            "Stage",
+            "Checkpoints",
+            "Status",
+            "Actions",
+          ],
+          rows
+        )
       )}
       <UploadModal
         modalDisclosure={{

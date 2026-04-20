@@ -49,7 +49,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
   }
 
   return (
-    <Box width={"100%"}>
+    <Box>
       <CmsdsTextField
         name={textbox.id}
         label={labelText}
@@ -61,6 +61,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
         multiline
         rows={3}
         disabled={props.disabled}
+        style={{ minHeight: "100px" }}
       />
     </Box>
   );

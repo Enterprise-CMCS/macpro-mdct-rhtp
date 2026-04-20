@@ -137,6 +137,9 @@ const sx = {
       display: "block",
       maxHeight: "100vh",
     },
+    ".init-attach &": {
+      background: "blue",
+    },
   },
   sidebarNav: {
     height: "100%",

@@ -1,20 +1,14 @@
 import {
   Button,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   Text,
   Link,
   Image,
-  Modal,
   ModalContent,
   ModalHeader,
   ModalOverlay,
   ModalBody,
   ModalFooter,
+  Modal,
   Flex,
 } from "@chakra-ui/react";
 import { UseOfFundsTableTemplate, UseOfFundsTableItem } from "types";
@@ -31,6 +25,7 @@ import {
 import { ErrorMessages } from "../../constants";
 import { isValidCurrency } from "utils/validation/inputValidation";
 import { useStore } from "utils";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
@@ -158,54 +153,46 @@ export const UseOfFundsTableElement = (
     setModalOpen(true);
   };
 
-  const rows = items.map((item, index) => {
-    return (
-      <Tr key={index}>
-        <Td>
-          <Text>{item.budgetPeriod}</Text>
-        </Td>
-        <Td>
-          <Text>${item.spentFunds}</Text>
-        </Td>
-        <Td>
-          <Text>{item.description}</Text>
-        </Td>
-        <Td>
-          <Text>{item.initiative}</Text>
-        </Td>
-        <Td>
-          <Text>{item.useOfFunds}</Text>
-        </Td>
-        <Td>
-          <Text>
-            {item.recipientName}; {item.recipientCategory}
-          </Text>
-        </Td>
-        <Td>
-          <Flex direction="row">
-            <Button
-              as={Link}
-              variant={"transparent"}
-              aria-label={`Edit ${item.id}`}
-              onClick={() => {
-                onEditClick(item);
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="plain"
-              aria-label={`Delete ${item.id}`}
-              onClick={() => {
-                handleDeleteClick(item.id);
-              }}
-            >
-              <Image src={cancelIcon} alt={"Delete Item"} />
-            </Button>
-          </Flex>
-        </Td>
-      </Tr>
+  const rows = items.map((item) => {
+    const nameAndCategory = (
+      <Text>
+        {item.recipientName}; {item.recipientCategory}
+      </Text>
     );
+
+    const columnAction = (
+      <Flex direction="row">
+        <Button
+          as={Link}
+          variant={"transparent"}
+          aria-label={`Edit ${item.id}`}
+          onClick={() => {
+            onEditClick(item);
+          }}
+        >
+          Edit
+        </Button>
+        <Button
+          variant="plain"
+          aria-label={`Delete ${item.id}`}
+          onClick={() => {
+            handleDeleteClick(item.id);
+          }}
+        >
+          <Image src={cancelIcon} alt={"Delete Item"} />
+        </Button>
+      </Flex>
+    );
+
+    return [
+      item.budgetPeriod,
+      item.spentFunds,
+      item.description,
+      item.initiative,
+      item.useOfFunds,
+      nameAndCategory,
+      columnAction,
+    ];
   });
 
   return (
@@ -219,20 +206,19 @@ export const UseOfFundsTableElement = (
         <Image src={addIcon} alt={"Add Item"} sx={sx.addIcon} />
         Add use of funds
       </Button>
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            <Th>Budget Period</Th>
-            <Th>Spent Funds ($)</Th>
-            <Th>Description</Th>
-            <Th>Init #</Th>
-            <Th>Use of Funds</Th>
-            <Th>Recipient name and category</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>{rows}</Tbody>
-      </Table>
+      {rows.length > 0 &&
+        ResponsiveTable(
+          [
+            "Budget Period",
+            "Spent Funds ($)",
+            "Description",
+            "Init #",
+            "Use of Funds",
+            "Recipient name and category",
+            "Actions",
+          ],
+          rows
+        )}
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         <ModalOverlay />
