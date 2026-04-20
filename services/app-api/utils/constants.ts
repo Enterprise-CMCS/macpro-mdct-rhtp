@@ -1,12 +1,189 @@
 import { ReportType, RhtpSubType } from "../types/reports";
 
-// TODO: These are the generic quarter start dates. Update when actual dates get decided on
-export const reportStartDates = {
-  [RhtpSubType.ANNUAL]: (year: number) => new Date(year, 0, 1).getTime(),
-  [RhtpSubType.Q1]: (year: number) => new Date(year, 0, 1).getTime(),
-  [RhtpSubType.Q2]: (year: number) => new Date(year, 3, 1).getTime(),
-  [RhtpSubType.Q3]: (year: number) => new Date(year, 6, 1).getTime(),
-  [RhtpSubType.Q4]: (year: number) => new Date(year, 9, 1).getTime(),
+export type RhtpSubTypeData = {
+  [key: string]: {
+    name: string;
+    dateRangeString: string;
+    startDate: number;
+    endDate: number;
+    nextReportSubType: string;
+    type: RhtpSubType;
+    budgetPeriod: number;
+  };
+};
+
+export const RhtpSubTypeMap: RhtpSubTypeData = {
+  A1: {
+    name: "Annual Report 1",
+    dateRangeString: "12/29/2025-7/31/2026",
+    startDate: 1766984400000,
+    endDate: 1785470400000,
+    nextReportSubType: "Q1",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 1,
+  },
+  Q1: {
+    name: "Quarterly Report 1",
+    dateRangeString: "8/1/2026-10/30/2026",
+    startDate: 1785556800000,
+    endDate: 1793332800000,
+    nextReportSubType: "Q2",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 1,
+  },
+  Q2: {
+    name: "Quarterly Report 2",
+    dateRangeString: "10/31/2026-1/30/2027",
+    startDate: 1793419200000,
+    endDate: 1801285200000,
+    nextReportSubType: "Q3",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 2,
+  },
+  Q3: {
+    name: "Quarterly Report 3",
+    dateRangeString: "1/31/2027-4/30/2027",
+    startDate: 1801371600000,
+    endDate: 1809057600000,
+    nextReportSubType: "A2",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 2,
+  },
+  A2: {
+    name: "Annual Report 2",
+    dateRangeString: "8/1/2026-7/31/2027",
+    startDate: 1785556800000,
+    endDate: 1817006400000,
+    nextReportSubType: "Q4",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 2,
+  },
+  Q4: {
+    name: "Quarterly Report 4",
+    dateRangeString: "8/1/2027-10/30/2027",
+    startDate: 1817092800000,
+    endDate: 1824868800000,
+    nextReportSubType: "Q5",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 2,
+  },
+  Q5: {
+    name: "Quarterly Report 5",
+    dateRangeString: "10/31/2027-1/30/2028",
+    startDate: 1824955200000,
+    endDate: 1832821200000,
+    nextReportSubType: "Q6",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 3,
+  },
+  Q6: {
+    name: "Quarterly Report 6",
+    dateRangeString: "1/31/2028-4/30/2028",
+    startDate: 1832907600000,
+    endDate: 1840680000000,
+    nextReportSubType: "A3",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 3,
+  },
+  A3: {
+    name: "Annual Report 3",
+    dateRangeString: "8/1/2027-7/31/2028",
+    startDate: 1817092800000,
+    endDate: 1848628800000,
+    nextReportSubType: "Q7",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 3,
+  },
+  Q7: {
+    name: "Quarterly Report 7",
+    dateRangeString: "8/1/2028-10/30/2028",
+    startDate: 1848715200000,
+    endDate: 1856491200000,
+    nextReportSubType: "Q8",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 3,
+  },
+  Q8: {
+    name: "Quarterly Report 8",
+    dateRangeString: "10/31/2028-1/30/2029",
+    startDate: 1856577600000,
+    endDate: 1864443600000,
+    nextReportSubType: "Q9",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 4,
+  },
+  Q9: {
+    name: "Quarterly Report 9",
+    dateRangeString: "1/31/2029-4/30/2029",
+    startDate: 1864530000000,
+    endDate: 1872216000000,
+    nextReportSubType: "A4",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 4,
+  },
+  A4: {
+    name: "Annual Report 4",
+    dateRangeString: "8/1/2028-7/31/2029",
+    startDate: 1848715200000,
+    endDate: 1880164800000,
+    nextReportSubType: "Q10",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 4,
+  },
+  Q10: {
+    name: "Quarterly Report 10",
+    dateRangeString: "8/1/2029-10/30/2029",
+    startDate: 1880251200000,
+    endDate: 1888027200000,
+    nextReportSubType: "Q11",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 4,
+  },
+  Q11: {
+    name: "Quarterly Report 11",
+    dateRangeString: "10/31/2029-1/30/2030",
+    startDate: 1888113600000,
+    endDate: 1895979600000,
+    nextReportSubType: "Q12",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 5,
+  },
+  Q12: {
+    name: "Quarterly Report 12",
+    dateRangeString: "1/31/2030-4/30/2030",
+    startDate: 1896066000000,
+    endDate: 1903752000000,
+    nextReportSubType: "A5",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 5,
+  },
+  A5: {
+    name: "Annual Report 5",
+    dateRangeString: "8/1/2029-7/31/2030",
+    startDate: 1880251200000,
+    endDate: 1911700800000,
+    nextReportSubType: "Q13",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 5,
+  },
+  Q13: {
+    name: "Quarterly Report 13",
+    dateRangeString: "8/1/2030-10/30/2030",
+    startDate: 1911787200000,
+    endDate: 1919563200000,
+    nextReportSubType: "FINAL",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 5,
+  },
+  FINAL: {
+    name: "Final Report",
+    dateRangeString: "12/29/2025-10/30/2030",
+    startDate: 1766984400000,
+    endDate: 1919563200000,
+    nextReportSubType: "",
+    type: RhtpSubType.FINAL,
+    budgetPeriod: 5,
+  },
 };
 
 export const error = {
@@ -14,7 +191,7 @@ export const error = {
   NO_KEY: "Must provide key for table.",
   MISSING_DATA: "Missing required data.",
   INVALID_DATA: "Provided data is not valid.",
-  SERVER_ERROR: "An unspecified server error occured.",
+  SERVER_ERROR: "An unspecified server error occurred.",
   CREATION_ERROR: "Could not be created due to a database error.",
   END_DATE_BEFORE_START_DATE: "End date can't be before start date",
 };
