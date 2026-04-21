@@ -154,12 +154,6 @@ export const UseOfFundsTableElement = (
   };
 
   const rows = items.map((item) => {
-    const nameAndCategory = (
-      <Text>
-        {item.recipientName}; {item.recipientCategory}
-      </Text>
-    );
-
     const columnAction = (
       <Flex direction="row">
         <Button
@@ -190,7 +184,8 @@ export const UseOfFundsTableElement = (
       item.description,
       item.initiative,
       item.useOfFunds,
-      nameAndCategory,
+      item.recipientName,
+      item.recipientCategory,
       columnAction,
     ];
   });
@@ -214,7 +209,8 @@ export const UseOfFundsTableElement = (
             "Description",
             "Init #",
             "Use of Funds",
-            "Recipient name and category",
+            "Recipient Name",
+            "Recipient Category",
             "Actions",
           ],
           rows

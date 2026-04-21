@@ -380,7 +380,8 @@ const attachmentTableSchema = object().shape({
           object().shape({
             name: string().required(),
             date: string().required(),
-            comment: string().required(),
+            comment: string().notRequired(),
+            statusChange: string().notRequired(),
           })
         ),
       })
