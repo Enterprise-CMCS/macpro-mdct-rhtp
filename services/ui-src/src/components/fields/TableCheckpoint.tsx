@@ -126,7 +126,7 @@ const getFilesFromTable = (tables: TableShape[], checkpoints: string) => {
 const header = [
   "#",
   "Checkpoint",
-  "Check if Complete",
+  "Ready for CMS Review",
   "Attachments",
   "Actions",
 ];

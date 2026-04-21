@@ -8,6 +8,7 @@ import {
   ReportState,
   ReportType,
   ReportStatus,
+  RhtpSubType,
 } from "types";
 import { mockBannerData } from "./mockBanner";
 
@@ -180,6 +181,10 @@ export const mockReportStore: ReportState = {
     year: 2026,
     state: "PA",
     submissionCount: 0,
+    created: 1776449695077,
+    subType: RhtpSubType.ANNUAL,
+    subTypeKey: "A1",
+    budgetPeriod: 1,
     pages: [
       {
         id: "root",

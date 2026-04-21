@@ -21,8 +21,9 @@ For example: `--rhtp--my-branch-name--aws.mdct.rhtp.rhtp-reports.v0`
 - `lastEditedBy` (string): The full name of the modifying user.
 - `lastEditedByEmail` (string): The email of the modifying user.
 - `type` (string): The type of the report ("RHTP")
-- `subType` (number): A number 0-4 corresponding to the report sub type
-  where 0 indicates an Annual report and 1-4 indicate a Quarterly report for quarters 1, 2, 3, and 4.
+- `subType` (string): One of "ANNUAL", "QUARTERLY", or "FINAL".
+- `subTypeKey` (string): Ex: "A1" for "Annual Report 1". A key associated with data for determining report information.
+- `budgetPeriod` (number): Range 1-5 corresponding to RHTP report budget periods.
 - `status` (string): "Not started", "In progress", or "Submitted"
 - `name` (string): The system assigned name for the report, based on state, report type, and reporting period.
   Ex: `PA - Annual Report 1 - 12/29/2025-7/31/2026`

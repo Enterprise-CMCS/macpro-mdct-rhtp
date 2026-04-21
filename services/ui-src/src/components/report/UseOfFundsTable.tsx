@@ -177,9 +177,10 @@ export const UseOfFundsTableElement = (
           <Text>{item.useOfFunds}</Text>
         </Td>
         <Td>
-          <Text>
-            {item.recipientName}; {item.recipientCategory}
-          </Text>
+          <Text>{item.recipientName}</Text>
+        </Td>
+        <Td>
+          <Text>{item.recipientCategory}</Text>
         </Td>
         <Td>
           <Flex direction="row">
@@ -227,7 +228,8 @@ export const UseOfFundsTableElement = (
             <Th>Description</Th>
             <Th>Init #</Th>
             <Th>Use of Funds</Th>
-            <Th>Recipient name and category</Th>
+            <Th>Recipient Name</Th>
+            <Th>Recipient Category</Th>
             <Th>Actions</Th>
           </Tr>
         </Thead>
