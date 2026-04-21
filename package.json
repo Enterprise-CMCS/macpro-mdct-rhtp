@@ -42,7 +42,7 @@
     "@octokit/rest": "^22.0.0",
     "@types/node": "^24.10.10",
     "aws-cdk": "~2.1118.4",
-    "aws-cdk-local": "~2.19.2",
+    "aws-cdk-local": "~3.0.4",
     "dotenv": "^17.2.3",
     "esbuild": "^0.27.2",
     "oxfmt": "^0.28.0",
