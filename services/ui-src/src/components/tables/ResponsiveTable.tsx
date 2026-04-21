@@ -15,11 +15,15 @@ import {
 } from "@chakra-ui/react";
 import { JSX } from "react";
 
-type TableRowType = string | JSX.Element | undefined | boolean;
+type TableRowType = string | number | JSX.Element | undefined | boolean;
 
-const HorizontalTable = (headers: string[], rows: TableRowType[][]) => {
+const HorizontalTable = (
+  headers: string[],
+  rows: TableRowType[][],
+  variant?: string
+) => {
   return (
-    <Table>
+    <Table variant={variant ?? ""}>
       <Thead>
         <Tr>
           {headers.map((item) => (
@@ -41,15 +45,18 @@ const HorizontalTable = (headers: string[], rows: TableRowType[][]) => {
 };
 
 const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
+  console.log(rows);
   return (
     <VStack gap="1.5rem" alignItems="flex-start">
       {rows.map((row) => (
         <>
-          <Grid templateColumns="repeat(3, 1fr)" gap="1.5rem">
+          <Grid templateColumns="repeat(3, 1fr)" gap="1.5rem" columnGap="4rem">
             {row.map((data, dataIndex) => (
               <Box>
-                <Text fontWeight="bold">{headers[dataIndex]}</Text>
-                <span>{data}</span>
+                <Text fontSize="1rem" color="#71767a">
+                  {headers[dataIndex]}
+                </Text>
+                <Box>{data ?? "N/A"}</Box>
               </Box>
             ))}
           </Grid>
@@ -60,11 +67,15 @@ const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
   );
 };
 
-export const ResponsiveTable = (headers: string[], rows: TableRowType[][]) => {
+export const ResponsiveTable = (
+  headers: string[],
+  rows: TableRowType[][],
+  variant?: string
+) => {
   return (
     <>
       <Hide below="md" key="table">
-        {HorizontalTable(headers, rows)}
+        {HorizontalTable(headers, rows, variant)}
       </Hide>
       <Show below="md" key="table-mobile">
         {VerticalTable(headers, rows)}

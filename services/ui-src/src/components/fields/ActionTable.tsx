@@ -1,16 +1,8 @@
-import {
-  Flex,
-  Button,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Flex, Button } from "@chakra-ui/react";
 import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 import { JSX, useState } from "react";
 import {
   ActionTableTemplate,
@@ -36,36 +28,35 @@ const buildRows = (
   onChange: (value: string[], index: number, id: string) => void,
   onEdit: (index: number) => void
 ) => {
-  const formattedRows: JSX.Element[][] = [];
+  const formattedRows: (string | number | JSX.Element | undefined)[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
-    const rowElement: JSX.Element[] = [];
+    const rowElement = [];
     const disabled = isRowDisabled(rows, answerRow);
-    rows.map((column, columnIndex) => {
+    rows.map((column) => {
       //autogenerate next # column
       if (column.id === "no") {
-        rowElement.push(<Td key={column.id}>{answerRowIndex + 1}</Td>);
+        rowElement.push(answerRowIndex + 1);
       } else {
         const element = answerRow.find((item) => item.id === column.id);
         const formattedCol = {
           ...column,
           disabled: disabled || column.disabled,
         };
-        const value = buildElement(formattedCol, element?.value!, (value) =>
-          onChange(value, answerRowIndex, column.id)
-        );
-        rowElement.push(<Td key={`action-column-${columnIndex}`}>{value}</Td>);
+        const value =
+          buildElement(formattedCol, element?.value!, (value) =>
+            onChange(value, answerRowIndex, column.id)
+          ) ?? undefined;
+        rowElement.push(value);
       }
     });
     rowElement.push(
-      <Td key={`row.element.${answerRowIndex}`}>
-        <Button
-          variant="link"
-          onClick={() => onEdit(answerRowIndex)}
-          disabled={disabled}
-        >
-          Edit/Abandon
-        </Button>
-      </Td>
+      <Button
+        variant="link"
+        onClick={() => onEdit(answerRowIndex)}
+        disabled={disabled}
+      >
+        Edit/Abandon
+      </Button>
     );
     formattedRows.push(rowElement);
   });
@@ -138,21 +129,11 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
       >
         Add {label.toLowerCase()}
       </Button>
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            {rows.map((row) => (
-              <Th key={row.header}>{row.header}</Th>
-            ))}
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {formattedRows.map((row, rowIndex) => (
-            <Tr key={`action-row-${rowIndex}`}>{row}</Tr>
-          ))}
-        </Tbody>
-      </Table>
+      {ResponsiveTable(
+        [...rows.map((row) => row.header), "Actions"],
+        formattedRows,
+        "metric"
+      )}
       <ActionModal
         rows={rows}
         modal={modal}

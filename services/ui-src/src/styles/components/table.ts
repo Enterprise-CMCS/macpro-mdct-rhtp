@@ -169,9 +169,6 @@ const initiativeVariant = {
       "&:last-of-type": {
         textAlign: "right",
       },
-      ".mobile &": {
-        background: "red",
-      },
     },
     td: {
       "&:last-of-type": {
@@ -182,9 +179,6 @@ const initiativeVariant = {
       },
       ".chakra-button": {
         padding: "0 1rem",
-      },
-      ".tablet &": {
-        background: "red",
       },
     },
   },

@@ -238,15 +238,7 @@ export const TableCheckpoint = (
     writeToAttachmentsTable(generateAnswer);
   };
 
-  const header = [
-    "#",
-    "Checkpoint",
-    "Check if Complete",
-    "Attachments",
-    "Actions",
-  ];
-
-  const buildRows = (
+  const renderRows = (
     rows: {
       id: string;
       stageNo: string;
@@ -304,7 +296,6 @@ export const TableCheckpoint = (
         </Flex>
       );
 
-      console.log("columnCompleted", columnCompleted);
       return [
         row.stageNo,
         row.label,
@@ -333,78 +324,11 @@ export const TableCheckpoint = (
           >
             Upload attachments
           </Button>
-          {ResponsiveTable(header, buildRows(table.rows))}
-          {/* <Table variant="metric" key={table.label}>
-            <Thead>
-              <Tr>
-                {header.map((item) => (
-                  <Th key={item}>{item}</Th>
-                ))}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {table.rows.map((row, rowIndex) => (
-                <Tr key={`checkpoint-row-${rowIndex}`}>
-                  <Td>{row.stageNo}</Td>
-                  <Td>{row.label}</Td>
-                  <Td>
-                    {row.label != "" ? (
-                      <Checkbox
-                        aria-label={`Check if ${row.label} is complete`}
-                        isChecked={
-                          initialDisplayValue.find(
-                            (value) => value.id === row.id,
-                          )?.checked
-                        }
-                        onChange={() => onCheckboxHandler(row.id)}
-                      ></Checkbox>
-                    ) : (
-                      <></>
-                    )}
-                  </Td>
-                  <Td>
-                    {"file" in row ? (
-                      <Button
-                        aria-label={`Download ${row.file.name}`}
-                        variant="link"
-                        onClick={() =>
-                          downloadFile(reportType, state, id, row.file)
-                        }
-                      >
-                        {row.file.name}
-                      </Button>
-                    ) : (
-                      "Not applicable"
-                    )}
-                  </Td>
-                  <Td>
-                    {"file" in row && row.file.fileId && (
-                      <Flex>
-                        <Button
-                          variant="link"
-                          onClick={() => onCommentClick(row.file)}
-                          aria-label={`Comment on ${row.file.name}`}
-                        >
-                          <Image
-                            src={commentIcon}
-                            alt="Comment"
-                            minWidth="26px"
-                          />
-                        </Button>
-                        <Button
-                          variant="unstyled"
-                          onClick={() => handleFileAddDelete(row.file.fileId)}
-                          aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
-                        >
-                          <Image src={cancelIcon} alt="Remove" />
-                        </Button>
-                      </Flex>
-                    )}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table> */}
+          {ResponsiveTable(
+            ["#", "Checkpoint", "Check if Complete", "Attachments", "Actions"],
+            renderRows(table.rows),
+            "metric"
+          )}
         </Stack>
       ))}
       <UploadModal
