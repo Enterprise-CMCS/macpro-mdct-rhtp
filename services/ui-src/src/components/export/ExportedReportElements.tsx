@@ -1,5 +1,5 @@
 import { Heading } from "@chakra-ui/react";
-import { ElementType, PageElement } from "types";
+import { ElementType, PageElement } from "@rhtp/shared";
 import { notAnsweredText } from "../../constants";
 import { UseOfFundsTableElementExport } from "components/report/UseOfFundsTable";
 

@@ -1,10 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ElementType, UseOfFundsTableTemplate } from "types";
+import {
+  ElementType,
+  UseOfFundsTableTemplate,
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useState } from "react";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
-import { dropdownEmptyOption } from "@rhtp/shared";
 
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),

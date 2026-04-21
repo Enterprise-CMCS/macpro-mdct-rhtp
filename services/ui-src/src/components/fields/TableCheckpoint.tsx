@@ -14,12 +14,12 @@ import {
 } from "@chakra-ui/react";
 import {
   AttachmentStatus,
-  DropdownOptions,
   ElementType,
   InitiativeAnswerProp,
   TableCheckpointTemplate,
   UploadListProp,
-} from "types";
+} from "@rhtp/shared";
+import { DropdownOptions } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";

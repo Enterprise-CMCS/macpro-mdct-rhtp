@@ -17,7 +17,11 @@ import {
   ModalFooter,
   Flex,
 } from "@chakra-ui/react";
-import { UseOfFundsTableTemplate, UseOfFundsTableItem } from "types";
+import {
+  UseOfFundsTableTemplate,
+  UseOfFundsTableItem,
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState, ChangeEvent, useEffect } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
@@ -31,7 +35,6 @@ import {
 import { ErrorMessages } from "../../constants";
 import { isValidCurrency } from "utils/validation/inputValidation";
 import { useStore } from "utils";
-import { dropdownEmptyOption } from "@rhtp/shared";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>

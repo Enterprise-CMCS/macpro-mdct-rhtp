@@ -17,7 +17,7 @@ import {
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-} from "types";
+} from "@rhtp/shared";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */

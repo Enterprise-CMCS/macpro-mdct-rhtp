@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { TextField } from "@cmsgov/design-system";
 import { Box, Text } from "@chakra-ui/react";
 import { Modal } from "./Modal";
-import { InitiativeAnswerProp, InitiativeComment, UploadListProp } from "types";
+import {
+  InitiativeAnswerProp,
+  InitiativeComment,
+  UploadListProp,
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
 

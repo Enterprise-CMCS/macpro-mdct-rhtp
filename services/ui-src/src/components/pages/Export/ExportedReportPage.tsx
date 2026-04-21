@@ -17,13 +17,13 @@ import {
 import { formatMonthDayYear, useStore } from "utils";
 import {
   FormPageTemplate,
-  getReportName,
   ParentPageTemplate,
   Report,
   ReviewSubmitTemplate,
-} from "types";
+  StateNames,
+} from "@rhtp/shared";
+import { getReportName } from "types";
 import { ExportedReportBanner, ExportedReportWrapper } from "components";
-import { StateNames } from "@rhtp/shared";
 import { shouldRender } from "./ExportedReportPageHelpers";
 
 export const ExportedReportPage = () => {

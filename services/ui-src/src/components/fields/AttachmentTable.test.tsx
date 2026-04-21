@@ -2,7 +2,11 @@ import { MockedFunction } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentTable } from "components";
-import { ElementType, AttachmentTableTemplate, AttachmentStatus } from "types";
+import {
+  ElementType,
+  AttachmentTableTemplate,
+  AttachmentStatus,
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 import { removeFile } from "utils/other/upload";

@@ -9,7 +9,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
 import { useParams } from "react-router";
-import { ElementType, TableCheckpointTemplate } from "types";
+import { ElementType, TableCheckpointTemplate } from "@rhtp/shared";
 import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
