@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { ParentPageTemplate, Report } from "@rhtp/shared";
-import { BannerData, ErrorVerbiage, PageData, User } from "types";
+import { ParentPageTemplate, Report, BannerData } from "@rhtp/shared";
+import { ErrorVerbiage, PageData, User } from "types";
 
 export interface AdminBannerState {
   bannerData: BannerData | undefined;
