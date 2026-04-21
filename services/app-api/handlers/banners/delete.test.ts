@@ -1,7 +1,7 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
+import { APIGatewayProxyEvent } from "../../types/types";
 import { canWriteBanner } from "../../utils/authorization";
 import { deleteBanner } from "./delete";
 import { error } from "../../utils/constants";
@@ -12,7 +12,7 @@ const dynamoClientMock = mockClient(DynamoDBDocumentClient);
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.ADMIN,
+    role: "mdctrhtp-bor",
     state: "PA",
   }),
 }));

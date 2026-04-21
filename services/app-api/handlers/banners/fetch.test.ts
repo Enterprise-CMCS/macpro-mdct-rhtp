@@ -1,7 +1,7 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
+import { APIGatewayProxyEvent } from "../../types/types";
 import { fetchBanner } from "./fetch";
 import { error } from "../../utils/constants";
 import { getBanner } from "../../storage/banners";
@@ -9,7 +9,7 @@ import { mockBannerResponse } from "../../testing/setupTest";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.ADMIN,
+    role: "mdctrhtp-bor",
     state: "PA",
   }),
 }));

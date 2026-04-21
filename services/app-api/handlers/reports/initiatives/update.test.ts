@@ -9,8 +9,9 @@ import {
   PageStatus,
   PageType,
   ReportStatus,
+  UserRoles,
 } from "@rhtp/shared";
-import { APIGatewayProxyEvent, User, UserRoles } from "../../../types/types";
+import { APIGatewayProxyEvent, User } from "../../../types/types";
 import { getReport, putReport } from "../../../storage/reports";
 
 vi.mock("../../../utils/authentication");

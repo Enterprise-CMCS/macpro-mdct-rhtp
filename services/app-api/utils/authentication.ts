@@ -1,6 +1,6 @@
-import { APIGatewayProxyEvent, isUserRole, User } from "../types/types";
+import { APIGatewayProxyEvent, User } from "../types/types";
 import jwtDecode from "jwt-decode";
-import { isStateAbbr } from "@rhtp/shared";
+import { isStateAbbr, isUserRole } from "@rhtp/shared";
 import { logger } from "../libs/debug-lib";
 
 export interface DecodedToken {

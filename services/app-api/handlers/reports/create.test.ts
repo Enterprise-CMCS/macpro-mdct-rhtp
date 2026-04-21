@@ -1,7 +1,6 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { putReport, queryReportsForState } from "../../storage/reports";
-import { UserRoles } from "../../types/types";
 import { canWriteState } from "../../utils/authorization";
 import { createReport } from "./create";
 import { ReportStatus, RhtpSubType } from "@rhtp/shared";
@@ -9,7 +8,7 @@ import { RhtpSubTypeMap } from "../../utils/constants";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.STATE_USER,
+    role: "mdctrhtp-state-user",
     state: "PA",
   }),
 }));

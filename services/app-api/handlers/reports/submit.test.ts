@@ -1,14 +1,14 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
+import { APIGatewayProxyEvent } from "../../types/types";
 import { canWriteState } from "../../utils/authorization";
 import { validReport } from "../../utils/tests/mockReport";
 import { submitReport } from "./submit";
 
 vi.mock("../../utils/authentication", () => ({
   authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.STATE_USER,
+    role: "mdctrhtp-state-user",
     state: validReport.state,
     fullName: "myname",
   }),
