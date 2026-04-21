@@ -128,6 +128,18 @@ describe("<AttachmentTable />", () => {
     ).not.toBeInTheDocument();
     expect(mockUpdateElement).toHaveBeenCalled();
   });
+  it("Mock delete and edit disabled for locked file status", async () => {
+    const mockLockedFileElement = structuredClone(mockAttachmentAreaElement);
+    mockLockedFileElement.answer![0].status =
+      AttachmentStatus.LOCKED_FOR_SCORING;
+    render(AttachmentTableComponent(mockLockedFileElement));
+    const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });
+    const editBtn = screen.getByRole("button", {
+      name: "Edit file or info for mock-file",
+    });
+    expect(deleteBtn).toBeDisabled();
+    expect(editBtn).toBeDisabled();
+  });
   it("Mock on remove file call", async () => {
     render(AttachmentTableComponent(mockAttachmentAreaElement));
     const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });
@@ -173,13 +185,13 @@ describe("<AttachmentTable />", () => {
         answer: [
           {
             ...existingAttachment,
-            status: AttachmentStatus.LOCKED_FOR_SCORING,
+            status: AttachmentStatus.NEEDS_REVISION,
           },
         ],
       })
     );
     expect(
-      screen.queryByText(AttachmentStatus.LOCKED_FOR_SCORING)
+      screen.queryByText(AttachmentStatus.NEEDS_REVISION)
     ).toBeInTheDocument();
 
     const editBtn = screen.getByRole("button", {
