@@ -13,6 +13,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import {
+  AttachmentStatus,
   DropdownOptions,
   ElementType,
   InitiativeAnswerProp,
@@ -111,7 +112,7 @@ const getFilesFromTable = (tables: TableShape[], checkpoints: string) => {
 const header = [
   "#",
   "Checkpoint",
-  "Check if Complete",
+  "Ready for CMS Review",
   "Attachments",
   "Actions",
 ];
@@ -208,7 +209,7 @@ export const TableCheckpoint = (
       ...selection,
       comments: [],
       attachment: file,
-      status: "Under Review", //TODO: update status when status has been added to initiatives
+      status: AttachmentStatus.PENDING_REVIEW,
     }));
   };
 
