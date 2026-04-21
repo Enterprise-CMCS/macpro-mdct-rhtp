@@ -7,6 +7,7 @@ import {
   ReportType,
   TextboxTemplate,
   FormPageTemplate,
+  RhtpSubType,
 } from "@rhtp/shared";
 import { ReportState } from "types";
 import {
@@ -29,6 +30,10 @@ const testReport: Report = {
   state: "NJ",
   id: "NJRHTP123",
   status: ReportStatus.NOT_STARTED,
+  created: 1776449695077,
+  subType: RhtpSubType.ANNUAL,
+  subTypeKey: "A1",
+  budgetPeriod: 1,
   submissionCount: 0,
   pages: [
     {

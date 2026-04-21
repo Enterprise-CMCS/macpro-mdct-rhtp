@@ -11,13 +11,10 @@ export enum ReportType {
   RHTP = "RHTP",
 }
 
-// TODO: Update when the quarter naming has been decided on
 export enum RhtpSubType {
-  ANNUAL = 0,
-  Q1 = 1,
-  Q2 = 2,
-  Q3 = 3,
-  Q4 = 4,
+  ANNUAL = "ANNUAL",
+  QUARTERLY = "QUARTERLY",
+  FINAL = "FINAL",
 }
 
 export const isReportType = (
@@ -42,7 +39,9 @@ export interface UpdateInitiativeOptions {
 export interface ReportOptions {
   name: string;
   year: number;
-  subType?: RhtpSubType;
+  subType: RhtpSubType;
+  subTypeKey: string;
+  budgetPeriod: number;
   copyFromReportId?: string;
 }
 
@@ -70,7 +69,7 @@ export interface Report extends ReportBase, ReportOptions {
   id: string;
   name: string;
   state: StateAbbr;
-  created?: number;
+  created: number;
   lastEdited?: number;
   lastEditedBy?: string;
   lastEditedByEmail?: string;
@@ -86,7 +85,6 @@ export type LiteReport = Omit<Report, "pages">;
 
 export type ReportBase = {
   type: ReportType;
-  subType?: RhtpSubType;
   year: number;
   pages: (
     | ParentPageTemplate
@@ -386,7 +384,8 @@ export type UseOfFundsTableTemplate = {
 export type InitiativeComment = {
   name: string;
   date: string;
-  comment: string;
+  comment?: string;
+  statusChange?: string;
 };
 
 export enum AttachmentStatus {

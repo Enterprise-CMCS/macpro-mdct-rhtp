@@ -36,6 +36,7 @@ describe("buildReport utility", () => {
       name: "report1",
       year: 2026,
       subType: RhtpSubType.ANNUAL,
+      subTypeKey: "A1",
     } as ReportOptions;
     const report = await buildReport(
       ReportType.RHTP,
@@ -60,7 +61,8 @@ describe("buildReport utility", () => {
     const reportOptions = {
       name: "report1",
       year: 2026,
-      subType: RhtpSubType.Q1,
+      subType: RhtpSubType.QUARTERLY,
+      subTypeKey: "Q1",
       copyFromReportId: "123",
     } as ReportOptions;
     const report = await buildReport(
@@ -72,7 +74,7 @@ describe("buildReport utility", () => {
 
     expect(report.state).toBe("PA");
     expect(report.type).toBe(ReportType.RHTP);
-    expect(report.subType).toEqual(RhtpSubType.Q1);
+    expect(report.subType).toEqual(RhtpSubType.QUARTERLY);
     expect(report.lastEditedBy).toBe("James Holden");
     expect(report.lastEditedByEmail).toBe("james.holden@test.com");
     expect(report.copyFromReportId).toBe("123");

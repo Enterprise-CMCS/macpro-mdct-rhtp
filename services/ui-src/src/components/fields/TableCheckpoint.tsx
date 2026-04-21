@@ -48,7 +48,8 @@ type TableShape = {
     id: string;
     stageNo: string;
     label: string;
-    file: { name: string; fileId: string; size: number };
+    file: UploadListProp;
+    status: string;
   }[];
 };
 
@@ -58,7 +59,12 @@ const buildRows = (
   values: {
     label: string;
     id: string;
-    attachments: UploadListProp[] | undefined;
+    attachments:
+      | {
+          file: UploadListProp;
+          status: AttachmentStatus;
+        }[]
+      | undefined;
   }[]
 ) => {
   return values.reduce((prev: any[], curr, index) => {
@@ -70,9 +76,17 @@ const buildRows = (
     };
     if (attachments) {
       const copy = [...attachments];
-      prev.push({ ...row, file: copy.shift() ?? {} });
-      copy.forEach((file) =>
-        prev.push({ id, stageNo: "", label: "", completed: undefined, file })
+      const { file, status } = copy.shift() || {};
+      prev.push({ ...row, file: file ?? {}, status: status ?? {} });
+      copy.forEach(({ file, status }) =>
+        prev.push({
+          id,
+          stageNo: "",
+          label: "",
+          completed: undefined,
+          file,
+          status,
+        })
       );
     } else {
       prev.push(row);
@@ -90,7 +104,7 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
           (answer) =>
             answer.stage === id && answer.checkpoints === checkpoint.id
         )
-        .map((upload) => upload.attachment);
+        .map((upload) => ({ file: upload.attachment, status: upload.status }));
       return {
         label: checkpoint.label,
         id: checkpoint.id,
@@ -112,7 +126,7 @@ const getFilesFromTable = (tables: TableShape[], checkpoints: string) => {
 const header = [
   "#",
   "Checkpoint",
-  "Check if Complete",
+  "Ready for CMS Review",
   "Attachments",
   "Actions",
 ];
@@ -183,7 +197,7 @@ export const TableCheckpoint = (
     setAttachments(attachments || []);
     setTables(newTables);
     setFiles(getFilesFromTable(newTables, selection.checkpoints));
-  }, [report]);
+  }, [isCommentsOpen, report]);
 
   const onCheckboxHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
@@ -337,6 +351,9 @@ export const TableCheckpoint = (
                           variant="unstyled"
                           onClick={() => handleFileAddDelete(row.file.fileId)}
                           aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
+                          disabled={
+                            row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                          }
                         >
                           <Image src={cancelIcon} alt="Remove" />
                         </Button>

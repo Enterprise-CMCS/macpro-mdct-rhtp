@@ -12,10 +12,13 @@ const report: Report = {
   id: "",
   name: "",
   state: "AL",
+  created: 1776449695077,
   status: ReportStatus.NOT_STARTED,
   submissionCount: 0,
   type: ReportType.RHTP,
   subType: RhtpSubType.ANNUAL,
+  subTypeKey: "A1",
+  budgetPeriod: 1,
   pages: [
     {
       id: "root",

@@ -7,12 +7,17 @@ import {
   Report,
   ReportStatus,
   ReportType,
+  RhtpSubType,
 } from "@rhtp/shared";
 import { ReportPageWrapper } from "./ReportPageWrapper";
 import { useStore } from "utils";
 
 const testReport: Report = {
   type: ReportType.RHTP,
+  created: 1776449695077,
+  subType: RhtpSubType.ANNUAL,
+  subTypeKey: "A1",
+  budgetPeriod: 1,
   name: "plan id",
   state: "NJ",
   id: "NJGeneral123",

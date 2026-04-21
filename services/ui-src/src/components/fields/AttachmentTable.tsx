@@ -181,7 +181,9 @@ export const AttachmentTable = (
       stage: selection.stage,
       checkpoints: selection.checkpoint,
       status: AttachmentStatus.PENDING_REVIEW,
-      comments: [],
+      comments:
+        displayValue.find((item) => item.attachment.fileId === upload.fileId)
+          ?.comments ?? [],
     }));
 
     const newValues = displayValue.map((item) => {
@@ -313,6 +315,9 @@ export const AttachmentTable = (
                     variant="outline"
                     onClick={() => onEditClick(row)}
                     aria-label={`Edit file or info for ${row.attachment.name}`}
+                    disabled={
+                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                    }
                   >
                     Edit
                   </Button>
@@ -327,6 +332,9 @@ export const AttachmentTable = (
                     variant="link"
                     onClick={() => onDeleteClick(row)}
                     aria-label={`Delete ${row.attachment.name}`}
+                    disabled={
+                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                    }
                   >
                     <Image src={cancelIcon} alt="Remove" minWidth="24px" />
                   </Button>

@@ -53,12 +53,14 @@ export const buildReport = async (
     name: reportOptions.name,
     year: reportOptions.year,
     subType: reportOptions.subType,
+    subTypeKey: reportOptions.subTypeKey,
+    budgetPeriod: reportOptions.budgetPeriod,
     copyFromReportId: reportOptions.copyFromReportId,
     submissionCount: 0,
     pages: template.pages,
   };
 
-  if (report.subType !== RhtpSubType.ANNUAL) {
+  if (report.subType === RhtpSubType.QUARTERLY) {
     makeQuarterlyChanges(report.pages);
   }
 

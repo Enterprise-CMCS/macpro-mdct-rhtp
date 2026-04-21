@@ -2,7 +2,7 @@ import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
 import * as framerMotion from "framer-motion";
 import { UserRoles, UserState, AdminBannerState, ReportState } from "types";
-import { ReportType, ReportStatus } from "@rhtp/shared";
+import { ReportType, ReportStatus, RhtpSubType } from "@rhtp/shared";
 import { mockBannerData } from "./mockBanner";
 
 /*
@@ -174,6 +174,10 @@ export const mockReportStore: ReportState = {
     year: 2026,
     state: "PA",
     submissionCount: 0,
+    created: 1776449695077,
+    subType: RhtpSubType.ANNUAL,
+    subTypeKey: "A1",
+    budgetPeriod: 1,
     pages: [
       {
         id: "root",

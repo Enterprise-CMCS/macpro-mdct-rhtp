@@ -27,6 +27,8 @@ const queryProjectionFields = [
   "year",
   "lastEditedByEmail",
   "subType",
+  "subTypeKey",
+  "budgetPeriod",
   "copyFromReportId",
 ];
 

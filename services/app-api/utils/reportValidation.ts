@@ -18,6 +18,7 @@ import {
   CreateReportOptions,
   CreateInitiativeOptions,
   UpdateInitiativeOptions,
+  RhtpSubType,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -379,7 +380,8 @@ const attachmentTableSchema = object().shape({
           object().shape({
             name: string().required(),
             date: string().required(),
-            comment: string().required(),
+            comment: string().notRequired(),
+            statusChange: string().notRequired(),
           })
         ),
       })
@@ -538,7 +540,9 @@ const reportValidateSchema = object().shape({
   status: mixed<ReportStatus>().oneOf(Object.values(ReportStatus)).required(),
   name: string().required(),
   type: mixed<ReportType>().oneOf(Object.values(ReportType)).required(),
-  subType: number().notRequired(),
+  subType: mixed<RhtpSubType>().oneOf(Object.values(RhtpSubType)).required(),
+  subTypeKey: string().required(),
+  budgetPeriod: number().min(0).max(5).required(),
   year: number().required(),
   submissionCount: number().required(),
   pages: pagesSchema,
