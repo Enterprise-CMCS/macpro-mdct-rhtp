@@ -1,4 +1,3 @@
-export * from "@rhtp/shared";
 // BANNERS
 export const bannerId = "admin-banner-id";
 export const attachmentTableId = "initiative-attachments-table";

@@ -1,5 +1,4 @@
 import { ReportType, RhtpSubType } from "@rhtp/shared";
-export * from "@rhtp/shared";
 
 export type RhtpSubTypeData = {
   [key: string]: {
