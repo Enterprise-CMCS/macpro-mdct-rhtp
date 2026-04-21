@@ -18,6 +18,7 @@ import nextArrowIcon from "assets/icons/arrows/icon_arrow_next_white.svg";
 import prevArrowIcon from "assets/icons/arrows/icon_arrow_prev_primary.svg";
 import { isReviewSubmitPage, PageElement, ReportStatus } from "types";
 import { ReportAutosaveContext } from "./ReportAutosaveProvider";
+import { SubmissionBar } from "./SubmissionBar";
 
 export const ReportPageWrapper = () => {
   const {
@@ -118,9 +119,10 @@ export const ReportPageWrapper = () => {
               )}
             </form>
           </Box>
+          <Divider></Divider>
+          {currentPage.hideNavButtons && <SubmissionBar />}
           {!currentPage.hideNavButtons && parentPage && (
             <>
-              <Divider></Divider>
               <Flex width="100%" marginTop="spacer3">
                 {parentPage.index > 0 && (
                   <Button
