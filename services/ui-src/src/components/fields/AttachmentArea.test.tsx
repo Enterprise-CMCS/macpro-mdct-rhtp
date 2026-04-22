@@ -3,7 +3,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
 import { useParams } from "react-router";
-import { ElementType, AttachmentAreaTemplate } from "types";
+import { ElementType, AttachmentAreaTemplate } from "@rhtp/shared";
 import { getFileDownloadUrl } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 

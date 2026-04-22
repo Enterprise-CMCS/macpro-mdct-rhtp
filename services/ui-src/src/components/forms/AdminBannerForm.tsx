@@ -7,7 +7,8 @@ import {
 } from "@cmsgov/design-system";
 import { bannerId, ErrorMessages } from "../../constants";
 import { convertDatetimeStringToNumber, parseMMDDYYYY } from "utils";
-import { AdminBannerMethods, BannerData } from "types";
+import { AdminBannerMethods } from "types";
+import { BannerData } from "@rhtp/shared";
 import { isUrl } from "utils/validation/inputValidation";
 
 export const AdminBannerForm = ({ writeAdminBanner }: Props) => {

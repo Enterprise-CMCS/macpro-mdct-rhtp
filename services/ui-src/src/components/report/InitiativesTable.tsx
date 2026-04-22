@@ -2,7 +2,7 @@ import {
   InitiativePageTemplate,
   InitiativesTableTemplate,
   PageStatus,
-} from "types";
+} from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { useStore } from "utils";
 import {

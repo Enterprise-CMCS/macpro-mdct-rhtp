@@ -1,6 +1,6 @@
 import { apiLib } from "utils";
 import { getRequestHeaders } from "./getRequestHeaders";
-import { CreateReportOptions, LiteReport, Report } from "types";
+import { CreateReportOptions, LiteReport, Report } from "@rhtp/shared";
 
 export async function createReport(
   reportType: string,

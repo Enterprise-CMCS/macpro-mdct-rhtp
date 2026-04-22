@@ -5,7 +5,7 @@ import { canWriteState } from "../../utils/authorization";
 import { error, RhtpSubTypeMap } from "../../utils/constants";
 import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
-import { ReportOptions, ReportStatus, RhtpSubType } from "../../types/reports";
+import { RhtpSubType, ReportStatus, ReportOptions } from "@rhtp/shared";
 import { isCreateReportOptions } from "../../utils/reportValidation";
 
 export const createReport = handler(

@@ -9,7 +9,7 @@ import {
 } from "utils/testing/setupTest";
 import { useStore } from "utils";
 import { getReportsForState } from "utils/api/requestMethods/report";
-import { Report } from "types";
+import { Report } from "@rhtp/shared";
 import { useParams } from "react-router";
 import userEvent from "@testing-library/user-event";
 

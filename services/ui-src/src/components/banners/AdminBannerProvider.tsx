@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useMemo, useEffect } from "react";
-import { BannerData, AdminBannerShape } from "types/banners";
+import { AdminBannerShape } from "types/banners";
+import { BannerData } from "@rhtp/shared";
 import { bannerId } from "../../constants";
 import { bannerErrors } from "verbiage/errors";
 import {

@@ -8,7 +8,7 @@ import {
   ok,
 } from "../../../libs/response-lib";
 import { getReport, putReport } from "../../../storage/reports";
-import { ReportStatus } from "../../../types/reports";
+import { ReportStatus } from "@rhtp/shared";
 import { canWriteInitiatives } from "../../../utils/authorization";
 import { error } from "../../../utils/constants";
 import { updateInitiativeStatus } from "../../../utils/reports/initiatives/initiatives";

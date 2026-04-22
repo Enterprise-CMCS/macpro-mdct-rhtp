@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { CommentModal } from "./CommentModal";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
-import { AttachmentStatus, InitiativeAnswerProp } from "types";
+import { AttachmentStatus, InitiativeAnswerProp } from "@rhtp/shared";
 import { useStore } from "utils";
 import {
   mockAdminUserStore,

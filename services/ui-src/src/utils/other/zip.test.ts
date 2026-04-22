@@ -1,4 +1,4 @@
-import { Report, ReportStatus, ReportType, RhtpSubType } from "types";
+import { Report, ReportStatus, ReportType, RhtpSubType } from "@rhtp/shared";
 import { convertBase64ToBlob, createZipFile } from "./zip";
 import JSZip from "jszip";
 

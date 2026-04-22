@@ -2,7 +2,7 @@ import { Accordion, Box, Button } from "@chakra-ui/react";
 import { Page } from "components/report/Page";
 import { AccordionItem } from "components";
 import { PageElementProps } from "components/report/Elements";
-import { AccordionGroupTemplate, PageElement } from "types";
+import { AccordionGroupTemplate, PageElement } from "@rhtp/shared";
 import { useState } from "react";
 
 export const AccordionGroup = (

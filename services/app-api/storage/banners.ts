@@ -1,6 +1,6 @@
 import { DeleteCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { createClient } from "./dynamo/dynamodb-lib";
-import { BannerData } from "../types/banner";
+import { BannerData } from "@rhtp/shared";
 
 const bannerTableName = process.env.BannersTable;
 const client = createClient();

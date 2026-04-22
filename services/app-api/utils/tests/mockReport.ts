@@ -4,9 +4,9 @@ import {
   PageType,
   ElementType,
   ReportStatus,
+  StateAbbr,
   RhtpSubType,
-} from "../../types/reports";
-import { StateAbbr } from "../constants";
+} from "@rhtp/shared";
 
 const rhtpReportTemplate = rhtpReportTemplate2026("PA");
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HideCondition } from "types";
+import { HideCondition } from "@rhtp/shared";
 import { elementIsHidden } from "../reportLogic/completeness";
 import { useStore } from "../useStore";
 import { currentPageSelector } from "../selectors";
