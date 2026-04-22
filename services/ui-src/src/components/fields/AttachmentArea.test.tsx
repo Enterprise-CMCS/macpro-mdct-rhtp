@@ -1,5 +1,5 @@
+import { Mock, MockedFunction } from "vitest";
 import { useStore } from "utils";
-import { Mock } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
@@ -9,16 +9,8 @@ import { testA11y } from "utils/testing/commonTests";
 
 const updateSpy = vi.fn();
 
-vi.mock("utils", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useStore: vi.fn().mockReturnValue({
-    report: {
-      id: "mock-report-id",
-      type: "RHTP",
-      state: "PA",
-    },
-  }),
-}));
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -46,6 +38,13 @@ const consoleMock = vi.spyOn(console, "error");
 describe("<AttachmentArea />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUseStore.mockReturnValue({
+      report: {
+        id: "mock-report-id",
+        type: "RHTP",
+        state: "PA",
+      },
+    });
   });
   test("AttachmentArea renders an upload button", async () => {
     await act(async () => {

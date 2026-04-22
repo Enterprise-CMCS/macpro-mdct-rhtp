@@ -21,6 +21,17 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
     ]),
 }));
 
+vi.mock("utils", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      id: "mock-report-id",
+      type: "RHTP",
+      state: "PA",
+    },
+  }),
+}));
+
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 
 const modalComponent = (
