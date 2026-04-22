@@ -1,8 +1,8 @@
+import { useStore } from "utils";
 import { Mock } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
-import { useParams } from "react-router";
 import { ElementType, AttachmentAreaTemplate } from "types";
 import { getFileDownloadUrl } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
@@ -55,8 +55,8 @@ describe("<AttachmentArea />", () => {
     expect(screen.getByText("mock attachment area")).toBeVisible();
     expect(screen.getByRole("button", { name: "Add attachment" }));
   });
-  test("receive an error when state or year is not provided", async () => {
-    (useParams as Mock).mockResolvedValueOnce("");
+  test("receive an error when state, id or type is not provided", async () => {
+    (useStore as unknown as Mock).mockReturnValue({ report: {} });
     await act(async () => {
       render(AttachmentAreaComponent);
     });
