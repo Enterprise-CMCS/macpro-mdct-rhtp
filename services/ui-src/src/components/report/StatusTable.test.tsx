@@ -18,12 +18,6 @@ vi.mock("react-router", async (importOriginal) => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock("launchdarkly-react-client-sdk", () => ({
-  useFlags: vi.fn().mockReturnValue({
-    viewPdf: true,
-  }),
-}));
-
 const report = {
   type: "RHTP",
   id: "mock-report-id",
@@ -42,7 +36,6 @@ const mockPageMap = new Map([
 ]);
 
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
-const mockSetModalComponent = vi.fn();
 
 describe("StatusTable with state user", () => {
   beforeEach(() => {
@@ -71,7 +64,6 @@ describe("StatusTable with state user", () => {
           ...mockStateUserStore,
           pageMap: mockPageMap,
           report: report,
-          setModalComponent: mockSetModalComponent,
         };
       }
     );
@@ -112,7 +104,6 @@ describe("StatusTable with state user", () => {
       ...mockStateUserStore,
       pageMap: mockPageMap,
       report: undefined,
-      setModalComponent: mockSetModalComponent,
     }));
 
     const { container } = render(
