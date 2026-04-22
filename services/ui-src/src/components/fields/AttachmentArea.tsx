@@ -4,7 +4,6 @@ import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
-import { useParams } from "react-router";
 import { useStore } from "utils";
 import { downloadFile, uploadListRender, removeFile } from "utils/other/upload";
 import { Hint, Label } from "@cmsgov/design-system";
@@ -14,15 +13,13 @@ export const AttachmentArea = (
 ) => {
   const { label, helperText, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-
-  const { state } = useParams();
   const { report } = useStore();
-  const { id, type } = report!;
+  const { id, state, type: reportType } = report!;
 
   const updateElement = props.updateElement;
   const files = answer ?? [];
 
-  if (!state || !id || !type) {
+  if (!state || !id || !reportType) {
     console.error("Can't retrieve uploads with missing state, id or type");
     return;
   }
@@ -34,7 +31,7 @@ export const AttachmentArea = (
   const onRemove = (exfile: UploadListProp) => {
     const newFiles = files.filter((file) => file.fileId != exfile.fileId);
     updateElement({ answer: newFiles });
-    removeFile(exfile, type, id, state);
+    removeFile(reportType, state, id, exfile);
   };
 
   const saveToReport = (newFiles: UploadListProp[]) => {
@@ -45,7 +42,7 @@ export const AttachmentArea = (
     <Stack gap="0">
       <Label fieldId={id}>{label}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
-      {uploadListRender(id, type, files, state, onRemove, downloadFile)}
+      {uploadListRender(reportType, state, id, files, onRemove, downloadFile)}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}
@@ -59,12 +56,9 @@ export const AttachmentArea = (
           isOpen: isModalOpen,
           onClose: onModalClose,
         }}
-        state={state}
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
-        id={id}
-        reportType={type}
       />
     </Stack>
   );

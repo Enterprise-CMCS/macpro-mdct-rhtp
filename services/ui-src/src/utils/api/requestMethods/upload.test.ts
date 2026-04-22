@@ -37,8 +37,8 @@ describe("Test fileApi functions", () => {
     (apiLib.post as Mock).mockReturnValue({ psurl: "https://mock.url" });
 
     const result = await recordFileInDatabaseAndGetUploadUrl(
-      "abc",
       ReportType.RHTP,
+      "PA",
       "mock-id",
       mockPng
     );
@@ -51,7 +51,7 @@ describe("Test fileApi functions", () => {
   });
   test("getFileDownloadUrl", async () => {
     (apiLib.get as Mock).mockReturnValue({ psurl: "mock.s3/url" });
-    const result = await getFileDownloadUrl("RHTP", "2025", "PA", "mock-id");
+    const result = await getFileDownloadUrl("RHTP", "PA", "mock-id", "2025");
     expect(result).toBe("mock.s3/url");
   });
   test("deleteUploadedFile", async () => {
@@ -67,7 +67,7 @@ describe("Test fileApi functions", () => {
   test("getFileBytes", async () => {
     const zipData = [{ name: "file-name", bytes: "abced" }];
     (apiLib.get as Mock).mockReturnValue(zipData);
-    const result = await getFileBytes("2025", "PA", "mock-id");
+    const result = await getFileBytes("RHTP", "PA", "mock-id");
     expect(result).toBe(zipData);
   });
 });

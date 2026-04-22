@@ -18,7 +18,6 @@ import { UploadModal } from "components/modals/UploadModal";
 import { CommentModal } from "components/modals/CommentModal";
 import { PageElementProps } from "components/report/Elements";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
 import {
   AttachmentTableTemplate,
   InitiativePageTemplate,
@@ -50,13 +49,13 @@ type Options = { label: string; value: string; checked?: boolean };
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
 ) => {
+  const { disabled } = props;
   const { answer } = props.element;
   const displayValue = structuredClone(answer) ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
-  const { state } = useParams();
   const { report } = useStore();
-  const { id, type: reportType } = report!;
+  const { id, state, type: reportType } = report!;
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -164,7 +163,7 @@ export const AttachmentTable = (
       (item) => item.attachment.fileId !== file.fileId
     );
     props.updateElement({ answer: newAnswerValue });
-    removeFile(file, reportType, id, state);
+    removeFile(reportType, state, id, file);
   };
 
   // TODO: When we have file replacement on edit logic in, make sure to set status to PENDING_REVIEW
@@ -351,10 +350,7 @@ export const AttachmentTable = (
           isOpen: isModalOpen,
           onClose: onClose,
         }}
-        state={state}
         answer={uploadedFiles}
-        id={id}
-        reportType={reportType}
         hint="[hint text]"
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">
@@ -371,7 +367,7 @@ export const AttachmentTable = (
               label={"Initiative"}
               onChange={onChoiceChangeHandler}
               hint={"This is the hint text"}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || disabled}
             ></ChoiceList>
             <Dropdown
               name={"stage"}
@@ -379,7 +375,7 @@ export const AttachmentTable = (
               value={selection?.stage}
               options={stageOption}
               onChange={onStageChangeHandler}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || disabled}
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
@@ -390,7 +386,7 @@ export const AttachmentTable = (
                 const value = dropdown.target.value;
                 setSelection({ ...selection, checkpoint: value });
               }}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || disabled}
             ></Dropdown>
           </Stack>
         }

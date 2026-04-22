@@ -9,16 +9,13 @@ import { testA11y } from "utils/testing/commonTests";
 
 const updateSpy = vi.fn();
 
-vi.mock("react-router", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA" }),
-}));
-
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),
   useStore: vi.fn().mockReturnValue({
     report: {
       id: "mock-report-id",
       type: "RHTP",
+      state: "PA",
     },
   }),
 }));

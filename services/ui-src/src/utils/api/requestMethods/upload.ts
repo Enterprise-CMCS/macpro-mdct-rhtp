@@ -21,9 +21,9 @@ export interface UploadData {
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
-  id: string,
   reportType: string,
-  stateCode: string,
+  state: string,
+  id: string,
   uploadedFile: File
 ) => {
   const requestHeaders = await getRequestHeaders();
@@ -39,7 +39,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   };
 
   const { psurl, fileId } = await apiLib.post<PathURL>(
-    `/reports/${reportType}/${stateCode}/${id}/files`,
+    `/reports/${reportType}/${state}/${id}/files`,
     options
   );
 
@@ -48,7 +48,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
 
 export const getFileBytes = async (
   reportType: string,
-  stateCode: string,
+  state: string,
   id: string
 ) => {
   const requestHeaders = await getRequestHeaders();
@@ -56,7 +56,7 @@ export const getFileBytes = async (
     headers: { ...requestHeaders },
   };
   const response = await apiLib.get<ZipData[]>(
-    `/reports/${reportType}/${stateCode}/${id}/files/`,
+    `/reports/${reportType}/${state}/${id}/files/`,
     options
   );
   return response ?? [];
@@ -74,7 +74,7 @@ export const uploadFileToS3 = async (
 
 export const getFileDownloadUrl = async (
   reportType: string,
-  stateCode: string,
+  state: string,
   id: string,
   fileId: string
 ) => {
@@ -84,7 +84,7 @@ export const getFileDownloadUrl = async (
   };
 
   const response = await apiLib.get<PathURL>(
-    `/reports/${reportType}/${stateCode}/${id}/files/${fileId}`,
+    `/reports/${reportType}/${state}/${id}/files/${fileId}`,
     options
   );
   return response.psurl;
@@ -92,7 +92,7 @@ export const getFileDownloadUrl = async (
 
 export const deleteUploadedFile = async (
   reportType: string,
-  stateCode: string,
+  state: string,
   id: string,
   fileId: string
 ) => {
@@ -101,7 +101,7 @@ export const deleteUploadedFile = async (
     headers: { ...requestHeaders },
   };
   await apiLib.del(
-    `/reports/${reportType}/${stateCode}/${id}/files/${fileId}`,
+    `/reports/${reportType}/${state}/${id}/files/${fileId}`,
     options
   );
 };

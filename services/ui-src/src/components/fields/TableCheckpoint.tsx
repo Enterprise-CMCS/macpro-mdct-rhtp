@@ -138,9 +138,9 @@ export const TableCheckpoint = (
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
-  const { state, pageId } = useParams();
+  const { pageId } = useParams();
   const { report, setAnswers } = useStore();
-  const { id, type: reportType } = report!;
+  const { id, state, type: reportType } = report!;
   const { autosave } = useContext(ReportAutosaveContext);
   //if there is answer on load, we need to build the shape from the checkpoints data
   const initialDisplayValue =
@@ -371,10 +371,7 @@ export const TableCheckpoint = (
           isOpen: isModalOpen,
           onClose: () => setModalOpen(false),
         }}
-        state={state}
         answer={files}
-        id={id}
-        reportType={reportType}
         selections={
           <>
             <Dropdown
