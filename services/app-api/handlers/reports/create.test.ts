@@ -3,15 +3,17 @@ import { StatusCodes } from "../../libs/response-lib";
 import { putReport, queryReportsForState } from "../../storage/reports";
 import { canWriteState } from "../../utils/authorization";
 import { createReport } from "./create";
-import { ReportStatus, RhtpSubType } from "@rhtp/shared";
+import { ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
 import { RhtpSubTypeMap } from "../../utils/constants";
+import { authenticatedUser } from "../../utils/authentication";
+import { User } from "../../types/types";
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: "mdctrhtp-state-user",
-    state: "PA",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.STATE_USER,
+  state: "PA",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   canWriteState: vi.fn().mockReturnValue(true),

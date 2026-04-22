@@ -1,16 +1,18 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent } from "../../types/types";
+import { APIGatewayProxyEvent, User } from "../../types/types";
 import { getUploadsByFileId, getUploadsByReportId } from "./get";
 import { queryUpload } from "../../storage/upload";
+import { authenticatedUser } from "../../utils/authentication";
+import { UserRoles } from "@rhtp/shared";
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: "mdctrhtp-bor",
-    state: "PA",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.ADMIN,
+  state: "PA",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   isAuthenticated: vi.fn().mockReturnValue(true),

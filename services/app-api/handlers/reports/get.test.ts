@@ -1,16 +1,18 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent } from "../../types/types";
+import { APIGatewayProxyEvent, User } from "../../types/types";
 import { canReadState } from "../../utils/authorization";
 import { getReport, getReportsForState } from "./get";
+import { authenticatedUser } from "../../utils/authentication";
+import { UserRoles } from "@rhtp/shared";
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: "mdctrhtp-state-user",
-    state: "PA",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.STATE_USER,
+  state: "PA",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   canReadState: vi.fn().mockReturnValue(true),

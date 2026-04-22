@@ -1,21 +1,23 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent } from "../../types/types";
+import { APIGatewayProxyEvent, User } from "../../types/types";
 import { canWriteBanner } from "../../utils/authorization";
 import { deleteBanner } from "./delete";
 import { error } from "../../utils/constants";
 import { DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
+import { authenticatedUser } from "../../utils/authentication";
+import { UserRoles } from "@rhtp/shared";
 
 const dynamoClientMock = mockClient(DynamoDBDocumentClient);
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: "mdctrhtp-bor",
-    state: "PA",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.ADMIN,
+  state: "PA",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   canWriteBanner: vi.fn().mockReturnValue(true),
