@@ -7,6 +7,7 @@ import {
   Th,
   Thead,
   Tr,
+  Image,
 } from "@chakra-ui/react";
 import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
@@ -19,6 +20,8 @@ import {
   ElementType,
 } from "types";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
+import addPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */
 const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
@@ -34,12 +37,13 @@ const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
   onChange: (value: string[], index: number, id: string) => void,
-  onEdit: (index: number) => void
+  onEdit: (index: number) => void,
+  formDisabled?: boolean
 ) => {
   const formattedRows: JSX.Element[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: JSX.Element[] = [];
-    const disabled = isRowDisabled(rows, answerRow);
+    const disabled = isRowDisabled(rows, answerRow) || formDisabled;
     rows.map((column, columnIndex) => {
       //autogenerate next # column
       if (column.id === "no") {
@@ -74,6 +78,7 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
+  const { disabled } = props;
   const { id, label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -111,7 +116,13 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     setModalOpen(true);
   };
 
-  const formattedRows = buildRows(rows, answer ?? [], onChange, onModalEdit);
+  const formattedRows = buildRows(
+    rows,
+    answer ?? [],
+    onChange,
+    onModalEdit,
+    disabled
+  );
 
   const onSave = (data: ActionAnswerShape) => {
     if (modalData.index === undefined) {
@@ -131,10 +142,14 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         aria-label={`add ${label}`}
         variant="outline"
         alignSelf="flex-start"
+        leftIcon={
+          <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
+        }
         onClick={() => {
           setModalOpen(true);
           setModalData({ data: initial, index: undefined });
         }}
+        disabled={disabled}
       >
         Add {label.toLowerCase()}
       </Button>

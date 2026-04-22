@@ -3,14 +3,16 @@ import { PageElementProps } from "components/report/Elements";
 import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
-import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { useStore } from "utils";
 import { downloadFile, uploadListRender, removeFile } from "utils/other/upload";
 import { Hint, Label } from "@cmsgov/design-system";
+import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
+  const { disabled } = props;
   const { label, helperText, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { report } = useStore();
@@ -42,12 +44,22 @@ export const AttachmentArea = (
     <Stack gap="0">
       <Label fieldId={id}>{label}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
-      {uploadListRender(reportType, state, id, files, onRemove, downloadFile)}
+      {files.length > 0 &&
+        uploadListRender(
+          reportType,
+          state,
+          id,
+          files,
+          onRemove,
+          downloadFile,
+          disabled
+        )}
       <Button
         width="fit-content"
         onClick={() => setModalOpen(true)}
         variant="outline"
-        leftIcon={<Image src={addIconPrimary} />}
+        leftIcon={<Image src={disabled ? addGray : addIconPrimary} />}
+        disabled={disabled}
       >
         Add attachment
       </Button>

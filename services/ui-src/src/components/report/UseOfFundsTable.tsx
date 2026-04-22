@@ -15,6 +15,7 @@ import { UseOfFundsTableTemplate, UseOfFundsTableItem } from "types";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState, ChangeEvent, useEffect } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import {
   TextField,
@@ -29,7 +30,7 @@ import { Modal } from "components/modals/Modal";
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
 ) => {
-  const { element, updateElement } = props;
+  const { disabled, element, updateElement } = props;
   const { budgetPeriodOptions, useOfFundsOptions, recipientCategoryOptions } =
     element.dropDownOptions;
   const { report } = useStore();
@@ -185,6 +186,7 @@ export const UseOfFundsTableElement = (
               onClick={() => {
                 onEditClick(item);
               }}
+              disabled={disabled}
             >
               Edit
             </Button>
@@ -194,6 +196,7 @@ export const UseOfFundsTableElement = (
               onClick={() => {
                 handleDeleteClick(item.id);
               }}
+              disabled={disabled}
             >
               <Image src={cancelIcon} alt={"Delete Item"} />
             </Button>
@@ -210,8 +213,9 @@ export const UseOfFundsTableElement = (
         onClick={() => {
           onAddClick();
         }}
+        disabled={disabled}
+        leftIcon={<Image src={disabled ? addGray : addIcon} />}
       >
-        <Image src={addIcon} alt={"Add Item"} sx={sx.addIcon} />
         Add use of funds
       </Button>
       {rows.length > 0 && (
@@ -317,10 +321,4 @@ export const UseOfFundsTableElementExport = (
 ) => {
   console.log("element", element);
   return <div>empty div for now</div>;
-};
-
-const sx = {
-  addIcon: {
-    padding: "3px",
-  },
 };

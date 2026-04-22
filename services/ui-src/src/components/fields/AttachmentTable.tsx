@@ -34,6 +34,7 @@ import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
 import { dropdownEmptyOption } from "../../constants";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 
 const header = [
   "Attachment name",
@@ -258,8 +259,11 @@ export const AttachmentTable = (
         aria-label="Add Attachment"
         variant="outline"
         alignSelf="flex-start"
-        leftIcon={<Image src={addPrimary} alt="Add icon" />}
+        leftIcon={
+          <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
+        }
         onClick={onAddClick}
+        disabled={disabled}
       >
         Add Attachment
       </Button>
@@ -317,7 +321,8 @@ export const AttachmentTable = (
                     onClick={() => onEditClick(row)}
                     aria-label={`Edit file or info for ${row.attachment.name}`}
                     disabled={
-                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                      row.status === AttachmentStatus.LOCKED_FOR_SCORING ||
+                      disabled
                     }
                   >
                     Edit
@@ -334,7 +339,8 @@ export const AttachmentTable = (
                     onClick={() => onDeleteClick(row)}
                     aria-label={`Delete ${row.attachment.name}`}
                     disabled={
-                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                      row.status === AttachmentStatus.LOCKED_FOR_SCORING ||
+                      disabled
                     }
                   >
                     <Image src={cancelIcon} alt="Remove" minWidth="24px" />
@@ -407,7 +413,7 @@ export const AttachmentTable = (
         selectedFile={uploadedFiles[0]}
         updateElement={props.updateElement}
         allFiles={displayValue}
-        disabled={props.disabled}
+        disabled={disabled}
       />
     </Stack>
   );
