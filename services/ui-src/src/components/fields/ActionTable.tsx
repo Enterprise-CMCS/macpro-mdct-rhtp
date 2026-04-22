@@ -18,6 +18,7 @@ import {
   ActionAnswerShape,
   ElementType,
 } from "types";
+import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */
@@ -34,7 +35,8 @@ const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
   onChange: (value: string[], index: number, id: string) => void,
-  onEdit: (index: number) => void
+  onEdit: (index: number) => void,
+  canChangeStatus: boolean = false
 ) => {
   const formattedRows: JSX.Element[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
@@ -61,7 +63,7 @@ const buildRows = (
         <Button
           variant="link"
           onClick={() => onEdit(answerRowIndex)}
-          disabled={disabled}
+          disabled={!canChangeStatus}
         >
           Edit/Abandon
         </Button>
@@ -76,6 +78,7 @@ const buildRows = (
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { id, label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)
@@ -111,7 +114,13 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     setModalOpen(true);
   };
 
-  const formattedRows = buildRows(rows, answer ?? [], onChange, onModalEdit);
+  const formattedRows = buildRows(
+    rows,
+    answer ?? [],
+    onChange,
+    onModalEdit,
+    canAddOrChangeStatus
+  );
 
   const onSave = (data: ActionAnswerShape) => {
     if (modalData.index === undefined) {
@@ -135,6 +144,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           setModalOpen(true);
           setModalData({ data: initial, index: undefined });
         }}
+        disabled={!canAddOrChangeStatus}
       >
         Add {label.toLowerCase()}
       </Button>
