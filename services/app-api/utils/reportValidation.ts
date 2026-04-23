@@ -321,6 +321,7 @@ const actionTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ActionTable)),
   id: string().required(),
   label: string().required(),
+  pluralLabel: string().notRequired(),
   hintText: string().required(),
   modal: object()
     .shape({

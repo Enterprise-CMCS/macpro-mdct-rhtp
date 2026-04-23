@@ -75,6 +75,24 @@ describe("Test ActionTable component", () => {
         />
       );
     });
+    test("ActionTable renders with add and status change buttons", () => {
+      expect(screen.getByRole("button", { name: "add" })).toBeVisible();
+      expect(
+        screen.getAllByRole("button", { name: "Edit/Abandon" }).length
+      ).toBe(2);
+      const { rows } = mockActionTableElement;
+      rows.forEach((row) => {
+        expect(
+          screen.getByRole("columnheader", { name: row.header })
+        ).toBeVisible();
+      });
+      expect(
+        screen.getByRole("columnheader", { name: "Actions" })
+      ).toBeVisible();
+      expect(screen.getAllByRole("textbox", { name: "" })[0]).toHaveValue(
+        "hello"
+      );
+    });
     test("Table row opens the add modal", async () => {
       const addBtn = screen.getByRole("button", { name: "add" });
       await userEvent.click(addBtn);
@@ -114,10 +132,9 @@ describe("Test ActionTable component", () => {
       );
     });
     test("ActionTable renders", () => {
-      expect(screen.getByRole("button", { name: "add" })).toBeVisible();
       expect(
-        screen.getAllByRole("button", { name: "Edit/Abandon" }).length
-      ).toBe(2);
+        screen.queryByRole("button", { name: "Edit/Abandon" })
+      ).not.toBeInTheDocument();
       const { rows } = mockActionTableElement;
       rows.forEach((row) => {
         expect(
@@ -125,8 +142,8 @@ describe("Test ActionTable component", () => {
         ).toBeVisible();
       });
       expect(
-        screen.getByRole("columnheader", { name: "Actions" })
-      ).toBeVisible();
+        screen.queryByRole("columnheader", { name: "Actions" })
+      ).not.toBeInTheDocument();
       expect(screen.getAllByRole("textbox", { name: "" })[0]).toHaveValue(
         "hello"
       );
@@ -136,25 +153,13 @@ describe("Test ActionTable component", () => {
       await userEvent.type(textbox, "mock");
       expect(updateSpy).toHaveBeenCalledTimes(4);
     });
-    test("Cannot open the add modal", async () => {
-      const addBtn = screen.getByRole("button", { name: "add" });
-      expect(addBtn).toBeDisabled();
-    });
-    test("Table row opens the edit modal", async () => {
-      const editBtn = screen.getAllByRole("button", {
-        name: "Edit/Abandon",
-      })[0];
-      expect(editBtn).toBeDisabled();
-    });
     test("Row inputs are disabled when status value is Abandoned", async () => {
       expect(
-        screen.getByRole("row", { name: "2 bye Abandoned Edit/Abandon" })
+        screen.getByRole("row", { name: "2 bye Abandoned" })
       ).toBeVisible();
       const textbox = screen.getAllByRole("textbox", { name: "" })[1];
       expect(textbox).toHaveValue("bye");
       expect(textbox).toBeDisabled();
-      const editBtn = screen.getAllByRole("button", { name: "Edit/Abandon" });
-      expect(editBtn[1]).toBeDisabled();
     });
   });
 });

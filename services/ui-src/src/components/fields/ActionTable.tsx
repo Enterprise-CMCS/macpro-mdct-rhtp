@@ -58,17 +58,15 @@ const buildRows = (
         rowElement.push(<Td key={`action-column-${columnIndex}`}>{value}</Td>);
       }
     });
-    rowElement.push(
-      <Td key={`row.element.${answerRowIndex}`}>
-        <Button
-          variant="link"
-          onClick={() => onEdit(answerRowIndex)}
-          disabled={!canChangeStatus}
-        >
-          Edit/Abandon
-        </Button>
-      </Td>
-    );
+    if (canChangeStatus) {
+      rowElement.push(
+        <Td key={`row.element.${answerRowIndex}`}>
+          <Button variant="link" onClick={() => onEdit(answerRowIndex)}>
+            Edit/Abandon
+          </Button>
+        </Td>
+      );
+    }
     formattedRows.push(rowElement);
   });
 
@@ -76,9 +74,18 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const { id, label, hintText, modal, rows, answer } = props.element;
+  const {
+    id,
+    label,
+    pluralLabel: plural,
+    hintText,
+    modal,
+    rows,
+    answer,
+  } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
+  const pluralLabel = plural ?? `${label}s`;
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)
@@ -110,7 +117,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   /* Modal functions */
   const onModalEdit = (index: number) => {
     if (!answer) return;
-    setModalData({ data: answer[index], index });
+    setModalData({ data: structuredClone(answer[index]), index });
     setModalOpen(true);
   };
 
@@ -134,27 +141,28 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
-      <Label>{label}</Label>
+      <Label>{pluralLabel}</Label>
       <Hint id={id}>{hintText}</Hint>
-      <Button
-        aria-label={`add ${label}`}
-        variant="outline"
-        alignSelf="flex-start"
-        onClick={() => {
-          setModalOpen(true);
-          setModalData({ data: initial, index: undefined });
-        }}
-        disabled={!canAddOrChangeStatus}
-      >
-        Add {label.toLowerCase()}
-      </Button>
+      {canAddOrChangeStatus ? (
+        <Button
+          aria-label={`add ${label}`}
+          variant="outline"
+          alignSelf="flex-start"
+          onClick={() => {
+            setModalOpen(true);
+            setModalData({ data: initial, index: undefined });
+          }}
+        >
+          Add {label.toLowerCase()}
+        </Button>
+      ) : null}
       <Table variant="metric">
         <Thead>
           <Tr>
             {rows.map((row) => (
               <Th key={row.header}>{row.header}</Th>
             ))}
-            <Th>Actions</Th>
+            {canAddOrChangeStatus ? <Th>Actions</Th> : null}
           </Tr>
         </Thead>
         <Tbody>
