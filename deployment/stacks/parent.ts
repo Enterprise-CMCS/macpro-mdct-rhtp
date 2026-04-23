@@ -17,6 +17,7 @@ import { deployFrontend } from "./deployFrontend.ts";
 import { isLocalStack } from "../local/util.ts";
 import { createUploadsComponents } from "./uploads.ts";
 import { getSubnets } from "../utils/vpc.ts";
+import { createTopicsComponents } from "./topics.ts";
 
 export class ParentStack extends Stack {
   constructor(
@@ -106,6 +107,12 @@ export class ParentStack extends Stack {
 
     new CfnOutput(this, "CloudFrontUrl", {
       value: applicationEndpointUrl,
+    });
+
+    createTopicsComponents({
+      ...commonProps,
+      vpc,
+      kafkaAuthorizedSubnets,
     });
 
     if (isDev) {
