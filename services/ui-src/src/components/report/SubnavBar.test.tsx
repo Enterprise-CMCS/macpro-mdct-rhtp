@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { RouterWrappedComponent, mockUseStore } from "utils/testing/setupTest";
 import { useStore } from "utils";
 import { SubnavBar } from "./SubnavBar";
-import { ReportType } from "types";
+import { ReportType } from "@rhtp/shared";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;

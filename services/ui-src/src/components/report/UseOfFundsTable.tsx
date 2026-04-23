@@ -11,7 +11,11 @@ import {
   Image,
   Flex,
 } from "@chakra-ui/react";
-import { UseOfFundsTableTemplate, UseOfFundsTableItem } from "types";
+import {
+  UseOfFundsTableTemplate,
+  UseOfFundsTableItem,
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState, ChangeEvent, useEffect } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
@@ -40,7 +44,7 @@ export const UseOfFundsTableElement = (
     (page) => "initiativeNumber" in page
   );
   const initiativeOptions = [
-    { label: "- Select an option -", value: "" },
+    dropdownEmptyOption,
     ...(initiatives ?? []).map((initiative) => ({
       label: `${initiative.initiativeNumber}: ${initiative.title}`,
       value: initiative.initiativeNumber,

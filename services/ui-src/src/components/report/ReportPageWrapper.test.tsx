@@ -8,7 +8,7 @@ import {
   ReportStatus,
   ReportType,
   RhtpSubType,
-} from "types";
+} from "@rhtp/shared";
 import { ReportPageWrapper } from "./ReportPageWrapper";
 import { useStore } from "utils";
 

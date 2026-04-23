@@ -6,9 +6,9 @@ import { submittableMetricsSelector } from "utils/state/selectors";
 import { submitReport, useStore, reportBasePath } from "utils";
 import { createZipFile } from "utils/other/zip";
 import { SubmitReportModal } from "./SubmitReportModal";
-import { ReportStatus } from "types";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
+import { ReportStatus } from "@rhtp/shared";
 
 export const SubmissionBar = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =

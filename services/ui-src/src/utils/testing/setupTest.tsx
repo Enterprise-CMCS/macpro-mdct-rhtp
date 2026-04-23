@@ -1,15 +1,8 @@
 import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
 import * as framerMotion from "framer-motion";
-import {
-  UserRoles,
-  UserState,
-  AdminBannerState,
-  ReportState,
-  ReportType,
-  ReportStatus,
-  RhtpSubType,
-} from "types";
+import { UserState, AdminBannerState, ReportState } from "types";
+import { ReportType, ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
 import { mockBannerData } from "./mockBanner";
 
 /*

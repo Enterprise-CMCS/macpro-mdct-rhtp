@@ -9,8 +9,8 @@ import {
   collectPageItems,
   createClient as createDynamoClient,
 } from "./dynamo/dynamodb-lib";
-import { reportTables, StateAbbr } from "../utils/constants";
-import { Report, ReportType, LiteReport } from "../types/reports";
+import { reportTables } from "../utils/constants";
+import { StateAbbr, Report, ReportType, LiteReport } from "@rhtp/shared";
 
 const dynamoClient = createDynamoClient();
 

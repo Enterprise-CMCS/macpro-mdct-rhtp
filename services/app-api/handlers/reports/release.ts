@@ -4,7 +4,7 @@ import { forbidden, ok } from "../../libs/response-lib";
 import { canReleaseReport } from "../../utils/authorization";
 import { error } from "../../utils/constants";
 import { getReport, putReport } from "../../storage/reports";
-import { ReportStatus } from "../../types/reports";
+import { ReportStatus } from "@rhtp/shared";
 
 export const releaseReport = handler(parseReportParameters, async (request) => {
   const { reportType, state, id } = request.parameters;

@@ -5,7 +5,7 @@ import { StatusTableElement } from "./StatusTable";
 import { MemoryRouter } from "react-router";
 import { useStore } from "utils";
 import { mockStateUserStore } from "utils/testing/setupTest";
-import { PageStatus } from "types";
+import { PageStatus } from "@rhtp/shared";
 
 vi.mock("utils", () => ({
   useStore: vi.fn(),

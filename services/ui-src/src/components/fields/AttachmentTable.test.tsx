@@ -7,7 +7,7 @@ import {
   AttachmentTableTemplate,
   AttachmentStatus,
   InitiativeAnswerProp,
-} from "types";
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
 import { removeFile } from "utils/other/upload";

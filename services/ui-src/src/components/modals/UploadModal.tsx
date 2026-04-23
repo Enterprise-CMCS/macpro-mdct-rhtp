@@ -2,7 +2,7 @@ import { Stack } from "@chakra-ui/react";
 import { Modal } from "components";
 import { Upload } from "components/fields/Upload";
 import { JSX } from "react";
-import { UploadListProp } from "types";
+import { UploadListProp } from "@rhtp/shared";
 
 export const UploadModal = ({
   modalDisclosure,

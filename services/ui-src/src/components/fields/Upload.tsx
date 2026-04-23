@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { UploadListProp } from "types";
+import { UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,

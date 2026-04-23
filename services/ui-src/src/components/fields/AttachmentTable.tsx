@@ -25,14 +25,14 @@ import {
   AlertTypes,
   InitiativeAnswerProp,
   AttachmentStatus,
-} from "types";
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
-import { dropdownEmptyOption } from "../../constants";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 

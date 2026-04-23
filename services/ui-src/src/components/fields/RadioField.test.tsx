@@ -2,7 +2,7 @@ import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RadioField } from "components";
-import { ElementType, RadioTemplate } from "types";
+import { ElementType, RadioTemplate } from "@rhtp/shared";
 import { useStore } from "utils";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { testA11y } from "utils/testing/commonTests";

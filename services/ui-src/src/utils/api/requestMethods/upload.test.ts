@@ -7,7 +7,7 @@ import {
   deleteUploadedFile,
   getFileBytes,
 } from "./upload";
-import { ReportType } from "types";
+import { ReportType } from "@rhtp/shared";
 
 vi.mock("../apiLib", () => ({
   apiLib: {

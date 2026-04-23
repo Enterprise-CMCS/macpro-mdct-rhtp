@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { renderElements } from "./ExportedReportElements";
-import { ElementType } from "types";
+import { ElementType } from "@rhtp/shared";
 
 describe("Test ExportedReportElements", () => {
   test("render SubHeader element", () => {

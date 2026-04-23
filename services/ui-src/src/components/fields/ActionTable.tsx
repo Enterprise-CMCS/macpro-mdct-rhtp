@@ -18,7 +18,7 @@ import {
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-} from "types";
+} from "@rhtp/shared";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";

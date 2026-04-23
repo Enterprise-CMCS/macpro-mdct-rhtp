@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { ListInput } from "./ListInput";
-import { ElementType, ListInputTemplate } from "types";
+import { ElementType, ListInputTemplate } from "@rhtp/shared";
 import userEvent from "@testing-library/user-event";
 
 const mockedListInputElement: ListInputTemplate = {

@@ -3,13 +3,13 @@ import {
   PageStatus,
   PageType,
   Report,
-  ReportState,
   ReportStatus,
   ReportType,
   TextboxTemplate,
   FormPageTemplate,
   RhtpSubType,
-} from "types";
+} from "@rhtp/shared";
+import { ReportState } from "types";
 import {
   buildState,
   mergeAnswers,

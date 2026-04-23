@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ListInputTemplate } from "types";
+import { ListInputTemplate } from "@rhtp/shared";
 import { PageElementProps } from "components/report/Elements";
 import { Button, HStack, Image } from "@chakra-ui/react";
 import { Hint, Label, TextField } from "@cmsgov/design-system";

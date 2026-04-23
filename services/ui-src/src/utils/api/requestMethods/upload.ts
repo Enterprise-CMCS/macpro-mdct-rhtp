@@ -11,15 +11,6 @@ interface ZipData {
   bytes: string;
 }
 
-export interface UploadData {
-  uploadedState: string;
-  filename: string;
-  uploadedDate: string;
-  uploadedUsername: string;
-  fileId: string;
-  filesize: number;
-}
-
 export const recordFileInDatabaseAndGetUploadUrl = async (
   reportType: string,
   state: string,

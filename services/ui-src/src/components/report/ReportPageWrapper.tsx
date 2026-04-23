@@ -16,7 +16,8 @@ import { currentPageSelector } from "utils/state/selectors";
 
 import nextArrowIcon from "assets/icons/arrows/icon_arrow_next_white.svg";
 import prevArrowIcon from "assets/icons/arrows/icon_arrow_prev_primary.svg";
-import { isReviewSubmitPage, PageElement, ReportStatus } from "types";
+import { isReviewSubmitPage } from "types";
+import { PageElement, ReportStatus } from "@rhtp/shared";
 import { ReportAutosaveContext } from "./ReportAutosaveProvider";
 import { SubmissionBar } from "./SubmissionBar";
 

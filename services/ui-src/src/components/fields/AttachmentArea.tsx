@@ -1,4 +1,4 @@
-import { AttachmentAreaTemplate, UploadListProp } from "types";
+import { AttachmentAreaTemplate, UploadListProp } from "@rhtp/shared";
 import { PageElementProps } from "components/report/Elements";
 import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
