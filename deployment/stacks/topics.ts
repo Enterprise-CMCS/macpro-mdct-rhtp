@@ -57,7 +57,6 @@ export function createTopicsComponents(props: CreateTopicsComponentsProps) {
     handler: "handler",
     timeout: Duration.seconds(60),
     retryAttempts: 0,
-    allowPublicSubnet: true,
     ...commonProps,
   });
 
@@ -66,7 +65,6 @@ export function createTopicsComponents(props: CreateTopicsComponentsProps) {
       entry: "services/topics/handlers/deleteTopics.js",
       handler: "handler",
       timeout: Duration.minutes(5),
-      allowPublicSubnet: true,
       ...commonProps,
     });
 
@@ -82,7 +80,6 @@ export function createTopicsComponents(props: CreateTopicsComponentsProps) {
     handler: "handler",
     timeout: Duration.minutes(5),
     retryAttempts: 0,
-    allowPublicSubnet: true,
     ...commonProps,
   });
 
