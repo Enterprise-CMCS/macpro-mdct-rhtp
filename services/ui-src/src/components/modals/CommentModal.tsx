@@ -11,7 +11,7 @@ import {
   InitiativeComment,
   UploadListProp,
   AttachmentStatus,
-} from "types";
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
 

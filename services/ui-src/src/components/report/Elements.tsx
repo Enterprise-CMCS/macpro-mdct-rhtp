@@ -17,7 +17,7 @@ import {
   ButtonLinkTemplate,
   HeaderIcon,
   PageElement,
-} from "types";
+} from "@rhtp/shared";
 import { AccordionItem } from "components";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { parseHtml } from "utils";

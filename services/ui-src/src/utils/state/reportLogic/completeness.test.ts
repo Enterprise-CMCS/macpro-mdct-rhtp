@@ -7,7 +7,7 @@ import {
   RadioTemplate,
   Report,
   TextboxTemplate,
-} from "types";
+} from "@rhtp/shared";
 import {
   elementSatisfiesRequired,
   inferredReportStatus,

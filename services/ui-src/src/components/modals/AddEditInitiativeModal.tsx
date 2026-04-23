@@ -12,7 +12,7 @@ import {
   CreateInitiativeOptions,
   InitiativePageTemplate,
   UpdateInitiativeOptions,
-} from "types";
+} from "@rhtp/shared";
 
 const initialValues = {
   initiativeName: "",

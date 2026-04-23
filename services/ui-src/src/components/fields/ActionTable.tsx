@@ -17,7 +17,7 @@ import {
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-} from "types";
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 

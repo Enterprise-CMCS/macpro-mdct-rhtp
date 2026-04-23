@@ -19,7 +19,7 @@ import {
   CreateInitiativeOptions,
   UpdateInitiativeOptions,
   RhtpSubType,
-} from "../types/reports";
+} from "@rhtp/shared";
 import { error } from "./constants";
 
 const hideConditionSchema = object()

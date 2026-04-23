@@ -1,7 +1,7 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
+import { APIGatewayProxyEvent, User } from "../../types/types";
 import { canWriteState } from "../../utils/authorization";
 import {
   incorrectTypeReport,
@@ -11,14 +11,16 @@ import {
   validReport,
 } from "../../utils/tests/mockReport";
 import { updateReport } from "./update";
+import { authenticatedUser } from "../../utils/authentication";
+import { UserRoles } from "@rhtp/shared";
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.STATE_USER,
-    state: "PA",
-    fullName: "Anthony Soprano",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.STATE_USER,
+  state: "PA",
+  fullName: "Anthony Soprano",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   canWriteState: vi.fn().mockReturnValue(true),

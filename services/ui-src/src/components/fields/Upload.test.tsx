@@ -13,7 +13,7 @@ import {
   recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
-import { ReportType } from "types";
+import { ReportType } from "@rhtp/shared";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),

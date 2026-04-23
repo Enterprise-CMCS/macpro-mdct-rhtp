@@ -1,9 +1,5 @@
-import {
-  ReportState,
-  PageStatus,
-  ParentPageTemplate,
-  ReportStatus,
-} from "types";
+import { PageStatus, ParentPageTemplate, ReportStatus } from "@rhtp/shared";
+import { ReportState } from "types";
 import { pageIsCompletable } from "./reportLogic/completeness";
 
 export const currentPageSelector = (state: ReportState) => {

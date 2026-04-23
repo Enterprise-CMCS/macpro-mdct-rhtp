@@ -11,7 +11,7 @@ import { canWriteBanner } from "../../utils/authorization";
 import { parseBannerId } from "../../libs/param-lib";
 import { validateBannerPayload } from "../../utils/bannerValidation";
 import { logger } from "../../libs/debug-lib";
-import { BannerData } from "../../types/banner";
+import { BannerData } from "@rhtp/shared";
 
 export const createBanner = handler(parseBannerId, async (request) => {
   const { bannerId } = request.parameters;

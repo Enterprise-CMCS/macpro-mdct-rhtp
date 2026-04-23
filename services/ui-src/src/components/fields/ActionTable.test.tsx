@@ -1,6 +1,6 @@
 import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { ActionTableTemplate, ElementType } from "types";
+import { ActionTableTemplate, ElementType } from "@rhtp/shared";
 import { ActionTable } from "./ActionTable";
 import userEvent from "@testing-library/user-event";
 import { useStore } from "utils";

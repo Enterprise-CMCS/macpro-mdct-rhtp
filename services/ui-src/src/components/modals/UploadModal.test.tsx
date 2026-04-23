@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
 import { Dropdown } from "@cmsgov/design-system";
-import { ReportType } from "types";
+import { ReportType } from "@rhtp/shared";
 
 const mockCloseHandler = vi.fn();
 const mockChangedExpanded = vi.fn();

@@ -1,7 +1,7 @@
 import { Button, Flex, Image, Link } from "@chakra-ui/react";
 import nextIcon from "assets/icons/arrows/icon_arrow_next_white.svg";
 import { useNavigate } from "react-router";
-import { ReportType, isReportType } from "types";
+import { ReportType, isReportType } from "@rhtp/shared";
 import { useStore } from "utils";
 
 /**

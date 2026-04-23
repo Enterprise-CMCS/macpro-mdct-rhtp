@@ -8,12 +8,8 @@ import {
   ButtonLinkElement,
   DividerElement,
 } from "./Elements";
-import {
-  assertExhaustive,
-  ElementType,
-  PageElement,
-  ReportStatus,
-} from "../../types";
+import { assertExhaustive } from "types";
+import { ElementType, PageElement, ReportStatus } from "@rhtp/shared";
 import {
   DateField,
   DropdownField,
