@@ -9,13 +9,18 @@ import {
 import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
 import { useParams } from "react-router";
-import { ElementType, TableCheckpointTemplate } from "types";
+import {
+  ElementType,
+  TableCheckpointTemplate,
+  AttachmentStatus,
+} from "@rhtp/shared";
 import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
+import { CommentModal } from "components/modals/CommentModal";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
@@ -64,6 +69,9 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
     ]),
 }));
 
+vi.mock("components/modals/CommentModal");
+const mockCommentModal = vi.mocked(CommentModal);
+
 const mockTableCheckpointElement: TableCheckpointTemplate = {
   id: "mock-TableCheckpoint-id",
   type: ElementType.TableCheckpoint,
@@ -82,40 +90,43 @@ const TableCheckpointComponent = (
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 const consoleMock = vi.spyOn(console, "error");
 
-describe("<TableCheckpoint />", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockedUseStore.mockReturnValue({
-      report: {
-        year: "2026",
-        pages: [
+const mockReport = {
+  report: {
+    id: "mock-report-id",
+    type: "RHTP",
+    pages: [
+      {
+        id: "mock-init-1",
+        initiativeNumber: "123",
+        title: "Init Title",
+      },
+      {
+        id: "initiative-attachments",
+        elements: [
           {
-            id: "mock-init-1",
-            initiativeNumber: "123",
-            title: "Init Title",
-          },
-          {
-            id: "initiative-attachments",
-            elements: [
+            id: "initiative-attachments-table",
+            type: ElementType.AttachmentTable,
+            answer: [
               {
-                id: "initiative-attachments-table",
-                type: ElementType.AttachmentTable,
-                answer: [
-                  {
-                    initiatives: ["mock-init-1"],
-                    checkpoints: "project-prop-2",
-                    comments: [],
-                    attachment: mockFiles,
-                    stage: "checkpoint-1",
-                    status: "Under Review",
-                  },
-                ],
+                initiatives: ["mock-init-1"],
+                checkpoints: "project-prop-2",
+                comments: [],
+                attachment: mockFiles,
+                stage: "checkpoint-1",
+                status: "Under Review",
               },
             ],
           },
         ],
       },
-    });
+    ],
+  },
+};
+
+describe("<TableCheckpoint />", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedUseStore.mockReturnValue(mockReport);
   });
   test("TableCheckpoint renders a table", () => {
     render(TableCheckpointComponent);
@@ -152,10 +163,32 @@ describe("<TableCheckpoint />", () => {
     await userEvent.click(fileBtn);
     expect(getFileDownloadUrl).toHaveBeenCalled();
   });
+  test("add comment to file", async () => {
+    render(TableCheckpointComponent);
+    const commentButton = screen.getByRole("button", {
+      name: "Comment on orange.png",
+    });
+    expect(commentButton).toBeVisible();
+    await userEvent.click(commentButton);
+    expect(mockCommentModal).toHaveBeenCalled();
+  });
+  test("delete disabled when file status locked", async () => {
+    const lockedFileReport = structuredClone(mockReport);
+    lockedFileReport.report.pages[1].elements![0].answer[0].status =
+      AttachmentStatus.LOCKED_FOR_SCORING;
+    mockedUseStore.mockReturnValue(lockedFileReport);
+    render(TableCheckpointComponent);
+    const deleteButton = screen.getByRole("button", {
+      name: "Remove orange.png from checkpoint Launch initiative",
+    });
+    expect(deleteButton).toBeDisabled();
+  });
   test("delete file", async () => {
     render(TableCheckpointComponent);
-    const fileBtn = screen.getByRole("button", { name: "Remove orange.png" });
-    await userEvent.click(fileBtn);
+    const deleteButton = screen.getByRole("button", {
+      name: "Remove orange.png from checkpoint Launch initiative",
+    });
+    await userEvent.click(deleteButton);
     expect(mockGetAnswer).toHaveBeenCalled();
   });
   testA11y(TableCheckpointComponent);
@@ -163,6 +196,9 @@ describe("<TableCheckpoint />", () => {
 
 describe("TableCheckpoint upload modal", () => {
   beforeEach(async () => {
+    vi.clearAllMocks();
+    mockedUseStore.mockReturnValue(mockReport);
+
     render(TableCheckpointComponent);
     const uploadBtn = screen.getAllByRole("button", {
       name: "Upload attachments",

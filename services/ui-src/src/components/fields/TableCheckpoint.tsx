@@ -10,16 +10,19 @@ import {
   Tr,
   Image,
   Text,
+  Flex,
 } from "@chakra-ui/react";
 import {
-  DropdownOptions,
+  AttachmentStatus,
   ElementType,
   InitiativeAnswerProp,
   TableCheckpointTemplate,
   UploadListProp,
-} from "types";
+} from "@rhtp/shared";
+import { DropdownOptions } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
+import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
@@ -31,6 +34,7 @@ import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider"
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
+import { CommentModal } from "components/modals/CommentModal";
 
 type TableShape = {
   stage: number;
@@ -44,7 +48,8 @@ type TableShape = {
     id: string;
     stageNo: string;
     label: string;
-    file: { name: string; fileId: string; size: number };
+    file: UploadListProp;
+    status: string;
   }[];
 };
 
@@ -54,7 +59,12 @@ const buildRows = (
   values: {
     label: string;
     id: string;
-    attachments: UploadListProp[] | undefined;
+    attachments:
+      | {
+          file: UploadListProp;
+          status: AttachmentStatus;
+        }[]
+      | undefined;
   }[]
 ) => {
   return values.reduce((prev: any[], curr, index) => {
@@ -66,9 +76,17 @@ const buildRows = (
     };
     if (attachments) {
       const copy = [...attachments];
-      prev.push({ ...row, file: copy.shift() ?? {} });
-      copy.forEach((file) =>
-        prev.push({ id, stageNo: "", label: "", completed: undefined, file })
+      const { file, status } = copy.shift() || {};
+      prev.push({ ...row, file: file ?? {}, status: status ?? {} });
+      copy.forEach(({ file, status }) =>
+        prev.push({
+          id,
+          stageNo: "",
+          label: "",
+          completed: undefined,
+          file,
+          status,
+        })
       );
     } else {
       prev.push(row);
@@ -86,7 +104,7 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
           (answer) =>
             answer.stage === id && answer.checkpoints === checkpoint.id
         )
-        .map((upload) => upload.attachment);
+        .map((upload) => ({ file: upload.attachment, status: upload.status }));
       return {
         label: checkpoint.label,
         id: checkpoint.id,
@@ -108,7 +126,7 @@ const getFilesFromTable = (tables: TableShape[], checkpoints: string) => {
 const header = [
   "#",
   "Checkpoint",
-  "Check if Complete",
+  "Ready for CMS Review",
   "Attachments",
   "Actions",
 ];
@@ -118,10 +136,12 @@ export const TableCheckpoint = (
 ) => {
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
+  const [selectedFile, setSelectedFile] = useState<UploadListProp>();
   const { state, pageId } = useParams();
   const { report, setAnswers } = useStore();
+  const { id, type: reportType } = report!;
   const { autosave } = useContext(ReportAutosaveContext);
-  const year = report?.year.toString();
   //if there is answer on load, we need to build the shape from the checkpoints data
   const initialDisplayValue =
     answer ??
@@ -141,8 +161,9 @@ export const TableCheckpoint = (
     checkpoints: string;
   }>({ stage: "", checkpoints: "" });
   const [files, setFiles] = useState<UploadListProp[]>([]);
+  const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
 
-  if (!state || !year || !pageId) {
+  if (!state || !id || !reportType || !pageId) {
     console.error("Can't retrieve uploads with missing state, year or id");
     return;
   }
@@ -173,11 +194,12 @@ export const TableCheckpoint = (
       attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
 
     const newTables = buildTables(files);
+    setAttachments(attachments || []);
     setTables(newTables);
     setFiles(getFilesFromTable(newTables, selection.checkpoints));
-  }, [report]);
+  }, [isCommentsOpen, report]);
 
-  const onCheckboxeHandler = (id: string) => {
+  const onCheckboxHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
     const checkbox = newValue.find((value) => value.id === id);
     if (checkbox) checkbox.checked = !checkbox.checked;
@@ -201,16 +223,36 @@ export const TableCheckpoint = (
       ...selection,
       comments: [],
       attachment: file,
-      status: "Under Review", //TODO: update status when status has been added to initiatives
+      status: AttachmentStatus.PENDING_REVIEW,
     }));
   };
 
-  const onUploadDelete = (file: UploadListProp) => {
-    writeToReport(file.fileId);
+  const deleteFromReport = (file: UploadListProp) => {
+    handleFileAddDelete(file.fileId);
   };
 
-  const writeToReport = (newValue: UploadListProp[] | string) => {
+  const onCommentClick = (file: UploadListProp) => {
+    setSelectedFile(file);
+    setCommentsOpen(true);
+  };
+
+  const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
+    writeToAttachmentsTable(() => data.answer);
+  };
+
+  const writeToAttachmentsTable = (generateAnswer: (answer: any) => any) => {
     if (!report) return;
+    setAnswerInElement<InitiativeAnswerProp[]>(
+      report,
+      "initiative-attachments",
+      attachmentTableId,
+      generateAnswer,
+      setAnswers
+    );
+    autosave();
+  };
+
+  const handleFileAddDelete = (newValue: UploadListProp[] | string) => {
     //the type of element being passed in determines whether it's an add or remove
     const generateAnswer = (answer: InitiativeAnswerProp[]) => {
       //if it's a string, we're removing a file
@@ -227,15 +269,7 @@ export const TableCheckpoint = (
         return [...answer, ...formatUploads(newValue)];
       }
     };
-    //setting an answer and saving are split, we have to run autosave after if we want it saved to the report
-    setAnswerInElement<InitiativeAnswerProp[]>(
-      report,
-      "initiative-attachments",
-      attachmentTableId,
-      generateAnswer,
-      setAnswers
-    );
-    autosave();
+    writeToAttachmentsTable(generateAnswer);
   };
 
   return (
@@ -276,9 +310,9 @@ export const TableCheckpoint = (
                         isChecked={
                           initialDisplayValue.find(
                             (value) => value.id === row.id
-                          )!.checked
+                          )?.checked
                         }
-                        onChange={() => onCheckboxeHandler(row.id)}
+                        onChange={() => onCheckboxHandler(row.id)}
                       ></Checkbox>
                     ) : (
                       <></>
@@ -289,7 +323,9 @@ export const TableCheckpoint = (
                       <Button
                         aria-label={`Download ${row.file.name}`}
                         variant="link"
-                        onClick={() => downloadFile(year, state, row.file)}
+                        onClick={() =>
+                          downloadFile(reportType, state, id, row.file)
+                        }
                       >
                         {row.file.name}
                       </Button>
@@ -299,13 +335,29 @@ export const TableCheckpoint = (
                   </Td>
                   <Td>
                     {"file" in row && row.file.fileId && (
-                      <Button
-                        variant="unstyled"
-                        onClick={() => writeToReport(row.file.fileId)}
-                        aria-label={`Remove ${row.file.name}`}
-                      >
-                        <Image src={cancelIcon} alt="Remove" />
-                      </Button>
+                      <Flex>
+                        <Button
+                          variant="link"
+                          onClick={() => onCommentClick(row.file)}
+                          aria-label={`Comment on ${row.file.name}`}
+                        >
+                          <Image
+                            src={commentIcon}
+                            alt="Comment"
+                            minWidth="26px"
+                          />
+                        </Button>
+                        <Button
+                          variant="unstyled"
+                          onClick={() => handleFileAddDelete(row.file.fileId)}
+                          aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
+                          disabled={
+                            row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                          }
+                        >
+                          <Image src={cancelIcon} alt="Remove" />
+                        </Button>
+                      </Flex>
                     )}
                   </Td>
                 </Tr>
@@ -320,9 +372,9 @@ export const TableCheckpoint = (
           onClose: () => setModalOpen(false),
         }}
         state={state}
-        year={year}
         answer={files}
-        id={attachmentTableId}
+        id={id}
+        reportType={reportType}
         selections={
           <>
             <Dropdown
@@ -344,9 +396,21 @@ export const TableCheckpoint = (
             ></Dropdown>
           </>
         }
-        saveToReport={writeToReport}
-        deleteFromReport={onUploadDelete}
+        saveToReport={handleFileAddDelete}
+        deleteFromReport={deleteFromReport}
       ></UploadModal>
+      <CommentModal
+        modalDisclosure={{
+          isOpen: isCommentsOpen,
+          onClose: () => {
+            setCommentsOpen(false);
+          },
+        }}
+        updateElement={handleCommentSave}
+        selectedFile={selectedFile}
+        allFiles={attachments}
+        disabled={props.disabled}
+      />
     </Stack>
   );
 };

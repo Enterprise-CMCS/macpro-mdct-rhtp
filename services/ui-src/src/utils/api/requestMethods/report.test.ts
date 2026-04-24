@@ -4,10 +4,10 @@ import {
   getReportsForState,
   putReport,
   releaseReport,
-  postSubmitReport,
+  submitReport,
 } from "./report";
 // types
-import { FormPageTemplate, Report, ReportType } from "types";
+import { FormPageTemplate, Report, ReportType } from "@rhtp/shared";
 
 const report = {
   type: ReportType.RHTP,
@@ -52,8 +52,8 @@ describe("utils/report", () => {
   });
 
   test("submitReport", async () => {
-    await postSubmitReport(report);
-    expect(mockPost).toHaveBeenCalledTimes(1);
+    await submitReport(report);
+    expect(mockPut).toHaveBeenCalledTimes(1);
   });
 
   test("releaseReport", async () => {

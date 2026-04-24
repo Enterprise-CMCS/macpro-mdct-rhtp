@@ -1,11 +1,10 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import { Report, BannerData } from "@rhtp/shared";
 import {
   UserState,
   User,
-  Report,
   ReportState,
-  BannerData,
   ErrorVerbiage,
   AdminBannerState,
 } from "types";

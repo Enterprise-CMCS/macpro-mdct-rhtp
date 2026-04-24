@@ -1,16 +1,18 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
+import { APIGatewayProxyEvent, User } from "../../types/types";
 import { createUpload } from "./create";
 import { updateUpload } from "../../storage/upload";
+import { authenticatedUser } from "../../utils/authentication";
+import { UserRoles } from "@rhtp/shared";
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.ADMIN,
-    state: "PA",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.ADMIN,
+  state: "PA",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   isAuthenticated: vi.fn().mockReturnValue(true),
@@ -29,12 +31,17 @@ vi.mock("../../libs/s3-lib", () => ({
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   body: `{"fileId":"mock-id"}`,
-  pathParameters: { state: "PA", year: "2025", fileId: "mock-id" },
+  pathParameters: {
+    state: "PA",
+    reportType: "RHTP",
+    id: "mock-id",
+    fileId: "mock-file-id",
+  },
   headers: { "cognito-identity-id": "test" },
 };
 
 const mockUploadRespond = {
-  Items: [{ uploadedState: "PA", fileId: "mock-id", awsFilename: "mockname" }],
+  Items: [{ uploadedState: "PA", fileId: "mock-id" }],
 };
 
 describe("Test createUpload API method", () => {

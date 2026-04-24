@@ -4,9 +4,10 @@ import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
   getFileDownloadUrl,
-  getUploadedFiles,
   deleteUploadedFile,
+  getFileBytes,
 } from "./upload";
+import { ReportType } from "@rhtp/shared";
 
 vi.mock("../apiLib", () => ({
   apiLib: {
@@ -18,17 +19,6 @@ vi.mock("../apiLib", () => ({
 }));
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
-const mockData = [
-  {
-    uploadedState: "PA",
-    awsFilename: "mock-aws-filename",
-    filename: "mock-name",
-    uploadedDate: "2/2/2",
-    uploadedUsername: "mock@mail.com",
-    fileId: "question-0001",
-    filesize: 40,
-  },
-];
 
 let originalFetch = window.fetch;
 
@@ -47,10 +37,10 @@ describe("Test fileApi functions", () => {
     (apiLib.post as Mock).mockReturnValue({ psurl: "https://mock.url" });
 
     const result = await recordFileInDatabaseAndGetUploadUrl(
-      "2025",
-      "PA",
-      mockPng,
-      "mock-id"
+      "abc",
+      ReportType.RHTP,
+      "mock-id",
+      mockPng
     );
     expect(result).toEqual({ presignedUploadUrl: "https://mock.url" });
   });
@@ -61,22 +51,23 @@ describe("Test fileApi functions", () => {
   });
   test("getFileDownloadUrl", async () => {
     (apiLib.get as Mock).mockReturnValue({ psurl: "mock.s3/url" });
-    const result = await getFileDownloadUrl("2025", "PA", "mock-id");
+    const result = await getFileDownloadUrl("RHTP", "2025", "PA", "mock-id");
     expect(result).toBe("mock.s3/url");
-  });
-  test("getUploadedFiles", async () => {
-    (apiLib.get as Mock).mockReturnValue(mockData);
-    const result = await getUploadedFiles("2025", "PA", "mock-id");
-    expect(result).toBe(mockData);
   });
   test("deleteUploadedFile", async () => {
     (apiLib.del as Mock).mockReturnValue(Promise.resolve());
-    await deleteUploadedFile("2025", "PA", "mock-id");
+    await deleteUploadedFile("RHTP", "PA", "mock-id", "mock-file-id");
     expect(apiLib.del as Mock).toHaveBeenCalledWith(
-      "/uploads/2025/PA/mock-id",
+      "/reports/RHTP/PA/mock-id/files/mock-file-id",
       {
         headers: { "x-api-key": undefined },
       }
     );
+  });
+  test("getFileBytes", async () => {
+    const zipData = [{ name: "file-name", bytes: "abced" }];
+    (apiLib.get as Mock).mockReturnValue(zipData);
+    const result = await getFileBytes("2025", "PA", "mock-id");
+    expect(result).toBe(zipData);
   });
 });

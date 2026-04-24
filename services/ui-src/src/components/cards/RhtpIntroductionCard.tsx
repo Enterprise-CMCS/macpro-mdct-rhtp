@@ -1,7 +1,7 @@
 import { Accordion } from "@chakra-ui/react";
 import { AccordionItem, ReportIntroCard } from "components";
 import { ReportIntroCardActions } from "./ReportIntroCardActions";
-import { ReportType } from "types";
+import { ReportType } from "@rhtp/shared";
 
 /**
  * This card appears on the state user home page.

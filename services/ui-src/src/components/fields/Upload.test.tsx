@@ -9,11 +9,11 @@ import {
 import userEvent from "@testing-library/user-event";
 import { Upload } from "./Upload";
 import {
-  deleteUploadedFile,
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
+import { ReportType } from "@rhtp/shared";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -30,13 +30,16 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
     ]),
 }));
 
+const mockDeleteFromReport = vi.fn();
+
 const props = {
   state: "PA",
-  year: "2026",
+  reportType: ReportType.RHTP,
   id: "mock-id",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   saveToReport: vi.fn(),
   updateElement: vi.fn(),
+  deleteFromReport: mockDeleteFromReport,
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
@@ -87,7 +90,6 @@ describe("<Upload />", () => {
   });
 
   test("test deleting a file", async () => {
-    (deleteUploadedFile as Mock).mockResolvedValueOnce("");
     render(<Upload {...props} />);
     await waitFor(() => {
       expect(
@@ -97,7 +99,7 @@ describe("<Upload />", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "delete mock-name" })
     );
-    expect(deleteUploadedFile).toHaveBeenCalled();
+    expect(mockDeleteFromReport).toHaveBeenCalled();
   });
   testA11y(<Upload {...props} />);
 });

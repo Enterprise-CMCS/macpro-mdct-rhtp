@@ -3,12 +3,13 @@ import {
   PageStatus,
   PageType,
   Report,
-  ReportState,
   ReportStatus,
   ReportType,
   TextboxTemplate,
   FormPageTemplate,
-} from "types";
+  RhtpSubType,
+} from "@rhtp/shared";
+import { ReportState } from "types";
 import {
   buildState,
   mergeAnswers,
@@ -29,6 +30,10 @@ const testReport: Report = {
   state: "NJ",
   id: "NJRHTP123",
   status: ReportStatus.NOT_STARTED,
+  created: 1776449695077,
+  subType: RhtpSubType.ANNUAL,
+  subTypeKey: "A1",
+  budgetPeriod: 1,
   submissionCount: 0,
   pages: [
     {

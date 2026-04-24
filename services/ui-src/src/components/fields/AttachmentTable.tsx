@@ -25,14 +25,15 @@ import {
   UploadListProp,
   AlertTypes,
   InitiativeAnswerProp,
-} from "types";
+  AttachmentStatus,
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
-import { dropdownEmptyOption } from "../../constants";
 
 const header = [
   "Attachment name",
@@ -48,13 +49,13 @@ type Options = { label: string; value: string; checked?: boolean };
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
 ) => {
-  const { id, answer } = props.element;
+  const { answer } = props.element;
   const displayValue = structuredClone(answer) ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const { state } = useParams();
   const { report } = useStore();
-  const year = report?.year.toString();
+  const { id, type: reportType } = report!;
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -79,7 +80,6 @@ export const AttachmentTable = (
     { id: string; label: string }[]
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
-
   const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
     "Upload"
   );
@@ -94,8 +94,8 @@ export const AttachmentTable = (
     Delete: "Delete Attachment",
   };
 
-  if (!state || !year) {
-    console.error("Can't retrieve uploads with missing state or year");
+  if (!state || !id || !reportType) {
+    console.error("Can't retrieve uploads with missing state, id or type");
     return;
   }
 
@@ -143,7 +143,7 @@ export const AttachmentTable = (
       initiatives: [],
       stage: "",
       checkpoints: "",
-      status: "Under Review",
+      status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     }));
 
@@ -163,11 +163,10 @@ export const AttachmentTable = (
       (item) => item.attachment.fileId !== file.fileId
     );
     props.updateElement({ answer: newAnswerValue });
-    removeFile(file, year, state, () => {
-      return;
-    });
+    removeFile(file, reportType, id, state);
   };
 
+  // TODO: When we have file replacement on edit logic in, make sure to set status to PENDING_REVIEW
   const onModalSubmit = () => {
     if (modalMode === "Delete") {
       removeAttachment(uploadedFiles[0]);
@@ -181,8 +180,10 @@ export const AttachmentTable = (
         .map((option) => option.value),
       stage: selection.stage,
       checkpoints: selection.checkpoint,
-      status: "Under Review",
-      comments: [],
+      status: AttachmentStatus.PENDING_REVIEW,
+      comments:
+        displayValue.find((item) => item.attachment.fileId === upload.fileId)
+          ?.comments ?? [],
     }));
 
     const newValues = displayValue.map((item) => {
@@ -268,7 +269,7 @@ export const AttachmentTable = (
           <Thead>
             <Tr>
               {header.map((item) => (
-                <Th>{item}</Th>
+                <Th key={item}>{item}</Th>
               ))}
             </Tr>
           </Thead>
@@ -278,7 +279,9 @@ export const AttachmentTable = (
                 <Td>
                   <Button
                     variant="link"
-                    onClick={() => downloadFile(year, state, row.attachment)}
+                    onClick={() =>
+                      downloadFile(reportType, state, id, row.attachment)
+                    }
                     fontWeight="bold"
                   >
                     {row.attachment.name}
@@ -308,16 +311,30 @@ export const AttachmentTable = (
                 </Td>
                 <Td>{row.status}</Td>
                 <Td className="actions" display="flex" width="152px">
-                  <Button variant="outline" onClick={() => onEditClick(row)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => onEditClick(row)}
+                    aria-label={`Edit file or info for ${row.attachment.name}`}
+                    disabled={
+                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                    }
+                  >
                     Edit
                   </Button>
-                  <Button variant="link" onClick={() => onCommentClick(row)}>
+                  <Button
+                    variant="link"
+                    onClick={() => onCommentClick(row)}
+                    aria-label={`Comment on ${row.attachment.name}`}
+                  >
                     <Image src={commentIcon} alt="Comment" minWidth="26px" />
                   </Button>
                   <Button
                     variant="link"
                     onClick={() => onDeleteClick(row)}
-                    aria-label={`Remove ${row.attachment.name}`}
+                    aria-label={`Delete ${row.attachment.name}`}
+                    disabled={
+                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                    }
                   >
                     <Image src={cancelIcon} alt="Remove" minWidth="24px" />
                   </Button>
@@ -333,9 +350,9 @@ export const AttachmentTable = (
           onClose: onClose,
         }}
         state={state}
-        year={year}
         answer={uploadedFiles}
         id={id}
+        reportType={reportType}
         hint="[hint text]"
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">

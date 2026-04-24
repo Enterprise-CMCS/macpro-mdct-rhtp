@@ -1,4 +1,4 @@
-import { ElementType, FormPageTemplate, PageType } from "types";
+import { ElementType, FormPageTemplate, PageType } from "@rhtp/shared";
 
 export const textboxSection: FormPageTemplate = {
   id: "mock-textbox-id",

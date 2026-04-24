@@ -2,7 +2,7 @@ import { Link as RouterLink } from "react-router";
 import { Flex, Container, Image, Link, Text } from "@chakra-ui/react";
 import { useStore } from "utils";
 import checkIcon from "assets/icons/check/icon_check_gray.png";
-import { isReportType } from "types";
+import { isReportType } from "@rhtp/shared";
 
 const getTitle = (reportType: string) => {
   if (!isReportType(reportType)) return "";

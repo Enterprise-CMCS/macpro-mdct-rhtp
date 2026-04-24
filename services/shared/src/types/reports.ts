@@ -1,67 +1,5 @@
 // Shared types between frontend and backend
-
-// STATES
-export const StateNames = {
-  AL: "Alabama",
-  AK: "Alaska",
-  AS: "American Samoa",
-  AZ: "Arizona",
-  AR: "Arkansas",
-  CA: "California",
-  CO: "Colorado",
-  CT: "Connecticut",
-  DE: "Delaware",
-  DC: "District of Columbia",
-  FM: "Federated States of Micronesia",
-  FL: "Florida",
-  GA: "Georgia",
-  GU: "Guam",
-  HI: "Hawaii",
-  ID: "Idaho",
-  IL: "Illinois",
-  IN: "Indiana",
-  IA: "Iowa",
-  KS: "Kansas",
-  KY: "Kentucky",
-  LA: "Louisiana",
-  ME: "Maine",
-  MH: "Marshall Islands",
-  MD: "Maryland",
-  MA: "Massachusetts",
-  MI: "Michigan",
-  MN: "Minnesota",
-  MS: "Mississippi",
-  MO: "Missouri",
-  MT: "Montana",
-  NE: "Nebraska",
-  NV: "Nevada",
-  NH: "New Hampshire",
-  NJ: "New Jersey",
-  NM: "New Mexico",
-  NY: "New York",
-  NC: "North Carolina",
-  ND: "North Dakota",
-  MP: "Northern Mariana Islands",
-  OH: "Ohio",
-  OK: "Oklahoma",
-  OR: "Oregon",
-  PW: "Palau",
-  PA: "Pennsylvania",
-  PR: "Puerto Rico",
-  RI: "Rhode Island",
-  SC: "South Carolina",
-  SD: "South Dakota",
-  TN: "Tennessee",
-  TX: "Texas",
-  UT: "Utah",
-  VT: "Vermont",
-  VI: "Virgin Islands",
-  VA: "Virginia",
-  WA: "Washington",
-  WV: "West Virginia",
-  WI: "Wisconsin",
-  WY: "Wyoming",
-} as const;
+import { StateNames } from "../utils/constants";
 
 export type StateAbbr = keyof typeof StateNames;
 
@@ -73,13 +11,10 @@ export enum ReportType {
   RHTP = "RHTP",
 }
 
-// TODO: Update when the quarter naming has been decided on
 export enum RhtpSubType {
-  ANNUAL = 0,
-  Q1 = 1,
-  Q2 = 2,
-  Q3 = 3,
-  Q4 = 4,
+  ANNUAL = "ANNUAL",
+  QUARTERLY = "QUARTERLY",
+  FINAL = "FINAL",
 }
 
 export const isReportType = (
@@ -104,7 +39,9 @@ export interface UpdateInitiativeOptions {
 export interface ReportOptions {
   name: string;
   year: number;
-  subType?: RhtpSubType;
+  subType: RhtpSubType;
+  subTypeKey: string;
+  budgetPeriod: number;
   copyFromReportId?: string;
 }
 
@@ -132,7 +69,7 @@ export interface Report extends ReportBase, ReportOptions {
   id: string;
   name: string;
   state: StateAbbr;
-  created?: number;
+  created: number;
   lastEdited?: number;
   lastEditedBy?: string;
   lastEditedByEmail?: string;
@@ -148,7 +85,6 @@ export type LiteReport = Omit<Report, "pages">;
 
 export type ReportBase = {
   type: ReportType;
-  subType?: RhtpSubType;
   year: number;
   pages: (
     | ParentPageTemplate
@@ -448,15 +384,23 @@ export type UseOfFundsTableTemplate = {
 export type InitiativeComment = {
   name: string;
   date: string;
-  comment: string;
+  comment?: string;
+  statusChange?: string;
 };
+
+export enum AttachmentStatus {
+  PENDING_REVIEW = "Pending Review", // State driven
+  NEEDS_REVISION = "Needs Revision", // CMS driven
+  LOCKED_FOR_SCORING = "Locked for Scoring", // CMS driven
+  INFORMATIONAL = "Informational", // CMS driven
+}
 
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
   stage?: string;
   checkpoints?: string;
-  status: string;
+  status: AttachmentStatus;
   comments: InitiativeComment[];
 };
 

@@ -8,7 +8,7 @@ import {
   mockUseReadOnlyUserStore,
   mockStateUserStore,
 } from "utils/testing/setupTest";
-import { PageStatus } from "types";
+import { PageStatus } from "@rhtp/shared";
 
 vi.mock("utils", () => ({
   useStore: vi.fn(),

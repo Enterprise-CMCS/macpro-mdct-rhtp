@@ -3,7 +3,11 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TextField } from "components";
 import { testA11y } from "utils/testing/commonTests";
-import { ElementType, NumberFieldTemplate, TextboxTemplate } from "types";
+import {
+  ElementType,
+  NumberFieldTemplate,
+  TextboxTemplate,
+} from "@rhtp/shared";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { useState } from "react";
 

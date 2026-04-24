@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { UploadListProp } from "types";
+import { ReportType, UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
@@ -8,25 +8,23 @@ import {
 import {
   acceptedFileTypes,
   downloadFile,
-  removeFile,
-  retrieveUploadedFiles,
   uploadListRender,
 } from "utils/other/upload";
 
 interface Props {
   id: string;
   state: string;
-  year: string;
+  reportType: ReportType;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
-  deleteFromReport?: (file: UploadListProp) => void;
+  deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
 }
 
 export const Upload = ({
-  id: uploadId,
+  id,
   state,
-  year,
+  reportType,
   answer,
   saveToReport,
   deleteFromReport,
@@ -67,20 +65,8 @@ export const Upload = ({
     }
   };
 
-  const onRemove = (file: UploadListProp) => {
-    if (deleteFromReport) {
-      deleteFromReport(file);
-    } else {
-      removeFile(file, year, state, () => {
-        retrieveUploadedFiles(year, state, uploadId).then((response) => {
-          saveToReport(response);
-        });
-      });
-    }
-  };
-
   const onUploadFiles = async () => {
-    if (!year || !state) {
+    if (!state) {
       throw new Error("Undefined year or state parameter");
     }
     const files = filesToUpload ?? [];
@@ -88,7 +74,7 @@ export const Upload = ({
     for (var i = 0; i < files.length; i++) {
       const file = files[i];
       const { presignedUploadUrl, fileId } =
-        await recordFileInDatabaseAndGetUploadUrl(year, state, file, uploadId);
+        await recordFileInDatabaseAndGetUploadUrl(id, reportType, state, file);
       savedFiles.push({ name: file.name, fileId: fileId, size: file.size });
       await uploadFileToS3({ presignedUploadUrl }, file);
     }
@@ -127,7 +113,13 @@ export const Upload = ({
             </span>
           </Box>
           <Text sx={sx.uploadedLabel}>Selected Files</Text>
-          {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+          {uploadListRender(
+            id,
+            reportType,
+            filesToUpload ?? [],
+            state,
+            deleteFromReport
+          )}
         </>
       )}
       <div>
@@ -137,7 +129,14 @@ export const Upload = ({
           above.
         </Text>
       </div>
-      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
+      {uploadListRender(
+        id,
+        reportType,
+        answer ?? [],
+        state,
+        deleteFromReport,
+        downloadFile
+      )}
     </VStack>
   );
 };

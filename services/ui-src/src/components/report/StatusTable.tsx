@@ -13,7 +13,7 @@ import {
   Text,
   Spinner,
 } from "@chakra-ui/react";
-import { postSubmitReport, useStore } from "utils";
+import { submitReport, useStore } from "utils";
 import editIconPrimary from "assets/icons/edit/icon_edit_primary.svg";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import { TableStatusIcon } from "components/tables/TableStatusIcon";
@@ -21,6 +21,7 @@ import { reportBasePath } from "utils/other/routing";
 import { SubmitReportModal } from "./SubmitReportModal";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { useFlags } from "launchdarkly-react-client-sdk";
+import { createZipFile } from "utils/other/zip";
 
 export const StatusTableElement = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =
@@ -43,7 +44,7 @@ export const StatusTableElement = () => {
   const onSubmit = async () => {
     setModalOpen(false);
     setSubmitting(true);
-    const submittedReport = await postSubmitReport(report);
+    const submittedReport = await submitReport(report);
     updateReport(submittedReport);
     setSubmitting(false);
   };
@@ -102,6 +103,13 @@ export const StatusTableElement = () => {
         justifyContent="space-between"
         mt={5}
       >
+        <Button
+          colorScheme="blue"
+          variant="outline"
+          onClick={() => createZipFile(report)}
+        >
+          ZIP Files
+        </Button>
         {isPdfActive && (
           <Button
             as={RouterLink}
