@@ -117,6 +117,7 @@ export const InitiativesTable = (
           onClick={onOpen}
           variant="outline"
           leftIcon={<Image src={addIconPrimary} />}
+          disabled={disabled}
         >
           Add initiative
         </Button>
