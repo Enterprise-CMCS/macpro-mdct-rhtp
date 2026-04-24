@@ -85,7 +85,6 @@ export const metricTable = (
     type: ElementType.ActionTable,
     id: "metrics-table",
     label: "Metric",
-    pluralLabel: "Metrics",
     hintText:
       "To add a metric, click button below. [Hint text here to let users know they must report on 4 metrics per initiative]",
     modal: {

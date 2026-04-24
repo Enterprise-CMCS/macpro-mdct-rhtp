@@ -432,7 +432,6 @@ export interface ActionTableTemplate {
   type: ElementType.ActionTable;
   id: string;
   label: string;
-  pluralLabel?: string;
   hintText: string;
   modal: {
     title: string;

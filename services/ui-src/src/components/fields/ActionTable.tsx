@@ -74,18 +74,10 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const {
-    id,
-    label,
-    pluralLabel: plural,
-    hintText,
-    modal,
-    rows,
-    answer,
-  } = props.element;
+  const { id, label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
-  const pluralLabel = plural ?? `${label}s`;
+  const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)
