@@ -25,8 +25,9 @@ import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { AddEditInitiativeModal } from "components/modals/AddEditInitiativeModal";
 
 export const InitiativesTable = (
-  _props: PageElementProps<InitiativesTableTemplate>
+  props: PageElementProps<InitiativesTableTemplate>
 ) => {
+  const { disabled } = props;
   const { report } = useStore();
   const { userIsAdmin } = useStore().user ?? {};
   const { reportType, state, reportId } = useParams();
@@ -71,6 +72,7 @@ export const InitiativesTable = (
                 variant="link"
                 onClick={() => editInitiative(initiative)}
                 aria-label={`Edit status of ${displayName}`}
+                disabled={disabled}
               >
                 Edit status
               </Button>

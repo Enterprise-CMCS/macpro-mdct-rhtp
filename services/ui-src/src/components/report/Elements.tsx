@@ -34,6 +34,7 @@ export type PageElementProps<T extends PageElement = PageElement> = T extends {
     }
   : {
       element: T;
+      disabled?: boolean;
     };
 
 export const HeaderElement = ({
