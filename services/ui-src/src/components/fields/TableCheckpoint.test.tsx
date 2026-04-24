@@ -21,12 +21,18 @@ import {
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import { CommentModal } from "components/modals/CommentModal";
+import { removeFile } from "utils/other/upload";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
+}));
+
+vi.mock("utils/other/upload", async (importOriginal) => ({
+  ...(await importOriginal()),
+  removeFile: vi.fn(),
 }));
 
 const mockGetAnswer = vi.fn();
@@ -189,7 +195,14 @@ describe("<TableCheckpoint />", () => {
       name: "Remove orange.png from checkpoint Launch initiative",
     });
     await userEvent.click(deleteButton);
+    await waitFor(() => {
+      expect(screen.getByText("Delete Attachment")).toBeVisible();
+    });
+    const confirmDeleteBtn = screen.getByRole("button", { name: "Delete" });
+    await userEvent.click(confirmDeleteBtn);
     expect(mockGetAnswer).toHaveBeenCalled();
+    expect(vi.mocked(removeFile)).toHaveBeenCalled();
+    expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
   });
   testA11y(TableCheckpointComponent);
 });

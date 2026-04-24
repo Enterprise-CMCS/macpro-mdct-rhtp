@@ -29,7 +29,7 @@ import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router";
 import { useStore } from "utils";
-import { downloadFile } from "utils/other/upload";
+import { downloadFile, removeFile } from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { PageElementProps } from "components/report/Elements";
@@ -62,11 +62,11 @@ const buildRows = (
     label: string;
     id: string;
     attachments:
-    | {
-      file: UploadListProp;
-      status: AttachmentStatus;
-    }[]
-    | undefined;
+      | {
+          file: UploadListProp;
+          status: AttachmentStatus;
+        }[]
+      | undefined;
   }[]
 ) => {
   return values.reduce((prev: any[], curr, index) => {
@@ -165,9 +165,7 @@ export const TableCheckpoint = (
   const [files, setFiles] = useState<UploadListProp[]>([]);
   const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
 
-  const [modalMode, setModalMode] = useState<"Upload" | "Delete">(
-    "Upload"
-  );
+  const [modalMode, setModalMode] = useState<"Upload" | "Delete">("Upload");
   const actionButtonText = {
     Upload: "Done",
     Delete: "Delete",
@@ -200,7 +198,6 @@ export const TableCheckpoint = (
     } else if (modalMode === "Delete") {
       setFiles(selectedFile ? [selectedFile] : []);
     }
-
   }, [selection]);
 
   //Updates when the report has been updated, so when a file has been added or removed from the table
@@ -248,6 +245,7 @@ export const TableCheckpoint = (
 
   const deleteFromReport = (file: UploadListProp) => {
     handleFileAddDelete(file.fileId);
+    removeFile(file, reportType, id, state);
   };
 
   const onCommentClick = (file: UploadListProp) => {
@@ -267,8 +265,8 @@ export const TableCheckpoint = (
     setModalOpen(true);
     setSelectedFile(selectedFile);
 
-    const fullSelectedFiled = attachments.find((attachment) =>
-      attachment.attachment.fileId === selectedFile.fileId
+    const fullSelectedFiled = attachments.find(
+      (attachment) => attachment.attachment.fileId === selectedFile.fileId
     );
     const checkpoints =
       checkpointsList
@@ -303,14 +301,10 @@ export const TableCheckpoint = (
     const generateAnswer = (answer: InitiativeAnswerProp[]) => {
       //if it's a string, we're removing a file
       if (typeof newValue === "string") {
-        const index = answer.findIndex(
-          (item) => item.attachment.fileId == newValue
+        const newAnswer = answer.filter(
+          (item) => item.attachment.fileId !== newValue
         );
-        const newInitiatives = answer[index].initiatives.filter(
-          (id) => id != pageId
-        );
-        answer[index].initiatives = newInitiatives;
-        return [...answer];
+        return [...newAnswer];
       } else {
         return [...answer, ...formatUploads(newValue)];
       }
@@ -319,34 +313,10 @@ export const TableCheckpoint = (
   };
 
   const onModalSubmit = () => {
-    console.log('RUNNING SUBMIT', modalMode);
     if (modalMode === "Delete") {
-      // removeAttachment(uploadedFiles[0]);
-      // return setModalOpen(false)
+      deleteFromReport(selectedFile!);
     }
-    setModalOpen(false)
-    // const formattedUploadsToSave = uploadedFiles.map((upload) => ({
-    //   attachment: upload,
-    //   initiatives: initiativeOptions
-    //     .filter((options) => options.checked)
-    //     .map((option) => option.value),
-    //   stage: selection.stage,
-    //   checkpoints: selection.checkpoint,
-    //   status: AttachmentStatus.PENDING_REVIEW,
-    //   comments:
-    //     displayValue.find((item) => item.attachment.fileId === upload.fileId)
-    //       ?.comments ?? [],
-    // }));
-
-    // const newValues = displayValue.map((item) => {
-    //   const updatedItem = formattedUploadsToSave.find(
-    //     (upload) => upload.attachment.fileId === item.attachment.fileId
-    //   );
-    //   return updatedItem || item;
-    // });
-
-    // props.updateElement({ answer: newValues });
-    // onClose();
+    setModalOpen(false);
   };
 
   return (

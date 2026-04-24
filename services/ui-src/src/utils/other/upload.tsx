@@ -56,7 +56,7 @@ export const uploadListRender = (
   state: string,
   onRemove: Function,
   onClick?: Function,
-  removeIconHidden: boolean = false,
+  removeIconHidden: boolean = false
 ) => {
   return (
     <List variant="upload">

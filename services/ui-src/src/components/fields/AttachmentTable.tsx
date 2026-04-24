@@ -290,11 +290,11 @@ export const AttachmentTable = (
                   {row.initiatives.length === 0
                     ? "N/A"
                     : row.initiatives
-                      .map(
-                        (id) =>
-                          `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
-                      )
-                      .join(", ")}
+                        .map(
+                          (id) =>
+                            `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
+                        )
+                        .join(", ")}
                 </Td>
                 <Td>
                   {row.stage == ""
@@ -305,8 +305,8 @@ export const AttachmentTable = (
                   {row.checkpoints == ""
                     ? "N/A"
                     : checkpointsArr.find(
-                      (check) => check.id === row.checkpoints
-                    )?.label}
+                        (check) => check.id === row.checkpoints
+                      )?.label}
                 </Td>
                 <Td>{row.status}</Td>
                 <Td className="actions" display="flex" width="152px">
