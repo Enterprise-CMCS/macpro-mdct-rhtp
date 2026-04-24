@@ -55,7 +55,8 @@ export const uploadListRender = (
   files: File[] | UploadListProp[],
   state: string,
   onRemove: Function,
-  onClick?: Function
+  onClick?: Function,
+  removeIconHidden: boolean = false,
 ) => {
   return (
     <List variant="upload">
@@ -81,6 +82,7 @@ export const uploadListRender = (
                 aria-label={`delete ${file.name}`}
                 onClick={() => onRemove(file)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                hidden={removeIconHidden}
               />
             </HStack>
             {!onClick && (

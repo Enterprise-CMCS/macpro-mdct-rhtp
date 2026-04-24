@@ -280,15 +280,6 @@ export const TableCheckpoint = (
       stage: fullSelectedFiled?.stage || "",
       checkpoints: fullSelectedFiled?.checkpoints || "",
     });
-    // console.log('files before setting', files);
-    // setFiles([selectedFile]);
-    // console.log('files after setting', files);
-
-    // console.log('selected file', selectedFile);
-    // console.log('attachments', attachments);
-    // console.log('full selected file', fullSelectedFiled);
-    // console.log('selection', selection);
-
   };
 
   const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
@@ -325,6 +316,37 @@ export const TableCheckpoint = (
       }
     };
     writeToAttachmentsTable(generateAnswer);
+  };
+
+  const onModalSubmit = () => {
+    console.log('RUNNING SUBMIT', modalMode);
+    if (modalMode === "Delete") {
+      // removeAttachment(uploadedFiles[0]);
+      // return setModalOpen(false)
+    }
+    setModalOpen(false)
+    // const formattedUploadsToSave = uploadedFiles.map((upload) => ({
+    //   attachment: upload,
+    //   initiatives: initiativeOptions
+    //     .filter((options) => options.checked)
+    //     .map((option) => option.value),
+    //   stage: selection.stage,
+    //   checkpoints: selection.checkpoint,
+    //   status: AttachmentStatus.PENDING_REVIEW,
+    //   comments:
+    //     displayValue.find((item) => item.attachment.fileId === upload.fileId)
+    //       ?.comments ?? [],
+    // }));
+
+    // const newValues = displayValue.map((item) => {
+    //   const updatedItem = formattedUploadsToSave.find(
+    //     (upload) => upload.attachment.fileId === item.attachment.fileId
+    //   );
+    //   return updatedItem || item;
+    // });
+
+    // props.updateElement({ answer: newValues });
+    // onClose();
   };
 
   return (
@@ -465,6 +487,7 @@ export const TableCheckpoint = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         uploadAreaHidden={modalMode === "Delete"}
+        onModalSubmit={onModalSubmit}
       ></UploadModal>
       <CommentModal
         modalDisclosure={{
