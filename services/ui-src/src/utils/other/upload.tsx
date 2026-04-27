@@ -28,6 +28,16 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
+const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
+
+export const getFileWithSafeName = (file: File) => {
+  const newName = file.name.replaceAll(negatedAllowedCharacters, "");
+  return new File([file], newName, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
+};
+
 export const downloadFile = async (
   reportType: ReportType,
   state: string,
