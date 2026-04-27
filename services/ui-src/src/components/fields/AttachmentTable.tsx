@@ -24,7 +24,7 @@ import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
-import { ResponsiveTable } from "components/tables/ResponsiveTable";
+import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 
 type Options = { label: string; value: string; checked?: boolean };
 
@@ -40,8 +40,8 @@ export const AttachmentTable = (
   const { id, type: reportType } = report!;
   const [sorting, setSorting] = useState<{
     sort: string;
-    ascending: boolean;
-  }>({ sort: "", ascending: false });
+    type: SORT_TYPE;
+  }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -121,6 +121,11 @@ export const AttachmentTable = (
     );
     choices[choiceIndex].checked = !choices[choiceIndex].checked;
     setInitiativeOptions(choices);
+
+    //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
+    if (choices.every((choice) => !choice.checked)) {
+      setSelection({ stage: "", checkpoint: "" });
+    }
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
@@ -238,6 +243,10 @@ export const AttachmentTable = (
     setUploadedFiles([]);
   };
 
+  const isStageEnabled = () => {
+    return initiativeOptions.every((option) => option.checked != true);
+  };
+
   const rows = (values: InitiativeAnswerProp[]) => {
     return values.map((row) => {
       const columnAttachmentName = (
@@ -303,22 +312,43 @@ export const AttachmentTable = (
     });
   };
 
-  const sort = (header: string) => {
-    setSorting({
-      sort: header,
-      ascending: sorting.sort == header ? !sorting.ascending : true,
-    });
+  const sort = (header: string, type: SORT_TYPE) => {
+    setSorting({ sort: header, type });
   };
 
   const sortedRows = (displayValue: InitiativeAnswerProp[]) => {
+    const unfilledAll = displayValue.filter(
+      (value) =>
+        value.initiatives.length === 0 &&
+        (value.stage == "" || value.stage == undefined)
+    );
+    const unfilledSome = displayValue.filter(
+      (value) =>
+        value.initiatives.length > 0 &&
+        (value.stage == "" || value.stage == undefined)
+    );
+
+    const filled = displayValue.filter(
+      (value) =>
+        value.initiatives.length > 0 &&
+        value.stage != "" &&
+        value.stage != undefined
+    );
+
     const getValue = (answer: InitiativeAnswerProp, type: string) => {
       switch (type) {
         case "Attachment name":
           return answer.attachment.name;
         case "Initiatives":
-          return answer.initiatives[0] ?? "";
+          const initNumber = initiatives.find(
+            (opt) => opt.id === answer.initiatives[0]
+          )?.initiativeNumber;
+          return initNumber ?? "";
         case "Stage":
-          return answer.stage ?? "";
+          const stageLabel = stageOption.find(
+            (opt) => opt.value === answer.stage
+          )?.label;
+          return stageLabel ?? "";
         case "Checkpoints":
           return answer.checkpoints ?? "";
         case "Status":
@@ -327,17 +357,20 @@ export const AttachmentTable = (
       return "";
     };
 
-    const sorted = displayValue.toSorted((a, b) => {
-      const valueA = getValue(a, sorting.sort);
-      const valueB = getValue(b, sorting.sort);
-      if (sorting.ascending) {
-        return valueA < valueB ? -1 : 1;
-      } else {
-        return valueB < valueA ? -1 : 1;
-      }
-    });
+    const sorted =
+      sorting.type == SORT_TYPE.DEFAULT
+        ? filled
+        : filled.toSorted((a, b) => {
+            const valueA = getValue(a, sorting.sort);
+            const valueB = getValue(b, sorting.sort);
+            if (sorting.type === SORT_TYPE.DESCENDING) {
+              return valueA < valueB ? -1 : 1;
+            } else {
+              return valueB < valueA ? -1 : 1;
+            }
+          });
 
-    return rows(sorted);
+    return rows([...unfilledAll, ...unfilledSome, ...sorted]);
   };
 
   return (
@@ -400,7 +433,7 @@ export const AttachmentTable = (
               value={selection?.stage}
               options={stageOption}
               onChange={onStageChangeHandler}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || isStageEnabled()}
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
@@ -411,7 +444,7 @@ export const AttachmentTable = (
                 const value = dropdown.target.value;
                 setSelection({ ...selection, checkpoint: value });
               }}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || isStageEnabled()}
             ></Dropdown>
           </Stack>
         }

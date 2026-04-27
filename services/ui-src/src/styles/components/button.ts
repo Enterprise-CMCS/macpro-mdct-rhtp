@@ -159,6 +159,12 @@ const returnVariant = {
   },
 };
 
+const sortVariant = {
+  background: "transparent",
+  fontWeight: "700",
+  fontSize: "14px",
+};
+
 const variants = {
   primary: primaryVariant,
   transparent: transparentVariant,
@@ -171,6 +177,7 @@ const variants = {
   inverse_link: inverse_linkVariant,
   danger: dangerVariant,
   return: returnVariant,
+  sort: sortVariant,
 };
 
 const buttonTheme: ComponentStyleConfig = {
