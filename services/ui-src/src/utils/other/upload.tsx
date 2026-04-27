@@ -28,6 +28,17 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
+export const getFileWithSafeName = (file: File) => {
+  const newName = file.name
+    .replaceAll("%", "")
+    .replaceAll("#", "")
+    .replaceAll("?", "");
+  return new File([file], newName, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
+};
+
 export const downloadFile = async (
   reportType: ReportType,
   state: string,

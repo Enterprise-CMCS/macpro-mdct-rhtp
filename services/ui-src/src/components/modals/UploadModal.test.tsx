@@ -78,7 +78,7 @@ describe("Test Modal", () => {
   test("Modal will run saveToReport function when a file is uploaded", async () => {
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
     });
     await waitFor(() => {
       expect(mockSaveToReport).toHaveBeenCalledTimes(1);

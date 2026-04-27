@@ -213,7 +213,7 @@ describe("TableCheckpoint upload modal", () => {
   test("drag and dropping a file", () => {
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
     });
     expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
   });

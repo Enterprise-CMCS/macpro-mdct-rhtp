@@ -8,6 +8,7 @@ import {
 import {
   acceptedFileTypes,
   downloadFile,
+  getFileWithSafeName,
   uploadListRender,
 } from "utils/other/upload";
 
@@ -72,10 +73,11 @@ export const Upload = ({
     const files = filesToUpload ?? [];
     const savedFiles = [];
     for (var i = 0; i < files.length; i++) {
-      const file = files[i];
+      const displayName = files[i].name;
+      const file = getFileWithSafeName(files[i]);
       const { presignedUploadUrl, fileId } =
         await recordFileInDatabaseAndGetUploadUrl(id, reportType, state, file);
-      savedFiles.push({ name: file.name, fileId: fileId, size: file.size });
+      savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
       await uploadFileToS3({ presignedUploadUrl }, file);
     }
     return savedFiles;

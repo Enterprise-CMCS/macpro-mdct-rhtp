@@ -13,7 +13,8 @@ export const getUploadsByFileId = handler(
   async (request) => {
     const { state, reportType, id, fileId } = request.parameters;
 
-    const results = await queryUpload(fileId, state);
+    const decodedFileId = decodeURIComponent(fileId);
+    const results = await queryUpload(decodedFileId, state);
     if (!results.Items || results.Items.length === 0) {
       return forbidden(error.UNAUTHORIZED);
     }
