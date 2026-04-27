@@ -28,7 +28,7 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
-const negatedAllowedCharacters = /[^0-9a-zA-Z!\-_.*'()]+/g;
+const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
 
 export const getFileWithSafeName = (file: File) => {
   const newName = file.name.replaceAll(negatedAllowedCharacters, "");

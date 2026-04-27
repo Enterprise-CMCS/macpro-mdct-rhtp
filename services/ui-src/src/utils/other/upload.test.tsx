@@ -8,7 +8,7 @@ describe("test upload utils", () => {
         type: "image/png",
       });
       const result = getFileWithSafeName(file);
-      expect(result.name).toEqual(encodeURIComponent(fileName));
+      expect(result.name).toEqual("nameneedshelp.png");
     });
   });
 });
