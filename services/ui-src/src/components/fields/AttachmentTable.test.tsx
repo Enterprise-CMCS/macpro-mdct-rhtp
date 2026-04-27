@@ -119,7 +119,7 @@ describe("<AttachmentTable />", () => {
 
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
     });
 
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
