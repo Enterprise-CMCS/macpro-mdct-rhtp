@@ -29,10 +29,7 @@ export const acceptedFileTypes = [
 ];
 
 export const getFileWithSafeName = (file: File) => {
-  const newName = file.name
-    .replaceAll("%", "")
-    .replaceAll("#", "")
-    .replaceAll("?", "");
+  const newName = encodeURIComponent(file.name);
   return new File([file], newName, {
     type: file.type,
     lastModified: file.lastModified,
