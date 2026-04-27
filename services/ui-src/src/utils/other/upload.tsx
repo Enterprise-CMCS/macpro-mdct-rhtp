@@ -28,8 +28,10 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
+const negatedAllowedCharacters = /[^0-9a-zA-Z!\-_.*'()]+/g;
+
 export const getFileWithSafeName = (file: File) => {
-  const newName = encodeURIComponent(file.name);
+  const newName = file.name.replaceAll(negatedAllowedCharacters, "");
   return new File([file], newName, {
     type: file.type,
     lastModified: file.lastModified,
