@@ -40,22 +40,23 @@ export const downloadFile = async (
 };
 
 export const removeFile = async (
-  file: File | UploadListProp,
   reportType: ReportType,
+  state: string,
   id: string,
-  state: string
+  file: File | UploadListProp
 ) => {
   if (!("fileId" in file)) return;
   return deleteUploadedFile(reportType, state, id, file.fileId);
 };
 
 export const uploadListRender = (
-  id: string,
   reportType: ReportType,
-  files: File[] | UploadListProp[],
   state: string,
+  id: string,
+  files: File[] | UploadListProp[],
   onRemove: Function,
-  onClick?: Function
+  onClick?: Function,
+  disabled?: boolean
 ) => {
   return (
     <List variant="upload">
@@ -81,6 +82,7 @@ export const uploadListRender = (
                 aria-label={`delete ${file.name}`}
                 onClick={() => onRemove(file)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                disabled={disabled}
               />
             </HStack>
             {!onClick && (

@@ -132,6 +132,14 @@ button {
   }
 }
 
+.chakra-checkbox__control {
+  background-color: #fff;
+  &[data-disabled] {
+    background-color: #bababa;
+    opacity: 0.4;
+  }
+}
+
 .chakra-collapse {
   overflow: visible !important;
 }

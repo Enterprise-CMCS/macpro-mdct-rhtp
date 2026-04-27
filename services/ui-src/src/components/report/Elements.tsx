@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   Button,
   Heading,
@@ -23,7 +23,6 @@ import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { parseHtml } from "utils";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
-import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
 
 export type PageElementProps<T extends PageElement = PageElement> = T extends {
   answer?: any;
@@ -35,6 +34,7 @@ export type PageElementProps<T extends PageElement = PageElement> = T extends {
     }
   : {
       element: T;
+      disabled?: boolean;
     };
 
 export const HeaderElement = ({
@@ -141,20 +141,6 @@ export const ButtonLinkElement = ({
   //swapping between props based on style
   const getPropObj = (style: string) => {
     switch (style) {
-      case "pdf":
-        return {
-          prop: {
-            as: Link,
-            target: "_blank",
-            variant: "primary",
-            to: link,
-          },
-          style: {
-            src: whitePDFPrimary,
-            alt: "pdf icon",
-          },
-        };
-
       case "alt-continue":
         return {
           prop: {

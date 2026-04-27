@@ -131,7 +131,7 @@ const metricVariant = {
       padding: "1rem",
       border: "none",
     },
-    "tr:nth-child(even)": {
+    "tr:nth-of-type(even)": {
       background: "gray_lightest_highlight",
     },
     td: {

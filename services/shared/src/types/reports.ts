@@ -156,8 +156,6 @@ export enum ElementType {
   Checkbox = "checkbox",
   ButtonLink = "buttonLink",
   StatusTable = "statusTable",
-  LengthOfStayRate = "lengthOfStay",
-  ReadmissionRate = "readmissionRate",
   StatusAlert = "statusAlert",
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",

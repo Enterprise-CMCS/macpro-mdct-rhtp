@@ -49,7 +49,7 @@ export const AdminDashSelector = () => {
   };
 
   return (
-    <Box>
+    <Box sx={sx.container}>
       <Heading as="h1" sx={sx.headerText}>
         View State/Territory Reports
       </Heading>
@@ -95,5 +95,10 @@ const sx = {
   },
   navigationButton: {
     padding: "1.5rem 0 2rem 0",
+  },
+  container: {
+    ".ds-c-dropdown__menu-container": {
+      zIndex: "1101",
+    },
   },
 };

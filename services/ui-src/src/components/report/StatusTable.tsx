@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { Link as RouterLink, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   Button,
   Image,
-  Stack,
   Table,
   Tbody,
   Td,
@@ -11,26 +9,17 @@ import {
   Thead,
   Tr,
   Text,
-  Spinner,
 } from "@chakra-ui/react";
-import { submitReport, useStore } from "utils";
+import { useStore } from "utils";
 import editIconPrimary from "assets/icons/edit/icon_edit_primary.svg";
-import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import { TableStatusIcon } from "components/tables/TableStatusIcon";
-import { reportBasePath } from "utils/other/routing";
-import { SubmitReportModal } from "./SubmitReportModal";
 import { submittableMetricsSelector } from "utils/state/selectors";
-import { useFlags } from "launchdarkly-react-client-sdk";
-import { createZipFile } from "utils/other/zip";
 
 export const StatusTableElement = () => {
-  const { report, user, setModalComponent, setModalOpen, updateReport } =
-    useStore();
+  const { report } = useStore();
   const { reportType, state, reportId } = useParams();
   const navigate = useNavigate();
   const submittableMetrics = useStore(submittableMetricsSelector);
-  const isPdfActive = useFlags()?.viewPdf;
-  const [submitting, setSubmitting] = useState<boolean>(false);
 
   if (!report) {
     return null;
@@ -39,24 +28,6 @@ export const StatusTableElement = () => {
   const handleEditClick = (sectionId: string) => {
     const path = `/report/${reportType}/${state}/${reportId}/${sectionId}`;
     navigate(path);
-  };
-
-  const onSubmit = async () => {
-    setModalOpen(false);
-    setSubmitting(true);
-    const submittedReport = await submitReport(report);
-    updateReport(submittedReport);
-    setSubmitting(false);
-  };
-
-  const modal = SubmitReportModal(
-    () => setModalOpen(false),
-    onSubmit,
-    reportType!
-  );
-
-  const displayModal = () => {
-    setModalComponent(modal, "Are you sure you want to submit?");
   };
 
   // Build Rows
@@ -96,43 +67,6 @@ export const StatusTableElement = () => {
         </Thead>
         <Tbody>{rows}</Tbody>
       </Table>
-      <Stack
-        direction="row"
-        width="100%"
-        display="flex"
-        justifyContent="space-between"
-        mt={5}
-      >
-        <Button
-          colorScheme="blue"
-          variant="outline"
-          onClick={() => createZipFile(report)}
-        >
-          ZIP Files
-        </Button>
-        {isPdfActive && (
-          <Button
-            as={RouterLink}
-            to={reportBasePath(report) + "/export"}
-            target="_blank"
-            colorScheme="blue"
-            variant="outline"
-            leftIcon={<Image src={lookupIconPrimary} />}
-          >
-            Review PDF
-          </Button>
-        )}
-        {user?.userIsEndUser && (
-          <Button
-            alignSelf="flex-end"
-            onClick={async () => displayModal()}
-            disabled={!submittableMetrics?.submittable || submitting}
-          >
-            {submitting && <Spinner size="sm" marginRight="spacer2" />}
-            {`Submit ${reportType} Report`}
-          </Button>
-        )}
-      </Stack>
     </>
   );
 };

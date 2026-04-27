@@ -13,7 +13,6 @@ import {
   recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
-import { ReportType } from "@rhtp/shared";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -29,17 +28,25 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
       { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
     ]),
 }));
+vi.mock("utils", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      id: "mock-report-id",
+      type: "RHTP",
+      state: "PA",
+    },
+  }),
+}));
 
 const mockDeleteFromReport = vi.fn();
 
 const props = {
-  state: "PA",
-  reportType: ReportType.RHTP,
-  id: "mock-id",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   saveToReport: vi.fn(),
   updateElement: vi.fn(),
   deleteFromReport: mockDeleteFromReport,
+  disabled: false,
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });

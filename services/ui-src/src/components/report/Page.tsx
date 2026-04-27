@@ -94,7 +94,7 @@ export const Page = ({ id, setElements, elements }: Props) => {
           <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
         );
       case ElementType.InitiativesTable:
-        return <InitiativesTable {...{ updateElement, disabled, element }} />;
+        return <InitiativesTable {...{ disabled, element }} />;
       case ElementType.AttachmentArea:
         return <AttachmentArea {...{ updateElement, disabled, element }} />;
       case ElementType.AccordionGroup:
