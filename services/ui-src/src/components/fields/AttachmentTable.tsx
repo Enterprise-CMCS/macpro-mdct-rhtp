@@ -7,7 +7,7 @@ import {
 import { UploadModal } from "components/modals/UploadModal";
 import { CommentModal } from "components/modals/CommentModal";
 import { PageElementProps } from "components/report/Elements";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import {
   AttachmentTableTemplate,
@@ -38,10 +38,6 @@ export const AttachmentTable = (
   const { state } = useParams();
   const { report } = useStore();
   const { id, type: reportType } = report!;
-  const [sorting, setSorting] = useState<{
-    sort: string;
-    type: SORT_TYPE;
-  }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -49,9 +45,18 @@ export const AttachmentTable = (
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([]);
-
-  const [stageOption, setStageOption] = useState<Options[]>([]);
+  const stageOption = [
+    dropdownEmptyOption,
+    ...checkpointsList.map((checks) => ({
+      label: `${checks.stage} ${checks.label}`,
+      value: checks.id,
+    })),
+  ];
+  const checkpointsArr = checkpointsList.flatMap((list) => list.checkpoints);
   const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
+  const [tableRows, setTableRows] = useState<
+    (string | JSX.Element | undefined)[][]
+  >([]);
 
   const initialValues = {
     stage: "",
@@ -62,9 +67,6 @@ export const AttachmentTable = (
     checkpoint: string;
   }>(initialValues);
 
-  const [checkpointsArr, setCheckpointsArr] = useState<
-    { id: string; label: string }[]
-  >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
   const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
     "Upload"
@@ -86,14 +88,8 @@ export const AttachmentTable = (
   }
 
   useEffect(() => {
-    setStageOption([
-      dropdownEmptyOption,
-      ...checkpointsList.map((checks) => ({
-        label: `${checks.stage} ${checks.label}`,
-        value: checks.id,
-      })),
-    ]);
-    setCheckpointsArr(checkpointsList.flatMap((list) => list.checkpoints));
+    //set initial sort to filter unfilled initiatives from filled initiatives
+    sortRows("", SORT_TYPE.DEFAULT);
   }, [report]);
 
   useEffect(() => {
@@ -312,11 +308,7 @@ export const AttachmentTable = (
     });
   };
 
-  const sort = (header: string, type: SORT_TYPE) => {
-    setSorting({ sort: header, type });
-  };
-
-  const sortedRows = (displayValue: InitiativeAnswerProp[]) => {
+  const sortRows = (row: string, type: SORT_TYPE) => {
     const unfilledAll = displayValue.filter(
       (value) =>
         value.initiatives.length === 0 &&
@@ -327,7 +319,6 @@ export const AttachmentTable = (
         value.initiatives.length > 0 &&
         (value.stage == "" || value.stage == undefined)
     );
-
     const filled = displayValue.filter(
       (value) =>
         value.initiatives.length > 0 &&
@@ -353,24 +344,32 @@ export const AttachmentTable = (
           return answer.checkpoints ?? "";
         case "Status":
           return answer.status;
+        default:
+          return "";
       }
-      return "";
     };
 
-    const sorted =
-      sorting.type == SORT_TYPE.DEFAULT
-        ? filled
-        : filled.toSorted((a, b) => {
-            const valueA = getValue(a, sorting.sort);
-            const valueB = getValue(b, sorting.sort);
-            if (sorting.type === SORT_TYPE.DESCENDING) {
+    const runSort = (arr: InitiativeAnswerProp[]) => {
+      return type == SORT_TYPE.DEFAULT
+        ? arr
+        : arr.toSorted((a, b) => {
+            const valueA = getValue(a, row);
+            const valueB = getValue(b, row);
+            if (type === SORT_TYPE.DESCENDING) {
               return valueA < valueB ? -1 : 1;
             } else {
               return valueB < valueA ? -1 : 1;
             }
           });
+    };
 
-    return rows([...unfilledAll, ...unfilledSome, ...sorted]);
+    setTableRows(
+      rows([
+        ...runSort(unfilledAll),
+        ...runSort(unfilledSome),
+        ...runSort(filled),
+      ])
+    );
   };
 
   return (
@@ -388,16 +387,16 @@ export const AttachmentTable = (
       ) : (
         ResponsiveTable(
           [
-            "Attachment name",
-            "Initiatives",
-            "Stage",
-            "Checkpoints",
-            "Status",
-            "Actions",
+            { label: "Attachment name", sortable: true },
+            { label: "Initiatives", sortable: true },
+            { label: "Stage", sortable: true },
+            { label: "Checkpoints", sortable: true },
+            { label: "Status", sortable: true },
+            { label: "Actions" },
           ],
-          sortedRows(displayValue),
+          tableRows,
           "",
-          sort
+          sortRows
         )
       )}
       <UploadModal

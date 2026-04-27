@@ -28,47 +28,44 @@ export enum SORT_TYPE {
   DESCENDING,
 }
 
+const getSortIcon = (type: SORT_TYPE) => {
+  switch (type) {
+    case SORT_TYPE.ASCENDING:
+      return sortAscIcon;
+    case SORT_TYPE.DESCENDING:
+      return sortDescIcon;
+    default:
+      return sortIcon;
+  }
+};
+
+const setNextSort = (type: SORT_TYPE) => {
+  switch (type) {
+    case SORT_TYPE.DESCENDING:
+      return SORT_TYPE.ASCENDING;
+    case SORT_TYPE.ASCENDING:
+      return SORT_TYPE.DEFAULT;
+    case SORT_TYPE.DEFAULT:
+      return SORT_TYPE.DESCENDING;
+  }
+};
+
 const HorizontalTable = (
-  headers: string[],
+  headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
-  sort: (header: string, type: SORT_TYPE) => void,
+  sorting: (header: string, type: SORT_TYPE) => void,
   variant?: string
 ) => {
-  const [sorting, setSorting] = useState<{
-    sort: string;
-    state: SORT_TYPE;
-  }>({ sort: "", state: SORT_TYPE.DEFAULT });
+  const [sort, setSort] = useState<{
+    label: string;
+    type: SORT_TYPE;
+  }>({ label: "", type: SORT_TYPE.DEFAULT });
 
-  const getSortState = (item: string) => {
-    if (item === sorting.sort) {
-      switch (sorting.state) {
-        case SORT_TYPE.ASCENDING:
-          return sortAscIcon;
-        case SORT_TYPE.DESCENDING:
-          return sortDescIcon;
-      }
-    }
-    return sortIcon;
-  };
-
-  const setSort = (sortName: string) => {
-    if (sorting.sort === sortName) {
-      const type = (type: SORT_TYPE) => {
-        switch (type) {
-          case SORT_TYPE.DESCENDING:
-            return SORT_TYPE.ASCENDING;
-          case SORT_TYPE.ASCENDING:
-            return SORT_TYPE.DEFAULT;
-          case SORT_TYPE.DEFAULT:
-            return SORT_TYPE.DESCENDING;
-        }
-      };
-      sort(sortName, type(sorting.state));
-      setSorting({ sort: sortName, state: type(sorting.state) });
-    } else {
-      setSorting({ sort: sortName, state: SORT_TYPE.DESCENDING });
-      sort(sortName, SORT_TYPE.DESCENDING);
-    }
+  const onSort = (sortName: string) => {
+    const type =
+      sortName === sort.label ? setNextSort(sort.type) : SORT_TYPE.DESCENDING;
+    setSort({ label: sortName, type });
+    sorting(sortName, type);
   };
 
   return (
@@ -76,16 +73,26 @@ const HorizontalTable = (
       <Thead>
         <Tr>
           {headers.map((item) => (
-            <Th key={item}>
-              <span>
+            <Th key={item.label}>
+              {item.sortable ? (
                 <Button
                   variant="sort"
-                  onClick={() => setSort(item)}
-                  rightIcon={<Image src={getSortState(item)}></Image>}
+                  onClick={() => onSort(item.label)}
+                  rightIcon={
+                    <Image
+                      src={
+                        item.label === sort.label
+                          ? getSortIcon(sort.type)
+                          : sortIcon
+                      }
+                    ></Image>
+                  }
                 >
-                  {item}
+                  {item.label}
                 </Button>
-              </span>
+              ) : (
+                item.label
+              )}
             </Th>
           ))}
         </Tr>
@@ -126,19 +133,21 @@ const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
 };
 
 export const ResponsiveTable = (
-  headers: string[],
+  headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
   variant?: string,
-  sort?: (header: string, type: SORT_TYPE) => void
+  sorting?: (header: string, type: SORT_TYPE) => void
 ) => {
-  const sortable = sort ?? (() => {});
   return (
     <>
       <Hide below="md" key="table">
-        {HorizontalTable(headers, rows, sortable, variant)}
+        {HorizontalTable(headers, rows, sorting ?? (() => {}), variant)}
       </Hide>
       <Show below="md" key="table-mobile">
-        {VerticalTable(headers, rows)}
+        {VerticalTable(
+          headers.map((header) => header.label),
+          rows
+        )}
       </Show>
     </>
   );
