@@ -92,7 +92,7 @@ const buildRows = (
         status: status ?? {},
         comments: comments ?? [],
       });
-      copy.forEach(({ file, status }) =>
+      copy.forEach(({ file, status, comments }) =>
         prev.push({
           id,
           stageNo: "",
