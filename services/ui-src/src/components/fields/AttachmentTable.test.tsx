@@ -140,6 +140,25 @@ describe("<AttachmentTable />", () => {
     expect(deleteBtn).toBeDisabled();
     expect(editBtn).toBeDisabled();
   });
+
+  it("Mock delete and edit disabled if there are previous comments", async () => {
+    const mockLockedFileElement = structuredClone(mockAttachmentAreaElement);
+    mockLockedFileElement.answer![0].comments = [
+      {
+        name: "Mock User",
+        date: "2024-06-01",
+        comment: "This is a mock comment",
+        statusChange: AttachmentStatus.INFORMATIONAL,
+      },
+    ];
+    render(AttachmentTableComponent(mockLockedFileElement));
+    const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });
+    const editBtn = screen.getByRole("button", {
+      name: "Edit file or info for mock-file",
+    });
+    expect(deleteBtn).toBeDisabled();
+    expect(editBtn).toBeDisabled();
+  });
   it("Mock on remove file call", async () => {
     render(AttachmentTableComponent(mockAttachmentAreaElement));
     const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });

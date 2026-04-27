@@ -29,7 +29,12 @@ import {
   dropdownEmptyOption,
 } from "@rhtp/shared";
 import { useStore } from "utils";
-import { downloadFile, removeFile } from "utils/other/upload";
+import {
+  downloadFile,
+  removeFile,
+  canEditAttachment,
+  canDeleteAttachment,
+} from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
@@ -314,9 +319,7 @@ export const AttachmentTable = (
                     variant="outline"
                     onClick={() => onEditClick(row)}
                     aria-label={`Edit file or info for ${row.attachment.name}`}
-                    disabled={
-                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
-                    }
+                    disabled={!canEditAttachment(row.status, row.comments)}
                   >
                     Edit
                   </Button>
@@ -331,9 +334,7 @@ export const AttachmentTable = (
                     variant="link"
                     onClick={() => onDeleteClick(row)}
                     aria-label={`Delete ${row.attachment.name}`}
-                    disabled={
-                      row.status === AttachmentStatus.LOCKED_FOR_SCORING
-                    }
+                    disabled={!canDeleteAttachment(row.status, row.comments)}
                   >
                     <Image src={cancelIcon} alt="Remove" minWidth="24px" />
                   </Button>

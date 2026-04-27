@@ -19,6 +19,7 @@ import {
   TableCheckpointTemplate,
   UploadListProp,
   AlertTypes,
+  InitiativeComment,
 } from "@rhtp/shared";
 import { DropdownOptions } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
@@ -29,7 +30,11 @@ import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router";
 import { useStore } from "utils";
-import { downloadFile, removeFile } from "utils/other/upload";
+import {
+  canDeleteAttachment,
+  downloadFile,
+  removeFile,
+} from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { PageElementProps } from "components/report/Elements";
@@ -51,7 +56,8 @@ type TableShape = {
     stageNo: string;
     label: string;
     file: UploadListProp;
-    status: string;
+    status: AttachmentStatus;
+    comments: InitiativeComment[];
   }[];
 };
 
@@ -65,6 +71,7 @@ const buildRows = (
       | {
           file: UploadListProp;
           status: AttachmentStatus;
+          comments: InitiativeComment[];
         }[]
       | undefined;
   }[]
@@ -78,8 +85,13 @@ const buildRows = (
     };
     if (attachments) {
       const copy = [...attachments];
-      const { file, status } = copy.shift() || {};
-      prev.push({ ...row, file: file ?? {}, status: status ?? {} });
+      const { file, status, comments } = copy.shift() || {};
+      prev.push({
+        ...row,
+        file: file ?? {},
+        status: status ?? {},
+        comments: comments ?? [],
+      });
       copy.forEach(({ file, status }) =>
         prev.push({
           id,
@@ -88,6 +100,7 @@ const buildRows = (
           completed: undefined,
           file,
           status,
+          comments,
         })
       );
     } else {
@@ -106,7 +119,11 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
           (answer) =>
             answer.stage === id && answer.checkpoints === checkpoint.id
         )
-        .map((upload) => ({ file: upload.attachment, status: upload.status }));
+        .map((upload) => ({
+          file: upload.attachment,
+          status: upload.status,
+          comments: upload.comments,
+        }));
       return {
         label: checkpoint.label,
         id: checkpoint.id,
@@ -400,7 +417,7 @@ export const TableCheckpoint = (
                           }}
                           aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
                           disabled={
-                            row.status === AttachmentStatus.LOCKED_FOR_SCORING
+                            !canDeleteAttachment(row.status, row.comments)
                           }
                         >
                           <Image src={cancelIcon} alt="Remove" />

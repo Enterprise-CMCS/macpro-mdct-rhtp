@@ -15,7 +15,12 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
-import { ReportType, UploadListProp } from "@rhtp/shared";
+import {
+  ReportType,
+  UploadListProp,
+  AttachmentStatus,
+  InitiativeComment,
+} from "@rhtp/shared";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -37,6 +42,28 @@ export const downloadFile = async (
   const fileLink = await getFileDownloadUrl(reportType, state, id, file.fileId);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
   window.open(sanitizeLink);
+};
+
+export const canEditAttachment = (
+  status: AttachmentStatus,
+  comments: InitiativeComment[]
+): boolean => {
+  if (status === AttachmentStatus.NEEDS_REVISION) return true;
+
+  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
+    return true;
+
+  return false;
+};
+
+export const canDeleteAttachment = (
+  status: AttachmentStatus,
+  comments: InitiativeComment[]
+): boolean => {
+  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
+    return true;
+
+  return false;
 };
 
 export const removeFile = async (

@@ -385,7 +385,7 @@ export type InitiativeComment = {
   name: string;
   date: string;
   comment?: string;
-  statusChange?: string;
+  statusChange?: AttachmentStatus;
 };
 
 export enum AttachmentStatus {
