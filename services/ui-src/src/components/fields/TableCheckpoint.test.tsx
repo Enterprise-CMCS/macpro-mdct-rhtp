@@ -28,7 +28,7 @@ vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("react-router", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
+  useParams: vi.fn().mockReturnValue({ pageId: "mock-init-1" }),
 }));
 
 vi.mock("utils/other/upload", async (importOriginal) => ({
@@ -100,6 +100,7 @@ const consoleMock = vi.spyOn(console, "error");
 const mockReport = {
   report: {
     id: "mock-report-id",
+    state: "PA",
     type: "RHTP",
     pages: [
       {

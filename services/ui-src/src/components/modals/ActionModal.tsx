@@ -95,7 +95,7 @@ export const ActionModal = ({
       content={{
         heading: isEdit ? `Edit ${modal.title}` : `Add ${modal.title}`,
         actionButtonText: "Save",
-        closeButtonText: "Close",
+        closeButtonText: "Cancel",
       }}
       disableConfirm={submitting}
     >

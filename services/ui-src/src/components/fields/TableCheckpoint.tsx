@@ -24,6 +24,7 @@ import {
 import { DropdownOptions } from "types";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
@@ -153,13 +154,14 @@ const header = [
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
 ) => {
+  const { disabled } = props;
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
-  const { state, pageId } = useParams();
+  const { pageId } = useParams();
   const { report, setAnswers } = useStore();
-  const { id, type: reportType } = report!;
+  const { id, state, type: reportType } = report!;
   const { autosave } = useContext(ReportAutosaveContext);
   //if there is answer on load, we need to build the shape from the checkpoints data
   const initialDisplayValue =
@@ -262,7 +264,7 @@ export const TableCheckpoint = (
 
   const deleteFromReport = (file: UploadListProp) => {
     handleFileAddDelete(file.fileId);
-    removeFile(file, reportType, id, state);
+    removeFile(reportType, state, id, file);
   };
 
   const onCommentClick = (file: UploadListProp) => {
@@ -346,10 +348,11 @@ export const TableCheckpoint = (
             aria-label="Upload attachments"
             variant="outline"
             alignSelf="flex-start"
-            leftIcon={<Image src={addIconPrimary} />}
+            leftIcon={<Image src={disabled ? addGray : addIconPrimary} />}
             onClick={() => {
               onAddClick(tableIndex);
             }}
+            disabled={disabled}
           >
             Upload attachments
           </Button>
@@ -376,6 +379,7 @@ export const TableCheckpoint = (
                           )?.checked
                         }
                         onChange={() => onCheckboxHandler(row.id)}
+                        disabled={disabled}
                       ></Checkbox>
                     ) : (
                       <></>
@@ -417,7 +421,8 @@ export const TableCheckpoint = (
                           }}
                           aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
                           disabled={
-                            !canDeleteAttachment(row.status, row.comments)
+                            !canDeleteAttachment(row.status, row.comments) ||
+                            disabled
                           }
                         >
                           <Image src={cancelIcon} alt="Remove" />
@@ -436,10 +441,7 @@ export const TableCheckpoint = (
           isOpen: isModalOpen,
           onClose: () => setModalOpen(false),
         }}
-        state={state}
         answer={files}
-        id={id}
-        reportType={reportType}
         selections={
           <>
             {modalMode === "Delete" ? (
