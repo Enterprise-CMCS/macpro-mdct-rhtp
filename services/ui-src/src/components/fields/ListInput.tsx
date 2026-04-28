@@ -5,6 +5,7 @@ import { Button, HStack, Image } from "@chakra-ui/react";
 import { Hint, Label, TextField } from "@cmsgov/design-system";
 import cancelPrimary from "assets/icons/cancel/icon_cancel_primary.svg";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 import { ErrorMessages } from "../../constants";
 
 const validateField = (rawValue: string, validation: string | undefined) => {
@@ -71,7 +72,7 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
       {displayValue.map((field, index) => (
         <HStack
           alignItems="flex-end"
-          mt="1rem"
+          my="1rem"
           key={`list-item-stack-${index}`}
         >
           <TextField
@@ -94,9 +95,10 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
         </HStack>
       ))}
       <Button
-        mt="1rem"
         variant="outline"
-        leftIcon={<Image src={addPrimary} alt="Add icon" />}
+        leftIcon={
+          <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
+        }
         onClick={onAddHandler}
         disabled={disabled}
       >
