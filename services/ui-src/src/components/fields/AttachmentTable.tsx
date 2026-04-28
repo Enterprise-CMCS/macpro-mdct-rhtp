@@ -324,9 +324,7 @@ export const AttachmentTable = (
                     variant="outline"
                     onClick={() => onEditClick(row)}
                     aria-label={`Edit file or info for ${row.attachment.name}`}
-                    disabled={
-                      !canEditAttachment(row.status, row.comments) || disabled
-                    }
+                    disabled={!canEditAttachment(row.status) || disabled}
                   >
                     Edit
                   </Button>

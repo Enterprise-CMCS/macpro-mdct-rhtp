@@ -44,16 +44,10 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
-export const canEditAttachment = (
-  status: AttachmentStatus,
-  comments: InitiativeComment[]
-): boolean => {
-  if (status === AttachmentStatus.NEEDS_REVISION) return true;
+export const canEditAttachment = (status: AttachmentStatus): boolean => {
+  if (status === AttachmentStatus.LOCKED_FOR_SCORING) return false;
 
-  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
-    return true;
-
-  return false;
+  return true;
 };
 
 export const canDeleteAttachment = (
