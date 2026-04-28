@@ -79,7 +79,7 @@ describe("<Upload />", () => {
 
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
     });
     expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
   });
