@@ -28,7 +28,12 @@ import {
   dropdownEmptyOption,
 } from "@rhtp/shared";
 import { useStore } from "utils";
-import { downloadFile, removeFile } from "utils/other/upload";
+import {
+  downloadFile,
+  removeFile,
+  canEditAttachment,
+  canDeleteAttachment,
+} from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
@@ -167,7 +172,6 @@ export const AttachmentTable = (
     removeFile(reportType, state, id, file);
   };
 
-  // TODO: When we have file replacement on edit logic in, make sure to set status to PENDING_REVIEW
   const onModalSubmit = () => {
     if (modalMode === "Delete") {
       removeAttachment(uploadedFiles[0]);
@@ -320,10 +324,7 @@ export const AttachmentTable = (
                     variant="outline"
                     onClick={() => onEditClick(row)}
                     aria-label={`Edit file or info for ${row.attachment.name}`}
-                    disabled={
-                      row.status === AttachmentStatus.LOCKED_FOR_SCORING ||
-                      disabled
-                    }
+                    disabled={!canEditAttachment(row.status) || disabled}
                   >
                     Edit
                   </Button>
@@ -339,8 +340,7 @@ export const AttachmentTable = (
                     onClick={() => onDeleteClick(row)}
                     aria-label={`Delete ${row.attachment.name}`}
                     disabled={
-                      row.status === AttachmentStatus.LOCKED_FOR_SCORING ||
-                      disabled
+                      !canDeleteAttachment(row.status, row.comments) || disabled
                     }
                   >
                     <Image src={cancelIcon} alt="Remove" minWidth="24px" />
@@ -401,7 +401,7 @@ export const AttachmentTable = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         deleteFromReport={removeAttachment}
-        uploadAreaHidden={modalMode === "Delete"}
+        uploadAreaHidden={modalMode !== "Upload"}
       ></UploadModal>
       <CommentModal
         modalDisclosure={{

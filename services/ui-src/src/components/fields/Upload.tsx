@@ -131,7 +131,8 @@ export const Upload = ({
         id,
         answer ?? [],
         deleteFromReport,
-        downloadFile
+        downloadFile,
+        uploadAreaHidden
       )}
     </VStack>
   );
