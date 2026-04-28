@@ -284,18 +284,18 @@ export const TableCheckpoint = (
     setModalOpen(true);
     setSelectedFile(selectedFile);
 
-    const fullSelectedFiled = attachments.find(
-      (attachment) => attachment.attachment.fileId === selectedFile.fileId
+    const fullSelectedFile = attachments.find(
+      ({ attachment }) => attachment.fileId === selectedFile.fileId
     );
     const checkpoints =
       checkpointsList
-        .find((checks) => checks.id === fullSelectedFiled?.stage)
+        .find((checks) => checks.id === fullSelectedFile?.stage)
         ?.checkpoints.filter((checks) => checks.attachable)
         .map((check) => ({ label: check.label, value: check.id })) ?? [];
     setCheckpointOption(checkpoints);
     setSelection({
-      stage: fullSelectedFiled?.stage || "",
-      checkpoints: fullSelectedFiled?.checkpoints || "",
+      stage: fullSelectedFile?.stage || "",
+      checkpoints: fullSelectedFile?.checkpoints || "",
     });
   };
 

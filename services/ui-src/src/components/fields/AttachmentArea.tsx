@@ -52,6 +52,7 @@ export const AttachmentArea = (
           files,
           onRemove,
           downloadFile,
+          false,
           disabled
         )}
       <Button
