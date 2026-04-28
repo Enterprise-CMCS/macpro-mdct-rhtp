@@ -5,3 +5,11 @@ COGNITO_USER_POOL_CLIENT_ID=op://mdct_devs/rhtp_secrets/COGNITO_USER_POOL_CLIENT
 COGNITO_USER_POOL_CLIENT_DOMAIN=op://mdct_devs/rhtp_secrets/COGNITO_USER_POOL_CLIENT_DOMAIN
 COGNITO_USER_POOL_ID=op://mdct_devs/rhtp_secrets/COGNITO_USER_POOL_ID
 REACT_APP_LD_SDK_CLIENT=op://mdct_devs/rhtp_secrets/REACT_APP_LD_SDK_CLIENT
+
+# db:seed and env setup
+SEED_ADMIN_USER_EMAIL=op://mdct_devs/rhtp_secrets/SEED_ADMIN_USER_EMAIL
+SEED_ADMIN_USER_PASSWORD=op://mdct_devs/rhtp_secrets/SEED_ADMIN_USER_PASSWORD # pragma: allowlist secret
+SEED_STATE_USER_EMAIL=op://mdct_devs/rhtp_secrets/SEED_STATE_USER_EMAIL
+SEED_STATE_USER_PASSWORD=op://mdct_devs/rhtp_secrets/SEED_STATE_USER_PASSWORD # pragma: allowlist secret
+SEED_STATE=op://mdct_devs/rhtp_secrets/SEED_STATE
+SEED_STATE_NAME=op://mdct_devs/rhtp_secrets/SEED_STATE_NAME

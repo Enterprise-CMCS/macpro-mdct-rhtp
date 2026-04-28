@@ -22,10 +22,17 @@
     "services/app-api",
     "services/ui-src",
     "services/ui-auth",
-    "services/topics"
+    "services/topics",
+    "tests"
   ],
   "type": "module",
   "main": "index.js",
+  "scripts": {
+    "test:e2e": "cd tests && yarn run test:e2e",
+    "test:e2e-ui": "cd tests && yarn run test:e2e-ui",
+    "test:e2e-stable": "cd tests && yarn run test:e2e-stable",
+    "test:e2e-stable-ui": "cd tests && yarn run test:e2e-stable-ui"
+  },
   "dependencies": {
     "@aws-sdk/client-cloudformation": "~3.1012.0",
     "@aws-sdk/client-lambda": "~3.1012.0",
@@ -40,7 +47,7 @@
   "devDependencies": {
     "@octokit/auth-action": "^6.0.1",
     "@octokit/rest": "^22.0.0",
-    "@types/node": "^24.10.10",
+    "@types/node": "^25.6.0",
     "aws-cdk": "~2.1112.0",
     "aws-cdk-local": "~2.19.2",
     "dotenv": "^17.2.3",

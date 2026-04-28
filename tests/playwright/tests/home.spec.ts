@@ -1,0 +1,68 @@
+import { test, expect } from "./fixtures/base";
+import { checkAccessibilityAcrossViewports } from "../utils/a11y";
+
+test.describe("state user home page", () => {
+  test.beforeEach(async ({ statePage }) => {
+    await statePage.page.goto("/");
+  });
+
+  test("should render a visible RHTP report link", async ({ statePage }) => {
+    await expect(
+      statePage.page.getByRole("link", {
+        name: "Enter RHTP Report online",
+        exact: true,
+      })
+    ).toBeVisible();
+  });
+
+  test("should be accessible across all device viewports @a11y", async ({
+    statePage,
+  }) => {
+    const accessibilityErrors = await checkAccessibilityAcrossViewports(
+      statePage.page,
+      "/"
+    );
+    expect(accessibilityErrors).toEqual([]);
+  });
+});
+
+test.describe("admin user home page", () => {
+  test.beforeEach(async ({ adminPage }) => {
+    await adminPage.page.goto("/");
+  });
+
+  test("should render a visible state dropdown", async ({ adminPage }) => {
+    await expect(adminPage.page.locator('select[name="state"]')).toBeVisible();
+  });
+
+  test("should be accessible across all device viewports @a11y", async ({
+    adminPage,
+  }) => {
+    const accessibilityErrors = await checkAccessibilityAcrossViewports(
+      adminPage.page,
+      "/"
+    );
+    expect(accessibilityErrors).toEqual([]);
+  });
+});
+
+test.describe("unauthenticated home page", () => {
+  test("should be accessible across all device viewports @a11y", async ({
+    browser,
+  }) => {
+    const userContext = await browser.newContext({
+      storageState: {
+        cookies: [],
+        origins: [],
+      },
+    });
+    const page = await userContext.newPage();
+    const accessibilityErrors = await checkAccessibilityAcrossViewports(
+      page,
+      "/"
+    );
+    expect(accessibilityErrors).toEqual([]);
+    await page.close();
+    await userContext.close();
+  });
+});
