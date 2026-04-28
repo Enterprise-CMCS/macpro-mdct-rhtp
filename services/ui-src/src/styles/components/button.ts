@@ -86,6 +86,16 @@ const outlineVariant = () => ({
 const linkVariant = () => ({
   ...theme.components.Button.variants.transparent,
   textDecoration: "underline",
+  _hover: {
+    color: "#0071bc",
+    opacity: "0.4",
+    textDecoration: "underline",
+  },
+  _disabled: {
+    background: "transparent",
+    minWidth: "2.5rem",
+    color: "#0071bc",
+  },
 });
 // inverse variants
 const inverseVariant = {
