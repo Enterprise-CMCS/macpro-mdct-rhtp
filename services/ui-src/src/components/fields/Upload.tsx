@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { ReportType, UploadListProp } from "@rhtp/shared";
+import { UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
@@ -11,11 +11,9 @@ import {
   getFileWithSafeName,
   uploadListRender,
 } from "utils/other/upload";
+import { useStore } from "utils";
 
 interface Props {
-  id: string;
-  state: string;
-  reportType: ReportType;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
@@ -23,14 +21,13 @@ interface Props {
 }
 
 export const Upload = ({
-  id,
-  state,
-  reportType,
   answer,
   saveToReport,
   deleteFromReport,
   uploadAreaHidden = false,
 }: Props) => {
+  const { report } = useStore();
+  const { id, state, type: reportType } = report!;
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   useEffect(() => {
@@ -67,16 +64,13 @@ export const Upload = ({
   };
 
   const onUploadFiles = async () => {
-    if (!state) {
-      throw new Error("Undefined year or state parameter");
-    }
     const files = filesToUpload ?? [];
     const savedFiles = [];
     for (var i = 0; i < files.length; i++) {
       const displayName = files[i].name;
       const file = getFileWithSafeName(files[i]);
       const { presignedUploadUrl, fileId } =
-        await recordFileInDatabaseAndGetUploadUrl(id, reportType, state, file);
+        await recordFileInDatabaseAndGetUploadUrl(reportType, state, id, file);
       savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
       await uploadFileToS3({ presignedUploadUrl }, file);
     }
@@ -116,10 +110,10 @@ export const Upload = ({
           </Box>
           <Text sx={sx.uploadedLabel}>Selected Files</Text>
           {uploadListRender(
-            id,
             reportType,
-            filesToUpload ?? [],
             state,
+            id,
+            filesToUpload ?? [],
             deleteFromReport
           )}
         </>
@@ -132,10 +126,10 @@ export const Upload = ({
         </Text>
       </div>
       {uploadListRender(
-        id,
         reportType,
-        answer ?? [],
         state,
+        id,
+        answer ?? [],
         deleteFromReport,
         downloadFile
       )}

@@ -16,6 +16,7 @@ import INITIATIVES from "./data/initiatives.json";
 type MetricData = {
   name: string;
   status: string;
+  target?: string; // TODO: (probably) make required once we have new CMS data with targets
 };
 
 type InitiativeData = {
@@ -102,6 +103,7 @@ export const metricTable = (
           required: true,
         },
         { id: "metric", type: ElementType.TextAreaField, required: true },
+        { id: "target", type: ElementType.NumberField, required: false },
         { id: "currValue", type: ElementType.NumberField, required: false },
         { id: "date", type: ElementType.Date, required: false },
       ],
@@ -110,6 +112,7 @@ export const metricTable = (
       { id: "no", header: "#", type: ElementType.Paragraph },
       { id: "status", header: "Status", type: ElementType.Paragraph },
       { id: "metric", header: "Metric", type: ElementType.Paragraph },
+      { id: "target", header: "Target", type: ElementType.Paragraph },
       {
         id: "prevValue",
         header: "Previous Value",
@@ -131,6 +134,7 @@ export const metricTable = (
     const answer = [
       { id: "status", value: metric.status },
       { id: "metric", value: metric.name },
+      { id: "target", value: metric.target },
       { id: "prevValue", value: "" },
       { id: "currValue", value: "" },
       { id: "date", value: "" },

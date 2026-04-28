@@ -2,7 +2,6 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { UploadModal } from "./UploadModal";
 import userEvent from "@testing-library/user-event";
 import { Dropdown } from "@cmsgov/design-system";
-import { ReportType } from "@rhtp/shared";
 
 const mockCloseHandler = vi.fn();
 const mockChangedExpanded = vi.fn();
@@ -22,6 +21,17 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
     ]),
 }));
 
+vi.mock("utils", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      id: "mock-report-id",
+      type: "RHTP",
+      state: "PA",
+    },
+  }),
+}));
+
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 
 const modalComponent = (
@@ -30,9 +40,6 @@ const modalComponent = (
       isOpen: true,
       onClose: mockCloseHandler,
     }}
-    id={"mock-id"}
-    reportType={ReportType.RHTP}
-    state={"PA"}
     answer={[]}
     selections={
       <>
