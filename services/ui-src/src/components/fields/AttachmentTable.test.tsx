@@ -58,6 +58,18 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     },
+    {
+      attachment: {
+        name: "mock-file-2",
+        size: 100,
+        fileId: "file-id",
+      },
+      initiatives: ["mock-init-1"],
+      stage: "checkpoint-1",
+      checkpoints: "project-prop-2",
+      status: AttachmentStatus.PENDING_REVIEW,
+      comments: [],
+    },
   ],
 };
 
@@ -221,6 +233,23 @@ describe("<AttachmentTable />", () => {
         ]),
       })
     );
+  });
+
+  it("Test table sorting", async () => {
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+    const sortNames = [
+      "Attachment name",
+      "Initiatives",
+      "Stage",
+      "Checkpoints",
+      "Status",
+    ];
+
+    for (var i = 0; i < sortNames.length; i++) {
+      const sortBtn = screen.getByRole("button", { name: sortNames[i] });
+      await userEvent.click(sortBtn);
+      await userEvent.click(sortBtn);
+    }
   });
 
   testA11y(AttachmentTableComponent(mockAttachmentAreaElement));
