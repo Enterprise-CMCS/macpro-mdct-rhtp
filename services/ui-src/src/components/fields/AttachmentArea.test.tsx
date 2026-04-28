@@ -1,27 +1,16 @@
-import { Mock } from "vitest";
+import { Mock, MockedFunction } from "vitest";
+import { useStore } from "utils";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
-import { useParams } from "react-router";
 import { ElementType, AttachmentAreaTemplate } from "@rhtp/shared";
 import { getFileDownloadUrl } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
 
 const updateSpy = vi.fn();
 
-vi.mock("react-router", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA" }),
-}));
-
-vi.mock("utils", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useStore: vi.fn().mockReturnValue({
-    report: {
-      id: "mock-report-id",
-      type: "RHTP",
-    },
-  }),
-}));
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -49,6 +38,13 @@ const consoleMock = vi.spyOn(console, "error");
 describe("<AttachmentArea />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUseStore.mockReturnValue({
+      report: {
+        id: "mock-report-id",
+        type: "RHTP",
+        state: "PA",
+      },
+    });
   });
   test("AttachmentArea renders an upload button", async () => {
     await act(async () => {
@@ -58,8 +54,8 @@ describe("<AttachmentArea />", () => {
     expect(screen.getByText("mock attachment area")).toBeVisible();
     expect(screen.getByRole("button", { name: "Add attachment" }));
   });
-  test("receive an error when state or year is not provided", async () => {
-    (useParams as Mock).mockResolvedValueOnce("");
+  test("receive an error when state, id or type is not provided", async () => {
+    (useStore as unknown as Mock).mockReturnValue({ report: {} });
     await act(async () => {
       render(AttachmentAreaComponent);
     });
