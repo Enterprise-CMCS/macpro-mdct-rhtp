@@ -65,9 +65,9 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
         fileId: "file-id",
       },
       initiatives: ["mock-init-1"],
-      stage: "checkpoint-1",
-      checkpoints: "project-prop-2",
-      status: AttachmentStatus.PENDING_REVIEW,
+      stage: "checkpoint-2",
+      checkpoints: "early-implementation-1",
+      status: AttachmentStatus.LOCKED_FOR_SCORING,
       comments: [],
     },
   ],
@@ -235,21 +235,45 @@ describe("<AttachmentTable />", () => {
     );
   });
 
-  it("Test table sorting", async () => {
+  it("Test AttachmentTable column sorting", async () => {
     render(AttachmentTableComponent(mockAttachmentAreaElement));
-    const sortNames = [
-      "Attachment name",
-      "Initiatives",
-      "Stage",
-      "Checkpoints",
-      "Status",
-    ];
 
-    for (var i = 0; i < sortNames.length; i++) {
-      const sortBtn = screen.getByRole("button", { name: sortNames[i] });
+    const sortResult = async (
+      sort: string,
+      columns: number[],
+      results: string[]
+    ) => {
+      const content = screen.getAllByRole("cell");
+      const sortBtn = screen.getByRole("button", { name: sort });
       await userEvent.click(sortBtn);
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results);
       await userEvent.click(sortBtn);
-    }
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results.toReversed());
+    };
+
+    await sortResult("Attachment name", [0, 6], ["mock-file", "mock-file-2"]);
+    await sortResult("Initiatives", [1, 7], ["#123", "#123"]);
+    await sortResult(
+      "Stage",
+      [2, 8],
+      ["1 Project Preparation", "2 Early Implementation"]
+    );
+    await sortResult(
+      "Checkpoints",
+      [3, 9],
+      ["Continue initiative", "Launch initiative"]
+    );
+    await sortResult(
+      "Status",
+      [4, 10],
+      ["Locked for Scoring", "Pending Review"]
+    );
   });
 
   testA11y(AttachmentTableComponent(mockAttachmentAreaElement));
