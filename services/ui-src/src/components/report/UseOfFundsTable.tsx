@@ -226,13 +226,13 @@ export const UseOfFundsTableElement = (
         <Table variant="metric">
           <Thead>
             <Tr>
-              <Th>Budget Period</Th>
-              <Th>Spent Funds ($)</Th>
+              <Th>Period</Th>
+              <Th>$ Spent</Th>
               <Th>Description</Th>
               <Th>Init #</Th>
-              <Th>Use of Funds</Th>
-              <Th>Recipient Name</Th>
-              <Th>Recipient Category</Th>
+              <Th>Use</Th>
+              <Th>Recipient</Th>
+              <Th>Category</Th>
               <Th>Actions</Th>
             </Tr>
           </Thead>
@@ -247,7 +247,6 @@ export const UseOfFundsTableElement = (
         }}
         content={{
           heading: `${modalMode} Use of Funds`,
-          subheading: "hint text",
           actionButtonText: "Save",
           closeButtonText: "Cancel",
         }}
@@ -255,7 +254,7 @@ export const UseOfFundsTableElement = (
       >
         <Flex direction="column" gap="2rem" marginTop="1.5rem">
           <Dropdown
-            label="Budget Period"
+            label="Budget period"
             name="budgetPeriod"
             onChange={handleChange}
             errorMessage={errorMessages.budgetPeriod}
@@ -263,7 +262,7 @@ export const UseOfFundsTableElement = (
             value={formValues.budgetPeriod}
           />
           <TextField
-            label="Spent Funds"
+            label="Spent funds"
             name="spentFunds"
             onBlur={handleChange}
             onChange={handleChange}
@@ -290,7 +289,7 @@ export const UseOfFundsTableElement = (
             value={formValues.initiative}
           />
           <Dropdown
-            label="Use of Funds"
+            label="Use of funds"
             name="useOfFunds"
             onChange={handleChange}
             errorMessage={errorMessages.useOfFunds}
@@ -298,7 +297,7 @@ export const UseOfFundsTableElement = (
             value={formValues.useOfFunds}
           />
           <TextField
-            label="Recipient Name"
+            label="Recipient name"
             name="recipientName"
             onBlur={handleChange}
             onChange={handleChange}
@@ -306,7 +305,7 @@ export const UseOfFundsTableElement = (
             value={formValues.recipientName}
           />
           <Dropdown
-            label="Recipient Category"
+            label="Recipient category"
             name="recipientCategory"
             onChange={handleChange}
             errorMessage={errorMessages.recipientCategory}

@@ -20,6 +20,7 @@ const modal = {
     {
       id: "status",
       type: ElementType.Dropdown,
+      label: "Mock dropdown",
       editOnly: true,
       children: [
         { label: "Active", value: "Active" },
@@ -29,10 +30,16 @@ const modal = {
     },
     {
       id: "mock-textbox",
+      label: "Mock textbox",
       type: ElementType.Textbox,
       required: true,
     },
-    { id: "mock-date", type: ElementType.Date, required: true },
+    {
+      id: "mock-date",
+      label: "Mock date",
+      type: ElementType.Date,
+      required: true,
+    },
   ],
 };
 
@@ -42,7 +49,6 @@ describe("Test ActionModal component", () => {
     render(
       <ActionModal
         modal={modal}
-        rows={rows}
         form={{
           data: initial,
           index: undefined,
@@ -59,22 +65,22 @@ describe("Test ActionModal component", () => {
     expect(screen.getByText("Add Mock Modal")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
     expect(
-      screen.getByRole("textbox", { name: "Mock Textbox" })
+      screen.getByRole("textbox", { name: "Mock textbox" })
     ).toBeInTheDocument();
     expect(
       screen.getAllByRole("button", { name: "Close" })[0]
     ).toBeInTheDocument();
   });
   test("Modal fields update with user input", async () => {
-    const textbox = screen.getByRole("textbox", { name: "Mock Textbox" });
+    const textbox = screen.getByRole("textbox", { name: "Mock textbox" });
     await userEvent.type(textbox, "hello");
     expect(textbox).toHaveValue("hello");
   });
   test("Modal save", async () => {
-    const textbox = screen.getByRole("textbox", { name: "Mock Textbox" });
+    const textbox = screen.getByRole("textbox", { name: "Mock textbox" });
     await userEvent.type(textbox, "hello");
 
-    const date = screen.getByRole("textbox", { name: "Mock Date" });
+    const date = screen.getByRole("textbox", { name: "Mock date" });
     await userEvent.type(date, "2/2/2022");
 
     const saveBtn = screen.getByRole("button", { name: "Save" });

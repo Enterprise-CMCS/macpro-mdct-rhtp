@@ -419,6 +419,7 @@ export interface ActionRowElement extends ActionElement {
 }
 
 export interface ActionModalElement extends ActionElement {
+  label: string;
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;

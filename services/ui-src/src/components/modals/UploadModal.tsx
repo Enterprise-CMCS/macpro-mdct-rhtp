@@ -11,7 +11,7 @@ export const UploadModal = ({
   answer,
   saveToReport,
   deleteFromReport,
-  modalHeading = "Upload attachments",
+  modalHeading = "Upload Attachments",
   onModalSubmit = modalDisclosure.onClose,
   actionButtonText = "Done",
   uploadAreaHidden = false,

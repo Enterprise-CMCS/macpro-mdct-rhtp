@@ -272,7 +272,7 @@ export const AttachmentTable = (
         Add Attachment
       </Button>
       {displayValue.length === 0 ? (
-        <p>No attachments found. Click 'Add Attachment' to get started</p>
+        <p>No attachments found. Select “Add attachment” to get started.</p>
       ) : (
         <Table variant="initiative" width="800px">
           <Thead>
@@ -357,27 +357,25 @@ export const AttachmentTable = (
           onClose: onClose,
         }}
         answer={uploadedFiles}
-        hint="[hint text]"
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">
             {modalMode === "Delete" ? (
               <Alert status={AlertTypes.WARNING} title="Warning">
-                Deleting attachment will remove it from all initiatives, stages
-                and checkpoints below.
+                Deleting this attachment will remove it from all initiatives,
+                stages, and checkpoints below.
               </Alert>
             ) : null}
             <ChoiceList
               choices={initiativeOptions}
               name={"initiative-choice-list"}
               type={"checkbox"}
-              label={"Initiative"}
+              label={"Which initiative does this attachment apply to?"}
               onChange={onChoiceChangeHandler}
-              hint={"This is the hint text"}
               disabled={modalMode === "Delete" || disabled}
             ></ChoiceList>
             <Dropdown
               name={"stage"}
-              label={"Stage"}
+              label={"Which stage does this attachment apply to?"}
               value={selection?.stage}
               options={stageOption}
               onChange={onStageChangeHandler}
@@ -385,7 +383,7 @@ export const AttachmentTable = (
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
-              label={"Checkpoint #"}
+              label={"Which checkpoint does this attachment apply to?"}
               options={checkpointOption}
               value={selection?.checkpoint}
               onChange={(dropdown) => {

@@ -109,7 +109,7 @@ const dropdownTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Dropdown)),
   id: string().required(),
   label: string().required(),
-  helperText: string().required(),
+  helperText: string().notRequired(),
   options: array().of(
     object().shape({
       label: string().required(),
@@ -330,6 +330,7 @@ const actionTableSchema = object().shape({
         .of(
           object().shape({
             ...ActionElementsSchema,
+            label: string().required(),
             editOnly: boolean().notRequired(),
             children: array()
               .of(
