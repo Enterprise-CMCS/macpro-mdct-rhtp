@@ -70,7 +70,6 @@ export const buildElement = (
           value={defaultValue}
           errorMessage={errorMessage}
           disabled={element.disabled}
-          numeric
         />
       );
     case ElementType.TextAreaField:

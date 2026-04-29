@@ -23,7 +23,6 @@ export const ActionModal = ({
   const renderElements = !isEdit
     ? modal.elements.filter((element) => !element.editOnly)
     : modal.elements;
-  // console.log("renderElements", renderElements);
   const [errorMessages, setErrorMessages] = useState<string[]>(
     renderElements.map(() => "")
   );
