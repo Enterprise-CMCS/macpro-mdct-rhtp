@@ -13,6 +13,7 @@ import {
   ElementType,
   TableCheckpointTemplate,
   AttachmentStatus,
+  InitiativeComment,
 } from "@rhtp/shared";
 import {
   getFileDownloadUrl,
@@ -21,12 +22,18 @@ import {
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import { CommentModal } from "components/modals/CommentModal";
+import { removeFile } from "utils/other/upload";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ pageId: "mock-init-1" }),
+}));
+
+vi.mock("utils/other/upload", async (importOriginal) => ({
+  ...(await importOriginal()),
+  removeFile: vi.fn(),
 }));
 
 const mockGetAnswer = vi.fn();
@@ -111,10 +118,10 @@ const mockReport = {
               {
                 initiatives: ["mock-init-1"],
                 checkpoints: "project-prop-2",
-                comments: [],
+                comments: [] as InitiativeComment[],
                 attachment: mockFiles,
                 stage: "checkpoint-1",
-                status: "Under Review",
+                status: AttachmentStatus.PENDING_REVIEW,
               },
             ],
           },
@@ -184,13 +191,37 @@ describe("<TableCheckpoint />", () => {
     });
     expect(deleteButton).toBeDisabled();
   });
+  test("delete disabled when file has previous comments", async () => {
+    const lockedFileReport = structuredClone(mockReport);
+    lockedFileReport.report.pages[1].elements![0].answer[0].comments = [
+      {
+        name: "Mock User",
+        date: "2024-06-01",
+        comment: "This is a mock comment",
+        statusChange: AttachmentStatus.INFORMATIONAL,
+      },
+    ];
+    mockedUseStore.mockReturnValue(lockedFileReport);
+    render(TableCheckpointComponent);
+    const deleteButton = screen.getByRole("button", {
+      name: "Remove orange.png from checkpoint Launch initiative",
+    });
+    expect(deleteButton).toBeDisabled();
+  });
   test("delete file", async () => {
     render(TableCheckpointComponent);
     const deleteButton = screen.getByRole("button", {
       name: "Remove orange.png from checkpoint Launch initiative",
     });
     await userEvent.click(deleteButton);
+    await waitFor(() => {
+      expect(screen.getByText("Delete Attachment")).toBeVisible();
+    });
+    const confirmDeleteBtn = screen.getByRole("button", { name: "Delete" });
+    await userEvent.click(confirmDeleteBtn);
     expect(mockGetAnswer).toHaveBeenCalled();
+    expect(vi.mocked(removeFile)).toHaveBeenCalled();
+    expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
   });
   testA11y(TableCheckpointComponent);
 });
@@ -214,7 +245,7 @@ describe("TableCheckpoint upload modal", () => {
   test("drag and dropping a file", () => {
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
     });
     expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
   });

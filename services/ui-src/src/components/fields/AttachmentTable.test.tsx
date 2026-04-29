@@ -132,7 +132,7 @@ describe("<AttachmentTable />", () => {
 
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
     });
 
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
@@ -153,6 +153,7 @@ describe("<AttachmentTable />", () => {
     expect(deleteBtn).toBeDisabled();
     expect(editBtn).toBeDisabled();
   });
+
   it("Mock on remove file call", async () => {
     render(AttachmentTableComponent(mockAttachmentAreaElement));
     const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });

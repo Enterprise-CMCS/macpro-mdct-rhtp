@@ -15,7 +15,12 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
-import { ReportType, UploadListProp } from "@rhtp/shared";
+import {
+  ReportType,
+  UploadListProp,
+  AttachmentStatus,
+  InitiativeComment,
+} from "@rhtp/shared";
 
 export const acceptedFileTypes = [
   ".ppt",
@@ -28,6 +33,16 @@ export const acceptedFileTypes = [
   ".png",
 ];
 
+const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
+
+export const getFileWithSafeName = (file: File) => {
+  const newName = file.name.replaceAll(negatedAllowedCharacters, "");
+  return new File([file], newName, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
+};
+
 export const downloadFile = async (
   reportType: ReportType,
   state: string,
@@ -37,6 +52,22 @@ export const downloadFile = async (
   const fileLink = await getFileDownloadUrl(reportType, state, id, file.fileId);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
   window.open(sanitizeLink);
+};
+
+export const canEditAttachment = (status: AttachmentStatus): boolean => {
+  if (status === AttachmentStatus.LOCKED_FOR_SCORING) return false;
+
+  return true;
+};
+
+export const canDeleteAttachment = (
+  status: AttachmentStatus,
+  comments: InitiativeComment[]
+): boolean => {
+  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
+    return true;
+
+  return false;
 };
 
 export const removeFile = async (
@@ -56,6 +87,7 @@ export const uploadListRender = (
   files: File[] | UploadListProp[],
   onRemove: Function,
   onClick?: Function,
+  removeIconHidden: boolean = false,
   disabled?: boolean
 ) => {
   return (
@@ -82,6 +114,7 @@ export const uploadListRender = (
                 aria-label={`delete ${file.name}`}
                 onClick={() => onRemove(file)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                hidden={removeIconHidden}
                 disabled={disabled}
               />
             </HStack>

@@ -18,6 +18,7 @@
   },
   "workspaces": [
     "cli",
+    ".github/scanResources",
     "services/shared",
     "services/app-api",
     "services/ui-src",
