@@ -356,25 +356,26 @@ export const AttachmentTable = (
     };
 
     const sortedValues = runSort(displayValue);
+    const filteredValues = sortedValues.reduce(
+      (prev: InitiativeAnswerProp[][], curr) => {
+        if (
+          curr.initiatives.length === 0 &&
+          (curr.stage == "" || curr.stage == undefined)
+        )
+          prev[0].push(curr);
+        else if (
+          curr.initiatives.length > 0 &&
+          (curr.stage == "" || curr.stage == undefined)
+        )
+          prev[1].push(curr);
+        else prev[2].push(curr);
 
-    const unfilledAll = sortedValues.filter(
-      (value) =>
-        value.initiatives.length === 0 &&
-        (value.stage == "" || value.stage == undefined)
-    );
-    const unfilledSome = sortedValues.filter(
-      (value) =>
-        value.initiatives.length > 0 &&
-        (value.stage == "" || value.stage == undefined)
-    );
-    const filled = sortedValues.filter(
-      (value) =>
-        value.initiatives.length > 0 &&
-        value.stage != "" &&
-        value.stage != undefined
+        return prev;
+      },
+      [[], [], []]
     );
 
-    setTableRows(rows([...unfilledAll, ...unfilledSome, ...filled]));
+    setTableRows(rows(filteredValues.flat()));
   };
 
   return (
