@@ -318,23 +318,6 @@ export const AttachmentTable = (
   };
 
   const sortRows = (row: string, type: SORT_TYPE) => {
-    const unfilledAll = displayValue.filter(
-      (value) =>
-        value.initiatives.length === 0 &&
-        (value.stage == "" || value.stage == undefined)
-    );
-    const unfilledSome = displayValue.filter(
-      (value) =>
-        value.initiatives.length > 0 &&
-        (value.stage == "" || value.stage == undefined)
-    );
-    const filled = displayValue.filter(
-      (value) =>
-        value.initiatives.length > 0 &&
-        value.stage != "" &&
-        value.stage != undefined
-    );
-
     const getValue = (answer: InitiativeAnswerProp, type: string) => {
       switch (type) {
         case "Attachment name":
@@ -372,13 +355,26 @@ export const AttachmentTable = (
           });
     };
 
-    setTableRows(
-      rows([
-        ...runSort(unfilledAll),
-        ...runSort(unfilledSome),
-        ...runSort(filled),
-      ])
+    const sortedValues = runSort(displayValue);
+
+    const unfilledAll = sortedValues.filter(
+      (value) =>
+        value.initiatives.length === 0 &&
+        (value.stage == "" || value.stage == undefined)
     );
+    const unfilledSome = sortedValues.filter(
+      (value) =>
+        value.initiatives.length > 0 &&
+        (value.stage == "" || value.stage == undefined)
+    );
+    const filled = sortedValues.filter(
+      (value) =>
+        value.initiatives.length > 0 &&
+        value.stage != "" &&
+        value.stage != undefined
+    );
+
+    setTableRows(rows([...unfilledAll, ...unfilledSome, ...filled]));
   };
 
   return (

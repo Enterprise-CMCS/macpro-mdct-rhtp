@@ -95,9 +95,9 @@ const HorizontalTable = (
         </Tr>
       </Thead>
       <Tbody>
-        {rows.map((datas: TableRowType[], rowIndex) => (
+        {rows.map((column: TableRowType[], rowIndex) => (
           <Tr key={rowIndex}>
-            {datas.map((data) => (
+            {column.map((data) => (
               <Td>{data}</Td>
             ))}
           </Tr>
@@ -132,13 +132,13 @@ const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
 export const ResponsiveTable = (
   headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
-  variant: string = "",
+  variant?: string,
   sorting: (header: string, type: SORT_TYPE) => void = () => {}
 ) => {
   return (
     <>
       <Hide below="md" key="table">
-        {HorizontalTable(headers, rows, sorting, variant)}
+        {HorizontalTable(headers, rows, sorting, variant ?? "")}
       </Hide>
       <Show below="md" key="table-mobile">
         {VerticalTable(
