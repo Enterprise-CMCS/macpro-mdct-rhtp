@@ -54,7 +54,7 @@ const HorizontalTable = (
   headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
   sorting: (header: string, type: SORT_TYPE) => void,
-  variant?: string
+  variant: string
 ) => {
   const [sort, setSort] = useState<{
     label: string;
@@ -69,7 +69,7 @@ const HorizontalTable = (
   };
 
   return (
-    <Table variant={variant ?? ""}>
+    <Table variant={variant}>
       <Thead>
         <Tr>
           {headers.map((item) => (
@@ -135,13 +135,13 @@ const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
 export const ResponsiveTable = (
   headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
-  variant?: string,
-  sorting?: (header: string, type: SORT_TYPE) => void
+  variant: string = "",
+  sorting: (header: string, type: SORT_TYPE) => void = () => {}
 ) => {
   return (
     <>
       <Hide below="md" key="table">
-        {HorizontalTable(headers, rows, sorting ?? (() => {}), variant)}
+        {HorizontalTable(headers, rows, sorting, variant)}
       </Hide>
       <Show below="md" key="table-mobile">
         {VerticalTable(
