@@ -5,6 +5,7 @@ import {
   aws_iam as iam,
   RemovalPolicy,
   Aws,
+  Duration,
 } from "aws-cdk-lib";
 
 interface CreateUploadsComponentsProps {
@@ -135,6 +136,13 @@ export function createUploadsComponents(props: CreateUploadsComponentsProps) {
       ],
     })
   );
+
+  attachmentsBucket.addLifecycleRule({
+    tagFilters: {
+      tagFiltersKey: "auto_delete_category=generated_zip",
+    },
+    expiration: Duration.days(1),
+  });
 
   new guardduty.CfnMalwareProtectionPlan(scope, "MalwareProtectionPlan", {
     actions: {

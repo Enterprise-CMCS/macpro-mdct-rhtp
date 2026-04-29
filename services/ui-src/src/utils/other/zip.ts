@@ -1,7 +1,14 @@
-import { getFileBytes } from "utils/api/requestMethods/upload";
+import { getFileBytes, getZip } from "utils/api/requestMethods/upload";
 import JSZip from "jszip";
+import DOMPurify from "dompurify";
 import { Report, RhtpSubType } from "@rhtp/shared";
 import { saveAs } from "file-saver";
+
+export const openZipFile = async (report: Report) => {
+  const { state, id, type } = report;
+  const zipUrl = await getZip(type, state, id);
+  window.open(DOMPurify.sanitize(zipUrl.psurl));
+};
 
 export const createZipFile = async (report: Report) => {
   const { state, year, subType, id, type } = report;

@@ -1,5 +1,6 @@
 process.env.BannersTable = "local-banners";
 process.env.RhtpReportsTable = "local-rhtp-reports";
+process.env.attachmentsBucketName = `uploads-local-attachments-123`;
 
 /*
  * This mock mutes all logger output during tests! Including console errors!

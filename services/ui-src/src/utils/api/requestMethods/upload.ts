@@ -53,6 +53,17 @@ export const getFileBytes = async (
   return response ?? [];
 };
 
+export const getZip = async (
+  reportType: string,
+  stateCode: string,
+  id: string
+) => {
+  return await apiLib.get<PathURL>(
+    `/reports/${reportType}/${stateCode}/${id}/zip/`,
+    { headers: await getRequestHeaders() }
+  );
+};
+
 export const uploadFileToS3 = async (
   { presignedUploadUrl }: { presignedUploadUrl: string },
   file: File

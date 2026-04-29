@@ -6773,6 +6773,7 @@ __metadata:
     aws-sdk-client-mock: "npm:~4.1.0"
     dompurify: "npm:^3.4.0"
     jsdom: "npm:^26.0.0"
+    jszip: "npm:3.10.1"
     jwt-decode: "npm:3.1.2"
     kafkajs: "npm:^2.2.4"
     ksuid: "npm:^3.0.0"

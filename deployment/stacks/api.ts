@@ -195,6 +195,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "getUploadBundleUrl", {
+    entry: "services/app-api/handlers/uploads/getBundleUrl.ts",
+    handler: "getUploadBundleUrl",
+    path: "/reports/{reportType}/{state}/{id}/zip",
+    method: "GET",
+    ...commonProps,
+  });
+
   new Lambda(scope, "getUploadsByFileId", {
     entry: "services/app-api/handlers/uploads/get.ts",
     handler: "getUploadsByFileId",
