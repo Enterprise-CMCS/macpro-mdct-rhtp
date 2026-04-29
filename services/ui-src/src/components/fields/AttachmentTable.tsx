@@ -126,7 +126,7 @@ export const AttachmentTable = (
 
     //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
     if (choices.every((choice) => !choice.checked)) {
-      setSelection({ stage: "", checkpoint: "" });
+      setSelection(initialValues);
     }
   };
 
@@ -395,7 +395,7 @@ export const AttachmentTable = (
       >
         Add Attachment
       </Button>
-      {displayValue.length === 0 ? (
+      {tableRows.length === 0 ? (
         <p>No attachments found. Click 'Add Attachment' to get started</p>
       ) : (
         ResponsiveTable(

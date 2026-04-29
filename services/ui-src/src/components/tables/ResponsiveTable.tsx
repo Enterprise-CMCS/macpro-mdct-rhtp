@@ -15,7 +15,7 @@ import {
   Button,
   Image,
 } from "@chakra-ui/react";
-import { JSX, useState } from "react";
+import { JSX } from "react";
 import sortIcon from "assets/icons/sort/icon_sort.svg";
 import sortAscIcon from "assets/icons/sort/icon_sort_asc.svg";
 import sortDescIcon from "assets/icons/sort/icon_sort_desc.svg";
@@ -27,6 +27,8 @@ export enum SORT_TYPE {
   ASCENDING,
   DESCENDING,
 }
+
+let sort = { label: "", type: SORT_TYPE.DEFAULT };
 
 const getSortIcon = (type: SORT_TYPE) => {
   switch (type) {
@@ -56,15 +58,10 @@ const HorizontalTable = (
   sorting: (header: string, type: SORT_TYPE) => void,
   variant: string
 ) => {
-  const [sort, setSort] = useState<{
-    label: string;
-    type: SORT_TYPE;
-  }>({ label: "", type: SORT_TYPE.DEFAULT });
-
   const onSort = (sortName: string) => {
     const type =
       sortName === sort.label ? setNextSort(sort.type) : SORT_TYPE.DESCENDING;
-    setSort({ label: sortName, type });
+    sort = { label: sortName, type };
     sorting(sortName, type);
   };
 
