@@ -56,10 +56,10 @@ export const createReport = handler(
 
       const nextReportKey =
         RhtpSubTypeMap[latestReport.subTypeKey].nextReportSubType;
-      const { name, dateRangeString, type, startDate, openDate, budgetPeriod } =
+      const { name, dateRangeString, type, openDate, budgetPeriod } =
         RhtpSubTypeMap[nextReportKey];
 
-      if (Date.now() < startDate) {
+      if (Date.now() < openDate) {
         return badRequest(
           `The next report cannot be created until ${new Date(
             openDate
