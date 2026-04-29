@@ -2,14 +2,11 @@ import { Stack } from "@chakra-ui/react";
 import { Modal } from "components";
 import { Upload } from "components/fields/Upload";
 import { JSX } from "react";
-import { ReportType, UploadListProp } from "@rhtp/shared";
+import { UploadListProp } from "@rhtp/shared";
 
 export const UploadModal = ({
   modalDisclosure,
-  id,
-  reportType,
   hint,
-  state,
   selections,
   answer,
   saveToReport,
@@ -33,13 +30,10 @@ export const UploadModal = ({
       <Stack gap="1.5rem">
         {selections ?? ""}
         <Upload
-          id={id}
-          state={state}
           answer={answer}
           saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
           uploadAreaHidden={uploadAreaHidden}
-          reportType={reportType}
         />
       </Stack>
     </Modal>
@@ -51,10 +45,7 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
-  id: string;
-  reportType: ReportType;
   hint?: string;
-  state: string;
   answer: UploadListProp[];
   selections?: JSX.Element;
   modalHeading?: string;

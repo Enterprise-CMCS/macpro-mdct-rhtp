@@ -13,7 +13,7 @@ import { testA11y } from "utils/testing/commonTests";
 import { removeFile } from "utils/other/upload";
 
 vi.mock("react-router", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA", pageId: "mock-init-1" }),
+  useParams: vi.fn().mockReturnValue({ pageId: "mock-init-1" }),
 }));
 
 vi.mock("utils/state/useStore");
@@ -78,6 +78,7 @@ describe("<AttachmentTable />", () => {
       report: {
         id: "mock-report-id",
         type: "RHTP",
+        state: "PA",
         pages: [
           {
             id: "mock-init-1",
@@ -119,7 +120,7 @@ describe("<AttachmentTable />", () => {
 
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
     });
 
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
@@ -140,6 +141,7 @@ describe("<AttachmentTable />", () => {
     expect(deleteBtn).toBeDisabled();
     expect(editBtn).toBeDisabled();
   });
+
   it("Mock on remove file call", async () => {
     render(AttachmentTableComponent(mockAttachmentAreaElement));
     const deleteBtn = screen.getByRole("button", { name: "Delete mock-file" });

@@ -156,8 +156,6 @@ export enum ElementType {
   Checkbox = "checkbox",
   ButtonLink = "buttonLink",
   StatusTable = "statusTable",
-  LengthOfStayRate = "lengthOfStay",
-  ReadmissionRate = "readmissionRate",
   StatusAlert = "statusAlert",
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
@@ -385,7 +383,7 @@ export type InitiativeComment = {
   name: string;
   date: string;
   comment?: string;
-  statusChange?: string;
+  statusChange?: AttachmentStatus;
 };
 
 export enum AttachmentStatus {
