@@ -301,6 +301,7 @@ const attachmentAreaSchema = object().shape({
   id: string().required(),
   label: string().required(),
   helperText: string().optional(),
+  uploadedSubLabel: string().required(),
   required: boolean().required(),
   answer: array().of(
     object().shape({

@@ -38,6 +38,8 @@ const commitmentAttachmentArea: AttachmentAreaTemplate = {
   id: "commitment-attachments",
   label: "Supporting Evidence: Attachments",
   helperText: "Upload files to submit as supporting evidence",
+  uploadedSubLabel:
+    "These files have been attached to the state policy commitment above.",
   required: false,
 };
 

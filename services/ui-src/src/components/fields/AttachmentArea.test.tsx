@@ -22,6 +22,7 @@ const mockAttachmentAreaElement: AttachmentAreaTemplate = {
   id: "mock-attachment-area-id",
   type: ElementType.AttachmentArea,
   label: "mock attachment area",
+  uploadedSubLabel: "mock sub label",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   required: true,
 };
