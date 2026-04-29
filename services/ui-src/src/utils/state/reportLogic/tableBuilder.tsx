@@ -6,7 +6,11 @@ import {
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../../constants";
 import { ActionElement, ElementType } from "@rhtp/shared";
-import { parseNumber, validateDate } from "utils/validation/inputValidation";
+import {
+  parseNumber,
+  validateDate,
+  maskNumber,
+} from "utils/validation/inputValidation";
 
 export const buildElement = (
   element: ActionElement,
@@ -36,7 +40,6 @@ export const buildElement = (
         />
       );
     case ElementType.Textbox:
-    case ElementType.NumberField:
       return (
         <TextField
           label={label}
@@ -50,6 +53,24 @@ export const buildElement = (
           value={defaultValue}
           errorMessage={errorMessage}
           disabled={element.disabled}
+        />
+      );
+    case ElementType.NumberField:
+      return (
+        <TextField
+          label={label}
+          name={label ?? "number-field"}
+          onChange={(event) => {
+            onChange([event.target.value]);
+          }}
+          onBlur={(event) => {
+            const maskedValue = maskNumber(event.target.value);
+            onChange([maskedValue]);
+          }}
+          value={defaultValue}
+          errorMessage={errorMessage}
+          disabled={element.disabled}
+          numeric
         />
       );
     case ElementType.TextAreaField:

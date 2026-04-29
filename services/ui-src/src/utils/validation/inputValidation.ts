@@ -104,7 +104,8 @@ export const isEmail = (value: string | undefined) => {
  * For more see https://stackoverflow.com/questions/175739
  */
 export const parseNumber = (value: string) => {
-  value = value.trim();
+  // Remove whitespace and commas (common number separator)
+  value = value.trim().replaceAll(",", "");
   if (value === "") return undefined;
   const nonNumericChars = /[^.-\d]/;
   if (nonNumericChars.test(value)) return undefined;
@@ -129,4 +130,16 @@ export const stringifyInput = (value: number | undefined) => {
 export const isValidCurrency = (value: string) => {
   const currencyPattern = /^\d*(,\d{3})*(\.\d*)?$/;
   return currencyPattern.test(value);
+};
+
+/**
+ * Adds commas as thousands separators for easier readability of large numbers.
+ */
+export const maskNumber = (value: string) => {
+  const parsedValue = parseNumber(value);
+  if (parsedValue === undefined) return "";
+  return parsedValue.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 10,
+  });
 };
