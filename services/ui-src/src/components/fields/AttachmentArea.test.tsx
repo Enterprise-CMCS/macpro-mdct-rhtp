@@ -53,7 +53,7 @@ describe("<AttachmentArea />", () => {
     });
 
     expect(screen.getByText("mock attachment area")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Add attachment" }));
+    expect(screen.getByRole("button", { name: "Upload Attachments" }));
   });
   test("receive an error when state, id or type is not provided", async () => {
     (useStore as unknown as Mock).mockReturnValue({ report: {} });
@@ -70,14 +70,18 @@ describe("<AttachmentArea />", () => {
       render(AttachmentAreaComponent);
     });
     await userEvent.click(
-      screen.getByRole("button", { name: "Add attachment" })
+      screen.getByRole("button", { name: "Upload Attachments" })
     );
-    expect(screen.getByText("Upload Attachments")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Upload Attachments" })
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Select a file or files to upload")
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(screen.queryByText("Upload Attachments")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Upload Attachments" })
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByText("Select a file or files to upload")
     ).not.toBeInTheDocument();

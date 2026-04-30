@@ -21,6 +21,7 @@ export const initiativeAttachments: FormPageTemplate = {
         "  <li>Edit or delete existing attachments dependent on their status</li>" +
         "  <li>Leave or respond to comments on any attachment</li>" +
         "</ul>" +
+        "<br />" +
         "<p>Utilize the comment icon to add new comments and adjust statuses where appropriate by attachment.</p>",
     },
     {

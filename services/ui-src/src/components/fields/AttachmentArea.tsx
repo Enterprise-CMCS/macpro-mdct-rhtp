@@ -62,7 +62,7 @@ export const AttachmentArea = (
         leftIcon={<Image src={disabled ? addGray : addIconPrimary} />}
         disabled={disabled}
       >
-        Add attachment
+        Upload Attachments
       </Button>
       <UploadModal
         modalDisclosure={{

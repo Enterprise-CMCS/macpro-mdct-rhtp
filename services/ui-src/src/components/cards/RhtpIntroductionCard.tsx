@@ -14,7 +14,7 @@ export const RhtpIntroductionCard = () => {
         The{" "}
         <a href="https://www.cms.gov/priorities/rural-health-transformation-rht-program/overview">
           Rural Health Tranformation Program
-        </a>
+        </a>{" "}
         aims to improve healthcare access, quality, and outcomes in rural
         communities. States using funding from this program to enhance their
         healthcare ecosystems must report on how the funds are being used, and

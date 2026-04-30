@@ -101,7 +101,7 @@ export const metricTable = (
     id: "metrics-table",
     label: "Metric",
     hintText:
-      "Each initiative should have at least 4 metrics to measure its progress toward initiative goals. Select Add metric to add more of them to the table.",
+      "Each initiative should have at least 4 metrics to measure its progress toward initiative goals.",
     modal: {
       title: "Metric",
       elements: [
