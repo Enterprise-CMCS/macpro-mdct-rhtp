@@ -184,8 +184,8 @@ export const UseOfFundsTableElement = (
         <Td>
           <Flex direction="row">
             <Button
-              as={Link}
-              variant={"transparent"}
+              as={disabled ? Button : Link}
+              variant={disabled ? "link" : "transparent"}
               aria-label={`Edit ${item.id}`}
               onClick={() => {
                 onEditClick(item);
@@ -202,7 +202,7 @@ export const UseOfFundsTableElement = (
               }}
               disabled={disabled}
             >
-              <Image src={cancelIcon} alt={"Delete Item"} />
+              <Image src={cancelIcon} alt={"Delete Item"} minW="1.5rem" />
             </Button>
           </Flex>
         </Td>

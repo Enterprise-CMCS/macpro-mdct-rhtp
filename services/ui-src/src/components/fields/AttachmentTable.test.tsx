@@ -58,6 +58,18 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     },
+    {
+      attachment: {
+        name: "mock-file-2",
+        size: 100,
+        fileId: "file-id",
+      },
+      initiatives: ["mock-init-1"],
+      stage: "checkpoint-2",
+      checkpoints: "early-implementation-1",
+      status: AttachmentStatus.LOCKED_FOR_SCORING,
+      comments: [],
+    },
   ],
 };
 
@@ -233,6 +245,47 @@ describe("<AttachmentTable />", () => {
           }),
         ]),
       })
+    );
+  });
+
+  it("Test AttachmentTable column sorting", async () => {
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+
+    const sortResult = async (
+      sort: string,
+      columns: number[],
+      results: string[]
+    ) => {
+      const content = screen.getAllByRole("cell");
+      const sortBtn = screen.getByRole("button", { name: sort });
+      await userEvent.click(sortBtn);
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results);
+      await userEvent.click(sortBtn);
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results.toReversed());
+    };
+
+    await sortResult("Attachment name", [0, 6], ["mock-file", "mock-file-2"]);
+    await sortResult("Initiatives", [1, 7], ["#123", "#123"]);
+    await sortResult(
+      "Stage",
+      [2, 8],
+      ["1 Project Preparation", "2 Early Implementation"]
+    );
+    await sortResult(
+      "Checkpoints",
+      [3, 9],
+      ["Continue initiative", "Launch initiative"]
+    );
+    await sortResult(
+      "Status",
+      [4, 10],
+      ["Locked for Scoring", "Pending Review"]
     );
   });
 
