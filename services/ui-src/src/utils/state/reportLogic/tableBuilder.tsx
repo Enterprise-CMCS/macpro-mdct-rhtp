@@ -44,16 +44,14 @@ export const buildElement = (
       return (
         <TextField
           label={label}
-          name={label ?? "number-field"}
+          name={label ?? "textbox"}
           onChange={(event) => {
             onChange([event.target.value]);
           }}
           onBlur={(event) => {
             onChange([event.target.value]);
           }}
-          value={
-            element.mask ? maskNumber(defaultValue.toString()) : defaultValue
-          }
+          value={element.mask ? maskNumber(defaultValue) : defaultValue}
           errorMessage={errorMessage}
           disabled={element.disabled}
         />
