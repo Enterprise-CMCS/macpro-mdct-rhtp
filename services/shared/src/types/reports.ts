@@ -397,7 +397,7 @@ export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
   stage?: string;
-  checkpoints?: string;
+  checkpoint?: string;
   status: AttachmentStatus;
   comments: InitiativeComment[];
 };
