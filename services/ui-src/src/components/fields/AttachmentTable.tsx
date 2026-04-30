@@ -1,14 +1,4 @@
-import {
-  Button,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Image,
-} from "@chakra-ui/react";
+import { Button, Stack, Image, HStack } from "@chakra-ui/react";
 import {
   ChoiceList,
   Dropdown,
@@ -17,7 +7,7 @@ import {
 import { UploadModal } from "components/modals/UploadModal";
 import { CommentModal } from "components/modals/CommentModal";
 import { PageElementProps } from "components/report/Elements";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import {
   AttachmentTableTemplate,
   InitiativePageTemplate,
@@ -38,17 +28,9 @@ import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
+import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-
-const header = [
-  "Attachment name",
-  "Initiatives",
-  "Stage",
-  "Checkpoints",
-  "Status",
-  "Actions",
-];
 
 type Options = { label: string; value: string; checked?: boolean };
 
@@ -69,9 +51,18 @@ export const AttachmentTable = (
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([]);
-
-  const [stageOption, setStageOption] = useState<Options[]>([]);
+  const stageOption = [
+    dropdownEmptyOption,
+    ...checkpointsList.map((checks) => ({
+      label: `${checks.stage} ${checks.label}`,
+      value: checks.id,
+    })),
+  ];
+  const checkpointsArr = checkpointsList.flatMap((list) => list.checkpoints);
   const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
+  const [tableRows, setTableRows] = useState<
+    (string | JSX.Element | undefined)[][]
+  >([]);
 
   const initialValues = {
     stage: "",
@@ -82,9 +73,6 @@ export const AttachmentTable = (
     checkpoint: string;
   }>(initialValues);
 
-  const [checkpointsArr, setCheckpointsArr] = useState<
-    { id: string; label: string }[]
-  >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
   const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
     "Upload"
@@ -106,14 +94,8 @@ export const AttachmentTable = (
   }
 
   useEffect(() => {
-    setStageOption([
-      dropdownEmptyOption,
-      ...checkpointsList.map((checks) => ({
-        label: `${checks.stage} ${checks.label}`,
-        value: checks.id,
-      })),
-    ]);
-    setCheckpointsArr(checkpointsList.flatMap((list) => list.checkpoints));
+    //set initial sort to filter unfilled initiatives from filled initiatives
+    sortRows("", SORT_TYPE.DEFAULT);
   }, [report]);
 
   useEffect(() => {
@@ -141,6 +123,11 @@ export const AttachmentTable = (
     );
     choices[choiceIndex].checked = !choices[choiceIndex].checked;
     setInitiativeOptions(choices);
+
+    //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
+    if (choices.every((choice) => !choice.checked)) {
+      setSelection(initialValues);
+    }
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
@@ -257,6 +244,140 @@ export const AttachmentTable = (
     setUploadedFiles([]);
   };
 
+  const isStageEnabled = () => {
+    return initiativeOptions.every((option) => option.checked != true);
+  };
+
+  const rows = (values: InitiativeAnswerProp[]) => {
+    return values.map((row) => {
+      const columnAttachmentName = (
+        <Button
+          variant="link"
+          onClick={() => downloadFile(reportType, state, id, row.attachment)}
+          fontWeight="bold"
+        >
+          {row.attachment.name}
+        </Button>
+      );
+      const columnInitiatives =
+        row.initiatives.length === 0
+          ? "N/A"
+          : row.initiatives
+              .map(
+                (id) =>
+                  `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
+              )
+              .join(", ");
+      const columnStage =
+        row.stage == ""
+          ? "N/A"
+          : stageOption.find((opt) => opt.value === row.stage)?.label;
+      const colummCheckpoints =
+        row.checkpoints == ""
+          ? "N/A"
+          : checkpointsArr.find((check) => check.id === row.checkpoints)?.label;
+      const columnActions = (
+        <HStack>
+          <Button
+            variant="outline"
+            onClick={() => onEditClick(row)}
+            aria-label={`Edit file or info for ${row.attachment.name}`}
+            disabled={!canEditAttachment(row.status) || disabled}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="link"
+            onClick={() => onCommentClick(row)}
+            aria-label={`Comment on ${row.attachment.name}`}
+          >
+            <Image src={commentIcon} alt="Comment" minWidth="26px" />
+          </Button>
+          <Button
+            variant="link"
+            onClick={() => onDeleteClick(row)}
+            aria-label={`Delete ${row.attachment.name}`}
+            disabled={
+              !canDeleteAttachment(row.status, row.comments) || disabled
+            }
+          >
+            <Image src={cancelIcon} alt="Remove" minWidth="24px" />
+          </Button>
+        </HStack>
+      );
+
+      return [
+        columnAttachmentName,
+        columnInitiatives,
+        columnStage,
+        colummCheckpoints,
+        row.status,
+        columnActions,
+      ];
+    });
+  };
+
+  const sortRows = (row: string, type: SORT_TYPE) => {
+    const getValue = (answer: InitiativeAnswerProp, type: string) => {
+      switch (type) {
+        case "Attachment name":
+          return answer.attachment.name;
+        case "Initiatives":
+          const initNumber = initiatives.find(
+            (opt) => opt.id === answer.initiatives[0]
+          )?.initiativeNumber;
+          return initNumber ?? "";
+        case "Stage":
+          const stageLabel = stageOption.find(
+            (opt) => opt.value === answer.stage
+          )?.label;
+          return stageLabel ?? "";
+        case "Checkpoints":
+          return answer.checkpoints ?? "";
+        case "Status":
+          return answer.status;
+        default:
+          return "";
+      }
+    };
+
+    const runSort = (arr: InitiativeAnswerProp[]) => {
+      return type == SORT_TYPE.DEFAULT
+        ? arr
+        : arr.toSorted((a, b) => {
+            const valueA = getValue(a, row);
+            const valueB = getValue(b, row);
+            if (type === SORT_TYPE.DESCENDING) {
+              return valueA < valueB ? -1 : 1;
+            } else {
+              return valueB < valueA ? -1 : 1;
+            }
+          });
+    };
+
+    const sortedValues = runSort(displayValue);
+    const filteredValues = sortedValues.reduce(
+      (prev: InitiativeAnswerProp[][], curr) => {
+        if (
+          curr.initiatives.length === 0 &&
+          (curr.stage == "" || curr.stage == undefined)
+        )
+          prev[0].push(curr);
+        else if (
+          curr.initiatives.length > 0 &&
+          (curr.stage == "" || curr.stage == undefined)
+        )
+          prev[1].push(curr);
+        else prev[2].push(curr);
+
+        return prev;
+      },
+      [[], [], []]
+    );
+
+    setTableRows(rows(filteredValues.flat()));
+  };
+
   return (
     <Stack width="100%" gap="1.5rem">
       <Button
@@ -271,85 +392,22 @@ export const AttachmentTable = (
       >
         Add Attachment
       </Button>
-      {displayValue.length === 0 ? (
+      {tableRows.length === 0 ? (
         <p>No attachments found. Click 'Add Attachment' to get started</p>
       ) : (
-        <Table variant="initiative" width="800px">
-          <Thead>
-            <Tr>
-              {header.map((item) => (
-                <Th key={item}>{item}</Th>
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {displayValue.map((row) => (
-              <Tr>
-                <Td>
-                  <Button
-                    variant="link"
-                    onClick={() =>
-                      downloadFile(reportType, state, id, row.attachment)
-                    }
-                    fontWeight="bold"
-                  >
-                    {row.attachment.name}
-                  </Button>
-                </Td>
-                <Td>
-                  {row.initiatives.length === 0
-                    ? "N/A"
-                    : row.initiatives
-                        .map(
-                          (id) =>
-                            `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
-                        )
-                        .join(", ")}
-                </Td>
-                <Td>
-                  {row.stage == ""
-                    ? "N/A"
-                    : stageOption.find((opt) => opt.value === row.stage)?.label}
-                </Td>
-                <Td>
-                  {row.checkpoints == ""
-                    ? "N/A"
-                    : checkpointsArr.find(
-                        (check) => check.id === row.checkpoints
-                      )?.label}
-                </Td>
-                <Td>{row.status}</Td>
-                <Td className="actions" display="flex" width="152px">
-                  <Button
-                    variant="outline"
-                    onClick={() => onEditClick(row)}
-                    aria-label={`Edit file or info for ${row.attachment.name}`}
-                    disabled={!canEditAttachment(row.status) || disabled}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="link"
-                    onClick={() => onCommentClick(row)}
-                    aria-label={`Comment on ${row.attachment.name}`}
-                  >
-                    <Image src={commentIcon} alt="Comment" minWidth="26px" />
-                  </Button>
-                  <Button
-                    variant="link"
-                    onClick={() => onDeleteClick(row)}
-                    aria-label={`Delete ${row.attachment.name}`}
-                    disabled={
-                      !canDeleteAttachment(row.status, row.comments) || disabled
-                    }
-                  >
-                    <Image src={cancelIcon} alt="Remove" minWidth="24px" />
-                  </Button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
+        ResponsiveTable(
+          [
+            { label: "Attachment name", sortable: true },
+            { label: "Initiatives", sortable: true },
+            { label: "Stage", sortable: true },
+            { label: "Checkpoints", sortable: true },
+            { label: "Status", sortable: true },
+            { label: "Actions" },
+          ],
+          tableRows,
+          "",
+          sortRows
+        )
       )}
       <UploadModal
         modalDisclosure={{
@@ -381,7 +439,7 @@ export const AttachmentTable = (
               value={selection?.stage}
               options={stageOption}
               onChange={onStageChangeHandler}
-              disabled={modalMode === "Delete" || disabled}
+              disabled={modalMode === "Delete" || isStageEnabled()}
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
@@ -392,7 +450,7 @@ export const AttachmentTable = (
                 const value = dropdown.target.value;
                 setSelection({ ...selection, checkpoint: value });
               }}
-              disabled={modalMode === "Delete" || disabled}
+              disabled={modalMode === "Delete" || isStageEnabled()}
             ></Dropdown>
           </Stack>
         }
