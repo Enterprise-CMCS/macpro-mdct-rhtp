@@ -315,6 +315,7 @@ const ActionElementsSchema = {
   id: string().required(),
   type: string().required(),
   disabled: boolean().notRequired(),
+  mask: boolean().notRequired(),
 };
 
 const actionTableSchema = object().shape({
@@ -340,6 +341,7 @@ const actionTableSchema = object().shape({
               )
               .notRequired(),
             required: boolean().required(),
+            mask: boolean().notRequired(),
           })
         )
         .required(),

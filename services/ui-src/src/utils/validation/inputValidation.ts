@@ -132,14 +132,27 @@ export const isValidCurrency = (value: string) => {
   return currencyPattern.test(value);
 };
 
+const intFormat = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
+
 /**
  * Adds commas as thousands separators for easier readability of large numbers.
+ * The decimal portion (including trailing dot and trailing zeros) is preserved
+ * as-is so that users can type decimals without the dot being stripped mid-input.
  */
-export const maskNumber = (value: string) => {
-  const parsedValue = parseNumber(value);
-  if (parsedValue === undefined) return "";
-  return parsedValue.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 10,
-  });
+export const maskNumber = (value: string | number) => {
+  if (!value && value !== 0) return "";
+  const str = value.toString().trim().replaceAll(",", "");
+  if (!str) return "";
+
+  const dotIndex = str.indexOf(".");
+  const intPart = dotIndex !== -1 ? str.slice(0, dotIndex) : str;
+  const decPart = dotIndex !== -1 ? str.slice(dotIndex) : ""; // e.g. "." or ".5" or ".50"
+
+  const intNum = Number(intPart || "0");
+  if (isNaN(intNum)) return "";
+
+  const sign = intPart.startsWith("-") ? "-" : "";
+  return sign + intFormat.format(Math.abs(intNum)) + decPart;
 };

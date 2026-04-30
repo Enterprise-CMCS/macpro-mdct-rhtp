@@ -24,7 +24,7 @@ export const buildElement = (
 
   switch (type) {
     case ElementType.Paragraph:
-      return defaultValue;
+      return element.mask ? maskNumber(defaultValue) : defaultValue;
     case ElementType.Dropdown:
       return (
         <Dropdown
@@ -40,21 +40,6 @@ export const buildElement = (
         />
       );
     case ElementType.Textbox:
-      return (
-        <TextField
-          label={label}
-          name={label ?? "textbox"}
-          onChange={(event) => {
-            onChange([event.target.value]);
-          }}
-          onBlur={(event) => {
-            onChange([event.target.value]);
-          }}
-          value={defaultValue}
-          errorMessage={errorMessage}
-          disabled={element.disabled}
-        />
-      );
     case ElementType.NumberField:
       return (
         <TextField
@@ -64,10 +49,11 @@ export const buildElement = (
             onChange([event.target.value]);
           }}
           onBlur={(event) => {
-            const maskedValue = maskNumber(event.target.value);
-            onChange([maskedValue]);
+            onChange([event.target.value]);
           }}
-          value={defaultValue}
+          value={
+            element.mask ? maskNumber(defaultValue.toString()) : defaultValue
+          }
           errorMessage={errorMessage}
           disabled={element.disabled}
         />

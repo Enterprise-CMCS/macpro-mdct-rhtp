@@ -23,6 +23,7 @@ import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
+import { parseNumber } from "utils/validation/inputValidation";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */
 const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
@@ -104,10 +105,36 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
+  const formatAnswers = (
+    data: ActionAnswerShape,
+    answerType: "modal" | "row"
+  ) => {
+    return data.map((item) => {
+      let element;
+      if (answerType === "modal") {
+        element = modal.elements.find((element) => element.id === item.id);
+      } else if (answerType === "row") {
+        element = rows.find((element) => element.id === item.id);
+      }
+      // This will remove the mask before saving to the DB
+      if (element?.mask) {
+        return {
+          ...item,
+          value: parseNumber(item.value.toString()) ?? item.value,
+        };
+      }
+      return item;
+    });
+  };
+
   const onChange = (value: string[], index: number, id: string) => {
     const newAnswer = [...(answer ?? [])];
     const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
-    newAnswer[index][rowIndex].value = value[0];
+    const formattedValue = formatAnswers(
+      [{ id: id, value: value[0] }],
+      "row"
+    )[0].value;
+    newAnswer[index][rowIndex].value = formattedValue;
     props.updateElement({ answer: newAnswer });
   };
 
@@ -128,11 +155,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   );
 
   const onSave = (data: ActionAnswerShape) => {
+    const newData = formatAnswers(data, "modal");
     if (modalData.index === undefined) {
-      props.updateElement({ answer: [...(answer ?? []), data] });
+      props.updateElement({ answer: [...(answer ?? []), newData] });
     } else {
       const newAnswer = [...answer!];
-      newAnswer[modalData.index] = data;
+      newAnswer[modalData.index] = newData;
       props.updateElement({ answer: newAnswer });
     }
   };

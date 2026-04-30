@@ -412,6 +412,7 @@ export interface ActionElement {
   id: string;
   type: ElementType;
   disabled?: boolean;
+  mask?: boolean;
 }
 
 export interface ActionRowElement extends ActionElement {
@@ -422,6 +423,7 @@ export interface ActionModalElement extends ActionElement {
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;
+  mask?: boolean;
 }
 
 export type ActionAnswerShape = { id: string; value: string | number }[];

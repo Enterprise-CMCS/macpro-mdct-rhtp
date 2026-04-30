@@ -27,7 +27,11 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
-import { isValidCurrency } from "utils/validation/inputValidation";
+import {
+  isValidCurrency,
+  parseNumber,
+  stringifyInput,
+} from "utils/validation/inputValidation";
 import { useStore } from "utils";
 import { Modal } from "components/modals/Modal";
 
@@ -110,6 +114,16 @@ export const UseOfFundsTableElement = (
     updateElement({ answer: updatedItems });
   };
 
+  const formatAnswer = (items: UseOfFundsTableItem[]) => {
+    return items.map((item) => {
+      return {
+        ...item,
+        // This will remove the mask before saving to the DB
+        spentFunds: stringifyInput(parseNumber(item.spentFunds)),
+      };
+    });
+  };
+
   const onSubmit = () => {
     let errors = { ...initialValues };
     let hasError = false;
@@ -138,7 +152,8 @@ export const UseOfFundsTableElement = (
     if (!updatedItems) return;
 
     setItems(updatedItems);
-    updateElement({ answer: updatedItems });
+    const newAnswer = formatAnswer(updatedItems);
+    updateElement({ answer: newAnswer });
     setModalOpen(false);
     setFormValues(initialValues);
   };
