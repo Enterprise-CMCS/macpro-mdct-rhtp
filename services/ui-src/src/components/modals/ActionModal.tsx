@@ -5,7 +5,11 @@ import {
   getErrorMessage,
 } from "utils/state/reportLogic/tableBuilder";
 import { Flex } from "@chakra-ui/react";
-import { ActionAnswerShape, ActionModalElement, ActionRowElement } from "types";
+import {
+  ActionAnswerShape,
+  ActionModalElement,
+  ActionRowElement,
+} from "@rhtp/shared";
 import { ErrorMessages } from "../../constants";
 
 export const ActionModal = ({
@@ -91,7 +95,7 @@ export const ActionModal = ({
       content={{
         heading: isEdit ? `Edit ${modal.title}` : `Add ${modal.title}`,
         actionButtonText: "Save",
-        closeButtonText: "Close",
+        closeButtonText: "Cancel",
       }}
       disableConfirm={submitting}
     >

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { PageElementProps } from "components/report/Elements";
-import { CheckboxTemplate, ChoiceTemplate } from "types";
+import { CheckboxTemplate, ChoiceTemplate } from "@rhtp/shared";
 import { ChoiceList as CmsdsChoiceList } from "@cmsgov/design-system";
 
 const formatChoices = (choices: ChoiceTemplate[], answer: string[]) => {

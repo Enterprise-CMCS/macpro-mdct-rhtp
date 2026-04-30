@@ -4,7 +4,8 @@ import { useStore } from "utils";
 import arrowDownIcon from "assets/icons/arrows/icon_arrow_down_gray.svg";
 import arrowUpIcon from "assets/icons/arrows/icon_arrow_up_gray.svg";
 import { ReactNode, useState } from "react";
-import { assertExhaustive, isReportType, Report, ReportType } from "types";
+import { assertExhaustive } from "types";
+import { isReportType, Report, ReportType } from "@rhtp/shared";
 
 const navItem = (title: string, index: number) => {
   if (index <= 0) return title;

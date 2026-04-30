@@ -7,7 +7,7 @@ import {
   RouterWrappedComponent,
 } from "utils/testing/setupTest";
 import { useStore } from "utils";
-import { LiteReport, ReportType } from "../../types";
+import { LiteReport, ReportType } from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 
 const mockCloseHandler = vi.fn();

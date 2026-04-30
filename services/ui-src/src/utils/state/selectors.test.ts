@@ -1,6 +1,6 @@
 import { mockUseStore } from "utils/testing/setupTest";
 import { currentPageSelector, submittableMetricsSelector } from "./selectors";
-import { PageStatus } from "types";
+import { PageStatus } from "@rhtp/shared";
 
 describe("Selectors", () => {
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { InitiativesTable } from "./InitiativesTable";
-import { ElementType, InitiativesTableTemplate } from "types";
+import { ElementType, InitiativesTableTemplate } from "@rhtp/shared";
 import { useStore } from "utils";
 import userEvent from "@testing-library/user-event";
 import {

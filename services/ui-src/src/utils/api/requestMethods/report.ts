@@ -1,6 +1,6 @@
 import { apiLib } from "utils";
 import { getRequestHeaders } from "./getRequestHeaders";
-import { CreateReportOptions, LiteReport, Report } from "types";
+import { CreateReportOptions, LiteReport, Report } from "@rhtp/shared";
 
 export async function createReport(
   reportType: string,
@@ -41,13 +41,13 @@ export async function putReport(report: Report) {
   );
 }
 
-export async function postSubmitReport(report: Report) {
+export async function submitReport(report: Report) {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
     body: { ...report },
   };
-  return await apiLib.post<Report>(
+  return await apiLib.put<Report>(
     `/reports/submit/${report.type}/${report.state}/${report.id}`,
     options
   );

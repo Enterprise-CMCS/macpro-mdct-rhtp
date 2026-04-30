@@ -1,10 +1,10 @@
 import { apiLib } from "utils";
-import { getRequestHeaders } from "./getRequestHeaders";
 import {
   CreateInitiativeOptions,
   Report,
   UpdateInitiativeOptions,
-} from "types";
+} from "@rhtp/shared";
+import { getRequestHeaders } from "./getRequestHeaders";
 
 async function createInitiative(report: Report, data: CreateInitiativeOptions) {
   const requestHeaders = await getRequestHeaders();

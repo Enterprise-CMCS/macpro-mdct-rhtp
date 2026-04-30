@@ -1,7 +1,7 @@
 import { Divider, Heading, Spinner, Flex } from "@chakra-ui/react";
 import { ReactNode, Fragment, useEffect, useState } from "react";
 import { elementObject } from "./elementObject";
-import { ElementType, Report, ReportStatus } from "types";
+import { ElementType, Report, ReportStatus } from "@rhtp/shared";
 import { useStore } from "utils";
 
 export const ComponentInventory = () => {

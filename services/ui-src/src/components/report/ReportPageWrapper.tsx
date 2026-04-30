@@ -8,6 +8,7 @@ import {
   VStack,
   Image,
   Spinner,
+  Divider,
 } from "@chakra-ui/react";
 import { getReport, useStore } from "utils";
 import { ReportModal, Sidebar, Page, PraDisclosure } from "components";
@@ -15,8 +16,10 @@ import { currentPageSelector } from "utils/state/selectors";
 
 import nextArrowIcon from "assets/icons/arrows/icon_arrow_next_white.svg";
 import prevArrowIcon from "assets/icons/arrows/icon_arrow_prev_primary.svg";
-import { isReviewSubmitPage, PageElement, ReportStatus } from "types";
+import { isReviewSubmitPage } from "types";
+import { PageElement, ReportStatus } from "@rhtp/shared";
 import { ReportAutosaveContext } from "./ReportAutosaveProvider";
+import { SubmissionBar } from "./SubmissionBar";
 
 export const ReportPageWrapper = () => {
   const {
@@ -117,6 +120,8 @@ export const ReportPageWrapper = () => {
               )}
             </form>
           </Box>
+          <Divider></Divider>
+          {currentPage.hideNavButtons && <SubmissionBar />}
           {!currentPage.hideNavButtons && parentPage && (
             <>
               <Flex width="100%" marginTop="spacer3">

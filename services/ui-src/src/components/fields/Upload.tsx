@@ -1,6 +1,6 @@
 import { Box, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { UploadListProp } from "types";
+import { UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
@@ -8,30 +8,26 @@ import {
 import {
   acceptedFileTypes,
   downloadFile,
-  removeFile,
-  retrieveUploadedFiles,
+  getFileWithSafeName,
   uploadListRender,
 } from "utils/other/upload";
+import { useStore } from "utils";
 
 interface Props {
-  id: string;
-  state: string;
-  year: string;
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
-  deleteFromReport?: (file: UploadListProp) => void;
+  deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
 }
 
 export const Upload = ({
-  id: uploadId,
-  state,
-  year,
   answer,
   saveToReport,
   deleteFromReport,
   uploadAreaHidden = false,
 }: Props) => {
+  const { report } = useStore();
+  const { id, state, type: reportType } = report!;
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
 
   useEffect(() => {
@@ -67,29 +63,15 @@ export const Upload = ({
     }
   };
 
-  const onRemove = (file: UploadListProp) => {
-    if (deleteFromReport) {
-      deleteFromReport(file);
-    } else {
-      removeFile(file, year, state, () => {
-        retrieveUploadedFiles(year, state, uploadId).then((response) => {
-          saveToReport(response);
-        });
-      });
-    }
-  };
-
   const onUploadFiles = async () => {
-    if (!year || !state) {
-      throw new Error("Undefined year or state parameter");
-    }
     const files = filesToUpload ?? [];
     const savedFiles = [];
     for (var i = 0; i < files.length; i++) {
-      const file = files[i];
+      const displayName = files[i].name;
+      const file = getFileWithSafeName(files[i]);
       const { presignedUploadUrl, fileId } =
-        await recordFileInDatabaseAndGetUploadUrl(year, state, file, uploadId);
-      savedFiles.push({ name: file.name, fileId: fileId, size: file.size });
+        await recordFileInDatabaseAndGetUploadUrl(reportType, state, id, file);
+      savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
       await uploadFileToS3({ presignedUploadUrl }, file);
     }
     return savedFiles;
@@ -127,7 +109,13 @@ export const Upload = ({
             </span>
           </Box>
           <Text sx={sx.uploadedLabel}>Selected Files</Text>
-          {uploadListRender(filesToUpload ?? [], year, state, onRemove)}
+          {uploadListRender(
+            reportType,
+            state,
+            id,
+            filesToUpload ?? [],
+            deleteFromReport
+          )}
         </>
       )}
       <div>
@@ -137,7 +125,15 @@ export const Upload = ({
           above.
         </Text>
       </div>
-      {uploadListRender(answer ?? [], year, state, onRemove, downloadFile)}
+      {uploadListRender(
+        reportType,
+        state,
+        id,
+        answer ?? [],
+        deleteFromReport,
+        downloadFile,
+        uploadAreaHidden
+      )}
     </VStack>
   );
 };

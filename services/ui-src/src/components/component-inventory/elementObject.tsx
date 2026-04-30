@@ -25,7 +25,7 @@ import {
   HeaderIcon,
   NumberFieldTemplate,
   PageElement,
-} from "types";
+} from "@rhtp/shared";
 import { ReactNode } from "react";
 import { ExportedReportWrapper } from "components/export/ExportedReportWrapper";
 import {

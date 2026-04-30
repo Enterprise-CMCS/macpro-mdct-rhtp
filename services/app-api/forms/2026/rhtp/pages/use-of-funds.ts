@@ -3,12 +3,13 @@ import {
   FormPageTemplate,
   PageType,
   UseOfFundsTableTemplate,
+  dropdownEmptyOption,
 } from "@rhtp/shared";
 
 const useOfFundsOptions = {
   dropDownOptions: {
     budgetPeriodOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Budget Period 1", value: "Budget Period 1" },
       { label: "Budget Period 2", value: "Budget Period 2" },
       { label: "Budget Period 3", value: "Budget Period 3" },
@@ -16,7 +17,7 @@ const useOfFundsOptions = {
       { label: "Budget Period 5", value: "Budget Period 5" },
     ],
     useOfFundsOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       {
         label: "Prevention and chronic disease",
         value: "Prevention and chronic disease",
@@ -42,7 +43,7 @@ const useOfFundsOptions = {
       { label: "Fostering collaboration", value: "Fostering collaboration" },
     ],
     recipientCategoryOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "State agency", value: "State agency" },
       { label: "Local government", value: "Local government" },
       { label: "Rural provider", value: "Rural provider" },

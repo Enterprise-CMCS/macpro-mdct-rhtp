@@ -1,6 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { ExportedReportWrapper } from "./ExportedReportWrapper";
-import { ElementType, FormPageTemplate, PageElement, PageType } from "types";
+import {
+  ElementType,
+  FormPageTemplate,
+  PageElement,
+  PageType,
+} from "@rhtp/shared";
 
 const elements: PageElement[] = [
   {

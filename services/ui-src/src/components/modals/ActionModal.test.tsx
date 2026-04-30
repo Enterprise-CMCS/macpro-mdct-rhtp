@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { ActionModal } from "./ActionModal";
-import { ElementType } from "types";
+import { ElementType } from "@rhtp/shared";
 import userEvent from "@testing-library/user-event";
 
 const mockCloseHandler = vi.fn();

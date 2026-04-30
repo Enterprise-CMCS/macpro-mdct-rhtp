@@ -1,4 +1,4 @@
-import { isStateAbbr, ReportBase, ReportType } from "../types/reports";
+import { isStateAbbr, ReportBase, ReportType } from "@rhtp/shared";
 import { rhtpReportTemplate as rhtpReportTemplate2026 } from "./2026/rhtp/rhtp";
 
 const formsByYearAndState: { [year: number]: (state: string) => ReportBase } = {

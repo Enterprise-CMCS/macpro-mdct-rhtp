@@ -16,6 +16,7 @@ import INITIATIVES from "./data/initiatives.json";
 type MetricData = {
   name: string;
   status: string;
+  target?: string; // TODO: (probably) make required once we have new CMS data with targets
 };
 
 type InitiativeData = {
@@ -84,9 +85,9 @@ export const metricTable = (
   const table: ActionTableTemplate = {
     type: ElementType.ActionTable,
     id: "metrics-table",
-    label: "Metrics",
+    label: "Metric",
     hintText:
-      "To add an metric, click button below. [Hint text here to let users know they must report on 4 metrics per initative]",
+      "To add a metric, click button below. [Hint text here to let users know they must report on 4 metrics per initiative]",
     modal: {
       title: "Metric",
       hintText: "[hint text]",
@@ -102,14 +103,16 @@ export const metricTable = (
           required: true,
         },
         { id: "metric", type: ElementType.TextAreaField, required: true },
-        { id: "currValue", type: ElementType.NumberField, required: true },
-        { id: "date", type: ElementType.Date, required: true },
+        { id: "target", type: ElementType.NumberField, required: false },
+        { id: "currValue", type: ElementType.NumberField, required: false },
+        { id: "date", type: ElementType.Date, required: false },
       ],
     },
     rows: [
       { id: "no", header: "#", type: ElementType.Paragraph },
       { id: "status", header: "Status", type: ElementType.Paragraph },
       { id: "metric", header: "Metric", type: ElementType.Paragraph },
+      { id: "target", header: "Target", type: ElementType.Paragraph },
       {
         id: "prevValue",
         header: "Previous Value",
@@ -131,6 +134,7 @@ export const metricTable = (
     const answer = [
       { id: "status", value: metric.status },
       { id: "metric", value: metric.name },
+      { id: "target", value: metric.target },
       { id: "prevValue", value: "" },
       { id: "currValue", value: "" },
       { id: "date", value: "" },

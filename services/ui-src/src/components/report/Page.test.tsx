@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import { useStore } from "utils";
 import { Page } from "./Page";
-import { AlertTypes, ElementType, PageElement } from "types";
+import { AlertTypes, ElementType, PageElement } from "@rhtp/shared";
 
 vi.mock("react-router", () => ({
   useNavigate: vi.fn(),

@@ -16,7 +16,7 @@ import {
   PageTemplate,
 } from "components";
 import { convertDateUtcToEt, useStore } from "utils";
-import { AlertTypes } from "types";
+import { AlertTypes } from "@rhtp/shared";
 
 export const AdminPage = () => {
   const { deleteAdminBanner, writeAdminBanner } =

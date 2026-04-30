@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { signIn } from "aws-amplify/auth";
 import { Box, Button, Heading, Input, Stack, Text } from "@chakra-ui/react";
 import { Alert } from "components";
-import { AlertTypes } from "types";
+import { AlertTypes } from "@rhtp/shared";
 
 export const LoginCognito = () => {
   const navigate = useNavigate();

@@ -51,6 +51,8 @@ function main() {
     ).split(";");
     const metricStatuses =
       initiativeData["Metric Statuses (Semicolon-Separated)"].split(";");
+    const metricTargets =
+      initiativeData["Metric Targets (Semicolon-Separated)"].split(";"); // TODO: update naming as needed once we have CMS data
     const initiative = {
       id: crypto.randomUUID(),
       title: stripNewlineAndTrim(initiativeData["Initiative name"]),
@@ -66,6 +68,7 @@ function main() {
       const metric = {
         name: metricName.trim(),
         status: metricStatuses[index]?.trim() || "Active",
+        target: metricTargets[index]?.trim() || "",
       };
       metrics.push(metric);
     });

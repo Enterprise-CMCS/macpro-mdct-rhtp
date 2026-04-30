@@ -13,6 +13,7 @@ import { Lambda } from "../constructs/lambda.ts";
 import { WafConstruct } from "../constructs/waf.ts";
 import { DynamoDBTable } from "../constructs/dynamodb-table.ts";
 import { isLocalStack } from "../local/util.ts";
+import { LambdaDynamoEventSource } from "../constructs/lambda-dynamo-event.ts";
 
 interface CreateApiComponentsProps {
   scope: Construct;
@@ -32,12 +33,25 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     stage,
     project,
     isDev,
+    vpc,
+    kafkaAuthorizedSubnets,
     brokerString,
     tables,
     attachmentsBucket,
   } = props;
 
   const service = "app-api";
+
+  const kafkaSecurityGroup = new ec2.SecurityGroup(
+    scope,
+    "KafkaSecurityGroup",
+    {
+      vpc,
+      description:
+        "Security Group for streaming functions. Egress all is set by default.",
+      allowAllOutbound: true,
+    }
+  );
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
@@ -167,7 +181,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     entry: "services/app-api/handlers/reports/submit.ts",
     handler: "submitReport",
     path: "reports/submit/{reportType}/{state}/{id}",
-    method: "POST",
+    method: "PUT",
     ...commonProps,
   });
 
@@ -190,15 +204,23 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "createUpload", {
     entry: "services/app-api/handlers/uploads/create.ts",
     handler: "createUpload",
-    path: "/uploads/{year}/{state}",
+    path: "/reports/{reportType}/{state}/{id}/files",
     method: "POST",
     ...commonProps,
   });
 
-  new Lambda(scope, "getUpload", {
+  new Lambda(scope, "getUploadsByFileId", {
     entry: "services/app-api/handlers/uploads/get.ts",
-    handler: "getUpload",
-    path: "/uploads/{year}/{state}/{fileId}",
+    handler: "getUploadsByFileId",
+    path: "/reports/{reportType}/{state}/{id}/files/{fileId}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getUploadsByReportId", {
+    entry: "services/app-api/handlers/uploads/get.ts",
+    handler: "getUploadsByReportId",
+    path: "/reports/{reportType}/{state}/{id}/files/",
     method: "GET",
     ...commonProps,
   });
@@ -206,16 +228,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
     handler: "deleteUploadedFile",
-    path: "/uploads/{year}/{state}/{fileId}",
+    path: "/reports/{reportType}/{state}/{id}/files/{fileId}",
     method: "DELETE",
-    ...commonProps,
-  });
-
-  new Lambda(scope, "viewUploadsForState", {
-    entry: "services/app-api/handlers/uploads/get.ts",
-    handler: "viewUploadsForState",
-    path: "/uploads/{year}/{state}/view/{fileId}",
-    method: "GET",
     ...commonProps,
   });
 
@@ -233,6 +247,23 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
     method: "PUT",
     ...commonProps,
+  });
+
+  new LambdaDynamoEventSource(scope, "postKafkaData", {
+    entry: "services/app-api/handlers/kafka/post/postKafkaData.ts",
+    handler: "handler",
+    timeout: Duration.seconds(120),
+    memorySize: 2048,
+    retryAttempts: 2,
+    vpc,
+    vpcSubnets: { subnets: kafkaAuthorizedSubnets },
+    securityGroups: [kafkaSecurityGroup],
+    ...commonProps,
+    environment: {
+      topicNamespace: isDev ? `--${project}--${stage}--` : "",
+      ...commonProps.environment,
+    },
+    tables: tables.filter((table) => ["RhtpReports"].includes(table.node.id)),
   });
 
   if (!isLocalStack) {

@@ -2,7 +2,11 @@ import { useNavigate, useParams } from "react-router";
 import { useStore } from "utils";
 import { Alert } from "components/alerts/Alert";
 import { PageElementProps } from "./Elements";
-import { ButtonLinkTemplate, PageStatus, StatusAlertTemplate } from "types";
+import {
+  ButtonLinkTemplate,
+  PageStatus,
+  StatusAlertTemplate,
+} from "@rhtp/shared";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { inferredReportStatus } from "utils/state/reportLogic/completeness";
 import { Link } from "@chakra-ui/react";

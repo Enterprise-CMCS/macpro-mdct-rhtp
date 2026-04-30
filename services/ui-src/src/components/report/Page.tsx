@@ -8,12 +8,8 @@ import {
   ButtonLinkElement,
   DividerElement,
 } from "./Elements";
-import {
-  assertExhaustive,
-  ElementType,
-  PageElement,
-  ReportStatus,
-} from "../../types";
+import { assertExhaustive } from "types";
+import { ElementType, PageElement, ReportStatus } from "@rhtp/shared";
 import {
   DateField,
   DropdownField,
@@ -98,7 +94,7 @@ export const Page = ({ id, setElements, elements }: Props) => {
           <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
         );
       case ElementType.InitiativesTable:
-        return <InitiativesTable {...{ updateElement, disabled, element }} />;
+        return <InitiativesTable {...{ disabled, element }} />;
       case ElementType.AttachmentArea:
         return <AttachmentArea {...{ updateElement, disabled, element }} />;
       case ElementType.AccordionGroup:

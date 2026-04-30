@@ -14,7 +14,8 @@ import {
 import config from "config";
 import { initAuthManager, updateTimeout, getExpiration, useStore } from "utils";
 import { PRODUCTION_HOST_DOMAIN } from "../../constants";
-import { User, UserContextShape, UserRoles } from "types/users";
+import { User, UserContextShape } from "types/users";
+import { UserRoles } from "@rhtp/shared";
 
 type ExpectedTokenShape = {
   email: string;

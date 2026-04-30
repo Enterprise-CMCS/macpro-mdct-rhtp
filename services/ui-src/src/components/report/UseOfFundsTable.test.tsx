@@ -1,6 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ElementType, UseOfFundsTableTemplate } from "types";
+import {
+  ElementType,
+  UseOfFundsTableTemplate,
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useState } from "react";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
@@ -24,17 +28,17 @@ const mockedElement: UseOfFundsTableTemplate = {
   type: ElementType.UseOfFundsTable,
   dropDownOptions: {
     budgetPeriodOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Budget Period 1", value: "budget-period-1" },
       { label: "Budget Period 2", value: "budget-period-2" },
     ],
     useOfFundsOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Use of Funds 1", value: "use-of-funds-1" },
       { label: "Use of Funds 2", value: "use-of-funds-2" },
     ],
     recipientCategoryOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Recipient Category 1", value: "recipient-category-1" },
       { label: "Recipient Category 2", value: "recipient-category-2" },
     ],

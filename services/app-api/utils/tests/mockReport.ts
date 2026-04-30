@@ -4,13 +4,17 @@ import {
   PageType,
   ElementType,
   ReportStatus,
-} from "../../types/reports";
-import { StateAbbr } from "../constants";
+  StateAbbr,
+  RhtpSubType,
+} from "@rhtp/shared";
 
 const rhtpReportTemplate = rhtpReportTemplate2026("PA");
 
 export const validReport: Report = {
   type: rhtpReportTemplate.type,
+  subType: RhtpSubType.ANNUAL,
+  subTypeKey: "A1",
+  budgetPeriod: 1,
   year: rhtpReportTemplate.year,
   pages: rhtpReportTemplate.pages,
   state: "NJ" as StateAbbr,

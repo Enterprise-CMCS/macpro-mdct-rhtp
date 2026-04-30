@@ -3,7 +3,7 @@ import { handler } from "../../libs/handler-lib";
 import { parseReportParameters } from "../../libs/param-lib";
 import { badRequest, forbidden, ok } from "../../libs/response-lib";
 import { putReport } from "../../storage/reports";
-import { Report, ReportStatus } from "../../types/reports";
+import { Report, ReportStatus } from "@rhtp/shared";
 import { canWriteState } from "../../utils/authorization";
 import { error } from "../../utils/constants";
 import { validateReportPayload } from "../../utils/reportValidation";

@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockUseStore } from "utils/testing/setupTest";
 import { StatusAlert } from "./StatusAlert";
-import { AlertTypes, ElementType, StatusAlertTemplate } from "types";
+import { AlertTypes, ElementType, StatusAlertTemplate } from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import userEvent from "@testing-library/user-event";

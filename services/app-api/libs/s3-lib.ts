@@ -31,4 +31,7 @@ export default {
       expiresIn: 3600,
     });
   },
+  getObject: (params: GetObjectRequest) => {
+    return client.send(new GetObjectCommand(params));
+  },
 };

@@ -4,7 +4,7 @@ import {
   PageElement,
   ParentPageTemplate,
   ReviewSubmitTemplate,
-} from "types";
+} from "@rhtp/shared";
 import { renderElements, shouldUseTable } from "./ExportedReportElements";
 import { chunkBy } from "utils/other/arrays";
 import { ExportedReportTable, ReportTableType } from "./ExportedReportTable";

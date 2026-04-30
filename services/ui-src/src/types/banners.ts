@@ -1,14 +1,6 @@
 // BANNER
 
-export interface BannerData {
-  title: string;
-  description: string;
-  link?: string;
-  key?: string;
-  startDate?: number;
-  endDate?: number;
-  isActive?: boolean;
-}
+import { BannerData } from "@rhtp/shared";
 
 export interface AdminBannerMethods {
   fetchAdminBanner: () => Promise<void>;

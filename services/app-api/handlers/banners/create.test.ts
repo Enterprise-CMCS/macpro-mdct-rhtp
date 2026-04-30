@@ -1,7 +1,8 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
+import { APIGatewayProxyEvent } from "../../types/types";
+import { UserRoles } from "@rhtp/shared";
 import { canWriteBanner } from "../../utils/authorization";
 import { createBanner } from "./create";
 import { error } from "../../utils/constants";

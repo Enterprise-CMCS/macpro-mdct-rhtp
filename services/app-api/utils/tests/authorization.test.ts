@@ -5,7 +5,8 @@ import {
   canWriteInitiatives,
   canWriteState,
 } from "../authorization";
-import { User, UserRoles } from "../../types/types";
+import { User } from "../../types/types";
+import { UserRoles } from "@rhtp/shared";
 
 const adminUser = {
   role: UserRoles.ADMIN,

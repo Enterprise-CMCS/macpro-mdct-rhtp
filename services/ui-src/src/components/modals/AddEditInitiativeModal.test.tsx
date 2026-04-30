@@ -8,7 +8,7 @@ import {
   updateInitiative,
 } from "utils/api/requestMethods/initiatives";
 import { mockReportStore } from "utils/testing/setupTest";
-import { InitiativePageTemplate } from "types";
+import { InitiativePageTemplate } from "@rhtp/shared";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;

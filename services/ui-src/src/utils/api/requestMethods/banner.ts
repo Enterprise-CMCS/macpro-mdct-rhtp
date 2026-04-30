@@ -1,6 +1,6 @@
 import { apiLib, updateTimeout } from "utils";
 import { getRequestHeaders } from "./getRequestHeaders";
-import { BannerData } from "types/banners";
+import { BannerData } from "@rhtp/shared";
 
 async function getBanner(bannerKey: string) {
   const requestHeaders = await getRequestHeaders();

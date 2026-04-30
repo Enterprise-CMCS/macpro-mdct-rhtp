@@ -1,4 +1,4 @@
-import { ReportType, ReportBase } from "../../../types/reports";
+import { ReportType, ReportBase } from "@rhtp/shared";
 import { generalInformation } from "./pages/general-information";
 import { initiativeAttachments } from "./pages/initiative-attachments";
 import { buildInitiativePages } from "./pages/initiatives/initiatives";

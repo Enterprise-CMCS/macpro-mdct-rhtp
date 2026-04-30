@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { CommentModal } from "./CommentModal";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
-import { InitiativeAnswerProp } from "types";
+import { AttachmentStatus, InitiativeAnswerProp } from "@rhtp/shared";
 import { useStore } from "utils";
 import {
   mockAdminUserStore,
@@ -13,6 +13,7 @@ import {
 import { useFlags } from "launchdarkly-react-client-sdk";
 
 vi.mock("utils/state/useStore");
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
 
@@ -35,7 +36,7 @@ const mockAllFiles = [
   {
     attachment: mockSelectedFile,
     initiatives: ["test 1", "test 2"],
-    status: "Under review",
+    status: AttachmentStatus.PENDING_REVIEW,
     comments: [],
   },
 ];
@@ -111,7 +112,7 @@ describe("CommentModal component", () => {
       {
         attachment: mockSelectedFile,
         initiatives: ["test 1", "test 2"],
-        status: "Under review",
+        status: AttachmentStatus.PENDING_REVIEW,
         comments: [
           {
             name: "CMS User",
@@ -160,7 +161,7 @@ describe("CommentModal component", () => {
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
       render(CommentModalComponent());
-      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeEnabled();
     });
 
@@ -170,7 +171,7 @@ describe("CommentModal component", () => {
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
       render(CommentModalComponent());
-      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeDisabled();
     });
 
@@ -192,6 +193,37 @@ describe("CommentModal component", () => {
       render(CommentModalComponent(mockAllFiles, true)); // set disabled true
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
+    });
+
+    test("admin user can edit attachment status", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockAdminUserStore);
+      render(CommentModalComponent());
+      const statusButton = screen.getAllByLabelText("Status")[1];
+      await userEvent.click(statusButton);
+      await userEvent.click(
+        screen.getByRole("option", { name: "Needs Revision" })
+      );
+      await userEvent.click(screen.getByText("Save"));
+      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+      expect(mockUpdateElement).toHaveBeenCalledWith(
+        expect.objectContaining({
+          answer: expect.arrayContaining([
+            expect.objectContaining({
+              comments: expect.arrayContaining([
+                expect.objectContaining({
+                  name: mockAdminUserStore.user?.full_name,
+                  comment: "",
+                  statusChange: AttachmentStatus.NEEDS_REVISION,
+                }),
+              ]),
+              status: AttachmentStatus.NEEDS_REVISION,
+            }),
+          ]),
+        })
+      );
     });
   });
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PageElementProps } from "components/report/Elements";
-import { DropdownTemplate } from "types";
+import { DropdownTemplate } from "@rhtp/shared";
 import {
   Dropdown as CmsdsDropdownField,
   DropdownChangeObject,

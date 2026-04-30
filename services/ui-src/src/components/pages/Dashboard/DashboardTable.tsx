@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
-import { LiteReport, ReportStatus } from "types";
+import { LiteReport, ReportStatus } from "@rhtp/shared";
 import {
   formatMonthDayYear,
   releaseReport,

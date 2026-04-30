@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
 import { parseHtml } from "utils";
-import { TextboxTemplate, NumberFieldTemplate, ElementType } from "../../types";
+import {
+  TextboxTemplate,
+  NumberFieldTemplate,
+  ElementType,
+} from "@rhtp/shared";
 import { PageElementProps } from "../report/Elements";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { ErrorMessages } from "../../constants";

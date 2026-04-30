@@ -3,7 +3,7 @@ import {
   PageType,
   Report,
   UpdateInitiativeOptions,
-} from "../../../types/reports";
+} from "@rhtp/shared";
 
 export const updateInitiativeStatus = (
   report: Report,

@@ -5,7 +5,7 @@ import {
   DropdownOption,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../../constants";
-import { ActionElement, ElementType } from "types";
+import { ActionElement, ElementType } from "@rhtp/shared";
 import { parseNumber, validateDate } from "utils/validation/inputValidation";
 
 export const buildElement = (

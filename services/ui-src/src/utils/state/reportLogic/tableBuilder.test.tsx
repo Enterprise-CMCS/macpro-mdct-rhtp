@@ -1,4 +1,4 @@
-import { ElementType } from "types";
+import { ElementType } from "@rhtp/shared";
 import { buildElement, getErrorMessage } from "./tableBuilder";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

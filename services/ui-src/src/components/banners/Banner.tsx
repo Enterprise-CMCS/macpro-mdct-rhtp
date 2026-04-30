@@ -1,5 +1,5 @@
 import { Alert } from "components";
-import { BannerData } from "types";
+import { BannerData } from "@rhtp/shared";
 
 export const Banner = ({ bannerData }: Props) => {
   if (bannerData) {

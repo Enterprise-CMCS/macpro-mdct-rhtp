@@ -1,14 +1,4 @@
-import {
-  Button,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Image,
-} from "@chakra-ui/react";
+import { Button, Stack, Image, HStack } from "@chakra-ui/react";
 import {
   ChoiceList,
   Dropdown,
@@ -17,44 +7,43 @@ import {
 import { UploadModal } from "components/modals/UploadModal";
 import { CommentModal } from "components/modals/CommentModal";
 import { PageElementProps } from "components/report/Elements";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { JSX, useEffect, useState } from "react";
 import {
   AttachmentTableTemplate,
   InitiativePageTemplate,
   UploadListProp,
   AlertTypes,
   InitiativeAnswerProp,
-} from "types";
+  AttachmentStatus,
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { useStore } from "utils";
-import { downloadFile, removeFile } from "utils/other/upload";
+import {
+  downloadFile,
+  removeFile,
+  canEditAttachment,
+  canDeleteAttachment,
+} from "utils/other/upload";
 import { checkpointsList } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
-import { dropdownEmptyOption } from "../../constants";
-
-const header = [
-  "Attachment name",
-  "Initiatives",
-  "Stage",
-  "Checkpoints",
-  "Status",
-  "Actions",
-];
+import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
+import addPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 
 type Options = { label: string; value: string; checked?: boolean };
 
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
 ) => {
-  const { id, answer } = props.element;
+  const { disabled } = props;
+  const { answer } = props.element;
   const displayValue = structuredClone(answer) ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
-  const { state } = useParams();
   const { report } = useStore();
-  const year = report?.year.toString();
+  const { id, state, type: reportType } = report!;
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -62,9 +51,18 @@ export const AttachmentTable = (
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([]);
-
-  const [stageOption, setStageOption] = useState<Options[]>([]);
+  const stageOption = [
+    dropdownEmptyOption,
+    ...checkpointsList.map((checks) => ({
+      label: `${checks.stage} ${checks.label}`,
+      value: checks.id,
+    })),
+  ];
+  const checkpointsArr = checkpointsList.flatMap((list) => list.checkpoints);
   const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
+  const [tableRows, setTableRows] = useState<
+    (string | JSX.Element | undefined)[][]
+  >([]);
 
   const initialValues = {
     stage: "",
@@ -75,11 +73,7 @@ export const AttachmentTable = (
     checkpoint: string;
   }>(initialValues);
 
-  const [checkpointsArr, setCheckpointsArr] = useState<
-    { id: string; label: string }[]
-  >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
-
   const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
     "Upload"
   );
@@ -94,20 +88,14 @@ export const AttachmentTable = (
     Delete: "Delete Attachment",
   };
 
-  if (!state || !year) {
-    console.error("Can't retrieve uploads with missing state or year");
+  if (!state || !id || !reportType) {
+    console.error("Can't retrieve uploads with missing state, id or type");
     return;
   }
 
   useEffect(() => {
-    setStageOption([
-      dropdownEmptyOption,
-      ...checkpointsList.map((checks) => ({
-        label: `${checks.stage} ${checks.label}`,
-        value: checks.id,
-      })),
-    ]);
-    setCheckpointsArr(checkpointsList.flatMap((list) => list.checkpoints));
+    //set initial sort to filter unfilled initiatives from filled initiatives
+    sortRows("", SORT_TYPE.DEFAULT);
   }, [report]);
 
   useEffect(() => {
@@ -135,6 +123,11 @@ export const AttachmentTable = (
     );
     choices[choiceIndex].checked = !choices[choiceIndex].checked;
     setInitiativeOptions(choices);
+
+    //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
+    if (choices.every((choice) => !choice.checked)) {
+      setSelection(initialValues);
+    }
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
@@ -143,7 +136,7 @@ export const AttachmentTable = (
       initiatives: [],
       stage: "",
       checkpoints: "",
-      status: "Under Review",
+      status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     }));
 
@@ -163,9 +156,7 @@ export const AttachmentTable = (
       (item) => item.attachment.fileId !== file.fileId
     );
     props.updateElement({ answer: newAnswerValue });
-    removeFile(file, year, state, () => {
-      return;
-    });
+    removeFile(reportType, state, id, file);
   };
 
   const onModalSubmit = () => {
@@ -181,8 +172,10 @@ export const AttachmentTable = (
         .map((option) => option.value),
       stage: selection.stage,
       checkpoints: selection.checkpoint,
-      status: "Under Review",
-      comments: [],
+      status: AttachmentStatus.PENDING_REVIEW,
+      comments:
+        displayValue.find((item) => item.attachment.fileId === upload.fileId)
+          ?.comments ?? [],
     }));
 
     const newValues = displayValue.map((item) => {
@@ -251,99 +244,177 @@ export const AttachmentTable = (
     setUploadedFiles([]);
   };
 
+  const isStageEnabled = () => {
+    return initiativeOptions.every((option) => option.checked != true);
+  };
+
+  const rows = (values: InitiativeAnswerProp[]) => {
+    return values.map((row) => {
+      const columnAttachmentName = (
+        <Button
+          variant="link"
+          onClick={() => downloadFile(reportType, state, id, row.attachment)}
+          fontWeight="bold"
+        >
+          {row.attachment.name}
+        </Button>
+      );
+      const columnInitiatives =
+        row.initiatives.length === 0
+          ? "N/A"
+          : row.initiatives
+              .map(
+                (id) =>
+                  `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
+              )
+              .join(", ");
+      const columnStage =
+        row.stage == ""
+          ? "N/A"
+          : stageOption.find((opt) => opt.value === row.stage)?.label;
+      const colummCheckpoints =
+        row.checkpoints == ""
+          ? "N/A"
+          : checkpointsArr.find((check) => check.id === row.checkpoints)?.label;
+      const columnActions = (
+        <HStack>
+          <Button
+            variant="outline"
+            onClick={() => onEditClick(row)}
+            aria-label={`Edit file or info for ${row.attachment.name}`}
+            disabled={!canEditAttachment(row.status) || disabled}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="link"
+            onClick={() => onCommentClick(row)}
+            aria-label={`Comment on ${row.attachment.name}`}
+          >
+            <Image src={commentIcon} alt="Comment" minWidth="26px" />
+          </Button>
+          <Button
+            variant="link"
+            onClick={() => onDeleteClick(row)}
+            aria-label={`Delete ${row.attachment.name}`}
+            disabled={
+              !canDeleteAttachment(row.status, row.comments) || disabled
+            }
+          >
+            <Image src={cancelIcon} alt="Remove" minWidth="24px" />
+          </Button>
+        </HStack>
+      );
+
+      return [
+        columnAttachmentName,
+        columnInitiatives,
+        columnStage,
+        colummCheckpoints,
+        row.status,
+        columnActions,
+      ];
+    });
+  };
+
+  const sortRows = (row: string, type: SORT_TYPE) => {
+    const getValue = (answer: InitiativeAnswerProp, type: string) => {
+      switch (type) {
+        case "Attachment name":
+          return answer.attachment.name;
+        case "Initiatives":
+          const initNumber = initiatives.find(
+            (opt) => opt.id === answer.initiatives[0]
+          )?.initiativeNumber;
+          return initNumber ?? "";
+        case "Stage":
+          const stageLabel = stageOption.find(
+            (opt) => opt.value === answer.stage
+          )?.label;
+          return stageLabel ?? "";
+        case "Checkpoints":
+          return answer.checkpoints ?? "";
+        case "Status":
+          return answer.status;
+        default:
+          return "";
+      }
+    };
+
+    const runSort = (arr: InitiativeAnswerProp[]) => {
+      return type == SORT_TYPE.DEFAULT
+        ? arr
+        : arr.toSorted((a, b) => {
+            const valueA = getValue(a, row);
+            const valueB = getValue(b, row);
+            if (type === SORT_TYPE.DESCENDING) {
+              return valueA < valueB ? -1 : 1;
+            } else {
+              return valueB < valueA ? -1 : 1;
+            }
+          });
+    };
+
+    const sortedValues = runSort(displayValue);
+    const filteredValues = sortedValues.reduce(
+      (prev: InitiativeAnswerProp[][], curr) => {
+        if (
+          curr.initiatives.length === 0 &&
+          (curr.stage == "" || curr.stage == undefined)
+        )
+          prev[0].push(curr);
+        else if (
+          curr.initiatives.length > 0 &&
+          (curr.stage == "" || curr.stage == undefined)
+        )
+          prev[1].push(curr);
+        else prev[2].push(curr);
+
+        return prev;
+      },
+      [[], [], []]
+    );
+
+    setTableRows(rows(filteredValues.flat()));
+  };
+
   return (
     <Stack width="100%" gap="1.5rem">
       <Button
         aria-label="Add Attachment"
         variant="outline"
         alignSelf="flex-start"
-        onClick={() => onAddClick()}
+        leftIcon={
+          <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
+        }
+        onClick={onAddClick}
+        disabled={disabled}
       >
         Add Attachment
       </Button>
-      {displayValue.length === 0 ? (
+      {tableRows.length === 0 ? (
         <p>No attachments found. Click 'Add Attachment' to get started</p>
       ) : (
-        <Table variant="initiative" width="800px">
-          <Thead>
-            <Tr>
-              {header.map((item) => (
-                <Th>{item}</Th>
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {displayValue.map((row) => (
-              <Tr>
-                <Td>
-                  <Button
-                    variant="link"
-                    onClick={() => downloadFile(year, state, row.attachment)}
-                    fontWeight="bold"
-                  >
-                    {row.attachment.name}
-                  </Button>
-                </Td>
-                <Td>
-                  {row.initiatives.length === 0
-                    ? "N/A"
-                    : row.initiatives
-                        .map(
-                          (id) =>
-                            `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
-                        )
-                        .join(", ")}
-                </Td>
-                <Td>
-                  {row.stage == ""
-                    ? "N/A"
-                    : stageOption.find((opt) => opt.value === row.stage)?.label}
-                </Td>
-                <Td>
-                  {row.checkpoints == ""
-                    ? "N/A"
-                    : checkpointsArr.find(
-                        (check) => check.id === row.checkpoints
-                      )?.label}
-                </Td>
-                <Td>{row.status}</Td>
-                <Td className="actions" display="flex" width="152px">
-                  <Button
-                    variant="outline"
-                    onClick={() => onEditClick(row)}
-                    aria-label={`Edit file or info for ${row.attachment.name}`}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="link"
-                    onClick={() => onCommentClick(row)}
-                    aria-label={`Comment on ${row.attachment.name}`}
-                  >
-                    <Image src={commentIcon} alt="Comment" minWidth="26px" />
-                  </Button>
-                  <Button
-                    variant="link"
-                    onClick={() => onDeleteClick(row)}
-                    aria-label={`Delete ${row.attachment.name}`}
-                  >
-                    <Image src={cancelIcon} alt="Remove" minWidth="24px" />
-                  </Button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
+        ResponsiveTable(
+          [
+            { label: "Attachment name", sortable: true },
+            { label: "Initiatives", sortable: true },
+            { label: "Stage", sortable: true },
+            { label: "Checkpoints", sortable: true },
+            { label: "Status", sortable: true },
+            { label: "Actions" },
+          ],
+          tableRows,
+          "",
+          sortRows
+        )
       )}
       <UploadModal
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: onClose,
         }}
-        state={state}
-        year={year}
         answer={uploadedFiles}
-        id={id}
         hint="[hint text]"
         selections={
           <Stack gap="1.5rem" marginTop="1.5rem">
@@ -360,7 +431,7 @@ export const AttachmentTable = (
               label={"Initiative"}
               onChange={onChoiceChangeHandler}
               hint={"This is the hint text"}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || disabled}
             ></ChoiceList>
             <Dropdown
               name={"stage"}
@@ -368,7 +439,7 @@ export const AttachmentTable = (
               value={selection?.stage}
               options={stageOption}
               onChange={onStageChangeHandler}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || isStageEnabled()}
             ></Dropdown>
             <Dropdown
               name={"checkpoint"}
@@ -379,7 +450,7 @@ export const AttachmentTable = (
                 const value = dropdown.target.value;
                 setSelection({ ...selection, checkpoint: value });
               }}
-              disabled={modalMode === "Delete"}
+              disabled={modalMode === "Delete" || isStageEnabled()}
             ></Dropdown>
           </Stack>
         }
@@ -388,7 +459,7 @@ export const AttachmentTable = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         deleteFromReport={removeAttachment}
-        uploadAreaHidden={modalMode === "Delete"}
+        uploadAreaHidden={modalMode !== "Upload"}
       ></UploadModal>
       <CommentModal
         modalDisclosure={{
@@ -400,7 +471,7 @@ export const AttachmentTable = (
         selectedFile={uploadedFiles[0]}
         updateElement={props.updateElement}
         allFiles={displayValue}
-        disabled={props.disabled}
+        disabled={disabled}
       />
     </Stack>
   );

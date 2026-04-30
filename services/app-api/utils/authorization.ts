@@ -1,5 +1,5 @@
-import { User, UserRoles } from "../types/types";
-import { StateAbbr } from "./constants";
+import { User } from "../types/types";
+import { StateAbbr, UserRoles } from "@rhtp/shared";
 
 /** These roles are allowed to read data for any state */
 const statelessRoles = [

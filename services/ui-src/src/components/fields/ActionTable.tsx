@@ -7,6 +7,7 @@ import {
   Th,
   Thead,
   Tr,
+  Image,
 } from "@chakra-ui/react";
 import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
@@ -17,8 +18,11 @@ import {
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-} from "types";
+} from "@rhtp/shared";
+import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
+import addPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */
 const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
@@ -34,12 +38,14 @@ const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
   onChange: (value: string[], index: number, id: string) => void,
-  onEdit: (index: number) => void
+  onEdit: (index: number) => void,
+  formDisabled?: boolean,
+  canChangeStatus: boolean = false
 ) => {
   const formattedRows: JSX.Element[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: JSX.Element[] = [];
-    const disabled = isRowDisabled(rows, answerRow);
+    const disabled = isRowDisabled(rows, answerRow) || formDisabled;
     rows.map((column, columnIndex) => {
       //autogenerate next # column
       if (column.id === "no") {
@@ -56,17 +62,15 @@ const buildRows = (
         rowElement.push(<Td key={`action-column-${columnIndex}`}>{value}</Td>);
       }
     });
-    rowElement.push(
-      <Td key={`row.element.${answerRowIndex}`}>
-        <Button
-          variant="link"
-          onClick={() => onEdit(answerRowIndex)}
-          disabled={disabled}
-        >
-          Edit/Abandon
-        </Button>
-      </Td>
-    );
+    if (canChangeStatus) {
+      rowElement.push(
+        <Td key={`row.element.${answerRowIndex}`}>
+          <Button variant="link" onClick={() => onEdit(answerRowIndex)}>
+            Edit/Abandon
+          </Button>
+        </Td>
+      );
+    }
     formattedRows.push(rowElement);
   });
 
@@ -74,8 +78,11 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
+  const { disabled } = props;
   const { id, label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
+  const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)
@@ -107,11 +114,18 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   /* Modal functions */
   const onModalEdit = (index: number) => {
     if (!answer) return;
-    setModalData({ data: answer[index], index });
+    setModalData({ data: structuredClone(answer[index]), index });
     setModalOpen(true);
   };
 
-  const formattedRows = buildRows(rows, answer ?? [], onChange, onModalEdit);
+  const formattedRows = buildRows(
+    rows,
+    answer ?? [],
+    onChange,
+    onModalEdit,
+    disabled,
+    canAddOrChangeStatus
+  );
 
   const onSave = (data: ActionAnswerShape) => {
     if (modalData.index === undefined) {
@@ -125,26 +139,32 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
-      <Label>{label}</Label>
+      <Label>{pluralLabel}</Label>
       <Hint id={id}>{hintText}</Hint>
-      <Button
-        aria-label={`add ${label}`}
-        variant="outline"
-        alignSelf="flex-start"
-        onClick={() => {
-          setModalOpen(true);
-          setModalData({ data: initial, index: undefined });
-        }}
-      >
-        Add {label.toLowerCase()}
-      </Button>
+      {canAddOrChangeStatus ? (
+        <Button
+          aria-label={`add ${label}`}
+          variant="outline"
+          alignSelf="flex-start"
+          leftIcon={
+            <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
+          }
+          onClick={() => {
+            setModalOpen(true);
+            setModalData({ data: initial, index: undefined });
+          }}
+          disabled={disabled}
+        >
+          Add {label.toLowerCase()}
+        </Button>
+      ) : null}
       <Table variant="metric">
         <Thead>
           <Tr>
             {rows.map((row) => (
               <Th key={row.header}>{row.header}</Th>
             ))}
-            <Th>Actions</Th>
+            {canAddOrChangeStatus ? <Th>Actions</Th> : null}
           </Tr>
         </Thead>
         <Tbody>

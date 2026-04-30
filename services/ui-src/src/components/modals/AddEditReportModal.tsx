@@ -15,11 +15,14 @@ import {
   isReportType,
   LiteReport,
   ReportStatus,
-} from "types";
+} from "@rhtp/shared";
 
 const verbiage = {
   addReportHeader: "Add new RHTP submission",
+  addReportSubheader:
+    "Add a new report to start a blank report or copy an existing report.",
   copyReportHeader: "Copy RHTP submission",
+  copyReportSubheader: "To start the next report, copy the previous report.",
   copyInputLabel:
     "If you want to copy an existing report, select one (optional)",
   copyInputHint:
@@ -97,6 +100,7 @@ export const AddEditReportModal = ({
       modalDisclosure={modalDisclosure}
       content={{
         heading: `${isFirstReport ? verbiage.addReportHeader : verbiage.copyReportHeader}`,
+        subheading: `${isFirstReport ? verbiage.addReportSubheader : verbiage.copyReportSubheader}`,
         actionButtonText: submitting ? <Spinner size="md" /> : "Save",
         closeButtonText: "Cancel",
       }}

@@ -1,4 +1,4 @@
-import { ReportType } from "../types/reports";
+import { ReportType } from "@rhtp/shared";
 import { rhtpReportTemplate as rhtpReportTemplate2026 } from "./2026/rhtp/rhtp";
 import { getReportTemplate } from "./yearlyFormSelection";
 

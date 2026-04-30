@@ -1,5 +1,5 @@
 import { boolean, number, object, string } from "yup";
-import { BannerData } from "../types/banner";
+import { BannerData } from "@rhtp/shared";
 import { error } from "./constants";
 
 const bannerValidateSchema = object().shape({

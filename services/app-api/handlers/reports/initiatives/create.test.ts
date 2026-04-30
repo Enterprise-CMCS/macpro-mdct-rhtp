@@ -4,8 +4,8 @@ import { StatusCodes } from "../../../libs/response-lib";
 import { canWriteInitiatives } from "../../../utils/authorization";
 import { authenticatedUser } from "../../../utils/authentication";
 import { validReport } from "../../../utils/tests/mockReport";
-import { ReportStatus } from "../../../types/reports";
-import { APIGatewayProxyEvent, User, UserRoles } from "../../../types/types";
+import { ReportStatus, UserRoles } from "@rhtp/shared";
+import { APIGatewayProxyEvent, User } from "../../../types/types";
 import { getReport, putReport } from "../../../storage/reports";
 import { buildInitiativePages } from "../../../forms/2026/rhtp/pages/initiatives/initiatives";
 
