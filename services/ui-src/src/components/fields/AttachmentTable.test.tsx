@@ -280,7 +280,7 @@ describe("<AttachmentTable />", () => {
     await sortResult(
       "Checkpoints",
       [3, 9],
-      ["Continue initiative", "Launch initiative"]
+      ["Continue initiative activities", "Launch initiative"]
     );
     await sortResult(
       "Status",
