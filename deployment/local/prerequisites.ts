@@ -29,12 +29,33 @@ export class LocalPrerequisiteStack extends Stack {
       cidrBlock: "10.0.1.0/24",
     });
 
+    function checkLocalFlagsFormat(value?: string) {
+      const defaultValue = '{"local": false, "flags": {}}';
+      if (!value) return defaultValue;
+
+      try {
+        const parsed = JSON.parse(value);
+        return JSON.stringify(parsed);
+      } catch {
+        console.error(
+          "Invalid local flags format. Soft failing to empty flags."
+        );
+        return defaultValue;
+      }
+    }
+
     new secretsmanager.Secret(this, "RhtpDefaultSecret", {
       secretName: `${process.env.PROJECT}-default`, // pragma: allowlist secret
       secretObjectValue: {
         vpcName: SecretValue.unsafePlainText("localstack-dev"),
         brokerString: SecretValue.unsafePlainText("localstack"),
         kafkaAuthorizedSubnetIds: SecretValue.unsafePlainText(subnet1.subnetId),
+        launchDarklyServer: SecretValue.unsafePlainText(
+          process.env.LD_SDK_KEY!
+        ),
+        launchDarklyLocalFlags: SecretValue.unsafePlainText(
+          checkLocalFlagsFormat(process.env.LD_LOCAL_FLAGS)
+        ),
       },
     });
 

@@ -25,6 +25,8 @@ interface CreateApiComponentsProps {
   kafkaAuthorizedSubnets: ec2.ISubnet[];
   brokerString: string;
   attachmentsBucket: s3.IBucket;
+  launchDarklyServer: string;
+  launchDarklyLocalFlags?: string;
 }
 
 export function createApiComponents(props: CreateApiComponentsProps) {
@@ -38,6 +40,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     brokerString,
     tables,
     attachmentsBucket,
+    launchDarklyServer,
+    launchDarklyLocalFlags = '{"local": false, "flags": {}}',
   } = props;
 
   const service = "app-api";
@@ -109,6 +113,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   const environment = {
     NODE_OPTIONS: "--enable-source-maps",
     STAGE: stage,
+    launchDarklyServer,
+    launchDarklyLocalFlags,
     attachmentsBucketName: attachmentsBucket.bucketName,
     ...Object.fromEntries(
       tables.map((table) => [`${table.node.id}Table`, table.table.tableName])

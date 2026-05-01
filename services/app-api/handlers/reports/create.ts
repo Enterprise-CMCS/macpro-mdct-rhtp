@@ -7,6 +7,7 @@ import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
 import { RhtpSubType, ReportStatus, ReportOptions } from "@rhtp/shared";
 import { isCreateReportOptions } from "../../utils/reportValidation";
+import { isFeatureFlagEnabled } from "../../utils/featureFlags";
 
 export const createReport = handler(
   parseReportTypeAndState,
@@ -42,6 +43,8 @@ export const createReport = handler(
         }
       }, reports[0]);
 
+      const useDevTools = await isFeatureFlagEnabled("devTools");
+
       if (latestReport.status !== ReportStatus.SUBMITTED) {
         return badRequest(
           "A new report cannot be created until the previous report is submitted."
@@ -59,12 +62,16 @@ export const createReport = handler(
       const { name, dateRangeString, type, openDate, budgetPeriod } =
         RhtpSubTypeMap[nextReportKey];
 
-      if (Date.now() < openDate) {
-        return badRequest(
-          `The next report cannot be created until ${new Date(
-            openDate
-          ).toLocaleDateString()}.`
-        );
+      if (useDevTools) {
+        console.log("using dev tools");
+      } else {
+        if (Date.now() < openDate) {
+          return badRequest(
+            `The next report cannot be created until ${new Date(
+              openDate
+            ).toLocaleDateString()}.`
+          );
+        }
       }
 
       reportOptions = {
