@@ -96,6 +96,7 @@ export const useOfFunds: FormPageTemplate = {
       id: "use-of-funds-main-instructions",
       text:
         "<p>Use the table below to enter information about how your state or territory spent funds from RHTP on each of its initiatives. Select <b>Add use of funds</b> to add as many rows to the table as needed.</p>" +
+        "<br />" +
         "<b>Budget Period dates for each Budget Period listed in the table below will consist of the following:</b>" +
         "<ul>" +
         "  <li>Budget Period 1 (12/29/2025 - 10/30/2026)</li>" +
