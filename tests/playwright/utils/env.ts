@@ -22,7 +22,6 @@ export async function authenticateWithUI(
   const passwordInput = page.getByRole("textbox", { name: "password" });
   const loginButton = page.getByRole("button", { name: "Log In with Cognito" });
 
-  console.log(`Logging in as ${username}...`);
   await emailInput.fill(username);
   await passwordInput.fill(password);
   await loginButton.click();
