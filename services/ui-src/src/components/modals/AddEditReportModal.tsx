@@ -16,6 +16,7 @@ import {
   LiteReport,
   ReportStatus,
 } from "@rhtp/shared";
+import { useStore } from "utils";
 
 const verbiage = {
   addReportHeader: "Add new RHTP submission",
@@ -50,6 +51,8 @@ export const AddEditReportModal = ({
     defaultCopyOption,
   ]);
 
+  const { devDate } = useStore();
+
   useEffect(() => {
     (async () => {
       const newCopyOptions: DropdownOption[] = copyOptions;
@@ -79,6 +82,7 @@ export const AddEditReportModal = ({
 
     const reportOptions: CreateReportOptions = {
       copyFromReportId: formData.copyFromReportId,
+      mockDate: devDate,
     };
 
     try {

@@ -25,6 +25,7 @@ export const isReportType = (
 
 export interface CreateReportOptions {
   copyFromReportId?: string;
+  mockDate?: string;
 }
 
 export interface CreateInitiativeOptions {

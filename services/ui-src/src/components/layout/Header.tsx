@@ -5,6 +5,7 @@ import { Menu, MenuOption, SubnavBar } from "components";
 import { useBreakpoint } from "utils";
 import appLogo from "assets/logos/logo_mdct_rhtp.svg";
 import getHelpIcon from "assets/icons/help/icon_help_white.svg";
+import { DevTools } from "components/devTools/DateTool";
 
 export const Header = ({ handleLogout }: Props) => {
   const { isMobile } = useBreakpoint();
@@ -44,6 +45,7 @@ export const Header = ({ handleLogout }: Props) => {
       {paths.length > 4 && (
         <SubnavBar reportType={paths[2]} stateName={paths[3]} />
       )}
+      <DevTools path={paths} />
     </Box>
   );
 };

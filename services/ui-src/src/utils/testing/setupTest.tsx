@@ -1,7 +1,7 @@
 import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
 import * as framerMotion from "framer-motion";
-import { UserState, AdminBannerState, ReportState } from "types";
+import { UserState, AdminBannerState, ReportState, DevToolsState } from "types";
 import { ReportType, ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
 import { mockBannerData } from "./mockBanner";
 
@@ -196,12 +196,21 @@ export const mockReportStore: ReportState = {
   saveReport: async () => {},
 };
 
+export const mockDevToolsStore: DevToolsState = {
+  devDate: undefined,
+  setDevDate: () => {},
+};
+
 // BOUND STORE
 
-export const mockUseStore: UserState & AdminBannerState & ReportState = {
+export const mockUseStore: UserState &
+  AdminBannerState &
+  ReportState &
+  DevToolsState = {
   ...mockStateUserStore,
   ...mockBannerStore,
   ...mockReportStore,
+  ...mockDevToolsStore,
 };
 
 export const mockUseAdminStore: UserState & AdminBannerState = {

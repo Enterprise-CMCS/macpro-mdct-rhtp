@@ -14,6 +14,7 @@ export const createReport = handler(
   async (request) => {
     const { reportType, state } = request.parameters;
     const { user, body } = request;
+    const { mockDate } = body as any;
 
     if (!canWriteState(user, state)) {
       return forbidden(error.UNAUTHORIZED);
@@ -43,8 +44,6 @@ export const createReport = handler(
         }
       }, reports[0]);
 
-      const useDevTools = await isFeatureFlagEnabled("devTools");
-
       if (latestReport.status !== ReportStatus.SUBMITTED) {
         return badRequest(
           "A new report cannot be created until the previous report is submitted."
@@ -62,16 +61,16 @@ export const createReport = handler(
       const { name, dateRangeString, type, openDate, budgetPeriod } =
         RhtpSubTypeMap[nextReportKey];
 
-      if (useDevTools) {
-        console.log("using dev tools");
-      } else {
-        if (Date.now() < openDate) {
-          return badRequest(
-            `The next report cannot be created until ${new Date(
-              openDate
-            ).toLocaleDateString()}.`
-          );
-        }
+      //using launchdarkly to control how we want to generate reports
+      const useDevTools = await isFeatureFlagEnabled("devTools");
+      const userDate = useDevTools && mockDate ? mockDate : Date.now();
+
+      if (userDate < openDate) {
+        return badRequest(
+          `The next report cannot be created until ${new Date(
+            openDate
+          ).toLocaleDateString()}.`
+        );
       }
 
       reportOptions = {
