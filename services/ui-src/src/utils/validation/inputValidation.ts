@@ -116,10 +116,10 @@ export const parseNumber = (value: string) => {
 };
 
 /**
- * Convert the given number to a string.
+ * Convert the given number or string to a string.
  * If it is undefined, return an empty string.
  */
-export const stringifyInput = (value: number | undefined) => {
+export const stringifyInput = (value: number | undefined | string) => {
   if (value === undefined) return "";
   return value.toString();
 };
@@ -131,10 +131,6 @@ export const isValidCurrency = (value: string) => {
   const currencyPattern = /^\d*(,\d{3})*(\.\d*)?$/;
   return currencyPattern.test(value);
 };
-
-const intFormat = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 0,
-});
 
 export const maskByType = (type: MaskType, value: any) => {
   switch (type) {
@@ -148,11 +144,15 @@ export const maskByType = (type: MaskType, value: any) => {
 export const unmaskByType = (type: MaskType, value: any) => {
   switch (type) {
     case MaskType.CommaSeparated:
-      return parseNumber(value);
+      return parseNumber(stringifyInput(value));
     default:
       return value;
   }
 };
+
+const intFormat = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
 
 /**
  * Adds commas as thousands separators for easier readability of large numbers.
