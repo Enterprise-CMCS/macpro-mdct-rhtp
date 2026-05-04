@@ -23,7 +23,7 @@ import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-import { parseNumber } from "utils/validation/inputValidation";
+import { unmaskByType } from "utils/validation/inputValidation";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */
 const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
@@ -116,11 +116,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
       } else if (answerType === "row") {
         element = rows.find((element) => element.id === item.id);
       }
-      // This will remove the mask before saving to the DB
       if (element?.mask) {
         return {
           ...item,
-          value: parseNumber(item.value.toString()) ?? item.value,
+          value: unmaskByType(element.mask, item.value),
         };
       }
       return item;

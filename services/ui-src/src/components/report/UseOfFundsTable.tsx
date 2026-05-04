@@ -15,6 +15,7 @@ import {
   UseOfFundsTableTemplate,
   UseOfFundsTableItem,
   dropdownEmptyOption,
+  MaskType,
 } from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState, ChangeEvent, useEffect } from "react";
@@ -29,8 +30,7 @@ import {
 import { ErrorMessages } from "../../constants";
 import {
   isValidCurrency,
-  parseNumber,
-  stringifyInput,
+  unmaskByType,
 } from "utils/validation/inputValidation";
 import { useStore } from "utils";
 import { Modal } from "components/modals/Modal";
@@ -118,8 +118,7 @@ export const UseOfFundsTableElement = (
     return items.map((item) => {
       return {
         ...item,
-        // This will remove the mask before saving to the DB
-        spentFunds: stringifyInput(parseNumber(item.spentFunds)),
+        spentFunds: unmaskByType(MaskType.CommaSeparated, item.spentFunds),
       };
     });
   };

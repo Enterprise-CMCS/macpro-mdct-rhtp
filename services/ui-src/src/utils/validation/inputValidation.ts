@@ -105,7 +105,6 @@ export const isEmail = (value: string | undefined) => {
  * For more see https://stackoverflow.com/questions/175739
  */
 export const parseNumber = (value: string) => {
-  // Remove whitespace and commas (common number separator)
   value = value.trim().replaceAll(",", "");
   if (value === "") return undefined;
   const nonNumericChars = /[^.-\d]/;
@@ -141,6 +140,15 @@ export const maskByType = (type: MaskType, value: any) => {
   switch (type) {
     case MaskType.CommaSeparated:
       return commaSeparatedMask(value);
+    default:
+      return value;
+  }
+};
+
+export const unmaskByType = (type: MaskType, value: any) => {
+  switch (type) {
+    case MaskType.CommaSeparated:
+      return parseNumber(value);
     default:
       return value;
   }
