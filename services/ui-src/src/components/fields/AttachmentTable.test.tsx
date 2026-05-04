@@ -108,7 +108,7 @@ describe("<AttachmentTable />", () => {
     ).toBeVisible();
     expect(
       screen.getByText(
-        "No attachments found. Click 'Add Attachment' to get started"
+        "No attachments found. Select “Add attachment” to get started."
       )
     ).toBeVisible();
   });
@@ -124,10 +124,14 @@ describe("<AttachmentTable />", () => {
       screen.getByRole("checkbox", { name: "123: Init Title" })
     );
 
-    const dropdown = screen.getAllByLabelText("Stage")[0];
+    const dropdown = screen.getAllByLabelText(
+      "Which stage does this attachment apply to?"
+    )[0];
     await userEvent.selectOptions(dropdown, "2 Early Implementation");
 
-    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
+    const dropdown2 = screen.getAllByLabelText(
+      "Which checkpoint does this attachment apply to?"
+    )[0];
     await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
 
     const dropArea = screen.getByLabelText("file drop area");
@@ -178,10 +182,14 @@ describe("<AttachmentTable />", () => {
       expect(screen.getByText("Edit Attachment")).toBeVisible();
     });
 
-    const dropdown = screen.getAllByLabelText("Stage")[0];
+    const dropdown = screen.getAllByLabelText(
+      "Which stage does this attachment apply to?"
+    )[0];
     await userEvent.selectOptions(dropdown, "2 Early Implementation");
 
-    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
+    const dropdown2 = screen.getAllByLabelText(
+      "Which checkpoint does this attachment apply to?"
+    )[0];
     await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
 
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
@@ -217,10 +225,14 @@ describe("<AttachmentTable />", () => {
       expect(screen.getByText("Edit Attachment")).toBeVisible();
     });
 
-    const dropdown = screen.getAllByLabelText("Stage")[0];
+    const dropdown = screen.getAllByLabelText(
+      "Which stage does this attachment apply to?"
+    )[0];
     await userEvent.selectOptions(dropdown, "2 Early Implementation");
 
-    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
+    const dropdown2 = screen.getAllByLabelText(
+      "Which checkpoint does this attachment apply to?"
+    )[0];
     await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
 
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
@@ -268,7 +280,7 @@ describe("<AttachmentTable />", () => {
     await sortResult(
       "Checkpoints",
       [3, 9],
-      ["Continue initiative", "Launch initiative"]
+      ["Continue initiative activities", "Launch initiative"]
     );
     await sortResult(
       "Status",

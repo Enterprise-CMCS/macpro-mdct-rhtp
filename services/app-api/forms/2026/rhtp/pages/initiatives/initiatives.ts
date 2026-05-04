@@ -1,5 +1,4 @@
 import {
-  AccordionTemplate,
   ActionTableTemplate,
   ButtonLinkTemplate,
   ElementType,
@@ -8,6 +7,7 @@ import {
   PageStatus,
   PageType,
   ParagraphTemplate,
+  SubHeaderTemplate,
   TableCheckpointTemplate,
   TextAreaBoxTemplate,
 } from "@rhtp/shared";
@@ -43,31 +43,45 @@ const BackToInitiativesButton: ButtonLinkTemplate = {
   style: "alt-continue",
 };
 
-const initiativeHeader: (initiativeName: string) => HeaderTemplate = (
-  initiativeName: string
-) => ({
+const initiativeHeader: (
+  initiativeName: string,
+  initiativeNumber: string
+) => HeaderTemplate = (initiativeName: string, initiativeNumber: string) => ({
   type: ElementType.Header,
   id: "initiative-header",
-  text: initiativeName,
+  text: `${initiativeNumber}: ${initiativeName}`,
 });
 
 const initiativeInstructions: ParagraphTemplate = {
   type: ElementType.Paragraph,
   id: "initiative-instructions",
-  text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+  text: "Use this page to provide information about your initiative and the metrics you use to measure its progress. Then, update any checkpoints for review. Note, only Initiative checkpoints and attachments can be updated in quarterly reporting cycles.",
 };
 
-const initiativeInstructionsAccordion: AccordionTemplate = {
-  type: ElementType.Accordion,
-  id: "initiative-instructions-accordion",
-  label: "Further instructions",
-  value: "More coming soon...",
+const checkpointsHeader: SubHeaderTemplate = {
+  type: ElementType.SubHeader,
+  id: "checkpoints-header",
+  text: "Checkpoints",
+};
+
+const checkpointsInstructions: ParagraphTemplate = {
+  type: ElementType.Paragraph,
+  id: "checkpoints-instructions",
+  text:
+    "<p>Checkpoints are grouped into the stages listed below. On this page, you can take the following actions on any checkpoint unless otherwise noted.</p>" +
+    "<ul>" +
+    "  <li>Add or remove attachments with supporting documentation</li>" +
+    "  <li>Check if the checkpoint is ready for CMS review</li>" +
+    "  <li>Leave comments for CMS, or respond to comments from them by attachment</li>" +
+    "</ul>",
 };
 
 const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   type: ElementType.TextAreaField,
   id: "initiative-narrative",
   label: "Narrative",
+  helperText:
+    "Provide a narrative description of the initiative’s progress during this reporting period.",
   required: true,
   answer: narrative,
 });
@@ -87,14 +101,14 @@ export const metricTable = (
     id: "metrics-table",
     label: "Metric",
     hintText:
-      "To add a metric, click button below. [Hint text here to let users know they must report on 4 metrics per initiative]",
+      "Each initiative should have at least 4 metrics to measure its progress toward initiative goals.",
     modal: {
       title: "Metric",
-      hintText: "[hint text]",
       elements: [
         {
           id: "status",
           type: ElementType.Dropdown,
+          label: "Status",
           editOnly: true,
           children: [
             { label: "Active", value: "Active" },
@@ -102,10 +116,30 @@ export const metricTable = (
           ],
           required: true,
         },
-        { id: "metric", type: ElementType.TextAreaField, required: true },
-        { id: "target", type: ElementType.NumberField, required: false },
-        { id: "currValue", type: ElementType.NumberField, required: false },
-        { id: "date", type: ElementType.Date, required: false },
+        {
+          id: "metric",
+          label: "Metric name",
+          type: ElementType.TextAreaField,
+          required: true,
+        },
+        {
+          id: "target",
+          label: "What is the target for this metric?",
+          type: ElementType.NumberField,
+          required: false,
+        },
+        {
+          id: "currValue",
+          label: "What is the metric’s current value?",
+          type: ElementType.NumberField,
+          required: false,
+        },
+        {
+          id: "date",
+          label: "Date of the current value",
+          type: ElementType.Date,
+          required: false,
+        },
       ],
     },
     rows: [
@@ -115,16 +149,16 @@ export const metricTable = (
       { id: "target", header: "Target", type: ElementType.Paragraph },
       {
         id: "prevValue",
-        header: "Previous Value",
+        header: "Previous value",
         type: ElementType.NumberField,
         disabled: true,
       },
       {
         id: "currValue",
-        header: "Current Value",
+        header: "Current value",
         type: ElementType.NumberField,
       },
-      { id: "date", header: "As of Date", type: ElementType.Date },
+      { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },
     ],
     answer: [],
   };
@@ -179,12 +213,13 @@ export const buildInitiativePages = (
       sidebar: false,
       elements: [
         returnToInitiativesDashboard,
-        initiativeHeader(title),
+        initiativeHeader(title, initiativeNumber),
         initiativeInstructions,
-        initiativeInstructionsAccordion,
         initiativeNarrative(narrative),
         initiativeNumberOfPeopleServed,
         metricTable(metrics),
+        checkpointsHeader,
+        checkpointsInstructions,
         checkpointsTables,
         BackToInitiativesButton,
       ],

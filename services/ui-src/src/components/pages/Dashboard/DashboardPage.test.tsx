@@ -178,7 +178,7 @@ describe("DashboardPage with state user", () => {
 
     await userEvent.click(screen.getByText("Start RHTP Report"));
 
-    expect(screen.getByText("Add new RHTP submission")).toBeInTheDocument();
+    expect(screen.getByText("Add New RHTP Report")).toBeInTheDocument();
   });
 });
 
