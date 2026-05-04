@@ -167,7 +167,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q12: {
     name: "Quarterly Report 12",
     dateRangeString: "1/31/2030-4/30/2030",
-    openDate: 1901232000000, //4.1.2020
+    openDate: 1901232000000, //4.1.2030
     startDate: 1896066000000,
     endDate: 1903752000000,
     nextReportSubType: "A5",
@@ -187,7 +187,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q13: {
     name: "Quarterly Report 13",
     dateRangeString: "8/1/2030-10/30/2030",
-    openDate: 1916956800000, //9.30.2029
+    openDate: 1916956800000, //9.30.2030
     startDate: 1911787200000,
     endDate: 1919563200000,
     nextReportSubType: "FINAL",

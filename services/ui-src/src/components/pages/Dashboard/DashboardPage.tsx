@@ -119,6 +119,7 @@ export const DashboardPage = () => {
         reportType={reportType}
         state={state}
         reloadReports={reloadReports}
+        reports={reports}
       />
       <Link as={RouterLink} to="/" variant="return">
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
