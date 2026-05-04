@@ -155,7 +155,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           }}
           disabled={disabled}
         >
-          Add {label.toLowerCase()}
+          Add {label}
         </Button>
       ) : null}
       <Table variant="metric">
@@ -174,7 +174,6 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         </Tbody>
       </Table>
       <ActionModal
-        rows={rows}
         modal={modal}
         form={modalData}
         onSave={onSave}

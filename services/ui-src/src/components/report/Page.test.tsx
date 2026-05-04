@@ -155,6 +155,7 @@ const elements: PageElement[] = [
     id: "",
     label: "Attachment area label",
     required: true,
+    uploadedSubLabel: "mock sub label",
   },
   {
     type: ElementType.ListInput,

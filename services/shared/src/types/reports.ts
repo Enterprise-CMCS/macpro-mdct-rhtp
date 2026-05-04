@@ -347,6 +347,7 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  uploadedSubLabel: string;
   answer?: UploadListProp[];
 }
 
@@ -384,7 +385,7 @@ export type InitiativeComment = {
   name: string;
   date: string;
   comment?: string;
-  statusChange?: string;
+  statusChange?: AttachmentStatus;
 };
 
 export enum AttachmentStatus {
@@ -398,7 +399,7 @@ export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
   stage?: string;
-  checkpoints?: string;
+  checkpoint?: string;
   status: AttachmentStatus;
   comments: InitiativeComment[];
 };
@@ -420,6 +421,7 @@ export interface ActionRowElement extends ActionElement {
 }
 
 export interface ActionModalElement extends ActionElement {
+  label: string;
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;

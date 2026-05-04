@@ -79,7 +79,7 @@ describe("<UseOfFundsTableElement />", () => {
 
     test("UseOfFundsTableElement is visible", () => {
       render(<UseOfFundsTableWrapper template={mockedElement} />);
-      expect(screen.getByText("Use of Funds")).toBeVisible();
+      expect(screen.getByText("Add use of funds")).toBeVisible();
     });
 
     test("Modal should open and close", async () => {
@@ -100,13 +100,13 @@ describe("<UseOfFundsTableElement />", () => {
       const addButton = screen.getByText("Add use of funds");
       await userEvent.click(addButton);
 
-      const budgetPeriodButton = screen.getAllByLabelText("Budget Period")[1];
+      const budgetPeriodButton = screen.getAllByLabelText("Budget period")[1];
       await userEvent.click(budgetPeriodButton);
       await userEvent.click(
         screen.getByRole("option", { name: "Budget Period 2" })
       );
 
-      const spentFunds = screen.getByRole("textbox", { name: "Spent Funds" });
+      const spentFunds = screen.getByRole("textbox", { name: "Spent funds" });
       await userEvent.type(spentFunds, "5000");
 
       const description = screen.getByRole("textbox", { name: "Description" });
@@ -118,19 +118,19 @@ describe("<UseOfFundsTableElement />", () => {
         screen.getByRole("option", { name: "2: Initiative 2" })
       );
 
-      const useOfFundsButton = screen.getAllByLabelText("Use of Funds")[1];
+      const useOfFundsButton = screen.getAllByLabelText("Use of funds")[1];
       await userEvent.click(useOfFundsButton);
       await userEvent.click(
         screen.getByRole("option", { name: "Use of Funds 2" })
       );
 
       const recipientName = screen.getByRole("textbox", {
-        name: "Recipient Name",
+        name: "Recipient name",
       });
       await userEvent.type(recipientName, "Test Recipient");
 
       const recipientCategoryButton =
-        screen.getAllByLabelText("Recipient Category")[1];
+        screen.getAllByLabelText("Recipient category")[1];
       await userEvent.click(recipientCategoryButton);
       await userEvent.click(
         screen.getByRole("option", { name: "Recipient Category 2" })

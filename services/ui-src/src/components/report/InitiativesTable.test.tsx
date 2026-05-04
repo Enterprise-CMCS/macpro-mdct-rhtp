@@ -46,7 +46,9 @@ describe("InitiativesTable component", () => {
     });
     test("renders with initiatives", () => {
       expect(
-        screen.getByRole("columnheader", { name: "Initiative name Status" })
+        screen.getByRole("columnheader", {
+          name: "Initiative number and name Status",
+        })
       ).toBeVisible();
       expect(
         screen.getByRole("columnheader", { name: "Actions" })
@@ -103,7 +105,9 @@ describe("InitiativesTable component", () => {
 
     test("renders with initiatives, cannot add or edit initiatives", () => {
       expect(
-        screen.getByRole("columnheader", { name: "Initiative name Status" })
+        screen.getByRole("columnheader", {
+          name: "Initiative number and name Status",
+        })
       ).toBeVisible();
       expect(
         screen.getByRole("columnheader", { name: "Actions" })

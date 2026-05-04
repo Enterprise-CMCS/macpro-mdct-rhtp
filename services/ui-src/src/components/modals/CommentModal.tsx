@@ -22,7 +22,7 @@ const PreviousComments = ({ comments }: { comments: InitiativeComment[] }) => {
 
   return (
     <Box marginTop={"spacer2"}>
-      <Text fontWeight={"bold"}>Previous Comments</Text>
+      <Text fontWeight={"bold"}>Previous comments</Text>
       {timeSortedComments.map((comment, index) => (
         <Box marginTop={"spacer2"} key={`previous-comment-${index}`}>
           <TextField
@@ -129,12 +129,21 @@ export const CommentModal = ({
     modalDisclosure.onClose();
   };
 
+  const modalHeading =
+    pastComments.length === 0
+      ? `Add Comment to ${fileName}`
+      : `Comments for ${fileName}`;
+  const modalSubHeading = userIsAdmin
+    ? "Use the fields below to manage the attachment status and leave comments for the state."
+    : "Leave a comment for your CMS Project Officer below";
+
   return (
     <Modal
       modalDisclosure={modalDisclosure}
       onConfirmHandler={onSubmit}
       content={{
-        heading: `Add Comment to ${fileName}`,
+        heading: modalHeading,
+        subheading: modalSubHeading,
         actionButtonText: "Save",
       }}
       disableConfirm={commentsDisabled}

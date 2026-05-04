@@ -171,15 +171,6 @@ export const DashboardPage = () => {
                   everything looks good, confirm your entries and proceed.
                 </p>
                 <p>
-                  Once the report is generated, you can edit the name of the
-                  report and monitor its status in the dashboard below.
-                </p>
-                <p>
-                  Please note, while you can generate multiple reports for the
-                  same reporting period, you should only submit a single report
-                  for the state.
-                </p>
-                <p>
                   <strong>Understanding Report Statuses</strong>
                 </p>
                 <ul>
@@ -201,10 +192,6 @@ export const DashboardPage = () => {
                     submission.
                   </li>
                 </ul>
-                <p>
-                  Use the dashboard below to check your report’s status and take
-                  any necessary follow-up actions.
-                </p>
               </Box>
             )}
           </AccordionItem>
