@@ -12,31 +12,19 @@ export const generalInformation: FormPageTemplate = {
       text: "General Information",
     },
     {
-      type: ElementType.Paragraph,
-      id: "general-information-instructions",
-      text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
-    },
-    {
-      type: ElementType.Accordion,
-      id: "general-information-accordion-instructions",
-      label: "Instructions",
-      value: "<b>More details coming soon.</b>",
-    },
-    {
       id: "aor-name",
       type: ElementType.Textbox,
       label: "Authorized Organizational Representative (AOR)",
       required: true,
       helperText:
-        "Enter person's name or a position title for CMS to contact with questions about this report.",
+        "Enter the name or position title for CMS to contact with questions about this report.",
     },
     {
       type: ElementType.Textbox,
       id: "aor-email",
       label: "Authorized Organizational Representative (AOR) Contact email",
       required: true,
-      helperText:
-        "Enter email address. Department or program-wide email addresses ok.",
+      helperText: "A department or program-wide email address is acceptable.",
     },
     {
       id: "pipd-name",
@@ -44,15 +32,14 @@ export const generalInformation: FormPageTemplate = {
       label: "Principal Investigator or Program Director",
       required: true,
       helperText:
-        "Enter person's name or a position title for CMS to contact with questions about this report.",
+        "Enter the name or position title for CMS to contact with questions about this report.",
     },
     {
       type: ElementType.Textbox,
       id: "pipd-email",
       label: "Principal Investigator or Program Director Contact email",
       required: true,
-      helperText:
-        "Enter email address. Department or program-wide email addresses ok.",
+      helperText: "A department or program-wide email address is acceptable.",
     },
   ],
 };

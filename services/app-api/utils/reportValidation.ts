@@ -109,7 +109,7 @@ const dropdownTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Dropdown)),
   id: string().required(),
   label: string().required(),
-  helperText: string().required(),
+  helperText: string().notRequired(),
   options: array().of(
     object().shape({
       label: string().required(),
@@ -301,6 +301,7 @@ const attachmentAreaSchema = object().shape({
   id: string().required(),
   label: string().required(),
   helperText: string().optional(),
+  uploadedSubLabel: string().required(),
   required: boolean().required(),
   answer: array().of(
     object().shape({
@@ -315,7 +316,7 @@ const ActionElementsSchema = {
   id: string().required(),
   type: string().required(),
   disabled: boolean().notRequired(),
-  mask: boolean().notRequired(),
+  mask: string().notRequired(),
 };
 
 const actionTableSchema = object().shape({
@@ -331,6 +332,7 @@ const actionTableSchema = object().shape({
         .of(
           object().shape({
             ...ActionElementsSchema,
+            label: string().required(),
             editOnly: boolean().notRequired(),
             children: array()
               .of(
@@ -341,7 +343,7 @@ const actionTableSchema = object().shape({
               )
               .notRequired(),
             required: boolean().required(),
-            mask: boolean().notRequired(),
+            mask: string().notRequired(),
           })
         )
         .required(),

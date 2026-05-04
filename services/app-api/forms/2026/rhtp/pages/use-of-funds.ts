@@ -87,15 +87,16 @@ export const useOfFunds: FormPageTemplate = {
   sidebar: true,
   elements: [
     {
-      type: ElementType.Paragraph,
-      id: "use-of-funds-main-instructions",
-      text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+      type: ElementType.Header,
+      id: "use-of-funds-header",
+      text: "Use of Funds",
     },
     {
-      type: ElementType.Accordion,
-      id: "use-of-funds-instructions",
-      label: "Instructions",
-      value:
+      type: ElementType.Paragraph,
+      id: "use-of-funds-main-instructions",
+      text:
+        "<p>Use the table below to enter information about how your state or territory spent funds from RHTP on each of its initiatives. Select <b>Add use of funds</b> to add as many rows to the table as needed.</p>" +
+        "<br />" +
         "<b>Budget Period dates for each Budget Period listed in the table below will consist of the following:</b>" +
         "<ul>" +
         "  <li>Budget Period 1 (12/29/2025 - 10/30/2026)</li>" +
@@ -104,12 +105,6 @@ export const useOfFunds: FormPageTemplate = {
         "  <li>Budget Period 4 (10/31/2028 - 10/30/2029)</li>" +
         "  <li>Budget Period 5 (10/31/2029 - 10/30/2030)</li>" +
         "</ul>",
-    },
-    {
-      type: ElementType.Paragraph,
-      id: "use-of-funds-table-text",
-      title: "Spent Funds",
-      text: `To add an use of funds, click the "Add use of funds" button below.`,
     },
     useOfFundsTableElement,
   ],

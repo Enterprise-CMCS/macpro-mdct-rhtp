@@ -346,6 +346,7 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  uploadedSubLabel: string;
   answer?: UploadListProp[];
 }
 
@@ -408,11 +409,15 @@ export type AttachmentTableTemplate = {
   answer?: InitiativeAnswerProp[];
 };
 
+export enum MaskType {
+  CommaSeparated = "CommaSeparated",
+}
+
 export interface ActionElement {
   id: string;
   type: ElementType;
   disabled?: boolean;
-  mask?: boolean;
+  mask?: MaskType;
 }
 
 export interface ActionRowElement extends ActionElement {
@@ -420,10 +425,11 @@ export interface ActionRowElement extends ActionElement {
 }
 
 export interface ActionModalElement extends ActionElement {
+  label: string;
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;
-  mask?: boolean;
+  mask?: MaskType;
 }
 
 export type ActionAnswerShape = { id: string; value: string | number }[];

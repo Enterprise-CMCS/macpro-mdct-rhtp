@@ -9,7 +9,7 @@ import { ActionElement, ElementType } from "@rhtp/shared";
 import {
   parseNumber,
   validateDate,
-  maskNumber,
+  maskByType,
 } from "utils/validation/inputValidation";
 
 export const buildElement = (
@@ -24,7 +24,9 @@ export const buildElement = (
 
   switch (type) {
     case ElementType.Paragraph:
-      return element.mask ? maskNumber(defaultValue) : defaultValue;
+      return element.mask
+        ? maskByType(element.mask, defaultValue)
+        : defaultValue;
     case ElementType.Dropdown:
       return (
         <Dropdown
@@ -51,7 +53,9 @@ export const buildElement = (
           onBlur={(event) => {
             onChange([event.target.value]);
           }}
-          value={element.mask ? maskNumber(defaultValue) : defaultValue}
+          value={
+            element.mask ? maskByType(element.mask, defaultValue) : defaultValue
+          }
           errorMessage={errorMessage}
           disabled={element.disabled}
         />

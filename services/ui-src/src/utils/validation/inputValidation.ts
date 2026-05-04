@@ -1,3 +1,4 @@
+import { MaskType } from "@rhtp/shared";
 import { ErrorMessages } from "../../constants";
 import { parseMMDDYYYY } from "utils";
 
@@ -136,12 +137,21 @@ const intFormat = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+export const maskByType = (type: MaskType, value: any) => {
+  switch (type) {
+    case MaskType.CommaSeparated:
+      return commaSeparatedMask(value);
+    default:
+      return value;
+  }
+};
+
 /**
  * Adds commas as thousands separators for easier readability of large numbers.
  * The decimal portion (including trailing dot and trailing zeros) is preserved
  * as-is so that users can type decimals without the dot being stripped mid-input.
  */
-export const maskNumber = (value: string | number) => {
+export const commaSeparatedMask = (value: string | number) => {
   if (!value && value !== 0) return "";
   const str = value.toString().trim().replaceAll(",", "");
   if (!str) return "";

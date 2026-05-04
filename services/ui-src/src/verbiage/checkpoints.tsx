@@ -40,7 +40,7 @@ export const checkpointsList = [
     checkpoints: [
       {
         id: "early-implementation-1",
-        label: "Continue initiative",
+        label: "Continue initiative activities",
         attachable: true,
       },
       {
@@ -84,7 +84,7 @@ export const checkpointsList = [
   },
   {
     id: "checkpoint-4",
-    label: "Project for Completion",
+    label: "Preparing for Completion",
     stage: 4,
     checkpoints: [
       {

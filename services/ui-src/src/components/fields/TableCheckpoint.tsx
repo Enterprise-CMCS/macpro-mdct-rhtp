@@ -9,7 +9,6 @@ import {
   Thead,
   Tr,
   Image,
-  Text,
   Flex,
 } from "@chakra-ui/react";
 import {
@@ -90,7 +89,7 @@ const buildRows = (
       prev.push({
         ...row,
         file: file ?? {},
-        status: status ?? {},
+        status: status ?? "",
         comments: comments ?? [],
       });
       copy.forEach(({ file, status, comments }) =>
@@ -148,6 +147,7 @@ const header = [
   "Checkpoint",
   "Ready for CMS Review",
   "Attachments",
+  "Status",
   "Actions",
 ];
 
@@ -343,7 +343,6 @@ export const TableCheckpoint = (
       {tables.map((table, tableIndex) => (
         <Stack key={`checkpoint-${tableIndex}`} gap="1.25rem">
           <Label>{`Stage ${table.stage}: ${table.label}`}</Label>
-          <Text>To upload attachments, click the button below.</Text>
           <Button
             aria-label="Upload attachments"
             variant="outline"
@@ -400,6 +399,7 @@ export const TableCheckpoint = (
                       "Not applicable"
                     )}
                   </Td>
+                  <Td>{row.status}</Td>
                   <Td>
                     {"file" in row && row.file.fileId && (
                       <Flex>
@@ -476,6 +476,9 @@ export const TableCheckpoint = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         uploadAreaHidden={modalMode === "Delete"}
+        uploadedSubLabel={
+          "These files have been attached to the stage and checkpoint selected above."
+        }
         onModalSubmit={onModalSubmit}
       ></UploadModal>
       <CommentModal

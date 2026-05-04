@@ -5,15 +5,10 @@ import {
   getErrorMessage,
 } from "utils/state/reportLogic/tableBuilder";
 import { Flex } from "@chakra-ui/react";
-import {
-  ActionAnswerShape,
-  ActionModalElement,
-  ActionRowElement,
-} from "@rhtp/shared";
+import { ActionAnswerShape, ActionModalElement } from "@rhtp/shared";
 import { ErrorMessages } from "../../constants";
 
 export const ActionModal = ({
-  rows,
   modal,
   form,
   modalDisclosure,
@@ -36,11 +31,6 @@ export const ActionModal = ({
   useEffect(() => {
     setErrorMessages(renderElements.map(() => ""));
   }, [modalDisclosure.isOpen]);
-
-  /* general functions */
-  const fieldLabel = (id: string) => {
-    return rows.find((row) => row.id == id)?.header ?? "";
-  };
 
   const onModalChange = (value: string[], id: string, index: number) => {
     const newData = [...formData];
@@ -105,7 +95,7 @@ export const ActionModal = ({
               element,
               formData.find((data) => data.id === element.id)?.value!,
               (value) => onModalChange(value, element.id, index),
-              fieldLabel(element.id),
+              element.label,
               errorMessages[index]
             )
           )}
@@ -116,7 +106,6 @@ export const ActionModal = ({
 };
 
 interface Props {
-  rows: ActionRowElement[];
   modal: {
     title: string;
     hintText?: string;
