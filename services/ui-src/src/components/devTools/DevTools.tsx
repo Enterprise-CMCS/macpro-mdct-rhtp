@@ -46,6 +46,7 @@ export const DevTools = ({
   const [devDateLabel, setDevDateLabel] = useState<string>("");
   const [showOptions, setShowOptions] = useState<boolean>();
   const [selectedReport, setSelectedReport] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>();
 
   const onDateChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const newDate = e.target.value ?? Date.now();
@@ -54,13 +55,17 @@ export const DevTools = ({
   };
 
   const onDeleteReport = async () => {
+    setLoading(true);
     await deleteReport(reportType, state, selectedReport).then(() => {
       reloadReports(reportType, state);
+      setLoading(false);
     });
   };
   const onDeleteAllReports = async () => {
+    setLoading(true);
     await deleteReportsForState(reportType, state).then(() => {
       reloadReports(reportType, state);
+      setLoading(false);
     });
   };
 
@@ -73,14 +78,14 @@ export const DevTools = ({
       </Button>
       {showOptions && (
         <Stack sx={sx.menuBox} gap="1rem">
-          <Text>Current Dev Date: {devDateLabel}</Text>
+          <Text fontWeight="bold">Current Dev Date: {devDateLabel}</Text>
           <Select placeholder="Select an open date" onChange={onDateChange}>
             {dateOptions.map((date) => (
               <option value={date.value}>{date.label}</option>
             ))}
           </Select>
           <Divider></Divider>
-          <Text>Reports</Text>
+          <Text fontWeight="bold">Delete a Report</Text>
           <Select
             placeholder="Select a report to delete"
             onChange={(e: ChangeEvent<HTMLSelectElement>) => {
@@ -91,9 +96,15 @@ export const DevTools = ({
               <option value={report.id}>{report.name}</option>
             ))}
           </Select>
-          <Button onClick={onDeleteReport}>Delete Report</Button>
+          <Button
+            onClick={onDeleteReport}
+            disabled={!selectedReport || loading}
+          >
+            Delete Report
+          </Button>
           <Divider></Divider>
-          <Button onClick={onDeleteAllReports}>
+          <Text fontWeight="bold">Delete all reports</Text>
+          <Button onClick={onDeleteAllReports} disabled={loading}>
             Delete All {reportType} Reports For {state}
           </Button>
         </Stack>
@@ -110,7 +121,7 @@ const sx = {
     right: "0",
     zIndex: "999",
     alignItems: "flex-start",
-    height: "45%",
+    height: "404px",
   },
   menuBox: {
     background: "white",
