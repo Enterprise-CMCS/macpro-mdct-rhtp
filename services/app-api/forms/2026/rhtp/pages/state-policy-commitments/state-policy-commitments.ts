@@ -17,7 +17,6 @@ const commitmentStatusDropdown = (
   type: ElementType.Dropdown,
   id: "commitment-status",
   label: "Current Status",
-  helperText: "This is the hint text",
   options: getDropdownOptions(label),
   required: true,
   answer: status,
@@ -27,7 +26,7 @@ const commitmentLinkListInput: ListInputTemplate = {
   type: ElementType.ListInput,
   id: "commitment-links",
   label: "Supporting Evidence: Links",
-  helperText: "This is the hint text",
+  helperText: "Add links to any supporting evidence materials posted online.",
   fieldLabel: "Link",
   buttonText: "Add link",
   validation: "link",
@@ -38,15 +37,18 @@ const commitmentAttachmentArea: AttachmentAreaTemplate = {
   type: ElementType.AttachmentArea,
   id: "commitment-attachments",
   label: "Supporting Evidence: Attachments",
-  helperText: "This is the hint text",
+  helperText: "Upload files to submit as supporting evidence",
+  uploadedSubLabel:
+    "These files have been attached to the state policy commitment above.",
   required: false,
 };
 
 const commitmentComments: TextAreaBoxTemplate = {
   id: "commitment-comment",
   type: ElementType.TextAreaField,
-  label: "Optional Comments/Notes",
-  helperText: "This is the hint text",
+  label: "Notes and comments",
+  helperText:
+    "Include any additional information about this policy commitment that you would like CMS to be aware of.",
   required: false,
 };
 
@@ -89,7 +91,7 @@ export const buildStatePolicyCommitments = (
     {
       type: ElementType.Paragraph,
       id: "initiatives-instructions",
-      text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+      text: "The commitments listed here are based on those your state submitted to CMS. Expand each one to update its status, evidence, and comments.",
     },
     {
       type: ElementType.AccordionGroup,

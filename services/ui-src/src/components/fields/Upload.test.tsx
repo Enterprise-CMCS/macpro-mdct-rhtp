@@ -47,6 +47,7 @@ const props = {
   updateElement: vi.fn(),
   deleteFromReport: mockDeleteFromReport,
   disabled: false,
+  uploadedSubLabel: "mock sub label",
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });

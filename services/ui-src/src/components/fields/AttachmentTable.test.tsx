@@ -108,7 +108,7 @@ describe("<AttachmentTable />", () => {
     ).toBeVisible();
     expect(
       screen.getByText(
-        "No attachments found. Click 'Add Attachment' to get started"
+        "No attachments found. Select “Add attachment” to get started."
       )
     ).toBeVisible();
   });
@@ -274,7 +274,7 @@ describe("<AttachmentTable />", () => {
     await sortResult(
       "Checkpoint",
       [3, 9],
-      ["Continue initiative", "Launch initiative"]
+      ["Continue initiative activities", "Launch initiative"]
     );
     await sortResult(
       "Status",

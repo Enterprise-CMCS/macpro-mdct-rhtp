@@ -346,6 +346,7 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  uploadedSubLabel: string;
   answer?: UploadListProp[];
 }
 
@@ -419,6 +420,7 @@ export interface ActionRowElement extends ActionElement {
 }
 
 export interface ActionModalElement extends ActionElement {
+  label: string;
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;
