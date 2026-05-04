@@ -21,7 +21,6 @@ const testReport: Report = {
   name: "plan id",
   state: "NJ",
   id: "NJGeneral123",
-  year: 2026,
   status: ReportStatus.NOT_STARTED,
   submissionCount: 0,
   pages: [

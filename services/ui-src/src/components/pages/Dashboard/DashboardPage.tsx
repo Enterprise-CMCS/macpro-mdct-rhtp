@@ -43,15 +43,19 @@ export const DashboardPage = () => {
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [dropdownValue, setDropdownValue] = useState(
-    searchParams.get("year") || "All"
+    searchParams.get("budgetPeriod") || "All"
   );
 
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
   const reportName = getReportName(reportType);
-  const filterYear = searchParams.get("year") || "All";
+  const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
   const filterDropdownOptions = [
     { label: "All", value: "All" },
-    { label: "2026", value: "2026" },
+    { label: "Budget Period 1", value: 1 },
+    { label: "Budget Period 2", value: 2 },
+    { label: "Budget Period 3", value: 3 },
+    { label: "Budget Period 4", value: 4 },
+    { label: "Budget Period 5", value: 5 },
   ];
   const hasSubmittedReport = reports.some(
     (report) => report.status === ReportStatus.SUBMITTED
@@ -65,14 +69,16 @@ export const DashboardPage = () => {
   }, [reportType, state]);
 
   useEffect(() => {
-    if (filterYear === "All") {
+    if (filterBudgetPeriod === "All") {
       setFilteredReports(reports);
     } else {
       setFilteredReports(
-        reports.filter((report) => String(report.year) === filterYear)
+        reports.filter(
+          (report) => report.budgetPeriod === parseInt(filterBudgetPeriod)
+        )
       );
     }
-  }, [reports, filterYear]);
+  }, [reports, filterBudgetPeriod]);
 
   const reloadReports = (reportType: string, state: string) => {
     (async () => {
@@ -102,13 +108,13 @@ export const DashboardPage = () => {
     onClose: unlockModalOnCloseHandler,
   } = useDisclosure();
 
-  const handleYearChange = (evt: { target: { value: string } }) => {
+  const handleBudgetPeriodChange = (evt: { target: { value: string } }) => {
     setDropdownValue(evt.target.value);
   };
 
   const handleFilter = () => {
     setSearchParams({
-      year: dropdownValue,
+      budgetPeriod: dropdownValue.toString(),
     });
   };
 
@@ -206,11 +212,10 @@ export const DashboardPage = () => {
       <Flex sx={sx.bodyBox} gap="2rem" flexDirection="column">
         <Flex alignItems="flex-end" gap="spacer3">
           <CmsdsDropdownField
-            name="yearFilter"
-            label="Filter by Year"
+            name="budgetPeriodFilter"
+            label="Filter by Budget Period"
             value={dropdownValue}
-            onChange={handleYearChange}
-            data-testid="year-filter-dropdown"
+            onChange={handleBudgetPeriodChange}
             options={filterDropdownOptions}
           />
           <Button onClick={handleFilter} variant="outline">
@@ -300,6 +305,9 @@ const sx = {
       "&:after": {
         borderLeftColor: "black",
       },
+    },
+    ".ds-c-dropdown__menu-container": {
+      zIndex: "1101",
     },
   },
   accordion: {

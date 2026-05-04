@@ -34,9 +34,10 @@ describe("buildReport utility", () => {
     } as User;
     const reportOptions = {
       name: "report1",
-      year: 2026,
       subType: RhtpSubType.ANNUAL,
       subTypeKey: "A1",
+      budgetPeriod: 1,
+      pages: [{}],
     } as ReportOptions;
     const report = await buildReport(
       ReportType.RHTP,
@@ -60,10 +61,11 @@ describe("buildReport utility", () => {
     } as User;
     const reportOptions = {
       name: "report1",
-      year: 2026,
       subType: RhtpSubType.QUARTERLY,
       subTypeKey: "Q1",
       copyFromReportId: "123",
+      budgetPeriod: 1,
+      pages: [{}],
     } as ReportOptions;
     const report = await buildReport(
       ReportType.RHTP,
@@ -93,7 +95,8 @@ describe("buildReport utility", () => {
     } as User;
     const reportOptions = {
       name: "report1",
-      year: 2026,
+      budgetPeriod: 1,
+      pages: [{}],
     } as ReportOptions;
 
     await expect(async () => {
