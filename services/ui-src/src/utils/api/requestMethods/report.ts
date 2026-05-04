@@ -77,3 +77,25 @@ export async function releaseReport(report: LiteReport) {
     options
   );
 }
+
+export async function deleteReport(
+  reportType: string,
+  state: string,
+  id: string
+) {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  await apiLib.del(`/reports/${reportType}/${state}/${id}`, options);
+}
+
+export async function deleteReportsForState(reportType: string, state: string) {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  await apiLib.del(`/reports/${reportType}/${state}`, options);
+}

@@ -25,7 +25,7 @@ export const writeLocalUiEnvFile = async (
     ),
     "};",
     `launchDarklyLocalFlags='${unescapeDoubleQuotes(envVariables["LD_LOCAL_FLAGS"])}'`,
-    `launchDarklyServer=${envVariables["LD_SDK_KEY"]}`,
+    `launchDarklyServer='${envVariables["LD_SDK_KEY"]}'`,
   ].join("\n");
 
   await fs.writeFile(configFilePath, envConfigContent);

@@ -31,6 +31,7 @@ import { useStore } from "utils";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
+import { DevTools } from "components/devTools/DevTools";
 
 export const DashboardPage = () => {
   const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
@@ -114,6 +115,11 @@ export const DashboardPage = () => {
 
   return (
     <PageTemplate type="report" sxOverride={sx.layout}>
+      <DevTools
+        reportType={reportType}
+        state={state}
+        reloadReports={reloadReports}
+      />
       <Link as={RouterLink} to="/" variant="return">
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
         Return home
