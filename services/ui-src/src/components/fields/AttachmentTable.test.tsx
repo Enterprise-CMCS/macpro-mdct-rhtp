@@ -53,8 +53,8 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
         fileId: "file-id",
       },
       initiatives: ["mock-init-1"],
-      stage: "checkpoint-1",
-      checkpoints: "project-prop-2",
+      stage: "stage-1",
+      checkpoint: "project-prop-2",
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     },
@@ -65,8 +65,8 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
         fileId: "file-id",
       },
       initiatives: ["mock-init-1"],
-      stage: "checkpoint-2",
-      checkpoints: "early-implementation-1",
+      stage: "stage-2",
+      checkpoint: "early-implementation-1",
       status: AttachmentStatus.LOCKED_FOR_SCORING,
       comments: [],
     },
@@ -125,14 +125,12 @@ describe("<AttachmentTable />", () => {
     );
 
     const dropdown = screen.getAllByLabelText(
-      "Which stage does this attachment apply to?"
+      "Which stage/checkpoint does this attachment apply to?"
     )[0];
-    await userEvent.selectOptions(dropdown, "2 Early Implementation");
-
-    const dropdown2 = screen.getAllByLabelText(
-      "Which checkpoint does this attachment apply to?"
-    )[0];
-    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
 
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
@@ -183,14 +181,12 @@ describe("<AttachmentTable />", () => {
     });
 
     const dropdown = screen.getAllByLabelText(
-      "Which stage does this attachment apply to?"
+      "Which stage/checkpoint does this attachment apply to?"
     )[0];
-    await userEvent.selectOptions(dropdown, "2 Early Implementation");
-
-    const dropdown2 = screen.getAllByLabelText(
-      "Which checkpoint does this attachment apply to?"
-    )[0];
-    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
@@ -226,14 +222,12 @@ describe("<AttachmentTable />", () => {
     });
 
     const dropdown = screen.getAllByLabelText(
-      "Which stage does this attachment apply to?"
+      "Which stage/checkpoint does this attachment apply to?"
     )[0];
-    await userEvent.selectOptions(dropdown, "2 Early Implementation");
-
-    const dropdown2 = screen.getAllByLabelText(
-      "Which checkpoint does this attachment apply to?"
-    )[0];
-    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
@@ -278,7 +272,7 @@ describe("<AttachmentTable />", () => {
       ["1 Project Preparation", "2 Early Implementation"]
     );
     await sortResult(
-      "Checkpoints",
+      "Checkpoint",
       [3, 9],
       ["Continue initiative activities", "Launch initiative"]
     );

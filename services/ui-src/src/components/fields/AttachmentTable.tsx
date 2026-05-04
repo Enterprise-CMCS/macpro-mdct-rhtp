@@ -1,9 +1,5 @@
 import { Button, Stack, Image, HStack } from "@chakra-ui/react";
-import {
-  ChoiceList,
-  Dropdown,
-  DropdownChangeObject,
-} from "@cmsgov/design-system";
+import { ChoiceList, Dropdown } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
 import { CommentModal } from "components/modals/CommentModal";
 import { PageElementProps } from "components/report/Elements";
@@ -24,15 +20,18 @@ import {
   canEditAttachment,
   canDeleteAttachment,
 } from "utils/other/upload";
-import { checkpointsList } from "verbiage/checkpoints";
+import {
+  checkpointAttachableOptions,
+  checkpointList,
+  getStageIdByCheckpointId,
+  stageList,
+} from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-
-type Options = { label: string; value: string; checked?: boolean };
 
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
@@ -53,26 +52,15 @@ export const AttachmentTable = (
   >([]);
   const stageOption = [
     dropdownEmptyOption,
-    ...checkpointsList.map((checks) => ({
+    ...stageList.map((checks) => ({
       label: `${checks.stage} ${checks.label}`,
       value: checks.id,
     })),
   ];
-  const checkpointsArr = checkpointsList.flatMap((list) => list.checkpoints);
-  const [checkpointOption, setCheckpointOption] = useState<Options[]>([]);
+  const [checkpoint, setCheckpoint] = useState("");
   const [tableRows, setTableRows] = useState<
     (string | JSX.Element | undefined)[][]
   >([]);
-
-  const initialValues = {
-    stage: "",
-    checkpoint: "",
-  };
-  const [selection, setSelection] = useState<{
-    stage: string;
-    checkpoint: string;
-  }>(initialValues);
-
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
   const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
     "Upload"
@@ -98,21 +86,6 @@ export const AttachmentTable = (
     sortRows("", SORT_TYPE.DEFAULT);
   }, [report]);
 
-  useEffect(() => {
-    const checkpoints =
-      checkpointsList
-        .find((checks) => checks.id === selection.stage)
-        ?.checkpoints.filter((checks) => checks.attachable)
-        .map((check) => ({ label: check.label, value: check.id })) ?? [];
-    setCheckpointOption([dropdownEmptyOption, ...checkpoints]);
-  }, [selection]);
-
-  const onStageChangeHandler = (event: DropdownChangeObject) => {
-    const value = event.target.value;
-
-    setSelection({ stage: value, checkpoint: "" });
-  };
-
   const onChoiceChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -126,7 +99,7 @@ export const AttachmentTable = (
 
     //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
     if (choices.every((choice) => !choice.checked)) {
-      setSelection(initialValues);
+      setCheckpoint("");
     }
   };
 
@@ -135,7 +108,7 @@ export const AttachmentTable = (
       attachment: upload,
       initiatives: [],
       stage: "",
-      checkpoints: "",
+      checkpoint: "",
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
     }));
@@ -170,8 +143,8 @@ export const AttachmentTable = (
       initiatives: initiativeOptions
         .filter((options) => options.checked)
         .map((option) => option.value),
-      stage: selection.stage,
-      checkpoints: selection.checkpoint,
+      stage: getStageIdByCheckpointId(checkpoint),
+      checkpoint,
       status: AttachmentStatus.PENDING_REVIEW,
       comments:
         displayValue.find((item) => item.attachment.fileId === upload.fileId)
@@ -192,7 +165,7 @@ export const AttachmentTable = (
   const onAddClick = () => {
     setModalMode("Upload");
     setModalOpen(true);
-    setSelection(initialValues);
+    setCheckpoint("");
     setUploadedFiles([]);
     setInitiativeOptions(
       initiatives.map((initiative) => ({
@@ -204,10 +177,7 @@ export const AttachmentTable = (
   };
 
   const setCurrentValues = (selectedFile: InitiativeAnswerProp) => {
-    setSelection({
-      stage: selectedFile.stage ?? "",
-      checkpoint: selectedFile.checkpoints ?? "",
-    });
+    setCheckpoint(selectedFile.checkpoint ?? "");
     setUploadedFiles([selectedFile.attachment]);
 
     const initiativeOptions = initiatives.map((initiative) => ({
@@ -240,7 +210,7 @@ export const AttachmentTable = (
 
   const onClose = () => {
     setModalOpen(false);
-    setSelection(initialValues);
+    setCheckpoint("");
     setUploadedFiles([]);
   };
 
@@ -271,11 +241,11 @@ export const AttachmentTable = (
       const columnStage =
         row.stage == ""
           ? "N/A"
-          : stageOption.find((opt) => opt.value === row.stage)?.label;
-      const colummCheckpoints =
-        row.checkpoints == ""
+          : stageOption.find(({ value }) => value === row.stage)?.label;
+      const columnCheckpoint =
+        row.checkpoint == ""
           ? "N/A"
-          : checkpointsArr.find((check) => check.id === row.checkpoints)?.label;
+          : checkpointList.find(({ id }) => id === row.checkpoint)?.label;
       const columnActions = (
         <HStack>
           <Button
@@ -310,7 +280,7 @@ export const AttachmentTable = (
         columnAttachmentName,
         columnInitiatives,
         columnStage,
-        colummCheckpoints,
+        columnCheckpoint,
         row.status,
         columnActions,
       ];
@@ -332,8 +302,8 @@ export const AttachmentTable = (
             (opt) => opt.value === answer.stage
           )?.label;
           return stageLabel ?? "";
-        case "Checkpoints":
-          return answer.checkpoints ?? "";
+        case "Checkpoint":
+          return answer.checkpoint ?? "";
         case "Status":
           return answer.status;
         default:
@@ -400,7 +370,7 @@ export const AttachmentTable = (
             { label: "Attachment name", sortable: true },
             { label: "Initiatives", sortable: true },
             { label: "Stage", sortable: true },
-            { label: "Checkpoints", sortable: true },
+            { label: "Checkpoint", sortable: true },
             { label: "Status", sortable: true },
             { label: "Actions" },
           ],
@@ -430,26 +400,15 @@ export const AttachmentTable = (
               label={"Which initiative does this attachment apply to?"}
               onChange={onChoiceChangeHandler}
               disabled={modalMode === "Delete" || disabled}
-            ></ChoiceList>
-            <Dropdown
-              name={"stage"}
-              label={"Which stage does this attachment apply to?"}
-              value={selection?.stage}
-              options={stageOption}
-              onChange={onStageChangeHandler}
-              disabled={modalMode === "Delete" || isStageEnabled()}
-            ></Dropdown>
+            />
             <Dropdown
               name={"checkpoint"}
-              label={"Which checkpoint does this attachment apply to?"}
-              options={checkpointOption}
-              value={selection?.checkpoint}
-              onChange={(dropdown) => {
-                const value = dropdown.target.value;
-                setSelection({ ...selection, checkpoint: value });
-              }}
+              label={"Which stage/checkpoint does this attachment apply to?"}
+              options={checkpointAttachableOptions}
+              value={checkpoint}
+              onChange={(event) => setCheckpoint(event.target.value)}
               disabled={modalMode === "Delete" || isStageEnabled()}
-            ></Dropdown>
+            />
           </Stack>
         }
         saveToReport={saveToReport}
@@ -461,7 +420,7 @@ export const AttachmentTable = (
         uploadedSubLabel={
           "These files have been attached to the stage and checkpoint selected above."
         }
-      ></UploadModal>
+      />
       <CommentModal
         modalDisclosure={{
           isOpen: isCommentsOpen,

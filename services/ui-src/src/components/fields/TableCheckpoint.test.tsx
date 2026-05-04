@@ -117,10 +117,10 @@ const mockReport = {
             answer: [
               {
                 initiatives: ["mock-init-1"],
-                checkpoints: "project-prop-2",
+                checkpoint: "project-prop-2",
                 comments: [] as InitiativeComment[],
                 attachment: mockFiles,
-                stage: "checkpoint-1",
+                stage: "stage-1",
                 status: AttachmentStatus.PENDING_REVIEW,
               },
             ],
@@ -143,7 +143,7 @@ describe("<TableCheckpoint />", () => {
       screen.getAllByRole("button", { name: "Upload attachments" })[0]
     ).toBeVisible();
     expect(screen.getByText("Establish governance")).toBeVisible();
-    expect(screen.getAllByText("Not applicable")).toHaveLength(9);
+    expect(screen.getAllByText("Not applicable")).toHaveLength(3);
   });
   test("receive an error when state or year is not provided", async () => {
     (useParams as Mock).mockResolvedValueOnce("");

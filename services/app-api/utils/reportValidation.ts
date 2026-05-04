@@ -376,7 +376,7 @@ const attachmentTableSchema = object().shape({
         }),
         initiatives: array().of(string().notRequired()).required(),
         stage: string().notRequired(),
-        checkpoints: string().notRequired(),
+        checkpoint: string().notRequired(),
         status: string().required(),
         comments: array().of(
           object().shape({
