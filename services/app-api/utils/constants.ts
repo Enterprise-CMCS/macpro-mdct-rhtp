@@ -30,7 +30,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q1: {
     name: "Quarterly Report 1",
     dateRangeString: "8/1/2026-10/30/2026",
-    openDate: 1790726400000, //9.30.2026
+    openDate: 1790740800000, //9.30.2026
     startDate: 1785556800000,
     endDate: 1793332800000,
     nextReportSubType: "Q2",
@@ -41,7 +41,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q2: {
     name: "Quarterly Report 2",
     dateRangeString: "10/31/2026-1/30/2027",
-    openDate: 1798502400000, //12.29.2026
+    openDate: 1798520400000, //12.29.2026
     startDate: 1793419200000,
     endDate: 1801285200000,
     nextReportSubType: "Q3",
@@ -52,7 +52,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q3: {
     name: "Quarterly Report 3",
     dateRangeString: "1/31/2027-4/30/2027",
-    openDate: 1806537600000, //4.1.2027
+    openDate: 1806552000000, //4.1.2027
     startDate: 1801371600000,
     endDate: 1809057600000,
     nextReportSubType: "A2",
@@ -63,7 +63,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   A2: {
     name: "Annual Report 2",
     dateRangeString: "8/1/2026-7/31/2027",
-    openDate: 1814313600000, //6.30.2027
+    openDate: 1814328000000, //6.30.2027
     startDate: 1785556800000,
     endDate: 1817006400000,
     nextReportSubType: "Q4",
@@ -74,7 +74,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q4: {
     name: "Quarterly Report 4",
     dateRangeString: "8/1/2027-10/30/2027",
-    openDate: 1822262400000, //9.30.2027
+    openDate: 1822276800000, //9.30.2027
     startDate: 1817092800000,
     endDate: 1824868800000,
     nextReportSubType: "Q5",
@@ -85,7 +85,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q5: {
     name: "Quarterly Report 5",
     dateRangeString: "10/31/2027-1/30/2028",
-    openDate: 1830038400000, //  12.29.2027
+    openDate: 1830056400000, //  12.29.2027
     startDate: 1824955200000,
     endDate: 1832821200000,
     nextReportSubType: "Q6",
@@ -96,7 +96,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q6: {
     name: "Quarterly Report 6",
     dateRangeString: "1/31/2028-4/30/2028",
-    openDate: 1837900800000, //3.29.2028
+    openDate: 1837915200000, //3.29.2028
     startDate: 1832907600000,
     endDate: 1840680000000,
     nextReportSubType: "A3",
@@ -107,7 +107,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   A3: {
     name: "Annual Report 3",
     dateRangeString: "8/1/2027-7/31/2028",
-    openDate: 1845936000000, //6.30.2028
+    openDate: 1845950400000, //6.30.2028
     startDate: 1817092800000,
     endDate: 1848628800000,
     nextReportSubType: "Q7",
@@ -118,7 +118,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q7: {
     name: "Quarterly Report 7",
     dateRangeString: "8/1/2028-10/30/2028",
-    openDate: 1853884800000, //9.30.2028
+    openDate: 1853899200000, //9.30.2028
     startDate: 1848715200000,
     endDate: 1856491200000,
     nextReportSubType: "Q8",
@@ -129,7 +129,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q8: {
     name: "Quarterly Report 8",
     dateRangeString: "10/31/2028-1/30/2029",
-    openDate: 1861660800000, //12.29.2028
+    openDate: 1861678800000, //12.29.2028
     startDate: 1856577600000,
     endDate: 1864443600000,
     nextReportSubType: "Q9",
@@ -140,7 +140,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q9: {
     name: "Quarterly Report 9",
     dateRangeString: "1/31/2029-4/30/2029",
-    openDate: 1869696000000, //4.1.2029
+    openDate: 1869710400000, //4.1.2029
     startDate: 1864530000000,
     endDate: 1872216000000,
     nextReportSubType: "A4",
@@ -151,7 +151,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   A4: {
     name: "Annual Report 4",
     dateRangeString: "8/1/2028-7/31/2029",
-    openDate: 1877472000000, //6.30.2029
+    openDate: 1877486400000, //6.30.2029
     startDate: 1848715200000,
     endDate: 1880164800000,
     nextReportSubType: "Q10",
@@ -162,7 +162,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q10: {
     name: "Quarterly Report 10",
     dateRangeString: "8/1/2029-10/30/2029",
-    openDate: 1885420800000, //9.30.2029
+    openDate: 1885435200000, //9.30.2029
     startDate: 1880251200000,
     endDate: 1888027200000,
     nextReportSubType: "Q11",
@@ -173,7 +173,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q11: {
     name: "Quarterly Report 11",
     dateRangeString: "10/31/2029-1/30/2030",
-    openDate: 1893196800000, //12.29.2029
+    openDate: 1893214800000, //12.29.2029
     startDate: 1888113600000,
     endDate: 1895979600000,
     nextReportSubType: "Q12",
@@ -184,7 +184,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q12: {
     name: "Quarterly Report 12",
     dateRangeString: "1/31/2030-4/30/2030",
-    openDate: 1901232000000, //4.1.2030
+    openDate: 1901246400000, //4.1.2030
     startDate: 1896066000000,
     endDate: 1903752000000,
     nextReportSubType: "A5",
@@ -195,7 +195,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   A5: {
     name: "Annual Report 5",
     dateRangeString: "8/1/2029-7/31/2030",
-    openDate: 1909008000000, //6.30.2030
+    openDate: 1909022400000, //6.30.2030
     startDate: 1880251200000,
     endDate: 1911700800000,
     nextReportSubType: "Q13",
@@ -206,7 +206,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   Q13: {
     name: "Quarterly Report 13",
     dateRangeString: "8/1/2030-10/30/2030",
-    openDate: 1916956800000, //9.30.2030
+    openDate: 1916971200000, //9.30.2030
     startDate: 1911787200000,
     endDate: 1919563200000,
     nextReportSubType: "FINAL",
@@ -217,7 +217,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
   FINAL: {
     name: "Final Report",
     dateRangeString: "12/29/2025-10/30/2030",
-    openDate: 1956441600000, //12.29.2031
+    openDate: 1956286800000, //12.29.2031
     startDate: 1766984400000,
     endDate: 1919563200000,
     nextReportSubType: "",
