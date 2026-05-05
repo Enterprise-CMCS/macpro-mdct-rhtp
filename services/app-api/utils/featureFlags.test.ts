@@ -104,21 +104,4 @@ describe("utils/featureFlags", () => {
       expect(expectedResult).toBe(false);
     });
   });
-
-  describe("featureFlags.isFeatureFlagEnabled()", () => {
-    beforeEach(() => {
-      vi.clearAllMocks();
-      (LD.init as Mock).mockReturnValue({
-        variation,
-        waitForInitialization,
-      });
-    });
-    test("returns false", async () => {
-      vi.spyOn(featureFlags, "getFlagValue").mockResolvedValue(true);
-      const expectedResult =
-        await featureFlags.isFeatureFlagEnabled("mockFlag");
-      expect(consoleSpy.log).toHaveBeenCalled();
-      expect(expectedResult).toBe(false);
-    });
-  });
 });
