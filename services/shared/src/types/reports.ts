@@ -38,10 +38,10 @@ export interface UpdateInitiativeOptions {
 
 export interface ReportOptions {
   name: string;
-  year: number;
   subType: RhtpSubType;
   subTypeKey: string;
   budgetPeriod: number;
+  pages: ReportPages;
   copyFromReportId?: string;
 }
 
@@ -65,9 +65,9 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
-export interface Report extends ReportBase, ReportOptions {
+export interface Report extends ReportOptions {
   id: string;
-  name: string;
+  type: ReportType;
   state: StateAbbr;
   created: number;
   lastEdited?: number;
@@ -83,16 +83,13 @@ export interface Report extends ReportBase, ReportOptions {
 
 export type LiteReport = Omit<Report, "pages">;
 
-export type ReportBase = {
-  type: ReportType;
-  year: number;
-  pages: (
-    | ParentPageTemplate
-    | FormPageTemplate
-    | InitiativePageTemplate
-    | ReviewSubmitTemplate
-  )[];
-};
+export type ReportPage =
+  | ParentPageTemplate
+  | FormPageTemplate
+  | InitiativePageTemplate
+  | ReviewSubmitTemplate;
+
+export type ReportPages = ReportPage[];
 
 export type ParentPageTemplate = {
   id: PageId;
@@ -346,6 +343,7 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  uploadedSubLabel: string;
   answer?: UploadListProp[];
 }
 
@@ -397,7 +395,7 @@ export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
   stage?: string;
-  checkpoints?: string;
+  checkpoint?: string;
   status: AttachmentStatus;
   comments: InitiativeComment[];
 };
@@ -419,6 +417,7 @@ export interface ActionRowElement extends ActionElement {
 }
 
 export interface ActionModalElement extends ActionElement {
+  label: string;
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;

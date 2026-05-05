@@ -14,13 +14,7 @@ export const initiativesTable: FormPageTemplate = {
     {
       type: ElementType.Paragraph,
       id: "initiatives-instructions",
-      text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
-    },
-    {
-      type: ElementType.Accordion,
-      id: "initiatives-accordion-instructions",
-      label: "More details",
-      value: "<b>More details coming soon.</b>",
+      text: "<p>The list below includes initiatives you have previously submitted to CMS. Select <b>Edit</b> for each initiative to report on its progress.</p>",
     },
     {
       type: ElementType.InitiativesTable,

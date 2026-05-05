@@ -13,7 +13,7 @@ export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
   const { disabled } = props;
-  const { label, helperText, answer } = props.element;
+  const { label, helperText, answer, uploadedSubLabel } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
@@ -62,7 +62,7 @@ export const AttachmentArea = (
         leftIcon={<Image src={disabled ? addGray : addIconPrimary} />}
         disabled={disabled}
       >
-        Add attachment
+        Upload Attachments
       </Button>
       <UploadModal
         modalDisclosure={{
@@ -72,6 +72,7 @@ export const AttachmentArea = (
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
+        uploadedSubLabel={uploadedSubLabel}
       />
     </Stack>
   );

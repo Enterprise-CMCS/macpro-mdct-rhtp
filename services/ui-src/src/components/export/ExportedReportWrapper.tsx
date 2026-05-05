@@ -1,10 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import {
-  FormPageTemplate,
-  PageElement,
-  ParentPageTemplate,
-  ReviewSubmitTemplate,
-} from "@rhtp/shared";
+import { PageElement, ReportPage } from "@rhtp/shared";
 import { renderElements, shouldUseTable } from "./ExportedReportElements";
 import { chunkBy } from "utils/other/arrays";
 import { ExportedReportTable, ReportTableType } from "./ExportedReportTable";
@@ -100,5 +95,5 @@ export const ExportedReportWrapper = ({ section }: Props) => {
 };
 
 export interface Props {
-  section: ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate;
+  section: ReportPage;
 }

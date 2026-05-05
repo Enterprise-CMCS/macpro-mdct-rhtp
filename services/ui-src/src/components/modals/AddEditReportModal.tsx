@@ -18,7 +18,7 @@ import {
 } from "@rhtp/shared";
 
 const verbiage = {
-  addReportHeader: "Add new RHTP submission",
+  addReportHeader: "Add New RHTP Report",
   addReportSubheader:
     "Add a new report to start a blank report or copy an existing report.",
   copyReportHeader: "Copy RHTP submission",

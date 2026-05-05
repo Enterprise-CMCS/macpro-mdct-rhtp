@@ -41,21 +41,21 @@ vi.mock("utils/api/requestMethods/report", () => ({
       id: "RHTPCO123",
       type: "RHTP",
       state: "CO",
-      lastEdited: new Date("2024-10-24T08:31:54").valueOf(),
+      lastEdited: new Date("2026-10-24T08:31:54").valueOf(),
       lastEditedBy: "Mock User",
       status: "Not started",
       name: "Mock Report Name",
-      year: 2026,
+      budgetPeriod: 1,
     } as Report,
     {
       id: "RHTPCO1234",
       type: "RHTP",
       state: "CO",
-      lastEdited: new Date("2024-10-24T08:31:54").valueOf(),
+      lastEdited: new Date("2027-10-24T08:31:54").valueOf(),
       lastEditedBy: "Mock User",
       status: "Not started",
       name: "Mock Report 2027",
-      year: 2027,
+      budgetPeriod: 2,
     } as Report,
   ]),
 }));
@@ -129,7 +129,7 @@ describe("DashboardPage with state user", () => {
       return cell.textContent;
     };
     expect(cellContent("Submission name")).toBe("Mock Report Name");
-    expect(cellContent("Last edited")).toBe("10/24/2024");
+    expect(cellContent("Last edited")).toBe("10/24/2026");
     expect(cellContent("Edited by")).toBe("Mock User");
   });
 
@@ -141,8 +141,8 @@ describe("DashboardPage with state user", () => {
     });
 
     await userEvent.selectOptions(
-      screen.queryAllByLabelText("Filter by Year")[0],
-      "2026"
+      screen.queryAllByLabelText("Filter by Budget Period")[0],
+      "Budget Period 1"
     );
     await userEvent.click(screen.getByText("Filter"));
 
@@ -164,7 +164,7 @@ describe("DashboardPage with state user", () => {
       return cell.textContent;
     };
     expect(cellContent("Submission name")).toBe("Mock Report Name");
-    expect(cellContent("Last edited")).toBe("10/24/2024");
+    expect(cellContent("Last edited")).toBe("10/24/2026");
     expect(cellContent("Edited by")).toBe("Mock User");
     expect(screen.queryByText("Mock Report 2027")).not.toBeInTheDocument();
   });
@@ -178,7 +178,7 @@ describe("DashboardPage with state user", () => {
 
     await userEvent.click(screen.getByText("Start RHTP Report"));
 
-    expect(screen.getByText("Add new RHTP submission")).toBeInTheDocument();
+    expect(screen.getByText("Add New RHTP Report")).toBeInTheDocument();
   });
 });
 

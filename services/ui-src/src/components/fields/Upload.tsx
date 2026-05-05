@@ -18,6 +18,7 @@ interface Props {
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
+  uploadedSubLabel: string;
 }
 
 export const Upload = ({
@@ -25,6 +26,7 @@ export const Upload = ({
   saveToReport,
   deleteFromReport,
   uploadAreaHidden = false,
+  uploadedSubLabel,
 }: Props) => {
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
@@ -120,10 +122,7 @@ export const Upload = ({
       )}
       <div>
         <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
-        <Text sx={sx.uploadedSubLabel}>
-          These files have been attached to the stage and checkpoint selected
-          above.
-        </Text>
+        <Text sx={sx.uploadedSubLabel}>{uploadedSubLabel}</Text>
       </div>
       {uploadListRender(
         reportType,

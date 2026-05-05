@@ -109,7 +109,7 @@ const dropdownTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Dropdown)),
   id: string().required(),
   label: string().required(),
-  helperText: string().required(),
+  helperText: string().notRequired(),
   options: array().of(
     object().shape({
       label: string().required(),
@@ -301,6 +301,7 @@ const attachmentAreaSchema = object().shape({
   id: string().required(),
   label: string().required(),
   helperText: string().optional(),
+  uploadedSubLabel: string().required(),
   required: boolean().required(),
   answer: array().of(
     object().shape({
@@ -330,6 +331,7 @@ const actionTableSchema = object().shape({
         .of(
           object().shape({
             ...ActionElementsSchema,
+            label: string().required(),
             editOnly: boolean().notRequired(),
             children: array()
               .of(
@@ -374,7 +376,7 @@ const attachmentTableSchema = object().shape({
         }),
         initiatives: array().of(string().notRequired()).required(),
         stage: string().notRequired(),
-        checkpoints: string().notRequired(),
+        checkpoint: string().notRequired(),
         status: string().required(),
         comments: array().of(
           object().shape({
@@ -442,7 +444,7 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
 /**
  * This schema is meant to represent the pages field in the ReportTemplate type.
  * The following yup `lazy` function is building up the union type:
- * `(ParentPageTemplate | FormPageTemplate)[]`
+ * `(ParentPageTemplate | FormPageTemplate | InitiativePageTemplate | ReviewSubmitTemplate)[]`
  * and outputs the correct type in the union based on various fields
  * on the page object that gets passed through.
  */
@@ -543,7 +545,6 @@ const reportValidateSchema = object().shape({
   subType: mixed<RhtpSubType>().oneOf(Object.values(RhtpSubType)).required(),
   subTypeKey: string().required(),
   budgetPeriod: number().min(0).max(5).required(),
-  year: number().required(),
   submissionCount: number().required(),
   pages: pagesSchema,
 });

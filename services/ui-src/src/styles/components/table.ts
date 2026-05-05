@@ -172,6 +172,8 @@ const initiativeVariant = {
     },
     td: {
       "&:last-of-type": {
+        display: "flex",
+        justifyContent: "end",
         textAlign: "right",
       },
       ".chakra-link": {

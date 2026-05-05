@@ -18,7 +18,6 @@ const mockGetReportsForState = vi.fn().mockResolvedValue([
   {
     id: "1",
     name: "mock-name-a",
-    year: 2026,
   } as LiteReport,
 ]);
 
@@ -76,7 +75,7 @@ describe("Test Add Report Modal", () => {
   });
 
   test("Add Report Modal shows proper add contents", () => {
-    expect(screen.getByText("Add new RHTP submission")).toBeInTheDocument();
+    expect(screen.getByText("Add New RHTP Report")).toBeInTheDocument();
     expect(screen.getByText("Save")).toBeInTheDocument();
   });
 
@@ -98,7 +97,7 @@ describe("Test submit", () => {
 });
 
 describe("Test AddEditReportModal types", () => {
-  test.each([{ type: ReportType.RHTP, text: "RHTP submission" }])(
+  test.each([{ type: ReportType.RHTP, text: "RHTP Report" }])(
     "$type report type renders a title",
     ({ type, text }) => {
       render(
@@ -114,7 +113,7 @@ describe("Test AddEditReportModal types", () => {
           />
         </RouterWrappedComponent>
       );
-      expect(screen.getByText(`Add new ${text}`)).toBeInTheDocument();
+      expect(screen.getByText(`Add New ${text}`)).toBeInTheDocument();
     }
   );
 });

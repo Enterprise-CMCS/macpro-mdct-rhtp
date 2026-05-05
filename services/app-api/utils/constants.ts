@@ -1,4 +1,5 @@
-import { ReportType, RhtpSubType } from "@rhtp/shared";
+import { ReportPages, ReportType, RhtpSubType } from "@rhtp/shared";
+import { rhtpReportTemplate } from "../forms/2026/rhtp/rhtp";
 
 export type RhtpSubTypeData = {
   [key: string]: {
@@ -9,6 +10,7 @@ export type RhtpSubTypeData = {
     nextReportSubType: string;
     type: RhtpSubType;
     budgetPeriod: number;
+    reportTemplateBuilder: (state: string) => ReportPages;
   };
 };
 
@@ -21,6 +23,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q1",
     type: RhtpSubType.ANNUAL,
     budgetPeriod: 1,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q1: {
     name: "Quarterly Report 1",
@@ -30,6 +33,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q2",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 1,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q2: {
     name: "Quarterly Report 2",
@@ -39,6 +43,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q3",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 2,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q3: {
     name: "Quarterly Report 3",
@@ -48,6 +53,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "A2",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 2,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   A2: {
     name: "Annual Report 2",
@@ -57,6 +63,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q4",
     type: RhtpSubType.ANNUAL,
     budgetPeriod: 2,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q4: {
     name: "Quarterly Report 4",
@@ -66,6 +73,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q5",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 2,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q5: {
     name: "Quarterly Report 5",
@@ -75,6 +83,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q6",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 3,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q6: {
     name: "Quarterly Report 6",
@@ -84,6 +93,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "A3",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 3,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   A3: {
     name: "Annual Report 3",
@@ -93,6 +103,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q7",
     type: RhtpSubType.ANNUAL,
     budgetPeriod: 3,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q7: {
     name: "Quarterly Report 7",
@@ -102,6 +113,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q8",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 3,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q8: {
     name: "Quarterly Report 8",
@@ -111,6 +123,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q9",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 4,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q9: {
     name: "Quarterly Report 9",
@@ -120,6 +133,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "A4",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 4,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   A4: {
     name: "Annual Report 4",
@@ -129,6 +143,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q10",
     type: RhtpSubType.ANNUAL,
     budgetPeriod: 4,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q10: {
     name: "Quarterly Report 10",
@@ -138,6 +153,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q11",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 4,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q11: {
     name: "Quarterly Report 11",
@@ -147,6 +163,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q12",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 5,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q12: {
     name: "Quarterly Report 12",
@@ -156,6 +173,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "A5",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 5,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   A5: {
     name: "Annual Report 5",
@@ -165,6 +183,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "Q13",
     type: RhtpSubType.ANNUAL,
     budgetPeriod: 5,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   Q13: {
     name: "Quarterly Report 13",
@@ -174,6 +193,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "FINAL",
     type: RhtpSubType.QUARTERLY,
     budgetPeriod: 5,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
   FINAL: {
     name: "Final Report",
@@ -183,6 +203,7 @@ export const RhtpSubTypeMap: RhtpSubTypeData = {
     nextReportSubType: "",
     type: RhtpSubType.FINAL,
     budgetPeriod: 5,
+    reportTemplateBuilder: rhtpReportTemplate,
   },
 };
 

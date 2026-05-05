@@ -8,7 +8,6 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
 }));
 
 const report: Report = {
-  year: 2026,
   id: "",
   name: "",
   state: "AL",

@@ -53,9 +53,21 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
         fileId: "file-id",
       },
       initiatives: ["mock-init-1"],
-      stage: "checkpoint-1",
-      checkpoints: "project-prop-2",
+      stage: "stage-1",
+      checkpoint: "project-prop-2",
       status: AttachmentStatus.PENDING_REVIEW,
+      comments: [],
+    },
+    {
+      attachment: {
+        name: "mock-file-2",
+        size: 100,
+        fileId: "file-id",
+      },
+      initiatives: ["mock-init-1"],
+      stage: "stage-2",
+      checkpoint: "early-implementation-1",
+      status: AttachmentStatus.LOCKED_FOR_SCORING,
       comments: [],
     },
   ],
@@ -96,7 +108,7 @@ describe("<AttachmentTable />", () => {
     ).toBeVisible();
     expect(
       screen.getByText(
-        "No attachments found. Click 'Add Attachment' to get started"
+        "No attachments found. Select “Add attachment” to get started."
       )
     ).toBeVisible();
   });
@@ -112,11 +124,13 @@ describe("<AttachmentTable />", () => {
       screen.getByRole("checkbox", { name: "123: Init Title" })
     );
 
-    const dropdown = screen.getAllByLabelText("Stage")[0];
-    await userEvent.selectOptions(dropdown, "2 Early Implementation");
-
-    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
-    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+    const dropdown = screen.getAllByLabelText(
+      "Which stage/checkpoint does this attachment apply to?"
+    )[0];
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
 
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
@@ -166,11 +180,13 @@ describe("<AttachmentTable />", () => {
       expect(screen.getByText("Edit Attachment")).toBeVisible();
     });
 
-    const dropdown = screen.getAllByLabelText("Stage")[0];
-    await userEvent.selectOptions(dropdown, "2 Early Implementation");
-
-    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
-    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+    const dropdown = screen.getAllByLabelText(
+      "Which stage/checkpoint does this attachment apply to?"
+    )[0];
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
@@ -205,11 +221,13 @@ describe("<AttachmentTable />", () => {
       expect(screen.getByText("Edit Attachment")).toBeVisible();
     });
 
-    const dropdown = screen.getAllByLabelText("Stage")[0];
-    await userEvent.selectOptions(dropdown, "2 Early Implementation");
-
-    const dropdown2 = screen.getAllByLabelText("Checkpoint #")[0];
-    await userEvent.selectOptions(dropdown2, "Achieve at least one milestone");
+    const dropdown = screen.getAllByLabelText(
+      "Which stage/checkpoint does this attachment apply to?"
+    )[0];
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
 
     await userEvent.click(screen.getByRole("button", { name: "Save" }));
     expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
@@ -221,6 +239,47 @@ describe("<AttachmentTable />", () => {
           }),
         ]),
       })
+    );
+  });
+
+  it("Test AttachmentTable column sorting", async () => {
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+
+    const sortResult = async (
+      sort: string,
+      columns: number[],
+      results: string[]
+    ) => {
+      const content = screen.getAllByRole("cell");
+      const sortBtn = screen.getByRole("button", { name: sort });
+      await userEvent.click(sortBtn);
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results);
+      await userEvent.click(sortBtn);
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results.toReversed());
+    };
+
+    await sortResult("Attachment name", [0, 6], ["mock-file", "mock-file-2"]);
+    await sortResult("Initiatives", [1, 7], ["#123", "#123"]);
+    await sortResult(
+      "Stage",
+      [2, 8],
+      ["1 Project Preparation", "2 Early Implementation"]
+    );
+    await sortResult(
+      "Checkpoint",
+      [3, 9],
+      ["Continue initiative activities", "Launch initiative"]
+    );
+    await sortResult(
+      "Status",
+      [4, 10],
+      ["Locked for Scoring", "Pending Review"]
     );
   });
 

@@ -60,6 +60,10 @@ export const InitiativesTable = (
   const rows = initiatives.map(
     (initiative: InitiativePageTemplate, index: number) => {
       const displayName = `${initiative.initiativeNumber}: ${initiative.title}`;
+      const buttonName =
+        initiative.status === PageStatus.ABANDONED || disabled
+          ? `View`
+          : `Edit`;
       return (
         <Tr key={index}>
           <Td>
@@ -81,7 +85,7 @@ export const InitiativesTable = (
               as={Link}
               variant="outline"
               href={`/report/${reportType}/${state}/${reportId}/${initiative.id}`}
-              aria-label={`Edit ${displayName}`}
+              aria-label={`${buttonName} ${displayName}`}
               onClick={(e) => {
                 e.preventDefault();
                 navigate(
@@ -89,7 +93,7 @@ export const InitiativesTable = (
                 );
               }}
             >
-              Edit
+              {buttonName}
             </Button>
           </Td>
         </Tr>
@@ -103,7 +107,7 @@ export const InitiativesTable = (
         <Thead>
           <Tr>
             <Th>
-              Initiative name <br />
+              Initiative number and name <br />
               Status
             </Th>
             <Th>Actions</Th>

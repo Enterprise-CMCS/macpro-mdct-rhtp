@@ -8,6 +8,7 @@ import {
   Accordion,
   Divider,
   Flex,
+  Box,
 } from "@chakra-ui/react";
 import {
   HeaderTemplate,
@@ -104,9 +105,9 @@ export const ParagraphElement = ({
           {element.title}
         </Text>
       )}
-      <Text fontSize="body_md" fontWeight={element.weight}>
-        {element.text}
-      </Text>
+      <Box fontSize="body_md" fontWeight={element.weight}>
+        {parseHtml(element.text)}
+      </Box>
     </Stack>
   );
 };

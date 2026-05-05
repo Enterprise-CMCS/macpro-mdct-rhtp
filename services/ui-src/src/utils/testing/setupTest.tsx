@@ -171,7 +171,6 @@ export const mockReportStore: ReportState = {
     type: ReportType.RHTP,
     status: ReportStatus.IN_PROGRESS,
     name: "mock-report-title",
-    year: 2026,
     state: "PA",
     submissionCount: 0,
     created: 1776449695077,
