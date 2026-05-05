@@ -26,7 +26,6 @@ vi.mock("../../api/requestMethods/report", () => ({
 const testReport: Report = {
   type: ReportType.RHTP,
   name: "plan id",
-  year: 2026,
   state: "NJ",
   id: "NJRHTP123",
   status: ReportStatus.NOT_STARTED,

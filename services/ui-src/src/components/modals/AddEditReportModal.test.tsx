@@ -18,7 +18,6 @@ const mockGetReportsForState = vi.fn().mockResolvedValue([
   {
     id: "1",
     name: "mock-name-a",
-    year: 2026,
   } as LiteReport,
 ]);
 

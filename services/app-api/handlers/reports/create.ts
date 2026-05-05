@@ -22,17 +22,9 @@ export const createReport = handler(
       return badRequest("Invalid request");
     }
 
+    let nextReportKey = "A1"; // default first report key
     const reports = await queryReportsForState(reportType, state);
 
-    // Report options for very first report
-    const { name, dateRangeString, type, budgetPeriod } = RhtpSubTypeMap.A1;
-    let reportOptions: ReportOptions = {
-      year: 2026,
-      subType: type,
-      subTypeKey: "A1",
-      name: `${state} - ${name} - ${dateRangeString}`,
-      budgetPeriod,
-    };
     if (reports.length > 0) {
       const latestReport = reports.reduce((latest, current) => {
         if (latest.created > current.created) {
@@ -54,28 +46,34 @@ export const createReport = handler(
         );
       }
 
-      const nextReportKey =
-        RhtpSubTypeMap[latestReport.subTypeKey].nextReportSubType;
-      const { name, dateRangeString, type, startDate, budgetPeriod } =
-        RhtpSubTypeMap[nextReportKey];
-
-      if (Date.now() < startDate) {
-        return badRequest(
-          `The next report cannot be created until ${new Date(
-            startDate
-          ).toLocaleDateString()}.`
-        );
-      }
-
-      reportOptions = {
-        year: 2026, // TODO: figure out year assignment and filtering for reports that span years
-        subType: type,
-        subTypeKey: nextReportKey,
-        name: `${state} - ${name} - ${dateRangeString}`,
-        budgetPeriod,
-        copyFromReportId: body?.copyFromReportId,
-      };
+      nextReportKey = RhtpSubTypeMap[latestReport.subTypeKey].nextReportSubType;
     }
+
+    const {
+      name,
+      dateRangeString,
+      type,
+      startDate,
+      budgetPeriod,
+      reportTemplateBuilder,
+    } = RhtpSubTypeMap[nextReportKey];
+
+    if (Date.now() < startDate) {
+      return badRequest(
+        `The next report cannot be created until ${new Date(
+          startDate
+        ).toLocaleDateString()}.`
+      );
+    }
+
+    const reportOptions: ReportOptions = {
+      subType: type,
+      subTypeKey: nextReportKey,
+      name: `${state} - ${name} - ${dateRangeString}`,
+      budgetPeriod,
+      copyFromReportId: body?.copyFromReportId,
+      pages: reportTemplateBuilder(state),
+    };
 
     const report = await buildReport(reportType, state, reportOptions, user);
 

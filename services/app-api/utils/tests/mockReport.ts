@@ -1,4 +1,4 @@
-import { rhtpReportTemplate as rhtpReportTemplate2026 } from "../../forms/2026/rhtp/rhtp";
+import { rhtpReportTemplate } from "../../forms/2026/rhtp/rhtp";
 import {
   Report,
   PageType,
@@ -6,17 +6,17 @@ import {
   ReportStatus,
   StateAbbr,
   RhtpSubType,
+  ReportType,
 } from "@rhtp/shared";
 
-const rhtpReportTemplate = rhtpReportTemplate2026("PA");
+const pages = rhtpReportTemplate("PA");
 
 export const validReport: Report = {
-  type: rhtpReportTemplate.type,
+  type: ReportType.RHTP,
   subType: RhtpSubType.ANNUAL,
   subTypeKey: "A1",
   budgetPeriod: 1,
-  year: rhtpReportTemplate.year,
-  pages: rhtpReportTemplate.pages,
+  pages: pages,
   state: "NJ" as StateAbbr,
   id: "2rRaoAFm8yLB2N2wSkTJ0iRTDu0",
   created: 1736524513631,

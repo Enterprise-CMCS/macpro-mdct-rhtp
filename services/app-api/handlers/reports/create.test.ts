@@ -76,7 +76,6 @@ describe("Test create report handler", () => {
     (queryReportsForState as Mock).mockReturnValueOnce([
       {
         id: "123",
-        year: 2026,
         subType: RhtpSubType.ANNUAL,
         subTypeKey: "A1",
         status: ReportStatus.IN_PROGRESS,
@@ -99,7 +98,6 @@ describe("Test create report handler", () => {
     (queryReportsForState as Mock).mockReturnValueOnce([
       {
         id: "123",
-        year: 2026,
         subType: RhtpSubType.FINAL,
         subTypeKey: "A1",
         status: ReportStatus.SUBMITTED,
@@ -125,7 +123,6 @@ describe("Test create report handler", () => {
     (queryReportsForState as Mock).mockReturnValueOnce([
       {
         id: "123",
-        year: 2026,
         subType: RhtpSubType.ANNUAL,
         subTypeKey: "A1",
         status: ReportStatus.SUBMITTED,
@@ -149,7 +146,6 @@ describe("Test create report handler", () => {
     (queryReportsForState as Mock).mockReturnValueOnce([
       {
         id: "123",
-        year: 2026,
         subType: RhtpSubType.ANNUAL,
         subTypeKey: "A1",
         status: ReportStatus.SUBMITTED,

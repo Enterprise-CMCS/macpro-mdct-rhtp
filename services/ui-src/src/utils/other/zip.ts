@@ -1,22 +1,21 @@
 import { getFileBytes } from "utils/api/requestMethods/upload";
 import JSZip from "jszip";
-import { Report, RhtpSubType } from "@rhtp/shared";
+import { Report } from "@rhtp/shared";
 import { saveAs } from "file-saver";
 
 export const createZipFile = async (report: Report) => {
-  const { state, year, subType, id, type } = report;
-  const quarter = RhtpSubType[subType!];
+  const { state, subTypeKey, id, type } = report;
 
   const files = await getFileBytes(type, state, id);
   var zip = new JSZip();
 
   for (var i = 0; i < files.length; i++) {
     const blob = convertBase64ToBlob(files[i].bytes);
-    zip.file(`${state}/${year}/${quarter}/${files[i].name}`, blob);
+    zip.file(`${state}/${subTypeKey}/${files[i].name}`, blob);
   }
 
   zip.generateAsync({ type: "blob" }).then((blob) => {
-    saveAs(blob, `RHTP_${state}_${year}.zip`);
+    saveAs(blob, `RHTP_${state}_${subTypeKey}.zip`);
   });
 };
 
