@@ -107,7 +107,7 @@ export const updateField = async (
   );
 };
 
-export const deleteReportFromDatabase = async (
+export const deleteReport = async (
   reportType: ReportType,
   state: StateAbbr,
   id: string

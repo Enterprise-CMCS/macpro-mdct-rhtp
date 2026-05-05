@@ -5,7 +5,7 @@ import {
 } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import {
-  deleteReportFromDatabase,
+  deleteReport as deleteReportFromDatabase,
   queryReportsForState,
 } from "../../storage/reports";
 import { isFeatureFlagEnabled } from "../../utils/featureFlags";

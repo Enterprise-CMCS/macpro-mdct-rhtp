@@ -56,17 +56,15 @@ export const DevTools = ({
 
   const onDeleteReport = async () => {
     setLoading(true);
-    await deleteReport(reportType, state, selectedReport).then(() => {
-      reloadReports(reportType, state);
-      setLoading(false);
-    });
+    await deleteReport(reportType, state, selectedReport);
+    reloadReports(reportType, state);
+    setLoading(false);
   };
   const onDeleteAllReports = async () => {
     setLoading(true);
-    await deleteReportsForState(reportType, state).then(() => {
-      reloadReports(reportType, state);
-      setLoading(false);
-    });
+    await deleteReportsForState(reportType, state);
+    reloadReports(reportType, state);
+    setLoading(false);
   };
 
   return (
@@ -79,7 +77,11 @@ export const DevTools = ({
       {showOptions && (
         <Stack sx={sx.menuBox} gap="1rem">
           <Text fontWeight="bold">Current Dev Date: {devDateLabel}</Text>
-          <Select placeholder="Select an open date" onChange={onDateChange}>
+          <Select
+            placeholder="Select an open date"
+            onChange={onDateChange}
+            aria-label="select an open date"
+          >
             {dateOptions.map((date) => (
               <option value={date.value}>{date.label}</option>
             ))}
@@ -91,6 +93,7 @@ export const DevTools = ({
             onChange={(e: ChangeEvent<HTMLSelectElement>) => {
               setSelectedReport(e.target.value);
             }}
+            aria-label="select a report to delete"
           >
             {reports.map((report) => (
               <option value={report.id}>{report.name}</option>
