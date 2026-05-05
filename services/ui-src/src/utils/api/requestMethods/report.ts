@@ -7,7 +7,6 @@ export async function createReport(
   state: string,
   reportOptions?: CreateReportOptions
 ) {
-  console.log("reportOptions", reportOptions);
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },

@@ -55,7 +55,6 @@ export const createReport = handler(
       name,
       dateRangeString,
       type,
-      startDate,
       budgetPeriod,
       openDate,
       reportTemplateBuilder,
@@ -68,7 +67,7 @@ export const createReport = handler(
     if (userDate < openDate) {
       return badRequest(
         `The next report cannot be created until ${new Date(
-          startDate
+          openDate
         ).toLocaleDateString()}.`
       );
     }

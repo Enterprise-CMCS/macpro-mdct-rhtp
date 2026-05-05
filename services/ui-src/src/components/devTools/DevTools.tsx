@@ -42,8 +42,8 @@ export const DevTools = ({
   const devTools = useFlags()?.devTools;
   if (!devTools || !reportType || !state) return;
 
-  const { setDevDate } = useStore();
-  const [devDateLabel, setDevDateLabel] = useState<string>("");
+  const { devDate, setDevDate } = useStore();
+  const [devDateLabel, setDevDateLabel] = useState<string>(devDate ?? "");
   const [showOptions, setShowOptions] = useState<boolean>();
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [loading, setLoading] = useState<boolean>();
