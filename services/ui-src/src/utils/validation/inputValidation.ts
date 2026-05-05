@@ -1,3 +1,4 @@
+import { MaskType } from "@rhtp/shared";
 import { ErrorMessages } from "../../constants";
 import { parseMMDDYYYY } from "utils";
 
@@ -104,7 +105,7 @@ export const isEmail = (value: string | undefined) => {
  * For more see https://stackoverflow.com/questions/175739
  */
 export const parseNumber = (value: string) => {
-  value = value.trim();
+  value = value.trim().replaceAll(",", "");
   if (value === "") return undefined;
   const nonNumericChars = /[^.-\d]/;
   if (nonNumericChars.test(value)) return undefined;
@@ -115,10 +116,10 @@ export const parseNumber = (value: string) => {
 };
 
 /**
- * Convert the given number to a string.
+ * Convert the given number or string to a string.
  * If it is undefined, return an empty string.
  */
-export const stringifyInput = (value: number | undefined) => {
+export const stringifyInput = (value: number | undefined | string) => {
   if (value === undefined) return "";
   return value.toString();
 };
@@ -129,4 +130,47 @@ export const stringifyInput = (value: number | undefined) => {
 export const isValidCurrency = (value: string) => {
   const currencyPattern = /^\d*(,\d{3})*(\.\d*)?$/;
   return currencyPattern.test(value);
+};
+
+export const maskByType = (type: MaskType, value: any) => {
+  switch (type) {
+    case MaskType.CommaSeparated:
+      return commaSeparatedMask(value);
+    default:
+      return value;
+  }
+};
+
+export const unmaskByType = (type: MaskType, value: any) => {
+  switch (type) {
+    case MaskType.CommaSeparated:
+      return parseNumber(stringifyInput(value));
+    default:
+      return value;
+  }
+};
+
+const intFormat = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
+
+/**
+ * Adds commas as thousands separators for easier readability of large numbers.
+ * The decimal portion (including trailing dot and trailing zeros) is preserved
+ * as-is so that users can type decimals without the dot being stripped mid-input.
+ */
+export const commaSeparatedMask = (value: string | number) => {
+  if (!value && value !== 0) return "";
+  const str = value.toString().trim().replaceAll(",", "");
+  if (!str) return "";
+
+  const dotIndex = str.indexOf(".");
+  const intPart = dotIndex !== -1 ? str.slice(0, dotIndex) : str;
+  const decPart = dotIndex !== -1 ? str.slice(dotIndex) : ""; // e.g. "." or ".5" or ".50"
+
+  const intNum = Number(intPart || "0");
+  if (isNaN(intNum)) return "";
+
+  const sign = intPart.startsWith("-") ? "-" : "";
+  return sign + intFormat.format(Math.abs(intNum)) + decPart;
 };

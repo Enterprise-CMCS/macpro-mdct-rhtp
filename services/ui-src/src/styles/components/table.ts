@@ -156,6 +156,10 @@ const metricVariant = {
       ".ds-c-label-mask": {
         display: "none",
       },
+      input: {
+        "field-sizing": "content",
+        minWidth: "50px",
+      },
       "&:last-of-type": {
         paddingRight: "0.75rem",
       },

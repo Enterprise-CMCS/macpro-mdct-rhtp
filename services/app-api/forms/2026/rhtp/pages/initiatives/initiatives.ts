@@ -10,6 +10,7 @@ import {
   SubHeaderTemplate,
   TableCheckpointTemplate,
   TextAreaBoxTemplate,
+  MaskType,
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
 
@@ -127,12 +128,14 @@ export const metricTable = (
           label: "What is the target for this metric?",
           type: ElementType.NumberField,
           required: false,
+          mask: MaskType.CommaSeparated,
         },
         {
           id: "currValue",
           label: "What is the metric’s current value?",
           type: ElementType.NumberField,
           required: false,
+          mask: MaskType.CommaSeparated,
         },
         {
           id: "date",
@@ -146,17 +149,24 @@ export const metricTable = (
       { id: "no", header: "#", type: ElementType.Paragraph },
       { id: "status", header: "Status", type: ElementType.Paragraph },
       { id: "metric", header: "Metric", type: ElementType.Paragraph },
-      { id: "target", header: "Target", type: ElementType.Paragraph },
+      {
+        id: "target",
+        header: "Target",
+        type: ElementType.Paragraph,
+        mask: MaskType.CommaSeparated,
+      },
       {
         id: "prevValue",
         header: "Previous value",
         type: ElementType.NumberField,
         disabled: true,
+        mask: MaskType.CommaSeparated,
       },
       {
         id: "currValue",
         header: "Current value",
         type: ElementType.NumberField,
+        mask: MaskType.CommaSeparated,
       },
       { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },
     ],
