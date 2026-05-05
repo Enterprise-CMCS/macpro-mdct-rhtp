@@ -15,13 +15,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { formatMonthDayYear, useStore } from "utils";
-import {
-  FormPageTemplate,
-  ParentPageTemplate,
-  Report,
-  ReviewSubmitTemplate,
-  StateNames,
-} from "@rhtp/shared";
+import { Report, ReportPages, StateNames } from "@rhtp/shared";
 import { getReportName } from "types";
 import { ExportedReportBanner, ExportedReportWrapper } from "components";
 import { shouldRender } from "./ExportedReportPageHelpers";
@@ -88,7 +82,7 @@ export const reportDetails = (report: Report) => {
     <Table variant={"reportDetails"}>
       <Thead>
         <Tr>
-          <Th>Reporting year</Th>
+          <Th>Reporting budget period</Th>
           <Th>Last edited</Th>
           <Th>Edited by</Th>
           <Th>Status</Th>
@@ -96,7 +90,7 @@ export const reportDetails = (report: Report) => {
       </Thead>
       <Tbody>
         <Tr>
-          <Td>{report.year}</Td>
+          <Td>{report.budgetPeriod}</Td>
           <Td>{formatMonthDayYear(report.lastEdited!)}</Td>
           <Td>{report.lastEditedBy}</Td>
           <Td>{report.status}</Td>
@@ -110,9 +104,7 @@ export const reportSubmissionSetUp = (_report: Report) => {
   return null;
 };
 
-export const renderReportSections = (
-  reportPages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
-) => {
+export const renderReportSections = (reportPages: ReportPages) => {
   reportPages = reportPages.filter(shouldRender);
 
   return reportPages.map((section, idx) => {

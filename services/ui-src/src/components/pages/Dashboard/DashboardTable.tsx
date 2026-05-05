@@ -72,7 +72,6 @@ export const HorizontalTable = (props: TableProps) => {
               </Text>
             )}
           </Td>
-          <Td>{report.year ?? "{Year of form}"}</Td>
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
           </Td>
@@ -144,10 +143,6 @@ export const VerticalTable = (props: TableProps) => {
             )}
           </div>
           <HStack gap="4rem">
-            <div>
-              <Text variant="gray">Reporting Year</Text>
-              <Text>{report.year}</Text>
-            </div>
             <div>
               <Text variant="gray">Last Edited</Text>
               <Text>{formatMonthDayYear(report.lastEdited!)}</Text>
@@ -221,13 +216,7 @@ export const DashboardTable = ({
   const showAdminControlsColumn = userIsAdmin;
 
   // Build header columns based on defined behaviors per role
-  const headers = [
-    "Submission name",
-    "Reporting Year",
-    "Last edited",
-    "Edited by",
-    "Status",
-  ];
+  const headers = ["Submission name", "Last edited", "Edited by", "Status"];
   if (showReportSubmissionsColumn) headers.push("#");
   headers.push("Actions");
 

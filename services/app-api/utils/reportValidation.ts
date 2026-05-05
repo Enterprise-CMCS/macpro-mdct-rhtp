@@ -444,7 +444,7 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
 /**
  * This schema is meant to represent the pages field in the ReportTemplate type.
  * The following yup `lazy` function is building up the union type:
- * `(ParentPageTemplate | FormPageTemplate)[]`
+ * `(ParentPageTemplate | FormPageTemplate | InitiativePageTemplate | ReviewSubmitTemplate)[]`
  * and outputs the correct type in the union based on various fields
  * on the page object that gets passed through.
  */
@@ -546,7 +546,6 @@ const reportValidateSchema = object().shape({
   subType: mixed<RhtpSubType>().oneOf(Object.values(RhtpSubType)).required(),
   subTypeKey: string().required(),
   budgetPeriod: number().min(0).max(5).required(),
-  year: number().required(),
   submissionCount: number().required(),
   pages: pagesSchema,
 });
