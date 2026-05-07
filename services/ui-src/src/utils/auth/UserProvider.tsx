@@ -82,7 +82,7 @@ export const UserProvider = ({ children }: Props) => {
       // "custom:cms_roles" is an string of concat roles so we need to check for the one applicable to RHTP
       const userRole = cms_role.split(",").find((r) => r.includes("mdctrhtp"));
       const full_name = [given_name, " ", family_name].join("");
-      const adminCanEditReport = flags?.adminCanEditReport ?? true;
+      const adminCanEditReport = flags?.adminCanEditReport ?? false;
       const userIsAdmin =
         userRole === UserRoles.ADMIN ||
         userRole === UserRoles.APPROVER ||

@@ -216,6 +216,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
             setModalOpen(false);
           },
         }}
+        disabled={reportSubmitted}
       ></ActionModal>
     </Flex>
   );
