@@ -3,7 +3,8 @@ export enum UserRoles {
   APPROVER = "mdctrhtp-appr", // "MDCT RHTP Approver"
   HELP_DESK = "mdctrhtp-hd", // "MDCT RHTP Help Desk"
   INTERNAL = "mdctrhtp-internal-user", // "MDCT RHTP Internal User"
-  STATE_USER = "mdctrhtp-state-user", // "MDCT RHTP State User"
+  STATE_USER = "mdctrhtp-state-user", // "MDCT RHTP State User",
+  PROJECT_OFFICER = "mdctrhtp-project-officer",
 }
 export const isUserRole = (role: string): role is UserRoles => {
   return Object.values(UserRoles).includes(role as UserRoles);
