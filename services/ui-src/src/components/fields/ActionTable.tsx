@@ -18,6 +18,7 @@ import {
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
+  ReportStatus,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
@@ -83,6 +84,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { id, label, hintText, modal, rows, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
+  const { report } = useStore();
+  const reportSubmitted = report?.status === ReportStatus.SUBMITTED;
   const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
@@ -174,13 +177,16 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           variant="outline"
           alignSelf="flex-start"
           leftIcon={
-            <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
+            <Image
+              src={reportSubmitted ? addGray : addPrimary}
+              alt="Add icon"
+            />
           }
           onClick={() => {
             setModalOpen(true);
             setModalData({ data: initial, index: undefined });
           }}
-          disabled={disabled}
+          disabled={reportSubmitted}
         >
           Add {label}
         </Button>

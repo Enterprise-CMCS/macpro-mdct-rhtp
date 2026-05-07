@@ -45,6 +45,15 @@ const CommentModalComponent = (
   allFiles: InitiativeAnswerProp[] = mockAllFiles,
   disabled: boolean = false
 ) => {
+  if (disabled) {
+    mockedUseStore.mockReturnValue({
+      ...mockUseStore,
+      report: {
+        ...mockUseStore.report,
+        status: "Submitted",
+      },
+    });
+  }
   return (
     <CommentModal
       modalDisclosure={{
@@ -54,7 +63,6 @@ const CommentModalComponent = (
       selectedFile={mockSelectedFile}
       updateElement={mockUpdateElement}
       allFiles={allFiles}
-      disabled={disabled}
     />
   );
 };

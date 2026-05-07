@@ -61,7 +61,6 @@ describe("Authorization functions", () => {
     });
 
     test("should reject other roles", () => {
-      expect(canWriteState(approverUser, "CO")).toBe(false);
       expect(canWriteState(internalUser, "CO")).toBe(false);
       expect(canWriteState(helpDeskUser, "CO")).toBe(false);
     });

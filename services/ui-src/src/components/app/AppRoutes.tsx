@@ -22,7 +22,6 @@ export const AppRoutes = () => {
   const { pathname } = useLocation();
   const isPdfActive = useFlags()?.viewPdf;
 
-  console.log("USEFLAGS", useFlags());
   const componentInventoryPageEnabled = useFlags()?.componentInventory;
 
   useEffect(() => {

@@ -40,6 +40,7 @@ const authenticateWithIDM = async () => {
 export const UserProvider = ({ children }: Props) => {
   const location = useLocation();
   const isProduction = window.location.origin.includes(PRODUCTION_HOST_DOMAIN);
+  const flags = useFlags();
 
   // state management
   const { user, showLocalLogins, setUser, setShowLocalLogins } = useStore();
@@ -81,7 +82,7 @@ export const UserProvider = ({ children }: Props) => {
       // "custom:cms_roles" is an string of concat roles so we need to check for the one applicable to RHTP
       const userRole = cms_role.split(",").find((r) => r.includes("mdctrhtp"));
       const full_name = [given_name, " ", family_name].join("");
-      const adminCanEditReport = useFlags()?.adminCanEditReport || true;
+      const adminCanEditReport = flags?.adminCanEditReport ?? true;
       const userIsAdmin =
         userRole === UserRoles.ADMIN ||
         userRole === UserRoles.APPROVER ||
@@ -113,7 +114,7 @@ export const UserProvider = ({ children }: Props) => {
         setShowLocalLogins(true);
       }
     }
-  }, [isProduction, location]);
+  }, [isProduction, location, flags]);
 
   // re-render on auth state change, checking router location
   useEffect(() => {
