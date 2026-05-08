@@ -7,6 +7,7 @@ import { fixLocalstackUrl } from "../../libs/localstack";
 import { error } from "../../utils/constants";
 import { getReport as getReportFromDatabase } from "../../storage/reports";
 import { ElementType } from "@rhtp/shared";
+import JSZip from "jszip";
 
 export const getUploadsByFileId = handler(
   parseUploadParameters,
@@ -60,24 +61,41 @@ export const getUploadsByReportId = handler(
       accordionGroups?.flatMap((group) => group.answer) ?? [];
 
     const files = [...initAttachmentFiles, ...accordionFiles].filter(
-      (files) => files != undefined
+      (file) => file != undefined
     );
 
-    const s3Objects = [];
-    for (var i = 0; i < files.length; i++) {
-      const file = files[i]?.fileId;
+    // Fetch each file from S3 and add to the zip archive
+    const zip = new JSZip();
+    for (const file of files) {
       const item = await s3.getObject({
         Bucket: process.env.attachmentsBucketName,
-        Key: `${reportType}/${state}/${id}/${file}`,
+        Key: `${reportType}/${state}/${id}/${file?.fileId}`,
       });
-      s3Objects.push(item);
+      const bytes = await item.Body?.transformToByteArray();
+      if (bytes && file?.name) {
+        zip.file(`${state}/${report?.subTypeKey}/${file.name}`, bytes);
+      }
     }
 
-    const data = [];
-    for (var j = 0; j < s3Objects.length; j++) {
-      const item = await s3Objects[j].Body?.transformToString("base64");
-      data.push({ name: files[j]?.name, bytes: item });
-    }
-    return ok(data);
+    // Generate zip buffer and upload to S3
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+    const zipKey = `zips/${reportType}/${state}/${id}.zip`;
+    await s3.putObject({
+      Bucket: process.env.attachmentsBucketName,
+      Key: zipKey,
+      Body: zipBuffer,
+      ContentLength: zipBuffer.byteLength,
+      ContentType: "application/zip",
+    });
+
+    // Return a presigned download URL so the client streams directly from S3
+    let psurl = await s3.getSignedDownloadUrl({
+      Bucket: process.env.attachmentsBucketName,
+      Key: zipKey,
+      ResponseContentDisposition: `attachment; filename=RHTP_${state}_${report?.subTypeKey}.zip`,
+    });
+    psurl = fixLocalstackUrl(psurl);
+
+    return ok({ psurl });
   }
 );

@@ -4,11 +4,11 @@ import { Link as RouterLink } from "react-router";
 import { Stack, Box, Button, Spinner, Image } from "@chakra-ui/react";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { submitReport, useStore, reportBasePath } from "utils";
-import { createZipFile } from "utils/other/zip";
 import { SubmitReportModal } from "./SubmitReportModal";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
 import { ReportStatus } from "@rhtp/shared";
+import { getZipFile } from "utils/other/upload";
 
 export const SubmissionBar = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =
@@ -69,7 +69,7 @@ export const SubmissionBar = () => {
           colorScheme="blue"
           variant={isSubmitted ? "outline" : "link"}
           fontWeight="bold"
-          onClick={() => createZipFile(report)}
+          onClick={() => getZipFile(report)}
         >
           ZIP Files
         </Button>

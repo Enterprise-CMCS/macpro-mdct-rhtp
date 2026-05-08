@@ -5,7 +5,7 @@ import {
   uploadFileToS3,
   getFileDownloadUrl,
   deleteUploadedFile,
-  getFileBytes,
+  getZipPresignedUrl,
 } from "./upload";
 import { ReportType } from "@rhtp/shared";
 
@@ -64,10 +64,10 @@ describe("Test fileApi functions", () => {
       }
     );
   });
-  test("getFileBytes", async () => {
-    const zipData = [{ name: "file-name", bytes: "abced" }];
-    (apiLib.get as Mock).mockReturnValue(zipData);
-    const result = await getFileBytes("RHTP", "PA", "mock-id");
-    expect(result).toBe(zipData);
+  test("getZipPresignedUrl", async () => {
+    const mockUrl = { psurl: "https://example.com/report.zip" };
+    (apiLib.get as Mock).mockReturnValue(mockUrl);
+    const result = await getZipPresignedUrl("RHTP", "PA", "mock-id");
+    expect(result).toBe(mockUrl);
   });
 });

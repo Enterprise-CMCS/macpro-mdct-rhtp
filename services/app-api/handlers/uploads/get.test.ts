@@ -25,8 +25,11 @@ vi.mock("../../storage/upload", () => ({
 
 vi.mock("../../libs/s3-lib", () => ({
   default: {
-    getSignedDownloadUrl: vi.fn(),
-    getObject: vi.fn().mockReturnValue([]),
+    getSignedDownloadUrl: vi
+      .fn()
+      .mockResolvedValue("https://example.com/presigned"),
+    getObject: vi.fn().mockResolvedValue({ Body: undefined }),
+    putObject: vi.fn().mockResolvedValue({}),
   },
 }));
 
