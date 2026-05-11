@@ -182,23 +182,24 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     method: "GET",
     ...commonProps,
   });
+  //paths made only for dev tool, not to be used on real data
+  if (stage !== "production") {
+    new Lambda(scope, "deleteReport", {
+      entry: "services/app-api/handlers/reports/delete.ts",
+      handler: "deleteReport",
+      path: "reports/{reportType}/{state}/{id}",
+      method: "DELETE",
+      ...commonProps,
+    });
 
-  new Lambda(scope, "deleteReport", {
-    entry: "services/app-api/handlers/reports/delete.ts",
-    handler: "deleteReport",
-    path: "reports/{reportType}/{state}/{id}",
-    method: "DELETE",
-    ...commonProps,
-  });
-
-  new Lambda(scope, "deleteReportsForState", {
-    entry: "services/app-api/handlers/reports/delete.ts",
-    handler: "deleteReportsForState",
-    path: "reports/{reportType}/{state}",
-    method: "DELETE",
-    ...commonProps,
-  });
-
+    new Lambda(scope, "deleteReportsForState", {
+      entry: "services/app-api/handlers/reports/delete.ts",
+      handler: "deleteReportsForState",
+      path: "reports/{reportType}/{state}",
+      method: "DELETE",
+      ...commonProps,
+    });
+  }
   new Lambda(scope, "submitReport", {
     entry: "services/app-api/handlers/reports/submit.ts",
     handler: "submitReport",

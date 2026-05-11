@@ -29,9 +29,8 @@ export const deleteReportsForState = handler(
     const useDevTools = await isFeatureFlagEnabled("devTools");
     if (useDevTools) {
       const reports = await queryReportsForState(reportType, state);
-      const reportIds = reports.map((report) => report.id);
-      for (var i = 0; i < reportIds.length; i++) {
-        await deleteReportFromDatabase(reportType, state, reportIds[i]);
+      for (var i = 0; i < reports.length; i++) {
+        await deleteReportFromDatabase(reportType, state, reports[i].id);
       }
     }
 
