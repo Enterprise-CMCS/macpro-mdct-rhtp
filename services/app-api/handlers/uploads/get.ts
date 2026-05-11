@@ -65,7 +65,6 @@ export const getUploadsByReportId = handler(
       (file) => file != undefined
     );
 
-    // Fetch each file from S3 and add to the zip archive
     const zip = new JSZip();
     for (const file of files) {
       const item = await s3.getObject({
@@ -78,7 +77,6 @@ export const getUploadsByReportId = handler(
       }
     }
 
-    // Generate zip buffer and upload to S3
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
     const zipKey = `zips/${reportType}/${state}/${id}.zip`;
     await s3.putObject({
@@ -89,7 +87,6 @@ export const getUploadsByReportId = handler(
       ContentType: "application/zip",
     });
 
-    // Return a presigned download URL so the client streams directly from S3
     let psurl = await s3.getSignedDownloadUrl({
       Bucket: process.env.attachmentsBucketName,
       Key: zipKey,
