@@ -407,10 +407,15 @@ export type AttachmentTableTemplate = {
   answer?: InitiativeAnswerProp[];
 };
 
+export enum MaskType {
+  CommaSeparated = "CommaSeparated",
+}
+
 export interface ActionElement {
   id: string;
   type: ElementType;
   disabled?: boolean;
+  mask?: MaskType;
 }
 
 export interface ActionRowElement extends ActionElement {
@@ -422,6 +427,7 @@ export interface ActionModalElement extends ActionElement {
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;
+  mask?: MaskType;
 }
 
 export type ActionAnswerShape = { id: string; value: string | number }[];
