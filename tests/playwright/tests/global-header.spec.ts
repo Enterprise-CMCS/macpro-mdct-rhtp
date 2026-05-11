@@ -1,6 +1,12 @@
-import { expect } from "@playwright/test";
 import { test } from "./fixtures/base";
 import { HeaderPage } from "./pageObjects/header.page";
+import {
+  verifyHeaderVisible,
+  verifyHeaderHidden,
+  verifyMenuItemsVisible,
+  verifyLogoutCompleted,
+  verifyHeaderNavigation,
+} from "../utils/header-assertions";
 
 test.describe("global header", () => {
   test.describe("authenticated state user", () => {
@@ -10,22 +16,24 @@ test.describe("global header", () => {
 
     test("renders and navigates for state user", async ({ statePage }) => {
       const header = new HeaderPage(statePage.page);
+      await verifyHeaderNavigation(header);
+    });
 
-      await header.expectVisible();
-      await expect(header.helpLink).toHaveAttribute("href", "/help");
+    test("renders and supports account menu for state user", async ({
+      statePage,
+    }) => {
+      const header = new HeaderPage(statePage.page);
 
-      await header.goToHelp();
-
-      await statePage.page.goto("/");
-      await header.goToProfileFromMenu();
+      await verifyHeaderVisible(header);
+      await header.openAccountMenu();
+      await verifyMenuItemsVisible(header);
     });
 
     test("logs out state user from header", async ({ statePage }) => {
       const header = new HeaderPage(statePage.page);
 
-      await header.logoutFromMenu();
-      await expect(header.accountButton).toHaveCount(0);
-      await expect(header.nav).toHaveCount(0);
+      await header.logout();
+      await verifyLogoutCompleted(header);
     });
   });
 
@@ -34,28 +42,26 @@ test.describe("global header", () => {
       await adminPage.page.goto("/");
     });
 
+    test("renders and navigates for admin", async ({ adminPage }) => {
+      const header = new HeaderPage(adminPage.page);
+      await verifyHeaderNavigation(header);
+    });
+
     test("renders and supports account menu for admin", async ({
       adminPage,
     }) => {
       const header = new HeaderPage(adminPage.page);
 
-      await header.expectVisible();
+      await verifyHeaderVisible(header);
       await header.openAccountMenu();
-
-      await expect(
-        adminPage.page.getByRole("menuitem", { name: "Manage Account" })
-      ).toBeVisible();
-      await expect(
-        adminPage.page.getByRole("menuitem", { name: "Log Out" })
-      ).toBeVisible();
+      await verifyMenuItemsVisible(header);
     });
 
     test("logs out admin user from header", async ({ adminPage }) => {
       const header = new HeaderPage(adminPage.page);
 
-      await header.logoutFromMenu();
-      await expect(header.accountButton).toHaveCount(0);
-      await expect(header.nav).toHaveCount(0);
+      await header.logout();
+      await verifyLogoutCompleted(header);
     });
   });
 
@@ -71,7 +77,7 @@ test.describe("global header", () => {
     await page.goto("/");
 
     const header = new HeaderPage(page);
-    await header.expectHidden();
+    await verifyHeaderHidden(header);
 
     await page.close();
     await context.close();

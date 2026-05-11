@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 export class HeaderPage {
   readonly page: Page;
@@ -6,6 +6,8 @@ export class HeaderPage {
   readonly logo: Locator;
   readonly helpLink: Locator;
   readonly accountButton: Locator;
+  readonly manageAccountMenuItem: Locator;
+  readonly logoutMenuItem: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,41 +15,34 @@ export class HeaderPage {
     this.logo = this.nav.getByRole("img", { name: "RHTP logo" });
     this.helpLink = this.nav.getByRole("link", { name: "Get Help" });
     this.accountButton = this.nav.getByRole("button", { name: "my account" });
-  }
-
-  async expectVisible() {
-    await expect(this.nav).toBeVisible();
-    await expect(this.logo).toBeVisible();
-    await expect(this.helpLink).toBeVisible();
-    await expect(this.accountButton).toBeVisible();
-  }
-
-  async expectHidden() {
-    await expect(this.nav).toHaveCount(0);
+    this.manageAccountMenuItem = page.getByRole("menuitem", {
+      name: "Manage Account",
+    });
+    this.logoutMenuItem = page.getByRole("menuitem", { name: "Log Out" });
   }
 
   async openAccountMenu() {
     await this.accountButton.click();
-    await expect(
-      this.page.getByRole("menuitem", { name: "Manage Account" })
-    ).toBeVisible();
+    await this.manageAccountMenuItem.waitFor({ state: "visible" });
   }
 
   async goToHelp() {
-    await Promise.all([this.page.waitForURL(/\/help$/), this.helpLink.click()]);
+    await Promise.all([
+      this.page.waitForURL(/\/help(\/)?(\?.*)?$/),
+      this.helpLink.click(),
+    ]);
   }
 
   async goToProfileFromMenu() {
     await this.openAccountMenu();
     await Promise.all([
-      this.page.waitForURL(/\/profile$/),
-      this.page.getByRole("menuitem", { name: "Manage Account" }).click(),
+      this.page.waitForURL(/\/profile(\/)?(\?.*)?$/),
+      this.manageAccountMenuItem.click(),
     ]);
   }
 
-  async logoutFromMenu() {
+  async logout() {
     await this.openAccountMenu();
-    await this.page.getByRole("menuitem", { name: "Log Out" }).click();
-    await expect(this.nav).toHaveCount(0);
+    await this.logoutMenuItem.click();
   }
 }
