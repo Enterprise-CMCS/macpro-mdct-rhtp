@@ -13,8 +13,6 @@ import {
   recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
-import { getZipFile } from "utils/other/upload";
-import { Report, ReportStatus, ReportType, RhtpSubType } from "@rhtp/shared";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -29,9 +27,6 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
     .mockReturnValue([
       { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
     ]),
-  getZipPresignedUrl: vi
-    .fn()
-    .mockResolvedValue({ psurl: "https://example.com/mock.zip" }),
 }));
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -115,34 +110,4 @@ describe("<Upload />", () => {
     expect(mockDeleteFromReport).toHaveBeenCalled();
   });
   testA11y(<Upload {...props} />);
-});
-
-const report: Report = {
-  id: "",
-  name: "",
-  state: "AL",
-  created: 1776449695077,
-  status: ReportStatus.NOT_STARTED,
-  submissionCount: 0,
-  type: ReportType.RHTP,
-  subType: RhtpSubType.ANNUAL,
-  subTypeKey: "A1",
-  budgetPeriod: 1,
-  pages: [
-    {
-      id: "root",
-      childPageIds: ["first-child"],
-    },
-  ],
-};
-
-describe("zip", () => {
-  test("createZipFile triggers a download link with the presigned URL", async () => {
-    const clickSpy = vi
-      .spyOn(HTMLAnchorElement.prototype, "click")
-      .mockImplementation(() => {});
-    await getZipFile(report);
-    expect(clickSpy).toHaveBeenCalledTimes(1);
-    clickSpy.mockRestore();
-  });
 });

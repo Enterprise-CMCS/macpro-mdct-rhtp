@@ -8,7 +8,6 @@ import {
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Readable } from "node:stream";
 import { logger } from "./debug-lib";
 
 export const awsConfig = {
@@ -35,17 +34,7 @@ export default {
   getObject: (params: GetObjectRequest) => {
     return client.send(new GetObjectCommand(params));
   },
-  putObject: (
-    params: Omit<PutObjectRequest, "Body"> & {
-      Body?: Buffer | Uint8Array | string;
-    }
-  ) => {
-    const { Body, ...rest } = params;
-    return client.send(
-      new PutObjectCommand({
-        ...rest,
-        Body: Body != null ? Readable.from(Body) : undefined,
-      })
-    );
+  putObject: (params: PutObjectRequest) => {
+    return client.send(new PutObjectCommand(params));
   },
 };

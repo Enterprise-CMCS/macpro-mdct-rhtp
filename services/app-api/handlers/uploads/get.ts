@@ -8,6 +8,7 @@ import { error } from "../../utils/constants";
 import { getReport as getReportFromDatabase } from "../../storage/reports";
 import { ElementType } from "@rhtp/shared";
 import JSZip from "jszip";
+import { Readable } from "node:stream";
 
 export const getUploadsByFileId = handler(
   parseUploadParameters,
@@ -83,7 +84,7 @@ export const getUploadsByReportId = handler(
     await s3.putObject({
       Bucket: process.env.attachmentsBucketName,
       Key: zipKey,
-      Body: zipBuffer,
+      Body: Readable.from(zipBuffer),
       ContentLength: zipBuffer.byteLength,
       ContentType: "application/zip",
     });
