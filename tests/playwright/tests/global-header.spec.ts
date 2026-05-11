@@ -19,6 +19,14 @@ test.describe("global header", () => {
       await statePage.page.goto("/");
       await header.goToProfileFromMenu();
     });
+
+    test("logs out state user from header", async ({ statePage }) => {
+      const header = new HeaderPage(statePage.page);
+
+      await header.logoutFromMenu();
+      await expect(header.accountButton).toHaveCount(0);
+      await expect(header.nav).toHaveCount(0);
+    });
   });
 
   test.describe("authenticated admin user", () => {
