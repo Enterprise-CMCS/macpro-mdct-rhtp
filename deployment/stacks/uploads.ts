@@ -102,6 +102,9 @@ export function createUploadsComponents(props: CreateUploadsComponentsProps) {
         StringNotEquals: {
           "s3:ExistingObjectTag/GuardDutyMalwareScanStatus": "NO_THREATS_FOUND",
         },
+        ArnNotLike: {
+          "aws:ResourceArn": `${attachmentsBucket.bucketArn}/zips/*`,
+        },
       },
     })
   );
