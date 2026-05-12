@@ -224,6 +224,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     method: "GET",
     memorySize: 4096,
     timeout: Duration.minutes(5),
+    integrationOptions: { timeout: Duration.minutes(5) },
     ...commonProps,
   });
 
