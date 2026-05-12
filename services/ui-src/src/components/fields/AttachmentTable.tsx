@@ -239,7 +239,7 @@ export const AttachmentTable = (
               )
               .join(", ");
       const columnStage =
-        row.stage == ""
+        row.stage == undefined || !("stage" in row)
           ? "N/A"
           : stageOption.find(({ value }) => value === row.stage)?.label;
       const columnCheckpoint =
@@ -303,7 +303,10 @@ export const AttachmentTable = (
           )?.label;
           return stageLabel ?? "";
         case "Checkpoint":
-          return answer.checkpoint ?? "";
+          const checkpointLabel = checkpointList.find(
+            ({ id }) => id === answer.checkpoint
+          )?.label;
+          return checkpointLabel ?? "";
         case "Status":
           return answer.status;
         default:

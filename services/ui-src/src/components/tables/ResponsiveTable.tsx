@@ -112,16 +112,14 @@ const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
     <VStack gap="1.5rem" alignItems="flex-start">
       {rows.map((row) => (
         <>
-          <Grid templateColumns="repeat(3, 1fr)" gap="1.5rem" columnGap="4rem">
-            {row.map((data, dataIndex) => (
-              <Box>
-                <Text fontSize="1rem" color="#71767a">
-                  {headers[dataIndex]}
-                </Text>
-                <Box>{data ?? "N/A"}</Box>
-              </Box>
-            ))}
-          </Grid>
+          {row.map((data, dataIndex) => (
+            <Grid templateColumns="repeat(2, 250px)" gap="1.5rem">
+              <Text fontSize="1rem" color="#71767a" fontWeight="bold">
+                {headers[dataIndex]}
+              </Text>
+              <Box>{data ?? "N/A"}</Box>
+            </Grid>
+          ))}
           <Divider></Divider>
         </>
       ))}
