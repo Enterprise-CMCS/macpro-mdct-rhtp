@@ -7,6 +7,7 @@ const statelessRoles = [
   UserRoles.APPROVER,
   UserRoles.HELP_DESK,
   UserRoles.INTERNAL,
+  UserRoles.PROJECT_OFFICER,
 ];
 
 const adminRoles = [
