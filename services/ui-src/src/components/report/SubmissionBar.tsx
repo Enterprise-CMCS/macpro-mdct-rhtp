@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { Link as RouterLink } from "react-router";
-import { Stack, Box, Button, Spinner, Image } from "@chakra-ui/react";
+import { Stack, Box, Button, Spinner, Image, Flex } from "@chakra-ui/react";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { submitReport, useStore, reportBasePath } from "utils";
 import { SubmitReportModal } from "./SubmitReportModal";
@@ -41,6 +41,14 @@ export const SubmissionBar = () => {
     setModalComponent(modal, "Are you sure you want to submit?");
   };
 
+  const [isZipLoading, setIsZipLoading] = useState(false);
+
+  const getZipClick = async () => {
+    setIsZipLoading(true);
+    await getZipFile(report);
+    setIsZipLoading(false);
+  };
+
   return (
     <Stack
       direction="row"
@@ -69,8 +77,13 @@ export const SubmissionBar = () => {
           colorScheme="blue"
           variant={isSubmitted ? "outline" : "link"}
           fontWeight="bold"
-          onClick={() => getZipFile(report)}
+          onClick={getZipClick}
         >
+          {isZipLoading && (
+            <Flex justify="center">
+              <Spinner size="md" />
+            </Flex>
+          )}
           ZIP Files
         </Button>
       </Box>
