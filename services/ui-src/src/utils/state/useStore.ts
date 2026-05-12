@@ -7,6 +7,7 @@ import {
   ReportState,
   ErrorVerbiage,
   AdminBannerState,
+  DevToolsState,
 } from "types";
 import { ReactNode } from "react";
 import {
@@ -115,14 +116,24 @@ const reportStore = (set: Set<ReportState>, get: Get<ReportState>) => ({
   },
 });
 
+const devToolStore = (set: Set<DevToolsState>) => ({
+  devDate: undefined,
+  setDevDate: (devDate: string) => {
+    set(() => ({ devDate }), false, { type: "setDevToolDate" });
+  },
+});
+
 export const useStore = create(
   // devtools is being used for debugging state
   persist(
-    devtools<UserState & ReportState & AdminBannerState>((set, get) => ({
-      ...userStore(set),
-      ...bannerStore(set),
-      ...reportStore(set, get),
-    })),
+    devtools<UserState & ReportState & AdminBannerState & DevToolsState>(
+      (set, get) => ({
+        ...userStore(set),
+        ...bannerStore(set),
+        ...reportStore(set, get),
+        ...devToolStore(set),
+      })
+    ),
     {
       name: "rhtp-store",
       partialize: (state) => ({ report: state.report }),

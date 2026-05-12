@@ -1,5 +1,7 @@
 import {
   createReport,
+  deleteReport,
+  deleteReportsForState,
   getReport,
   getReportsForState,
   putReport,
@@ -19,11 +21,13 @@ const report = {
 const mockGet = vi.fn();
 const mockPost = vi.fn();
 const mockPut = vi.fn();
+const mockDel = vi.fn();
 vi.mock("../apiLib", () => ({
   apiLib: {
     get: (path: string, opts: Record<string, any>) => mockGet(path, opts),
     post: (path: string, opts: Record<string, any>) => mockPost(path, opts),
     put: (path: string, opts: Record<string, any>) => mockPut(path, opts),
+    del: (path: string, opts: Record<string, any>) => mockDel(path, opts),
   },
 }));
 
@@ -59,5 +63,13 @@ describe("utils/report", () => {
   test("releaseReport", async () => {
     await releaseReport(report);
     expect(mockPut).toHaveBeenCalledTimes(1);
+  });
+  test("deleteReport", async () => {
+    await deleteReport("reportType", "PA", "mock-id");
+    expect(mockDel).toHaveBeenCalledTimes(1);
+  });
+  test("deleteReportsForState", async () => {
+    await deleteReportsForState("reportType", "PA");
+    expect(mockDel).toHaveBeenCalledTimes(1);
   });
 });
