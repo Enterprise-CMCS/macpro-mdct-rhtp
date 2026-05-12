@@ -85,6 +85,7 @@ export const getUploadsByReportId = handler(
       Body: Readable.from(zipBuffer),
       ContentLength: zipBuffer.byteLength,
       ContentType: "application/zip",
+      Tagging: "auto_delete_category=generated_zip",
     });
 
     let psurl = await s3.getSignedDownloadUrl({
