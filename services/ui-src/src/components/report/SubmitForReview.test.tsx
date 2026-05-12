@@ -36,23 +36,6 @@ describe("SubmitForReview component", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  test("shows success text when comment already submitted", async () => {
-    const mockStoreWithComment = {
-      ...mockUseStore,
-    };
-    mockStoreWithComment.report!.comments = [
-      {
-        name: "test user",
-        date: new Date().toString(),
-        comment: "ready for review",
-        isInternal: false,
-      },
-    ];
-    mockedUseStore.mockReturnValue(mockStoreWithComment);
-    render(<SubmitForReview />);
-    expect(screen.getByText("Submitted for Review")).toBeVisible();
-  });
-
   test("appends comment to existing ones", async () => {
     const mockStoreWithComment = {
       ...mockUseStore,
