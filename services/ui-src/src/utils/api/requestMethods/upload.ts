@@ -46,7 +46,7 @@ export const getZipPresignedUrl = async (
     headers: { ...requestHeaders },
   };
   const response = await apiLib.get<ZipPresignedUrl>(
-    `/reports/${reportType}/${state}/${id}/files/`,
+    `/reports/${reportType}/${state}/${id}/files`,
     options
   );
   return response.psurl;

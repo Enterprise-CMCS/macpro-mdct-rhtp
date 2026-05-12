@@ -220,7 +220,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "getUploadsByReportId", {
     entry: "services/app-api/handlers/uploads/get.ts",
     handler: "getUploadsByReportId",
-    path: "/reports/{reportType}/{state}/{id}/files/",
+    path: "/reports/{reportType}/{state}/{id}/files",
     method: "GET",
     memorySize: 4096,
     timeout: Duration.minutes(5),
