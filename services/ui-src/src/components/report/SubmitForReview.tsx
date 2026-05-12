@@ -1,9 +1,9 @@
+import { useState } from "react";
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { TextField } from "@cmsgov/design-system";
 import { AlertTypes, ReportComment } from "@rhtp/shared";
 import { Alert } from "components/alerts/Alert";
 import { Modal } from "components/modals/Modal";
-import { useEffect, useState } from "react";
 import { putReport, useStore } from "utils";
 
 export const SubmitForReview = () => {
@@ -18,13 +18,6 @@ export const SubmitForReview = () => {
   if (!report) {
     return null;
   }
-
-  // TODO: update to more accurately reflect when submit for review is published
-  useEffect(() => {
-    if (report.comments && report.comments.length > 0) {
-      setIsSubmittedForReview(true);
-    }
-  }, []);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -61,7 +54,7 @@ export const SubmitForReview = () => {
   };
 
   return (
-    <Stack>
+    <Stack width={"100%"}>
       {isSubmittedForReview ? (
         <Alert title={"Submitted for Review"} status={AlertTypes.SUCCESS}>
           Instructions to come
