@@ -7,12 +7,14 @@ import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
 import { RhtpSubType, ReportStatus, ReportOptions } from "@rhtp/shared";
 import { isCreateReportOptions } from "../../utils/reportValidation";
+import { isFeatureFlagEnabled } from "../../utils/featureFlags";
 
 export const createReport = handler(
   parseReportTypeAndState,
   async (request) => {
     const { reportType, state } = request.parameters;
     const { user, body } = request;
+    const { mockDate } = body as any;
 
     if (!canWriteState(user, state)) {
       return forbidden(error.UNAUTHORIZED);
@@ -53,15 +55,19 @@ export const createReport = handler(
       name,
       dateRangeString,
       type,
-      startDate,
       budgetPeriod,
+      openDate,
       reportTemplateBuilder,
     } = RhtpSubTypeMap[nextReportKey];
 
-    if (Date.now() < startDate) {
+    //using launchdarkly to control how we want to generate reports
+    const useDevTools = await isFeatureFlagEnabled("devTools");
+    const userDate = useDevTools && mockDate ? mockDate : Date.now();
+
+    if (userDate < openDate) {
       return badRequest(
         `The next report cannot be created until ${new Date(
-          startDate
+          openDate
         ).toLocaleDateString()}.`
       );
     }
