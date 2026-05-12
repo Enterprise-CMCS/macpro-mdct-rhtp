@@ -221,6 +221,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return attachmentTableSchema;
     case ElementType.ActionTable:
       return actionTableSchema;
+    case ElementType.SubmitForReview:
+      return submitForReviewSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -443,6 +445,11 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
   submittedView: array().of(pageElementSchema).required(),
 });
 
+const submitForReviewSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.SubmitForReview)),
+  id: string().required(),
+});
+
 /**
  * This schema is meant to represent the pages field in the ReportTemplate type.
  * The following yup `lazy` function is building up the union type:
@@ -523,6 +530,13 @@ export const isUpdateInitiativeBody = (
   });
 };
 
+const reportCommentSchema = object().shape({
+  name: string().required(),
+  date: string().required(),
+  comment: string().required(),
+  isInternal: boolean().required(),
+});
+
 const reportValidateSchema = object().shape({
   id: string().notRequired(),
   state: string().required(),
@@ -548,6 +562,7 @@ const reportValidateSchema = object().shape({
   subTypeKey: string().required(),
   budgetPeriod: number().min(0).max(5).required(),
   submissionCount: number().required(),
+  comments: array().of(reportCommentSchema).notRequired(),
   pages: pagesSchema,
 });
 
