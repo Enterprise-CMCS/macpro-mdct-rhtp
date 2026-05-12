@@ -432,7 +432,6 @@ export const AttachmentTable = (
         selectedFile={uploadedFiles[0]}
         updateElement={props.updateElement}
         allFiles={displayValue}
-        disabled={disabled}
       />
     </Stack>
   );

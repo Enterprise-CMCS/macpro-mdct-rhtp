@@ -195,7 +195,6 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
   });
 
   let bootstrapUsersFunction;
-
   if (bootstrapUsersPassword) {
     const service = "ui-auth";
     bootstrapUsersFunction = new Lambda(scope, "bootstrapUsers", {
