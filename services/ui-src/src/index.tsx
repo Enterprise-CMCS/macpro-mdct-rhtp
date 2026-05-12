@@ -58,13 +58,13 @@ const ldClientId = config.REACT_APP_LD_SDK_CLIENT;
   createRoot(document.getElementById("root")!).render(
     <ErrorBoundary FallbackComponent={Error}>
       <Router>
-        <UserProvider>
-          <ChakraProvider theme={theme}>
-            <LDProvider>
+        <ChakraProvider theme={theme}>
+          <LDProvider>
+            <UserProvider>
               <App />
-            </LDProvider>
-          </ChakraProvider>
-        </UserProvider>
+            </UserProvider>
+          </LDProvider>
+        </ChakraProvider>
       </Router>
     </ErrorBoundary>
   );

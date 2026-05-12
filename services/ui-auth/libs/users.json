@@ -24,7 +24,6 @@
       }
     ]
   },
-
   {
     "username": "borep@test.com",
     "attributes": [
@@ -71,7 +70,7 @@
       },
       {
         "Name": "custom:cms_roles",
-        "Value": "mdctrhtp-hd"
+        "Value": "mdctrhtp-help-desk"
       }
     ]
   },
@@ -179,7 +178,7 @@
       },
       {
         "Name": "custom:cms_roles",
-        "Value": "mdctrhtp-appr"
+        "Value": "mdctrhtp-approver"
       },
       {
         "Name": "custom:cms_state",
@@ -528,6 +527,31 @@
       {
         "Name": "custom:cms_state",
         "Value": "UT"
+      }
+    ]
+  },
+  {
+    "username": "projectofficer@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "projectofficer@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "Office"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Officer"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-project-officer"
       }
     ]
   }
