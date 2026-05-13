@@ -11,6 +11,7 @@ import {
   InitiativeComment,
   UploadListProp,
   AttachmentStatus,
+  ReportStatus,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
@@ -53,14 +54,15 @@ export const CommentModal = ({
   selectedFile,
   updateElement,
   allFiles,
-  disabled,
 }: Props) => {
   const { full_name, userIsAdmin, userIsEndUser } = useStore().user ?? {};
+  const { report } = useStore();
   const [pastComments, setPastComments] = useState<InitiativeComment[]>([]);
   const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
   const userCanAddComment =
     userIsEndUser || (userIsAdmin && adminCommentsEnabled);
-  const commentsDisabled = disabled ? true : !userCanAddComment;
+  const commentsDisabled =
+    report?.status === ReportStatus.SUBMITTED || !userCanAddComment;
   const commentsOptional = userIsAdmin;
   const fileName = selectedFile?.name || "attachment";
   const selectedAttachmentIndex = allFiles.findIndex(
@@ -189,5 +191,4 @@ interface Props {
   selectedFile: UploadListProp | undefined;
   updateElement: Function;
   allFiles: InitiativeAnswerProp[];
-  disabled?: boolean;
 }

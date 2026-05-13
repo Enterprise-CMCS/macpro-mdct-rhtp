@@ -1,10 +1,16 @@
-import { getReport, putReport, queryReportsForState } from "./reports";
+import {
+  deleteReport,
+  getReport,
+  putReport,
+  queryReportsForState,
+} from "./reports";
 import { Report, ReportType } from "@rhtp/shared";
 import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
   QueryCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 
@@ -61,6 +67,16 @@ describe("Report storage helpers", () => {
       mockDynamo.on(GetCommand).resolvesOnce({});
       const report = await getReport(ReportType.RHTP, "CO", "mock-report-id");
       expect(report).toBe(undefined);
+    });
+  });
+
+  describe("deleteReport", () => {
+    test("should call DynamoDB to delete report data", async () => {
+      const mockDelete = vi.fn();
+      mockDynamo.on(DeleteCommand).callsFake(mockDelete);
+
+      await deleteReport(ReportType.RHTP, "CO", "mock-report-id");
+      expect(mockDelete).toHaveBeenCalled();
     });
   });
 

@@ -4,6 +4,7 @@ import {
   paginateQuery,
   QueryCommandInput,
   UpdateCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import {
   collectPageItems,
@@ -102,6 +103,21 @@ export const updateField = async (
       ExpressionAttributeValues: {
         ":updateValue": updateValue,
       },
+    })
+  );
+};
+
+export const deleteReport = async (
+  reportType: ReportType,
+  state: StateAbbr,
+  id: string
+) => {
+  const table = reportTables[reportType];
+
+  await dynamoClient.send(
+    new DeleteCommand({
+      TableName: table,
+      Key: { state, id },
     })
   );
 };

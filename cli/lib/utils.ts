@@ -30,6 +30,25 @@ const buildUiEnvObject = (
   cfnOutputs: Record<string, string>
 ): Record<string, string> => {
   if (stage === "localstack") {
+    const escapeDoubleQuotes = (value: string) => {
+      return value.replaceAll('"', String.raw`\"`);
+    };
+
+    function checkLocalFlagsFormat(value?: string) {
+      const defaultValue = '{"local": false, "flags": {}}';
+      if (!value) return defaultValue;
+
+      try {
+        const parsed = JSON.parse(value);
+        return JSON.stringify(parsed);
+      } catch {
+        console.error(
+          "Invalid local flags format. Soft failing to empty flags."
+        );
+        return defaultValue;
+      }
+    }
+
     return {
       SKIP_PREFLIGHT_CHECK: "true",
       API_REGION: region,
@@ -47,6 +66,10 @@ const buildUiEnvObject = (
       S3_ATTACHMENTS_BUCKET_REGION: "us-east-1",
       S3_ATTACHMENTS_BUCKET_NAME: `uploads-${stage}-attachments-000000000000`,
       REACT_APP_LD_SDK_CLIENT: process.env.REACT_APP_LD_SDK_CLIENT!,
+      LD_LOCAL_FLAGS: escapeDoubleQuotes(
+        checkLocalFlagsFormat(process.env.LD_LOCAL_FLAGS)
+      ),
+      LD_SDK_KEY: process.env.LD_SDK_KEY!,
     };
   }
 

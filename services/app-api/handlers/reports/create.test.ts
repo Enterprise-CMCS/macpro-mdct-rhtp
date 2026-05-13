@@ -141,7 +141,7 @@ describe("Test create report handler", () => {
 
   test("Test successful create report after the first", async () => {
     // set date to after allowed date to copy
-    const date = new Date(RhtpSubTypeMap.Q1.startDate + 1);
+    const date = new Date(RhtpSubTypeMap.Q1.openDate + 1);
     vi.setSystemTime(date);
     (queryReportsForState as Mock).mockReturnValueOnce([
       {

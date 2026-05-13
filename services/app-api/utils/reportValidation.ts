@@ -480,6 +480,7 @@ export const isCreateReportOptions = (
   const createReportOptionsValidationSchema = object()
     .shape({
       copyFromReportId: string().notRequired(),
+      mockDate: string().notRequired(),
     })
     .required()
     .noUnknown();
