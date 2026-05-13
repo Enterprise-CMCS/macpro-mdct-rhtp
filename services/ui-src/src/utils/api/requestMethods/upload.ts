@@ -44,6 +44,7 @@ export const getZipPresignedUrl = async (
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
+    signal: AbortSignal.timeout(5 * 60 * 1000), // 5 minutes
   };
   const response = await apiLib.get<ZipPresignedUrl>(
     `/reports/${reportType}/${state}/${id}/files`,

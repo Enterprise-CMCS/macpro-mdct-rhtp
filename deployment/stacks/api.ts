@@ -222,7 +222,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "getUploadsByReportId",
     path: "/reports/{reportType}/{state}/{id}/files",
     method: "GET",
-    memorySize: 4096,
+    memorySize: 10240,
     timeout: Duration.minutes(3),
     integrationOptions: { timeout: Duration.minutes(3) },
     ...commonProps,
