@@ -34,7 +34,7 @@ export const App = () => {
   }, [key]);
 
   useEffect(() => {
-    if (mqClasses === "testWide") {
+    if (mqClasses.includes("sidebarwide")) {
       setSidebar(false);
     } else if (mqClasses === "desktop") {
       setSidebar(true);

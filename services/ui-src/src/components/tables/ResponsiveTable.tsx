@@ -110,6 +110,7 @@ const HorizontalTable = (
 const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
   return (
     <VStack gap="1.5rem" alignItems="flex-start">
+      <Divider />
       {rows.map((row) => (
         <>
           {row.map((data, dataIndex) => (
