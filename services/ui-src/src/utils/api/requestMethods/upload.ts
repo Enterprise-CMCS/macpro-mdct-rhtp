@@ -44,7 +44,11 @@ export const getZipPresignedUrl = async (
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    signal: AbortSignal.timeout(5 * 60 * 1000), // 5 minutes
+    abortController: (() => {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), 5 * 60 * 1000); // 5 minutes
+      return controller;
+    })(),
   };
   const response = await apiLib.get<ZipPresignedUrl>(
     `/reports/${reportType}/${state}/${id}/files`,
