@@ -113,7 +113,10 @@ const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
       {rows.map((row) => (
         <>
           {row.map((data, dataIndex) => (
-            <Grid templateColumns="repeat(2, 250px)" gap="1.5rem">
+            <Grid
+              templateColumns="minmax(0, 40vw) minmax(0, 1fr) "
+              gap="1.5rem"
+            >
               <Text fontSize="1rem" color="#71767a" fontWeight="bold">
                 {headers[dataIndex]}
               </Text>

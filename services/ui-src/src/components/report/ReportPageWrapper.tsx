@@ -166,7 +166,7 @@ const sx = {
     padding: "10",
   },
   sidebarContainer: {
-    ".tablet &, .mobile &": {
+    ".tablet &, .mobile &, .testWide &": {
       position: "absolute",
     },
     height: "100%",
