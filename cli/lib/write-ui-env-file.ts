@@ -15,17 +15,12 @@ export const writeLocalUiEnvFile = async (
 ) => {
   await fs.rm(configFilePath, { force: true });
 
-  const unescapeDoubleQuotes = (value: string) => {
-    return value.replaceAll(String.raw`\"`, '"');
-  };
   const envConfigContent = [
     "window._env_ = {",
     ...Object.entries(envVariables).map(
       ([key, value]) => `  ${key}: "${value}",`
     ),
     "};",
-    `launchDarklyLocalFlags='${unescapeDoubleQuotes(envVariables["LD_LOCAL_FLAGS"])}'`,
-    `launchDarklyServer='${envVariables["LD_SDK_KEY"]}'`,
   ].join("\n");
 
   await fs.writeFile(configFilePath, envConfigContent);
