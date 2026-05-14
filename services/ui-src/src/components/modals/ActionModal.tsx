@@ -13,12 +13,12 @@ export const ActionModal = ({
   form,
   modalDisclosure,
   onSave,
+  disabled,
 }: Props) => {
   const isEdit = form.index !== undefined;
   const renderElements = !isEdit
     ? modal.elements.filter((element) => !element.editOnly)
     : modal.elements;
-
   const [errorMessages, setErrorMessages] = useState<string[]>(
     renderElements.map(() => "")
   );
@@ -87,13 +87,16 @@ export const ActionModal = ({
         actionButtonText: "Save",
         closeButtonText: "Cancel",
       }}
-      disableConfirm={submitting}
+      disableConfirm={submitting || disabled}
     >
       <form id="actionModal" onSubmit={onSubmit}>
         <Flex flexDir="column" gap="1.5rem">
           {renderElements.map((element, index) =>
             buildElement(
-              element,
+              {
+                ...element,
+                disabled: element.disabled || disabled,
+              },
               formData.find((data) => data.id === element.id)?.value!,
               (value) => onModalChange(value, element.id, index),
               element.label,
@@ -118,4 +121,5 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
+  disabled?: boolean;
 }

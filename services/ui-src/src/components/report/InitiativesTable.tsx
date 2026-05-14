@@ -2,6 +2,7 @@ import {
   InitiativePageTemplate,
   InitiativesTableTemplate,
   PageStatus,
+  ReportStatus,
 } from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { useStore } from "utils";
@@ -121,7 +122,7 @@ export const InitiativesTable = (
           onClick={onOpen}
           variant="outline"
           leftIcon={<Image src={addIconPrimary} />}
-          disabled={disabled}
+          disabled={report?.status === ReportStatus.SUBMITTED}
         >
           Add initiative
         </Button>

@@ -11,6 +11,7 @@
     "@aws-sdk/client-dynamodb": "~3.1032.0",
     "@aws-sdk/lib-dynamodb": "~3.1032.0",
     "@aws-sdk/s3-request-presigner": "~3.1032.0",
+    "@launchdarkly/node-server-sdk": "^9.10.4",
     "@rhtp/shared": "workspace:*",
     "dompurify": "^3.4.0",
     "jsdom": "^26.0.0",

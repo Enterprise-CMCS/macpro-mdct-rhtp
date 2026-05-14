@@ -1,4 +1,4 @@
-import { Button, Stack, Image, HStack } from "@chakra-ui/react";
+import { Button, Stack, Image, HStack, Text } from "@chakra-ui/react";
 import { ChoiceList, Dropdown } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
 import { CommentModal } from "components/modals/CommentModal";
@@ -362,22 +362,23 @@ export const AttachmentTable = (
       >
         Add Attachment
       </Button>
-      {tableRows.length === 0 ? (
-        <p>No attachments found. Select “Add attachment” to get started.</p>
-      ) : (
-        ResponsiveTable(
-          [
-            { label: "Attachment name", sortable: true },
-            { label: "Initiatives", sortable: true },
-            { label: "Stage", sortable: true },
-            { label: "Checkpoint", sortable: true },
-            { label: "Status", sortable: true },
-            { label: "Actions" },
-          ],
-          tableRows,
-          "",
-          sortRows
-        )
+      {ResponsiveTable(
+        [
+          { label: "Attachment name", sortable: true },
+          { label: "Initiatives", sortable: true },
+          { label: "Stage", sortable: true },
+          { label: "Checkpoint", sortable: true },
+          { label: "Status", sortable: true },
+          { label: "Actions" },
+        ],
+        tableRows,
+        "",
+        sortRows
+      )}
+      {tableRows.length === 0 && (
+        <Text variant="tableEmpty">
+          No attachments found. Select “Add Attachment” to get started.
+        </Text>
       )}
       <UploadModal
         modalDisclosure={{
@@ -431,7 +432,6 @@ export const AttachmentTable = (
         selectedFile={uploadedFiles[0]}
         updateElement={props.updateElement}
         allFiles={displayValue}
-        disabled={disabled}
       />
     </Stack>
   );

@@ -108,7 +108,7 @@ describe("<AttachmentTable />", () => {
     ).toBeVisible();
     expect(
       screen.getByText(
-        "No attachments found. Select “Add attachment” to get started."
+        "No attachments found. Select “Add Attachment” to get started."
       )
     ).toBeVisible();
   });

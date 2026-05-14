@@ -316,6 +316,7 @@ const ActionElementsSchema = {
   id: string().required(),
   type: string().required(),
   disabled: boolean().notRequired(),
+  mask: string().notRequired(),
 };
 
 const actionTableSchema = object().shape({
@@ -342,6 +343,7 @@ const actionTableSchema = object().shape({
               )
               .notRequired(),
             required: boolean().required(),
+            mask: string().notRequired(),
           })
         )
         .required(),
@@ -478,6 +480,7 @@ export const isCreateReportOptions = (
   const createReportOptionsValidationSchema = object()
     .shape({
       copyFromReportId: string().notRequired(),
+      mockDate: string().notRequired(),
     })
     .required()
     .noUnknown();

@@ -7,6 +7,7 @@ export interface DeploymentConfigProperties {
   isDev: boolean;
   oktaMetadataUrl: string;
   launchDarklyClient: string;
+  launchDarklyServer: string;
   redirectSignout: string;
   cloudfrontCertificateArn?: string;
   cloudfrontDomainName?: string;
@@ -72,6 +73,7 @@ function validateConfig(
     "stage",
     "oktaMetadataUrl",
     "launchDarklyClient",
+    "launchDarklyServer",
     "redirectSignout",
     "vpcName",
     "brokerString",

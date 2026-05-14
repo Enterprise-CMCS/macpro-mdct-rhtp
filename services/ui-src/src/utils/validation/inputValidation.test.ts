@@ -157,6 +157,13 @@ describe("Input validation utilities", () => {
       expect(result.isValid).toBe(true);
       expect(result.errorMessage).toBe("");
     });
+
+    test("should allow numbers with comma separators", () => {
+      const result = validateNumber("12,345", false);
+      expect(result.parsedValue).toBe(12345);
+      expect(result.isValid).toBe(true);
+      expect(result.errorMessage).toBe("");
+    });
   });
 
   describe("isUrl()", () => {

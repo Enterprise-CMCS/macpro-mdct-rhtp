@@ -100,40 +100,34 @@ describe("<UseOfFundsTableElement />", () => {
       const addButton = screen.getByText("Add use of funds");
       await userEvent.click(addButton);
 
-      const budgetPeriodButton = screen.getAllByLabelText("Budget period")[1];
-      await userEvent.click(budgetPeriodButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Budget Period 2" })
-      );
+      const budgetPeriodButton = screen.getAllByLabelText("Budget period")[0];
+      await userEvent.selectOptions(budgetPeriodButton, "Budget Period 2");
 
       const spentFunds = screen.getByRole("textbox", { name: "Spent funds" });
-      await userEvent.type(spentFunds, "5000");
+      await userEvent.click(spentFunds);
+      await userEvent.paste("5000");
 
       const description = screen.getByRole("textbox", { name: "Description" });
-      await userEvent.type(description, "Test description");
+      await userEvent.click(description);
+      await userEvent.paste("Test description");
 
-      const initiativeButton = screen.getAllByLabelText("Initiative")[1];
-      await userEvent.click(initiativeButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "2: Initiative 2" })
-      );
+      const initiativeButton = screen.getAllByLabelText("Initiative")[0];
+      await userEvent.selectOptions(initiativeButton, "2: Initiative 2");
 
-      const useOfFundsButton = screen.getAllByLabelText("Use of funds")[1];
-      await userEvent.click(useOfFundsButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Use of Funds 2" })
-      );
+      const useOfFundsButton = screen.getAllByLabelText("Use of funds")[0];
+      await userEvent.selectOptions(useOfFundsButton, "Use of Funds 2");
 
       const recipientName = screen.getByRole("textbox", {
         name: "Recipient name",
       });
-      await userEvent.type(recipientName, "Test Recipient");
+      await userEvent.click(recipientName);
+      await userEvent.paste("Test Recipient");
 
       const recipientCategoryButton =
-        screen.getAllByLabelText("Recipient category")[1];
-      await userEvent.click(recipientCategoryButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Recipient Category 2" })
+        screen.getAllByLabelText("Recipient category")[0];
+      await userEvent.selectOptions(
+        recipientCategoryButton,
+        "Recipient Category 2"
       );
 
       const saveButton = screen.getByText("Save");

@@ -15,6 +15,7 @@ import {
   UseOfFundsTableTemplate,
   UseOfFundsTableItem,
   dropdownEmptyOption,
+  MaskType,
 } from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState, ChangeEvent, useEffect } from "react";
@@ -27,7 +28,10 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
-import { isValidCurrency } from "utils/validation/inputValidation";
+import {
+  isValidCurrency,
+  unmaskByType,
+} from "utils/validation/inputValidation";
 import { useStore } from "utils";
 import { Modal } from "components/modals/Modal";
 
@@ -110,6 +114,15 @@ export const UseOfFundsTableElement = (
     updateElement({ answer: updatedItems });
   };
 
+  const formatAnswer = (items: UseOfFundsTableItem[]) => {
+    return items.map((item) => {
+      return {
+        ...item,
+        spentFunds: unmaskByType(MaskType.CommaSeparated, item.spentFunds),
+      };
+    });
+  };
+
   const onSubmit = () => {
     let errors = { ...initialValues };
     let hasError = false;
@@ -138,7 +151,8 @@ export const UseOfFundsTableElement = (
     if (!updatedItems) return;
 
     setItems(updatedItems);
-    updateElement({ answer: updatedItems });
+    const newAnswer = formatAnswer(updatedItems);
+    updateElement({ answer: newAnswer });
     setModalOpen(false);
     setFormValues(initialValues);
   };
