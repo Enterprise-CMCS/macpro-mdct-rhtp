@@ -8,6 +8,7 @@ import {
   CfnOutput,
   Duration,
   RemovalPolicy,
+  triggers,
 } from "aws-cdk-lib";
 import { Lambda } from "../constructs/lambda.ts";
 import { WafConstruct } from "../constructs/waf.ts";
@@ -270,6 +271,28 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
     method: "PUT",
     ...commonProps,
+  });
+
+  // Notification handlers
+  new Lambda(scope, "sendEmail", {
+    entry: "services/app-api/handlers/notifications/sendEmail.ts",
+    handler: "sendEmail",
+    path: "reports/{reportType}/{state}/{id}/notifications",
+    method: "POST",
+    ...commonProps,
+  });
+
+  const verifyEmailLambda = new Lambda(scope, "verifyEmail", {
+    entry: "services/app-api/handlers/notifications/verifyEmail.ts",
+    handler: "verifyEmail",
+    timeout: Duration.seconds(60),
+    retryAttempts: 0,
+    ...commonProps,
+  });
+
+  new triggers.Trigger(scope, "InvokeEmailVerificationLambda", {
+    handler: verifyEmailLambda.lambda,
+    invocationType: triggers.InvocationType.EVENT,
   });
 
   new LambdaDynamoEventSource(scope, "postKafkaData", {
