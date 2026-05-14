@@ -60,18 +60,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   );
 
   // Create and Verify SES Email Identity
-  const senderEmailIdentity = new ses.EmailIdentity(
-    scope,
-    "VerifySenderEmail",
-    {
-      identity: ses.Identity.email("MDCT_NoReply@cms.hhs.gov"),
-    }
-  );
+  new ses.EmailIdentity(scope, "VerifySenderEmail", {
+    identity: ses.Identity.email("MDCT_NoReply@cms.hhs.gov"),
+  });
 
   const sesPolicy = new iam.PolicyStatement({
     effect: iam.Effect.ALLOW,
     actions: ["ses:SendEmail", "ses:SendRawEmail"],
-    resources: [senderEmailIdentity.emailIdentityArn],
+    resources: ["*"],
   });
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
