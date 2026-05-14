@@ -5,10 +5,10 @@ import {
   aws_wafv2 as wafv2,
   aws_s3 as s3,
   aws_ec2 as ec2,
+  aws_ses as ses,
   CfnOutput,
   Duration,
   RemovalPolicy,
-  triggers,
 } from "aws-cdk-lib";
 import { Lambda } from "../constructs/lambda.ts";
 import { WafConstruct } from "../constructs/waf.ts";
@@ -57,6 +57,11 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       allowAllOutbound: true,
     }
   );
+
+  // Create and Verify SES Email Identity
+  new ses.EmailIdentity(scope, "VerifySenderEmail", {
+    identity: ses.Identity.email("garrett.rabian@coforma.io"),
+  });
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
@@ -280,19 +285,6 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     path: "reports/{reportType}/{state}/{id}/notifications",
     method: "POST",
     ...commonProps,
-  });
-
-  const verifyEmailLambda = new Lambda(scope, "verifyEmail", {
-    entry: "services/app-api/handlers/notifications/verifyEmail.ts",
-    handler: "verifyEmail",
-    timeout: Duration.seconds(60),
-    retryAttempts: 0,
-    ...commonProps,
-  });
-
-  new triggers.Trigger(scope, "InvokeEmailVerificationLambda", {
-    handler: verifyEmailLambda.lambda,
-    invocationType: triggers.InvocationType.EVENT,
   });
 
   new LambdaDynamoEventSource(scope, "postKafkaData", {

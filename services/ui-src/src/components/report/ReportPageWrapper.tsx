@@ -150,9 +150,7 @@ export const ReportPageWrapper = () => {
                   <PraDisclosure />
                 </Box>
               )}
-              <Button
-                onClick={() => sendEmail(report!)}
-              >Send email</Button>
+              <Button onClick={() => sendEmail(report!)}>Send email</Button>
             </>
           )}
         </VStack>
