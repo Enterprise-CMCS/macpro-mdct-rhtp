@@ -4,7 +4,7 @@ import { parseReportParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 
 const client = new SESClient({ region: "us-east-1" });
-const FROM_ADDRESS = "garrett.rabian@coforma.io";
+const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
 
 const createSendEmailCommand = (toAddress: string) => {
   return new SendEmailCommand({

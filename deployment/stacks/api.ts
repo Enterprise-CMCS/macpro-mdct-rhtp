@@ -64,7 +64,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     scope,
     "VerifySenderEmail",
     {
-      identity: ses.Identity.email("garrett.rabian@coforma.io"),
+      identity: ses.Identity.email("MDCT_NoReply@cms.hhs.gov"),
     }
   );
 
