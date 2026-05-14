@@ -1,16 +1,4 @@
-import {
-  Button,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Text,
-  Link,
-  Image,
-  Flex,
-} from "@chakra-ui/react";
+import { Button, Link, Image, Flex } from "@chakra-ui/react";
 import {
   UseOfFundsTableTemplate,
   UseOfFundsTableItem,
@@ -34,6 +22,7 @@ import {
 } from "utils/validation/inputValidation";
 import { useStore } from "utils";
 import { Modal } from "components/modals/Modal";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
@@ -171,57 +160,43 @@ export const UseOfFundsTableElement = (
     setModalOpen(true);
   };
 
-  const rows = items.map((item, index) => {
-    return (
-      <Tr key={index}>
-        <Td>
-          <Text>{item.budgetPeriod}</Text>
-        </Td>
-        <Td>
-          <Text>${item.spentFunds}</Text>
-        </Td>
-        <Td>
-          <Text>{item.description}</Text>
-        </Td>
-        <Td>
-          <Text>{item.initiative}</Text>
-        </Td>
-        <Td>
-          <Text>{item.useOfFunds}</Text>
-        </Td>
-        <Td>
-          <Text>{item.recipientName}</Text>
-        </Td>
-        <Td>
-          <Text>{item.recipientCategory}</Text>
-        </Td>
-        <Td>
-          <Flex direction="row">
-            <Button
-              as={disabled ? Button : Link}
-              variant={disabled ? "link" : "transparent"}
-              aria-label={`Edit ${item.id}`}
-              onClick={() => {
-                onEditClick(item);
-              }}
-              disabled={disabled}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="plain"
-              aria-label={`Delete ${item.id}`}
-              onClick={() => {
-                handleDeleteClick(item.id);
-              }}
-              disabled={disabled}
-            >
-              <Image src={cancelIcon} alt={"Delete Item"} minW="1.5rem" />
-            </Button>
-          </Flex>
-        </Td>
-      </Tr>
+  const rows = items.map((item) => {
+    const columnActions = (
+      <Flex direction="row">
+        <Button
+          as={disabled ? Button : Link}
+          variant={disabled ? "link" : "transparent"}
+          aria-label={`Edit ${item.id}`}
+          onClick={() => {
+            onEditClick(item);
+          }}
+          disabled={disabled}
+        >
+          Edit
+        </Button>
+        <Button
+          variant="plain"
+          aria-label={`Delete ${item.id}`}
+          onClick={() => {
+            handleDeleteClick(item.id);
+          }}
+          disabled={disabled}
+        >
+          <Image src={cancelIcon} alt={"Delete Item"} minW="1.5rem" />
+        </Button>
+      </Flex>
     );
+
+    return [
+      item.budgetPeriod,
+      item.spentFunds,
+      item.description,
+      item.initiative,
+      item.useOfFunds,
+      item.recipientName,
+      item.recipientCategory,
+      columnActions,
+    ];
   });
 
   return (
@@ -236,23 +211,21 @@ export const UseOfFundsTableElement = (
       >
         Add use of funds
       </Button>
-      {rows.length > 0 && (
-        <Table variant="metric">
-          <Thead>
-            <Tr>
-              <Th>Period</Th>
-              <Th>$ Spent</Th>
-              <Th>Description</Th>
-              <Th>Init #</Th>
-              <Th>Use</Th>
-              <Th>Recipient</Th>
-              <Th>Category</Th>
-              <Th>Actions</Th>
-            </Tr>
-          </Thead>
-          <Tbody>{rows}</Tbody>
-        </Table>
-      )}
+      {rows.length > 0 &&
+        ResponsiveTable(
+          [
+            { label: "Period" },
+            { label: "$ Spent" },
+            { label: "Description" },
+            { label: "Init #" },
+            { label: "Use" },
+            { label: "Recipient" },
+            { label: "Category" },
+            { label: "Actions" },
+          ],
+          rows,
+          "metric"
+        )}
 
       <Modal
         modalDisclosure={{

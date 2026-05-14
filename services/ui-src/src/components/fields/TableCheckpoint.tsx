@@ -1,16 +1,4 @@
-import {
-  Stack,
-  Button,
-  Checkbox,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Image,
-  Flex,
-} from "@chakra-ui/react";
+import { Stack, Button, Checkbox, Image, Flex } from "@chakra-ui/react";
 import {
   AttachmentStatus,
   ElementType,
@@ -46,6 +34,7 @@ import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
 import { CommentModal } from "components/modals/CommentModal";
 import { Alert } from "components";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 type TableShape = {
   stage: number;
@@ -146,15 +135,6 @@ const getFilesFromTable = (tables: TableShape[], checkpoint: string) => {
     .filter((row) => row.id === checkpoint && row.file.fileId)
     .map((filter) => filter.file);
 };
-
-const header = [
-  "#",
-  "Checkpoint",
-  "Ready for CMS Review",
-  "Attachments",
-  "Status",
-  "Actions",
-];
 
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
@@ -303,6 +283,88 @@ export const TableCheckpoint = (
     setModalOpen(false);
   };
 
+  const getRows = (
+    rows: {
+      id: string;
+      stageNo: string;
+      label: string;
+      file: UploadListProp;
+      status: AttachmentStatus;
+      comments: InitiativeComment[];
+    }[]
+  ) => {
+    return rows.map((row) => {
+      const columnCheckbox =
+        row.label != "" ? (
+          <Checkbox
+            aria-label={`Check if ${row.label} is complete`}
+            isChecked={
+              initialDisplayValue.find((value) => value.id === row.id)?.checked
+            }
+            onChange={() => onCheckboxHandler(row.id)}
+            disabled={disabled}
+          ></Checkbox>
+        ) : (
+          <></>
+        );
+
+      const columnFile =
+        "file" in row ? (
+          <Button
+            aria-label={`Download ${row.file.name}`}
+            variant="link"
+            onClick={() => downloadFile(reportType, state, id, row.file)}
+          >
+            {row.file.name}
+          </Button>
+        ) : (
+          "Not applicable"
+        );
+
+      const columnActions = "file" in row && row.file.fileId && (
+        <Flex>
+          <Button
+            variant="link"
+            onClick={() => onCommentClick(row.file)}
+            aria-label={`Comment on ${row.file.name}`}
+          >
+            <Image src={commentIcon} alt="Comment" minWidth="26px" />
+          </Button>
+          <Button
+            variant="unstyled"
+            onClick={() => {
+              onDeleteClick(row.file);
+            }}
+            aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
+            disabled={
+              !canDeleteAttachment(row.status, row.comments) || disabled
+            }
+          >
+            <Image src={cancelIcon} alt="Remove" />
+          </Button>
+        </Flex>
+      );
+
+      return [
+        row.stageNo,
+        row.label,
+        columnCheckbox,
+        columnFile,
+        row.status,
+        columnActions,
+      ];
+    });
+  };
+
+  const header = [
+    { label: "#" },
+    { label: "Checkpoint" },
+    { label: "Ready for CMS Review" },
+    { label: "Attachments" },
+    { label: "Status" },
+    { label: "Actions" },
+  ];
+
   return (
     <Stack gap="1.25rem" width="100%">
       {tables.map((table, tableIndex) => (
@@ -318,85 +380,7 @@ export const TableCheckpoint = (
           >
             Upload attachments
           </Button>
-          <Table variant="metric" key={table.label}>
-            <Thead>
-              <Tr>
-                {header.map((item) => (
-                  <Th key={item}>{item}</Th>
-                ))}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {table.rows.map((row, rowIndex) => (
-                <Tr key={`checkpoint-row-${rowIndex}`}>
-                  <Td>{row.stageNo}</Td>
-                  <Td>{row.label}</Td>
-                  <Td>
-                    {row.label != "" ? (
-                      <Checkbox
-                        aria-label={`Check if ${row.label} is complete`}
-                        isChecked={
-                          initialDisplayValue.find(
-                            (value) => value.id === row.id
-                          )?.checked
-                        }
-                        onChange={() => onCheckboxHandler(row.id)}
-                        disabled={disabled}
-                      ></Checkbox>
-                    ) : (
-                      <></>
-                    )}
-                  </Td>
-                  <Td>
-                    {"file" in row ? (
-                      <Button
-                        aria-label={`Download ${row.file.name}`}
-                        variant="link"
-                        onClick={() =>
-                          downloadFile(reportType, state, id, row.file)
-                        }
-                      >
-                        {row.file.name}
-                      </Button>
-                    ) : (
-                      "Not applicable"
-                    )}
-                  </Td>
-                  <Td>{row.status}</Td>
-                  <Td>
-                    {"file" in row && row.file.fileId && (
-                      <Flex>
-                        <Button
-                          variant="link"
-                          onClick={() => onCommentClick(row.file)}
-                          aria-label={`Comment on ${row.file.name}`}
-                        >
-                          <Image
-                            src={commentIcon}
-                            alt="Comment"
-                            minWidth="26px"
-                          />
-                        </Button>
-                        <Button
-                          variant="unstyled"
-                          onClick={() => {
-                            onDeleteClick(row.file);
-                          }}
-                          aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
-                          disabled={
-                            !canDeleteAttachment(row.status, row.comments) ||
-                            disabled
-                          }
-                        >
-                          <Image src={cancelIcon} alt="Remove" />
-                        </Button>
-                      </Flex>
-                    )}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
+          {ResponsiveTable(header, getRows(table.rows), "metric")}
         </Stack>
       ))}
       <UploadModal

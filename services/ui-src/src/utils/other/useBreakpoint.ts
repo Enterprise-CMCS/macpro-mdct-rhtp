@@ -25,8 +25,8 @@ export const useBreakpoint = (): { [key: string]: boolean } => {
       `(min-width: ${pxBreaks.md + 1}px)`,
       // ultrawide (>100em|1600px)
       `(min-width: ${pxBreaks.xl + 1}px)`,
-      // sidebarwide (>35em|560px) and <75em|1200px)
-      `(min-width: ${pxBreaks.sm + 1}px) and (max-width: ${pxBreaks.lg + 1}px)`,
+      // sidebarwide (>35em|560px) and <75em|1205px)
+      `(min-width: ${pxBreaks.sm + 1}px) and (max-width: ${pxBreaks.lg + 5}px)`,
     ]);
   return { isMobile, isTablet, isDesktop, isUltrawide, isSidebarWide };
 };
