@@ -6,6 +6,7 @@ import {
   aws_s3 as s3,
   aws_ec2 as ec2,
   aws_ses as ses,
+  aws_iam as iam,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -59,8 +60,18 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   );
 
   // Create and Verify SES Email Identity
-  new ses.EmailIdentity(scope, "VerifySenderEmail", {
-    identity: ses.Identity.email("garrett.rabian@coforma.io"),
+  const senderEmailIdentity = new ses.EmailIdentity(
+    scope,
+    "VerifySenderEmail",
+    {
+      identity: ses.Identity.email("garrett.rabian@coforma.io"),
+    }
+  );
+
+  const sesPolicy = new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ["ses:SendEmail", "ses:SendRawEmail"],
+    resources: [senderEmailIdentity.emailIdentityArn],
   });
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
@@ -284,6 +295,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "sendEmail",
     path: "reports/{reportType}/{state}/{id}/notifications",
     method: "POST",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
