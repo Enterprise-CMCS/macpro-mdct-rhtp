@@ -303,9 +303,10 @@ export const TableCheckpoint = (
             }
             onChange={() => onCheckboxHandler(row.id)}
             disabled={disabled}
+            sx={sx.checkbox}
           ></Checkbox>
         ) : (
-          <></>
+          ""
         );
 
       const columnFile =
@@ -430,4 +431,15 @@ export const TableCheckpoint = (
       />
     </Stack>
   );
+};
+
+const sx = {
+  checkbox: {
+    marginBlock: "0",
+    span: {
+      width: "24px",
+      height: "24px",
+      border: "2px solid black",
+    },
+  },
 };

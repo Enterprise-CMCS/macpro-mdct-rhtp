@@ -52,7 +52,7 @@ const buildRows = (
         const value = buildElement(formattedCol, element?.value!, (value) =>
           onChange(value, answerRowIndex, column.id)
         );
-        rowElement.push(value);
+        rowElement.push(value || "--");
       }
     });
     if (canChangeStatus) {

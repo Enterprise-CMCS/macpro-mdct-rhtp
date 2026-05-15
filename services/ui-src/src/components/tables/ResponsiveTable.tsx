@@ -113,17 +113,21 @@ const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
       <Divider />
       {rows.map((row) => (
         <>
-          {row.map((data, dataIndex) => (
-            <Grid
-              templateColumns="minmax(0, 40vw) minmax(0, 1fr) "
-              gap="1.5rem"
-            >
-              <Text fontSize="1rem" color="#71767a" fontWeight="bold">
-                {headers[dataIndex]}
-              </Text>
-              <Box>{data ?? "N/A"}</Box>
-            </Grid>
-          ))}
+          {row
+            .map((data, dataIndex) => {
+              return data ? (
+                <Grid
+                  templateColumns="minmax(0, 40vw) minmax(0, 1fr) "
+                  gap="1.5rem"
+                >
+                  <Text fontSize="1rem" color="#71767a" fontWeight="bold">
+                    {headers[dataIndex]}
+                  </Text>
+                  <Box fontSize={{ base: "14px", sm: "16px" }}>{data}</Box>
+                </Grid>
+              ) : undefined;
+            })
+            .filter(Boolean)}
           <Divider></Divider>
         </>
       ))}
