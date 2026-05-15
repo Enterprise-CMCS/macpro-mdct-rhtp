@@ -45,7 +45,12 @@ export const SubmissionBar = () => {
 
   const getZipClick = async () => {
     setIsZipLoading(true);
-    await getZipFile(report);
+    try {
+      await getZipFile(report);
+    } catch (error) {
+      console.error("Error fetching ZIP file:", error);
+    }
+
     setIsZipLoading(false);
   };
 
