@@ -62,7 +62,9 @@ export const getZipFile = async (report: Report) => {
   const fileLink = await getZipPresignedUrl(type, state, id);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
 
-  window.open(sanitizeLink);
+  const link = document.createElement("a");
+  link.href = sanitizeLink;
+  link.click();
 };
 
 export const canEditAttachment = (status: AttachmentStatus): boolean => {
