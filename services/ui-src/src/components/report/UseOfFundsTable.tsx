@@ -189,7 +189,7 @@ export const UseOfFundsTableElement = (
 
     return [
       item.budgetPeriod,
-      item.spentFunds,
+      `$${item.spentFunds}`,
       item.description,
       item.initiative,
       item.useOfFunds,
