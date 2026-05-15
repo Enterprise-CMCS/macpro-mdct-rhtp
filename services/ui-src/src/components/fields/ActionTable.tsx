@@ -157,6 +157,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   };
 
   const headers = rows.map((row) => ({ label: row.header }));
+  if (canAddOrChangeStatus) headers.push({ label: "Actions" });
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
