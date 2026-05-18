@@ -171,7 +171,7 @@ export const TableCheckpoint = (
   const modalHeading = {
     Upload: "Upload Initiative Attachments",
     Delete: "Delete Attachment",
-    Edit: "Edit Attachmen",
+    Edit: "Edit Attachment",
   };
 
   if (!state || !id || !reportType || !pageId) {
