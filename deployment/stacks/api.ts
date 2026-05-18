@@ -60,8 +60,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   );
 
   // Create and Verify SES Email Identity
-  new ses.EmailIdentity(scope, "VerifySenderEmail", {
-    identity: ses.Identity.email("MDCT_NoReply@cms.hhs.gov"),
+  new ses.EmailIdentity(scope, "SenderDomainIdentity", {
+    identity: ses.Identity.domain("cms.hhs.gov"),
   });
 
   const sesPolicy = new iam.PolicyStatement({
