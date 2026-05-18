@@ -26,6 +26,10 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
       text: "Review & Submit",
     },
     {
+      type: ElementType.SubmitForReview,
+      id: "review-submit-for-review",
+    },
+    {
       type: ElementType.Paragraph,
       id: "review-text",
       title: "Ready to submit?",

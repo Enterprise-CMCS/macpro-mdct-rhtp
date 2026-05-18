@@ -66,6 +66,13 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
+export type ReportComment = {
+  name: string;
+  date: string;
+  comment: string;
+  isInternal: boolean;
+};
+
 export interface Report extends ReportOptions {
   id: string;
   type: ReportType;
@@ -80,6 +87,7 @@ export interface Report extends ReportOptions {
   submittedByEmail?: string;
   status: ReportStatus;
   submissionCount: number;
+  comments?: ReportComment[];
 }
 
 export type LiteReport = Omit<Report, "pages">;
@@ -165,6 +173,7 @@ export enum ElementType {
   UseOfFundsTable = "useOfFundsTable",
   ActionTable = "actionTable",
   AttachmentTable = "attachmentTable",
+  SubmitForReview = "submitForReview",
 }
 
 export type PageElement =
@@ -191,7 +200,8 @@ export type PageElement =
   | UseOfFundsTableTemplate
   | AttachmentAreaTemplate
   | AttachmentTableTemplate
-  | ActionTableTemplate;
+  | ActionTableTemplate
+  | SubmitForReviewTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -444,4 +454,9 @@ export interface ActionTableTemplate {
   };
   rows: ActionRowElement[];
   answer?: ActionAnswerShape[];
+}
+
+export interface SubmitForReviewTemplate {
+  type: ElementType.SubmitForReview;
+  id: string;
 }
