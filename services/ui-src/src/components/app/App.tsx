@@ -23,7 +23,7 @@ export const App = () => {
   const mqClasses = makeMediaQueryClasses();
   const context = useContext(UserContext);
   const { logout } = context;
-  const { user, showLocalLogins } = useStore();
+  const { user, showLocalLogins, setSidebar } = useStore();
   const { pathname, key } = useLocation();
 
   const isExportPage = pathname.includes("/export");
@@ -32,6 +32,14 @@ export const App = () => {
   useEffect(() => {
     fireTealiumPageView(user, window.location.href, pathname);
   }, [key]);
+
+  useEffect(() => {
+    if (mqClasses.includes("sidebarwide")) {
+      setSidebar(false);
+    } else if (mqClasses === "desktop") {
+      setSidebar(true);
+    }
+  }, [mqClasses]);
 
   const authenticatedRoutes = (
     <>

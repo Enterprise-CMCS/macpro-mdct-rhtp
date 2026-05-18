@@ -12,7 +12,7 @@ const accordionVariant = {
 
 const uploadVariant = {
   container: {
-    width: "90vw",
+    width: "100%",
     maxWidth: "450px",
   },
   item: {

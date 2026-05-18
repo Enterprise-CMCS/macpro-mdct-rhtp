@@ -110,18 +110,24 @@ const HorizontalTable = (
 const VerticalTable = (headers: string[], rows: TableRowType[][]) => {
   return (
     <VStack gap="1.5rem" alignItems="flex-start">
+      <Divider />
       {rows.map((row) => (
         <>
-          <Grid templateColumns="repeat(3, 1fr)" gap="1.5rem" columnGap="4rem">
-            {row.map((data, dataIndex) => (
-              <Box>
-                <Text fontSize="1rem" color="#71767a">
-                  {headers[dataIndex]}
-                </Text>
-                <Box>{data ?? "N/A"}</Box>
-              </Box>
-            ))}
-          </Grid>
+          {row
+            .map((data, dataIndex) => {
+              return data ? (
+                <Grid
+                  templateColumns="minmax(0, 40vw) minmax(0, 1fr) "
+                  gap="1.5rem"
+                >
+                  <Text fontSize="1rem" color="#71767a" fontWeight="bold">
+                    {headers[dataIndex]}
+                  </Text>
+                  <Box fontSize={{ base: "14px", sm: "16px" }}>{data}</Box>
+                </Grid>
+              ) : undefined;
+            })
+            .filter(Boolean)}
           <Divider></Divider>
         </>
       ))}

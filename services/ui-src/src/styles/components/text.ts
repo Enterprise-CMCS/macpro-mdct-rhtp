@@ -4,7 +4,7 @@ const baseStyles = {
   color: "base",
   transition: "all 0.3s ease",
   ".mobile &": {
-    fontSize: "body_md",
+    fontSize: "body_sm",
   },
 };
 
