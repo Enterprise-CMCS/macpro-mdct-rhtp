@@ -19,6 +19,7 @@ import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
   canDeleteAttachment,
+  canEditAttachment,
   downloadFile,
   removeFile,
 } from "utils/other/upload";
@@ -143,7 +144,7 @@ export const TableCheckpoint = (
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
-  const [selectedFile, setSelectedFile] = useState<UploadListProp>();
+  const [selectedFile, setSelectedFile] = useState<UploadListProp[]>([]);
   const { pageId } = useParams();
   const { report, setAnswers } = useStore();
   const { id, state, type: reportType } = report!;
@@ -157,17 +158,20 @@ export const TableCheckpoint = (
     }));
   const [tables, setTables] = useState<TableShape[]>([]);
   const [checkpoint, setCheckpoint] = useState("");
-  const [files, setFiles] = useState<UploadListProp[]>([]);
   const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
 
-  const [modalMode, setModalMode] = useState<"Upload" | "Delete">("Upload");
+  const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
+    "Upload"
+  );
   const actionButtonText = {
     Upload: "Done",
     Delete: "Delete",
+    Edit: "Edit",
   };
   const modalHeading = {
     Upload: "Upload Initiative Attachments",
     Delete: "Delete Attachment",
+    Edit: "Edit Attachment",
   };
 
   if (!state || !id || !reportType || !pageId) {
@@ -178,9 +182,9 @@ export const TableCheckpoint = (
   //This populates the uploaded area of the uploads modal when the dropdown selection has changed
   useEffect(() => {
     if (modalMode === "Upload") {
-      setFiles(getFilesFromTable(tables, checkpoint));
+      setSelectedFile(getFilesFromTable(tables, checkpoint));
     } else if (modalMode === "Delete") {
-      setFiles(selectedFile ? [selectedFile] : []);
+      setSelectedFile(selectedFile ?? []);
     }
   }, [checkpoint]);
 
@@ -196,7 +200,7 @@ export const TableCheckpoint = (
     const newTables = buildTables(files);
     setAttachments(attachments || []);
     setTables(newTables);
-    setFiles(getFilesFromTable(newTables, checkpoint));
+    setSelectedFile(getFilesFromTable(newTables, checkpoint));
   }, [isCommentsOpen, report]);
 
   const onCheckboxHandler = (id: string) => {
@@ -223,7 +227,7 @@ export const TableCheckpoint = (
   };
 
   const onCommentClick = (file: UploadListProp) => {
-    setSelectedFile(file);
+    setSelectedFile([file]);
     setCommentsOpen(true);
   };
 
@@ -233,10 +237,21 @@ export const TableCheckpoint = (
     setModalOpen(true);
   };
 
-  const onDeleteClick = (selectedFile: any) => {
+  const onEditClick = (selectedFile: UploadListProp) => {
+    setModalMode("Edit");
+    setModalOpen(true);
+    setSelectedFile([selectedFile]);
+
+    const fullSelectedFile = attachments.find(
+      ({ attachment }) => attachment.fileId === selectedFile.fileId
+    );
+    setCheckpoint(fullSelectedFile?.checkpoint ?? "");
+  };
+
+  const onDeleteClick = (selectedFile: UploadListProp) => {
     setModalMode("Delete");
     setModalOpen(true);
-    setSelectedFile(selectedFile);
+    setSelectedFile([selectedFile]);
 
     const fullSelectedFile = attachments.find(
       ({ attachment }) => attachment.fileId === selectedFile.fileId
@@ -278,7 +293,19 @@ export const TableCheckpoint = (
 
   const onModalSubmit = () => {
     if (modalMode === "Delete") {
-      deleteFromReport(selectedFile!);
+      deleteFromReport(selectedFile[0]!);
+    } else if (modalMode === "Edit") {
+      //the type of element being passed in determines whether it's an add or remove
+      const generateAnswer = (answer: InitiativeAnswerProp[]) => {
+        const selectedIndex = answer.findIndex(
+          (file) => file.attachment.fileId === selectedFile[0].fileId
+        );
+        const newAnswers = [...answer];
+        newAnswers[selectedIndex].stage = getStageIdByCheckpointId(checkpoint);
+        newAnswers[selectedIndex].checkpoint = checkpoint;
+        return newAnswers;
+      };
+      writeToAttachmentsTable(generateAnswer);
     }
     setModalOpen(false);
   };
@@ -324,6 +351,14 @@ export const TableCheckpoint = (
 
       const columnActions = "file" in row && row.file.fileId && (
         <Flex>
+          <Button
+            variant="link"
+            onClick={() => onEditClick(row.file)}
+            aria-label={`Edit file or info for ${row.file.name}`}
+            disabled={!canEditAttachment(row.status) || disabled}
+          >
+            Edit
+          </Button>
           <Button
             variant="link"
             onClick={() => onCommentClick(row.file)}
@@ -389,7 +424,7 @@ export const TableCheckpoint = (
           isOpen: isModalOpen,
           onClose: () => setModalOpen(false),
         }}
-        answer={files}
+        answer={selectedFile}
         selections={
           <>
             {modalMode === "Delete" ? (
@@ -426,7 +461,7 @@ export const TableCheckpoint = (
           },
         }}
         updateElement={handleCommentSave}
-        selectedFile={selectedFile}
+        selectedFile={selectedFile[0]}
         allFiles={attachments}
       />
     </Stack>
