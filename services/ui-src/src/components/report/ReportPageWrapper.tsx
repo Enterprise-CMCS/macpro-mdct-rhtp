@@ -20,6 +20,7 @@ import { isReviewSubmitPage } from "types";
 import { PageElement, ReportStatus } from "@rhtp/shared";
 import { ReportAutosaveContext } from "./ReportAutosaveProvider";
 import { SubmissionBar } from "./SubmissionBar";
+import { sendEmail } from "utils/api/requestMethods/emailNotification";
 
 export const ReportPageWrapper = () => {
   const {
@@ -149,6 +150,7 @@ export const ReportPageWrapper = () => {
                   <PraDisclosure />
                 </Box>
               )}
+              <Button onClick={() => sendEmail(report!)}>Send email</Button>
             </>
           )}
         </VStack>

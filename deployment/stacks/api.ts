@@ -5,6 +5,8 @@ import {
   aws_wafv2 as wafv2,
   aws_s3 as s3,
   aws_ec2 as ec2,
+  aws_ses as ses,
+  aws_iam as iam,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -56,6 +58,16 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       allowAllOutbound: true,
     }
   );
+
+  const emailIdentity = new ses.EmailIdentity(scope, "SenderDomainIdentity", {
+    identity: ses.Identity.domain("cms.hhs.gov"),
+  });
+
+  const sesPolicy = new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ["ses:SendEmail", "ses:SendRawEmail"],
+    resources: [emailIdentity.emailIdentityArn],
+  });
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
@@ -269,6 +281,16 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "updateInitiative",
     path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
     method: "PUT",
+    ...commonProps,
+  });
+
+  // Notification handlers
+  new Lambda(scope, "sendEmail", {
+    entry: "services/app-api/handlers/notifications/sendEmail.ts",
+    handler: "sendEmail",
+    path: "reports/{reportType}/{state}/{id}/notifications",
+    method: "POST",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
