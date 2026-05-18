@@ -223,6 +223,20 @@ describe("<TableCheckpoint />", () => {
     expect(vi.mocked(removeFile)).toHaveBeenCalled();
     expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
   });
+  test("edit file", async () => {
+    render(TableCheckpointComponent);
+    const editButton = screen.getByRole("button", {
+      name: "Edit file or info for orange.png",
+    });
+    await userEvent.click(editButton);
+    await waitFor(() => {
+      expect(screen.getByText("Edit Attachment")).toBeVisible();
+    });
+    const confirmEditBtn = screen.getByRole("button", { name: "Edit" });
+    await userEvent.click(confirmEditBtn);
+    expect(mockGetAnswer).toHaveBeenCalled();
+    expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
+  });
   testA11y(TableCheckpointComponent);
 });
 
