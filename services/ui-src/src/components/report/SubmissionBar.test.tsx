@@ -9,7 +9,7 @@ vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 const mockSetModalComponent = vi.fn();
 const mockSetModalOpen = vi.fn();
-const mockCreateZip = vi.fn();
+const getZipFile = vi.fn();
 
 const mockNavigate = vi.fn();
 vi.mock("react-router", async (importOriginal) => ({
@@ -17,8 +17,8 @@ vi.mock("react-router", async (importOriginal) => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock("utils/other/zip", () => ({
-  createZipFile: () => mockCreateZip,
+vi.mock("utils/other/upload", () => ({
+  getZipFile: () => getZipFile,
 }));
 
 const report = {
@@ -68,7 +68,7 @@ describe("SubmissionBar", () => {
       const zipFilesBtn = screen.getByRole("button", { name: "ZIP Files" });
       await userEvent.click(zipFilesBtn);
       waitFor(() => {
-        expect(mockCreateZip).toHaveBeenCalled();
+        expect(getZipFile).toHaveBeenCalled();
       });
     });
   });

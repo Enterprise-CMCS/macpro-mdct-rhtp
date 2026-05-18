@@ -22,11 +22,13 @@ vi.mock("../../storage/upload", () => ({
   queryViewUploads: vi.fn(),
   queryUpload: vi.fn(),
 }));
-
 vi.mock("../../libs/s3-lib", () => ({
   default: {
-    getSignedDownloadUrl: vi.fn(),
-    getObject: vi.fn().mockReturnValue([]),
+    getSignedDownloadUrl: vi
+      .fn()
+      .mockResolvedValue("https://example.com/presigned"),
+    getObject: vi.fn().mockResolvedValue({ Body: undefined }),
+    putObject: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -106,8 +108,11 @@ describe("Test get API methods", () => {
     const res = await getUploadsByReportId(badTestEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
-  test("getUploadsByReportId is successful ", async () => {
+  test("getUploadsByReportId is successful and returns data", async () => {
     const res = await getUploadsByReportId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
+    expect(res.body).toBe(
+      JSON.stringify({ psurl: "https://example.com/presigned" })
+    );
   });
 });

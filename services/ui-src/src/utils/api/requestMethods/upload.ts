@@ -6,9 +6,8 @@ interface PathURL {
   fileId: string;
 }
 
-interface ZipData {
-  name: string;
-  bytes: string;
+interface ZipPresignedUrl {
+  psurl: string;
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
@@ -37,7 +36,7 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   return { presignedUploadUrl: psurl, fileId };
 };
 
-export const getFileBytes = async (
+export const getZipPresignedUrl = async (
   reportType: string,
   state: string,
   id: string
@@ -46,11 +45,11 @@ export const getFileBytes = async (
   const options = {
     headers: { ...requestHeaders },
   };
-  const response = await apiLib.get<ZipData[]>(
-    `/reports/${reportType}/${state}/${id}/files/`,
+  const response = await apiLib.get<ZipPresignedUrl>(
+    `/reports/${reportType}/${state}/${id}/files`,
     options
   );
-  return response ?? [];
+  return response.psurl;
 };
 
 export const uploadFileToS3 = async (

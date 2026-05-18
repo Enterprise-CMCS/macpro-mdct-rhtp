@@ -5,6 +5,7 @@ import {
   aws_iam as iam,
   RemovalPolicy,
   Aws,
+  Duration,
 } from "aws-cdk-lib";
 
 interface CreateUploadsComponentsProps {
@@ -101,6 +102,9 @@ export function createUploadsComponents(props: CreateUploadsComponentsProps) {
         StringNotEquals: {
           "s3:ExistingObjectTag/GuardDutyMalwareScanStatus": "NO_THREATS_FOUND",
         },
+        ArnNotLike: {
+          "aws:ResourceArn": `${attachmentsBucket.bucketArn}/zips/*`,
+        },
       },
     })
   );
@@ -132,9 +136,15 @@ export function createUploadsComponents(props: CreateUploadsComponentsProps) {
         `${attachmentsBucket.bucketArn}/*.xls`,
         `${attachmentsBucket.bucketArn}/*.xlsx`,
         `${attachmentsBucket.bucketArn}/*.json`,
+        `${attachmentsBucket.bucketArn}/*.zip`,
       ],
     })
   );
+
+  attachmentsBucket.addLifecycleRule({
+    tagFilters: { auto_delete_category: "generated_zip" },
+    expiration: Duration.days(1),
+  });
 
   new guardduty.CfnMalwareProtectionPlan(scope, "MalwareProtectionPlan", {
     actions: {

@@ -66,6 +66,9 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     restApiName: `${project}-${stage}-app-api`,
     deploy: true,
     cloudWatchRole: false,
+    endpointConfiguration: {
+      types: [apigateway.EndpointType.REGIONAL],
+    },
     deployOptions: {
       stageName: stage,
       tracingEnabled: true,
@@ -243,8 +246,11 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "getUploadsByReportId", {
     entry: "services/app-api/handlers/uploads/get.ts",
     handler: "getUploadsByReportId",
-    path: "/reports/{reportType}/{state}/{id}/files/",
+    path: "/reports/{reportType}/{state}/{id}/files",
     method: "GET",
+    memorySize: 10240,
+    timeout: Duration.minutes(3),
+    integrationOptions: { timeout: Duration.minutes(3) },
     ...commonProps,
   });
 

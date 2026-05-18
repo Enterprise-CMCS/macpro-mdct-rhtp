@@ -34,4 +34,7 @@ export default {
   getObject: (params: GetObjectRequest) => {
     return client.send(new GetObjectCommand(params));
   },
+  putObject: (params: PutObjectRequest) => {
+    return client.send(new PutObjectCommand(params));
+  },
 };

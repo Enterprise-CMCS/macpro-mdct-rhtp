@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { Link as RouterLink } from "react-router";
-import { Stack, Box, Button, Spinner, Image } from "@chakra-ui/react";
+import { Stack, Box, Button, Spinner, Image, Flex } from "@chakra-ui/react";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { submitReport, useStore, reportBasePath } from "utils";
-import { createZipFile } from "utils/other/zip";
 import { SubmitReportModal } from "./SubmitReportModal";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
 import { ReportStatus } from "@rhtp/shared";
+import { getZipFile } from "utils/other/upload";
 
 export const SubmissionBar = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =
@@ -41,6 +41,19 @@ export const SubmissionBar = () => {
     setModalComponent(modal, "Are you sure you want to submit?");
   };
 
+  const [isZipLoading, setIsZipLoading] = useState(false);
+
+  const getZipClick = async () => {
+    setIsZipLoading(true);
+    try {
+      await getZipFile(report);
+    } catch (error) {
+      console.error("Error fetching ZIP file:", error);
+    }
+
+    setIsZipLoading(false);
+  };
+
   return (
     <Stack
       direction="row"
@@ -69,8 +82,13 @@ export const SubmissionBar = () => {
           colorScheme="blue"
           variant={isSubmitted ? "outline" : "link"}
           fontWeight="bold"
-          onClick={() => createZipFile(report)}
+          onClick={getZipClick}
         >
+          {isZipLoading && (
+            <Flex justify="center">
+              <Spinner size="md" />
+            </Flex>
+          )}
           ZIP Files
         </Button>
       </Box>
