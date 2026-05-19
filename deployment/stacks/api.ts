@@ -66,9 +66,6 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     restApiName: `${project}-${stage}-app-api`,
     deploy: true,
     cloudWatchRole: false,
-    endpointConfiguration: {
-      types: [apigateway.EndpointType.REGIONAL],
-    },
     deployOptions: {
       stageName: stage,
       tracingEnabled: true,
