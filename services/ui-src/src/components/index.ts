@@ -2,15 +2,10 @@
 export { AccordionItem } from "./accordions/AccordionItem";
 // alerts
 export { Alert } from "./alerts/Alert";
+export { Banner } from "./alerts/Banner";
 // app
 export { App } from "./app/App";
 export { Error } from "./app/Error";
-// banners
-export {
-  AdminBannerContext,
-  AdminBannerProvider,
-} from "./banners/AdminBannerProvider";
-export { Banner } from "./banners/Banner";
 // layout
 export { HomePage } from "./layout/HomePage";
 export { Header } from "./layout/Header";
