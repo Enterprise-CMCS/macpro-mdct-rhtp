@@ -447,7 +447,7 @@ export const TableCheckpoint = (
         deleteFromReport={deleteFromReport}
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
-        uploadAreaHidden={modalMode === "Delete"}
+        uploadAreaHidden={modalMode !== "Upload"}
         uploadedSubLabel={
           "These files have been attached to the stage and checkpoint selected above."
         }
