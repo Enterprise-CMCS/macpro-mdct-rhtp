@@ -144,7 +144,7 @@ export const TableCheckpoint = (
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
-  const [selectedFile, setSelectedFile] = useState<UploadListProp[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<UploadListProp[]>([]);
   const { pageId } = useParams();
   const { report, setAnswers } = useStore();
   const { id, state, type: reportType } = report!;
@@ -182,9 +182,9 @@ export const TableCheckpoint = (
   //This populates the uploaded area of the uploads modal when the dropdown selection has changed
   useEffect(() => {
     if (modalMode === "Upload") {
-      setSelectedFile(getFilesFromTable(tables, checkpoint));
+      setSelectedFiles(getFilesFromTable(tables, checkpoint));
     } else if (modalMode === "Delete") {
-      setSelectedFile(selectedFile ?? []);
+      setSelectedFiles(selectedFiles ?? []);
     }
   }, [checkpoint]);
 
@@ -200,7 +200,7 @@ export const TableCheckpoint = (
     const newTables = buildTables(files);
     setAttachments(attachments || []);
     setTables(newTables);
-    setSelectedFile(getFilesFromTable(newTables, checkpoint));
+    setSelectedFiles(getFilesFromTable(newTables, checkpoint));
   }, [isCommentsOpen, report]);
 
   const onCheckboxHandler = (id: string) => {
@@ -227,7 +227,7 @@ export const TableCheckpoint = (
   };
 
   const onCommentClick = (file: UploadListProp) => {
-    setSelectedFile([file]);
+    setSelectedFiles([file]);
     setCommentsOpen(true);
   };
 
@@ -237,29 +237,30 @@ export const TableCheckpoint = (
     setModalOpen(true);
   };
 
-  const onEditClick = (selectedFile: UploadListProp) => {
+  const onEditClick = (selectedFiles: UploadListProp) => {
     setModalMode("Edit");
     setModalOpen(true);
-    setSelectedFile([selectedFile]);
+    setSelectedFiles([selectedFiles]);
 
     const fullSelectedFile = attachments.find(
-      ({ attachment }) => attachment.fileId === selectedFile.fileId
+      ({ attachment }) => attachment.fileId === selectedFiles.fileId
     );
     setCheckpoint(fullSelectedFile?.checkpoint ?? "");
   };
 
-  const onDeleteClick = (selectedFile: UploadListProp) => {
+  const onDeleteClick = (selectedFiles: UploadListProp) => {
     setModalMode("Delete");
     setModalOpen(true);
-    setSelectedFile([selectedFile]);
+    setSelectedFiles([selectedFiles]);
 
     const fullSelectedFile = attachments.find(
-      ({ attachment }) => attachment.fileId === selectedFile.fileId
+      ({ attachment }) => attachment.fileId === selectedFiles.fileId
     );
     setCheckpoint(fullSelectedFile?.checkpoint ?? "");
   };
 
   const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
+    console.log(data.answer);
     writeToAttachmentsTable(() => data.answer);
   };
 
@@ -293,12 +294,12 @@ export const TableCheckpoint = (
 
   const onModalSubmit = () => {
     if (modalMode === "Delete") {
-      deleteFromReport(selectedFile[0]!);
+      deleteFromReport(selectedFiles[0]!);
     } else if (modalMode === "Edit") {
       //the type of element being passed in determines whether it's an add or remove
       const generateAnswer = (answer: InitiativeAnswerProp[]) => {
         const selectedIndex = answer.findIndex(
-          (file) => file.attachment.fileId === selectedFile[0].fileId
+          (file) => file.attachment.fileId === selectedFiles[0].fileId
         );
         const newAnswers = [...answer];
         newAnswers[selectedIndex].stage = getStageIdByCheckpointId(checkpoint);
@@ -424,7 +425,7 @@ export const TableCheckpoint = (
           isOpen: isModalOpen,
           onClose: () => setModalOpen(false),
         }}
-        answer={selectedFile}
+        answer={selectedFiles}
         selections={
           <>
             {modalMode === "Delete" ? (
@@ -461,7 +462,7 @@ export const TableCheckpoint = (
           },
         }}
         updateElement={handleCommentSave}
-        selectedFile={selectedFile[0]}
+        selectedFile={selectedFiles[0]}
         allFiles={attachments}
       />
     </Stack>
