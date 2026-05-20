@@ -201,7 +201,7 @@ export const TableCheckpoint = (
     setAttachments(attachments || []);
     setTables(newTables);
     setSelectedFiles(getFilesFromTable(newTables, checkpoint));
-  }, [isCommentsOpen, report]);
+  }, [report]);
 
   const onCheckboxHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
@@ -260,7 +260,6 @@ export const TableCheckpoint = (
   };
 
   const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
-    console.log(data.answer);
     writeToAttachmentsTable(() => data.answer);
   };
 
