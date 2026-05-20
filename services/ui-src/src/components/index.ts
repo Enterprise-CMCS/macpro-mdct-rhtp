@@ -58,6 +58,7 @@ export { StatusTableElement } from "./report/StatusTable";
 export { SubnavBar } from "./report/SubnavBar";
 export { InitiativesTable } from "./report/InitiativesTable";
 // menus
+export { AdminMenu } from "./menus/AdminMenu";
 export { Menu } from "./menus/Menu";
 export { MenuOption } from "./menus/MenuOption";
 // modals

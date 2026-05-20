@@ -233,6 +233,8 @@ export const AdminBannerForm = ({ createBanner }: Props) => {
             onBlur={onBlur}
             value={formData.description}
             errorMessage={formErrors.description}
+            multiline
+            rows={3}
             data-required="true"
           />
           <CmsdsTextField
