@@ -1,11 +1,11 @@
-import { DeleteCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, paginateScan, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { createClient } from "./dynamo/dynamodb-lib";
-import { BannerData } from "@rhtp/shared";
+import { BannerFormData, BannerShape } from "@rhtp/shared";
 
 const bannerTableName = process.env.BannersTable;
 const client = createClient();
 
-export const putBanner = async (banner: BannerData) => {
+export const putBanner = async (banner: BannerFormData) => {
   await client.send(
     new PutCommand({
       TableName: bannerTableName,
@@ -14,16 +14,13 @@ export const putBanner = async (banner: BannerData) => {
   );
 };
 
-export const getBanner = async (bannerId: string) => {
-  const response = await client.send(
-    new GetCommand({
-      TableName: bannerTableName,
-      Key: {
-        key: bannerId,
-      },
-    })
-  );
-  return response.Item as BannerData | undefined;
+export const scanAllBanners = async () => {
+  const pages = paginateScan({ client }, { TableName: bannerTableName });
+  const items: Record<string, any>[] = [];
+  for await (const page of pages) {
+    items.push(...(page.Items ?? []));
+  }
+  return items as BannerShape[];
 };
 
 export const deleteBanner = async (bannerId: string) => {

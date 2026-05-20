@@ -15,8 +15,8 @@ export const MenuOption = ({ text, icon, altText, role, hideText }: Props) => {
 
 interface Props {
   text: string;
-  icon: string;
-  altText: string;
+  icon?: string;
+  altText?: string;
   role?: string;
   hideText?: boolean;
 }
