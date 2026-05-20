@@ -18,7 +18,6 @@ export const generalInformation: FormPageTemplate = {
       required: true,
       helperText:
         "Enter the name or position title for CMS to contact with questions about this report.",
-      quarterly: true,
     },
     {
       type: ElementType.Textbox,
@@ -26,7 +25,6 @@ export const generalInformation: FormPageTemplate = {
       label: "Authorized Organizational Representative (AOR) Contact email",
       required: true,
       helperText: "A department or program-wide email address is acceptable.",
-      quarterly: true,
     },
     {
       id: "pipd-name",
@@ -35,7 +33,6 @@ export const generalInformation: FormPageTemplate = {
       required: true,
       helperText:
         "Enter the name or position title for CMS to contact with questions about this report.",
-      quarterly: true,
     },
     {
       type: ElementType.Textbox,
@@ -43,7 +40,6 @@ export const generalInformation: FormPageTemplate = {
       label: "Principal Investigator or Program Director Contact email",
       required: true,
       helperText: "A department or program-wide email address is acceptable.",
-      quarterly: true,
     },
   ],
 };
