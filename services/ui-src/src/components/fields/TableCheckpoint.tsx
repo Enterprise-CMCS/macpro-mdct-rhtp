@@ -189,6 +189,7 @@ export const TableCheckpoint = (
   }, [checkpoint]);
 
   //Updates when the report has been updated, so when a file has been added or removed from the table
+  //when isCommentsOpen is closed, we want to reload the report to update the status in the table
   useEffect(() => {
     const attachments = report?.pages
       .flatMap((page) => page.elements)
@@ -200,8 +201,11 @@ export const TableCheckpoint = (
     const newTables = buildTables(files);
     setAttachments(attachments || []);
     setTables(newTables);
-    setSelectedFiles(getFilesFromTable(newTables, checkpoint));
-  }, [report]);
+
+    //setSelectedFiles shouldn't update when the comment modal is opened
+    if (!isCommentsOpen)
+      setSelectedFiles(getFilesFromTable(newTables, checkpoint));
+  }, [isCommentsOpen, report]);
 
   const onCheckboxHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
