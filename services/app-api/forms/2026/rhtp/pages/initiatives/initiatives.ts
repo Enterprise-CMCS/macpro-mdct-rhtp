@@ -85,6 +85,7 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
     "Provide a narrative description of the initiative’s progress during this reporting period.",
   required: true,
   answer: narrative,
+  quarterly: false,
 });
 
 const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
@@ -92,6 +93,7 @@ const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   id: "initiative-number-of-people-served",
   label: "Number of people served",
   required: true,
+  quarterly: false,
 };
 
 export const metricTable = (
