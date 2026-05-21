@@ -367,6 +367,8 @@ const actionTableSchema = object().shape({
     )
     .required(),
   answer: array().of(mixed()).notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const initiativesTableSchema = object().shape({

@@ -105,6 +105,7 @@ export const metricTable = (
     label: "Metric",
     hintText:
       "Each initiative should have at least 4 metrics to measure its progress toward initiative goals.",
+    quarterly: false,
     modal: {
       title: "Metric",
       elements: [

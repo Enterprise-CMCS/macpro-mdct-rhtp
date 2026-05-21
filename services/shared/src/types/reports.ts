@@ -454,6 +454,8 @@ export interface ActionTableTemplate {
   };
   rows: ActionRowElement[];
   answer?: ActionAnswerShape[];
+  quarterly?: boolean;
+  disabled?: boolean;
 }
 
 export interface SubmitForReviewTemplate {
