@@ -314,7 +314,10 @@ const attachmentAreaSchema = object().shape({
   required: boolean().required(),
   answer: array().of(
     object().shape({
-      name: string().required(),
+      name: string()
+        .transform((value) => (value === "" ? undefined : value))
+        .default("Uploaded File")
+        .required(),
       size: number().required(),
       fileId: string().required(),
     })
@@ -383,7 +386,10 @@ const attachmentTableSchema = object().shape({
     .of(
       object().shape({
         attachment: object().shape({
-          name: string().required(),
+          name: string()
+            .transform((value) => (value === "" ? undefined : value))
+            .default("Uploaded File")
+            .required(),
           size: number().required(),
           fileId: string().required(),
         }),

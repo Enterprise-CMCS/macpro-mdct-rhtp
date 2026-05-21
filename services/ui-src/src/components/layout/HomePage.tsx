@@ -1,37 +1,26 @@
-import { Box, Collapse, Heading, Text } from "@chakra-ui/react";
+import { Box, Heading, Text } from "@chakra-ui/react";
+import { BannerAreas } from "@rhtp/shared";
 import {
   AdminDashSelector,
   Banner,
   PageTemplate,
   RhtpIntroductionCard,
 } from "components";
-import { useEffect } from "react";
-import { checkDateRangeStatus, useStore } from "utils";
+import { useStore } from "utils";
+import { activeBannerSelector } from "utils/state/selectors";
 
 export const HomePage = () => {
-  const { bannerData, bannerActive, setBannerActive } = useStore();
+  const banner = useStore(activeBannerSelector(BannerAreas.Home));
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
-
-  useEffect(() => {
-    let bannerActivity = false;
-    if (bannerData && bannerData.startDate && bannerData.endDate) {
-      bannerActivity = checkDateRangeStatus(
-        bannerData.startDate,
-        bannerData.endDate
-      );
-    }
-    setBannerActive(bannerActivity);
-  }, [bannerData]);
-
-  const showBanner = !!bannerData?.key && bannerActive;
 
   return (
     <>
-      <Collapse in={showBanner}>
+      {banner ? (
         <Box marginX={{ base: "spacer2", md: "spacer3" }} marginTop="spacer3">
-          <Banner bannerData={bannerData} />
+          {" "}
+          <Banner {...banner} key={banner.key} />
         </Box>
-      </Collapse>
+      ) : null}
       <PageTemplate>
         {userIsEndUser && !userIsAdmin ? (
           <>

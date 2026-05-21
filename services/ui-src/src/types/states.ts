@@ -1,22 +1,20 @@
 import { ReactNode } from "react";
-import { ParentPageTemplate, Report, BannerData } from "@rhtp/shared";
-import { ErrorVerbiage, PageData, User } from "types";
+import {
+  ParentPageTemplate,
+  Report,
+  BannerShape,
+  BannerFormData,
+} from "@rhtp/shared";
+import { PageData, User } from "types";
 
-export interface AdminBannerState {
-  bannerData: BannerData | undefined;
-  bannerActive: boolean;
-  bannerLoading: boolean;
-  bannerErrorMessage: ErrorVerbiage | undefined;
-  bannerDeleting: boolean;
-  // ACTIONS
-  setBannerData: (newBannerData: BannerData | undefined) => void;
-  clearAdminBanner: () => void;
-  setBannerActive: (bannerStatus: boolean) => void;
-  setBannerLoading: (bannerLoading: boolean) => void;
-  setBannerErrorMessage: (
-    bannerErrorMessage: ErrorVerbiage | undefined
-  ) => void;
-  setBannerDeleting: (bannerDeleting: boolean) => void;
+export interface BannerState {
+  /** All banners, active and inactive, for every area of the site */
+  allBanners: BannerShape[];
+  /** When was the last time banners were fetched? */
+  _lastFetchTime: number;
+  fetchBanners: () => Promise<void>;
+  createBanner: (data: BannerFormData) => Promise<void>;
+  deleteBanner: (id: string) => Promise<void>;
 }
 
 // initial user state

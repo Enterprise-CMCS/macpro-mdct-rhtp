@@ -6,6 +6,7 @@ import {
   isReportType,
   LiteReport,
   ReportStatus,
+  BannerArea,
 } from "@rhtp/shared";
 import { getReportName } from "types";
 import {
@@ -14,6 +15,7 @@ import {
   AddEditReportModal,
   AccordionItem,
   UnlockModal,
+  Banner,
 } from "components";
 import {
   Box,
@@ -32,10 +34,12 @@ import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import { DevTools } from "components/devTools/DevTools";
+import { activeBannerSelector } from "utils/state/selectors";
 
 export const DashboardPage = () => {
   const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
   const { reportType, state } = useParams();
+  const banner = useStore(activeBannerSelector(reportType as BannerArea));
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<LiteReport[]>([]);
   const [selectedReport, setSelectedReport] = useState<LiteReport | undefined>(
@@ -131,6 +135,7 @@ export const DashboardPage = () => {
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
         Return home
       </Link>
+      {banner ? <Banner {...banner} key={banner.key} /> : null}
       <Box sx={sx.leadTextBox}>
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}

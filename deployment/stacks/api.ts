@@ -137,7 +137,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "createBanner", {
     entry: "services/app-api/handlers/banners/create.ts",
     handler: "createBanner",
-    path: "banners/{bannerId}",
+    path: "banners",
     method: "POST",
     ...commonProps,
   });
@@ -150,10 +150,10 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "fetchBanner", {
+  new Lambda(scope, "getBanners", {
     entry: "services/app-api/handlers/banners/fetch.ts",
-    handler: "fetchBanner",
-    path: "banners/{bannerId}",
+    handler: "getBanners",
+    path: "banners",
     method: "GET",
     ...commonProps,
   });
