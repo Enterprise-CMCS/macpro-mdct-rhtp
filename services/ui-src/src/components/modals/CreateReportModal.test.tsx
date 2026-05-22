@@ -1,7 +1,7 @@
 import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { AddEditReportModal } from "components";
+import { CreateReportModal } from "components";
 import {
   mockStateUserStore,
   RouterWrappedComponent,
@@ -18,6 +18,7 @@ const mockGetReportsForState = vi.fn().mockResolvedValue([
   {
     id: "1",
     name: "mock-name-a",
+    subTypeKey: "A1",
   } as LiteReport,
 ]);
 
@@ -33,7 +34,7 @@ vi.mock("utils/api/requestMethods/report", () => ({
 
 const addModalComponent = (
   <RouterWrappedComponent>
-    <AddEditReportModal
+    <CreateReportModal
       activeState="AB"
       reportType={ReportType.RHTP}
       modalDisclosure={{
@@ -96,13 +97,13 @@ describe("Test submit", () => {
   });
 });
 
-describe("Test AddEditReportModal types", () => {
+describe("Test CreateReportModal types", () => {
   test.each([{ type: ReportType.RHTP, text: "RHTP Report" }])(
     "$type report type renders a title",
     ({ type, text }) => {
       render(
         <RouterWrappedComponent>
-          <AddEditReportModal
+          <CreateReportModal
             activeState="AB"
             reportType={type}
             modalDisclosure={{

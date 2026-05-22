@@ -46,6 +46,7 @@ vi.mock("utils/api/requestMethods/report", () => ({
       status: "Not started",
       name: "Mock Report Name",
       budgetPeriod: 1,
+      subTypeKey: "A1",
     } as Report,
     {
       id: "RHTPCO1234",
@@ -56,6 +57,7 @@ vi.mock("utils/api/requestMethods/report", () => ({
       status: "Not started",
       name: "Mock Report 2027",
       budgetPeriod: 2,
+      subTypeKey: "Q2",
     } as Report,
   ]),
 }));
@@ -170,6 +172,7 @@ describe("DashboardPage with state user", () => {
   });
 
   test("should be able to open the modal to start new report", async () => {
+    (getReportsForState as Mock).mockResolvedValueOnce([]);
     render(dashboardComponent);
     await waitFor(() => {
       expect(getReportsForState).toHaveBeenCalled();
