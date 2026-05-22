@@ -42,6 +42,7 @@ export const DashboardPage = () => {
   const banner = useStore(activeBannerSelector(reportType as BannerArea));
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<LiteReport[]>([]);
+  const [canCreateReport, setCanCreateReport] = useState(false);
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [dropdownValue, setDropdownValue] = useState(
@@ -81,6 +82,14 @@ export const DashboardPage = () => {
       );
     }
   }, [reports, filterBudgetPeriod]);
+
+  useEffect(() => {
+    const noReports = reports.length === 0;
+    const allSubmittedReports = reports.every(
+      (report) => report.status === ReportStatus.SUBMITTED
+    );
+    setCanCreateReport(noReports || allSubmittedReports);
+  }, [reports]);
 
   const reloadReports = (reportType: string, state: string) => {
     (async () => {
@@ -237,7 +246,11 @@ export const DashboardPage = () => {
           ))}
         {userIsEndUser && (
           <Flex justifyContent="center">
-            <Button onClick={createReportModalOnOpenHandler} type="submit">
+            <Button
+              onClick={createReportModalOnOpenHandler}
+              type="submit"
+              disabled={!canCreateReport}
+            >
               {hasSubmittedReport
                 ? `Copy ${reportName} Submission`
                 : `Start ${reportName} Report`}
