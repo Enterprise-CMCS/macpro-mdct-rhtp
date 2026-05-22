@@ -321,6 +321,7 @@ export interface ListInputTemplate extends InputElementTemplate {
 
 export interface NumberFieldTemplate extends InputElementTemplate {
   type: ElementType.NumberField;
+  mask?: MaskType;
   answer?: number;
   hideCondition?: never;
 }
