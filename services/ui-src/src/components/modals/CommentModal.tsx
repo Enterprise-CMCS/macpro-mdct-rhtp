@@ -28,32 +28,20 @@ const PreviousComments = ({ comments }: { comments: InitiativeComment[] }) => {
       </Heading>
       {timeSortedComments.map((comment, index) => (
         <Box marginTop={"spacer2"} key={`previous-comment-${index}`}>
-          {comment.comment === "" ? (
-            <Box paddingY={"spacer2"}>
-              <Text fontWeight={"heading_md"}>{comment.name}</Text>
-              {comment.statusChange && (
-                <Text fontWeight={"heading_md"}>
-                  Status changed to: {comment.statusChange}
-                </Text>
-              )}
-              <Text fontSize={"body_sm"} color={"gray_dark"}>
-                {comment.date}
-              </Text>
-            </Box>
-          ) : (
+          <Text fontWeight={"heading_md"}>{comment.name}</Text>
+          {comment.statusChange && (
+            <Text fontWeight={"heading_md"}>
+              Status changed to: {comment.statusChange}
+            </Text>
+          )}
+          <Text fontSize={"body_sm"} color={"gray_dark"}>
+            {comment.date}
+          </Text>
+          {comment.comment !== "" && (
             <TextField
               id={`previous-comment-${index}`}
               name={`previous-comment-${index}`}
-              label={
-                <>
-                  {comment.name}
-                  <br />
-                  {comment.statusChange && (
-                    <span>Status changed to: {comment.statusChange}</span>
-                  )}
-                </>
-              }
-              hint={comment.date}
+              label={""}
               value={comment.comment}
               disabled={true}
               multiline
