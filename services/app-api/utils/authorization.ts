@@ -48,3 +48,7 @@ export const canWriteBanner = (user: User) => {
 export const canReleaseReport = (user: User) => {
   return adminRoles.includes(user.role);
 };
+
+export const canReadType = (user: User) => {
+  return user.role == UserRoles.ADMIN;
+};

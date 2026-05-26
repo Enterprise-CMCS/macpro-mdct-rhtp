@@ -1,7 +1,7 @@
 import { Box, Heading, Text } from "@chakra-ui/react";
 import { BannerAreas } from "@rhtp/shared";
 import {
-  AdminDashSelector,
+  AdminDashboard,
   Banner,
   PageTemplate,
   RhtpIntroductionCard,
@@ -36,7 +36,7 @@ export const HomePage = () => {
             <RhtpIntroductionCard />
           </>
         ) : (
-          <AdminDashSelector />
+          <AdminDashboard />
         )}
       </PageTemplate>
     </>
