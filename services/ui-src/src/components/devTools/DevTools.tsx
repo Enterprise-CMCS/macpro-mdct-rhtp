@@ -43,7 +43,9 @@ export const DevTools = ({
   if (!devTools || !reportType || !state) return;
 
   const { devDate, setDevDate } = useStore();
-  const [devDateLabel, setDevDateLabel] = useState<string>(devDate ?? "");
+  const [devDateLabel, setDevDateLabel] = useState<string>(
+    devDate ? new Date(parseInt(devDate) ?? 0).toLocaleDateString() : ""
+  );
   const [showOptions, setShowOptions] = useState<boolean>();
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [loading, setLoading] = useState<boolean>();
