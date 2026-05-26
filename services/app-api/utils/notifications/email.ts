@@ -18,21 +18,20 @@ const getTemplate = (
     Body: {
       Text: {
         Data: `Dear User,
+This is an automated notification to inform you that there has been a change in the status of a report within the Rural Health Transformation Program (RHTP) platform on MDCT.
 
-      This is an automated notification to inform you that there has been a change in the status of a report within the Rural Health Transformation Program (RHTP) platform on MDCT.
+Please find the details of the update below:
 
-      Please find the details of the update below:
+Update Summary
 
-      Update Summary
+    Report Name: ${name}
 
-          Report Name: ${name}
+    New Status: ${status}
 
-          New Status: ${status}
+    Date of Change: ${new Date().toDateString()}
 
-          Date of Change: ${new Date().toDateString()}
-
-      If you believe this status change was made in error, or if you have questions regarding the requirements for this new status, please contact your system administrator or reach out to the RHTP support desk.
-      `,
+If you believe this status change was made in error, or if you have questions regarding the requirements for this new status, please contact your system administrator or reach out to the RHTP support desk.
+`,
       },
     },
   },
@@ -42,11 +41,14 @@ const getRecipients = (pages: ReportPages) => {
   const generalInformationPage = pages.find(
     (page) => page.id === "general-information"
   );
-  const emailFields = generalInformationPage?.elements?.filter((element) =>
-    element.id.includes("email")
+  const emailFields = generalInformationPage?.elements?.filter(
+    (element) =>
+      element.id.includes("email") &&
+      "answer" in element &&
+      element.answer !== ""
   );
   const emails = emailFields?.map((field) =>
-    "answer" in field ? field.answer : ""
+    "answer" in field ? field.answer : undefined
   ) as string[];
   return emails || [];
 };
