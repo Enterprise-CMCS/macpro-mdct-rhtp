@@ -18,6 +18,7 @@ const getTemplate = (
     Body: {
       Text: {
         Data: `Dear User,
+
 This is an automated notification to inform you that there has been a change in the status of a report within the Rural Health Transformation Program (RHTP) platform on MDCT.
 
 Please find the details of the update below:
@@ -56,6 +57,7 @@ const getRecipients = (pages: ReportPages) => {
 export const sendEmail = async (report: Report) => {
   const { name, pages, status } = report;
   const recipients = getRecipients(pages);
+  if (recipients.length === 0) return;
   const emailTemplate = getTemplate(name, status, recipients);
   logger.info("sending email to ", recipients);
   await sesLib.sendSesEmail(emailTemplate);
