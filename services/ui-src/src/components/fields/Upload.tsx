@@ -49,7 +49,6 @@ export const Upload = ({
   };
 
   const filterFilesAndStartUpload = (files: File[]) => {
-    console.log("files", files);
     const filteredFiles = files.filter((file) => {
       if (file === null) return false;
       const splitName = file.name.split(".");
@@ -74,7 +73,7 @@ export const Upload = ({
 
       return true;
     });
-    console.log("filtered files", filteredFiles);
+
     const prevFiles = filesToUpload ?? [];
     setFilesToUpload([...prevFiles, ...filteredFiles]);
   };
@@ -138,7 +137,6 @@ export const Upload = ({
               </label>
             </span>
           </Box>
-          {/* <Text sx={sx.uploadErrorLabel}>Failed to Upload</Text> */}
           {uploadErrors.length > 0 && (
             <Box>
               {uploadErrors.map((error) => (
