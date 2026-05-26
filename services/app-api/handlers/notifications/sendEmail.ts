@@ -8,13 +8,7 @@ const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
 const emailTemplate = {
   Source: FROM_ADDRESS,
   Destination: {
-    ToAddresses: [
-      // testing multiple domain recipients, all owned by team members or client
-      "petedunlap@gmail.com",
-      "hi@canipush.com",
-      "junni.rajbhandari1@cms.hhs.gov",
-      "garrett.rabian@coforma.io",
-    ],
+    ToAddresses: ["garrett.rabian@coforma.io"],
   },
   Message: {
     Subject: { Data: "RHTP Notification" },
