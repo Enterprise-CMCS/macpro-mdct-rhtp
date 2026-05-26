@@ -234,6 +234,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "releaseReport",
     path: "reports/release/{reportType}/{state}/{id}",
     method: "PUT",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
