@@ -217,6 +217,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "submitReport",
     path: "reports/submit/{reportType}/{state}/{id}",
     method: "PUT",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
@@ -281,16 +282,6 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "updateInitiative",
     path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
     method: "PUT",
-    ...commonProps,
-  });
-
-  // Notification handlers
-  new Lambda(scope, "sendEmail", {
-    entry: "services/app-api/handlers/notifications/sendEmail.ts",
-    handler: "sendEmail",
-    path: "reports/{reportType}/{state}/{id}/notifications",
-    method: "POST",
-    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
