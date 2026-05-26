@@ -1,14 +1,4 @@
-import {
-  Flex,
-  Button,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Image,
-} from "@chakra-ui/react";
+import { Flex, Button, Image } from "@chakra-ui/react";
 import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
@@ -25,6 +15,7 @@ import { buildElement } from "utils/state/reportLogic/tableBuilder";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { unmaskByType } from "utils/validation/inputValidation";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */
 const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
@@ -44,14 +35,14 @@ const buildRows = (
   formDisabled?: boolean,
   canChangeStatus: boolean = false
 ) => {
-  const formattedRows: JSX.Element[][] = [];
+  const formattedRows: (JSX.Element | string | number)[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
-    const rowElement: JSX.Element[] = [];
+    const rowElement: (JSX.Element | string | number)[] = [];
     const disabled = isRowDisabled(rows, answerRow) || formDisabled;
-    rows.map((column, columnIndex) => {
+    rows.map((column) => {
       //autogenerate next # column
       if (column.id === "no") {
-        rowElement.push(<Td key={column.id}>{answerRowIndex + 1}</Td>);
+        rowElement.push(answerRowIndex + 1);
       } else {
         const element = answerRow.find((item) => item.id === column.id);
         const formattedCol = {
@@ -61,16 +52,14 @@ const buildRows = (
         const value = buildElement(formattedCol, element?.value!, (value) =>
           onChange(value, answerRowIndex, column.id)
         );
-        rowElement.push(<Td key={`action-column-${columnIndex}`}>{value}</Td>);
+        rowElement.push(value || "--");
       }
     });
     if (canChangeStatus) {
       rowElement.push(
-        <Td key={`row.element.${answerRowIndex}`}>
-          <Button variant="link" onClick={() => onEdit(answerRowIndex)}>
-            Edit/Abandon
-          </Button>
-        </Td>
+        <Button variant="link" onClick={() => onEdit(answerRowIndex)}>
+          Edit/Abandon
+        </Button>
       );
     }
     formattedRows.push(rowElement);
@@ -80,8 +69,8 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const { disabled } = props;
-  const { id, label, hintText, modal, rows, answer } = props.element;
+  const { disabled, element } = props;
+  const { id, label, hintText, modal, rows, answer } = element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
@@ -152,7 +141,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     answer ?? [],
     onChange,
     onModalEdit,
-    disabled,
+    disabled || element.disabled,
     canAddOrChangeStatus
   );
 
@@ -166,6 +155,9 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
       props.updateElement({ answer: newAnswer });
     }
   };
+
+  const headers = rows.map((row) => ({ label: row.header }));
+  if (canAddOrChangeStatus) headers.push({ label: "Actions" });
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
@@ -191,21 +183,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           Add {label}
         </Button>
       ) : null}
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            {rows.map((row) => (
-              <Th key={row.header}>{row.header}</Th>
-            ))}
-            {canAddOrChangeStatus ? <Th>Actions</Th> : null}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {formattedRows.map((row, rowIndex) => (
-            <Tr key={`action-row-${rowIndex}`}>{row}</Tr>
-          ))}
-        </Tbody>
-      </Table>
+      {ResponsiveTable(headers, formattedRows, "metric")}
       <ActionModal
         modal={modal}
         form={modalData}

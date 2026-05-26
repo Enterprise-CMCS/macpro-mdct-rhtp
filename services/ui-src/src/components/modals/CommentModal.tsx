@@ -4,7 +4,7 @@ import {
   Dropdown,
   DropdownChangeObject,
 } from "@cmsgov/design-system";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Divider, Heading, Text } from "@chakra-ui/react";
 import { Modal } from "./Modal";
 import {
   InitiativeAnswerProp,
@@ -23,26 +23,30 @@ const PreviousComments = ({ comments }: { comments: InitiativeComment[] }) => {
 
   return (
     <Box marginTop={"spacer2"}>
-      <Text fontWeight={"bold"}>Previous comments</Text>
+      <Heading as={"h3"} fontWeight={"bold"}>
+        Comments
+      </Heading>
       {timeSortedComments.map((comment, index) => (
         <Box marginTop={"spacer2"} key={`previous-comment-${index}`}>
-          <TextField
-            id={`previous-comment-${index}`}
-            name={`previous-comment-${index}`}
-            label={
-              <>
-                {comment.name}
-                <br />
-                {comment.statusChange && (
-                  <span>Status changed to: {comment.statusChange}</span>
-                )}
-              </>
-            }
-            hint={comment.date}
-            value={comment.comment}
-            disabled={true}
-            multiline
-          />
+          <Text fontWeight={"heading_md"}>{comment.name}</Text>
+          {comment.statusChange && (
+            <Text fontWeight={"heading_md"}>
+              Status changed to: {comment.statusChange}
+            </Text>
+          )}
+          <Text fontSize={"body_sm"} color={"gray_dark"}>
+            {comment.date}
+          </Text>
+          {comment.comment !== "" && (
+            <TextField
+              id={`previous-comment-${index}`}
+              name={`previous-comment-${index}`}
+              label={""}
+              value={comment.comment}
+              disabled={true}
+              multiline
+            />
+          )}
         </Box>
       ))}
     </Box>
@@ -176,6 +180,7 @@ export const CommentModal = ({
         multiline
         rows={3}
       />
+      <Divider marginTop={"spacer3"} borderColor={"black"} />
       {pastComments.length > 0 ? (
         <PreviousComments comments={pastComments} />
       ) : null}

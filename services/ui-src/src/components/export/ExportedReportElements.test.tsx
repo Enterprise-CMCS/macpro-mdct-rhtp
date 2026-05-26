@@ -42,4 +42,27 @@ describe("Test ExportedReportElements", () => {
     render(element);
     expect(screen.getByText("TBD")).toBeInTheDocument();
   });
+  test("render ActionTable element", () => {
+    const element = renderElements({
+      type: ElementType.ActionTable,
+      id: "mock-action-table",
+      label: "action table",
+      hintText: "action table hint text",
+      modal: {
+        title: "",
+        elements: [],
+      },
+      rows: [],
+    });
+    render(element);
+    expect(screen.getByText("TBD")).toBeInTheDocument();
+  });
+  test("render AttachmentTable element", () => {
+    const element = renderElements({
+      type: ElementType.AttachmentTable,
+      id: "mock-attachment-table",
+    });
+    render(element);
+    expect(screen.getByText("TBD")).toBeInTheDocument();
+  });
 });
