@@ -4,7 +4,7 @@ import { putReport, queryReportsForState } from "../../storage/reports";
 import { canWriteState } from "../../utils/authorization";
 import { createReport } from "./create";
 import { ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
-import { RhtpSubTypeMap } from "../../utils/constants";
+import { RhtpSubTypeTemplateMap } from "../../utils/constants";
 import { authenticatedUser } from "../../utils/authentication";
 import { User } from "../../types/types";
 
@@ -84,7 +84,6 @@ describe("Test create report handler", () => {
 
     const copyEvent = {
       ...testEvent,
-      copyFromReportId: "123",
     };
     const res = await createReport(copyEvent);
 
@@ -106,7 +105,6 @@ describe("Test create report handler", () => {
 
     const copyEvent = {
       ...testEvent,
-      copyFromReportId: "123",
     };
     const res = await createReport(copyEvent);
 
@@ -118,7 +116,7 @@ describe("Test create report handler", () => {
 
   test("Test cannot create next report if not past start date", async () => {
     // set date to right before allowed date to copy
-    const date = new Date(RhtpSubTypeMap.Q1.startDate - 1);
+    const date = new Date(RhtpSubTypeTemplateMap.Q1.startDate - 1);
     vi.setSystemTime(date);
     (queryReportsForState as Mock).mockReturnValueOnce([
       {
@@ -131,7 +129,6 @@ describe("Test create report handler", () => {
 
     const copyEvent = {
       ...testEvent,
-      copyFromReportId: "123",
     };
     const res = await createReport(copyEvent);
 
@@ -141,7 +138,7 @@ describe("Test create report handler", () => {
 
   test("Test successful create report after the first", async () => {
     // set date to after allowed date to copy
-    const date = new Date(RhtpSubTypeMap.Q1.openDate + 1);
+    const date = new Date(RhtpSubTypeTemplateMap.Q1.openDate + 1);
     vi.setSystemTime(date);
     (queryReportsForState as Mock).mockReturnValueOnce([
       {
@@ -154,7 +151,6 @@ describe("Test create report handler", () => {
 
     const copyEvent = {
       ...testEvent,
-      copyFromReportId: "123",
     };
     const res = await createReport(copyEvent);
 

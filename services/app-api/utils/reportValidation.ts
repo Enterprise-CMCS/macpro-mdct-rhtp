@@ -501,7 +501,6 @@ export const isCreateReportOptions = (
 ): obj is CreateReportOptions => {
   const createReportOptionsValidationSchema = object()
     .shape({
-      copyFromReportId: string().notRequired(),
       mockDate: string().notRequired(),
     })
     .required()

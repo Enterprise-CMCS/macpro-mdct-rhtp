@@ -2,7 +2,7 @@ import { handler } from "../../libs/handler-lib";
 import { parseReportTypeAndState } from "../../libs/param-lib";
 import { badRequest, forbidden, ok } from "../../libs/response-lib";
 import { canWriteState } from "../../utils/authorization";
-import { error, RhtpSubTypeMap } from "../../utils/constants";
+import { error, RhtpSubTypeTemplateMap } from "../../utils/constants";
 import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
 import { RhtpSubType, ReportStatus, ReportOptions } from "@rhtp/shared";
@@ -26,6 +26,7 @@ export const createReport = handler(
 
     let nextReportKey = "A1"; // default first report key
     const reports = await queryReportsForState(reportType, state);
+    let latestReportId;
 
     if (reports.length > 0) {
       const latestReport = reports.reduce((latest, current) => {
@@ -48,7 +49,9 @@ export const createReport = handler(
         );
       }
 
-      nextReportKey = RhtpSubTypeMap[latestReport.subTypeKey].nextReportSubType;
+      latestReportId = latestReport.id;
+      nextReportKey =
+        RhtpSubTypeTemplateMap[latestReport.subTypeKey].nextReportSubType;
     }
 
     const {
@@ -58,7 +61,7 @@ export const createReport = handler(
       budgetPeriod,
       openDate,
       reportTemplateBuilder,
-    } = RhtpSubTypeMap[nextReportKey];
+    } = RhtpSubTypeTemplateMap[nextReportKey];
 
     //using launchdarkly to control how we want to generate reports
     const useDevTools = await isFeatureFlagEnabled("devTools");
@@ -77,8 +80,8 @@ export const createReport = handler(
       subTypeKey: nextReportKey,
       name: `${state} - ${name} - ${dateRangeString}`,
       budgetPeriod,
-      copyFromReportId: body?.copyFromReportId,
-      pages: reportTemplateBuilder(state),
+      pages: reportTemplateBuilder!(state),
+      copyFromReportId: latestReportId,
     };
 
     const report = await buildReport(reportType, state, reportOptions, user);
