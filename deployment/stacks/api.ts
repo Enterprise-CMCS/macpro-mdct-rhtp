@@ -59,14 +59,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     }
   );
 
-  new ses.EmailIdentity(scope, "SenderDomainIdentity", {
+  const senderIdentity = new ses.EmailIdentity(scope, "SenderDomainIdentity", {
     identity: ses.Identity.domain("cms.hhs.gov"),
   });
 
   const sesPolicy = new iam.PolicyStatement({
     effect: iam.Effect.ALLOW,
     actions: ["ses:SendEmail", "ses:SendRawEmail"],
-    resources: ["*"],
+    resources: [senderIdentity.emailIdentityArn],
   });
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
