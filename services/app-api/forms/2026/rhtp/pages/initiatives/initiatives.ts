@@ -92,6 +92,7 @@ const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   type: ElementType.NumberField,
   id: "initiative-number-of-people-served",
   label: "Number of people served",
+  mask: MaskType.CommaSeparated,
   required: true,
   quarterly: false,
 };
