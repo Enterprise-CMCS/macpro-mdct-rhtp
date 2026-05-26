@@ -85,6 +85,8 @@ const numberFieldTemplateSchema = object().shape({
   answer: number().notRequired(),
   required: boolean().required(),
   mask: string().notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const textAreaTemplateSchema = object().shape({
@@ -95,6 +97,8 @@ const textAreaTemplateSchema = object().shape({
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
   required: boolean().required(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({
@@ -271,7 +275,10 @@ const tableCheckpointTemplateSchema = object().shape({
   required: boolean().required(),
   answer: array()
     .of(
-      object().shape({ id: string().required(), checked: boolean().required() })
+      object().shape({
+        id: string().required(),
+        checked: boolean().required(),
+      })
     )
     .notRequired(),
 });
@@ -364,6 +371,8 @@ const actionTableSchema = object().shape({
     )
     .required(),
   answer: array().of(mixed()).notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const initiativesTableSchema = object().shape({
