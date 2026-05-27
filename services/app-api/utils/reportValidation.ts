@@ -84,6 +84,7 @@ const numberFieldTemplateSchema = object().shape({
   helperText: string().notRequired(),
   answer: number().notRequired(),
   required: boolean().required(),
+  mask: string().notRequired(),
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
 });
@@ -501,7 +502,6 @@ export const isCreateReportOptions = (
 ): obj is CreateReportOptions => {
   const createReportOptionsValidationSchema = object()
     .shape({
-      copyFromReportId: string().notRequired(),
       mockDate: string().notRequired(),
     })
     .required()
