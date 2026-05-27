@@ -59,7 +59,7 @@ export const App = () => {
         <main>
           <Container sx={sx.appContainer}>
             <Heading as="h1" fontSize="heading_3xl" variant="login">
-              RHTP
+              RHTP - Jon's branch take 1
             </Heading>
           </Container>
           <Container sx={sx.loginContainer}>
