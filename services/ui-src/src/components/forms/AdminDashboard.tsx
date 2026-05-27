@@ -9,7 +9,7 @@ import {
   Spinner,
   Stack,
   VStack,
-  Box,
+  Image,
 } from "@chakra-ui/react";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import { Report, StateNames } from "@rhtp/shared";
@@ -17,6 +17,19 @@ import { PageTemplate, AccordionItem } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
+import closeTag from "assets/icons/close/icon_close_tag.svg";
+
+const buildStateOptions = () => {
+  const stateValues = [];
+  for (const [key, value] of Object.entries(StateNames)) {
+    stateValues.push({
+      label: value,
+      value: key,
+      checked: false,
+    });
+  }
+  return stateValues;
+};
 
 export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -29,8 +42,14 @@ export const AdminDashboard = () => {
   const [dropdownValue, setDropdownValue] = useState(
     searchParams.get("budgetPeriod") || "All"
   );
-
-  const states = Object.values(StateNames);
+  const [stateSelected, setStateSelected] =
+    useState<
+      {
+        label: string;
+        value: string;
+        checked?: boolean;
+      }[]
+    >(buildStateOptions());
 
   const reloadReports = (reportType: string) => {
     (async () => {
@@ -38,12 +57,12 @@ export const AdminDashboard = () => {
       const result = await getReportByType(reportType);
       setReports(result);
       setIsLoading(false);
+      sortRows("", SORT_TYPE.DEFAULT);
     })();
   };
 
   useEffect(() => {
     reloadReports("RHTP");
-    sortRows("", SORT_TYPE.DEFAULT);
   }, []);
 
   const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
@@ -74,6 +93,19 @@ export const AdminDashboard = () => {
     });
   };
 
+  const handleStateFilter = (
+    selected: { label: string; value: string; checked?: boolean }[]
+  ) => {
+    setStateSelected(selected);
+  };
+
+  const removeTag = (tag: string) => {
+    const newState = [...stateSelected];
+    const stateIndex = newState.findIndex((state) => state.value == tag);
+    newState[stateIndex].checked = false;
+    setStateSelected(newState);
+  };
+
   const buildRows = (reports: Report[]) => {
     return reports.map((report) => {
       const columnAction = (
@@ -89,7 +121,7 @@ export const AdminDashboard = () => {
       );
 
       return [
-        report.state,
+        StateNames[report.state],
         report.name,
         report.budgetPeriod,
         formatMonthDayYear(report.lastEdited!),
@@ -152,7 +184,11 @@ export const AdminDashboard = () => {
         </Accordion>
       </Stack>
       <Flex alignItems="flex-end" gap="spacer3">
-        <MultiSelect label="State(s)" values={states} />
+        <MultiSelect
+          label="State(s)"
+          values={stateSelected}
+          onChange={handleStateFilter}
+        />
         <CmsdsDropdownField
           name="budgetPeriodFilter"
           label="Budget Period"
@@ -167,7 +203,20 @@ export const AdminDashboard = () => {
           Clear Filters
         </Button>
       </Flex>
-      <Box>Tags</Box>
+      <Flex gap=".75rem">
+        {stateSelected
+          .filter((state) => state.checked)
+          .map((state) => (
+            <Button
+              variant="tag"
+              rightIcon={<Image src={closeTag} />}
+              onClick={() => removeTag(state.value)}
+              aria-label={`Remove ${state} tag`}
+            >
+              {state.label}
+            </Button>
+          ))}
+      </Flex>
       {ResponsiveTable(
         [
           { label: "State/Territory", sortable: true },

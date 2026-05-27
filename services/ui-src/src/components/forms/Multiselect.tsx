@@ -3,35 +3,89 @@ import { useState } from "react";
 
 interface Prop {
   label: string;
-  values: string[];
+  values: { label: string; value: string; checked?: boolean }[];
+  onChange: (
+    item: { label: string; value: string; checked?: boolean }[]
+  ) => void;
 }
 
-export const MultiSelect = ({ label, values }: Prop) => {
+export const MultiSelect = ({ label, values, onChange }: Prop) => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [search, setSearch] = useState<string>("");
+  const [filteredValues, setFilteredValues] =
+    useState<{ label: string; value: string; checked?: boolean }[]>(values);
 
   const onClick = () => {
     setShowMenu(!showMenu);
   };
 
-  const onChecked = (item: string) => {
-    const newValues = [...selected, item];
-    setSelected(newValues);
+  const onChecked = (selection: string) => {
+    const newSelection = [...values];
+    const index = newSelection.findIndex(
+      (select) => select.value === selection
+    );
+    newSelection[index].checked = !newSelection[index].checked;
+    onChange(newSelection);
   };
 
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchValue = e.target.value.toLowerCase();
+    setSearch(searchValue);
+
+    if (searchValue === undefined || searchValue === "")
+      setFilteredValues(values);
+    else {
+      const displayValues = values.filter((value) =>
+        value.label.toLowerCase().startsWith(searchValue)
+      );
+      setFilteredValues(displayValues);
+    }
+  };
+
+  const count = () => {
+    return values.filter((value) => value.checked).length;
+  };
+
+  const field = () => {
+    return showMenu ? (
+      <input
+        type="search"
+        placeholder="Search states"
+        onChange={onSearch}
+        value={search}
+      />
+    ) : (
+      <input type="button" onClick={onClick} value={`States (${count()})`} />
+    );
+  };
+
+  window.addEventListener("click", (e) => {
+    const multiselect = document.getElementById("multiselect");
+    const target = e.target as any;
+
+    if (multiselect && !multiselect.contains(target)) {
+      setSearch("");
+      setFilteredValues(values);
+      setShowMenu(false);
+    }
+  });
+
   return (
-    <Box className="ds-c-dropdown" sx={sx.container}>
-      <div className="ds-c-label ds-c-dropdown__label">{label}</div>
-      <button onClick={onClick}>
-        <span className="ds-c-dropdown__button ds-c-field">States</span>
-        <span className="ds-c-downdown__caret"></span>
-      </button>
+    <Box sx={sx.container} id="multiselect">
+      <div className="ds-c-label">{label}</div>
+      <div className="displayContainer">{field()}</div>
       {showMenu && (
         <div className="ds-c-dropdown__menu-container">
           <ul className="ds-c-dropdown__menu">
-            {values.map((value) => (
+            {filteredValues.map((value) => (
               <li>
-                <Checkbox onChange={() => onChecked(value)}>{value}</Checkbox>
+                <Checkbox
+                  onChange={() => onChecked(value.value)}
+                  isChecked={value.checked}
+                  checked={value.checked}
+                >
+                  {value.label}
+                </Checkbox>
               </li>
             ))}
           </ul>
@@ -43,9 +97,18 @@ export const MultiSelect = ({ label, values }: Prop) => {
 
 const sx = {
   container: {
+    position: "relative",
+    display: "flex",
+    flexDir: "column",
+
+    zIndex: "1101",
     width: "140px",
     ".ds-c-field": {
       width: "140px",
+    },
+    ".ds-c-dropdown__menu-container": {
+      position: "absolute",
+      top: "80px",
     },
     ".chakra-checkbox__control": {
       width: "24px",
@@ -54,6 +117,19 @@ const sx = {
     },
     li: {
       paddingLeft: "10px",
+    },
+    ".displayContainer": {
+      border: "2px solid black",
+      input: {
+        background: "white",
+        width: "100%",
+        height: "100%",
+        padding: "8px",
+        textAlign: "left",
+        margin: "0",
+      },
+      height: "42px",
+      marginTop: "8px",
     },
   },
 };
