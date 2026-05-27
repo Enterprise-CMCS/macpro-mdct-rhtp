@@ -4,6 +4,8 @@ export const stateUser = process.env.TEST_STATE_USER_EMAIL!;
 export const statePassword = process.env.TEST_STATE_USER_PASSWORD!; // pragma: allowlist secret
 export const stateAbbreviation = process.env.TEST_STATE || "DC";
 export const stateName = process.env.TEST_STATE_NAME || "District of Columbia";
+export const reportType = process.env.TEST_REPORT_TYPE || "RHTP";
+export const fakerSeed = Number(process.env.TEST_FAKER_SEED || "20260519");
 
 export const adminAuthPath: string = "playwright/.auth/admin.json";
 export const stateUserAuthPath: string = "playwright/.auth/user.json";
@@ -12,6 +14,13 @@ export const expectedAdminHeading = "View State/Territory Reports";
 export const expectedStateUserHeading = "Rural Health Transformation Program";
 
 export const cognitoIdentityRoute = "https://cognito-identity.*.amazonaws.com/";
+
+export const defaultReportFormData = {
+  aorName: "Test AOR",
+  aorEmail: "aor@test.com",
+  piName: "Test PI",
+  piEmail: "pi@test.com",
+} as const;
 
 export const a11yViewports = {
   mobile: { width: 560, height: 800 },

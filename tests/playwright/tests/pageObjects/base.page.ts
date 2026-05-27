@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 
 export class BasePage {
   readonly page: Page;
@@ -7,22 +7,19 @@ export class BasePage {
     this.page = page;
   }
 
-  protected waitForApiResponse(
-    method: string,
-    status: number,
-    urlPattern?: string
-  ) {
-    return this.page.waitForResponse((response) => {
-      const matchesMethod = response.request().method() === method;
-      const matchesStatus = response.status() === status;
-      const matchesUrl = urlPattern
-        ? response.url().includes(urlPattern)
-        : true;
-      return matchesMethod && matchesStatus && matchesUrl;
-    });
+  // ===== Navigation =====
+  async navigateTo(route: string): Promise<void> {
+    await this.page.goto(route, { waitUntil: "domcontentloaded" });
   }
 
-  protected waitForReportResponse(method: string, status: number) {
-    return this.waitForApiResponse(method, status, "/reports/");
+  // ===== Page State & Loading =====
+  async waitForLoadingComplete(): Promise<void> {
+    // Wait for any spinners or loading indicators to disappear
+    const spinners = this.page.getByRole("status").first();
+    await expect(spinners)
+      .toBeHidden()
+      .catch(() => {
+        // It's ok if the status element doesn't exist
+      });
   }
 }
