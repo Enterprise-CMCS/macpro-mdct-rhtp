@@ -69,6 +69,28 @@ export function deployFrontend(props: DeployFrontendProps) {
     }
   );
 
+  const deployIndex = new s3_deployment.BucketDeployment(
+    scope,
+    "DeployIndex",
+    {
+      sources: [
+        s3_deployment.Source.asset(buildOutputPath, {
+          exclude: ["*", ".*", "!index.html"],
+        }),
+      ],
+      destinationBucket: uiBucket,
+      distribution,
+      distributionPaths: ["/index.html"],
+      prune: false,
+      cacheControl: [
+        s3_deployment.CacheControl.noCache(),
+        s3_deployment.CacheControl.mustRevalidate(),
+      ],
+    }
+  );
+
+  deployIndex.node.addDependency(deployWebsite);
+
   const deployTimeConfig = new s3_deployment.DeployTimeSubstitutedFile(
     scope,
     "DeployTimeConfig",
