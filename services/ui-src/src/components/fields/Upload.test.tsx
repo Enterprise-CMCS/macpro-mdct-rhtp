@@ -51,6 +51,7 @@ const props = {
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
+window.open = vi.fn();
 
 describe("<Upload />", () => {
   beforeEach(() => {
@@ -79,8 +80,10 @@ describe("<Upload />", () => {
     });
 
     const dropArea = screen.getByLabelText("file drop area");
-    fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
+    await act(async () => {
+      await fireEvent.drop(dropArea, {
+        dataTransfer: { items: [{ getAsFile: () => mockPng }] },
+      });
     });
     expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
   });

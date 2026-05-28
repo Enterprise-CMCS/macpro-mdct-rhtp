@@ -30,6 +30,7 @@ export const buildElement = (
     case ElementType.Dropdown:
       return (
         <Dropdown
+          key={`dropdown-${label}`}
           name={label ?? "dropdown"}
           label={label}
           onChange={(event) => {
@@ -45,6 +46,7 @@ export const buildElement = (
     case ElementType.NumberField:
       return (
         <TextField
+          key={`textbox-${label}`}
           label={label}
           name={label ?? "textbox"}
           onChange={(event) => {
@@ -63,6 +65,7 @@ export const buildElement = (
     case ElementType.TextAreaField:
       return (
         <TextField
+          key={`textarea-${label}`}
           label={label}
           name={label ?? "textarea"}
           onChange={(event) => {
@@ -81,6 +84,7 @@ export const buildElement = (
     case ElementType.Date:
       return (
         <SingleInputDateField
+          key={`date-${label}`}
           name={label ?? "date-field"}
           label={label}
           onChange={(_rawValue: string, maskedValue: string) => {

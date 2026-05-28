@@ -37,6 +37,7 @@ const mockNavigate = vi.fn();
   reportType: "exampleReport",
   state: "exampleState",
   reportId: "123",
+  pageId: "examplePage",
 });
 
 const elements: PageElement[] = [

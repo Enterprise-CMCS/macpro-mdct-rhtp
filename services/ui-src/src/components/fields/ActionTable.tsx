@@ -195,7 +195,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           },
         }}
         disabled={reportSubmitted}
-      ></ActionModal>
+      />
     </Flex>
   );
 };
