@@ -78,12 +78,7 @@ export const AdminBannerForm = ({ createBanner }: Props) => {
         ? evt.target.maskedValue!
         : newFormData.startDate
     );
-    console.log(
-      "parsedStartDate",
-      parsedStartDate,
-      evt.target.maskedValue,
-      newFormData.startDate
-    );
+
     if (touched.startDate) {
       if (!newFormData.startDate) {
         newFormErrors.startDate = ErrorMessages.requiredResponse;

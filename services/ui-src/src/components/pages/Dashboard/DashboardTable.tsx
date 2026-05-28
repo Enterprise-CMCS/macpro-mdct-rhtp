@@ -62,15 +62,6 @@ export const HorizontalTable = (props: TableProps) => {
             padding="16px 16px 16px 0"
           >
             {report.name ?? "{Name of form}"}
-            {report.copyFromReportId && (
-              <Text
-                color="gray_dark"
-                fontSize="body_sm"
-                paddingTop="spacer_half"
-              >
-                Copied from previous report
-              </Text>
-            )}
           </Td>
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
@@ -134,13 +125,6 @@ export const VerticalTable = (props: TableProps) => {
                 {report.name}
               </Text>
             </HStack>
-            {report.copyFromReportId && (
-              <HStack>
-                <Text color="gray_dark" fontSize="body_sm">
-                  Copied from previous report
-                </Text>
-              </HStack>
-            )}
           </div>
           <HStack gap="4rem">
             <div>

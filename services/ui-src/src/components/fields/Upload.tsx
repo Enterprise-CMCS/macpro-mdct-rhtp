@@ -31,6 +31,7 @@ export const Upload = ({
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
   const [filesToUpload, setFilesToUpload] = useState<File[]>();
+  const [uploadErrors, setUploadErrors] = useState<string[]>([]);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
@@ -47,21 +48,47 @@ export const Upload = ({
     event.preventDefault();
   };
 
+  const filterFilesAndStartUpload = (files: File[]) => {
+    const filteredFiles = files.filter((file) => {
+      if (file === null) return false;
+      const splitName = file.name.split(".");
+
+      if (splitName.at(0)?.trim() === "") {
+        setUploadErrors((prevErrors) => [
+          ...(prevErrors ?? []),
+          `File ${file.name} has an invalid name and was not uploaded`,
+        ]);
+        return false;
+      }
+
+      const fileType = splitName.at(-1)?.toLowerCase();
+
+      if (!fileType || !acceptedFileTypes.includes(`.${fileType}`)) {
+        setUploadErrors((prevErrors) => [
+          ...(prevErrors ?? []),
+          `File ${file.name} has unsupported file type and was not uploaded`,
+        ]);
+        return false;
+      }
+
+      return true;
+    });
+
+    const prevFiles = filesToUpload ?? [];
+    setFilesToUpload([...prevFiles, ...filteredFiles]);
+  };
+
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    /** TO DO: add filtering to upload only accepted file types */
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
       .filter((file) => file != null);
-
-    const prevFiles = filesToUpload ?? [];
-    setFilesToUpload([...prevFiles, ...files]);
+    filterFilesAndStartUpload(files);
   };
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      const file = event.target.files;
-      setFilesToUpload([...(filesToUpload ?? []), ...file]);
+      filterFilesAndStartUpload([...event.target.files]);
     }
   };
 
@@ -110,6 +137,14 @@ export const Upload = ({
               </label>
             </span>
           </Box>
+          {uploadErrors.length > 0 && (
+            <Box>
+              {uploadErrors.map((error) => (
+                <Text sx={sx.uploadErrorLabel}>{error}</Text>
+              ))}
+            </Box>
+          )}
+
           <Text sx={sx.uploadedLabel}>Selected Files</Text>
           {uploadListRender(
             reportType,
@@ -150,6 +185,12 @@ const sx = {
     fontWeight: "600",
   },
 
+  uploadErrorLabel: {
+    marginBottom: ".50rem",
+    fontWeight: "600",
+    color: "error",
+  },
+
   uploadedSubLabel: {
     fontSize: "14px",
   },
@@ -170,7 +211,7 @@ const sx = {
     label: {
       paddingLeft: ".25rem",
       marginBlock: 0,
-      color: "#0071bc",
+      color: "primary",
       textDecoration: "underline",
       fontWeight: "700",
     },
