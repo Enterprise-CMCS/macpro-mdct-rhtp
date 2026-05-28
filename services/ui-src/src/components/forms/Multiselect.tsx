@@ -100,8 +100,6 @@ const sx = {
     position: "relative",
     display: "flex",
     flexDir: "column",
-
-    zIndex: "1101",
     width: "140px",
     ".ds-c-field": {
       width: "140px",

@@ -8,11 +8,11 @@ import {
   Accordion,
   Spinner,
   Stack,
-  VStack,
+  HStack,
   Image,
 } from "@chakra-ui/react";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
-import { Report, StateNames } from "@rhtp/shared";
+import { Report, ReportType, StateNames } from "@rhtp/shared";
 import { PageTemplate, AccordionItem } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
@@ -57,13 +57,17 @@ export const AdminDashboard = () => {
       const result = await getReportByType(reportType);
       setReports(result);
       setIsLoading(false);
-      sortRows("", SORT_TYPE.DEFAULT);
     })();
   };
 
   useEffect(() => {
-    reloadReports("RHTP");
+    //we don't have any other report types so defaulting to RHTP
+    reloadReports(ReportType.RHTP);
   }, []);
+
+  useEffect(() => {
+    sortRows("", SORT_TYPE.DEFAULT);
+  }, [reports]);
 
   const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
   const filterDropdownOptions = [
@@ -109,15 +113,17 @@ export const AdminDashboard = () => {
   const buildRows = (reports: Report[]) => {
     return reports.map((report) => {
       const columnAction = (
-        <VStack>
+        <HStack>
           <Button
             variant="outline"
             onClick={() => navigate(reportBasePath(report))}
           >
             View Report
           </Button>
-          <Button variant="link">Comment/Status</Button>
-        </VStack>
+          <Button variant="link" fontWeight="bold">
+            Comment/Status
+          </Button>
+        </HStack>
       );
 
       return [
@@ -168,7 +174,7 @@ export const AdminDashboard = () => {
 
   return (
     <PageTemplate type="report" sxOverride={sx.layout}>
-      <Stack gap="2rem" width="100%">
+      <Stack sx={sx.box} gap="2rem">
         <Heading as="h1" variant="h1">
           Admin Dashboard
         </Heading>
@@ -182,60 +188,60 @@ export const AdminDashboard = () => {
         >
           <AccordionItem label="Instructions">[Needs content]</AccordionItem>
         </Accordion>
-      </Stack>
-      <Flex alignItems="flex-end" gap="spacer3">
-        <MultiSelect
-          label="State(s)"
-          values={stateSelected}
-          onChange={handleStateFilter}
-        />
-        <CmsdsDropdownField
-          name="budgetPeriodFilter"
-          label="Budget Period"
-          value={dropdownValue}
-          onChange={handleBudgetPeriodChange}
-          options={filterDropdownOptions}
-        />
-        <Button onClick={handleFilter} variant="outline">
-          Apply
-        </Button>
-        <Button onClick={handleFilter} variant="link">
-          Clear Filters
-        </Button>
-      </Flex>
-      <Flex gap=".75rem">
-        {stateSelected
-          .filter((state) => state.checked)
-          .map((state) => (
-            <Button
-              variant="tag"
-              rightIcon={<Image src={closeTag} />}
-              onClick={() => removeTag(state.value)}
-              aria-label={`Remove ${state} tag`}
-            >
-              {state.label}
-            </Button>
-          ))}
-      </Flex>
-      {ResponsiveTable(
-        [
-          { label: "State/Territory", sortable: true },
-          { label: "Report Name", sortable: true },
-          { label: "Budget Period", sortable: true },
-          { label: "Last Edited", sortable: true },
-          { label: "Status", sortable: true },
-          { label: "#" },
-          { label: "Actions" },
-        ],
-        tableRows,
-        "",
-        sortRows
-      )}
-      {isLoading && (
-        <Flex justify="center">
-          <Spinner size="md" />
+        <Flex gap="spacer3" alignItems="flex-end">
+          <MultiSelect
+            label="State(s)"
+            values={stateSelected}
+            onChange={handleStateFilter}
+          />
+          <CmsdsDropdownField
+            name="budgetPeriodFilter"
+            label="Budget Period"
+            value={dropdownValue}
+            onChange={handleBudgetPeriodChange}
+            options={filterDropdownOptions}
+          />
+          <Button onClick={handleFilter} variant="outline">
+            Apply
+          </Button>
+          <Button onClick={handleFilter} variant="link" height="40px">
+            Clear Filters
+          </Button>
         </Flex>
-      )}
+        <Flex gap=".75rem" flexWrap="wrap">
+          {stateSelected
+            .filter((state) => state.checked)
+            .map((state) => (
+              <Button
+                variant="tag"
+                rightIcon={<Image src={closeTag} />}
+                onClick={() => removeTag(state.value)}
+                aria-label={`Remove ${state} tag`}
+              >
+                {state.label}
+              </Button>
+            ))}
+        </Flex>
+        {ResponsiveTable(
+          [
+            { label: "State/Territory", sortable: true },
+            { label: "Report Name", sortable: true },
+            { label: "Budget Period", sortable: true },
+            { label: "Last Edited", sortable: true },
+            { label: "Status", sortable: true },
+            { label: "#" },
+            { label: "Actions" },
+          ],
+          tableRows,
+          "",
+          sortRows
+        )}
+        {isLoading && (
+          <Flex justify="center">
+            <Spinner size="md" />
+          </Flex>
+        )}
+      </Stack>
     </PageTemplate>
   );
 };
@@ -244,8 +250,12 @@ const sx = {
   layout: {
     ".contentFlex": {
       maxWidth: "appMax",
-      marginTop: "spacer4",
+      marginTop: "spacer7",
       marginBottom: "spacer7",
+      alignItems: "center",
     },
+  },
+  box: {
+    maxWidth: "55.25rem",
   },
 };
