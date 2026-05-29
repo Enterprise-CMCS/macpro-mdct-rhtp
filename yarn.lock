@@ -5739,6 +5739,7 @@ __metadata:
   resolution: "app-api@workspace:services/app-api"
   dependencies:
     "@aws-sdk/client-dynamodb": "npm:~3.1032.0"
+    "@aws-sdk/client-lambda": "npm:~3.1032.0"
     "@aws-sdk/lib-dynamodb": "npm:~3.1032.0"
     "@aws-sdk/s3-request-presigner": "npm:~3.1032.0"
     "@launchdarkly/node-server-sdk": "npm:^9.10.4"

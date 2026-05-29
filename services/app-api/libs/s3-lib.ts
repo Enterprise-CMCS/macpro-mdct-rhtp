@@ -2,6 +2,8 @@ import {
   S3Client,
   DeleteObjectRequest,
   DeleteObjectCommand,
+  HeadObjectRequest,
+  HeadObjectCommand,
   PutObjectRequest,
   PutObjectCommand,
   GetObjectRequest,
@@ -22,6 +24,9 @@ const client = new S3Client(awsConfig);
 export default {
   deleteObject: (params: DeleteObjectRequest) =>
     client.send(new DeleteObjectCommand(params)),
+
+  headObject: (params: HeadObjectRequest) =>
+    client.send(new HeadObjectCommand(params)),
 
   createPresignedPost: (params: PutObjectRequest) =>
     getSignedUrl(client, new PutObjectCommand(params), { expiresIn: 600 }),
