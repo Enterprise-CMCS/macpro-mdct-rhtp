@@ -4,7 +4,11 @@ import { Button, Stack, Image } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
 import { useStore } from "utils";
-import { downloadFile, uploadListRender, removeFile } from "utils/other/upload";
+import {
+  downloadFile,
+  uploadListRender,
+  removeFile,
+} from "utils/other/fileUtils";
 import { Hint, Label } from "@cmsgov/design-system";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";

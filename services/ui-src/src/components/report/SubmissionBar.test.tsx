@@ -17,7 +17,7 @@ vi.mock("react-router", async (importOriginal) => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock("utils/other/upload", () => ({
+vi.mock("utils/other/fileUtils", () => ({
   getZipFile: () => getZipFile,
 }));
 

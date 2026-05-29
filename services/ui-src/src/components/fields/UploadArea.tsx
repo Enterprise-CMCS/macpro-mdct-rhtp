@@ -10,7 +10,7 @@ import {
   downloadFile,
   getFileWithSafeName,
   uploadListRender,
-} from "utils/other/upload";
+} from "utils/other/fileUtils";
 import { useStore } from "utils";
 
 interface Props {

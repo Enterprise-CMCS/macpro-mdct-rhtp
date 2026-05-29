@@ -22,7 +22,7 @@ import {
   canEditAttachment,
   downloadFile,
   removeFile,
-} from "utils/other/upload";
+} from "utils/other/fileUtils";
 import {
   checkpointAttachableOptions,
   checkpointList,

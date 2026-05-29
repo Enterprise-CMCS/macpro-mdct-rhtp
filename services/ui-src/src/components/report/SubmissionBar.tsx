@@ -8,7 +8,7 @@ import { SubmitReportModal } from "./SubmitReportModal";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
 import { ReportStatus } from "@rhtp/shared";
-import { getZipFile } from "utils/other/upload";
+import { getZipFile } from "utils/other/fileUtils";
 
 export const SubmissionBar = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =

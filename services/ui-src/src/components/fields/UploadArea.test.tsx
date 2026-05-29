@@ -14,7 +14,7 @@ import {
 } from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 
-vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
+vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),
