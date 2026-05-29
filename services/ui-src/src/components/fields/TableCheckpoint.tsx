@@ -175,7 +175,9 @@ export const TableCheckpoint = (
   };
 
   if (!state || !id || !reportType || !pageId) {
-    console.error("Can't retrieve uploads with missing state, year or id");
+    console.error(
+      "Can't retrieve uploads with missing state, report id, type, or page id"
+    );
     return;
   }
 
@@ -335,7 +337,7 @@ export const TableCheckpoint = (
             onChange={() => onCheckboxHandler(row.id)}
             disabled={disabled}
             sx={sx.checkbox}
-          ></Checkbox>
+          />
         ) : (
           ""
         );

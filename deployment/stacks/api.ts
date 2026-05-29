@@ -5,6 +5,8 @@ import {
   aws_wafv2 as wafv2,
   aws_s3 as s3,
   aws_ec2 as ec2,
+  aws_ses as ses,
+  aws_iam as iam,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -56,6 +58,28 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       allowAllOutbound: true,
     }
   );
+
+  // sending emails requires manual steps and approvals, so we only do them in dev, val, prod
+  let sesPolicy = new iam.PolicyStatement({
+    effect: iam.Effect.DENY,
+    actions: ["ses:SendEmail", "ses:SendRawEmail"],
+    resources: ["*"],
+  });
+  if (!isDev) {
+    const senderIdentity = new ses.EmailIdentity(
+      scope,
+      "SenderDomainIdentity",
+      {
+        identity: ses.Identity.domain("cms.hhs.gov"),
+      }
+    );
+
+    sesPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["ses:SendEmail", "ses:SendRawEmail"],
+      resources: [senderIdentity.emailIdentityArn],
+    });
+  }
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
@@ -213,6 +237,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "submitReport",
     path: "reports/submit/{reportType}/{state}/{id}",
     method: "PUT",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
@@ -229,6 +254,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "releaseReport",
     path: "reports/release/{reportType}/{state}/{id}",
     method: "PUT",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { AdminBannerForm } from "components";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
@@ -83,7 +83,9 @@ describe("AdminBannerForm validation", () => {
       startDate: "2026-01-10",
       endDate: "2026-01-20",
     } as BannerShape;
-    useStore.setState({ allBanners: [existingBanner] });
+    act(() => {
+      useStore.setState({ allBanners: [existingBanner] });
+    });
 
     const startDateInput = screen.getByLabelText("Start date");
     const endDateInput = screen.getByLabelText("End date");

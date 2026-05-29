@@ -95,7 +95,8 @@ const TableCheckpointComponent = (
 );
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
-const consoleMock = vi.spyOn(console, "error");
+const consoleMock = vi.spyOn(console, "error").mockImplementation(vi.fn());
+window.open = vi.fn();
 
 const mockReport = {
   report: {
@@ -152,7 +153,7 @@ describe("<TableCheckpoint />", () => {
     });
     expect(screen.queryByText("mock attachment area")).not.toBeInTheDocument();
     expect(consoleMock).toHaveBeenLastCalledWith(
-      "Can't retrieve uploads with missing state, year or id"
+      "Can't retrieve uploads with missing state, report id, type, or page id"
     );
   });
   test("checkbox checking", async () => {

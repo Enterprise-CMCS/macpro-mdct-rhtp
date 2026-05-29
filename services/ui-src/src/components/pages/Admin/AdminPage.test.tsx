@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AdminPage } from "components";
 import { useStore } from "utils";
-import { testA11y } from "utils/testing/commonTests";
+import { testA11yAct } from "utils/testing/commonTests";
 import { BannerShape, BannerAreas } from "@rhtp/shared";
 
 const daysFromToday = (offset: number) => {
@@ -172,7 +172,7 @@ describe("<AdminPage />", () => {
     expect(screen.getByText(dates, { exact: false })).toBeVisible();
   });
 
-  testA11y(<AdminPage />, () => {
+  testA11yAct(<AdminPage />, () => {
     useStore.setState({
       allBanners: [
         mockBannerRhtp,
@@ -183,7 +183,7 @@ describe("<AdminPage />", () => {
     });
   });
 
-  testA11y(<AdminPage />, () => {
+  testA11yAct(<AdminPage />, () => {
     useStore.setState({ allBanners: [] });
   });
 });

@@ -27,6 +27,10 @@ vi.mock("../../utils/reportValidation", () => ({
   validateReportPayload: vi.fn(),
 }));
 
+vi.mock("../../utils/notifications/email", () => ({
+  sendEmail: vi.fn(),
+}));
+
 const invalidReport = JSON.stringify({
   type: "RHTP",
   state: "PA",
