@@ -22,7 +22,6 @@ interface LambdaProps extends Partial<NodejsFunctionProps> {
   tables?: DynamoDBTable[];
   buckets?: s3.IBucket[];
   isDev: boolean;
-  integrationOptions?: apigateway.LambdaIntegrationOptions;
 }
 
 export class Lambda extends Construct {
@@ -42,7 +41,6 @@ export class Lambda extends Construct {
       buckets = [],
       stackName,
       isDev,
-      integrationOptions,
       ...restProps
     } = props;
 
@@ -77,7 +75,7 @@ export class Lambda extends Construct {
       const resource = api.root.resourceForPath(path);
       resource.addMethod(
         method,
-        new apigateway.LambdaIntegration(this.lambda, integrationOptions),
+        new apigateway.LambdaIntegration(this.lambda),
         {
           authorizationType: isLocalStack
             ? undefined

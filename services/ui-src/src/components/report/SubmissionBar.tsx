@@ -48,6 +48,8 @@ export const SubmissionBar = () => {
     try {
       await getZipFile(report);
     } catch (error) {
+      // TODO: better visual handing of this error for client?
+      // or not, because the timeout is 15 minutes
       console.error("Error fetching ZIP file:", error);
     }
 

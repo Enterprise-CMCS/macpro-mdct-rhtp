@@ -9,7 +9,7 @@ import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 import JSZip from "jszip";
 import { Readable } from "node:stream";
 
-const lambdaClient = new LambdaClient({});
+const lambdaClient = new LambdaClient({ region: "us-east-1" });
 
 const S3ZipKey = (reportType: string, state: string, id: string) =>
   `zips/${reportType}/${state}/${id}.zip`;
