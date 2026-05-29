@@ -137,7 +137,6 @@ export function createUploadsComponents(props: CreateUploadsComponentsProps) {
         `${attachmentsBucket.bucketArn}/*.pdf`,
         `${attachmentsBucket.bucketArn}/*.jpg`,
         `${attachmentsBucket.bucketArn}/*.xlsx`,
-        `${attachmentsBucket.bucketArn}/*.json`,
         `${attachmentsBucket.bucketArn}/*.zip`,
         `${attachmentsBucket.bucketArn}/*.xltx`,
         `${attachmentsBucket.bucketArn}/*.xls`,
