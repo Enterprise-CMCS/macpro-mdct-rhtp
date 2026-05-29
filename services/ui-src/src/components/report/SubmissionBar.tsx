@@ -85,6 +85,7 @@ export const SubmissionBar = () => {
           variant={isSubmitted ? "outline" : "link"}
           fontWeight="bold"
           onClick={getZipClick}
+          disabled={isZipLoading}
         >
           {isZipLoading && (
             <Flex justify="center">
