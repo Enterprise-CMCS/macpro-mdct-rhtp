@@ -18,6 +18,7 @@ import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
+import { budgetPeriodFilterOptions } from "./../../constants";
 
 const buildStateOptions = () => {
   const stateValues = [];
@@ -34,6 +35,7 @@ const buildStateOptions = () => {
 export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<Report[]>([]);
+  const [filteredReports, setFilteredReports] = useState<Report[]>([]);
   const [tableRows, setTableRows] = useState<
     (string | number | JSX.Element | undefined)[][]
   >([]);
@@ -51,49 +53,59 @@ export const AdminDashboard = () => {
       }[]
     >(buildStateOptions());
 
-  const reloadReports = (reportType: string) => {
-    (async () => {
-      setIsLoading(true);
-      const result = await getReportByType(reportType);
-      setReports(result);
-      setIsLoading(false);
-    })();
-  };
+  const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
+  const statesTag = searchParams.get("states");
 
   useEffect(() => {
+    const reloadReports = (reportType: string) => {
+      (async () => {
+        setIsLoading(true);
+        const result = await getReportByType(reportType);
+        setReports(result);
+        setIsLoading(false);
+      })();
+    };
+
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
   }, []);
 
   useEffect(() => {
     sortRows("", SORT_TYPE.DEFAULT);
-  }, [reports]);
-
-  const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
-  const filterDropdownOptions = [
-    { label: "All", value: "All" },
-    { label: "Budget Period 1", value: 1 },
-    { label: "Budget Period 2", value: 2 },
-    { label: "Budget Period 3", value: 3 },
-    { label: "Budget Period 4", value: 4 },
-    { label: "Budget Period 5", value: 5 },
-  ];
+  }, [filteredReports]);
 
   useEffect(() => {
-    if (filterBudgetPeriod === "All") {
-      //placeholder
-    } else {
-      //placeholder
-    }
-  }, [filterBudgetPeriod]);
+    const states =
+      statesTag && statesTag.length > 0 ? statesTag.split(",") : "";
+
+    const filterByBudget =
+      filterBudgetPeriod === "All"
+        ? reports
+        : reports.filter(
+            (report) => report.budgetPeriod === parseInt(filterBudgetPeriod)
+          );
+
+    const filterByState =
+      states === ""
+        ? filterByBudget
+        : filterByBudget.filter((report) => states.includes(report.state));
+    setFilteredReports(filterByState);
+  }, [filterBudgetPeriod, statesTag, reports]);
+
+  const selectedTags = () => {
+    return stateSelected.filter((state) => state.checked);
+  };
 
   const handleBudgetPeriodChange = (evt: { target: { value: string } }) => {
     setDropdownValue(evt.target.value);
   };
 
-  const handleFilter = () => {
+  const applyFilter = () => {
     setSearchParams({
       budgetPeriod: dropdownValue.toString(),
+      states: selectedTags()
+        .map((state) => state.value)
+        .join(","),
     });
   };
 
@@ -101,6 +113,18 @@ export const AdminDashboard = () => {
     selected: { label: string; value: string; checked?: boolean }[]
   ) => {
     setStateSelected(selected);
+  };
+
+  const clearFilter = () => {
+    const newState = [...stateSelected].map((state) => ({
+      ...state,
+      checked: false,
+    }));
+    setStateSelected(newState);
+    setDropdownValue("All");
+
+    setFilteredReports(reports);
+    setSearchParams();
   };
 
   const removeTag = (tag: string) => {
@@ -169,7 +193,7 @@ export const AdminDashboard = () => {
             }
           });
     };
-    setTableRows(buildRows(runSort(reports)));
+    setTableRows(buildRows(runSort(filteredReports)));
   };
 
   return (
@@ -199,19 +223,18 @@ export const AdminDashboard = () => {
             label="Budget Period"
             value={dropdownValue}
             onChange={handleBudgetPeriodChange}
-            options={filterDropdownOptions}
+            options={budgetPeriodFilterOptions}
           />
-          <Button onClick={handleFilter} variant="outline">
+          <Button onClick={applyFilter} variant="outline">
             Apply
           </Button>
-          <Button onClick={handleFilter} variant="link" height="40px">
+          <Button onClick={clearFilter} variant="link" height="40px">
             Clear Filters
           </Button>
         </Flex>
-        <Flex gap=".75rem" flexWrap="wrap">
-          {stateSelected
-            .filter((state) => state.checked)
-            .map((state) => (
+        {selectedTags().length > 0 && (
+          <Flex gap=".75rem" flexWrap="wrap">
+            {selectedTags().map((state) => (
               <Button
                 variant="tag"
                 rightIcon={<Image src={closeTag} />}
@@ -221,25 +244,27 @@ export const AdminDashboard = () => {
                 {state.label}
               </Button>
             ))}
-        </Flex>
-        {ResponsiveTable(
-          [
-            { label: "State/Territory", sortable: true },
-            { label: "Report Name", sortable: true },
-            { label: "Budget Period", sortable: true },
-            { label: "Last Edited", sortable: true },
-            { label: "Status", sortable: true },
-            { label: "#" },
-            { label: "Actions" },
-          ],
-          tableRows,
-          "",
-          sortRows
+          </Flex>
         )}
-        {isLoading && (
+        {isLoading ? (
           <Flex justify="center">
             <Spinner size="md" />
           </Flex>
+        ) : (
+          ResponsiveTable(
+            [
+              { label: "State/Territory", sortable: true },
+              { label: "Report Name", sortable: true },
+              { label: "Budget Period", sortable: true },
+              { label: "Last Edited", sortable: true },
+              { label: "Status", sortable: true },
+              { label: "#" },
+              { label: "Actions" },
+            ],
+            tableRows,
+            "",
+            sortRows
+          )
         )}
       </Stack>
     </PageTemplate>
@@ -251,7 +276,7 @@ const sx = {
     ".contentFlex": {
       maxWidth: "appMax",
       marginTop: "spacer7",
-      marginBottom: "spacer7",
+      marginBottom: "100px",
       alignItems: "center",
     },
   },

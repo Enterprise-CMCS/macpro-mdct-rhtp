@@ -35,6 +35,7 @@ import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import { DevTools } from "components/devTools/DevTools";
 import { activeBannerSelector } from "utils/state/selectors";
+import { budgetPeriodFilterOptions } from "./../../../constants";
 
 export const DashboardPage = () => {
   const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
@@ -52,14 +53,6 @@ export const DashboardPage = () => {
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
   const reportName = getReportName(reportType);
   const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
-  const filterDropdownOptions = [
-    { label: "All", value: "All" },
-    { label: "Budget Period 1", value: 1 },
-    { label: "Budget Period 2", value: 2 },
-    { label: "Budget Period 3", value: 3 },
-    { label: "Budget Period 4", value: 4 },
-    { label: "Budget Period 5", value: 5 },
-  ];
   const hasSubmittedReport = reports.some(
     (report) => report.status === ReportStatus.SUBMITTED
   );
@@ -215,7 +208,7 @@ export const DashboardPage = () => {
             label="Filter by Budget Period"
             value={dropdownValue}
             onChange={handleBudgetPeriodChange}
-            options={filterDropdownOptions}
+            options={budgetPeriodFilterOptions}
           />
           <Button onClick={handleFilter} variant="outline">
             Filter
