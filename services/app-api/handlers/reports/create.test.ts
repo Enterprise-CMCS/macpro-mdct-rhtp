@@ -28,6 +28,10 @@ vi.mock("../../storage/reports", () => ({
   queryReportsForState: vi.fn().mockReturnValue([]),
 }));
 
+vi.mock("../../utils/featureFlags", () => ({
+  isFeatureFlagEnabled: vi.fn(),
+}));
+
 const testEvent = {
   queryStringParameters: {},
   pathParameters: { reportType: "RHTP", state: "PA" },

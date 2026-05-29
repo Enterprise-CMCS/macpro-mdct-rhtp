@@ -96,9 +96,9 @@ const HorizontalTable = (
       </Thead>
       <Tbody>
         {rows.map((column: TableRowType[], rowIndex) => (
-          <Tr key={rowIndex}>
-            {column.map((data) => (
-              <Td>{data}</Td>
+          <Tr key={`row-${rowIndex}`}>
+            {column.map((data, dataIndex) => (
+              <Td key={`data-${rowIndex}-${dataIndex}`}>{data}</Td>
             ))}
           </Tr>
         ))}

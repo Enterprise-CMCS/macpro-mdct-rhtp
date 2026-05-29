@@ -47,7 +47,7 @@ export const CreateReportModal = ({
   useEffect(() => {
     (async () => {
       const reports = await getReportsForState(reportType, activeState);
-      if (reports.length > 0) {
+      if (reports?.length > 0) {
         const latestReport = reports.reduce((latest, current) => {
           if (latest.created > current.created) {
             return latest;
