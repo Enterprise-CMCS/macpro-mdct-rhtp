@@ -30,6 +30,7 @@ import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
 import { AttachmentArea } from "components/fields/AttachmentArea";
+import { SubmitForReview } from "./SubmitForReview";
 
 interface Props {
   id: string;
@@ -103,6 +104,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <ActionTable {...{ updateElement, disabled, element }} />;
       case ElementType.AttachmentTable:
         return <AttachmentTable {...{ updateElement, disabled, element }} />;
+      case ElementType.SubmitForReview:
+        return <SubmitForReview />;
       default:
         assertExhaustive(element);
         return null;

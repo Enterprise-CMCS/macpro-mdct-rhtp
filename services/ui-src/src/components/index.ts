@@ -2,15 +2,10 @@
 export { AccordionItem } from "./accordions/AccordionItem";
 // alerts
 export { Alert } from "./alerts/Alert";
+export { Banner } from "./alerts/Banner";
 // app
 export { App } from "./app/App";
 export { Error } from "./app/Error";
-// banners
-export {
-  AdminBannerContext,
-  AdminBannerProvider,
-} from "./banners/AdminBannerProvider";
-export { Banner } from "./banners/Banner";
 // layout
 export { HomePage } from "./layout/HomePage";
 export { Header } from "./layout/Header";
@@ -63,11 +58,12 @@ export { StatusTableElement } from "./report/StatusTable";
 export { SubnavBar } from "./report/SubnavBar";
 export { InitiativesTable } from "./report/InitiativesTable";
 // menus
+export { AdminMenu } from "./menus/AdminMenu";
 export { Menu } from "./menus/Menu";
 export { MenuOption } from "./menus/MenuOption";
 // modals
 export { Modal } from "./modals/Modal";
-export { AddEditReportModal } from "./modals/AddEditReportModal";
+export { CreateReportModal } from "./modals/CreateReportModal";
 export { UnlockModal } from "./modals/UnlockModal";
 // Redirects
 export { PostLogoutRedirect } from "./PostLogoutRedirect/index";

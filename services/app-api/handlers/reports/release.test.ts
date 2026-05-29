@@ -29,6 +29,10 @@ vi.mock("../../storage/reports", () => ({
   putReport: vi.fn(),
 }));
 
+vi.mock("../../utils/notifications/email", () => ({
+  sendEmail: vi.fn(),
+}));
+
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   pathParameters: {

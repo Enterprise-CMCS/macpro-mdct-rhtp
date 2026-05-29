@@ -43,10 +43,10 @@ const commitmentAttachmentArea: AttachmentAreaTemplate = {
   required: false,
 };
 
-const commitmentComments: TextAreaBoxTemplate = {
-  id: "commitment-comment",
+const commitmentNotes: TextAreaBoxTemplate = {
+  id: "commitment-notes",
   type: ElementType.TextAreaField,
-  label: "Notes and comments",
+  label: "Notes",
   helperText:
     "Include any additional information about this policy commitment that you would like CMS to be aware of.",
   required: false,
@@ -68,7 +68,7 @@ const buildCommitments = (
         commitmentStatusDropdown(label, status),
         commitmentLinkListInput,
         commitmentAttachmentArea,
-        commitmentComments,
+        commitmentNotes,
       ],
     });
   }

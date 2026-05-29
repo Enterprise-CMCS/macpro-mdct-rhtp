@@ -1,25 +1,20 @@
 import { MockedFunction } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { AddEditReportModal } from "components";
+import { CreateReportModal } from "components";
 import {
   mockStateUserStore,
   RouterWrappedComponent,
 } from "utils/testing/setupTest";
 import { useStore } from "utils";
-import { LiteReport, ReportType } from "@rhtp/shared";
-import { testA11y } from "utils/testing/commonTests";
+import { ReportType } from "@rhtp/shared";
+import { testA11yAct } from "utils/testing/commonTests";
 
 const mockCloseHandler = vi.fn();
 const mockReportHandler = vi.fn();
 const mockCreateReport = vi.fn();
 const mockUpdateReport = vi.fn();
-const mockGetReportsForState = vi.fn().mockResolvedValue([
-  {
-    id: "1",
-    name: "mock-name-a",
-  } as LiteReport,
-]);
+const mockGetReportsForState = vi.fn();
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
@@ -33,7 +28,7 @@ vi.mock("utils/api/requestMethods/report", () => ({
 
 const addModalComponent = (
   <RouterWrappedComponent>
-    <AddEditReportModal
+    <CreateReportModal
       activeState="AB"
       reportType={ReportType.RHTP}
       modalDisclosure={{
@@ -46,8 +41,10 @@ const addModalComponent = (
 );
 
 describe("Test general modal functionality", () => {
-  beforeEach(() => {
-    render(addModalComponent);
+  beforeEach(async () => {
+    await act(async () => {
+      await render(addModalComponent);
+    });
   });
 
   afterEach(() => {
@@ -66,8 +63,10 @@ describe("Test general modal functionality", () => {
 });
 
 describe("Test Add Report Modal", () => {
-  beforeEach(() => {
-    render(addModalComponent);
+  beforeEach(async () => {
+    await act(async () => {
+      await render(addModalComponent);
+    });
   });
 
   afterEach(() => {
@@ -79,7 +78,7 @@ describe("Test Add Report Modal", () => {
     expect(screen.getByText("Save")).toBeInTheDocument();
   });
 
-  testA11y(addModalComponent);
+  testA11yAct(addModalComponent);
 });
 
 describe("Test submit", () => {
@@ -87,7 +86,9 @@ describe("Test submit", () => {
     vi.clearAllMocks();
   });
   test("Simulate submitting modal", async () => {
-    render(addModalComponent);
+    await act(async () => {
+      await render(addModalComponent);
+    });
     const submitBtn = screen.getByText("Save");
     await userEvent.click(submitBtn);
 
@@ -96,13 +97,13 @@ describe("Test submit", () => {
   });
 });
 
-describe("Test AddEditReportModal types", () => {
+describe("Test CreateReportModal types", () => {
   test.each([{ type: ReportType.RHTP, text: "RHTP Report" }])(
     "$type report type renders a title",
     ({ type, text }) => {
       render(
         <RouterWrappedComponent>
-          <AddEditReportModal
+          <CreateReportModal
             activeState="AB"
             reportType={type}
             modalDisclosure={{

@@ -2,6 +2,8 @@ import { isReportType, isStateAbbr } from "@rhtp/shared";
 import { APIGatewayProxyEvent } from "../types/types";
 import { logger } from "./debug-lib";
 
+export const emptyParser = (_event: APIGatewayProxyEvent) => ({});
+
 export const parseReportTypeAndState = (event: APIGatewayProxyEvent) => {
   const { reportType, state } = event.pathParameters ?? {};
 

@@ -25,14 +25,31 @@ import {
 } from "@rhtp/shared";
 
 export const acceptedFileTypes = [
-  ".ppt",
-  ".pdf",
-  ".doc",
-  ".docx",
+  ".bmp",
+  ".txt",
   ".csv",
-  ".jpg",
+  ".jar",
+  ".odt",
+  ".ods",
+  ".odp",
+  ".msg",
+  ".potx",
+  ".pptx",
+  ".ppt",
+  ".rtf",
+  ".tif",
+  ".gif",
   ".jpeg",
   ".png",
+  ".docm",
+  ".docx",
+  ".doc",
+  ".pdf",
+  ".jpg",
+  ".xlsx",
+  ".xltx",
+  ".xls",
+  ".xml",
 ];
 
 const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;

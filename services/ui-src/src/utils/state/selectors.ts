@@ -1,6 +1,12 @@
-import { PageStatus, ParentPageTemplate, ReportStatus } from "@rhtp/shared";
-import { ReportState } from "types";
+import {
+  BannerArea,
+  PageStatus,
+  ParentPageTemplate,
+  ReportStatus,
+} from "@rhtp/shared";
+import { BannerState, ReportState } from "types";
 import { pageIsCompletable } from "./reportLogic/completeness";
+import { compareDates, parseAsLocalDate } from "utils/other/time";
 
 export const currentPageSelector = (state: ReportState) => {
   const { report, pageMap, currentPageId } = state;
@@ -56,4 +62,23 @@ export const submittableMetricsSelector = (state: ReportState) => {
     report.status !== ReportStatus.SUBMITTED && allPagesSubmittable;
 
   return { sections: sections, submittable: submittable };
+};
+
+export const activeBannerSelector = (area: BannerArea) => {
+  return (state: BannerState) => {
+    const now = new Date();
+    const ONE_HOUR = 60 * 60 * 1000;
+    if (now.valueOf() - state._lastFetchTime > ONE_HOUR) {
+      // Kick off a fetch, but don't bother awaiting.
+      // The useStore hook will update dependent components as needed.
+      state.fetchBanners();
+    }
+
+    return state.allBanners.find(
+      (banner) =>
+        area === banner.area &&
+        compareDates(parseAsLocalDate(banner.startDate), now) <= 0 &&
+        compareDates(now, parseAsLocalDate(banner.endDate)) <= 0
+    );
+  };
 };

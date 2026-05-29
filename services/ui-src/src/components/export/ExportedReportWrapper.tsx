@@ -83,11 +83,13 @@ export const ExportedReportWrapper = ({ section }: Props) => {
     <Flex flexDir="column" gap="1.5rem">
       {chunkedElements.length > 0 && (
         <>
-          {chunkedElements.map((elements) =>
-            shouldUseTable(elements[0].type)
-              ? renderReportTable(elements)
-              : renderReportDisplay(elements)
-          )}
+          {chunkedElements.map((elements, index) => (
+            <div key={`element-${index}`}>
+              {shouldUseTable(elements[0].type)
+                ? renderReportTable(elements)
+                : renderReportDisplay(elements)}
+            </div>
+          ))}
         </>
       )}
     </Flex>

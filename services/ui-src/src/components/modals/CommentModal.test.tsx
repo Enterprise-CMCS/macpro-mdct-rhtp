@@ -132,6 +132,12 @@ describe("CommentModal component", () => {
             date: "Thu Feb 5 2026 00:00:00 GMT-0400 (Eastern Daylight Time)",
             comment: "Second comment from cms user",
           },
+          {
+            name: "CMS User",
+            date: "Thu Feb 12 2026 00:00:00 GMT-0400 (Eastern Daylight Time)",
+            comment: "",
+            statusChange: AttachmentStatus.PENDING_REVIEW,
+          },
         ],
       },
     ];
@@ -140,14 +146,15 @@ describe("CommentModal component", () => {
       render(CommentModalComponent(mockPreviousCommentsInFile));
     });
 
-    test("Shows previous comments", async () => {
-      const previousComments = screen.getAllByRole("textbox", {
-        name: "CMS User",
-      });
-      expect(previousComments).toHaveLength(2);
+    test("Shows previous comments and status changes", async () => {
+      const previousComments = screen.getAllByRole("textbox");
+      expect(previousComments).toHaveLength(3); // one for new comment, two for existing, no textbox for empty comment with status change
       // most recent comment should be first in the list
-      expect(previousComments[0]).toHaveValue("Second comment from cms user");
-      expect(previousComments[1]).toHaveValue("First comment from cms user");
+      expect(previousComments[1]).toHaveValue("Second comment from cms user");
+      expect(previousComments[2]).toHaveValue("First comment from cms user");
+      expect(
+        screen.getByText("Status changed to: Pending Review")
+      ).toBeInTheDocument();
     });
   });
 

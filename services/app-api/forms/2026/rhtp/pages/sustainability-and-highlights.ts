@@ -17,6 +17,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       label:
         "Share success stories that you want to highlight as a result of your state’s implementation of the RHT Program.",
       required: true,
+      quarterly: false,
     },
     {
       type: ElementType.TextAreaField,
@@ -24,6 +25,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       label:
         "What are the most significant updates or changes to your sustainability plan based on the past year’s experiences, successes, and challenges?",
       required: true,
+      quarterly: false,
     },
   ],
 };
