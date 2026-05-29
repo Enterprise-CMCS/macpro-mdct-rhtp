@@ -1,13 +1,12 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { Report, BannerData } from "@rhtp/shared";
+import { Report, BannerFormData } from "@rhtp/shared";
 import {
   UserState,
   User,
   ReportState,
-  ErrorVerbiage,
-  AdminBannerState,
   DevToolsState,
+  BannerState,
 } from "types";
 import { ReactNode } from "react";
 import {
@@ -17,6 +16,11 @@ import {
   saveReport,
   setPage,
 } from "./reportLogic/reportActions";
+import {
+  createBanner,
+  deleteBanner,
+  getBanners,
+} from "utils/api/requestMethods/banner";
 
 // USER STORE
 const userStore = (set: Set<UserState>) => ({
@@ -33,34 +37,22 @@ const userStore = (set: Set<UserState>) => ({
 });
 
 // BANNER STORE
-const bannerStore = (set: Set<AdminBannerState>) => ({
+const bannerStore = (set: Set<BannerState>, get: Get<BannerState>) => ({
   // initial state
-  bannerData: undefined,
-  bannerActive: false,
-  bannerLoading: false,
-  bannerErrorMessage: undefined,
-  bannerDeleting: false,
-  // actions
-  setBannerData: (newBanner: BannerData | undefined) =>
-    set(() => ({ bannerData: newBanner }), false, { type: "setBannerData" }),
-  clearAdminBanner: () =>
-    set(() => ({ bannerData: undefined }), false, { type: "clearAdminBanner" }),
-  setBannerActive: (bannerStatus: boolean) =>
-    set(() => ({ bannerActive: bannerStatus }), false, {
-      type: "setBannerActive",
-    }),
-  setBannerLoading: (loading: boolean) =>
-    set(() => ({ bannerLoading: loading }), false, {
-      type: "setBannerLoading",
-    }),
-  setBannerErrorMessage: (errorMessage: ErrorVerbiage | undefined) =>
-    set(() => ({ bannerErrorMessage: errorMessage }), false, {
-      type: "setBannerErrorMessage",
-    }),
-  setBannerDeleting: (deleting: boolean) =>
-    set(() => ({ bannerDeleting: deleting }), false, {
-      type: "setBannerDeleting",
-    }),
+  allBanners: [],
+  _lastFetchTime: 0,
+  fetchBanners: async () => {
+    const allBanners = await getBanners();
+    set({ allBanners, _lastFetchTime: Date.now() });
+  },
+  createBanner: async (banner: BannerFormData) => {
+    await createBanner(banner);
+    await get().fetchBanners();
+  },
+  deleteBanner: async (bannerKey: string) => {
+    await deleteBanner(bannerKey);
+    await get().fetchBanners();
+  },
 });
 
 // REPORT STORE
@@ -126,10 +118,10 @@ const devToolStore = (set: Set<DevToolsState>) => ({
 export const useStore = create(
   // devtools is being used for debugging state
   persist(
-    devtools<UserState & ReportState & AdminBannerState & DevToolsState>(
+    devtools<UserState & ReportState & BannerState & DevToolsState>(
       (set, get) => ({
         ...userStore(set),
-        ...bannerStore(set),
+        ...bannerStore(set, get),
         ...reportStore(set, get),
         ...devToolStore(set),
       })

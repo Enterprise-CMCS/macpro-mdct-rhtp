@@ -39,7 +39,6 @@ const reports = [
     name: "report 3",
     submissionCount: 1,
     status: ReportStatus.IN_PROGRESS,
-    copyFromReportId: "xyz",
   },
 ] as Report[];
 
@@ -60,7 +59,6 @@ describe("Dashboard table with state user", () => {
   test("should render report name and edit button in table", async () => {
     render(dashboardTableComponent);
     expect(screen.getByText("report 1")).toBeVisible();
-    expect(screen.getByText("Copied from previous report")).toBeVisible();
   });
 });
 

@@ -84,6 +84,9 @@ const numberFieldTemplateSchema = object().shape({
   helperText: string().notRequired(),
   answer: number().notRequired(),
   required: boolean().required(),
+  mask: string().notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const textAreaTemplateSchema = object().shape({
@@ -94,6 +97,8 @@ const textAreaTemplateSchema = object().shape({
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
   required: boolean().required(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({
@@ -221,6 +226,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return attachmentTableSchema;
     case ElementType.ActionTable:
       return actionTableSchema;
+    case ElementType.SubmitForReview:
+      return submitForReviewSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -268,7 +275,10 @@ const tableCheckpointTemplateSchema = object().shape({
   required: boolean().required(),
   answer: array()
     .of(
-      object().shape({ id: string().required(), checked: boolean().required() })
+      object().shape({
+        id: string().required(),
+        checked: boolean().required(),
+      })
     )
     .notRequired(),
 });
@@ -305,7 +315,10 @@ const attachmentAreaSchema = object().shape({
   required: boolean().required(),
   answer: array().of(
     object().shape({
-      name: string().required(),
+      name: string()
+        .transform((value) => (value === "" ? undefined : value))
+        .default("Uploaded File")
+        .required(),
       size: number().required(),
       fileId: string().required(),
     })
@@ -358,6 +371,8 @@ const actionTableSchema = object().shape({
     )
     .required(),
   answer: array().of(mixed()).notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const initiativesTableSchema = object().shape({
@@ -372,7 +387,10 @@ const attachmentTableSchema = object().shape({
     .of(
       object().shape({
         attachment: object().shape({
-          name: string().required(),
+          name: string()
+            .transform((value) => (value === "" ? undefined : value))
+            .default("Uploaded File")
+            .required(),
           size: number().required(),
           fileId: string().required(),
         }),
@@ -443,6 +461,11 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
   submittedView: array().of(pageElementSchema).required(),
 });
 
+const submitForReviewSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.SubmitForReview)),
+  id: string().required(),
+});
+
 /**
  * This schema is meant to represent the pages field in the ReportTemplate type.
  * The following yup `lazy` function is building up the union type:
@@ -479,7 +502,6 @@ export const isCreateReportOptions = (
 ): obj is CreateReportOptions => {
   const createReportOptionsValidationSchema = object()
     .shape({
-      copyFromReportId: string().notRequired(),
       mockDate: string().notRequired(),
     })
     .required()
@@ -524,6 +546,13 @@ export const isUpdateInitiativeBody = (
   });
 };
 
+const reportCommentSchema = object().shape({
+  name: string().required(),
+  date: string().required(),
+  comment: string().required(),
+  isInternal: boolean().required(),
+});
+
 const reportValidateSchema = object().shape({
   id: string().notRequired(),
   state: string().required(),
@@ -549,6 +578,7 @@ const reportValidateSchema = object().shape({
   subTypeKey: string().required(),
   budgetPeriod: number().min(0).max(5).required(),
   submissionCount: number().required(),
+  comments: array().of(reportCommentSchema).notRequired(),
   pages: pagesSchema,
 });
 

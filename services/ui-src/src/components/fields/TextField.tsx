@@ -12,6 +12,7 @@ import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { ErrorMessages } from "../../constants";
 import {
   isEmail,
+  maskByType,
   parseNumber,
   stringifyInput,
 } from "utils/validation/inputValidation";
@@ -22,6 +23,9 @@ export const TextField = (
   const { element: textbox, disabled } = props;
   const stringifyAnswer = (newAnswer: typeof textbox.answer) => {
     if (textbox.type === ElementType.NumberField) {
+      if (textbox.mask) {
+        newAnswer = maskByType(textbox.mask, newAnswer);
+      }
       return stringifyInput(newAnswer as number);
     }
     return newAnswer ?? "";
@@ -54,7 +58,7 @@ export const TextField = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const rawValue = event.target.value;
-    setDisplayValue(rawValue);
+    setDisplayValue(stringifyAnswer(rawValue));
 
     if (textbox.type === ElementType.NumberField) {
       const updateElement = (props as PageElementProps<NumberFieldTemplate>)

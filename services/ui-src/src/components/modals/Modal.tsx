@@ -41,7 +41,9 @@ export const Modal = ({
             {content.heading}
           </Heading>
         </ModalHeader>
-        {content.subheading && <Box>{content.subheading}</Box>}
+        {content.subheading && (
+          <Box sx={sx.subheading}>{content.subheading}</Box>
+        )}
         <Flex sx={sx.modalCloseContainer}>
           <Button
             leftIcon={<Image src={closeIcon} alt="Close" />}
@@ -117,6 +119,9 @@ const sx = {
   modalCloseContainer: {
     position: "absolute",
     right: "spacer4",
+  },
+  subheading: {
+    paddingBottom: "spacer3",
   },
   action: {
     minWidth: "10rem",

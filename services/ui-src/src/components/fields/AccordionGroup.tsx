@@ -61,7 +61,11 @@ export const AccordionGroup = (
       </Box>
       <Accordion allowMultiple variant="border" index={accordionState}>
         {accordions.map((accordion, index) => (
-          <AccordionItem label={accordion.label} onClick={() => toggle(index)}>
+          <AccordionItem
+            key={`${accordion.label}-${index}`}
+            label={accordion.label}
+            onClick={() => toggle(index)}
+          >
             <Page
               id="radio-children"
               setElements={(element) => setAccordionChildren(element, index)}

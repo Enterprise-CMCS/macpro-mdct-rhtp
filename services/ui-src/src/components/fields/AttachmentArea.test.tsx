@@ -34,7 +34,8 @@ const AttachmentAreaComponent = (
   />
 );
 
-const consoleMock = vi.spyOn(console, "error");
+const consoleMock = vi.spyOn(console, "error").mockImplementation(vi.fn());
+window.open = vi.fn();
 
 describe("<AttachmentArea />", () => {
   beforeEach(() => {

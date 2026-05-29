@@ -17,6 +17,7 @@ const renderElementList = [
   ElementType.AttachmentArea,
   ElementType.AccordionGroup,
   ElementType.ActionTable,
+  ElementType.AttachmentTable,
 ];
 
 export const shouldUseTable = (type: ElementType) => {

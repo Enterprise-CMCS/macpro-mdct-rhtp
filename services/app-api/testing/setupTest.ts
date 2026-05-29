@@ -28,6 +28,3 @@ vi.mock("../libs/debug-lib", () => {
     flush: vi.fn(),
   };
 });
-
-// BANNER
-export * from "./mockBanner";
