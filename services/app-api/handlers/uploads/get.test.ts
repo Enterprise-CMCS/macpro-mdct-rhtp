@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, User } from "../../types/types";
-import { getUploadsByFileId, getUploadsByReportId } from "./get";
+import { getUploadsByFileId } from "./get";
 import { queryUpload } from "../../storage/upload";
 import { authenticatedUser } from "../../utils/authentication";
 import { UserRoles } from "@rhtp/shared";
@@ -98,21 +98,5 @@ describe("Test get API methods", () => {
     (queryUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
     const res = await getUploadsByFileId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
-  });
-
-  test("getUploadsByReportId missing path params", async () => {
-    const badTestEvent = {
-      ...proxyEvent,
-      pathParameters: {},
-    } as APIGatewayProxyEvent;
-    const res = await getUploadsByReportId(badTestEvent);
-    expect(res.statusCode).toBe(StatusCodes.BadRequest);
-  });
-  test("getUploadsByReportId is successful and returns data", async () => {
-    const res = await getUploadsByReportId(mockGetUploadEvent);
-    expect(res.statusCode).toBe(StatusCodes.Ok);
-    expect(res.body).toBe(
-      JSON.stringify({ psurl: "https://example.com/presigned" })
-    );
   });
 });

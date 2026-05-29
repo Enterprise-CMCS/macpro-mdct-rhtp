@@ -6,7 +6,7 @@ import {
   getFileDownloadUrl,
   deleteUploadedFile,
   getZipPresignedUrl,
-} from "./upload";
+} from "./fileMethods";
 import { ReportType } from "@rhtp/shared";
 
 vi.mock("../apiLib", () => ({

@@ -7,11 +7,11 @@ import {
   waitFor,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Upload } from "./Upload";
+import { UploadArea } from "./UploadArea";
 import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
-} from "utils/api/requestMethods/upload";
+} from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
@@ -58,7 +58,7 @@ describe("<Upload />", () => {
   });
   test("Upload is visible", async () => {
     await act(async () => {
-      render(<Upload {...props} />);
+      render(<UploadArea {...props} />);
     });
     expect(
       screen.getByText("Select a file or files to upload")
@@ -66,7 +66,7 @@ describe("<Upload />", () => {
   });
   test("uploading a file by file window", async () => {
     await act(async () => {
-      render(<Upload {...props} />);
+      render(<UploadArea {...props} />);
     });
 
     const input = screen.getByLabelText("Choose from folder");
@@ -75,7 +75,7 @@ describe("<Upload />", () => {
   });
   test("uploading a file by drag and drop", async () => {
     await act(async () => {
-      render(<Upload {...props} />);
+      render(<UploadArea {...props} />);
     });
 
     const dropArea = screen.getByLabelText("file drop area");
@@ -87,7 +87,7 @@ describe("<Upload />", () => {
 
   test("test file download", async () => {
     (getFileDownloadUrl as Mock).mockResolvedValueOnce("");
-    render(<Upload {...props} />);
+    render(<UploadArea {...props} />);
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: "mock-name" })
@@ -98,7 +98,7 @@ describe("<Upload />", () => {
   });
 
   test("test deleting a file", async () => {
-    render(<Upload {...props} />);
+    render(<UploadArea {...props} />);
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: "delete mock-name" })
@@ -109,5 +109,5 @@ describe("<Upload />", () => {
     );
     expect(mockDeleteFromReport).toHaveBeenCalled();
   });
-  testA11y(<Upload {...props} />);
+  testA11y(<UploadArea {...props} />);
 });

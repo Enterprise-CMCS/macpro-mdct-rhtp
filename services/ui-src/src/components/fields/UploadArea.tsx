@@ -4,7 +4,7 @@ import { UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
-} from "utils/api/requestMethods/upload";
+} from "utils/api/requestMethods/fileMethods";
 import {
   acceptedFileTypes,
   downloadFile,
@@ -21,7 +21,7 @@ interface Props {
   uploadedSubLabel: string;
 }
 
-export const Upload = ({
+export const UploadArea = ({
   answer,
   saveToReport,
   deleteFromReport,

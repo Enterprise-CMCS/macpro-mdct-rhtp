@@ -12,7 +12,7 @@ import {
   deleteUploadedFile,
   getFileDownloadUrl,
   getZipPresignedUrl,
-} from "../api/requestMethods/upload";
+} from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";

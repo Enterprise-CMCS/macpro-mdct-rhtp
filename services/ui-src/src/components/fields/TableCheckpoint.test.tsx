@@ -18,7 +18,7 @@ import {
 import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
-} from "utils/api/requestMethods/upload";
+} from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import { CommentModal } from "components/modals/CommentModal";
