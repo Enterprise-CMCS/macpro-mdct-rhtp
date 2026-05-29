@@ -15,11 +15,6 @@ import userEvent from "@testing-library/user-event";
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-vi.mock("utils/other/useBreakpoint", () => ({
-  isMobile: vi.fn().mockReturnValue(false),
-  makeMediaQueryClasses: vi.fn().mockReturnValue("desktop"),
-}));
-
 vi.mock("utils/state/useStore", () => ({
   useStore: vi.fn().mockReturnValue({}),
 }));
