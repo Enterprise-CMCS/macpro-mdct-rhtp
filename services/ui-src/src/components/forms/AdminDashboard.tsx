@@ -16,7 +16,7 @@ import { Report, ReportType, StateNames } from "@rhtp/shared";
 import { PageTemplate, AccordionItem } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
-import { MultiSelect } from "./Multiselect";
+import { MultiselectOptions, MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
 
@@ -45,17 +45,9 @@ export const AdminDashboard = () => {
     searchParams.get("budgetPeriod") || "All"
   );
   const [stateSelected, setStateSelected] =
-    useState<
-      {
-        label: string;
-        value: string;
-        checked?: boolean;
-      }[]
-    >(buildStateOptions());
+    useState<MultiselectOptions[]>(buildStateOptions());
 
-  const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
-  const statesTag = searchParams.get("states");
-
+  //when the page is loaded, we load the reports
   useEffect(() => {
     const reloadReports = (reportType: string) => {
       (async () => {
@@ -68,13 +60,33 @@ export const AdminDashboard = () => {
 
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
+
+    const savedStates = localStorage.getItem("states");
+    if (savedStates !== null) {
+      const stateFilter = savedStates.split(",");
+      const filteredStates = stateSelected.map((state) => ({
+        ...state,
+        checked: stateFilter.includes(state.value),
+      }));
+      setStateSelected(filteredStates);
+
+      setSearchParams({
+        budgetPeriod: dropdownValue.toString(),
+        states: savedStates,
+      });
+    }
   }, []);
 
+  //after reports are filtered, we apply the sort
   useEffect(() => {
     sortRows("", SORT_TYPE.DEFAULT);
   }, [filteredReports]);
 
+  // when reports have been loaded or when any filters have been changed
   useEffect(() => {
+    const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
+    const statesTag = searchParams.get("states") || "";
+
     const states =
       statesTag && statesTag.length > 0 ? statesTag.split(",") : "";
 
@@ -90,7 +102,7 @@ export const AdminDashboard = () => {
         ? filterByBudget
         : filterByBudget.filter((report) => states.includes(report.state));
     setFilteredReports(filterByState);
-  }, [filterBudgetPeriod, statesTag, reports]);
+  }, [reports, searchParams]);
 
   const selectedTags = () => {
     return stateSelected.filter((state) => state.checked);
@@ -101,18 +113,15 @@ export const AdminDashboard = () => {
   };
 
   const applyFilter = () => {
+    const selectedStates = selectedTags()
+      .map((state) => state.value)
+      .join(",");
     setSearchParams({
       budgetPeriod: dropdownValue.toString(),
-      states: selectedTags()
-        .map((state) => state.value)
-        .join(","),
+      states: selectedStates,
     });
-  };
 
-  const handleStateFilter = (
-    selected: { label: string; value: string; checked?: boolean }[]
-  ) => {
-    setStateSelected(selected);
+    localStorage.setItem("states", selectedStates);
   };
 
   const clearFilter = () => {
@@ -125,6 +134,7 @@ export const AdminDashboard = () => {
 
     setFilteredReports(reports);
     setSearchParams();
+    localStorage.removeItem("states");
   };
 
   const removeTag = (tag: string) => {
@@ -216,7 +226,9 @@ export const AdminDashboard = () => {
           <MultiSelect
             label="State(s)"
             values={stateSelected}
-            onChange={handleStateFilter}
+            onChange={(selected) => {
+              setStateSelected(selected);
+            }}
           />
           <CmsdsDropdownField
             name="budgetPeriodFilter"

@@ -1,12 +1,16 @@
 import { Box, Checkbox } from "@chakra-ui/react";
 import { useState } from "react";
 
+export type MultiselectOptions = {
+  label: string;
+  value: string;
+  checked?: boolean;
+};
+
 interface Prop {
   label: string;
-  values: { label: string; value: string; checked?: boolean }[];
-  onChange: (
-    item: { label: string; value: string; checked?: boolean }[]
-  ) => void;
+  values: MultiselectOptions[];
+  onChange: (item: MultiselectOptions[]) => void;
 }
 
 export const MultiSelect = ({ label, values, onChange }: Prop) => {
