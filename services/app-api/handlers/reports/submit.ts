@@ -3,10 +3,11 @@ import { handler } from "../../libs/handler-lib";
 import { parseReportParameters } from "../../libs/param-lib";
 import { badRequest, forbidden, ok } from "../../libs/response-lib";
 import { putReport } from "../../storage/reports";
-import { Report, ReportStatus } from "../../types/reports";
+import { Report, ReportStatus } from "@rhtp/shared";
 import { canWriteState } from "../../utils/authorization";
 import { error } from "../../utils/constants";
 import { validateReportPayload } from "../../utils/reportValidation";
+import { sendEmail } from "../../utils/notifications/email";
 
 export const submitReport = handler(parseReportParameters, async (request) => {
   const { reportType, state, id } = request.parameters;
@@ -56,6 +57,13 @@ export const submitReport = handler(parseReportParameters, async (request) => {
 
   // save the report that's being submitted (with the new information on top of it)
   await putReport(validatedPayload);
+
+  try {
+    await sendEmail(report);
+  } catch (error) {
+    // log and allow call to succeed even if email fails
+    logger.error(error);
+  }
 
   return ok(validatedPayload);
 });

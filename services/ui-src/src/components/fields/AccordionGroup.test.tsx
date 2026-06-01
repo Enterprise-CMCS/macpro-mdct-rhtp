@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AccordionGroup } from "components";
-import { ElementType, AccordionGroupTemplate } from "types";
+import { ElementType, AccordionGroupTemplate } from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 
 const updateSpy = vi.fn();

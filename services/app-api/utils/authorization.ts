@@ -1,5 +1,5 @@
-import { User, UserRoles } from "../types/types";
-import { StateAbbr } from "./constants";
+import { User } from "../types/types";
+import { StateAbbr, UserRoles } from "@rhtp/shared";
 
 /** These roles are allowed to read data for any state */
 const statelessRoles = [
@@ -7,6 +7,13 @@ const statelessRoles = [
   UserRoles.APPROVER,
   UserRoles.HELP_DESK,
   UserRoles.INTERNAL,
+  UserRoles.PROJECT_OFFICER,
+];
+
+const adminRoles = [
+  UserRoles.ADMIN,
+  UserRoles.APPROVER,
+  UserRoles.PROJECT_OFFICER,
 ];
 
 export const canReadState = (user: User, state: StateAbbr) => {
@@ -21,8 +28,8 @@ export const canReadState = (user: User, state: StateAbbr) => {
 
 export const canWriteState = (user: User, state: StateAbbr) => {
   // TODO: For the first year, Admins will be entering data manually for the states
-  // Remove the check below this when we want to stop allowing Admins to create/edit reports.
-  if (user.role == UserRoles.ADMIN) return true;
+  // Remove the bottom line to stop allowing Admins to create/edit reports.
+  if (adminRoles.includes(user.role)) return true;
 
   if (user.role == UserRoles.STATE_USER && user.state === state) {
     return true;
@@ -31,7 +38,7 @@ export const canWriteState = (user: User, state: StateAbbr) => {
 };
 
 export const canWriteInitiatives = (user: User) => {
-  return [UserRoles.ADMIN, UserRoles.APPROVER].includes(user.role);
+  return adminRoles.includes(user.role);
 };
 
 export const canWriteBanner = (user: User) => {
@@ -39,5 +46,5 @@ export const canWriteBanner = (user: User) => {
 };
 
 export const canReleaseReport = (user: User) => {
-  return [UserRoles.ADMIN, UserRoles.APPROVER].includes(user.role);
+  return adminRoles.includes(user.role);
 };

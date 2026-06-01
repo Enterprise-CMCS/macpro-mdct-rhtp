@@ -1,31 +1,42 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
-import { fetchBanner } from "./fetch";
-import { error } from "../../utils/constants";
-import { getBanner } from "../../storage/banners";
-import { mockBannerResponse } from "../../testing/setupTest";
+import { APIGatewayProxyEvent, User } from "../../types/types";
+import { getBanners } from "./fetch";
+import { authenticatedUser } from "../../utils/authentication";
+import { BannerAreas, BannerShape, UserRoles } from "@rhtp/shared";
+import { scanAllBanners } from "../../storage/banners";
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.ADMIN,
-    state: "PA",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.ADMIN,
+  state: "PA",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   isAuthenticated: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock("../../storage/banners", () => ({
-  getBanner: vi.fn(),
+  scanAllBanners: vi.fn(),
 }));
 
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   headers: { "cognito-identity-id": "test" },
-  pathParameters: { bannerId: "admin-banner-id" },
+};
+
+const mockBanner: BannerShape = {
+  key: "889c059a-54fe-4331-8d31-3d8e91665806", // #gitleaks:allow
+  area: BannerAreas.Home,
+  title: "mock title",
+  description: "mock description",
+  link: "https://example.com",
+  startDate: "2026-03-01",
+  endDate: "2026-03-06",
+  createdAt: "2026-02-18T13:55:53.735Z",
+  createdBy: "mock username",
 };
 
 describe("Test fetchBanner API method", () => {
@@ -34,39 +45,16 @@ describe("Test fetchBanner API method", () => {
   });
 
   test("Successful Banner Fetch", async () => {
-    (getBanner as Mock).mockResolvedValueOnce(mockBannerResponse);
-    const res = await fetchBanner(testEvent);
+    (scanAllBanners as Mock).mockResolvedValueOnce([mockBanner]);
+    const res = await getBanners(testEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
-    expect(res.body).toContain("testDesc");
-    expect(res.body).toContain("testTitle");
+    expect(JSON.parse(res.body as string)).toEqual([mockBanner]);
   });
 
   test("successful empty banner found fetch", async () => {
-    (getBanner as Mock).mockResolvedValueOnce(undefined);
-    const res = await fetchBanner(testEvent);
-    expect(res.body).not.toBeDefined();
+    (scanAllBanners as Mock).mockResolvedValueOnce([]);
+    const res = await getBanners(testEvent);
+    expect(res.body).toBe("[]");
     expect(res.statusCode).toBe(StatusCodes.Ok);
-  });
-
-  test("bannerKey not provided throws 500 error", async () => {
-    const noKeyEvent: APIGatewayProxyEvent = {
-      ...testEvent,
-      pathParameters: {},
-    };
-    const res = await fetchBanner(noKeyEvent);
-
-    expect(res.statusCode).toBe(StatusCodes.BadRequest);
-    expect(res.body).toContain(error.MISSING_DATA);
-  });
-
-  test("bannerKey empty throws 500 error", async () => {
-    const noKeyEvent: APIGatewayProxyEvent = {
-      ...testEvent,
-      pathParameters: { bannerId: "" },
-    };
-    const res = await fetchBanner(noKeyEvent);
-
-    expect(res.statusCode).toBe(StatusCodes.BadRequest);
-    expect(res.body).toContain(error.MISSING_DATA);
   });
 });

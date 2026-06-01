@@ -1,7 +1,8 @@
-import { isReportType } from "../types/reports";
+import { isReportType, isStateAbbr } from "@rhtp/shared";
 import { APIGatewayProxyEvent } from "../types/types";
-import { isStateAbbreviation } from "../utils/constants";
 import { logger } from "./debug-lib";
+
+export const emptyParser = (_event: APIGatewayProxyEvent) => ({});
 
 export const parseReportTypeAndState = (event: APIGatewayProxyEvent) => {
   const { reportType, state } = event.pathParameters ?? {};
@@ -10,7 +11,7 @@ export const parseReportTypeAndState = (event: APIGatewayProxyEvent) => {
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -25,7 +26,7 @@ export const parseReportParameters = (event: APIGatewayProxyEvent) => {
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -46,7 +47,7 @@ export const parseInitiativeUpdateParameters = (
     logger.warn("Invalid report type in path");
     return undefined;
   }
-  if (!isStateAbbreviation(state)) {
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
@@ -73,42 +74,53 @@ export const parseBannerId = (event: APIGatewayProxyEvent) => {
 };
 
 export const parseUploadParameters = (event: APIGatewayProxyEvent) => {
-  const { state, fileId } = event.pathParameters ?? {};
-  if (!fileId) {
-    logger.warn("Invalid file id in path");
+  const { state, reportType, id, fileId } = event.pathParameters ?? {};
+  if (!isReportType(reportType)) {
+    logger.warn("Invalid report type in path");
+    return undefined;
+  }
+  if (!isStateAbbr(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+  if (!id || !fileId) {
+    logger.warn("Missing report ID or file ID in path");
     return undefined;
   }
 
-  return { state, fileId };
+  return { state, reportType, id, fileId };
 };
 
 export const parseCreateUploadParameters = (event: APIGatewayProxyEvent) => {
-  const { state, year } = event.pathParameters ?? {};
-  if (!isStateAbbreviation(state)) {
+  const { state, reportType, id } = event.pathParameters ?? {};
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
 
-  if (!state || !year) {
-    logger.warn("Invalid state, year or fileId in path");
+  if (!state || !reportType || !id) {
+    logger.warn("Invalid state, reportType or id in path");
     return undefined;
   }
 
-  return { state, year };
+  return { state, reportType, id };
 };
 
-export const parseUploadViewParameters = (event: APIGatewayProxyEvent) => {
-  const { state, year, fileId } = event.pathParameters ?? {};
+export const parseUploadFiles = (event: APIGatewayProxyEvent) => {
+  const { state, reportType, id } = event.pathParameters ?? {};
 
-  if (!isStateAbbreviation(state)) {
+  if (!isReportType(reportType)) {
+    logger.warn("Invalid report type in path");
+    return undefined;
+  }
+  if (!isStateAbbr(state)) {
     logger.warn("Invalid state abbreviation in path");
     return undefined;
   }
-
-  if (!state || !year || !fileId) {
-    logger.warn("Invalid state, year or fileId in path");
+  if (!id) {
+    logger.warn("Missing report ID in path");
     return undefined;
   }
 
-  return { state, year, fileId };
+  return { state, reportType, id };
 };

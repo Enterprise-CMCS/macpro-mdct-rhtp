@@ -2,7 +2,8 @@ import {
   InitiativePageTemplate,
   InitiativesTableTemplate,
   PageStatus,
-} from "types";
+  ReportStatus,
+} from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { useStore } from "utils";
 import {
@@ -19,14 +20,15 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { AddEditInitiativeModal } from "components/modals/AddEditInitiativeModal";
 
 export const InitiativesTable = (
-  _props: PageElementProps<InitiativesTableTemplate>
+  props: PageElementProps<InitiativesTableTemplate>
 ) => {
+  const { disabled } = props;
   const { report } = useStore();
   const { userIsAdmin } = useStore().user ?? {};
   const { reportType, state, reportId } = useParams();
@@ -59,6 +61,10 @@ export const InitiativesTable = (
   const rows = initiatives.map(
     (initiative: InitiativePageTemplate, index: number) => {
       const displayName = `${initiative.initiativeNumber}: ${initiative.title}`;
+      const buttonName =
+        initiative.status === PageStatus.ABANDONED || disabled
+          ? `View`
+          : `Edit`;
       return (
         <Tr key={index}>
           <Td>
@@ -71,6 +77,7 @@ export const InitiativesTable = (
                 variant="link"
                 onClick={() => editInitiative(initiative)}
                 aria-label={`Edit status of ${displayName}`}
+                disabled={disabled}
               >
                 Edit status
               </Button>
@@ -79,7 +86,7 @@ export const InitiativesTable = (
               as={Link}
               variant="outline"
               href={`/report/${reportType}/${state}/${reportId}/${initiative.id}`}
-              aria-label={`Edit ${displayName}`}
+              aria-label={`${buttonName} ${displayName}`}
               onClick={(e) => {
                 e.preventDefault();
                 navigate(
@@ -87,7 +94,7 @@ export const InitiativesTable = (
                 );
               }}
             >
-              Edit
+              {buttonName}
             </Button>
           </Td>
         </Tr>
@@ -101,7 +108,7 @@ export const InitiativesTable = (
         <Thead>
           <Tr>
             <Th>
-              Initiative name <br />
+              Initiative number and name <br />
               Status
             </Th>
             <Th>Actions</Th>
@@ -115,6 +122,7 @@ export const InitiativesTable = (
           onClick={onOpen}
           variant="outline"
           leftIcon={<Image src={addIconPrimary} />}
+          disabled={report?.status === ReportStatus.SUBMITTED}
         >
           Add initiative
         </Button>

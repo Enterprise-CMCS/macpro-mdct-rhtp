@@ -1,16 +1,18 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
-import { viewUploadsForState, getUpload } from "./get";
-import { queryViewUploads, queryUpload } from "../../storage/upload";
+import { APIGatewayProxyEvent, User } from "../../types/types";
+import { getUploadsByFileId, getUploadsByReportId } from "./get";
+import { queryUpload } from "../../storage/upload";
+import { authenticatedUser } from "../../utils/authentication";
+import { UserRoles } from "@rhtp/shared";
 
-vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
-    role: UserRoles.ADMIN,
-    state: "PA",
-  }),
-}));
+vi.mock("../../utils/authentication");
+const mockAuthenticatedUser = vi.mocked(authenticatedUser);
+mockAuthenticatedUser.mockResolvedValue({
+  role: UserRoles.ADMIN,
+  state: "PA",
+} as User);
 
 vi.mock("../../utils/authorization", () => ({
   isAuthenticated: vi.fn().mockReturnValue(true),
@@ -24,60 +26,88 @@ vi.mock("../../storage/upload", () => ({
 vi.mock("../../libs/s3-lib", () => ({
   default: {
     getSignedDownloadUrl: vi.fn(),
+    getObject: vi.fn().mockReturnValue([]),
   },
 }));
 
-const mockViewUploadEvent: APIGatewayProxyEvent = {
-  ...proxyEvent,
-  body: `{}`,
-  pathParameters: { state: "PA", year: "2025", fileId: "mock-id" },
-  headers: { "cognito-identity-id": "test" },
-};
+vi.mock("../../storage/reports", () => ({
+  getReport: vi.fn().mockReturnValue({
+    pages: [
+      { elements: [{ type: "attachmentTable", answer: [{ attachment: [] }] }] },
+      {
+        elements: [
+          {
+            type: "accordionGroup",
+            accordions: [
+              { children: [{ type: "attachmentArea", answer: [] }] },
+            ],
+          },
+        ],
+      },
+    ],
+  }),
+}));
 
 const mockGetUploadEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   body: `{}`,
-  pathParameters: { state: "PA", year: "2025", fileId: "mock-id" },
+  pathParameters: {
+    state: "PA",
+    reportType: "RHTP",
+    id: "mock-id",
+    fileId: "mock-id",
+  },
   headers: { "cognito-identity-id": "test" },
 };
 
 const mockUploadRespond = {
-  Items: [{ uploadedState: "PA", fileId: "mock-id", awsFilename: "mockname" }],
+  Items: [
+    {
+      uploadedState: "PA",
+      name: "name",
+      fileId: "mock-id",
+    },
+    {
+      uploadedState: "PA",
+      name: "name 2",
+      fileId: "mock-id-2",
+    },
+  ],
 };
 
 describe("Test get API methods", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  test("viewUploadsForState missing path params", async () => {
+  test("getUploadsByFileId missing path params", async () => {
     const badTestEvent = {
       ...proxyEvent,
       pathParameters: {},
     } as APIGatewayProxyEvent;
-    const res = await viewUploadsForState(badTestEvent);
+    const res = await getUploadsByFileId(badTestEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
-  test("viewUploadsForState successful uploads fetch", async () => {
-    (queryViewUploads as Mock).mockResolvedValueOnce(mockUploadRespond);
-    const res = await viewUploadsForState(mockViewUploadEvent);
-    expect(res.statusCode).toBe(StatusCodes.Ok);
-  });
-  test("getUpload missing path params", async () => {
-    const badTestEvent = {
-      ...proxyEvent,
-      pathParameters: {},
-    } as APIGatewayProxyEvent;
-    const res = await getUpload(badTestEvent);
-    expect(res.statusCode).toBe(StatusCodes.BadRequest);
-  });
-  test("getUpload undefined query returns error", async () => {
+  test("getUploadsByFileId undefined query returns error", async () => {
     (queryUpload as Mock).mockResolvedValueOnce({});
-    const res = await getUpload(mockGetUploadEvent);
+    const res = await getUploadsByFileId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Forbidden);
   });
-  test("getUpload successful create download ps url", async () => {
+  test("getUploadsByFileId successful create download ps url", async () => {
     (queryUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
-    const res = await getUpload(mockGetUploadEvent);
+    const res = await getUploadsByFileId(mockGetUploadEvent);
+    expect(res.statusCode).toBe(StatusCodes.Ok);
+  });
+
+  test("getUploadsByReportId missing path params", async () => {
+    const badTestEvent = {
+      ...proxyEvent,
+      pathParameters: {},
+    } as APIGatewayProxyEvent;
+    const res = await getUploadsByReportId(badTestEvent);
+    expect(res.statusCode).toBe(StatusCodes.BadRequest);
+  });
+  test("getUploadsByReportId is successful ", async () => {
+    const res = await getUploadsByReportId(mockGetUploadEvent);
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });
 });

@@ -1,5 +1,5 @@
 import { Heading } from "@chakra-ui/react";
-import { ElementType, PageElement } from "types";
+import { ElementType, PageElement } from "@rhtp/shared";
 import { notAnsweredText } from "../../constants";
 import { UseOfFundsTableElementExport } from "components/report/UseOfFundsTable";
 
@@ -17,6 +17,7 @@ const renderElementList = [
   ElementType.AttachmentArea,
   ElementType.AccordionGroup,
   ElementType.ActionTable,
+  ElementType.AttachmentTable,
 ];
 
 export const shouldUseTable = (type: ElementType) => {
@@ -43,6 +44,8 @@ export const renderElements = (element: PageElement) => {
     case ElementType.AccordionGroup:
       return "TBD";
     case ElementType.ActionTable:
+      return "TBD";
+    case ElementType.AttachmentTable:
       return "TBD";
   }
 

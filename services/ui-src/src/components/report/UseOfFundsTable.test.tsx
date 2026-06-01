@@ -1,27 +1,44 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ElementType, UseOfFundsTableTemplate } from "types";
+import {
+  ElementType,
+  UseOfFundsTableTemplate,
+  dropdownEmptyOption,
+} from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useState } from "react";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
+
+vi.mock("utils", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      pages: [
+        { initiativeNumber: "1", title: "Initiative 1" },
+        { initiativeNumber: "2", title: "Initiative 2" },
+      ],
+    },
+  }),
+}));
+
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 const mockedElement: UseOfFundsTableTemplate = {
   id: "mock-id",
   type: ElementType.UseOfFundsTable,
   dropDownOptions: {
     budgetPeriodOptions: [
+      dropdownEmptyOption,
       { label: "Budget Period 1", value: "budget-period-1" },
       { label: "Budget Period 2", value: "budget-period-2" },
     ],
-    initiativeOptions: [
-      { label: "Initiative 1", value: "initiative-1" },
-      { label: "Initiative 2", value: "initiative-2" },
-    ],
     useOfFundsOptions: [
+      dropdownEmptyOption,
       { label: "Use of Funds 1", value: "use-of-funds-1" },
       { label: "Use of Funds 2", value: "use-of-funds-2" },
     ],
     recipientCategoryOptions: [
+      dropdownEmptyOption,
       { label: "Recipient Category 1", value: "recipient-category-1" },
       { label: "Recipient Category 2", value: "recipient-category-2" },
     ],
@@ -62,7 +79,7 @@ describe("<UseOfFundsTableElement />", () => {
 
     test("UseOfFundsTableElement is visible", () => {
       render(<UseOfFundsTableWrapper template={mockedElement} />);
-      expect(screen.getByText("Use of Funds")).toBeVisible();
+      expect(screen.getByText("Add use of funds")).toBeVisible();
     });
 
     test("Modal should open and close", async () => {
@@ -83,47 +100,34 @@ describe("<UseOfFundsTableElement />", () => {
       const addButton = screen.getByText("Add use of funds");
       await userEvent.click(addButton);
 
-      const budgetPeriodButton = screen.getByRole("button", {
-        name: "Budget Period",
-      });
-      await userEvent.click(budgetPeriodButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Budget Period 2" })
-      );
+      const budgetPeriodButton = screen.getAllByLabelText("Budget period")[0];
+      await userEvent.selectOptions(budgetPeriodButton, "Budget Period 2");
 
-      const spentFunds = screen.getByRole("textbox", { name: "Spent Funds" });
-      await userEvent.type(spentFunds, "5000");
+      const spentFunds = screen.getByRole("textbox", { name: "Spent funds" });
+      await userEvent.click(spentFunds);
+      await userEvent.paste("5000");
 
       const description = screen.getByRole("textbox", { name: "Description" });
-      await userEvent.type(description, "Test description");
+      await userEvent.click(description);
+      await userEvent.paste("Test description");
 
-      const initiativeButton = screen.getByRole("button", {
-        name: "Initiative",
-      });
-      await userEvent.click(initiativeButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Initiative 2" })
-      );
+      const initiativeButton = screen.getAllByLabelText("Initiative")[0];
+      await userEvent.selectOptions(initiativeButton, "2: Initiative 2");
 
-      const useOfFundsButton = screen.getByRole("button", {
-        name: "Use of Funds",
-      });
-      await userEvent.click(useOfFundsButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Use of Funds 2" })
-      );
+      const useOfFundsButton = screen.getAllByLabelText("Use of funds")[0];
+      await userEvent.selectOptions(useOfFundsButton, "Use of Funds 2");
 
       const recipientName = screen.getByRole("textbox", {
-        name: "Recipient Name",
+        name: "Recipient name",
       });
-      await userEvent.type(recipientName, "Test Recipient");
+      await userEvent.click(recipientName);
+      await userEvent.paste("Test Recipient");
 
-      const recipientCategoryButton = screen.getByRole("button", {
-        name: "Recipient Category",
-      });
-      await userEvent.click(recipientCategoryButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Recipient Category 2" })
+      const recipientCategoryButton =
+        screen.getAllByLabelText("Recipient category")[0];
+      await userEvent.selectOptions(
+        recipientCategoryButton,
+        "Recipient Category 2"
       );
 
       const saveButton = screen.getByText("Save");

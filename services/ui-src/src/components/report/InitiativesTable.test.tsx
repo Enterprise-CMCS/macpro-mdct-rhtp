@@ -1,7 +1,7 @@
 import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { InitiativesTable } from "./InitiativesTable";
-import { ElementType, InitiativesTableTemplate } from "types";
+import { ElementType, InitiativesTableTemplate } from "@rhtp/shared";
 import { useStore } from "utils";
 import userEvent from "@testing-library/user-event";
 import {
@@ -46,7 +46,9 @@ describe("InitiativesTable component", () => {
     });
     test("renders with initiatives", () => {
       expect(
-        screen.getByRole("columnheader", { name: "Initiative name Status" })
+        screen.getByRole("columnheader", {
+          name: "Initiative number and name Status",
+        })
       ).toBeVisible();
       expect(
         screen.getByRole("columnheader", { name: "Actions" })
@@ -103,7 +105,9 @@ describe("InitiativesTable component", () => {
 
     test("renders with initiatives, cannot add or edit initiatives", () => {
       expect(
-        screen.getByRole("columnheader", { name: "Initiative name Status" })
+        screen.getByRole("columnheader", {
+          name: "Initiative number and name Status",
+        })
       ).toBeVisible();
       expect(
         screen.getByRole("columnheader", { name: "Actions" })

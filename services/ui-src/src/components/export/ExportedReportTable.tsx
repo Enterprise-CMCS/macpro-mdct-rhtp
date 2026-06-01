@@ -10,7 +10,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { notAnsweredText } from "../../constants";
-import { ElementType } from "types";
+import { ElementType } from "@rhtp/shared";
 import { ReactElement } from "react";
 import { parseHtml } from "utils";
 

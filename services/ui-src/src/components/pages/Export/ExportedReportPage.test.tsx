@@ -1,6 +1,6 @@
 import { MockedFunction } from "vitest";
 import { screen, render } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { useStore } from "utils";
 import { ExportedReportPage } from "./ExportedReportPage";
 

@@ -5,6 +5,8 @@ import {
   aws_wafv2 as wafv2,
   aws_s3 as s3,
   aws_ec2 as ec2,
+  aws_ses as ses,
+  aws_iam as iam,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -13,6 +15,7 @@ import { Lambda } from "../constructs/lambda.ts";
 import { WafConstruct } from "../constructs/waf.ts";
 import { DynamoDBTable } from "../constructs/dynamodb-table.ts";
 import { isLocalStack } from "../local/util.ts";
+import { LambdaDynamoEventSource } from "../constructs/lambda-dynamo-event.ts";
 
 interface CreateApiComponentsProps {
   scope: Construct;
@@ -24,6 +27,8 @@ interface CreateApiComponentsProps {
   kafkaAuthorizedSubnets: ec2.ISubnet[];
   brokerString: string;
   attachmentsBucket: s3.IBucket;
+  launchDarklyServer: string;
+  launchDarklyLocalFlags?: string;
 }
 
 export function createApiComponents(props: CreateApiComponentsProps) {
@@ -32,12 +37,49 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     stage,
     project,
     isDev,
+    vpc,
+    kafkaAuthorizedSubnets,
     brokerString,
     tables,
     attachmentsBucket,
+    launchDarklyServer,
+    launchDarklyLocalFlags = '{"local": false, "flags": {}}',
   } = props;
 
   const service = "app-api";
+
+  const kafkaSecurityGroup = new ec2.SecurityGroup(
+    scope,
+    "KafkaSecurityGroup",
+    {
+      vpc,
+      description:
+        "Security Group for streaming functions. Egress all is set by default.",
+      allowAllOutbound: true,
+    }
+  );
+
+  // sending emails requires manual steps and approvals, so we only do them in dev, val, prod
+  let sesPolicy = new iam.PolicyStatement({
+    effect: iam.Effect.DENY,
+    actions: ["ses:SendEmail", "ses:SendRawEmail"],
+    resources: ["*"],
+  });
+  if (!isDev) {
+    const senderIdentity = new ses.EmailIdentity(
+      scope,
+      "SenderDomainIdentity",
+      {
+        identity: ses.Identity.domain("cms.hhs.gov"),
+      }
+    );
+
+    sesPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["ses:SendEmail", "ses:SendRawEmail"],
+      resources: [senderIdentity.emailIdentityArn],
+    });
+  }
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
@@ -95,6 +137,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   const environment = {
     NODE_OPTIONS: "--enable-source-maps",
     STAGE: stage,
+    launchDarklyServer,
+    launchDarklyLocalFlags,
     attachmentsBucketName: attachmentsBucket.bucketName,
     ...Object.fromEntries(
       tables.map((table) => [`${table.node.id}Table`, table.table.tableName])
@@ -117,7 +161,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "createBanner", {
     entry: "services/app-api/handlers/banners/create.ts",
     handler: "createBanner",
-    path: "banners/{bannerId}",
+    path: "banners",
     method: "POST",
     ...commonProps,
   });
@@ -130,10 +174,10 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "fetchBanner", {
+  new Lambda(scope, "getBanners", {
     entry: "services/app-api/handlers/banners/fetch.ts",
-    handler: "fetchBanner",
-    path: "banners/{bannerId}",
+    handler: "getBanners",
+    path: "banners",
     method: "GET",
     ...commonProps,
   });
@@ -162,12 +206,30 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     method: "GET",
     ...commonProps,
   });
+  //paths made only for dev tool, not to be used on real data
+  if (stage !== "production") {
+    new Lambda(scope, "deleteReport", {
+      entry: "services/app-api/handlers/reports/delete.ts",
+      handler: "deleteReport",
+      path: "reports/{reportType}/{state}/{id}",
+      method: "DELETE",
+      ...commonProps,
+    });
 
+    new Lambda(scope, "deleteReportsForState", {
+      entry: "services/app-api/handlers/reports/delete.ts",
+      handler: "deleteReportsForState",
+      path: "reports/{reportType}/{state}",
+      method: "DELETE",
+      ...commonProps,
+    });
+  }
   new Lambda(scope, "submitReport", {
     entry: "services/app-api/handlers/reports/submit.ts",
     handler: "submitReport",
     path: "reports/submit/{reportType}/{state}/{id}",
-    method: "POST",
+    method: "PUT",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
@@ -184,21 +246,30 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "releaseReport",
     path: "reports/release/{reportType}/{state}/{id}",
     method: "PUT",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
   new Lambda(scope, "createUpload", {
     entry: "services/app-api/handlers/uploads/create.ts",
     handler: "createUpload",
-    path: "/uploads/{year}/{state}",
+    path: "/reports/{reportType}/{state}/{id}/files",
     method: "POST",
     ...commonProps,
   });
 
-  new Lambda(scope, "getUpload", {
+  new Lambda(scope, "getUploadsByFileId", {
     entry: "services/app-api/handlers/uploads/get.ts",
-    handler: "getUpload",
-    path: "/uploads/{year}/{state}/{fileId}",
+    handler: "getUploadsByFileId",
+    path: "/reports/{reportType}/{state}/{id}/files/{fileId}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getUploadsByReportId", {
+    entry: "services/app-api/handlers/uploads/get.ts",
+    handler: "getUploadsByReportId",
+    path: "/reports/{reportType}/{state}/{id}/files/",
     method: "GET",
     ...commonProps,
   });
@@ -206,16 +277,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
     handler: "deleteUploadedFile",
-    path: "/uploads/{year}/{state}/{fileId}",
+    path: "/reports/{reportType}/{state}/{id}/files/{fileId}",
     method: "DELETE",
-    ...commonProps,
-  });
-
-  new Lambda(scope, "viewUploadsForState", {
-    entry: "services/app-api/handlers/uploads/get.ts",
-    handler: "viewUploadsForState",
-    path: "/uploads/{year}/{state}/view/{fileId}",
-    method: "GET",
     ...commonProps,
   });
 
@@ -233,6 +296,23 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
     method: "PUT",
     ...commonProps,
+  });
+
+  new LambdaDynamoEventSource(scope, "postKafkaData", {
+    entry: "services/app-api/handlers/kafka/post/postKafkaData.ts",
+    handler: "handler",
+    timeout: Duration.seconds(120),
+    memorySize: 2048,
+    retryAttempts: 2,
+    vpc,
+    vpcSubnets: { subnets: kafkaAuthorizedSubnets },
+    securityGroups: [kafkaSecurityGroup],
+    ...commonProps,
+    environment: {
+      topicNamespace: isDev ? `--${project}--${stage}--` : "",
+      ...commonProps.environment,
+    },
+    tables: tables.filter((table) => ["RhtpReports"].includes(table.node.id)),
   });
 
   if (!isLocalStack) {

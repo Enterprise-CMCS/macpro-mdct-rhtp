@@ -5,34 +5,33 @@ import {
   getErrorMessage,
 } from "utils/state/reportLogic/tableBuilder";
 import { Flex } from "@chakra-ui/react";
-import { ActionAnswerShape, ActionModalElement, ActionRowElement } from "types";
+import { ActionAnswerShape, ActionModalElement } from "@rhtp/shared";
 import { ErrorMessages } from "../../constants";
 
 export const ActionModal = ({
-  rows,
   modal,
   form,
   modalDisclosure,
   onSave,
+  disabled,
 }: Props) => {
   const isEdit = form.index !== undefined;
   const renderElements = !isEdit
     ? modal.elements.filter((element) => !element.editOnly)
     : modal.elements;
-
   const [errorMessages, setErrorMessages] = useState<string[]>(
     renderElements.map(() => "")
   );
+
   const [formData, setFormData] = useState<ActionAnswerShape>(form.data);
   const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     setFormData(form.data);
   }, [form.data]);
 
-  /* general functions */
-  const fieldLabel = (id: string) => {
-    return rows.find((row) => row.id == id)?.header ?? "";
-  };
+  useEffect(() => {
+    setErrorMessages(renderElements.map(() => ""));
+  }, [modalDisclosure.isOpen]);
 
   const onModalChange = (value: string[], id: string, index: number) => {
     const newData = [...formData];
@@ -52,7 +51,6 @@ export const ActionModal = ({
 
   const onModalClose = () => {
     modalDisclosure.onClose();
-    setErrorMessages(renderElements.map(() => ""));
   };
 
   const onSubmit = (event: SubmitEvent) => {
@@ -69,7 +67,6 @@ export const ActionModal = ({
         : errorMessages[index]
     );
     setErrorMessages(errors);
-
     if (errors.some((error) => error != "")) return;
 
     setSubmitting(true);
@@ -88,18 +85,21 @@ export const ActionModal = ({
       content={{
         heading: isEdit ? `Edit ${modal.title}` : `Add ${modal.title}`,
         actionButtonText: "Save",
-        closeButtonText: "Close",
+        closeButtonText: "Cancel",
       }}
-      disableConfirm={submitting}
+      disableConfirm={submitting || disabled}
     >
       <form id="actionModal" onSubmit={onSubmit}>
         <Flex flexDir="column" gap="1.5rem">
           {renderElements.map((element, index) =>
             buildElement(
-              element,
+              {
+                ...element,
+                disabled: element.disabled || disabled,
+              },
               formData.find((data) => data.id === element.id)?.value!,
               (value) => onModalChange(value, element.id, index),
-              fieldLabel(element.id),
+              element.label,
               errorMessages[index]
             )
           )}
@@ -110,7 +110,6 @@ export const ActionModal = ({
 };
 
 interface Props {
-  rows: ActionRowElement[];
   modal: {
     title: string;
     hintText?: string;
@@ -122,4 +121,5 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
+  disabled?: boolean;
 }

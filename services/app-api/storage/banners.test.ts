@@ -1,21 +1,25 @@
-import { putBanner, getBanner, deleteBanner } from "./banners";
+import { deleteBanner, putBanner, scanAllBanners } from "./banners";
 import { mockClient } from "aws-sdk-client-mock";
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
   PutCommand,
+  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { BannerAreas, BannerShape } from "@rhtp/shared";
 
 const mockDynamo = mockClient(DynamoDBDocumentClient);
 
-const mockBanner = {
-  key: "mock-key",
-  title: "Mock Title",
-  description: "Mock description",
-  startDate: new Date(2024, 8, 27).getDate(),
-  endDate: new Date(2024, 8, 28).getDate(),
-  isActive: true,
+const mockBanner: BannerShape = {
+  title: "mock title",
+  area: BannerAreas.RHTP,
+  description: "mock description",
+  link: "https://example.com",
+  startDate: new Date().toISOString().slice(0, 10),
+  endDate: new Date().toISOString().slice(0, 10),
+  key: "mock-existing-banner-key-guid",
+  createdAt: "1998-01-01T00:00:00.123Z",
+  createdBy: "prev username",
 };
 
 describe("Banner storage methods", () => {
@@ -38,18 +42,21 @@ describe("Banner storage methods", () => {
     );
   });
 
-  test("should call Dynamo to fetch a banner", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ Item: mockBanner });
-    mockDynamo.on(GetCommand).callsFakeOnce(mockFetch);
+  test("should call Dynamo to scan all banners", async () => {
+    const mockScan = vi
+      .fn()
+      .mockResolvedValueOnce({ Items: [mockBanner], LastEvaluatedKey: "foo" })
+      .mockResolvedValueOnce({ Items: [mockBanner] });
 
-    const banner = await getBanner("mock-key");
+    mockDynamo.on(ScanCommand).callsFakeOnce(mockScan).callsFakeOnce(mockScan);
 
-    expect(banner).toBe(mockBanner);
-    expect(mockFetch).toHaveBeenCalledWith(
-      {
+    const banner = await scanAllBanners();
+
+    expect(banner).toEqual([mockBanner, mockBanner]);
+    expect(mockScan).toHaveBeenCalledWith(
+      expect.objectContaining({
         TableName: "local-banners",
-        Key: { key: "mock-key" },
-      },
+      }),
       expect.any(Function)
     );
   });

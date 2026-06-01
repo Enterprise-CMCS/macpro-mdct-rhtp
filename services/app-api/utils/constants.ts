@@ -1,12 +1,83 @@
-import { ReportType, RhtpSubType } from "../types/reports";
+import { ReportType, RhtpSubTypeData, RhtpSubTypeMap } from "@rhtp/shared";
+import { rhtpReportTemplate } from "../forms/2026/rhtp/rhtp";
 
-// TODO: These are the generic quarter start dates. Update when actual dates get decided on
-export const reportStartDates = {
-  [RhtpSubType.ANNUAL]: (year: number) => new Date(year, 0, 1).getTime(),
-  [RhtpSubType.Q1]: (year: number) => new Date(year, 0, 1).getTime(),
-  [RhtpSubType.Q2]: (year: number) => new Date(year, 3, 1).getTime(),
-  [RhtpSubType.Q3]: (year: number) => new Date(year, 6, 1).getTime(),
-  [RhtpSubType.Q4]: (year: number) => new Date(year, 9, 1).getTime(),
+export const RhtpSubTypeTemplateMap: RhtpSubTypeData = {
+  A1: {
+    ...RhtpSubTypeMap.A1,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q1: {
+    ...RhtpSubTypeMap.Q1,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q2: {
+    ...RhtpSubTypeMap.Q2,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q3: {
+    ...RhtpSubTypeMap.Q3,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  A2: {
+    ...RhtpSubTypeMap.A2,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q4: {
+    ...RhtpSubTypeMap.Q4,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q5: {
+    ...RhtpSubTypeMap.Q5,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q6: {
+    ...RhtpSubTypeMap.Q6,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  A3: {
+    ...RhtpSubTypeMap.A3,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q7: {
+    ...RhtpSubTypeMap.Q7,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q8: {
+    ...RhtpSubTypeMap.Q8,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q9: {
+    ...RhtpSubTypeMap.Q9,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  A4: {
+    ...RhtpSubTypeMap.A4,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q10: {
+    ...RhtpSubTypeMap.Q10,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q11: {
+    ...RhtpSubTypeMap.Q11,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q12: {
+    ...RhtpSubTypeMap.Q12,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  A5: {
+    ...RhtpSubTypeMap.A5,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  Q13: {
+    ...RhtpSubTypeMap.Q13,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
+  FINAL: {
+    ...RhtpSubTypeMap.FINAL,
+    reportTemplateBuilder: rhtpReportTemplate,
+  },
 };
 
 export const error = {
@@ -14,75 +85,9 @@ export const error = {
   NO_KEY: "Must provide key for table.",
   MISSING_DATA: "Missing required data.",
   INVALID_DATA: "Provided data is not valid.",
-  SERVER_ERROR: "An unspecified server error occured.",
+  SERVER_ERROR: "An unspecified server error occurred.",
   CREATION_ERROR: "Could not be created due to a database error.",
   END_DATE_BEFORE_START_DATE: "End date can't be before start date",
-};
-
-export enum StateNames {
-  AL = "Alabama",
-  AK = "Alaska",
-  AS = "American Samoa",
-  AZ = "Arizona",
-  AR = "Arkansas",
-  CA = "California",
-  CO = "Colorado",
-  CT = "Connecticut",
-  DE = "Delaware",
-  DC = "District of Columbia",
-  FM = "Federated States of Micronesia",
-  FL = "Florida",
-  GA = "Georgia",
-  GU = "Guam",
-  HI = "Hawaii",
-  ID = "Idaho",
-  IL = "Illinois",
-  IN = "Indiana",
-  IA = "Iowa",
-  KS = "Kansas",
-  KY = "Kentucky",
-  LA = "Louisiana",
-  ME = "Maine",
-  MH = "Marshall Islands",
-  MD = "Maryland",
-  MA = "Massachusetts",
-  MI = "Michigan",
-  MN = "Minnesota",
-  MS = "Mississippi",
-  MO = "Missouri",
-  MT = "Montana",
-  NE = "Nebraska",
-  NV = "Nevada",
-  NH = "New Hampshire",
-  NJ = "New Jersey",
-  NM = "New Mexico",
-  NY = "New York",
-  NC = "North Carolina",
-  ND = "North Dakota",
-  MP = "Northern Mariana Islands",
-  OH = "Ohio",
-  OK = "Oklahoma",
-  OR = "Oregon",
-  PW = "Palau",
-  PA = "Pennsylvania",
-  PR = "Puerto Rico",
-  RI = "Rhode Island",
-  SC = "South Carolina",
-  SD = "South Dakota",
-  TN = "Tennessee",
-  TX = "Texas",
-  UT = "Utah",
-  VT = "Vermont",
-  VI = "Virgin Islands",
-  VA = "Virginia",
-  WA = "Washington",
-  WV = "West Virginia",
-  WI = "Wisconsin",
-  WY = "Wyoming",
-}
-export type StateAbbr = keyof typeof StateNames;
-export const isStateAbbreviation = (x: string | undefined): x is StateAbbr => {
-  return Object.keys(StateNames).includes(x!);
 };
 
 export const reportTables: { [key in ReportType]: string } = {

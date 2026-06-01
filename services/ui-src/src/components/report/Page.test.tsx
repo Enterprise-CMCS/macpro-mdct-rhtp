@@ -3,14 +3,14 @@ import {
   mockUseReadOnlyUserStore,
   mockUseStore,
 } from "utils/testing/setupTest";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import { useStore } from "utils";
 import { Page } from "./Page";
-import { AlertTypes, ElementType, PageElement } from "types";
+import { AlertTypes, ElementType, PageElement } from "@rhtp/shared";
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useNavigate: vi.fn(),
   useParams: vi.fn(),
 }));
@@ -37,6 +37,7 @@ const mockNavigate = vi.fn();
   reportType: "exampleReport",
   state: "exampleState",
   reportId: "123",
+  pageId: "examplePage",
 });
 
 const elements: PageElement[] = [
@@ -155,6 +156,7 @@ const elements: PageElement[] = [
     id: "",
     label: "Attachment area label",
     required: true,
+    uploadedSubLabel: "mock sub label",
   },
   {
     type: ElementType.ListInput,
@@ -166,16 +168,7 @@ const elements: PageElement[] = [
   },
   {
     type: ElementType.TableCheckpoint,
-    id: "mockod",
-    label: "mock label",
-    stage: 0,
-    checkpoints: [
-      {
-        id: "mock id",
-        label: "label",
-        attachable: false,
-      },
-    ],
+    id: "mock-checkpoint-id",
     required: false,
   },
 ];

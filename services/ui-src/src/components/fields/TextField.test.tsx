@@ -3,7 +3,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TextField } from "components";
 import { testA11y } from "utils/testing/commonTests";
-import { ElementType, NumberFieldTemplate, TextboxTemplate } from "types";
+import {
+  ElementType,
+  MaskType,
+  NumberFieldTemplate,
+  TextboxTemplate,
+} from "@rhtp/shared";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { useState } from "react";
 
@@ -79,6 +84,19 @@ describe("<TextField />", () => {
 
     const textField = screen.getByRole("textbox");
     expect(textField).toHaveValue("123");
+  });
+
+  test("Masked NumberField should render its initial value with mask", () => {
+    const maskedNumberField = {
+      ...mockedNumberField,
+      mask: MaskType.CommaSeparated,
+    };
+    render(
+      <TextFieldWrapper template={{ ...maskedNumberField, answer: 1234 }} />
+    );
+
+    const textField = screen.getByRole("textbox");
+    expect(textField).toHaveValue("1,234");
   });
 
   test("NumberField should respond to rerender", () => {

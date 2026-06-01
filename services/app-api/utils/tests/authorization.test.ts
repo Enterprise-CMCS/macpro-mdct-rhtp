@@ -5,7 +5,8 @@ import {
   canWriteInitiatives,
   canWriteState,
 } from "../authorization";
-import { User, UserRoles } from "../../types/types";
+import { User } from "../../types/types";
+import { UserRoles } from "@rhtp/shared";
 
 const adminUser = {
   role: UserRoles.ADMIN,
@@ -60,7 +61,6 @@ describe("Authorization functions", () => {
     });
 
     test("should reject other roles", () => {
-      expect(canWriteState(approverUser, "CO")).toBe(false);
       expect(canWriteState(internalUser, "CO")).toBe(false);
       expect(canWriteState(helpDeskUser, "CO")).toBe(false);
     });

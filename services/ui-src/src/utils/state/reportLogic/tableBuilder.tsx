@@ -5,8 +5,12 @@ import {
   DropdownOption,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../../constants";
-import { ActionElement, ElementType } from "types";
-import { parseNumber, validateDate } from "utils/validation/inputValidation";
+import { ActionElement, ElementType } from "@rhtp/shared";
+import {
+  parseNumber,
+  validateDate,
+  maskByType,
+} from "utils/validation/inputValidation";
 
 export const buildElement = (
   element: ActionElement,
@@ -20,10 +24,13 @@ export const buildElement = (
 
   switch (type) {
     case ElementType.Paragraph:
-      return defaultValue;
+      return element.mask
+        ? maskByType(element.mask, defaultValue)
+        : defaultValue;
     case ElementType.Dropdown:
       return (
         <Dropdown
+          key={`dropdown-${label}`}
           name={label ?? "dropdown"}
           label={label}
           onChange={(event) => {
@@ -39,6 +46,7 @@ export const buildElement = (
     case ElementType.NumberField:
       return (
         <TextField
+          key={`textbox-${label}`}
           label={label}
           name={label ?? "textbox"}
           onChange={(event) => {
@@ -47,7 +55,9 @@ export const buildElement = (
           onBlur={(event) => {
             onChange([event.target.value]);
           }}
-          value={defaultValue}
+          value={
+            element.mask ? maskByType(element.mask, defaultValue) : defaultValue
+          }
           errorMessage={errorMessage}
           disabled={element.disabled}
         />
@@ -55,6 +65,7 @@ export const buildElement = (
     case ElementType.TextAreaField:
       return (
         <TextField
+          key={`textarea-${label}`}
           label={label}
           name={label ?? "textarea"}
           onChange={(event) => {
@@ -73,6 +84,7 @@ export const buildElement = (
     case ElementType.Date:
       return (
         <SingleInputDateField
+          key={`date-${label}`}
           name={label ?? "date-field"}
           label={label}
           onChange={(_rawValue: string, maskedValue: string) => {

@@ -1,10 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import {
-  FormPageTemplate,
-  PageElement,
-  ParentPageTemplate,
-  ReviewSubmitTemplate,
-} from "types";
+import { PageElement, ReportPage } from "@rhtp/shared";
 import { renderElements, shouldUseTable } from "./ExportedReportElements";
 import { chunkBy } from "utils/other/arrays";
 import { ExportedReportTable, ReportTableType } from "./ExportedReportTable";
@@ -88,11 +83,13 @@ export const ExportedReportWrapper = ({ section }: Props) => {
     <Flex flexDir="column" gap="1.5rem">
       {chunkedElements.length > 0 && (
         <>
-          {chunkedElements.map((elements) =>
-            shouldUseTable(elements[0].type)
-              ? renderReportTable(elements)
-              : renderReportDisplay(elements)
-          )}
+          {chunkedElements.map((elements, index) => (
+            <div key={`element-${index}`}>
+              {shouldUseTable(elements[0].type)
+                ? renderReportTable(elements)
+                : renderReportDisplay(elements)}
+            </div>
+          ))}
         </>
       )}
     </Flex>
@@ -100,5 +97,5 @@ export const ExportedReportWrapper = ({ section }: Props) => {
 };
 
 export interface Props {
-  section: ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate;
+  section: ReportPage;
 }

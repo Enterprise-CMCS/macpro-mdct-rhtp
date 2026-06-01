@@ -11,8 +11,8 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { Table } from "components";
-import { NavigateFunction, useNavigate } from "react-router-dom";
-import { LiteReport, ReportStatus } from "types";
+import { NavigateFunction, useNavigate } from "react-router";
+import { LiteReport, ReportStatus } from "@rhtp/shared";
 import {
   formatMonthDayYear,
   releaseReport,
@@ -62,17 +62,7 @@ export const HorizontalTable = (props: TableProps) => {
             padding="16px 16px 16px 0"
           >
             {report.name ?? "{Name of form}"}
-            {report.copyFromReportId && (
-              <Text
-                color="gray_dark"
-                fontSize="body_sm"
-                paddingTop="spacer_half"
-              >
-                Copied from previous report
-              </Text>
-            )}
           </Td>
-          <Td>{report.year ?? "{Year of form}"}</Td>
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
           </Td>
@@ -135,19 +125,8 @@ export const VerticalTable = (props: TableProps) => {
                 {report.name}
               </Text>
             </HStack>
-            {report.copyFromReportId && (
-              <HStack>
-                <Text color="gray_dark" fontSize="body_sm">
-                  Copied from previous report
-                </Text>
-              </HStack>
-            )}
           </div>
           <HStack gap="4rem">
-            <div>
-              <Text variant="gray">Reporting Year</Text>
-              <Text>{report.year}</Text>
-            </div>
             <div>
               <Text variant="gray">Last Edited</Text>
               <Text>{formatMonthDayYear(report.lastEdited!)}</Text>
@@ -221,13 +200,7 @@ export const DashboardTable = ({
   const showAdminControlsColumn = userIsAdmin;
 
   // Build header columns based on defined behaviors per role
-  const headers = [
-    "Submission name",
-    "Reporting Year",
-    "Last edited",
-    "Edited by",
-    "Status",
-  ];
+  const headers = ["Submission name", "Last edited", "Edited by", "Status"];
   if (showReportSubmissionsColumn) headers.push("#");
   headers.push("Actions");
 

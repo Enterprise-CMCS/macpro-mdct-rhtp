@@ -18,8 +18,6 @@ const baseStyles = {
     },
     td: {
       paddingLeft: 0,
-      borderTop: "1px solid",
-      borderBottom: "1px solid",
       borderColor: "gray_light",
       textAlign: "left",
       "&:last-of-type": {
@@ -133,7 +131,7 @@ const metricVariant = {
       padding: "1rem",
       border: "none",
     },
-    "tr:nth-child(even)": {
+    "tr:nth-of-type(even)": {
       background: "gray_lightest_highlight",
     },
     td: {
@@ -158,6 +156,10 @@ const metricVariant = {
       ".ds-c-label-mask": {
         display: "none",
       },
+      input: {
+        "field-sizing": "content",
+        minWidth: "50px",
+      },
       "&:last-of-type": {
         paddingRight: "0.75rem",
       },
@@ -174,6 +176,8 @@ const initiativeVariant = {
     },
     td: {
       "&:last-of-type": {
+        display: "flex",
+        justifyContent: "end",
         textAlign: "right",
       },
       ".chakra-link": {

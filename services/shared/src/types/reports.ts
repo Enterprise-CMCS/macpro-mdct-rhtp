@@ -1,67 +1,5 @@
 // Shared types between frontend and backend
-
-// STATES
-export const StateNames = {
-  AL: "Alabama",
-  AK: "Alaska",
-  AS: "American Samoa",
-  AZ: "Arizona",
-  AR: "Arkansas",
-  CA: "California",
-  CO: "Colorado",
-  CT: "Connecticut",
-  DE: "Delaware",
-  DC: "District of Columbia",
-  FM: "Federated States of Micronesia",
-  FL: "Florida",
-  GA: "Georgia",
-  GU: "Guam",
-  HI: "Hawaii",
-  ID: "Idaho",
-  IL: "Illinois",
-  IN: "Indiana",
-  IA: "Iowa",
-  KS: "Kansas",
-  KY: "Kentucky",
-  LA: "Louisiana",
-  ME: "Maine",
-  MH: "Marshall Islands",
-  MD: "Maryland",
-  MA: "Massachusetts",
-  MI: "Michigan",
-  MN: "Minnesota",
-  MS: "Mississippi",
-  MO: "Missouri",
-  MT: "Montana",
-  NE: "Nebraska",
-  NV: "Nevada",
-  NH: "New Hampshire",
-  NJ: "New Jersey",
-  NM: "New Mexico",
-  NY: "New York",
-  NC: "North Carolina",
-  ND: "North Dakota",
-  MP: "Northern Mariana Islands",
-  OH: "Ohio",
-  OK: "Oklahoma",
-  OR: "Oregon",
-  PW: "Palau",
-  PA: "Pennsylvania",
-  PR: "Puerto Rico",
-  RI: "Rhode Island",
-  SC: "South Carolina",
-  SD: "South Dakota",
-  TN: "Tennessee",
-  TX: "Texas",
-  UT: "Utah",
-  VT: "Vermont",
-  VI: "Virgin Islands",
-  VA: "Virginia",
-  WA: "Washington",
-  WV: "West Virginia",
-  WI: "Wisconsin",
-  WY: "Wyoming",
-} as const;
+import { StateNames } from "../utils/constants";
 
 export type StateAbbr = keyof typeof StateNames;
 
@@ -73,13 +11,10 @@ export enum ReportType {
   RHTP = "RHTP",
 }
 
-// TODO: Update when the quarter naming has been decided on
 export enum RhtpSubType {
-  ANNUAL = 0,
-  Q1 = 1,
-  Q2 = 2,
-  Q3 = 3,
-  Q4 = 4,
+  ANNUAL = "ANNUAL",
+  QUARTERLY = "QUARTERLY",
+  FINAL = "FINAL",
 }
 
 export const isReportType = (
@@ -89,7 +24,7 @@ export const isReportType = (
 };
 
 export interface CreateReportOptions {
-  copyFromReportId?: string;
+  mockDate?: string;
 }
 
 export interface CreateInitiativeOptions {
@@ -103,8 +38,10 @@ export interface UpdateInitiativeOptions {
 
 export interface ReportOptions {
   name: string;
-  year: number;
-  subType?: RhtpSubType;
+  subType: RhtpSubType;
+  subTypeKey: string;
+  budgetPeriod: number;
+  pages: ReportPages;
   copyFromReportId?: string;
 }
 
@@ -128,11 +65,18 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
-export interface Report extends ReportBase, ReportOptions {
-  id: string;
+export type ReportComment = {
   name: string;
+  date: string;
+  comment: string;
+  isInternal: boolean;
+};
+
+export interface Report extends ReportOptions {
+  id: string;
+  type: ReportType;
   state: StateAbbr;
-  created?: number;
+  created: number;
   lastEdited?: number;
   lastEditedBy?: string;
   lastEditedByEmail?: string;
@@ -142,21 +86,18 @@ export interface Report extends ReportBase, ReportOptions {
   submittedByEmail?: string;
   status: ReportStatus;
   submissionCount: number;
+  comments?: ReportComment[];
 }
 
 export type LiteReport = Omit<Report, "pages">;
 
-export type ReportBase = {
-  type: ReportType;
-  subType?: RhtpSubType;
-  year: number;
-  pages: (
-    | ParentPageTemplate
-    | FormPageTemplate
-    | InitiativePageTemplate
-    | ReviewSubmitTemplate
-  )[];
-};
+export type ReportPage =
+  | ParentPageTemplate
+  | FormPageTemplate
+  | InitiativePageTemplate
+  | ReviewSubmitTemplate;
+
+export type ReportPages = ReportPage[];
 
 export type ParentPageTemplate = {
   id: PageId;
@@ -195,19 +136,6 @@ export type UploadListProp = {
   fileId: string;
 };
 
-export type CheckpointShape = {
-  id: string;
-  label: string;
-  attachable: boolean;
-};
-
-export type CheckpointAnswerShape = {
-  id: string;
-  label: string;
-  completed: boolean;
-  attachments?: UploadListProp[];
-};
-
 export enum PageType {
   Standard = "standard",
   Modal = "modal",
@@ -233,8 +161,6 @@ export enum ElementType {
   Checkbox = "checkbox",
   ButtonLink = "buttonLink",
   StatusTable = "statusTable",
-  LengthOfStayRate = "lengthOfStay",
-  ReadmissionRate = "readmissionRate",
   StatusAlert = "statusAlert",
   Divider = "divider",
   SubmissionParagraph = "submissionParagraph",
@@ -245,6 +171,8 @@ export enum ElementType {
   AccordionGroup = "accordionGroup",
   UseOfFundsTable = "useOfFundsTable",
   ActionTable = "actionTable",
+  AttachmentTable = "attachmentTable",
+  SubmitForReview = "submitForReview",
 }
 
 export type PageElement =
@@ -270,7 +198,9 @@ export type PageElement =
   | AccordionGroupTemplate
   | UseOfFundsTableTemplate
   | AttachmentAreaTemplate
-  | ActionTableTemplate;
+  | AttachmentTableTemplate
+  | ActionTableTemplate
+  | SubmitForReviewTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -390,6 +320,7 @@ export interface ListInputTemplate extends InputElementTemplate {
 
 export interface NumberFieldTemplate extends InputElementTemplate {
   type: ElementType.NumberField;
+  mask?: MaskType;
   answer?: number;
   hideCondition?: never;
 }
@@ -414,15 +345,16 @@ export interface TextboxTemplate extends InputElementTemplate {
   hideCondition?: HideCondition;
 }
 
-export interface TableCheckpointTemplate extends InputElementTemplate {
+export interface TableCheckpointTemplate {
   type: ElementType.TableCheckpoint;
-  stage: number;
-  checkpoints: CheckpointShape[];
-  answer?: CheckpointAnswerShape[];
+  id: string;
+  required: boolean;
+  answer?: { id: string; checked: boolean }[];
 }
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  uploadedSubLabel: string;
   answer?: UploadListProp[];
 }
 
@@ -450,17 +382,50 @@ export type UseOfFundsTableTemplate = {
   id: string;
   dropDownOptions: {
     budgetPeriodOptions: { label: string; value: string }[];
-    initiativeOptions: { label: string; value: string }[];
     useOfFundsOptions: { label: string; value: string }[];
     recipientCategoryOptions: { label: string; value: string }[];
   };
   answer?: UseOfFundsTableItem[];
 };
 
+export type InitiativeComment = {
+  name: string;
+  date: string;
+  comment?: string;
+  statusChange?: AttachmentStatus;
+};
+
+export enum AttachmentStatus {
+  PENDING_REVIEW = "Pending Review", // State driven
+  NEEDS_REVISION = "Needs Revision", // CMS driven
+  LOCKED_FOR_SCORING = "Locked for Scoring", // CMS driven
+  INFORMATIONAL = "Informational", // CMS driven
+}
+
+export type InitiativeAnswerProp = {
+  attachment: UploadListProp;
+  initiatives: string[];
+  stage?: string;
+  checkpoint?: string;
+  status: AttachmentStatus;
+  comments: InitiativeComment[];
+};
+
+export type AttachmentTableTemplate = {
+  type: ElementType.AttachmentTable;
+  id: string;
+  answer?: InitiativeAnswerProp[];
+};
+
+export enum MaskType {
+  CommaSeparated = "CommaSeparated",
+}
+
 export interface ActionElement {
   id: string;
   type: ElementType;
   disabled?: boolean;
+  mask?: MaskType;
 }
 
 export interface ActionRowElement extends ActionElement {
@@ -468,9 +433,11 @@ export interface ActionRowElement extends ActionElement {
 }
 
 export interface ActionModalElement extends ActionElement {
+  label: string;
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;
+  mask?: MaskType;
 }
 
 export type ActionAnswerShape = { id: string; value: string | number }[];
@@ -487,4 +454,219 @@ export interface ActionTableTemplate {
   };
   rows: ActionRowElement[];
   answer?: ActionAnswerShape[];
+  quarterly?: boolean;
+  disabled?: boolean;
 }
+
+export interface SubmitForReviewTemplate {
+  type: ElementType.SubmitForReview;
+  id: string;
+}
+
+export interface RhtpSubTypeData {
+  [key: string]: {
+    name: string;
+    dateRangeString: string;
+    openDate: number;
+    startDate: number;
+    endDate: number;
+    nextReportSubType: string;
+    type: RhtpSubType;
+    budgetPeriod: number;
+    reportTemplateBuilder?: (state: string) => ReportPages;
+  };
+}
+
+// included in this file to prevent cyclical declaration between constants and types
+export const RhtpSubTypeMap: RhtpSubTypeData = {
+  A1: {
+    name: "Annual Report 1",
+    dateRangeString: "12/29/2025-7/31/2026",
+    openDate: 1766984400000, //using start date for now, actual date TBD
+    startDate: 1766984400000,
+    endDate: 1785470400000,
+    nextReportSubType: "Q1",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 1,
+  },
+  Q1: {
+    name: "Quarterly Report 1",
+    dateRangeString: "8/1/2026-10/30/2026",
+    openDate: 1790740800000, //9.30.2026
+    startDate: 1785556800000,
+    endDate: 1793332800000,
+    nextReportSubType: "Q2",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 1,
+  },
+  Q2: {
+    name: "Quarterly Report 2",
+    dateRangeString: "10/31/2026-1/30/2027",
+    openDate: 1798520400000, //12.29.2026
+    startDate: 1793419200000,
+    endDate: 1801285200000,
+    nextReportSubType: "Q3",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 2,
+  },
+  Q3: {
+    name: "Quarterly Report 3",
+    dateRangeString: "1/31/2027-4/30/2027",
+    openDate: 1806552000000, //4.1.2027
+    startDate: 1801371600000,
+    endDate: 1809057600000,
+    nextReportSubType: "A2",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 2,
+  },
+  A2: {
+    name: "Annual Report 2",
+    dateRangeString: "8/1/2026-7/31/2027",
+    openDate: 1814328000000, //6.30.2027
+    startDate: 1785556800000,
+    endDate: 1817006400000,
+    nextReportSubType: "Q4",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 2,
+  },
+  Q4: {
+    name: "Quarterly Report 4",
+    dateRangeString: "8/1/2027-10/30/2027",
+    openDate: 1822276800000, //9.30.2027
+    startDate: 1817092800000,
+    endDate: 1824868800000,
+    nextReportSubType: "Q5",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 2,
+  },
+  Q5: {
+    name: "Quarterly Report 5",
+    dateRangeString: "10/31/2027-1/30/2028",
+    openDate: 1830056400000, //  12.29.2027
+    startDate: 1824955200000,
+    endDate: 1832821200000,
+    nextReportSubType: "Q6",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 3,
+  },
+  Q6: {
+    name: "Quarterly Report 6",
+    dateRangeString: "1/31/2028-4/30/2028",
+    openDate: 1837915200000, //3.29.2028
+    startDate: 1832907600000,
+    endDate: 1840680000000,
+    nextReportSubType: "A3",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 3,
+  },
+  A3: {
+    name: "Annual Report 3",
+    dateRangeString: "8/1/2027-7/31/2028",
+    openDate: 1845950400000, //6.30.2028
+    startDate: 1817092800000,
+    endDate: 1848628800000,
+    nextReportSubType: "Q7",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 3,
+  },
+  Q7: {
+    name: "Quarterly Report 7",
+    dateRangeString: "8/1/2028-10/30/2028",
+    openDate: 1853899200000, //9.30.2028
+    startDate: 1848715200000,
+    endDate: 1856491200000,
+    nextReportSubType: "Q8",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 3,
+  },
+  Q8: {
+    name: "Quarterly Report 8",
+    dateRangeString: "10/31/2028-1/30/2029",
+    openDate: 1861678800000, //12.29.2028
+    startDate: 1856577600000,
+    endDate: 1864443600000,
+    nextReportSubType: "Q9",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 4,
+  },
+  Q9: {
+    name: "Quarterly Report 9",
+    dateRangeString: "1/31/2029-4/30/2029",
+    openDate: 1869710400000, //4.1.2029
+    startDate: 1864530000000,
+    endDate: 1872216000000,
+    nextReportSubType: "A4",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 4,
+  },
+  A4: {
+    name: "Annual Report 4",
+    dateRangeString: "8/1/2028-7/31/2029",
+    openDate: 1877486400000, //6.30.2029
+    startDate: 1848715200000,
+    endDate: 1880164800000,
+    nextReportSubType: "Q10",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 4,
+  },
+  Q10: {
+    name: "Quarterly Report 10",
+    dateRangeString: "8/1/2029-10/30/2029",
+    openDate: 1885435200000, //9.30.2029
+    startDate: 1880251200000,
+    endDate: 1888027200000,
+    nextReportSubType: "Q11",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 4,
+  },
+  Q11: {
+    name: "Quarterly Report 11",
+    dateRangeString: "10/31/2029-1/30/2030",
+    openDate: 1893214800000, //12.29.2029
+    startDate: 1888113600000,
+    endDate: 1895979600000,
+    nextReportSubType: "Q12",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 5,
+  },
+  Q12: {
+    name: "Quarterly Report 12",
+    dateRangeString: "1/31/2030-4/30/2030",
+    openDate: 1901246400000, //4.1.2030
+    startDate: 1896066000000,
+    endDate: 1903752000000,
+    nextReportSubType: "A5",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 5,
+  },
+  A5: {
+    name: "Annual Report 5",
+    dateRangeString: "8/1/2029-7/31/2030",
+    openDate: 1909022400000, //6.30.2030
+    startDate: 1880251200000,
+    endDate: 1911700800000,
+    nextReportSubType: "Q13",
+    type: RhtpSubType.ANNUAL,
+    budgetPeriod: 5,
+  },
+  Q13: {
+    name: "Quarterly Report 13",
+    dateRangeString: "8/1/2030-10/30/2030",
+    openDate: 1916971200000, //9.30.2030
+    startDate: 1911787200000,
+    endDate: 1919563200000,
+    nextReportSubType: "FINAL",
+    type: RhtpSubType.QUARTERLY,
+    budgetPeriod: 5,
+  },
+  FINAL: {
+    name: "Final Report",
+    dateRangeString: "12/29/2025-10/30/2030",
+    openDate: 1956286800000, //12.29.2031
+    startDate: 1766984400000,
+    endDate: 1919563200000,
+    nextReportSubType: "",
+    type: RhtpSubType.FINAL,
+    budgetPeriod: 5,
+  },
+};

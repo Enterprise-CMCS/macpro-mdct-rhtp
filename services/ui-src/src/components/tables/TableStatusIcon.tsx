@@ -3,7 +3,7 @@ import successIcon from "assets/icons/status/icon_status_check.svg";
 import notStartedIcon from "assets/icons/status/icon_status_alert.svg";
 import notStartedPDFIcon from "assets/icons/status/icon_status_alert_pdf.svg";
 import inProgressIcon from "assets/icons/status/icon_status_inprogress.svg";
-import { PageStatus } from "types";
+import { PageStatus } from "@rhtp/shared";
 
 export enum TableStatuses {
   CLOSE = "close",

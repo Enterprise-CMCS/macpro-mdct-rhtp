@@ -9,6 +9,7 @@ package-lock.json
 tests/playwright-report/
 tests/playwright/.cache/
 tests/playwright/.auth
+tests/test-results/
 /.cdk
 cdk.out
 cdk.context.json

@@ -1,5 +1,5 @@
 import { getReport as getReportFromDatabase } from "../../storage/reports";
-import { PageElement, Report } from "../../types/reports";
+import { ActionAnswerShape, PageElement, Report } from "@rhtp/shared";
 
 const copyAnswer = (oldElements: PageElement[], newElements: PageElement[]) => {
   for (const oldElement of oldElements) {
@@ -9,9 +9,27 @@ const copyAnswer = (oldElements: PageElement[], newElements: PageElement[]) => {
       (newElement) => newElement.id === oldElement.id
     );
     if (newElement?.type === oldElement.type) {
-      newElement.answer = oldElement.answer;
+      if (newElement.id === "metrics-table") {
+        newElement.answer = copyMetricAnswers(
+          oldElement.answer as ActionAnswerShape[]
+        );
+      } else {
+        newElement.answer = oldElement.answer;
+      }
     }
   }
+};
+
+const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
+  return oldAnswerRows.map((oldAnswerRow) => {
+    const newAnswerRow = structuredClone(oldAnswerRow);
+    const indexes = ["prevValue", "currValue"].map((key) =>
+      oldAnswerRow.findIndex((row) => row.id === key)
+    );
+    newAnswerRow[indexes[0]].value = oldAnswerRow[indexes[1]].value;
+    newAnswerRow[indexes[1]].value = "";
+    return newAnswerRow;
+  });
 };
 
 export const copyReport = async (newReport: Report) => {
@@ -25,17 +43,17 @@ export const copyReport = async (newReport: Report) => {
 
   for (const oldPage of reportToCopy.pages) {
     if (oldPage.elements) {
-      const newPage = newPages.find((newPage) => newPage.id === oldPage.id);
+      let newPage = newPages.find((newPage) => newPage.id === oldPage.id);
       // ensure initiatives not in base template get copied
       if (!newPage && "initiativeNumber" in oldPage) {
-        newReport.pages.push(oldPage);
-        continue;
+        newPages.push(oldPage);
+        newPage = oldPage;
       }
 
       const newElements = newPage?.elements;
       if (!newElements) continue;
 
-      if ("status" in oldPage && newPage.status !== oldPage.status) {
+      if (newPage && newPage.status !== oldPage.status) {
         newPage.status = oldPage.status;
       }
 

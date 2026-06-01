@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import {
   Button,
   Heading,
@@ -8,6 +8,7 @@ import {
   Accordion,
   Divider,
   Flex,
+  Box,
 } from "@chakra-ui/react";
 import {
   HeaderTemplate,
@@ -17,13 +18,12 @@ import {
   ButtonLinkTemplate,
   HeaderIcon,
   PageElement,
-} from "types";
+} from "@rhtp/shared";
 import { AccordionItem } from "components";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { parseHtml } from "utils";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
-import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
 
 export type PageElementProps<T extends PageElement = PageElement> = T extends {
   answer?: any;
@@ -35,6 +35,7 @@ export type PageElementProps<T extends PageElement = PageElement> = T extends {
     }
   : {
       element: T;
+      disabled?: boolean;
     };
 
 export const HeaderElement = ({
@@ -104,9 +105,9 @@ export const ParagraphElement = ({
           {element.title}
         </Text>
       )}
-      <Text fontSize="body_md" fontWeight={element.weight}>
-        {element.text}
-      </Text>
+      <Box fontSize="body_md" fontWeight={element.weight}>
+        {parseHtml(element.text)}
+      </Box>
     </Stack>
   );
 };
@@ -141,17 +142,12 @@ export const ButtonLinkElement = ({
   //swapping between props based on style
   const getPropObj = (style: string) => {
     switch (style) {
-      case "pdf":
+      case "alt-continue":
         return {
           prop: {
-            as: Link,
-            target: "_blank",
+            marginLeft: "auto",
             variant: "primary",
-            to: link,
-          },
-          style: {
-            src: whitePDFPrimary,
-            alt: "pdf icon",
+            onClick: () => nav(),
           },
         };
 
@@ -173,7 +169,7 @@ export const ButtonLinkElement = ({
 
   return (
     <Button {...propObj.prop}>
-      <Image {...propObj.style} className="icon" />
+      {propObj.style ? <Image {...propObj.style} className="icon" /> : null}
       {button.label}
     </Button>
   );

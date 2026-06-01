@@ -1,68 +1,69 @@
+import { Mock, MockedFunction } from "vitest";
+import { useStore } from "utils";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
-import { useParams } from "react-router-dom";
-import { ElementType, AttachmentAreaTemplate } from "types";
-import {
-  deleteUploadedFile,
-  getFileDownloadUrl,
-} from "utils/api/requestMethods/upload";
+import { ElementType, AttachmentAreaTemplate } from "@rhtp/shared";
+import { getFileDownloadUrl } from "utils/api/requestMethods/upload";
 import { testA11y } from "utils/testing/commonTests";
-import { Mock } from "vitest";
 
-vi.mock("react-router-dom", () => ({
-  useParams: vi.fn().mockReturnValue({ state: "PA" }),
-}));
+const updateSpy = vi.fn();
 
-vi.mock("utils", async (importOriginal) => ({
-  ...(await importOriginal()),
-  useStore: vi.fn().mockReturnValue({ report: { year: "2026" } }),
-}));
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
 vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),
-  getUploadedFiles: vi
-    .fn()
-    .mockReturnValue([
-      { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
-    ]),
 }));
 
 const mockAttachmentAreaElement: AttachmentAreaTemplate = {
   id: "mock-attachment-area-id",
   type: ElementType.AttachmentArea,
   label: "mock attachment area",
+  uploadedSubLabel: "mock sub label",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   required: true,
 };
 
 const AttachmentAreaComponent = (
-  <AttachmentArea element={mockAttachmentAreaElement} updateElement={vi.fn()} />
+  <AttachmentArea
+    element={mockAttachmentAreaElement}
+    updateElement={updateSpy}
+  />
 );
 
-const consoleMock = vi.spyOn(console, "error");
+const consoleMock = vi.spyOn(console, "error").mockImplementation(vi.fn());
+window.open = vi.fn();
 
 describe("<AttachmentArea />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUseStore.mockReturnValue({
+      report: {
+        id: "mock-report-id",
+        type: "RHTP",
+        state: "PA",
+      },
+    });
   });
   test("AttachmentArea renders an upload button", async () => {
     await act(async () => {
       render(AttachmentAreaComponent);
     });
+
     expect(screen.getByText("mock attachment area")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Add attachment" }));
+    expect(screen.getByRole("button", { name: "Upload Attachments" }));
   });
-  test("receive an error when state or year is not provided", async () => {
-    (useParams as Mock).mockResolvedValueOnce("");
+  test("receive an error when state, id or type is not provided", async () => {
+    (useStore as unknown as Mock).mockReturnValue({ report: {} });
     await act(async () => {
       render(AttachmentAreaComponent);
     });
     expect(screen.queryByText("mock attachment area")).not.toBeInTheDocument();
     expect(consoleMock).toHaveBeenLastCalledWith(
-      "Can't retrieve uploads with missing state or year"
+      "Can't retrieve uploads with missing state, id or type"
     );
   });
   test("open and close the upload modal", async () => {
@@ -70,14 +71,18 @@ describe("<AttachmentArea />", () => {
       render(AttachmentAreaComponent);
     });
     await userEvent.click(
-      screen.getByRole("button", { name: "Add attachment" })
+      screen.getByRole("button", { name: "Upload Attachments" })
     );
-    expect(screen.getByText("Upload Attachments")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Upload Attachments" })
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Select a file or files to upload")
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(screen.queryByText("Upload Attachments")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Upload Attachments" })
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByText("Select a file or files to upload")
     ).not.toBeInTheDocument();
@@ -96,7 +101,6 @@ describe("<AttachmentArea />", () => {
     expect(getFileDownloadUrl).toHaveBeenCalled();
   });
   test("test deleting a file", async () => {
-    (deleteUploadedFile as Mock).mockResolvedValueOnce("");
     await act(async () => {
       render(AttachmentAreaComponent);
     });
@@ -108,7 +112,7 @@ describe("<AttachmentArea />", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "delete mock-name" })
     );
-    expect(deleteUploadedFile).toHaveBeenCalled();
+    expect(updateSpy).toHaveBeenCalled();
   });
   testA11y(AttachmentAreaComponent);
 });

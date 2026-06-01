@@ -2,7 +2,7 @@ import { Accordion, Box, Button } from "@chakra-ui/react";
 import { Page } from "components/report/Page";
 import { AccordionItem } from "components";
 import { PageElementProps } from "components/report/Elements";
-import { AccordionGroupTemplate, PageElement } from "types";
+import { AccordionGroupTemplate, PageElement } from "@rhtp/shared";
 import { useState } from "react";
 
 export const AccordionGroup = (
@@ -61,7 +61,11 @@ export const AccordionGroup = (
       </Box>
       <Accordion allowMultiple variant="border" index={accordionState}>
         {accordions.map((accordion, index) => (
-          <AccordionItem label={accordion.label} onClick={() => toggle(index)}>
+          <AccordionItem
+            key={`${accordion.label}-${index}`}
+            label={accordion.label}
+            onClick={() => toggle(index)}
+          >
             <Page
               id="radio-children"
               setElements={(element) => setAccordionChildren(element, index)}

@@ -7,9 +7,9 @@ import {
   ReportOptions,
   ReportType,
   RhtpSubType,
-} from "../../types/reports";
+  StateAbbr,
+} from "@rhtp/shared";
 import { User } from "../../types/types";
-import { StateAbbr } from "../../utils/constants";
 import { validateReportPayload } from "../../utils/reportValidation";
 import { buildReport, makeQuarterlyChanges } from "./buildReport";
 
@@ -34,8 +34,10 @@ describe("buildReport utility", () => {
     } as User;
     const reportOptions = {
       name: "report1",
-      year: 2026,
       subType: RhtpSubType.ANNUAL,
+      subTypeKey: "A1",
+      budgetPeriod: 1,
+      pages: [{}],
     } as ReportOptions;
     const report = await buildReport(
       ReportType.RHTP,
@@ -59,9 +61,11 @@ describe("buildReport utility", () => {
     } as User;
     const reportOptions = {
       name: "report1",
-      year: 2026,
-      subType: RhtpSubType.Q1,
+      subType: RhtpSubType.QUARTERLY,
+      subTypeKey: "Q1",
       copyFromReportId: "123",
+      budgetPeriod: 1,
+      pages: [{}],
     } as ReportOptions;
     const report = await buildReport(
       ReportType.RHTP,
@@ -72,7 +76,7 @@ describe("buildReport utility", () => {
 
     expect(report.state).toBe("PA");
     expect(report.type).toBe(ReportType.RHTP);
-    expect(report.subType).toEqual(RhtpSubType.Q1);
+    expect(report.subType).toEqual(RhtpSubType.QUARTERLY);
     expect(report.lastEditedBy).toBe("James Holden");
     expect(report.lastEditedByEmail).toBe("james.holden@test.com");
     expect(report.copyFromReportId).toBe("123");
@@ -91,7 +95,8 @@ describe("buildReport utility", () => {
     } as User;
     const reportOptions = {
       name: "report1",
-      year: 2026,
+      budgetPeriod: 1,
+      pages: [{}],
     } as ReportOptions;
 
     await expect(async () => {

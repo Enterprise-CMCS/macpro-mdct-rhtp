@@ -1,46 +1,48 @@
+import { Button, Link, Image, Flex } from "@chakra-ui/react";
 import {
-  Button,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Text,
-  Link,
-  Image,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  ModalBody,
-  ModalFooter,
-  Flex,
-} from "@chakra-ui/react";
-import { UseOfFundsTableTemplate, UseOfFundsTableItem } from "types";
+  UseOfFundsTableTemplate,
+  UseOfFundsTableItem,
+  dropdownEmptyOption,
+  MaskType,
+} from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState, ChangeEvent, useEffect } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
-import closeIcon from "assets/icons/close/icon_close_primary.svg";
 import {
   TextField,
   Dropdown,
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
-import { isValidCurrency } from "utils/validation/inputValidation";
+import {
+  isValidCurrency,
+  unmaskByType,
+} from "utils/validation/inputValidation";
+import { useStore } from "utils";
+import { Modal } from "components/modals/Modal";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 export const UseOfFundsTableElement = (
   props: PageElementProps<UseOfFundsTableTemplate>
 ) => {
-  const { element, updateElement } = props;
-  const {
-    budgetPeriodOptions,
-    initiativeOptions,
-    useOfFundsOptions,
-    recipientCategoryOptions,
-  } = element.dropDownOptions;
+  const { disabled, element, updateElement } = props;
+  const { budgetPeriodOptions, useOfFundsOptions, recipientCategoryOptions } =
+    element.dropDownOptions;
+  const { report } = useStore();
+
+  // Initiative options are dynamic and are generated based on the initiatives added previously in the form
+  const initiatives = report?.pages.filter(
+    (page) => "initiativeNumber" in page
+  );
+  const initiativeOptions = [
+    dropdownEmptyOption,
+    ...(initiatives ?? []).map((initiative) => ({
+      label: `${initiative.initiativeNumber}: ${initiative.title}`,
+      value: initiative.initiativeNumber,
+    })),
+  ];
 
   const initialValues = {
     budgetPeriod: "",
@@ -101,6 +103,15 @@ export const UseOfFundsTableElement = (
     updateElement({ answer: updatedItems });
   };
 
+  const formatAnswer = (items: UseOfFundsTableItem[]) => {
+    return items.map((item) => {
+      return {
+        ...item,
+        spentFunds: unmaskByType(MaskType.CommaSeparated, item.spentFunds),
+      };
+    });
+  };
+
   const onSubmit = () => {
     let errors = { ...initialValues };
     let hasError = false;
@@ -129,7 +140,8 @@ export const UseOfFundsTableElement = (
     if (!updatedItems) return;
 
     setItems(updatedItems);
-    updateElement({ answer: updatedItems });
+    const newAnswer = formatAnswer(updatedItems);
+    updateElement({ answer: newAnswer });
     setModalOpen(false);
     setFormValues(initialValues);
   };
@@ -148,54 +160,43 @@ export const UseOfFundsTableElement = (
     setModalOpen(true);
   };
 
-  const rows = items.map((item, index) => {
-    return (
-      <Tr key={index}>
-        <Td>
-          <Text>{item.budgetPeriod}</Text>
-        </Td>
-        <Td>
-          <Text>${item.spentFunds}</Text>
-        </Td>
-        <Td>
-          <Text>{item.description}</Text>
-        </Td>
-        <Td>
-          <Text>{item.initiative}</Text>
-        </Td>
-        <Td>
-          <Text>{item.useOfFunds}</Text>
-        </Td>
-        <Td>
-          <Text>
-            {item.recipientName}; {item.recipientCategory}
-          </Text>
-        </Td>
-        <Td>
-          <Flex direction="row">
-            <Button
-              as={Link}
-              variant={"transparent"}
-              aria-label={`Edit ${item.id}`}
-              onClick={() => {
-                onEditClick(item);
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="plain"
-              aria-label={`Delete ${item.id}`}
-              onClick={() => {
-                handleDeleteClick(item.id);
-              }}
-            >
-              <Image src={cancelIcon} alt={"Delete Item"} />
-            </Button>
-          </Flex>
-        </Td>
-      </Tr>
+  const rows = items.map((item) => {
+    const columnActions = (
+      <Flex direction="row">
+        <Button
+          as={disabled ? Button : Link}
+          variant={disabled ? "link" : "transparent"}
+          aria-label={`Edit ${item.id}`}
+          onClick={() => {
+            onEditClick(item);
+          }}
+          disabled={disabled}
+        >
+          Edit
+        </Button>
+        <Button
+          variant="plain"
+          aria-label={`Delete ${item.id}`}
+          onClick={() => {
+            handleDeleteClick(item.id);
+          }}
+          disabled={disabled}
+        >
+          <Image src={cancelIcon} alt={"Delete Item"} minW="1.5rem" />
+        </Button>
+      </Flex>
     );
+
+    return [
+      item.budgetPeriod,
+      `$${item.spentFunds}`,
+      item.description,
+      item.initiative,
+      item.useOfFunds,
+      item.recipientName,
+      item.recipientCategory,
+      columnActions,
+    ];
   });
 
   return (
@@ -205,110 +206,100 @@ export const UseOfFundsTableElement = (
         onClick={() => {
           onAddClick();
         }}
+        disabled={disabled}
+        leftIcon={<Image src={disabled ? addGray : addIcon} />}
       >
-        <Image src={addIcon} alt={"Add Item"} sx={sx.addIcon} />
         Add use of funds
       </Button>
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            <Th>Budget Period</Th>
-            <Th>Spent Funds ($)</Th>
-            <Th>Description</Th>
-            <Th>Init #</Th>
-            <Th>Use of Funds</Th>
-            <Th>Recipient name and category</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>{rows}</Tbody>
-      </Table>
+      {rows.length > 0 &&
+        ResponsiveTable(
+          [
+            { label: "Period" },
+            { label: "$ Spent" },
+            { label: "Description" },
+            { label: "Init #" },
+            { label: "Use" },
+            { label: "Recipient" },
+            { label: "Category" },
+            { label: "Actions" },
+          ],
+          rows,
+          "metric"
+        )}
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{modalMode} Use of Funds</ModalHeader>
-          <Button
-            className="close"
-            leftIcon={<Image src={closeIcon} alt="Close" />}
-            variant="link"
-            onClick={() => setModalOpen(false)}
-          >
-            Close
-          </Button>
-          <ModalBody>
-            <Flex direction="column" gap="2rem">
-              <Text>hint text</Text>
-              <Dropdown
-                label="Budget Period"
-                name="budgetPeriod"
-                onChange={handleChange}
-                errorMessage={errorMessages.budgetPeriod}
-                options={budgetPeriodOptions}
-                value={formValues.budgetPeriod}
-              />
-              <TextField
-                label="Spent Funds"
-                name="spentFunds"
-                onBlur={handleChange}
-                onChange={handleChange}
-                errorMessage={errorMessages.spentFunds}
-                value={formValues.spentFunds}
-                mask="currency"
-                numeric={true}
-              />
-              <TextField
-                label="Description"
-                name="description"
-                onBlur={handleChange}
-                onChange={handleChange}
-                errorMessage={errorMessages.description}
-                value={formValues.description}
-                multiline={true}
-              />
-              <Dropdown
-                label="Initiative"
-                name="initiative"
-                onChange={handleChange}
-                errorMessage={errorMessages.initiative}
-                options={initiativeOptions}
-                value={formValues.initiative}
-              />
-              <Dropdown
-                label="Use of Funds"
-                name="useOfFunds"
-                onChange={handleChange}
-                errorMessage={errorMessages.useOfFunds}
-                options={useOfFundsOptions}
-                value={formValues.useOfFunds}
-              />
-              <TextField
-                label="Recipient Name"
-                name="recipientName"
-                onBlur={handleChange}
-                onChange={handleChange}
-                errorMessage={errorMessages.recipientName}
-                value={formValues.recipientName}
-              />
-              <Dropdown
-                label="Recipient Category"
-                name="recipientCategory"
-                onChange={handleChange}
-                errorMessage={errorMessages.recipientCategory}
-                options={recipientCategoryOptions}
-                value={formValues.recipientCategory}
-              />
-            </Flex>
-          </ModalBody>
-          <ModalFooter gap="4">
-            <Button colorScheme="blue" mr={3} onClick={() => onSubmit()}>
-              Save
-            </Button>
-            <Button variant="link" onClick={() => setModalOpen(false)}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
+      <Modal
+        modalDisclosure={{
+          isOpen: modalOpen,
+          onClose: () => setModalOpen(false),
+        }}
+        content={{
+          heading: `${modalMode} Use of Funds`,
+          actionButtonText: "Save",
+          closeButtonText: "Cancel",
+        }}
+        onConfirmHandler={onSubmit}
+      >
+        <Flex direction="column" gap="2rem" marginTop="1.5rem">
+          <Dropdown
+            label="Budget period"
+            name="budgetPeriod"
+            onChange={handleChange}
+            errorMessage={errorMessages.budgetPeriod}
+            options={budgetPeriodOptions}
+            value={formValues.budgetPeriod}
+          />
+          <TextField
+            label="Spent funds"
+            name="spentFunds"
+            onBlur={handleChange}
+            onChange={handleChange}
+            errorMessage={errorMessages.spentFunds}
+            value={formValues.spentFunds}
+            mask="currency"
+            numeric={true}
+          />
+          <TextField
+            label="Description"
+            name="description"
+            onBlur={handleChange}
+            onChange={handleChange}
+            errorMessage={errorMessages.description}
+            value={formValues.description}
+            multiline={true}
+          />
+          <Dropdown
+            label="Initiative"
+            name="initiative"
+            onChange={handleChange}
+            errorMessage={errorMessages.initiative}
+            options={initiativeOptions}
+            value={formValues.initiative}
+          />
+          <Dropdown
+            label="Use of funds"
+            name="useOfFunds"
+            onChange={handleChange}
+            errorMessage={errorMessages.useOfFunds}
+            options={useOfFundsOptions}
+            value={formValues.useOfFunds}
+          />
+          <TextField
+            label="Recipient name"
+            name="recipientName"
+            onBlur={handleChange}
+            onChange={handleChange}
+            errorMessage={errorMessages.recipientName}
+            value={formValues.recipientName}
+          />
+          <Dropdown
+            label="Recipient category"
+            name="recipientCategory"
+            onChange={handleChange}
+            errorMessage={errorMessages.recipientCategory}
+            options={recipientCategoryOptions}
+            value={formValues.recipientCategory}
+          />
+        </Flex>
       </Modal>
     </Fragment>
   );
@@ -320,10 +311,4 @@ export const UseOfFundsTableElementExport = (
 ) => {
   console.log("element", element);
   return <div>empty div for now</div>;
-};
-
-const sx = {
-  addIcon: {
-    padding: "3px",
-  },
 };

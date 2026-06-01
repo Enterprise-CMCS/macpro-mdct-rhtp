@@ -8,7 +8,7 @@ import {
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 import { MenuOption } from "components";
 import { useBreakpoint } from "utils";
 import accountCircleIcon from "assets/icons/account/icon_account_circle.svg";

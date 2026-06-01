@@ -1,15 +1,8 @@
 import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
 import * as framerMotion from "framer-motion";
-import {
-  UserRoles,
-  UserState,
-  AdminBannerState,
-  ReportState,
-  ReportType,
-  ReportStatus,
-} from "types";
-import { mockBannerData } from "./mockBanner";
+import { UserState, ReportState, DevToolsState, BannerState } from "types";
+import { ReportType, ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
 
 /*
  * @testing-library defines custom matchers for DOM nodes.
@@ -95,18 +88,12 @@ vi.mock("aws-amplify/auth", () => ({
 
 //  BANNER STATES / STORE
 
-export const mockBannerStore: AdminBannerState = {
-  bannerData: mockBannerData,
-  bannerActive: false,
-  bannerLoading: false,
-  bannerErrorMessage: { title: "", children: undefined },
-  bannerDeleting: false,
-  setBannerData: () => {},
-  clearAdminBanner: () => {},
-  setBannerActive: () => {},
-  setBannerLoading: () => {},
-  setBannerErrorMessage: () => {},
-  setBannerDeleting: () => {},
+export const mockBannerStore: BannerState = {
+  allBanners: [],
+  _lastFetchTime: 0,
+  fetchBanners: async () => {},
+  createBanner: async () => {},
+  deleteBanner: async () => {},
 };
 
 // USER STATES / STORE
@@ -177,9 +164,12 @@ export const mockReportStore: ReportState = {
     type: ReportType.RHTP,
     status: ReportStatus.IN_PROGRESS,
     name: "mock-report-title",
-    year: 2026,
     state: "PA",
     submissionCount: 0,
+    created: 1776449695077,
+    subType: RhtpSubType.ANNUAL,
+    subTypeKey: "A1",
+    budgetPeriod: 1,
     pages: [
       {
         id: "root",
@@ -198,26 +188,33 @@ export const mockReportStore: ReportState = {
   saveReport: async () => {},
 };
 
+export const mockDevToolsStore: DevToolsState = {
+  devDate: undefined,
+  setDevDate: () => {},
+};
+
 // BOUND STORE
 
-export const mockUseStore: UserState & AdminBannerState & ReportState = {
+export const mockUseStore: UserState &
+  BannerState &
+  ReportState &
+  DevToolsState = {
   ...mockStateUserStore,
   ...mockBannerStore,
   ...mockReportStore,
+  ...mockDevToolsStore,
 };
 
-export const mockUseAdminStore: UserState & AdminBannerState = {
+export const mockUseAdminStore: UserState & BannerState = {
   ...mockAdminUserStore,
   ...mockBannerStore,
 };
 
-export const mockUseReadOnlyUserStore: UserState & AdminBannerState = {
+export const mockUseReadOnlyUserStore: UserState & BannerState = {
   ...mockHelpDeskUserStore,
   ...mockBannerStore,
   ...mockReportStore,
 };
 
-// BANNER
-export * from "./mockBanner";
 // ROUTER
 export * from "./mockRouter";

@@ -1,19 +1,10 @@
 import {
   AlertTypes,
-  ButtonLinkTemplate,
   ElementType,
   HeaderIcon,
   PageType,
   ReviewSubmitTemplate,
 } from "@rhtp/shared";
-
-const exportToPDF: ButtonLinkTemplate = {
-  type: ElementType.ButtonLink,
-  id: "pdf-btn",
-  label: "Download PDF",
-  to: "export",
-  style: "pdf",
-};
 
 export const reviewAndSubmit: ReviewSubmitTemplate = {
   id: "review-submit",
@@ -33,6 +24,10 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
       type: ElementType.Header,
       id: "review-header",
       text: "Review & Submit",
+    },
+    {
+      type: ElementType.SubmitForReview,
+      id: "review-submit-for-review",
     },
     {
       type: ElementType.Paragraph,
@@ -73,6 +68,5 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
       id: "submitted-what-happens",
       text: "Email your CMS representative to inform them you submitted the RHTP Report and it is ready for their review.",
     },
-    exportToPDF,
   ],
 };

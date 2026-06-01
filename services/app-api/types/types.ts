@@ -1,16 +1,5 @@
 import { HttpResponse } from "../libs/response-lib";
-import { StateAbbr } from "../utils/constants";
-
-export enum UserRoles {
-  ADMIN = "mdctrhtp-bor", // "MDCT RHTP Business Owner Representative"
-  APPROVER = "mdctrhtp-appr", // "MDCT RHTP Approver"
-  HELP_DESK = "mdctrhtp-hd", // "MDCT RHTP Help Desk"
-  INTERNAL = "mdctrhtp-internal-user", // "MDCT RHTP Internal User"
-  STATE_USER = "mdctrhtp-state-user", // "MDCT RHTP State User"
-}
-export const isUserRole = (role: string): role is UserRoles => {
-  return Object.values(UserRoles).includes(role as UserRoles);
-};
+import { StateAbbr, UserRoles } from "@rhtp/shared";
 
 export interface User {
   role: UserRoles;
@@ -75,3 +64,26 @@ export interface AuthenticatedRequest<TParams> {
 export type HandlerLambda<TParams> = (
   request: AuthenticatedRequest<TParams>
 ) => Promise<HttpResponse>;
+
+export const isValidUrl = (x: unknown): x is string => {
+  try {
+    const url = new URL(x as string);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
+/** A date, formatted like `2026-02-17` */
+export const isIsoDateString = (x: unknown): x is string => {
+  if ("string" !== typeof x) {
+    return false;
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(x)) {
+    return false;
+  }
+  // The date constructor never throws, even given impossible values.
+  // But invalid values like "2001-02-31T00:00:00.000Z" do not round-trip,
+  // so we can use that fact for validation.
+  return new Date(x).toISOString().slice(0, 10) === x;
+};

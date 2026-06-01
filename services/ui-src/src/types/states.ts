@@ -1,28 +1,20 @@
 import { ReactNode } from "react";
 import {
-  BannerData,
-  ErrorVerbiage,
   ParentPageTemplate,
-  PageData,
   Report,
-  User,
-} from "types";
+  BannerShape,
+  BannerFormData,
+} from "@rhtp/shared";
+import { PageData, User } from "types";
 
-export interface AdminBannerState {
-  bannerData: BannerData | undefined;
-  bannerActive: boolean;
-  bannerLoading: boolean;
-  bannerErrorMessage: ErrorVerbiage | undefined;
-  bannerDeleting: boolean;
-  // ACTIONS
-  setBannerData: (newBannerData: BannerData | undefined) => void;
-  clearAdminBanner: () => void;
-  setBannerActive: (bannerStatus: boolean) => void;
-  setBannerLoading: (bannerLoading: boolean) => void;
-  setBannerErrorMessage: (
-    bannerErrorMessage: ErrorVerbiage | undefined
-  ) => void;
-  setBannerDeleting: (bannerDeleting: boolean) => void;
+export interface BannerState {
+  /** All banners, active and inactive, for every area of the site */
+  allBanners: BannerShape[];
+  /** When was the last time banners were fetched? */
+  _lastFetchTime: number;
+  fetchBanners: () => Promise<void>;
+  createBanner: (data: BannerFormData) => Promise<void>;
+  deleteBanner: (id: string) => Promise<void>;
 }
 
 // initial user state
@@ -55,8 +47,13 @@ export interface ReportState {
   setCurrentPageId: (currentPageId: string) => void;
   setModalOpen: (modalOpen: boolean) => void;
   setModalComponent: (modalComponent: ReactNode, modalHeader: string) => void;
-  setAnswers: (answers: any) => void;
+  setAnswers: (answers: any, pageId?: string) => void;
   completePage: (pageId: string) => void;
   setSidebar: (sidebarOpen: boolean) => void;
   saveReport: () => void;
+}
+
+export interface DevToolsState {
+  devDate: string | undefined;
+  setDevDate: (date: string) => void;
 }

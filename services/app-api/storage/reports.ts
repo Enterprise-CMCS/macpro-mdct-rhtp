@@ -4,13 +4,14 @@ import {
   paginateQuery,
   QueryCommandInput,
   UpdateCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import {
   collectPageItems,
   createClient as createDynamoClient,
 } from "./dynamo/dynamodb-lib";
-import { reportTables, StateAbbr } from "../utils/constants";
-import { Report, ReportType, LiteReport } from "../types/reports";
+import { reportTables } from "../utils/constants";
+import { StateAbbr, Report, ReportType, LiteReport } from "@rhtp/shared";
 
 const dynamoClient = createDynamoClient();
 
@@ -27,6 +28,8 @@ const queryProjectionFields = [
   "year",
   "lastEditedByEmail",
   "subType",
+  "subTypeKey",
+  "budgetPeriod",
   "copyFromReportId",
 ];
 
@@ -100,6 +103,21 @@ export const updateField = async (
       ExpressionAttributeValues: {
         ":updateValue": updateValue,
       },
+    })
+  );
+};
+
+export const deleteReport = async (
+  reportType: ReportType,
+  state: StateAbbr,
+  id: string
+) => {
+  const table = reportTables[reportType];
+
+  await dynamoClient.send(
+    new DeleteCommand({
+      TableName: table,
+      Key: { state, id },
     })
   );
 };

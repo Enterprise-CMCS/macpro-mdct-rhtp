@@ -8,12 +8,8 @@ import {
   ButtonLinkElement,
   DividerElement,
 } from "./Elements";
-import {
-  assertExhaustive,
-  ElementType,
-  PageElement,
-  ReportStatus,
-} from "../../types";
+import { assertExhaustive } from "types";
+import { ElementType, PageElement, ReportStatus } from "@rhtp/shared";
 import {
   DateField,
   DropdownField,
@@ -28,11 +24,13 @@ import {
   AccordionGroup,
   InitiativesTable,
   ActionTable,
+  AttachmentTable,
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
 import { UseOfFundsTableElement } from "./UseOfFundsTable";
 import { AttachmentArea } from "components/fields/AttachmentArea";
+import { SubmitForReview } from "./SubmitForReview";
 
 interface Props {
   id: string;
@@ -97,13 +95,17 @@ export const Page = ({ id, setElements, elements }: Props) => {
           <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
         );
       case ElementType.InitiativesTable:
-        return <InitiativesTable {...{ updateElement, disabled, element }} />;
+        return <InitiativesTable {...{ disabled, element }} />;
       case ElementType.AttachmentArea:
         return <AttachmentArea {...{ updateElement, disabled, element }} />;
       case ElementType.AccordionGroup:
         return <AccordionGroup {...{ updateElement, disabled, element }} />;
       case ElementType.ActionTable:
         return <ActionTable {...{ updateElement, disabled, element }} />;
+      case ElementType.AttachmentTable:
+        return <AttachmentTable {...{ updateElement, disabled, element }} />;
+      case ElementType.SubmitForReview:
+        return <SubmitForReview />;
       default:
         assertExhaustive(element);
         return null;

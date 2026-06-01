@@ -1,5 +1,3 @@
-export * from "@rhtp/shared";
-
 import {
   type ParentPageTemplate,
   type FormPageTemplate,

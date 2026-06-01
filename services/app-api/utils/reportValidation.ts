@@ -18,7 +18,8 @@ import {
   CreateReportOptions,
   CreateInitiativeOptions,
   UpdateInitiativeOptions,
-} from "../types/reports";
+  RhtpSubType,
+} from "@rhtp/shared";
 import { error } from "./constants";
 
 const hideConditionSchema = object()
@@ -83,6 +84,9 @@ const numberFieldTemplateSchema = object().shape({
   helperText: string().notRequired(),
   answer: number().notRequired(),
   required: boolean().required(),
+  mask: string().notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const textAreaTemplateSchema = object().shape({
@@ -93,6 +97,8 @@ const textAreaTemplateSchema = object().shape({
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
   required: boolean().required(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({
@@ -108,7 +114,7 @@ const dropdownTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Dropdown)),
   id: string().required(),
   label: string().required(),
-  helperText: string().required(),
+  helperText: string().notRequired(),
   options: array().of(
     object().shape({
       label: string().required(),
@@ -133,12 +139,6 @@ const useOfFundsTableSchema = object().shape({
   id: string().required(),
   dropDownOptions: object().shape({
     budgetPeriodOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
-    initiativeOptions: array().of(
       object().shape({
         label: string().required(),
         value: string().notRequired(),
@@ -222,8 +222,12 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return attachmentAreaSchema;
     case ElementType.AccordionGroup:
       return accordionGroupTemplateSchema;
+    case ElementType.AttachmentTable:
+      return attachmentTableSchema;
     case ElementType.ActionTable:
       return actionTableSchema;
+    case ElementType.SubmitForReview:
+      return submitForReviewSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -268,35 +272,15 @@ const checkboxTemplateSchema = object().shape({
 const tableCheckpointTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.TableCheckpoint)),
   id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
-  stage: number().required(),
-  checkpoints: array().of(
-    object().shape({
-      id: string().required(),
-      label: string().required(),
-      attachable: boolean().notRequired(),
-    })
-  ),
+  required: boolean().required(),
   answer: array()
     .of(
       object().shape({
         id: string().required(),
-        label: string().required(),
-        completed: boolean().required(),
-        attachments: array()
-          .of(
-            object().shape({
-              name: string().required(),
-              size: number().required(),
-              fileId: string().required(),
-            })
-          )
-          .notRequired(),
+        checked: boolean().required(),
       })
     )
     .notRequired(),
-  required: boolean().required(),
 });
 
 const accordionGroupTemplateSchema = object().shape({
@@ -327,10 +311,14 @@ const attachmentAreaSchema = object().shape({
   id: string().required(),
   label: string().required(),
   helperText: string().optional(),
+  uploadedSubLabel: string().required(),
   required: boolean().required(),
   answer: array().of(
     object().shape({
-      name: string().required(),
+      name: string()
+        .transform((value) => (value === "" ? undefined : value))
+        .default("Uploaded File")
+        .required(),
       size: number().required(),
       fileId: string().required(),
     })
@@ -341,6 +329,7 @@ const ActionElementsSchema = {
   id: string().required(),
   type: string().required(),
   disabled: boolean().notRequired(),
+  mask: string().notRequired(),
 };
 
 const actionTableSchema = object().shape({
@@ -356,6 +345,7 @@ const actionTableSchema = object().shape({
         .of(
           object().shape({
             ...ActionElementsSchema,
+            label: string().required(),
             editOnly: boolean().notRequired(),
             children: array()
               .of(
@@ -366,6 +356,7 @@ const actionTableSchema = object().shape({
               )
               .notRequired(),
             required: boolean().required(),
+            mask: string().notRequired(),
           })
         )
         .required(),
@@ -380,11 +371,44 @@ const actionTableSchema = object().shape({
     )
     .required(),
   answer: array().of(mixed()).notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const initiativesTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.InitiativesTable)),
   id: string().required(),
+});
+
+const attachmentTableSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.AttachmentTable)),
+  id: string().required(),
+  answer: array()
+    .of(
+      object().shape({
+        attachment: object().shape({
+          name: string()
+            .transform((value) => (value === "" ? undefined : value))
+            .default("Uploaded File")
+            .required(),
+          size: number().required(),
+          fileId: string().required(),
+        }),
+        initiatives: array().of(string().notRequired()).required(),
+        stage: string().notRequired(),
+        checkpoint: string().notRequired(),
+        status: string().required(),
+        comments: array().of(
+          object().shape({
+            name: string().required(),
+            date: string().required(),
+            comment: string().notRequired(),
+            statusChange: string().notRequired(),
+          })
+        ),
+      })
+    )
+    .notRequired(),
 });
 
 const dividerSchema = object().shape({
@@ -437,10 +461,15 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
   submittedView: array().of(pageElementSchema).required(),
 });
 
+const submitForReviewSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.SubmitForReview)),
+  id: string().required(),
+});
+
 /**
  * This schema is meant to represent the pages field in the ReportTemplate type.
  * The following yup `lazy` function is building up the union type:
- * `(ParentPageTemplate | FormPageTemplate)[]`
+ * `(ParentPageTemplate | FormPageTemplate | InitiativePageTemplate | ReviewSubmitTemplate)[]`
  * and outputs the correct type in the union based on various fields
  * on the page object that gets passed through.
  */
@@ -473,7 +502,7 @@ export const isCreateReportOptions = (
 ): obj is CreateReportOptions => {
   const createReportOptionsValidationSchema = object()
     .shape({
-      copyFromReportId: string().notRequired(),
+      mockDate: string().notRequired(),
     })
     .required()
     .noUnknown();
@@ -517,6 +546,13 @@ export const isUpdateInitiativeBody = (
   });
 };
 
+const reportCommentSchema = object().shape({
+  name: string().required(),
+  date: string().required(),
+  comment: string().required(),
+  isInternal: boolean().required(),
+});
+
 const reportValidateSchema = object().shape({
   id: string().notRequired(),
   state: string().required(),
@@ -538,9 +574,11 @@ const reportValidateSchema = object().shape({
   status: mixed<ReportStatus>().oneOf(Object.values(ReportStatus)).required(),
   name: string().required(),
   type: mixed<ReportType>().oneOf(Object.values(ReportType)).required(),
-  subType: number().notRequired(),
-  year: number().required(),
+  subType: mixed<RhtpSubType>().oneOf(Object.values(RhtpSubType)).required(),
+  subTypeKey: string().required(),
+  budgetPeriod: number().min(0).max(5).required(),
   submissionCount: number().required(),
+  comments: array().of(reportCommentSchema).notRequired(),
   pages: pagesSchema,
 });
 

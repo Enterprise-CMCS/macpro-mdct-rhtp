@@ -1,16 +1,26 @@
 import { MockedFunction } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ElementType, PageType, Report, ReportStatus, ReportType } from "types";
+import {
+  ElementType,
+  PageType,
+  Report,
+  ReportStatus,
+  ReportType,
+  RhtpSubType,
+} from "@rhtp/shared";
 import { ReportPageWrapper } from "./ReportPageWrapper";
 import { useStore } from "utils";
 
 const testReport: Report = {
   type: ReportType.RHTP,
+  created: 1776449695077,
+  subType: RhtpSubType.ANNUAL,
+  subTypeKey: "A1",
+  budgetPeriod: 1,
   name: "plan id",
   state: "NJ",
   id: "NJGeneral123",
-  year: 2026,
   status: ReportStatus.NOT_STARTED,
   submissionCount: 0,
   pages: [
@@ -60,7 +70,7 @@ const mockUseParams = vi.fn();
 const mockNavigate = vi.fn();
 const mockSaveReport = vi.fn();
 
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useParams: () => mockUseParams(),
   useNavigate: () => mockNavigate,
 }));

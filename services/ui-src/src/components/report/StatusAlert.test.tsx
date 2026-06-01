@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockUseStore } from "utils/testing/setupTest";
 import { StatusAlert } from "./StatusAlert";
-import { AlertTypes, ElementType, StatusAlertTemplate } from "types";
+import { AlertTypes, ElementType, StatusAlertTemplate } from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import userEvent from "@testing-library/user-event";
@@ -26,7 +26,7 @@ vi.mock("utils/state/useStore", () => ({
 
 const mockUseNavigate = vi.fn();
 
-vi.mock("react-router-dom", async (importOriginal) => ({
+vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => mockUseNavigate,
   useParams: vi.fn(() => ({

@@ -1,4 +1,4 @@
-import { FormPageTemplate, Report, ReportType } from "types";
+import { FormPageTemplate, Report, ReportType } from "@rhtp/shared";
 import { createInitiative, updateInitiative } from "./initiatives";
 
 const report = {

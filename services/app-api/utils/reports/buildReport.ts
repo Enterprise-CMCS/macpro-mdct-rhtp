@@ -1,24 +1,19 @@
 import KSUID from "ksuid";
-import { getReportTemplate } from "../../forms/yearlyFormSelection";
 import {
   Report,
   ReportStatus,
   ReportOptions,
   ReportType,
-  ParentPageTemplate,
-  FormPageTemplate,
-  ReviewSubmitTemplate,
   RhtpSubType,
-} from "../../types/reports";
+  StateAbbr,
+  ReportPages,
+} from "@rhtp/shared";
 import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
-import { StateAbbr } from "../constants";
 import { copyReport } from "./copyReport";
 
-export const makeQuarterlyChanges = (
-  pages: (ParentPageTemplate | FormPageTemplate | ReviewSubmitTemplate)[]
-) => {
+export const makeQuarterlyChanges = (pages: ReportPages) => {
   for (const page of pages) {
     if (!page.elements) continue;
     for (const element of page.elements) {
@@ -35,11 +30,7 @@ export const buildReport = async (
   reportOptions: ReportOptions,
   user: User
 ) => {
-  const year = reportOptions.year;
-  // json parse and stringify used instead of structuredClone to break shared references between repeat elements
-  const template = JSON.parse(
-    JSON.stringify(getReportTemplate(reportType, year))
-  );
+  const pages = JSON.parse(JSON.stringify(reportOptions.pages)); // remove object references to prevent modifying shared objects
 
   const report: Report = {
     state,
@@ -51,14 +42,15 @@ export const buildReport = async (
     type: reportType,
     status: ReportStatus.NOT_STARTED,
     name: reportOptions.name,
-    year: reportOptions.year,
     subType: reportOptions.subType,
+    subTypeKey: reportOptions.subTypeKey,
+    budgetPeriod: reportOptions.budgetPeriod,
     copyFromReportId: reportOptions.copyFromReportId,
     submissionCount: 0,
-    pages: template.pages,
+    pages,
   };
 
-  if (report.subType !== RhtpSubType.ANNUAL) {
+  if (report.subType === RhtpSubType.QUARTERLY) {
     makeQuarterlyChanges(report.pages);
   }
 

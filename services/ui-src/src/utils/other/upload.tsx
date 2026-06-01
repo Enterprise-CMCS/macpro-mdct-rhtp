@@ -11,65 +11,101 @@ import {
 import {
   deleteUploadedFile,
   getFileDownloadUrl,
-  getUploadedFiles,
 } from "../api/requestMethods/upload";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
-import { UploadListProp } from "types";
+import {
+  ReportType,
+  UploadListProp,
+  AttachmentStatus,
+  InitiativeComment,
+} from "@rhtp/shared";
 
 export const acceptedFileTypes = [
-  ".ppt",
-  ".pdf",
-  ".doc",
-  ".docx",
+  ".bmp",
+  ".txt",
   ".csv",
-  ".jpg",
+  ".jar",
+  ".odt",
+  ".ods",
+  ".odp",
+  ".msg",
+  ".potx",
+  ".pptx",
+  ".ppt",
+  ".rtf",
+  ".tif",
+  ".gif",
   ".jpeg",
   ".png",
+  ".docm",
+  ".docx",
+  ".doc",
+  ".pdf",
+  ".jpg",
+  ".xlsx",
+  ".xltx",
+  ".xls",
+  ".xml",
 ];
 
-export const retrieveUploadedFiles = async (
-  year: string,
-  state: string,
-  uploadId: string
-) => {
-  const uploadedFiles = await getUploadedFiles(year, state, uploadId);
-  return uploadedFiles.map((file) => ({
-    name: file.filename,
-    size: file.filesize,
-    fileId: file.fileId,
-  }));
+const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
+
+export const getFileWithSafeName = (file: File) => {
+  const newName = file.name.replaceAll(negatedAllowedCharacters, "");
+  return new File([file], newName, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
 };
 
 export const downloadFile = async (
-  year: string,
+  reportType: ReportType,
   state: string,
+  id: string,
   file: UploadListProp
 ) => {
-  const fileLink = await getFileDownloadUrl(year, state, file.fileId);
+  const fileLink = await getFileDownloadUrl(reportType, state, id, file.fileId);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
   window.open(sanitizeLink);
 };
 
+export const canEditAttachment = (status: AttachmentStatus): boolean => {
+  if (status === AttachmentStatus.LOCKED_FOR_SCORING) return false;
+
+  return true;
+};
+
+export const canDeleteAttachment = (
+  status: AttachmentStatus,
+  comments: InitiativeComment[]
+): boolean => {
+  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
+    return true;
+
+  return false;
+};
+
 export const removeFile = async (
-  file: File | UploadListProp,
-  year: string,
+  reportType: ReportType,
   state: string,
-  onRemove: Function
+  id: string,
+  file: File | UploadListProp
 ) => {
   if (!("fileId" in file)) return;
-  await deleteUploadedFile(year, state, file.fileId).then(() => {
-    onRemove();
-  });
+  return deleteUploadedFile(reportType, state, id, file.fileId);
 };
 
 export const uploadListRender = (
-  files: File[] | UploadListProp[],
-  year: string,
+  reportType: ReportType,
   state: string,
+  id: string,
+  files: File[] | UploadListProp[],
   onRemove: Function,
-  onClick?: Function
+  onClick?: Function,
+  removeIconHidden: boolean = false,
+  disabled?: boolean
 ) => {
   return (
     <List variant="upload">
@@ -83,7 +119,7 @@ export const uploadListRender = (
                 ) : (
                   <Button
                     variant="link"
-                    onClick={() => onClick(year, state, file)}
+                    onClick={() => onClick(reportType, state, id, file)}
                   >
                     {file.name}
                   </Button>
@@ -93,8 +129,10 @@ export const uploadListRender = (
               <Button
                 variant="unstyled"
                 aria-label={`delete ${file.name}`}
-                onClick={() => removeFile(file, year, state, onRemove)}
+                onClick={() => onRemove(file)}
                 rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                hidden={removeIconHidden}
+                disabled={disabled}
               />
             </HStack>
             {!onClick && (

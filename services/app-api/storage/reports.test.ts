@@ -1,10 +1,16 @@
-import { getReport, putReport, queryReportsForState } from "./reports";
-import { Report, ReportType } from "../types/reports";
+import {
+  deleteReport,
+  getReport,
+  putReport,
+  queryReportsForState,
+} from "./reports";
+import { Report, ReportType } from "@rhtp/shared";
 import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
   QueryCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 
@@ -64,6 +70,16 @@ describe("Report storage helpers", () => {
     });
   });
 
+  describe("deleteReport", () => {
+    test("should call DynamoDB to delete report data", async () => {
+      const mockDelete = vi.fn();
+      mockDynamo.on(DeleteCommand).callsFake(mockDelete);
+
+      await deleteReport(ReportType.RHTP, "CO", "mock-report-id");
+      expect(mockDelete).toHaveBeenCalled();
+    });
+  });
+
   describe("queryReportsForState", () => {
     test("should call DynamoDB to get report data", async () => {
       const mockQuery = vi.fn().mockResolvedValue({
@@ -93,10 +109,12 @@ describe("Report storage helpers", () => {
             "#year": "year",
             "#lastEditedByEmail": "lastEditedByEmail",
             "#subType": "subType",
+            "#subTypeKey": "subTypeKey",
+            "#budgetPeriod": "budgetPeriod",
             "#copyFromReportId": "copyFromReportId",
           },
           ProjectionExpression:
-            "#id, #name, #state, #created, #status, #submissionCount, #lastEdited, #lastEditedBy, #type, #year, #lastEditedByEmail, #subType, #copyFromReportId",
+            "#id, #name, #state, #created, #status, #submissionCount, #lastEdited, #lastEditedBy, #type, #year, #lastEditedByEmail, #subType, #subTypeKey, #budgetPeriod, #copyFromReportId",
         },
         expect.any(Function)
       );

@@ -3,29 +3,21 @@ import {
   FormPageTemplate,
   PageType,
   UseOfFundsTableTemplate,
+  dropdownEmptyOption,
 } from "@rhtp/shared";
 
 const useOfFundsOptions = {
   dropDownOptions: {
-    // These are placeholder
     budgetPeriodOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "Budget Period 1", value: "Budget Period 1" },
       { label: "Budget Period 2", value: "Budget Period 2" },
       { label: "Budget Period 3", value: "Budget Period 3" },
       { label: "Budget Period 4", value: "Budget Period 4" },
       { label: "Budget Period 5", value: "Budget Period 5" },
     ],
-    // These are placeholder, the initiatives will be come from a previous question in the report
-    initiativeOptions: [
-      { label: "- Select an option -", value: "" },
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
     useOfFundsOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       {
         label: "Prevention and chronic disease",
         value: "Prevention and chronic disease",
@@ -51,7 +43,7 @@ const useOfFundsOptions = {
       { label: "Fostering collaboration", value: "Fostering collaboration" },
     ],
     recipientCategoryOptions: [
-      { label: "- Select an option -", value: "" },
+      dropdownEmptyOption,
       { label: "State agency", value: "State agency" },
       { label: "Local government", value: "Local government" },
       { label: "Rural provider", value: "Rural provider" },
@@ -95,15 +87,16 @@ export const useOfFunds: FormPageTemplate = {
   sidebar: true,
   elements: [
     {
-      type: ElementType.Paragraph,
-      id: "use-of-funds-main-instructions",
-      text: "Instructions go here that need to be seen at all times. Provide details and context to help the user complete this page.",
+      type: ElementType.Header,
+      id: "use-of-funds-header",
+      text: "Use of Funds",
     },
     {
-      type: ElementType.Accordion,
-      id: "use-of-funds-instructions",
-      label: "Instructions",
-      value:
+      type: ElementType.Paragraph,
+      id: "use-of-funds-main-instructions",
+      text:
+        "<p>Use the table below to enter information about how your state or territory spent funds from RHTP on each of its initiatives. Select <b>Add use of funds</b> to add as many rows to the table as needed.</p>" +
+        "<br />" +
         "<b>Budget Period dates for each Budget Period listed in the table below will consist of the following:</b>" +
         "<ul>" +
         "  <li>Budget Period 1 (12/29/2025 - 10/30/2026)</li>" +
@@ -112,12 +105,6 @@ export const useOfFunds: FormPageTemplate = {
         "  <li>Budget Period 4 (10/31/2028 - 10/30/2029)</li>" +
         "  <li>Budget Period 5 (10/31/2029 - 10/30/2030)</li>" +
         "</ul>",
-    },
-    {
-      type: ElementType.Paragraph,
-      id: "use-of-funds-table-text",
-      title: "Spent Funds",
-      text: `To add an use of funds, click the "Add use of funds" button below.`,
     },
     useOfFundsTableElement,
   ],

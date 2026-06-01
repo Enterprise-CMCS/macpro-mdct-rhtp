@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react";
+import { Link as RouterLink, useParams, useSearchParams } from "react-router";
 import {
-  Link as RouterLink,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-import { StateNames } from "../../../constants";
-import {
-  getReportName,
-  isReportType,
+  StateNames,
   isStateAbbr,
+  isReportType,
   LiteReport,
   ReportStatus,
-} from "types";
+  BannerArea,
+} from "@rhtp/shared";
+import { getReportName } from "types";
 import {
   PageTemplate,
   DashboardTable,
-  AddEditReportModal,
+  CreateReportModal,
   AccordionItem,
   UnlockModal,
+  Banner,
 } from "components";
 import {
   Box,
@@ -35,27 +33,32 @@ import { useStore } from "utils";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
+import { DevTools } from "components/devTools/DevTools";
+import { activeBannerSelector } from "utils/state/selectors";
 
 export const DashboardPage = () => {
   const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
   const { reportType, state } = useParams();
+  const banner = useStore(activeBannerSelector(reportType as BannerArea));
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<LiteReport[]>([]);
-  const [selectedReport, setSelectedReport] = useState<LiteReport | undefined>(
-    undefined
-  );
+  const [canCreateReport, setCanCreateReport] = useState(false);
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [dropdownValue, setDropdownValue] = useState(
-    searchParams.get("year") || "All"
+    searchParams.get("budgetPeriod") || "All"
   );
 
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
   const reportName = getReportName(reportType);
-  const filterYear = searchParams.get("year") || "All";
+  const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
   const filterDropdownOptions = [
     { label: "All", value: "All" },
-    { label: "2026", value: "2026" },
+    { label: "Budget Period 1", value: 1 },
+    { label: "Budget Period 2", value: 2 },
+    { label: "Budget Period 3", value: 3 },
+    { label: "Budget Period 4", value: 4 },
+    { label: "Budget Period 5", value: 5 },
   ];
   const hasSubmittedReport = reports.some(
     (report) => report.status === ReportStatus.SUBMITTED
@@ -69,14 +72,24 @@ export const DashboardPage = () => {
   }, [reportType, state]);
 
   useEffect(() => {
-    if (filterYear === "All") {
+    if (filterBudgetPeriod === "All") {
       setFilteredReports(reports);
     } else {
       setFilteredReports(
-        reports.filter((report) => String(report.year) === filterYear)
+        reports.filter(
+          (report) => report.budgetPeriod === parseInt(filterBudgetPeriod)
+        )
       );
     }
-  }, [reports, filterYear]);
+  }, [reports, filterBudgetPeriod]);
+
+  useEffect(() => {
+    const noReports = reports.length === 0;
+    const allSubmittedReports = reports.every(
+      (report) => report.status === ReportStatus.SUBMITTED
+    );
+    setCanCreateReport(noReports || allSubmittedReports);
+  }, [reports]);
 
   const reloadReports = (reportType: string, state: string) => {
     (async () => {
@@ -87,17 +100,11 @@ export const DashboardPage = () => {
     })();
   };
 
-  const openAddEditReportModal = (report?: LiteReport) => {
-    setSelectedReport(report);
-    // use disclosure to open modal
-    addEditReportModalOnOpenHandler();
-  };
-
   // add/edit program modal disclosure
   const {
-    isOpen: addEditReportModalIsOpen,
-    onOpen: addEditReportModalOnOpenHandler,
-    onClose: addEditReportModalOnCloseHandler,
+    isOpen: createReportModalIsOpen,
+    onOpen: createReportModalOnOpenHandler,
+    onClose: createReportModalOnCloseHandler,
   } = useDisclosure();
 
   const {
@@ -106,22 +113,29 @@ export const DashboardPage = () => {
     onClose: unlockModalOnCloseHandler,
   } = useDisclosure();
 
-  const handleYearChange = (evt: { target: { value: string } }) => {
+  const handleBudgetPeriodChange = (evt: { target: { value: string } }) => {
     setDropdownValue(evt.target.value);
   };
 
   const handleFilter = () => {
     setSearchParams({
-      year: dropdownValue,
+      budgetPeriod: dropdownValue.toString(),
     });
   };
 
   return (
     <PageTemplate type="report" sxOverride={sx.layout}>
+      <DevTools
+        reportType={reportType}
+        state={state}
+        reloadReports={reloadReports}
+        reports={reports}
+      />
       <Link as={RouterLink} to="/" variant="return">
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
         Return home
       </Link>
+      {banner ? <Banner {...banner} key={banner.key} /> : null}
       <Box sx={sx.leadTextBox}>
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}
@@ -168,15 +182,6 @@ export const DashboardPage = () => {
                   everything looks good, confirm your entries and proceed.
                 </p>
                 <p>
-                  Once the report is generated, you can edit the name of the
-                  report and monitor its status in the dashboard below.
-                </p>
-                <p>
-                  Please note, while you can generate multiple reports for the
-                  same reporting period, you should only submit a single report
-                  for the state.
-                </p>
-                <p>
                   <strong>Understanding Report Statuses</strong>
                 </p>
                 <ul>
@@ -198,10 +203,6 @@ export const DashboardPage = () => {
                     submission.
                   </li>
                 </ul>
-                <p>
-                  Use the dashboard below to check your report’s status and take
-                  any necessary follow-up actions.
-                </p>
               </Box>
             )}
           </AccordionItem>
@@ -210,11 +211,10 @@ export const DashboardPage = () => {
       <Flex sx={sx.bodyBox} gap="2rem" flexDirection="column">
         <Flex alignItems="flex-end" gap="spacer3">
           <CmsdsDropdownField
-            name="yearFilter"
-            label="Filter by Year"
+            name="budgetPeriodFilter"
+            label="Filter by Budget Period"
             value={dropdownValue}
-            onChange={handleYearChange}
-            data-testid="year-filter-dropdown"
+            onChange={handleBudgetPeriodChange}
             options={filterDropdownOptions}
           />
           <Button onClick={handleFilter} variant="outline">
@@ -246,7 +246,11 @@ export const DashboardPage = () => {
           ))}
         {userIsEndUser && (
           <Flex justifyContent="center">
-            <Button onClick={() => openAddEditReportModal()} type="submit">
+            <Button
+              onClick={createReportModalOnOpenHandler}
+              type="submit"
+              disabled={!canCreateReport}
+            >
               {hasSubmittedReport
                 ? `Copy ${reportName} Submission`
                 : `Start ${reportName} Report`}
@@ -254,15 +258,14 @@ export const DashboardPage = () => {
           </Flex>
         )}
       </Flex>
-      <AddEditReportModal
+      <CreateReportModal
         activeState={state!}
         reportType={reportType!}
         modalDisclosure={{
-          isOpen: addEditReportModalIsOpen,
-          onClose: addEditReportModalOnCloseHandler,
+          isOpen: createReportModalIsOpen,
+          onClose: createReportModalOnCloseHandler,
         }}
         reportHandler={reloadReports}
-        selectedReport={selectedReport}
       />
       <UnlockModal
         modalDisclosure={{
@@ -304,6 +307,9 @@ const sx = {
       "&:after": {
         borderLeftColor: "black",
       },
+    },
+    ".ds-c-dropdown__menu-container": {
+      zIndex: "1101",
     },
   },
   accordion: {

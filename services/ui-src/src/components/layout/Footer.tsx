@@ -1,4 +1,4 @@
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 import { Box, Container, Flex, Image, Link, Text } from "@chakra-ui/react";
 import { useBreakpoint } from "utils";
 import hhsLogo from "assets/logos/logo_hhs.svg";

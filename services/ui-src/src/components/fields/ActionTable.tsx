@@ -1,13 +1,4 @@
-import {
-  Flex,
-  Button,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Flex, Button, Image } from "@chakra-ui/react";
 import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
@@ -17,8 +8,14 @@ import {
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-} from "types";
+  ReportStatus,
+} from "@rhtp/shared";
+import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
+import addPrimary from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
+import { unmaskByType } from "utils/validation/inputValidation";
+import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
 /** This function is meant to handle how the table rows disabled is set, this may expand to encompass more than the Status column */
 const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
@@ -34,17 +31,18 @@ const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
   onChange: (value: string[], index: number, id: string) => void,
-  onEdit: (index: number) => void
+  onEdit: (index: number) => void,
+  formDisabled?: boolean,
+  canChangeStatus: boolean = false
 ) => {
-  const formattedRows: JSX.Element[][] = [];
+  const formattedRows: (JSX.Element | string | number)[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
-    const rowElement: JSX.Element[] = [];
-    const disabled = isRowDisabled(rows, answerRow);
-
+    const rowElement: (JSX.Element | string | number)[] = [];
+    const disabled = isRowDisabled(rows, answerRow) || formDisabled;
     rows.map((column) => {
       //autogenerate next # column
       if (column.id === "no") {
-        rowElement.push(<Td>{answerRowIndex + 1}</Td>);
+        rowElement.push(answerRowIndex + 1);
       } else {
         const element = answerRow.find((item) => item.id === column.id);
         const formattedCol = {
@@ -54,20 +52,16 @@ const buildRows = (
         const value = buildElement(formattedCol, element?.value!, (value) =>
           onChange(value, answerRowIndex, column.id)
         );
-        rowElement.push(<Td>{value}</Td>);
+        rowElement.push(value || "--");
       }
     });
-    rowElement.push(
-      <Td>
-        <Button
-          variant="link"
-          onClick={() => onEdit(answerRowIndex)}
-          disabled={disabled}
-        >
+    if (canChangeStatus) {
+      rowElement.push(
+        <Button variant="link" onClick={() => onEdit(answerRowIndex)}>
           Edit/Abandon
         </Button>
-      </Td>
-    );
+      );
+    }
     formattedRows.push(rowElement);
   });
 
@@ -75,8 +69,13 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const { id, label, hintText, modal, rows, answer } = props.element;
+  const { disabled, element } = props;
+  const { id, label, hintText, modal, rows, answer } = element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
+  const { report } = useStore();
+  const reportSubmitted = report?.status === ReportStatus.SUBMITTED;
+  const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)
@@ -98,64 +97,94 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
+  const formatAnswers = (
+    data: ActionAnswerShape,
+    answerType: "modal" | "row"
+  ) => {
+    return data.map((item) => {
+      let element;
+      if (answerType === "modal") {
+        element = modal.elements.find((element) => element.id === item.id);
+      } else if (answerType === "row") {
+        element = rows.find((element) => element.id === item.id);
+      }
+      if (element?.mask) {
+        return {
+          ...item,
+          value: unmaskByType(element.mask, item.value),
+        };
+      }
+      return item;
+    });
+  };
+
   const onChange = (value: string[], index: number, id: string) => {
     const newAnswer = [...(answer ?? [])];
     const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
-    newAnswer[index][rowIndex].value = value[0];
+    const formattedValue = formatAnswers(
+      [{ id: id, value: value[0] }],
+      "row"
+    )[0].value;
+    newAnswer[index][rowIndex].value = formattedValue;
     props.updateElement({ answer: newAnswer });
   };
 
   /* Modal functions */
   const onModalEdit = (index: number) => {
     if (!answer) return;
-    setModalData({ data: answer[index], index });
+    setModalData({ data: structuredClone(answer[index]), index });
     setModalOpen(true);
   };
 
-  const formattedRows = buildRows(rows, answer ?? [], onChange, onModalEdit);
+  const formattedRows = buildRows(
+    rows,
+    answer ?? [],
+    onChange,
+    onModalEdit,
+    disabled || element.disabled,
+    canAddOrChangeStatus
+  );
 
   const onSave = (data: ActionAnswerShape) => {
+    const newData = formatAnswers(data, "modal");
     if (modalData.index === undefined) {
-      props.updateElement({ answer: [...(answer ?? []), data] });
+      props.updateElement({ answer: [...(answer ?? []), newData] });
     } else {
       const newAnswer = [...answer!];
-      newAnswer[modalData.index] = data;
+      newAnswer[modalData.index] = newData;
       props.updateElement({ answer: newAnswer });
     }
   };
 
+  const headers = rows.map((row) => ({ label: row.header }));
+  if (canAddOrChangeStatus) headers.push({ label: "Actions" });
+
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
-      <Label>{label}</Label>
+      <Label>{pluralLabel}</Label>
       <Hint id={id}>{hintText}</Hint>
-      <Button
-        aria-label={`add ${label}`}
-        variant="outline"
-        alignSelf="flex-start"
-        onClick={() => {
-          setModalOpen(true);
-          setModalData({ data: initial, index: undefined });
-        }}
-      >
-        Add {label.toLowerCase()}
-      </Button>
-      <Table variant="metric">
-        <Thead>
-          <Tr>
-            {rows.map((row) => (
-              <Th>{row.header}</Th>
-            ))}
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {formattedRows.map((row: any) => (
-            <Tr>{row}</Tr>
-          ))}
-        </Tbody>
-      </Table>
+      {canAddOrChangeStatus ? (
+        <Button
+          aria-label={`add ${label}`}
+          variant="outline"
+          alignSelf="flex-start"
+          leftIcon={
+            <Image
+              src={reportSubmitted ? addGray : addPrimary}
+              alt="Add icon"
+            />
+          }
+          onClick={() => {
+            setModalOpen(true);
+            setModalData({ data: initial, index: undefined });
+          }}
+          disabled={reportSubmitted}
+        >
+          Add {label}
+        </Button>
+      ) : null}
+      {ResponsiveTable(headers, formattedRows, "metric")}
       <ActionModal
-        rows={rows}
         modal={modal}
         form={modalData}
         onSave={onSave}
@@ -165,7 +194,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
             setModalOpen(false);
           },
         }}
-      ></ActionModal>
+        disabled={reportSubmitted}
+      />
     </Flex>
   );
 };

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Box, Button, Flex, Heading } from "@chakra-ui/react";
 import {
   Dropdown,
   ChoiceList,
   DropdownChangeObject,
 } from "@cmsgov/design-system";
-import { DropdownOptions, ReportType, getReportName } from "types";
-import { StateNames } from "../../constants";
+import { DropdownOptions, getReportName } from "types";
+import { StateNames, ReportType } from "@rhtp/shared";
 
 const reportChoices = Object.values(ReportType).map((type) => {
   return {
@@ -49,7 +49,7 @@ export const AdminDashSelector = () => {
   };
 
   return (
-    <Box>
+    <Box sx={sx.container}>
       <Heading as="h1" sx={sx.headerText}>
         View State/Territory Reports
       </Heading>
@@ -95,5 +95,10 @@ const sx = {
   },
   navigationButton: {
     padding: "1.5rem 0 2rem 0",
+  },
+  container: {
+    ".ds-c-dropdown__menu-container": {
+      zIndex: "1101",
+    },
   },
 };

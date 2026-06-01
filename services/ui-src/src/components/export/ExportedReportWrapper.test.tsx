@@ -1,6 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { ExportedReportWrapper } from "./ExportedReportWrapper";
-import { ElementType, FormPageTemplate, PageElement, PageType } from "types";
+import {
+  ElementType,
+  FormPageTemplate,
+  PageElement,
+  PageType,
+} from "@rhtp/shared";
 
 const elements: PageElement[] = [
   {
@@ -44,12 +49,12 @@ const section: FormPageTemplate = {
 
 describe("ExportedReportWrapper", () => {
   test("ExportedReportWrapper is visible", () => {
-    render(<ExportedReportWrapper section={section}></ExportedReportWrapper>);
+    render(<ExportedReportWrapper section={section} />);
     expect(screen.getByText("Contact title")).toBeInTheDocument();
   });
 
   test("Unanswered optional fields are not rendered", () => {
-    render(<ExportedReportWrapper section={section}></ExportedReportWrapper>);
+    render(<ExportedReportWrapper section={section} />);
     expect(screen.queryByText("Additional comments")).not.toBeInTheDocument();
   });
 

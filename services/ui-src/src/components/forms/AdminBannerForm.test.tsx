@@ -1,82 +1,71 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { AdminBannerForm } from "components";
-import { RouterWrappedComponent } from "utils/testing/mockRouter";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
-import { AdminBannerMethods } from "types";
+import { BannerShape } from "@rhtp/shared";
+import { useStore } from "utils";
 
-const mockWriteAdminBanner = vi.fn();
+const mockCreateBanner = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-const adminBannerFormComponent = (
-  writeAdminBanner: AdminBannerMethods["writeAdminBanner"]
-) => (
-  <RouterWrappedComponent>
-    <AdminBannerForm writeAdminBanner={writeAdminBanner} />
-  </RouterWrappedComponent>
+const AdminBannerFormComponent = (
+  <AdminBannerForm createBanner={mockCreateBanner} />
 );
-
-const HOURS = 60 * 60 * 1000;
 
 describe("<AdminBannerForm />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  test("AdminBannerForm is visible", () => {
-    render(adminBannerFormComponent(mockWriteAdminBanner));
-    expect(screen.getByRole("textbox", { name: "Title text" })).toBeVisible();
-    expect(
-      screen.getByRole("textbox", { name: "Description text" })
-    ).toBeVisible();
-    expect(screen.getByRole("textbox", { name: "Link" })).toBeVisible();
-    expect(screen.getByRole("textbox", { name: "Start date" })).toBeVisible();
-    expect(screen.getByRole("textbox", { name: "End date" })).toBeVisible();
-    expect(
-      screen.getByRole("button", { name: "Replace Current Banner" })
-    ).toBeVisible();
+    render(AdminBannerFormComponent);
   });
 
   test("AdminBannerForm can be filled and submitted without error", async () => {
-    render(adminBannerFormComponent(mockWriteAdminBanner));
+    const siteAreaDropdown = screen.getAllByLabelText("Site area")[0];
+    await userEvent.selectOptions(siteAreaDropdown, "RHTP");
 
     const titleInput = screen.getByLabelText("Title text");
-    await userEvent.type(titleInput, "mock title");
+    await userEvent.click(titleInput);
+    await userEvent.paste("mock title");
 
     const descriptionInput = screen.getByLabelText("Description text");
-    await userEvent.type(descriptionInput, "mock description");
+    await userEvent.click(descriptionInput);
+    await userEvent.paste("mock description");
 
     const linkInput = screen.getByLabelText("Link", { exact: false });
-    await userEvent.type(linkInput, "http://example.com");
+    await userEvent.click(linkInput);
+    await userEvent.paste("http://example.com");
 
     const startDateInput = screen.getByLabelText("Start date");
-    await userEvent.type(startDateInput, "01/01/1970");
+    await userEvent.click(startDateInput);
+    await userEvent.paste("01/01/1970");
 
     const endDateInput = screen.getByLabelText("End date");
-    // Modified: End date must be after start date
-    await userEvent.type(endDateInput, "01/02/1970");
+    await userEvent.click(endDateInput);
+    await userEvent.paste("01/02/1970");
 
-    const submitButton = screen.getByText("Replace Current Banner");
+    const submitButton = screen.getByText("Create Banner");
     await userEvent.click(submitButton);
 
-    expect(mockWriteAdminBanner).toHaveBeenCalledWith({
-      key: "admin-banner-id",
+    expect(mockCreateBanner).toHaveBeenCalledWith({
+      area: "RHTP",
       title: "mock title",
       description: "mock description",
       link: "http://example.com",
-      startDate: 5 * HOURS, // midnight UTC, in New York
-      endDate: 53 * HOURS - 1000, // End of the next day in NY
+      startDate: "1970-01-01",
+      endDate: "1970-01-02",
     });
   });
 
-  testA11yAct(adminBannerFormComponent(mockWriteAdminBanner));
+  testA11yAct(AdminBannerFormComponent);
 });
 
 describe("AdminBannerForm validation", () => {
-  test("Display form errors when user tries to submit completely blank form", async () => {
-    render(adminBannerFormComponent(mockWriteAdminBanner));
+  beforeEach(() => {
+    vi.clearAllMocks();
+    render(AdminBannerFormComponent);
+  });
 
-    const submitButton = screen.getByText("Replace Current Banner");
+  test("Display form errors when user tries to submit completely blank form", async () => {
+    const submitButton = screen.getByText("Create Banner");
     await userEvent.click(submitButton);
 
     const responseIsRequiredErrorMessage = screen.getAllByText(
@@ -87,10 +76,61 @@ describe("AdminBannerForm validation", () => {
     expect(responseIsRequiredErrorMessage.length).toBe(4);
   });
 
-  test("User has form errors but then fills out the form and errors go away", async () => {
-    render(adminBannerFormComponent(mockWriteAdminBanner));
+  test("Display errors when date range conflicts with existing banners", async () => {
+    const existingBanner = {
+      title: "alpha",
+      area: "home",
+      startDate: "2026-01-10",
+      endDate: "2026-01-20",
+    } as BannerShape;
+    act(() => {
+      useStore.setState({ allBanners: [existingBanner] });
+    });
 
-    const submitButton = screen.getByText("Replace Current Banner");
+    const startDateInput = screen.getByLabelText("Start date");
+    const endDateInput = screen.getByLabelText("End date");
+    const startDateConflict = /Start date conflicts .* alpha/;
+    const endDateConflict = /End date conflicts .* alpha/;
+    const rangeConflict = /date range conflicts .* alpha/;
+
+    // No data entered yet, therefore no conflicts
+    expect(screen.queryByText(startDateConflict)).not.toBeInTheDocument();
+    expect(screen.queryByText(endDateConflict)).not.toBeInTheDocument();
+    expect(screen.queryByText(rangeConflict)).not.toBeInTheDocument();
+
+    // Start date OK, end date in existing banner's range
+    await userEvent.type(startDateInput, "01/05/2026");
+    await userEvent.type(endDateInput, "01/18/2026");
+    expect(screen.queryByText(startDateConflict)).not.toBeInTheDocument();
+    expect(screen.getByText(endDateConflict)).toBeVisible();
+    expect(screen.queryByText(rangeConflict)).not.toBeInTheDocument();
+
+    // End date OK, end date in existing banner's range
+    await userEvent.clear(startDateInput);
+    await userEvent.type(startDateInput, "01/12/2026");
+    await userEvent.clear(endDateInput);
+    await userEvent.type(endDateInput, "01/25/2026");
+    expect(screen.getByText(startDateConflict)).toBeVisible();
+    expect(screen.queryByText(endDateConflict)).not.toBeInTheDocument();
+    expect(screen.queryByText(rangeConflict)).not.toBeInTheDocument();
+
+    // Both dates OK individually, but the range overlaps
+    await userEvent.clear(startDateInput);
+    await userEvent.type(startDateInput, "01/05/2026");
+    expect(screen.queryByText(startDateConflict)).not.toBeInTheDocument();
+    expect(screen.queryByText(endDateConflict)).not.toBeInTheDocument();
+    expect(screen.getByText(rangeConflict)).toBeVisible();
+
+    // Move the banner to a different area, so no conflict
+    await userEvent.click(screen.getByRole("button", { name: /Site area/ }));
+    await userEvent.click(screen.getByRole("option", { name: /RHTP report/ }));
+    expect(screen.queryByText(startDateConflict)).not.toBeInTheDocument();
+    expect(screen.queryByText(endDateConflict)).not.toBeInTheDocument();
+    expect(screen.queryByText(rangeConflict)).not.toBeInTheDocument();
+  });
+
+  test("User has form errors but then fills out the form and errors go away", async () => {
+    const submitButton = screen.getByText("Create Banner");
     const titleInput = screen.getByLabelText("Title text");
     const descriptionInput = screen.getByLabelText("Description text");
     const linkInput = screen.getByLabelText("Link", { exact: false });
@@ -125,13 +165,13 @@ describe("AdminBannerForm validation", () => {
       screen.queryByText("End date can't be before start date")
     ).not.toBeInTheDocument();
 
-    expect(mockWriteAdminBanner).toHaveBeenCalledWith({
-      key: "admin-banner-id",
+    expect(mockCreateBanner).toHaveBeenCalledWith({
+      area: "home",
       title: "mock title",
       description: "mock description",
       link: "http://example.com",
-      startDate: 5 * HOURS, // midnight UTC, in New York
-      endDate: 53 * HOURS - 1000, // Expected end date for 01/02/1970
+      startDate: "1970-01-01",
+      endDate: "1970-01-02",
     });
   });
 });

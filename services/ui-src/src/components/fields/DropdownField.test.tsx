@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
-import { DropdownTemplate, ElementType } from "types";
+import { DropdownTemplate, ElementType } from "@rhtp/shared";
 import { DropdownField } from "./DropdownField";
 import assert from "node:assert";
 import { useState } from "react";

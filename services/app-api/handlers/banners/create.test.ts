@@ -1,15 +1,17 @@
 import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
-import { proxyEvent } from "../../testing/proxyEvent";
-import { APIGatewayProxyEvent, UserRoles } from "../../types/types";
+import { APIGatewayProxyEvent } from "../../types/types";
+import { BannerAreas, BannerFormData, UserRoles } from "@rhtp/shared";
 import { canWriteBanner } from "../../utils/authorization";
 import { createBanner } from "./create";
 import { error } from "../../utils/constants";
+import { putBanner } from "../../storage/banners";
 
 vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockResolvedValue({
+  authenticatedUser: vi.fn().mockReturnValue({
     role: UserRoles.ADMIN,
     state: "PA",
+    fullName: "mock state user",
   }),
 }));
 
@@ -17,74 +19,59 @@ vi.mock("../../utils/authorization", () => ({
   canWriteBanner: vi.fn().mockReturnValue(true),
 }));
 
-vi.mock("../../storage/banners", () => ({
-  putBanner: vi.fn().mockReturnValue({}),
-}));
+vi.mock("../../storage/banners");
+const mockPutBanner = vi.mocked(putBanner);
 
-const testEvent: APIGatewayProxyEvent = {
-  ...proxyEvent,
-  body: `{"key":"mock-id","title":"test banner","description":"test description","link":"https://www.mocklink.com","startDate":1000,"endDate":2000}`,
-  pathParameters: { bannerId: "testKey" },
-  headers: { "cognito-identity-id": "test" },
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+
+const mockBannerFormData: BannerFormData = {
+  area: BannerAreas.Home,
+  title: "mock title",
+  description: "mock description",
+  link: "https://example.com",
+  startDate: "2026-03-01",
+  endDate: "2026-03-06",
 };
 
-const testEventWithInvalidData: APIGatewayProxyEvent = {
-  ...proxyEvent,
-  body: `{"description":"test description","link":"test link","startDate":"1000","endDate":2000}`,
-  pathParameters: { bannerId: "testKey" },
-  headers: { "cognito-identity-id": "test" },
-};
+const mockEvent = {
+  body: JSON.stringify(mockBannerFormData),
+} as APIGatewayProxyEvent;
 
 describe("Test createBanner API method", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  test("missing path params", async () => {
-    const badTestEvent = {
-      ...proxyEvent,
-      pathParameters: {},
-    } as APIGatewayProxyEvent;
-    const res = await createBanner(badTestEvent);
-    expect(res.statusCode).toBe(StatusCodes.BadRequest);
-  });
-
   test("unauthorized banner creation throws 403 error", async () => {
     (canWriteBanner as Mock).mockReturnValueOnce(false);
-    const res = await createBanner(testEvent);
+    const res = await createBanner(mockEvent);
     expect(res.statusCode).toBe(StatusCodes.Forbidden);
     expect(res.body).toContain(error.UNAUTHORIZED);
   });
 
   test("Successful Run of Banner Creation", async () => {
-    const res = await createBanner(testEvent);
+    const res = await createBanner(mockEvent);
+
     expect(res.statusCode).toBe(StatusCodes.Created);
-    expect(res.body).toContain("test banner");
-    expect(res.body).toContain("test description");
+    expect(mockPutBanner).toHaveBeenCalledWith({
+      ...mockBannerFormData,
+      key: expect.stringMatching(/^[0-9a-f\-]{36}$/),
+      createdAt: expect.stringMatching(ISO_DATE_REGEX),
+      createdBy: "mock state user",
+    });
   });
 
-  test("bannerKey not provided throws 500 error", async () => {
-    const noKeyEvent: APIGatewayProxyEvent = {
-      ...testEvent,
-      pathParameters: {},
+  test("should return an error if the request body is invalid", async () => {
+    const badEvent = {
+      ...mockEvent,
+      body: JSON.stringify({
+        ...mockBannerFormData,
+        link: "invalid url",
+      }),
     };
-    const res = await createBanner(noKeyEvent);
-    expect(res.statusCode).toBe(StatusCodes.BadRequest);
-    expect(res.body).toContain(error.MISSING_DATA);
-  });
 
-  test("bannerKey empty throws 500 error", async () => {
-    const noKeyEvent: APIGatewayProxyEvent = {
-      ...testEvent,
-      pathParameters: { bannerId: "" },
-    };
-    const res = await createBanner(noKeyEvent);
-    expect(res.statusCode).toBe(StatusCodes.BadRequest);
-    expect(res.body).toContain(error.MISSING_DATA);
-  });
+    const res = await createBanner(badEvent);
 
-  test("invalid data causes internal server error", async () => {
-    const res = await createBanner(testEventWithInvalidData);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
 });

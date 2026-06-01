@@ -9,7 +9,6 @@ import {
 import userEvent from "@testing-library/user-event";
 import { Upload } from "./Upload";
 import {
-  deleteUploadedFile,
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
 } from "utils/api/requestMethods/upload";
@@ -20,24 +19,39 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),
   uploadFileToS3: vi.fn(),
-  recordFileInDatabaseAndGetUploadUrl: vi.fn(),
+  recordFileInDatabaseAndGetUploadUrl: vi
+    .fn()
+    .mockReturnValue({ presignedUploadUrl: "", fileId: "" }),
   getUploadedFiles: vi
     .fn()
     .mockReturnValue([
       { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
     ]),
 }));
+vi.mock("utils", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useStore: vi.fn().mockReturnValue({
+    report: {
+      id: "mock-report-id",
+      type: "RHTP",
+      state: "PA",
+    },
+  }),
+}));
+
+const mockDeleteFromReport = vi.fn();
 
 const props = {
-  state: "PA",
-  year: "2026",
-  id: "mock-id",
   answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
   saveToReport: vi.fn(),
   updateElement: vi.fn(),
+  deleteFromReport: mockDeleteFromReport,
+  disabled: false,
+  uploadedSubLabel: "mock sub label",
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
+window.open = vi.fn();
 
 describe("<Upload />", () => {
   beforeEach(() => {
@@ -66,8 +80,10 @@ describe("<Upload />", () => {
     });
 
     const dropArea = screen.getByLabelText("file drop area");
-    fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => [mockPng] }] },
+    await act(async () => {
+      await fireEvent.drop(dropArea, {
+        dataTransfer: { items: [{ getAsFile: () => mockPng }] },
+      });
     });
     expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
   });
@@ -85,7 +101,6 @@ describe("<Upload />", () => {
   });
 
   test("test deleting a file", async () => {
-    (deleteUploadedFile as Mock).mockResolvedValueOnce("");
     render(<Upload {...props} />);
     await waitFor(() => {
       expect(
@@ -95,7 +110,7 @@ describe("<Upload />", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "delete mock-name" })
     );
-    expect(deleteUploadedFile).toHaveBeenCalled();
+    expect(mockDeleteFromReport).toHaveBeenCalled();
   });
   testA11y(<Upload {...props} />);
 });

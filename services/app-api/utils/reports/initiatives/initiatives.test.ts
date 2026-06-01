@@ -1,4 +1,4 @@
-import { FormPageTemplate, PageStatus, PageType } from "../../../types/reports";
+import { FormPageTemplate, PageStatus, PageType } from "@rhtp/shared";
 import { validReport } from "../../tests/mockReport";
 import { updateInitiativeStatus } from "./initiatives";
 
