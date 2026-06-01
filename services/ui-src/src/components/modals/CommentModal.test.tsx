@@ -83,11 +83,6 @@ describe("CommentModal component", () => {
       ).toBeInTheDocument();
     });
 
-    test("Modals action button can be clicked", async () => {
-      await userEvent.click(screen.getByText("Save"));
-      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
-    });
-
     test("Modals close button can be clicked", async () => {
       await userEvent.click(screen.getByText("Close"));
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
@@ -168,6 +163,15 @@ describe("CommentModal component", () => {
       render(CommentModalComponent());
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
+    });
+
+    test("state user must leave a comment to submit", async () => {
+      mockedUseStore.mockReturnValue(mockUseStore);
+      render(CommentModalComponent());
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeEnabled();
+      await userEvent.click(screen.getByText("Save"));
+      expect(screen.getByText("A comment is required.")).toBeVisible();
     });
 
     test("state user can edit attachment status to certain options", async () => {

@@ -89,9 +89,16 @@ export const CommentModal = ({
     status: fileStatus,
   };
 
+  const noErrorState = {
+    comment: "",
+    status: "",
+  };
+
   const [displayValue, setDisplayValue] = useState(initialValues);
+  const [errorMessages, setErrorMessages] = useState(noErrorState);
 
   useEffect(() => {
+    setErrorMessages(noErrorState);
     setDisplayValue(initialValues);
 
     let statusOptions = structuredClone(FileStatusOptions);
@@ -129,6 +136,13 @@ export const CommentModal = ({
     const didStatusChange =
       displayValue.status !== allFiles[selectedAttachmentIndex].status;
     const commentsEmpty = displayValue.comment.trim() === "";
+    if (commentsEmpty && !commentsOptional) {
+      setErrorMessages({
+        ...errorMessages,
+        comment: "A comment is required.",
+      });
+      return;
+    }
 
     // Comments are optional for admins
     if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
@@ -180,6 +194,7 @@ export const CommentModal = ({
         options={statusOptions}
         value={displayValue.status}
         disabled={statusDisabled}
+        errorMessage={errorMessages.status}
       />
       <TextField
         name={"comment"}
@@ -196,6 +211,7 @@ export const CommentModal = ({
         disabled={commentsDisabled}
         multiline
         rows={3}
+        errorMessage={errorMessages.comment}
       />
       <Divider marginTop={"spacer3"} borderColor={"black"} />
       {pastComments.length > 0 ? (
