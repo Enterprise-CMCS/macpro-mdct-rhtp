@@ -48,7 +48,7 @@ export const getZipPresignedUrl = async (
   const requestHeaders = await getRequestHeaders();
 
   await apiLib.post<{ status: string }>(
-    `/reports/${reportType}/${state}/${id}/zip`,
+    `/reports/${reportType}/${state}/${id}/files/zip`,
     { headers: { ...requestHeaders }, body: {} }
   );
 
@@ -58,7 +58,7 @@ export const getZipPresignedUrl = async (
 
     const freshHeaders = await getRequestHeaders();
     const result = await apiLib.get<ZipStatusResponse>(
-      `/reports/${reportType}/${state}/${id}/zip`,
+      `/reports/${reportType}/${state}/${id}/files/zip`,
       { headers: { ...freshHeaders } }
     );
 
