@@ -92,8 +92,6 @@ const mockGetZipEvent: APIGatewayProxyEvent = {
 describe("Test zip methods", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    lambdaMock.reset();
-    lambdaMock.on(InvokeCommand).resolves({});
   });
 
   describe("triggerZipGeneration method", () => {
