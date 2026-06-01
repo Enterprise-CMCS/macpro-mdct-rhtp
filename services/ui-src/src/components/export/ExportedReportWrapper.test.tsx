@@ -49,12 +49,12 @@ const section: FormPageTemplate = {
 
 describe("ExportedReportWrapper", () => {
   test("ExportedReportWrapper is visible", () => {
-    render(<ExportedReportWrapper section={section}></ExportedReportWrapper>);
+    render(<ExportedReportWrapper section={section} />);
     expect(screen.getByText("Contact title")).toBeInTheDocument();
   });
 
   test("Unanswered optional fields are not rendered", () => {
-    render(<ExportedReportWrapper section={section}></ExportedReportWrapper>);
+    render(<ExportedReportWrapper section={section} />);
     expect(screen.queryByText("Additional comments")).not.toBeInTheDocument();
   });
 

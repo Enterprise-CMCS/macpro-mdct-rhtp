@@ -1,9 +1,8 @@
 import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
 import * as framerMotion from "framer-motion";
-import { UserState, AdminBannerState, ReportState, DevToolsState } from "types";
+import { UserState, ReportState, DevToolsState, BannerState } from "types";
 import { ReportType, ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
-import { mockBannerData } from "./mockBanner";
 
 /*
  * @testing-library defines custom matchers for DOM nodes.
@@ -89,18 +88,12 @@ vi.mock("aws-amplify/auth", () => ({
 
 //  BANNER STATES / STORE
 
-export const mockBannerStore: AdminBannerState = {
-  bannerData: mockBannerData,
-  bannerActive: false,
-  bannerLoading: false,
-  bannerErrorMessage: { title: "", children: undefined },
-  bannerDeleting: false,
-  setBannerData: () => {},
-  clearAdminBanner: () => {},
-  setBannerActive: () => {},
-  setBannerLoading: () => {},
-  setBannerErrorMessage: () => {},
-  setBannerDeleting: () => {},
+export const mockBannerStore: BannerState = {
+  allBanners: [],
+  _lastFetchTime: 0,
+  fetchBanners: async () => {},
+  createBanner: async () => {},
+  deleteBanner: async () => {},
 };
 
 // USER STATES / STORE
@@ -203,7 +196,7 @@ export const mockDevToolsStore: DevToolsState = {
 // BOUND STORE
 
 export const mockUseStore: UserState &
-  AdminBannerState &
+  BannerState &
   ReportState &
   DevToolsState = {
   ...mockStateUserStore,
@@ -212,18 +205,16 @@ export const mockUseStore: UserState &
   ...mockDevToolsStore,
 };
 
-export const mockUseAdminStore: UserState & AdminBannerState = {
+export const mockUseAdminStore: UserState & BannerState = {
   ...mockAdminUserStore,
   ...mockBannerStore,
 };
 
-export const mockUseReadOnlyUserStore: UserState & AdminBannerState = {
+export const mockUseReadOnlyUserStore: UserState & BannerState = {
   ...mockHelpDeskUserStore,
   ...mockBannerStore,
   ...mockReportStore,
 };
 
-// BANNER
-export * from "./mockBanner";
 // ROUTER
 export * from "./mockRouter";

@@ -8,8 +8,7 @@ import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { ErrorMessages } from "../../constants";
 
 export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
-  const textbox = props.element;
-  const updateElement = props.updateElement;
+  const { element: textbox, updateElement, disabled } = props;
   const defaultValue = textbox.answer ?? "";
   const [displayValue, setDisplayValue] = useState(defaultValue);
   const [errorMessage, setErrorMessage] = useState("");
@@ -60,7 +59,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
         errorMessage={errorMessage}
         multiline
         rows={3}
-        disabled={props.disabled}
+        disabled={disabled || textbox.disabled}
       />
     </Box>
   );

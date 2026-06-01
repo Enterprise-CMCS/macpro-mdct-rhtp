@@ -15,11 +15,6 @@ import userEvent from "@testing-library/user-event";
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-vi.mock("utils/other/useBreakpoint", () => ({
-  isMobile: vi.fn().mockReturnValue(false),
-  makeMediaQueryClasses: vi.fn().mockReturnValue("desktop"),
-}));
-
 vi.mock("utils/state/useStore", () => ({
   useStore: vi.fn().mockReturnValue({}),
 }));
@@ -35,30 +30,34 @@ vi.mock("react-router", async (importOriginal) => ({
   })),
 }));
 
-vi.mock("utils/api/requestMethods/report", () => ({
-  getReportsForState: vi.fn().mockResolvedValue([
-    {
-      id: "RHTPCO123",
-      type: "RHTP",
-      state: "CO",
-      lastEdited: new Date("2026-10-24T08:31:54").valueOf(),
-      lastEditedBy: "Mock User",
-      status: "Not started",
-      name: "Mock Report Name",
-      budgetPeriod: 1,
-    } as Report,
-    {
-      id: "RHTPCO1234",
-      type: "RHTP",
-      state: "CO",
-      lastEdited: new Date("2027-10-24T08:31:54").valueOf(),
-      lastEditedBy: "Mock User",
-      status: "Not started",
-      name: "Mock Report 2027",
-      budgetPeriod: 2,
-    } as Report,
-  ]),
-}));
+const mockReportsInDatabase = [
+  {
+    id: "RHTPCO123",
+    type: "RHTP",
+    state: "CO",
+    lastEdited: new Date("2026-10-24T08:31:54").valueOf(),
+    lastEditedBy: "Mock User",
+    status: "Not started",
+    name: "Mock Report Name",
+    budgetPeriod: 1,
+    subTypeKey: "A1",
+  } as Report,
+  {
+    id: "RHTPCO1234",
+    type: "RHTP",
+    state: "CO",
+    lastEdited: new Date("2027-10-24T08:31:54").valueOf(),
+    lastEditedBy: "Mock User",
+    status: "Not started",
+    name: "Mock Report 2027",
+    budgetPeriod: 2,
+    subTypeKey: "Q2",
+  } as Report,
+];
+
+vi.mock("utils/api/requestMethods/report");
+const mockGetReportsForState = vi.mocked(getReportsForState);
+mockGetReportsForState.mockResolvedValue(mockReportsInDatabase);
 
 vi.mock("utils/other/useBreakpoint", () => ({
   useBreakpoint: vi.fn(() => ({
@@ -73,12 +72,13 @@ const dashboardComponent = (
 );
 
 describe("DashboardPage with state user", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetReportsForState.mockResolvedValue(mockReportsInDatabase);
+  });
 
   test("should render an empty state when there are no reports", async () => {
-    (getReportsForState as Mock)
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([]);
+    (getReportsForState as Mock).mockResolvedValue([]);
 
     render(dashboardComponent);
     await waitFor(() => {
@@ -170,13 +170,17 @@ describe("DashboardPage with state user", () => {
   });
 
   test("should be able to open the modal to start new report", async () => {
+    (getReportsForState as Mock).mockResolvedValue([]);
     render(dashboardComponent);
     await waitFor(() => {
       expect(getReportsForState).toHaveBeenCalled();
-      expect(screen.getByText("Mock Report Name")).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByText("Start RHTP Report"));
+    const reportModalButton = screen.getByRole("button", {
+      name: "Start RHTP Report",
+    });
+    expect(reportModalButton).toBeEnabled();
+    await userEvent.click(reportModalButton);
 
     expect(screen.getByText("Add New RHTP Report")).toBeInTheDocument();
   });
@@ -184,7 +188,9 @@ describe("DashboardPage with state user", () => {
 
 describe("DashboardPage with Read only user", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mockedUseStore.mockReturnValue(mockUseReadOnlyUserStore);
+    mockGetReportsForState.mockResolvedValue(mockReportsInDatabase);
   });
   test("should not render the Start Report button when user is read only", async () => {
     render(dashboardComponent);
@@ -202,7 +208,9 @@ describe("DashboardPage with Read only user", () => {
 
 describe("DashboardPage with Admin user", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mockedUseStore.mockReturnValue(mockUseAdminStore);
+    mockGetReportsForState.mockResolvedValue(mockReportsInDatabase);
   });
   test("should render the Start Report button for admin users at start of report", async () => {
     render(dashboardComponent);

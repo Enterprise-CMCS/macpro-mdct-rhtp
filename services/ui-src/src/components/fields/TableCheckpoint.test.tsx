@@ -95,7 +95,8 @@ const TableCheckpointComponent = (
 );
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
-const consoleMock = vi.spyOn(console, "error");
+const consoleMock = vi.spyOn(console, "error").mockImplementation(vi.fn());
+window.open = vi.fn();
 
 const mockReport = {
   report: {
@@ -152,7 +153,7 @@ describe("<TableCheckpoint />", () => {
     });
     expect(screen.queryByText("mock attachment area")).not.toBeInTheDocument();
     expect(consoleMock).toHaveBeenLastCalledWith(
-      "Can't retrieve uploads with missing state, year or id"
+      "Can't retrieve uploads with missing state, report id, type, or page id"
     );
   });
   test("checkbox checking", async () => {
@@ -222,6 +223,20 @@ describe("<TableCheckpoint />", () => {
     expect(mockGetAnswer).toHaveBeenCalled();
     expect(vi.mocked(removeFile)).toHaveBeenCalled();
     expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
+  });
+  test("edit file", async () => {
+    render(TableCheckpointComponent);
+    const editButton = screen.getByRole("button", {
+      name: "Edit file or info for orange.png",
+    });
+    await userEvent.click(editButton);
+    await waitFor(() => {
+      expect(screen.getByText("Edit Attachment")).toBeVisible();
+    });
+    const confirmEditBtn = screen.getByRole("button", { name: "Edit" });
+    await userEvent.click(confirmEditBtn);
+    expect(mockGetAnswer).toHaveBeenCalled();
+    expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
   });
   testA11y(TableCheckpointComponent);
 });

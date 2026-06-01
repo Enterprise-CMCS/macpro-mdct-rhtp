@@ -84,6 +84,9 @@ const numberFieldTemplateSchema = object().shape({
   helperText: string().notRequired(),
   answer: number().notRequired(),
   required: boolean().required(),
+  mask: string().notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const textAreaTemplateSchema = object().shape({
@@ -94,6 +97,8 @@ const textAreaTemplateSchema = object().shape({
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
   required: boolean().required(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({
@@ -270,7 +275,10 @@ const tableCheckpointTemplateSchema = object().shape({
   required: boolean().required(),
   answer: array()
     .of(
-      object().shape({ id: string().required(), checked: boolean().required() })
+      object().shape({
+        id: string().required(),
+        checked: boolean().required(),
+      })
     )
     .notRequired(),
 });
@@ -307,7 +315,10 @@ const attachmentAreaSchema = object().shape({
   required: boolean().required(),
   answer: array().of(
     object().shape({
-      name: string().required(),
+      name: string()
+        .transform((value) => (value === "" ? undefined : value))
+        .default("Uploaded File")
+        .required(),
       size: number().required(),
       fileId: string().required(),
     })
@@ -360,6 +371,8 @@ const actionTableSchema = object().shape({
     )
     .required(),
   answer: array().of(mixed()).notRequired(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
 });
 
 const initiativesTableSchema = object().shape({
@@ -374,7 +387,10 @@ const attachmentTableSchema = object().shape({
     .of(
       object().shape({
         attachment: object().shape({
-          name: string().required(),
+          name: string()
+            .transform((value) => (value === "" ? undefined : value))
+            .default("Uploaded File")
+            .required(),
           size: number().required(),
           fileId: string().required(),
         }),
@@ -486,7 +502,6 @@ export const isCreateReportOptions = (
 ): obj is CreateReportOptions => {
   const createReportOptionsValidationSchema = object()
     .shape({
-      copyFromReportId: string().notRequired(),
       mockDate: string().notRequired(),
     })
     .required()

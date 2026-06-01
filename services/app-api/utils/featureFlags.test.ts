@@ -13,8 +13,8 @@ const consoleSpy: {
   error: any;
   log: any;
 } = {
-  error: vi.spyOn(console, "error"),
-  log: vi.spyOn(console, "log"),
+  error: vi.spyOn(console, "error").mockImplementation(vi.fn()),
+  log: vi.spyOn(console, "log").mockImplementation(vi.fn()),
 };
 
 describe("utils/featureFlags", () => {

@@ -85,13 +85,16 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
     "Provide a narrative description of the initiative’s progress during this reporting period.",
   required: true,
   answer: narrative,
+  quarterly: false,
 });
 
 const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   type: ElementType.NumberField,
   id: "initiative-number-of-people-served",
   label: "Number of people served",
+  mask: MaskType.CommaSeparated,
   required: true,
+  quarterly: false,
 };
 
 export const metricTable = (
@@ -103,6 +106,7 @@ export const metricTable = (
     label: "Metric",
     hintText:
       "Each initiative should have at least 4 metrics to measure its progress toward initiative goals.",
+    quarterly: false,
     modal: {
       title: "Metric",
       elements: [

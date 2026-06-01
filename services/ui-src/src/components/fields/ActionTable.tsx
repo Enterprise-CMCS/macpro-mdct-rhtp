@@ -69,8 +69,8 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const { disabled } = props;
-  const { id, label, hintText, modal, rows, answer } = props.element;
+  const { disabled, element } = props;
+  const { id, label, hintText, modal, rows, answer } = element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
@@ -141,7 +141,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     answer ?? [],
     onChange,
     onModalEdit,
-    disabled,
+    disabled || element.disabled,
     canAddOrChangeStatus
   );
 
@@ -195,7 +195,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           },
         }}
         disabled={reportSubmitted}
-      ></ActionModal>
+      />
     </Flex>
   );
 };

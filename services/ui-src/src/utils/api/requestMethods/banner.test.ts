@@ -1,7 +1,15 @@
-import { getBanner, writeBanner, deleteBanner } from "./banner";
-import { bannerId } from "../../../constants";
-import { mockBannerData } from "utils/testing/setupTest";
+import { getBanners, createBanner, deleteBanner } from "./banner";
+import { BannerAreas, BannerFormData } from "@rhtp/shared";
 import { initAuthManager } from "utils/auth/authLifecycle";
+
+const mockBanner: BannerFormData = {
+  title: "RHTP Alert",
+  area: BannerAreas.RHTP,
+  description: "mock description",
+  link: "https://example.com/rhtp-alert",
+  startDate: "2026-01-01",
+  endDate: "2027-01-01",
+};
 
 describe("utils/banner", () => {
   beforeEach(async () => {
@@ -10,21 +18,21 @@ describe("utils/banner", () => {
     vi.runAllTimers();
   });
 
-  describe("getBanner()", () => {
+  describe("getBanners()", () => {
     test("executes", () => {
-      expect(getBanner(bannerId)).toBeTruthy();
+      expect(getBanners()).toBeTruthy();
     });
   });
 
-  describe("writeBanner()", () => {
+  describe("createBanner()", () => {
     test("executes", () => {
-      expect(writeBanner(mockBannerData)).toBeTruthy();
+      expect(createBanner(mockBanner)).toBeTruthy();
     });
   });
 
   describe("deleteBanner()", () => {
     test("executes", () => {
-      expect(deleteBanner(bannerId)).toBeTruthy();
+      expect(deleteBanner("mock-banner-id")).toBeTruthy();
     });
   });
 });

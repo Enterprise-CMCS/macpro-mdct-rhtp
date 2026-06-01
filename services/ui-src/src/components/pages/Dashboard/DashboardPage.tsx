@@ -6,14 +6,16 @@ import {
   isReportType,
   LiteReport,
   ReportStatus,
+  BannerArea,
 } from "@rhtp/shared";
 import { getReportName } from "types";
 import {
   PageTemplate,
   DashboardTable,
-  AddEditReportModal,
+  CreateReportModal,
   AccordionItem,
   UnlockModal,
+  Banner,
 } from "components";
 import {
   Box,
@@ -32,15 +34,15 @@ import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import { DevTools } from "components/devTools/DevTools";
+import { activeBannerSelector } from "utils/state/selectors";
 
 export const DashboardPage = () => {
   const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
   const { reportType, state } = useParams();
+  const banner = useStore(activeBannerSelector(reportType as BannerArea));
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<LiteReport[]>([]);
-  const [selectedReport, setSelectedReport] = useState<LiteReport | undefined>(
-    undefined
-  );
+  const [canCreateReport, setCanCreateReport] = useState(false);
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [dropdownValue, setDropdownValue] = useState(
@@ -81,6 +83,14 @@ export const DashboardPage = () => {
     }
   }, [reports, filterBudgetPeriod]);
 
+  useEffect(() => {
+    const noReports = reports.length === 0;
+    const allSubmittedReports = reports.every(
+      (report) => report.status === ReportStatus.SUBMITTED
+    );
+    setCanCreateReport(noReports || allSubmittedReports);
+  }, [reports]);
+
   const reloadReports = (reportType: string, state: string) => {
     (async () => {
       setIsLoading(true);
@@ -90,17 +100,11 @@ export const DashboardPage = () => {
     })();
   };
 
-  const openAddEditReportModal = (report?: LiteReport) => {
-    setSelectedReport(report);
-    // use disclosure to open modal
-    addEditReportModalOnOpenHandler();
-  };
-
   // add/edit program modal disclosure
   const {
-    isOpen: addEditReportModalIsOpen,
-    onOpen: addEditReportModalOnOpenHandler,
-    onClose: addEditReportModalOnCloseHandler,
+    isOpen: createReportModalIsOpen,
+    onOpen: createReportModalOnOpenHandler,
+    onClose: createReportModalOnCloseHandler,
   } = useDisclosure();
 
   const {
@@ -131,6 +135,7 @@ export const DashboardPage = () => {
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
         Return home
       </Link>
+      {banner ? <Banner {...banner} key={banner.key} /> : null}
       <Box sx={sx.leadTextBox}>
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}
@@ -241,7 +246,11 @@ export const DashboardPage = () => {
           ))}
         {userIsEndUser && (
           <Flex justifyContent="center">
-            <Button onClick={() => openAddEditReportModal()} type="submit">
+            <Button
+              onClick={createReportModalOnOpenHandler}
+              type="submit"
+              disabled={!canCreateReport}
+            >
               {hasSubmittedReport
                 ? `Copy ${reportName} Submission`
                 : `Start ${reportName} Report`}
@@ -249,15 +258,14 @@ export const DashboardPage = () => {
           </Flex>
         )}
       </Flex>
-      <AddEditReportModal
+      <CreateReportModal
         activeState={state!}
         reportType={reportType!}
         modalDisclosure={{
-          isOpen: addEditReportModalIsOpen,
-          onClose: addEditReportModalOnCloseHandler,
+          isOpen: createReportModalIsOpen,
+          onClose: createReportModalOnCloseHandler,
         }}
         reportHandler={reloadReports}
-        selectedReport={selectedReport}
       />
       <UnlockModal
         modalDisclosure={{

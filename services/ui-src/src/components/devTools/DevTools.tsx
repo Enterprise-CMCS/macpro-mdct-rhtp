@@ -43,7 +43,9 @@ export const DevTools = ({
   if (!devTools || !reportType || !state) return;
 
   const { devDate, setDevDate } = useStore();
-  const [devDateLabel, setDevDateLabel] = useState<string>(devDate ?? "");
+  const [devDateLabel, setDevDateLabel] = useState<string>(
+    devDate ? new Date(parseInt(devDate) ?? 0).toLocaleDateString() : ""
+  );
   const [showOptions, setShowOptions] = useState<boolean>();
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [loading, setLoading] = useState<boolean>();
@@ -82,8 +84,10 @@ export const DevTools = ({
             onChange={onDateChange}
             aria-label="select an open date"
           >
-            {dateOptions.map((date) => (
-              <option value={date.value}>{date.label}</option>
+            {dateOptions.map((date, index) => (
+              <option key={`${date.value}-${index}`} value={date.value}>
+                {date.label}
+              </option>
             ))}
           </Select>
           <Divider></Divider>
@@ -95,8 +99,10 @@ export const DevTools = ({
             }}
             aria-label="select a report to delete"
           >
-            {reports.map((report) => (
-              <option value={report.id}>{report.name}</option>
+            {reports.map((report, index) => (
+              <option key={`${report.name}-${index}`} value={report.id}>
+                {report.name}
+              </option>
             ))}
           </Select>
           <Button
