@@ -399,8 +399,15 @@ export enum AttachmentStatus {
   PENDING_REVIEW = "Pending Review", // State driven
   NEEDS_REVISION = "Needs Revision", // CMS driven
   LOCKED_FOR_SCORING = "Locked for Scoring", // CMS driven
-  INFORMATIONAL = "Informational", // CMS driven
+  INFORMATIONAL = "Informational",
+  ARCHIVED = "Archived",
 }
+
+export const FileStatusOptions = Object.values(AttachmentStatus).map(
+  (status) => {
+    return { label: status, value: status };
+  }
+);
 
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;

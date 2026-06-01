@@ -3,6 +3,7 @@ import {
   TextField,
   Dropdown,
   DropdownChangeObject,
+  DropdownOption,
 } from "@cmsgov/design-system";
 import { Box, Divider, Heading, Text } from "@chakra-ui/react";
 import { Modal } from "./Modal";
@@ -12,6 +13,8 @@ import {
   UploadListProp,
   AttachmentStatus,
   ReportStatus,
+  UserRoles,
+  FileStatusOptions,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
@@ -59,9 +62,13 @@ export const CommentModal = ({
   updateElement,
   allFiles,
 }: Props) => {
-  const { full_name, userIsAdmin, userIsEndUser } = useStore().user ?? {};
+  const { full_name, userIsAdmin, userIsEndUser, userRole } =
+    useStore().user ?? {};
+  const isStateUser = userRole === UserRoles.STATE_USER;
   const { report } = useStore();
   const [pastComments, setPastComments] = useState<InitiativeComment[]>([]);
+  const [statusOptions, setStatusOptions] =
+    useState<DropdownOption[]>(FileStatusOptions);
   const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
   const userCanAddComment =
     userIsEndUser || (userIsAdmin && adminCommentsEnabled);
@@ -72,20 +79,32 @@ export const CommentModal = ({
   const selectedAttachmentIndex = allFiles.findIndex(
     (file) => file.attachment.fileId === selectedFile?.fileId
   );
+  const fileStatus = allFiles[selectedAttachmentIndex]?.status || "";
+  const statusDisabled =
+    commentsDisabled ||
+    (isStateUser && fileStatus === AttachmentStatus.LOCKED_FOR_SCORING);
 
   const initialValues = {
     comment: "",
-    status: allFiles[selectedAttachmentIndex]?.status || "",
+    status: fileStatus,
   };
 
   const [displayValue, setDisplayValue] = useState(initialValues);
 
-  const statusOptions = Object.values(AttachmentStatus).map((status) => {
-    return { label: status, value: status };
-  });
-
   useEffect(() => {
     setDisplayValue(initialValues);
+
+    let statusOptions = structuredClone(FileStatusOptions);
+    // state users cannot change status to Locked For Scoring or Needs Revision, but those options should still show up if it's the existing status
+    if (isStateUser) {
+      statusOptions = statusOptions.filter(
+        (status) =>
+          (status.value !== AttachmentStatus.LOCKED_FOR_SCORING &&
+            status.value !== AttachmentStatus.NEEDS_REVISION) ||
+          status.value === fileStatus
+      );
+    }
+    setStatusOptions(statusOptions);
 
     if (selectedAttachmentIndex !== -1) {
       setPastComments(allFiles[selectedAttachmentIndex].comments);
@@ -154,16 +173,14 @@ export const CommentModal = ({
       }}
       disableConfirm={commentsDisabled}
     >
-      {userIsAdmin && (
-        <Dropdown
-          label="Status"
-          name="status"
-          onChange={onChange}
-          options={statusOptions}
-          value={displayValue.status}
-          disabled={commentsDisabled}
-        />
-      )}
+      <Dropdown
+        label="Status"
+        name="status"
+        onChange={onChange}
+        options={statusOptions}
+        value={displayValue.status}
+        disabled={statusDisabled}
+      />
       <TextField
         name={"comment"}
         label={

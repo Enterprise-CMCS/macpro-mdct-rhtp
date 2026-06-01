@@ -163,11 +163,31 @@ describe("CommentModal component", () => {
       vi.clearAllMocks();
     });
 
-    test("state user can edit always", () => {
+    test("state user can edit comment box always", () => {
       mockedUseStore.mockReturnValue(mockUseStore);
       render(CommentModalComponent());
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
+    });
+
+    test("state user can edit attachment status to certain options", async () => {
+      mockedUseStore.mockReturnValue(mockUseStore);
+      render(CommentModalComponent());
+      const statusButton = screen.getAllByLabelText("Status")[1];
+      await userEvent.click(statusButton);
+      expect(
+        screen.queryByRole("option", { name: "Needs Revision" })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("option", { name: "Locked for Scoring" })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("option", { name: "Pending Review" })
+      ).toBeVisible();
+      expect(
+        screen.getByRole("option", { name: "Informational" })
+      ).toBeVisible();
+      expect(screen.getByRole("option", { name: "Archived" })).toBeVisible();
     });
 
     test("admin user can edit when flag true", () => {
