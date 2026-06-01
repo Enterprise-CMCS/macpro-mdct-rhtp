@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test";
+import { Page } from "@playwright/test";
 
 export class BasePage {
   readonly page: Page;
@@ -9,17 +9,23 @@ export class BasePage {
 
   // ===== Navigation =====
   async navigateTo(route: string): Promise<void> {
-    await this.page.goto(route, { waitUntil: "domcontentloaded" });
+    // domcontentloaded is ideal for local dev - fast and reliable
+    await this.page.goto(route, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
   }
 
   // ===== Page State & Loading =====
   async waitForLoadingComplete(): Promise<void> {
-    // Wait for any spinners or loading indicators to disappear
-    const spinners = this.page.getByRole("status").first();
-    await expect(spinners)
-      .toBeHidden()
+    // Wait for any loading spinners to disappear (if they exist)
+    // Use implicit retry logic via waitFor rather than explicit expect
+    await this.page
+      .getByRole("status")
+      .first()
+      .waitFor({ state: "hidden", timeout: 15000 })
       .catch(() => {
-        // It's ok if the status element doesn't exist
+        // No spinner found or already hidden - that's fine
       });
   }
 }

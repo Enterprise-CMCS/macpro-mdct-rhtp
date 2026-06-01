@@ -13,35 +13,81 @@ export class DashboardPage extends BasePage {
     await this.waitForLoadingComplete();
   }
 
-  // ===== Modal Interactions =====
-  async openCreateModal(): Promise<void> {
-    // Look for "Start RHTP Report" or similar create button
-    const createButton = this.page
+  // ===== Locators (private helpers) =====
+  private getCreateButton() {
+    // Prefer specific pattern first, fall back to generic
+    const specific = this.page
       .getByRole("button")
-      .filter({ hasText: /Start|New|Create/ })
+      .filter({ hasText: /Start.*Report|Add.*Report/i });
+    const generic = this.page
+      .getByRole("button")
+      .filter({ hasText: /Start|New|Create/i });
+    // Return the first visible match
+    return specific.or(generic).first();
+  }
+
+  private getCopyButton() {
+    return this.page
+      .getByRole("button")
+      .filter({ hasText: /Copy|Duplicate/i })
       .first();
-    await createButton.click();
+  }
+
+  // ===== Modal Interactions =====
+  async isCreateButtonAvailable(): Promise<boolean> {
+    return this.getCreateButton().isVisible();
+  }
+
+  async openCreateModal(): Promise<void> {
+    // click() implicitly waits for the element to be visible and actionable
+    await this.getCreateButton().click();
     await expect(this.page.getByRole("dialog")).toBeVisible();
   }
 
   async openCopyModal(): Promise<void> {
-    // Look for "Copy RHTP Submission" button
-    const copyButton = this.page
-      .getByRole("button")
-      .filter({ hasText: /Copy/ })
-      .first();
-    await copyButton.click();
+    await this.getCopyButton().click();
     await expect(this.page.getByRole("dialog")).toBeVisible();
   }
 
   // ===== Report Count =====
   async getReportCount(): Promise<number> {
-    // Wait for the tbody element to exist (indicates table has loaded)
     const tbody = this.page.locator("tbody");
     await expect(tbody).toHaveCount(1);
+    return await tbody.getByRole("row").count();
+  }
 
-    // Count only data rows in the tbody using Playwright semantic queries
-    const dataRows = this.page.locator("tbody").getByRole("row");
-    return await dataRows.count();
+  /**
+   * Check if there are any submitted reports on the dashboard.
+   * Looks for "Submitted" status text in the table.
+   */
+  async hasSubmittedReports(): Promise<boolean> {
+    try {
+      const submittedCell = this.page.locator(
+        'td:has-text("Submitted"), text="Submitted"'
+      );
+      return await submittedCell
+        .first()
+        .isVisible()
+        .catch(() => false);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Check if there are any unsubmitted (in progress or not started) reports.
+   */
+  async hasUnsubmittedReports(): Promise<boolean> {
+    try {
+      const unsubmittedCell = this.page.locator(
+        'td:has-text("Not started"), td:has-text("In progress"), text="Not started", text="In progress"'
+      );
+      return await unsubmittedCell
+        .first()
+        .isVisible()
+        .catch(() => false);
+    } catch {
+      return false;
+    }
   }
 }
