@@ -46,7 +46,20 @@ export const AdminDashboard = () => {
   );
   const [stateSelected, setStateSelected] =
     useState<MultiselectOptions[]>(buildStateOptions());
+  const [stateTags, setStateTags] = useState<MultiselectOptions[]>([]);
 
+  const updateStateFilter = (newStates: MultiselectOptions[]) => {
+    setStateSelected(newStates);
+    const checkedStates = newStates.filter((states) => states.checked);
+    setStateTags(checkedStates);
+
+    const statesString = checkedStates.map((state) => state.value).join(",");
+    localStorage.setItem("states", statesString);
+    setSearchParams({
+      budgetPeriod: dropdownValue.toString(),
+      states: statesString,
+    });
+  };
   //when the page is loaded, we load the reports
   useEffect(() => {
     const reloadReports = (reportType: string) => {
@@ -57,52 +70,51 @@ export const AdminDashboard = () => {
         setIsLoading(false);
       })();
     };
-
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
+  }, []);
 
+  useEffect(() => {
+    //if local storage is no null, we want to set params
     const savedStates = localStorage.getItem("states");
-    if (savedStates !== null) {
-      const stateFilter = savedStates.split(",");
-      const filteredStates = stateSelected.map((state) => ({
-        ...state,
-        checked: stateFilter.includes(state.value),
-      }));
-      setStateSelected(filteredStates);
-
+    if (savedStates != null) {
       setSearchParams({
         budgetPeriod: dropdownValue.toString(),
-        states: savedStates,
+        states: savedStates ?? "",
       });
+
+      const statesArr = savedStates.split(",");
+      const reloadStateFilter = [...stateSelected].map((state) => ({
+        ...state,
+        checked: (state.checked = statesArr.includes(state.value)),
+      }));
+      setStateSelected(reloadStateFilter);
+      setStateTags(selectedTags());
     }
-  }, []);
+    const filters = [
+      searchParams.get("budgetPeriod") || "All",
+      searchParams.get("states") || "",
+    ];
+
+    const stateTags = filters[1].length > 0 ? filters[1].split(",") : undefined;
+    const filterByBudget =
+      filters[0] === "All"
+        ? reports
+        : reports.filter(
+            (report) => report.budgetPeriod === parseInt(filters[0])
+          );
+
+    const filterByState = stateTags
+      ? filterByBudget.filter((report) => stateTags.includes(report.state))
+      : filterByBudget;
+
+    setFilteredReports(filterByState);
+  }, [reports, searchParams]);
 
   //after reports are filtered, we apply the sort
   useEffect(() => {
     sortRows("", SORT_TYPE.DEFAULT);
   }, [filteredReports]);
-
-  // when reports have been loaded or when any filters have been changed
-  useEffect(() => {
-    const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
-    const statesTag = searchParams.get("states") || "";
-
-    const states =
-      statesTag && statesTag.length > 0 ? statesTag.split(",") : "";
-
-    const filterByBudget =
-      filterBudgetPeriod === "All"
-        ? reports
-        : reports.filter(
-            (report) => report.budgetPeriod === parseInt(filterBudgetPeriod)
-          );
-
-    const filterByState =
-      states === ""
-        ? filterByBudget
-        : filterByBudget.filter((report) => states.includes(report.state));
-    setFilteredReports(filterByState);
-  }, [reports, searchParams]);
 
   const selectedTags = () => {
     return stateSelected.filter((state) => state.checked);
@@ -113,15 +125,7 @@ export const AdminDashboard = () => {
   };
 
   const applyFilter = () => {
-    const selectedStates = selectedTags()
-      .map((state) => state.value)
-      .join(",");
-    setSearchParams({
-      budgetPeriod: dropdownValue.toString(),
-      states: selectedStates,
-    });
-
-    localStorage.setItem("states", selectedStates);
+    updateStateFilter(stateSelected);
   };
 
   const clearFilter = () => {
@@ -132,16 +136,17 @@ export const AdminDashboard = () => {
     setStateSelected(newState);
     setDropdownValue("All");
 
-    setFilteredReports(reports);
-    setSearchParams();
     localStorage.removeItem("states");
+    setFilteredReports(reports);
+    setStateTags([]);
+    setSearchParams();
   };
 
   const removeTag = (tag: string) => {
     const newState = [...stateSelected];
     const stateIndex = newState.findIndex((state) => state.value == tag);
     newState[stateIndex].checked = false;
-    setStateSelected(newState);
+    updateStateFilter(newState);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -222,7 +227,7 @@ export const AdminDashboard = () => {
         >
           <AccordionItem label="Instructions">[Needs content]</AccordionItem>
         </Accordion>
-        <Flex gap="spacer3" alignItems="flex-end">
+        <Flex gap="spacer3" alignItems="flex-end" sx={sx.filters}>
           <MultiSelect
             label="State(s)"
             values={stateSelected}
@@ -244,9 +249,9 @@ export const AdminDashboard = () => {
             Clear Filters
           </Button>
         </Flex>
-        {selectedTags().length > 0 && (
+        {stateTags.length > 0 && (
           <Flex gap=".75rem" flexWrap="wrap">
-            {selectedTags().map((state) => (
+            {stateTags.map((state) => (
               <Button
                 variant="tag"
                 rightIcon={<Image src={closeTag} />}
@@ -294,5 +299,10 @@ const sx = {
   },
   box: {
     maxWidth: "55.25rem",
+  },
+  filters: {
+    ".ds-c-dropdown__menu-container": {
+      zIndex: "1001",
+    },
   },
 };

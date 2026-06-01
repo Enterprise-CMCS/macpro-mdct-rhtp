@@ -1,5 +1,6 @@
-import { Box, Checkbox } from "@chakra-ui/react";
+import { Box, Checkbox, Image } from "@chakra-ui/react";
 import { useState } from "react";
+import arrowIcon from "assets/icons/arrows/icon_arrow_up_black.svg";
 
 export type MultiselectOptions = {
   label: string;
@@ -64,7 +65,7 @@ export const MultiSelect = ({ label, values, onChange }: Prop) => {
   };
 
   window.addEventListener("click", (e) => {
-    const multiselect = document.getElementById("multiselect");
+    const multiselect = document.getElementById("multiselect-field");
     const target = e.target as any;
 
     if (multiselect && !multiselect.contains(target)) {
@@ -76,25 +77,35 @@ export const MultiSelect = ({ label, values, onChange }: Prop) => {
 
   return (
     <Box sx={sx.container} id="multiselect">
-      <div className="ds-c-label">{label}</div>
-      <div className="displayContainer">{field()}</div>
-      {showMenu && (
-        <div className="ds-c-dropdown__menu-container">
-          <ul className="ds-c-dropdown__menu">
-            {filteredValues.map((value) => (
-              <li>
-                <Checkbox
-                  onChange={() => onChecked(value.value)}
-                  isChecked={value.checked}
-                  checked={value.checked}
-                >
-                  {value.label}
-                </Checkbox>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <Box className="ds-c-label">{label}</Box>
+      <Box position="relative" id="multiselect-field">
+        <Box className="displayContainer">
+          {field()}
+          {search.length <= 0 && (
+            <Image
+              src={arrowIcon}
+              className={showMenu ? "open" : "closed"}
+            ></Image>
+          )}
+        </Box>
+        {showMenu && (
+          <Box className="ds-c-dropdown__menu-container">
+            <ul className="ds-c-dropdown__menu">
+              {filteredValues.map((value) => (
+                <li>
+                  <Checkbox
+                    onChange={() => onChecked(value.value)}
+                    isChecked={value.checked}
+                    checked={value.checked}
+                  >
+                    {value.label}
+                  </Checkbox>
+                </li>
+              ))}
+            </ul>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };
@@ -104,13 +115,10 @@ const sx = {
     position: "relative",
     display: "flex",
     flexDir: "column",
-    width: "140px",
-    ".ds-c-field": {
-      width: "140px",
-    },
-    ".ds-c-dropdown__menu-container": {
-      position: "absolute",
-      top: "80px",
+    width: "190px",
+    zIndex: "1001",
+    ".ds-c-label": {
+      marginBottom: "8px",
     },
     ".chakra-checkbox__control": {
       width: "24px",
@@ -119,19 +127,35 @@ const sx = {
     },
     li: {
       paddingLeft: "10px",
+      label: {
+        margin: "0",
+        paddingY: " 10px",
+      },
     },
     ".displayContainer": {
-      border: "2px solid black",
+      height: "42px",
       input: {
         background: "white",
         width: "100%",
         height: "100%",
-        padding: "8px",
         textAlign: "left",
         margin: "0",
+        border: "2px solid black",
+        borderRadius: "3px",
+        padding: "8px",
       },
-      height: "42px",
-      marginTop: "8px",
+      img: {
+        position: "absolute",
+        width: "18px",
+        right: "8px",
+        top: "12px",
+        "&.closed": {
+          transform: "rotate(180deg)",
+        },
+        "&.open": {
+          transform: "rotate(0deg)",
+        },
+      },
     },
   },
 };
