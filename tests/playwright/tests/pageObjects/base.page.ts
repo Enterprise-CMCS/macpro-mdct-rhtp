@@ -25,7 +25,7 @@ export class BasePage {
       .first()
       .waitFor({ state: "hidden", timeout: 15000 })
       .catch(() => {
-        // No spinner found or already hidden - that's fine
+        // No spinner found or already hidden
       });
   }
 }

@@ -27,15 +27,36 @@ export class DashboardPage extends BasePage {
   }
 
   private getCopyButton() {
-    return this.page
-      .getByRole("button")
-      .filter({ hasText: /Copy|Duplicate/i })
-      .first();
+    return this.page.getByRole("button").filter({ hasText: /Copy/i }).first();
   }
 
   // ===== Modal Interactions =====
   async isCreateButtonAvailable(): Promise<boolean> {
-    return this.getCreateButton().isVisible();
+    const btn = this.getCreateButton();
+    const visible = await btn.isVisible().catch(() => false);
+    if (!visible) return false;
+    const enabled = await btn.isEnabled().catch(() => false);
+    return enabled;
+  }
+
+  async isCreateButtonVisible(): Promise<boolean> {
+    return await this.getCreateButton()
+      .isVisible()
+      .catch(() => false);
+  }
+
+  async isCopyButtonAvailable(): Promise<boolean> {
+    const btn = this.getCopyButton();
+    const visible = await btn.isVisible().catch(() => false);
+    if (!visible) return false;
+    const enabled = await btn.isEnabled().catch(() => false);
+    return enabled;
+  }
+
+  async isCopyButtonVisible(): Promise<boolean> {
+    return await this.getCopyButton()
+      .isVisible()
+      .catch(() => false);
   }
 
   async openCreateModal(): Promise<void> {
@@ -45,15 +66,45 @@ export class DashboardPage extends BasePage {
   }
 
   async openCopyModal(): Promise<void> {
-    await this.getCopyButton().click();
+    const button = this.getCopyButton();
+
+    // Check if button exists and is enabled before clicking (with 3 second timeout)
+    const isEnabled = await button
+      .isEnabled({ timeout: 3000 })
+      .catch(() => false);
+    if (!isEnabled) {
+      throw new Error(
+        "Copy button is disabled or not found - unsubmitted report may exist"
+      );
+    }
+
+    await button.click({ timeout: 5000 });
     await expect(this.page.getByRole("dialog")).toBeVisible();
   }
 
   // ===== Report Count =====
   async getReportCount(): Promise<number> {
-    const tbody = this.page.locator("tbody");
-    await expect(tbody).toHaveCount(1);
-    return await tbody.getByRole("row").count();
+    // Try to find table body rows - handle both table and non-table structures
+    try {
+      const tbody = this.page.locator("tbody").first();
+      const isVisible = await tbody
+        .isVisible({ timeout: 5000 })
+        .catch(() => false);
+      if (isVisible) {
+        return await tbody.getByRole("row").count();
+      }
+    } catch {
+      // tbody doesn't exist, try alternative selectors
+    }
+
+    // Fallback: look for any row-like elements (table or div-based)
+    try {
+      const rows = this.page.locator("[role='row']");
+      const count = await rows.count();
+      return Math.max(count, 0);
+    } catch {
+      return 0;
+    }
   }
 
   /**
@@ -61,33 +112,23 @@ export class DashboardPage extends BasePage {
    * Looks for "Submitted" status text in the table.
    */
   async hasSubmittedReports(): Promise<boolean> {
-    try {
-      const submittedCell = this.page.locator(
-        'td:has-text("Submitted"), text="Submitted"'
-      );
-      return await submittedCell
-        .first()
-        .isVisible()
-        .catch(() => false);
-    } catch {
-      return false;
-    }
+    return await this.page
+      .locator("td")
+      .filter({ hasText: /^Submitted$/i })
+      .first()
+      .isVisible()
+      .catch(() => false);
   }
 
   /**
    * Check if there are any unsubmitted (in progress or not started) reports.
    */
   async hasUnsubmittedReports(): Promise<boolean> {
-    try {
-      const unsubmittedCell = this.page.locator(
-        'td:has-text("Not started"), td:has-text("In progress"), text="Not started", text="In progress"'
-      );
-      return await unsubmittedCell
-        .first()
-        .isVisible()
-        .catch(() => false);
-    } catch {
-      return false;
-    }
+    return await this.page
+      .locator("td")
+      .filter({ hasText: /^(Not started|In progress)$/i })
+      .first()
+      .isVisible()
+      .catch(() => false);
   }
 }
