@@ -19,13 +19,13 @@ export const MultiSelect = ({
   placeholder,
   onChange,
 }: Prop) => {
-  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [filteredValues, setFilteredValues] =
     useState<{ label: string; value: string }[]>(options);
 
   const onClick = () => {
-    setShowMenu(!showMenu);
+    setIsOpen(!isOpen);
   };
 
   const onChecked = (selection: string) => {
@@ -52,7 +52,7 @@ export const MultiSelect = ({
   };
 
   const field = () => {
-    return showMenu ? (
+    return isOpen ? (
       <input
         type="search"
         placeholder={placeholder}
@@ -75,7 +75,7 @@ export const MultiSelect = ({
     if (multiselect && !multiselect.contains(target)) {
       setSearch("");
       setFilteredValues(options);
-      setShowMenu(false);
+      setIsOpen(false);
     }
   });
 
@@ -88,15 +88,15 @@ export const MultiSelect = ({
           {search.length <= 0 && (
             <Image
               src={arrowIcon}
-              className={showMenu ? "open" : "closed"}
+              className={isOpen ? "open" : "closed"}
             ></Image>
           )}
         </Box>
-        {showMenu && (
+        {isOpen && (
           <Box className="ds-c-dropdown__menu-container">
             <ul className="ds-c-dropdown__menu">
               {filteredValues.map((opt) => (
-                <li>
+                <li key={opt.value}>
                   <Checkbox
                     onChange={() => onChecked(opt.value)}
                     isChecked={values.includes(opt.value)}

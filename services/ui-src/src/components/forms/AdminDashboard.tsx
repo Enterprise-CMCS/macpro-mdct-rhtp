@@ -53,15 +53,9 @@ export const AdminDashboard = () => {
     type: SORT_TYPE;
   }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
-  const setPreviousSession = () => {
-    const prevSavedStates = localStorage.getItem("states");
-    if (prevSavedStates) {
-      setSelectedStates(prevSavedStates.split(","));
-    }
-  };
-
   //when the page is loaded, we load the reports
   useEffect(() => {
+    console.log("load report");
     const reloadReports = (reportType: string) => {
       (async () => {
         setIsLoading(true);
@@ -70,13 +64,12 @@ export const AdminDashboard = () => {
         setIsLoading(false);
       })();
     };
-
-    setPreviousSession();
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
   }, []);
 
   useEffect(() => {
+    console.log("selected states");
     const savingStates = selectedStates.join(",");
 
     if (selectedStates.length === 0 && budgetValue === "All") {
@@ -87,13 +80,10 @@ export const AdminDashboard = () => {
         states: savingStates,
       });
     }
-    localStorage.setItem("states", savingStates);
   }, [selectedStates, budgetValue]);
 
   useEffect(() => {
-    //there are instances where the url changes but the page is not being reloaded so we need to get previous localstorage a second time.
-    //i.e. if the user clicks the mdct logo and reloads the page that way
-    setPreviousSession();
+    console.log("search params");
     const paramBudgetPeriod = searchParams.get("budgetPeriod");
     const paramStates = searchParams.get("states");
 
@@ -129,7 +119,6 @@ export const AdminDashboard = () => {
     setSelectedStates([]);
     setBudgetValue("All");
     setSortedReports(reports);
-    localStorage.removeItem("states");
   };
 
   const tagLabel = (id: string) => {
@@ -258,6 +247,7 @@ export const AdminDashboard = () => {
           <Flex gap=".75rem" flexWrap="wrap">
             {selectedStates.map((tag) => (
               <Button
+                key={tag}
                 variant="tag"
                 rightIcon={<Image src={closeTag} />}
                 onClick={() => removeTag(tag)}
