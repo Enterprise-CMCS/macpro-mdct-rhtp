@@ -78,10 +78,15 @@ export const AdminDashboard = () => {
 
   useEffect(() => {
     const savingStates = selectedStates.join(",");
-    setSearchParams({
-      budgetPeriod: budgetValue.toString(),
-      states: savingStates,
-    });
+
+    if (selectedStates.length === 0 && budgetValue === "All") {
+      setSearchParams();
+    } else {
+      setSearchParams({
+        budgetPeriod: budgetValue.toString(),
+        states: savingStates,
+      });
+    }
     localStorage.setItem("states", savingStates);
   }, [selectedStates, budgetValue]);
 
