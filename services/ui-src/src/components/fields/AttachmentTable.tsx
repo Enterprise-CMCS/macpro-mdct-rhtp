@@ -19,7 +19,7 @@ import {
   removeFile,
   canEditAttachment,
   canDeleteAttachment,
-} from "utils/other/upload";
+} from "utils/other/fileUtils";
 import {
   checkpointAttachableOptions,
   checkpointList,

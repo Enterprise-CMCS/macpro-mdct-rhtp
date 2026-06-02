@@ -4,7 +4,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AttachmentArea } from "components";
 import { ElementType, AttachmentAreaTemplate } from "@rhtp/shared";
-import { getFileDownloadUrl } from "utils/api/requestMethods/upload";
+import { getFileDownloadUrl } from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 
 const updateSpy = vi.fn();
@@ -12,7 +12,7 @@ const updateSpy = vi.fn();
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
-vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
+vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),

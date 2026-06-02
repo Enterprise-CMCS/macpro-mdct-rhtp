@@ -18,11 +18,11 @@ import {
 import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
-} from "utils/api/requestMethods/upload";
+} from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import { CommentModal } from "components/modals/CommentModal";
-import { removeFile } from "utils/other/upload";
+import { removeFile } from "utils/other/fileUtils";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
@@ -31,7 +31,7 @@ vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ pageId: "mock-init-1" }),
 }));
 
-vi.mock("utils/other/upload", async (importOriginal) => ({
+vi.mock("utils/other/fileUtils", async (importOriginal) => ({
   ...(await importOriginal()),
   removeFile: vi.fn(),
 }));
@@ -61,7 +61,7 @@ vi.mock("utils/state/reportLogic/reportActions", () => ({
     ),
 }));
 
-vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
+vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),

@@ -13,6 +13,7 @@ import {
 } from "aws-cdk-lib";
 import { Lambda } from "../constructs/lambda.ts";
 import { WafConstruct } from "../constructs/waf.ts";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { DynamoDBTable } from "../constructs/dynamodb-table.ts";
 import { isLocalStack } from "../local/util.ts";
 import { LambdaDynamoEventSource } from "../constructs/lambda-dynamo-event.ts";
@@ -266,10 +267,36 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "getUploadsByReportId", {
-    entry: "services/app-api/handlers/uploads/get.ts",
-    handler: "getUploadsByReportId",
-    path: "/reports/{reportType}/{state}/{id}/files/",
+  const zipWorkerLambda = new Lambda(scope, "zipWorker", {
+    entry: "services/app-api/handlers/uploads/zip.ts",
+    handler: "zipWorker",
+    memorySize: 10240,
+    timeout: Duration.minutes(15),
+    ...commonProps,
+  });
+
+  new Lambda(scope, "triggerZipGeneration", {
+    entry: "services/app-api/handlers/uploads/zip.ts",
+    handler: "triggerZipGeneration",
+    path: "/reports/{reportType}/{state}/{id}/files/zip",
+    method: "POST",
+    additionalPolicies: [
+      new PolicyStatement({
+        actions: ["lambda:InvokeFunction"],
+        resources: [zipWorkerLambda.lambda.functionArn],
+      }),
+    ],
+    ...commonProps,
+    environment: {
+      ...commonProps.environment,
+      zipWorkerFunctionName: zipWorkerLambda.lambda.functionName,
+    },
+  });
+
+  new Lambda(scope, "getZipStatus", {
+    entry: "services/app-api/handlers/uploads/zip.ts",
+    handler: "getZipStatus",
+    path: "/reports/{reportType}/{state}/{id}/files/zip",
     method: "GET",
     ...commonProps,
   });
