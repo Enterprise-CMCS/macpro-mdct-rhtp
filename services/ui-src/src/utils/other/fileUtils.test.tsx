@@ -1,4 +1,4 @@
-import { getFileWithSafeName } from "./upload";
+import { getFileWithSafeName } from "./fileUtils";
 
 describe("test upload utils", () => {
   describe("getFileWithSafeName()", () => {

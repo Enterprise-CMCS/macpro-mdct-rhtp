@@ -1,6 +1,6 @@
 import { Stack } from "@chakra-ui/react";
 import { Modal } from "components";
-import { Upload } from "components/fields/Upload";
+import { UploadArea } from "components/fields/UploadArea";
 import { JSX } from "react";
 import { UploadListProp } from "@rhtp/shared";
 
@@ -30,7 +30,7 @@ export const UploadModal = ({
     >
       <Stack gap="1.5rem">
         {selections ?? ""}
-        <Upload
+        <UploadArea
           answer={answer}
           saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
