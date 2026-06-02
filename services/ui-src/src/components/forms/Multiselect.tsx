@@ -10,27 +10,28 @@ export type MultiselectOptions = {
 
 interface Prop {
   label: string;
-  values: MultiselectOptions[];
-  onChange: (item: MultiselectOptions[]) => void;
+  values: string[];
+  options: MultiselectOptions[];
+  onChange: (item: string[]) => void;
 }
 
-export const MultiSelect = ({ label, values, onChange }: Prop) => {
+export const MultiSelect = ({ label, values, options, onChange }: Prop) => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [filteredValues, setFilteredValues] =
-    useState<{ label: string; value: string; checked?: boolean }[]>(values);
+    useState<{ label: string; value: string }[]>(options);
 
   const onClick = () => {
     setShowMenu(!showMenu);
   };
 
   const onChecked = (selection: string) => {
-    const newSelection = [...values];
-    const index = newSelection.findIndex(
-      (select) => select.value === selection
-    );
-    newSelection[index].checked = !newSelection[index].checked;
-    onChange(newSelection);
+    let newSelection = [...values];
+    if (newSelection.includes(selection)) {
+      onChange(newSelection.filter((selected) => selected != selection));
+    } else {
+      onChange([...newSelection, selection]);
+    }
   };
 
   const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,17 +39,13 @@ export const MultiSelect = ({ label, values, onChange }: Prop) => {
     setSearch(searchValue);
 
     if (searchValue === undefined || searchValue === "")
-      setFilteredValues(values);
+      setFilteredValues(options);
     else {
-      const displayValues = values.filter((value) =>
+      const displayValues = options.filter((value) =>
         value.label.toLowerCase().startsWith(searchValue)
       );
       setFilteredValues(displayValues);
     }
-  };
-
-  const count = () => {
-    return values.filter((value) => value.checked).length;
   };
 
   const field = () => {
@@ -60,7 +57,11 @@ export const MultiSelect = ({ label, values, onChange }: Prop) => {
         value={search}
       />
     ) : (
-      <input type="button" onClick={onClick} value={`States (${count()})`} />
+      <input
+        type="button"
+        onClick={onClick}
+        value={`States (${values.length})`}
+      />
     );
   };
 
@@ -70,7 +71,7 @@ export const MultiSelect = ({ label, values, onChange }: Prop) => {
 
     if (multiselect && !multiselect.contains(target)) {
       setSearch("");
-      setFilteredValues(values);
+      setFilteredValues(options);
       setShowMenu(false);
     }
   });
@@ -91,14 +92,14 @@ export const MultiSelect = ({ label, values, onChange }: Prop) => {
         {showMenu && (
           <Box className="ds-c-dropdown__menu-container">
             <ul className="ds-c-dropdown__menu">
-              {filteredValues.map((value) => (
+              {filteredValues.map((opt) => (
                 <li>
                   <Checkbox
-                    onChange={() => onChecked(value.value)}
-                    isChecked={value.checked}
-                    checked={value.checked}
+                    onChange={() => onChecked(opt.value)}
+                    isChecked={values.includes(opt.value)}
+                    checked={values.includes(opt.value)}
                   >
-                    {value.label}
+                    {opt.label}
                   </Checkbox>
                 </li>
               ))}
