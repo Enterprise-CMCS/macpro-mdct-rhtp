@@ -2,20 +2,23 @@ import { Box, Checkbox, Image } from "@chakra-ui/react";
 import { useState } from "react";
 import arrowIcon from "assets/icons/arrows/icon_arrow_up_black.svg";
 
-export type MultiselectOptions = {
-  label: string;
-  value: string;
-  checked?: boolean;
-};
-
 interface Prop {
   label: string;
   values: string[];
-  options: MultiselectOptions[];
+  options: { label: string; value: string }[];
+  placeholder: string;
+  countLabel: string;
   onChange: (item: string[]) => void;
 }
 
-export const MultiSelect = ({ label, values, options, onChange }: Prop) => {
+export const MultiSelect = ({
+  label,
+  values,
+  options,
+  countLabel,
+  placeholder,
+  onChange,
+}: Prop) => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [filteredValues, setFilteredValues] =
@@ -52,7 +55,7 @@ export const MultiSelect = ({ label, values, options, onChange }: Prop) => {
     return showMenu ? (
       <input
         type="search"
-        placeholder="Search states"
+        placeholder={placeholder}
         onChange={onSearch}
         value={search}
       />
@@ -60,7 +63,7 @@ export const MultiSelect = ({ label, values, options, onChange }: Prop) => {
       <input
         type="button"
         onClick={onClick}
-        value={`States (${values.length})`}
+        value={`${countLabel} (${values.length})`}
       />
     );
   };

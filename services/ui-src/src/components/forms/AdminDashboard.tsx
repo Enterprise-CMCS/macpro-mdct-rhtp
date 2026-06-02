@@ -31,33 +31,35 @@ const buildStateOptions = () => {
   return stateValues;
 };
 
+const budgetPeriodValues = [1, 2, 3, 4, 5];
+const stateAbbr = Object.keys(StateNames);
+
 export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<Report[]>([]);
-  const [filteredReports, setFilteredReports] = useState<Report[]>([]);
+  const [sortedReports, setSortedReports] = useState<Report[]>([]);
   const [tableRows, setTableRows] = useState<
     (string | number | JSX.Element | undefined)[][]
   >([]);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [dropdownValue, setDropdownValue] = useState(
+  const [budgetValue, setBudgetValue] = useState(
     searchParams.get("budgetPeriod") || "All"
   );
-  const [stateSelected, setStateSelected] = useState<string[]>([]);
-  const [stateTags, setStateTags] = useState<string[]>([]);
+  const [selectedStates, setSelectedStates] = useState<string[]>([]);
   const states = buildStateOptions();
+  const [lastSorted, setLastSorted] = useState<{
+    sort: string;
+    type: SORT_TYPE;
+  }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
-  const updateStateFilter = (newStates: string[]) => {
-    setStateSelected(newStates);
-    setStateTags(newStates);
-
-    const statesString = newStates.join(",");
-    localStorage.setItem("states", newStates.join(","));
-    setSearchParams({
-      budgetPeriod: dropdownValue.toString(),
-      states: statesString,
-    });
+  const setPreviousSession = () => {
+    const prevSavedStates = localStorage.getItem("states");
+    if (prevSavedStates) {
+      setSelectedStates(prevSavedStates.split(","));
+    }
   };
+
   //when the page is loaded, we load the reports
   useEffect(() => {
     const reloadReports = (reportType: string) => {
@@ -68,64 +70,61 @@ export const AdminDashboard = () => {
         setIsLoading(false);
       })();
     };
+
+    setPreviousSession();
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
   }, []);
 
   useEffect(() => {
-    //if local storage is no null, we want to set params
-    const savedStates = localStorage.getItem("states");
-    if (savedStates != null && savedStates != "") {
-      setSearchParams({
-        budgetPeriod: dropdownValue.toString(),
-        states: savedStates ?? "",
-      });
+    const savingStates = selectedStates.join(",");
+    setSearchParams({
+      budgetPeriod: budgetValue.toString(),
+      states: savingStates,
+    });
+    localStorage.setItem("states", savingStates);
+  }, [selectedStates, budgetValue]);
 
-      const statesArr = savedStates.split(",");
-      setStateSelected(statesArr);
-    }
-    const filters = [
-      searchParams.get("budgetPeriod") || "All",
-      searchParams.get("states") || "",
-    ];
+  useEffect(() => {
+    //there are instances where the url changes but the page is not being reloaded so we need to get previous localstorage a second time.
+    //i.e. if the user clicks the mdct logo and reloads the page that way
+    setPreviousSession();
+    const paramBudgetPeriod = searchParams.get("budgetPeriod");
+    const paramStates = searchParams.get("states");
 
-    const stateTags = filters[1].length > 0 ? filters[1].split(",") : undefined;
-    const filterByBudget =
-      filters[0] === "All"
-        ? reports
-        : reports.filter(
-            (report) => report.budgetPeriod === parseInt(filters[0])
-          );
+    const filterBudgetPeriod =
+      paramBudgetPeriod == null || paramBudgetPeriod == "All"
+        ? budgetPeriodValues
+        : [parseInt(paramBudgetPeriod)];
 
-    const filterByState = stateTags
-      ? filterByBudget.filter((report) => stateTags.includes(report.state))
-      : filterByBudget;
+    const filterStates =
+      paramStates == null || paramStates == ""
+        ? stateAbbr
+        : paramStates.split(",");
 
-    setFilteredReports(filterByState);
-    setStateTags(stateTags ?? []);
+    const filtered = reports.filter(
+      (report) =>
+        filterBudgetPeriod.includes(report.budgetPeriod) &&
+        filterStates.includes(report.state)
+    );
+
+    setSortedReports(filtered);
   }, [reports, searchParams]);
 
-  //after reports are filtered, we apply the sort
+  //after reports are filtered, we apply the last saved sort
   useEffect(() => {
-    sortRows("", SORT_TYPE.DEFAULT);
-  }, [filteredReports]);
+    sortRows(lastSorted.sort, lastSorted.type);
+  }, [sortedReports]);
 
   const handleBudgetPeriodChange = (evt: { target: { value: string } }) => {
-    setDropdownValue(evt.target.value);
-  };
-
-  const applyFilter = () => {
-    updateStateFilter(stateSelected);
+    setBudgetValue(evt.target.value);
   };
 
   const clearFilter = () => {
-    setStateSelected([]);
-    setStateTags([]);
-    setDropdownValue("All");
-
+    setSelectedStates([]);
+    setBudgetValue("All");
+    setSortedReports(reports);
     localStorage.removeItem("states");
-    setFilteredReports(reports);
-    setSearchParams();
   };
 
   const tagLabel = (id: string) => {
@@ -133,8 +132,12 @@ export const AdminDashboard = () => {
   };
 
   const removeTag = (deleteTag: string) => {
-    const remainingTags = stateTags.filter((tag) => tag != deleteTag);
-    updateStateFilter(remainingTags);
+    const remainingTags = selectedStates.filter((tag) => tag != deleteTag);
+    setSelectedStates(remainingTags);
+    setSearchParams({
+      budgetPeriod: budgetValue.toString(),
+      states: remainingTags.join(","),
+    });
   };
 
   const buildRows = (reports: Report[]) => {
@@ -196,7 +199,8 @@ export const AdminDashboard = () => {
             }
           });
     };
-    setTableRows(buildRows(runSort(filteredReports)));
+    setLastSorted({ sort: row, type: type });
+    setTableRows(buildRows(runSort(sortedReports)));
   };
 
   return (
@@ -218,29 +222,36 @@ export const AdminDashboard = () => {
         <Flex gap="spacer3" alignItems="flex-end" sx={sx.filters}>
           <MultiSelect
             label="State(s)"
+            placeholder="Search states"
+            countLabel="States"
             options={states}
-            values={stateSelected}
+            values={selectedStates}
             onChange={(selected) => {
-              setStateSelected(selected);
+              setSelectedStates(selected);
             }}
           />
           <CmsdsDropdownField
             name="budgetPeriodFilter"
             label="Budget Period"
-            value={dropdownValue}
+            value={budgetValue}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodFilterOptions}
           />
-          <Button onClick={applyFilter} variant="outline">
-            Apply
-          </Button>
-          <Button onClick={clearFilter} variant="link" height="40px">
+          <Button
+            onClick={clearFilter}
+            variant="link"
+            height="40px"
+            aria-label="Clear All Filters"
+          >
             Clear Filters
           </Button>
         </Flex>
-        {stateTags.length > 0 && (
+        <Text>
+          [placeholder text for letting users know that filters auto apply]
+        </Text>
+        {selectedStates.length > 0 && (
           <Flex gap=".75rem" flexWrap="wrap">
-            {stateTags.map((tag) => (
+            {selectedStates.map((tag) => (
               <Button
                 variant="tag"
                 rightIcon={<Image src={closeTag} />}
