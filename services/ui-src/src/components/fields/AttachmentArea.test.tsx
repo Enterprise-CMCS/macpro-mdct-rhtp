@@ -100,6 +100,22 @@ describe("<AttachmentArea />", () => {
     await userEvent.click(screen.getByRole("button", { name: "mock-name" }));
     expect(getFileDownloadUrl).toHaveBeenCalled();
   });
+  test("test opening delete modal", async () => {
+    await act(async () => {
+      render(AttachmentAreaComponent);
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "delete mock-name" })
+      ).toBeInTheDocument();
+    });
+    await userEvent.click(
+      screen.getByRole("button", { name: "delete mock-name" })
+    );
+    expect(screen.getByText("Delete Attachment")).toBeInTheDocument();
+    await userEvent.click(screen.getByText("Close"));
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
   test("test deleting a file", async () => {
     await act(async () => {
       render(AttachmentAreaComponent);
@@ -112,6 +128,8 @@ describe("<AttachmentArea />", () => {
     await userEvent.click(
       screen.getByRole("button", { name: "delete mock-name" })
     );
+    expect(screen.getByText("Delete Attachment")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     expect(updateSpy).toHaveBeenCalled();
   });
   testA11y(AttachmentAreaComponent);
