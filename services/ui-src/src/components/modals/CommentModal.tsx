@@ -18,6 +18,10 @@ import {
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
+import {
+  createComment,
+  getComments,
+} from "utils/api/requestMethods/commentMethods";
 
 const PreviousComments = ({ comments }: { comments: InitiativeComment[] }) => {
   const timeSortedComments = comments.toSorted(
@@ -128,7 +132,16 @@ export const CommentModal = ({
     }));
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    console.log("slectedFile", allFiles[selectedAttachmentIndex]);
+    // const pastComments = await getComments(
+    //   allFiles[selectedAttachmentIndex].attachment.fileId
+    // );
+    // console.log("pastComments", pastComments);
+    // await createComment(
+    //   allFiles[selectedAttachmentIndex].attachment.fileId,
+    //   "later random Text 3"
+    // );
     if (selectedAttachmentIndex === -1 || commentsDisabled) {
       return modalDisclosure.onClose();
     }

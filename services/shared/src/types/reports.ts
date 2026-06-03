@@ -72,6 +72,17 @@ export type ReportComment = {
   isInternal: boolean;
 };
 
+export type Comment = {
+  contextId: string;
+  created: number;
+  id: string;
+  author: string;
+  authorEmail: string;
+  isInternal: boolean;
+  comment?: string;
+  statusChange?: AttachmentStatus;
+};
+
 export interface Report extends ReportOptions {
   id: string;
   type: ReportType;
