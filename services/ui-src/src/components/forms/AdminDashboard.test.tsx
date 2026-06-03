@@ -7,10 +7,10 @@ import {
 } from "@testing-library/react";
 import { AdminDashboard } from "./AdminDashboard";
 import { RouterWrappedComponent } from "utils/testing/mockRouter";
-import { mockReport } from "utils/testing/mockForm";
+import { mockReport, mockReport2 } from "utils/testing/mockForm";
 import userEvent from "@testing-library/user-event";
 
-const mockGetReport = vi.fn().mockResolvedValue([mockReport]);
+const mockGetReport = vi.fn().mockResolvedValue([mockReport, mockReport2]);
 vi.mock("../../utils/api/requestMethods/report", () => ({
   getReportByType: () => mockGetReport(),
 }));
@@ -62,7 +62,7 @@ describe("<AdminDashboard />", () => {
     fireEvent.click(stateFilter);
 
     const search = screen.getByRole("searchbox", {
-      name: "Search states by name",
+      name: "Search States by name",
     });
     fireEvent.input(search, { target: { value: "New Jersey" } });
     const checkbox1 = screen.getByRole("checkbox", { name: "New Jersey" });
@@ -96,6 +96,9 @@ describe("<AdminDashboard />", () => {
   });
 
   it("Table sort are clickable", async () => {
+    await waitFor(() => {
+      expect(screen.queryByText("plan id")).toBeVisible();
+    });
     const sorts = [
       "State/Territory",
       "Report Name",
@@ -114,8 +117,8 @@ describe("<AdminDashboard />", () => {
     await waitFor(() => {
       expect(screen.getByText("plan id")).toBeVisible();
     });
-    const reportBtn = screen.getByRole("button", { name: "View Report" });
-    await userEvent.click(reportBtn);
+    const reportBtn = screen.getAllByRole("button", { name: "View Report" });
+    await userEvent.click(reportBtn[0]);
     expect(mockUseNavigate).toHaveBeenCalled();
   });
 });

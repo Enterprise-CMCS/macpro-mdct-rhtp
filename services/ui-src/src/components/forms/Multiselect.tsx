@@ -59,7 +59,7 @@ export const MultiSelect = ({
         placeholder={placeholder}
         onChange={onSearch}
         value={search}
-        aria-label="Search states by name"
+        aria-label={`Search ${countLabel} by name`}
       />
     ) : (
       <input

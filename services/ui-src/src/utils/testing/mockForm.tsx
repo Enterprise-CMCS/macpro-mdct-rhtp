@@ -78,3 +78,22 @@ export const mockReport: Report = {
     },
   ],
 };
+
+export const mockReport2: Report = {
+  type: ReportType.RHTP,
+  created: 1776449695077,
+  subType: RhtpSubType.ANNUAL,
+  subTypeKey: "A1",
+  budgetPeriod: 1,
+  name: "plan mn id",
+  state: "MN",
+  id: "MNGeneral123",
+  status: ReportStatus.NOT_STARTED,
+  submissionCount: 0,
+  pages: [
+    {
+      id: "root",
+      childPageIds: ["general-info", "mock-report-page"],
+    },
+  ],
+};

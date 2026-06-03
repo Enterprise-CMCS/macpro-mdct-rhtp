@@ -28,11 +28,13 @@ describe("<MultiSelect />", () => {
   });
   it("Test Multiselect renders", () => {
     expect(screen.getByText("mock select")).toBeVisible();
-    expect(screen.getByRole("button", { name: "States Filter" })).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "options Filter" })
+    ).toBeVisible();
   });
 
   it("Test multi-selection of the options", () => {
-    const dropdownBtn = screen.getByRole("button", { name: "States Filter" });
+    const dropdownBtn = screen.getByRole("button", { name: "options Filter" });
     fireEvent.click(dropdownBtn);
 
     const optCheckbox1 = screen.getByRole("checkbox", { name: "option 1" });
@@ -46,16 +48,19 @@ describe("<MultiSelect />", () => {
   });
 
   it("Test filter search", () => {
-    const dropdownBtn = screen.getByRole("button", { name: "States Filter" });
+    const dropdownBtn = screen.getByRole("button", { name: "options Filter" });
     fireEvent.click(dropdownBtn);
 
     const search = screen.getByRole("searchbox", {
-      name: "Search states by name",
+      name: "Search options by name",
     });
     fireEvent.input(search, { target: { value: "option 1" } });
     expect(
       screen.queryByRole("checkbox", { name: "option 2" })
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "option 1" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "option 1" }));
+
+    fireEvent.input(search, { target: { value: "" } });
+    expect(screen.getByRole("checkbox", { name: "option 2" }));
   });
 });
