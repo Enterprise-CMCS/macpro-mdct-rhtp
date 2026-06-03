@@ -3,6 +3,7 @@ import {
   deleteReport,
   deleteReportsForState,
   getReport,
+  getReportByType,
   getReportsForState,
   putReport,
   releaseReport,
@@ -42,6 +43,11 @@ describe("utils/report", () => {
 
   test("getReportsForState", async () => {
     await getReportsForState("reportType", "PA");
+    expect(mockGet).toHaveBeenCalledTimes(1);
+  });
+
+  test("getReportByType", async () => {
+    await getReportByType("reportTyppe");
     expect(mockGet).toHaveBeenCalledTimes(1);
   });
 

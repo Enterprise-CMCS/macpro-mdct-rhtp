@@ -58,12 +58,16 @@ export const MultiSelect = ({
         placeholder={placeholder}
         onChange={onSearch}
         value={search}
+        aria-label="Search states by name"
       />
     ) : (
       <input
+        id="states-filter"
+        name="states-filter"
         type="button"
         onClick={onClick}
         value={`${countLabel} (${values.length})`}
+        aria-label="States Filter"
       />
     );
   };

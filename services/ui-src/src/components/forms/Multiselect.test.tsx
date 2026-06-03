@@ -28,11 +28,11 @@ describe("<MultiSelect />", () => {
   });
   it("Test Multiselect renders", () => {
     expect(screen.getByText("mock select")).toBeVisible();
-    expect(screen.getByRole("button", { name: "options (0)" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "States Filter" })).toBeVisible();
   });
 
   it("Test multi-selection of the options", () => {
-    const dropdownBtn = screen.getByRole("button", { name: "options (0)" });
+    const dropdownBtn = screen.getByRole("button", { name: "States Filter" });
     fireEvent.click(dropdownBtn);
 
     const optCheckbox1 = screen.getByRole("checkbox", { name: "option 1" });
@@ -45,11 +45,13 @@ describe("<MultiSelect />", () => {
     expect(mockChanged).toHaveBeenCalled();
   });
 
-  it("Test filter search", async () => {
-    const dropdownBtn = screen.getByRole("button", { name: "options (0)" });
+  it("Test filter search", () => {
+    const dropdownBtn = screen.getByRole("button", { name: "States Filter" });
     fireEvent.click(dropdownBtn);
 
-    const search = screen.getByRole("searchbox", { name: "" });
+    const search = screen.getByRole("searchbox", {
+      name: "Search states by name",
+    });
     fireEvent.input(search, { target: { value: "option 1" } });
     expect(
       screen.queryByRole("checkbox", { name: "option 2" })
