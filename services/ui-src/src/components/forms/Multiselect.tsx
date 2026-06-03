@@ -54,6 +54,7 @@ export const MultiSelect = ({
   const field = () => {
     return isOpen ? (
       <input
+        id="multi-search"
         type="search"
         placeholder={placeholder}
         onChange={onSearch}
@@ -62,12 +63,12 @@ export const MultiSelect = ({
       />
     ) : (
       <input
-        id="states-filter"
-        name="states-filter"
+        id="multi-filter"
+        name="multi-filter"
         type="button"
         onClick={onClick}
         value={`${countLabel} (${values.length})`}
-        aria-label="States Filter"
+        aria-label={`${countLabel} Filter`}
       />
     );
   };
@@ -93,6 +94,7 @@ export const MultiSelect = ({
             <Image
               src={arrowIcon}
               className={isOpen ? "open" : "closed"}
+              onClick={onClick}
             ></Image>
           )}
         </Box>
@@ -159,9 +161,11 @@ const sx = {
         top: "12px",
         "&.closed": {
           transform: "rotate(180deg)",
+          pointerEvents: "None",
         },
         "&.open": {
           transform: "rotate(0deg)",
+          pointerEvents: "auto",
         },
       },
     },
