@@ -1,11 +1,18 @@
 import { test, expect } from "./fixtures/base";
-import { DashboardPage } from "./pageObjects/dashboard.page";
+import { DashboardPage, DashboardState } from "./pageObjects/dashboard.page";
 import { ModalPage } from "./pageObjects/modal.page";
 import { reportType, stateAbbreviation } from "../utils/consts";
 
 test.describe("Report Creation", () => {
   const REPORT_TYPE = reportType;
   const STATE = stateAbbreviation;
+
+  const navigateAndGetState = async (
+    dashboard: DashboardPage
+  ): Promise<DashboardState> => {
+    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    return dashboard.getDashboardState();
+  };
 
   test("should allow creating a new report when no reports exist on the dashboard", async ({
     statePage,
@@ -14,30 +21,16 @@ test.describe("Report Creation", () => {
     const dashboard = new DashboardPage(statePage.page);
     const modal = new ModalPage(statePage.page);
 
-    // Act - Navigate to dashboard
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    // Act - Navigate to dashboard and detect state
+    const dashboardState = await navigateAndGetState(dashboard);
 
-    // Wait for the dashboard to fully load reports (if any exist)
-    try {
-      await expect(statePage.page.locator("[role='row'], tbody")).toBeVisible({
-        timeout: 5000,
-      });
-    } catch {
-      // No table/rows found - dashboard is likely empty
-    }
-
-    // Check if we have an empty dashboard (no reports)
-    const hasNoReports =
-      !(await dashboard.hasSubmittedReports()) &&
-      !(await dashboard.hasUnsubmittedReports());
-
-    if (!hasNoReports) {
+    if (dashboardState !== "empty") {
       test.skip();
       return;
     }
 
     // Assert empty dashboard state
-    expect(await dashboard.isCreateButtonAvailable()).toBe(true);
+    expect(await dashboard.isStartButtonAvailable()).toBe(true);
     expect(await dashboard.isCopyButtonVisible()).toBe(false);
 
     // Act - Create a report
@@ -54,28 +47,16 @@ test.describe("Report Creation", () => {
     // Arrange
     const dashboard = new DashboardPage(statePage.page);
 
-    // Act - Navigate to dashboard
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    // Act - Navigate to dashboard and detect state
+    const dashboardState = await navigateAndGetState(dashboard);
 
-    // Wait for the dashboard to fully load reports
-    try {
-      await expect(statePage.page.locator("[role='row'], tbody")).toBeVisible({
-        timeout: 5000,
-      });
-    } catch {
-      // No table/rows found - dashboard is empty
-    }
-
-    // Check if we have an unsubmitted report
-    const hasUnsubmitted = await dashboard.hasUnsubmittedReports();
-
-    if (!hasUnsubmitted) {
+    if (dashboardState !== "unsubmitted") {
       test.skip();
       return;
     }
 
     // Assert blocking behavior
-    expect(await dashboard.isCreateButtonAvailable()).toBe(false);
+    expect(await dashboard.isStartButtonAvailable()).toBe(false);
     expect(await dashboard.isCopyButtonAvailable()).toBe(false);
   });
 
@@ -86,30 +67,17 @@ test.describe("Report Creation", () => {
     const dashboard = new DashboardPage(statePage.page);
     const modal = new ModalPage(statePage.page);
 
-    // Act - Navigate to dashboard
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    // Act - Navigate to dashboard and detect state
+    const dashboardState = await navigateAndGetState(dashboard);
 
-    // Wait for the dashboard to fully load reports
-    try {
-      await expect(statePage.page.locator("[role='row'], tbody")).toBeVisible({
-        timeout: 5000,
-      });
-    } catch {
-      // No table/rows found - dashboard is empty
-    }
-
-    // Check if we have a submitted report (and no unsubmitted)
-    const hasSubmitted = await dashboard.hasSubmittedReports();
-    const hasUnsubmitted = await dashboard.hasUnsubmittedReports();
-
-    if (!hasSubmitted || hasUnsubmitted) {
+    if (dashboardState !== "submitted") {
       test.skip();
       return;
     }
 
-    // Assert submitted dashboard state
+    // Assert submitted dashboard state — button relabels to "Copy", "Start" variant should not be visible
     expect(await dashboard.isCopyButtonAvailable()).toBe(true);
-    expect(await dashboard.isCreateButtonVisible()).toBe(false);
+    expect(await dashboard.isStartButtonVisible()).toBe(false);
 
     // Act - Open and submit copy modal
     await dashboard.openCopyModal();

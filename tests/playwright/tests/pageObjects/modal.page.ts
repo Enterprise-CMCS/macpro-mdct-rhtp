@@ -1,34 +1,14 @@
 import { Page, expect } from "@playwright/test";
 import { BasePage } from "./base.page";
+import {
+  TIMEOUT_LOADING,
+  TIMEOUT_MODAL,
+  TIMEOUT_UI,
+} from "../../utils/timeouts";
 
 export class ModalPage extends BasePage {
   constructor(page: Page) {
     super(page);
-  }
-
-  // ===== Form Filling =====
-  async fillFormFields(fields: Record<string, string>): Promise<void> {
-    const modal = this.page.getByRole("dialog").first();
-
-    for (const [key, value] of Object.entries(fields)) {
-      // Try to find the input by label or placeholder
-      const input = modal
-        .getByLabel(new RegExp(key, "i"), { exact: false })
-        .or(modal.getByPlaceholder(new RegExp(key, "i"), { exact: false }));
-
-      // If not found, try finding by role and name pattern
-      if ((await input.count().catch(() => 0)) === 0) {
-        const textInput = modal
-          .getByRole("textbox")
-          .filter({ hasText: new RegExp(key, "i") })
-          .first();
-        if ((await textInput.count().catch(() => 0)) > 0) {
-          await textInput.fill(value);
-        }
-      } else {
-        await input.fill(value);
-      }
-    }
   }
 
   // ===== Copy Modal - Report Selection =====
@@ -46,7 +26,7 @@ export class ModalPage extends BasePage {
 
   async getFirstReportOptionValue(): Promise<string | null> {
     const modal = this.page.getByRole("dialog").first();
-    await expect(modal).toBeVisible({ timeout: 10000 });
+    await expect(modal).toBeVisible({ timeout: TIMEOUT_MODAL });
 
     const select = modal.getByRole("combobox").first();
     const selectCount = await select.count();
@@ -79,29 +59,23 @@ export class ModalPage extends BasePage {
       .first()
       .getByRole("combobox")
       .first();
-    await expect(select).toBeVisible({ timeout: 10000 });
+    await expect(select).toBeVisible({ timeout: TIMEOUT_MODAL });
     await select.selectOption(reportId);
   }
 
   // ===== Modal Buttons =====
   async submitCreateModal(): Promise<"created" | "blocked"> {
     const modal = this.page.getByRole("dialog").first();
-    const submitButton = modal
-      .getByRole("button")
-      .filter({ hasText: /Save/ })
-      .first();
+    const submitButton = modal.getByRole("button", { name: /Save/i });
     await submitButton.click();
 
     // Created flow closes the modal and navigates to detail.
     try {
-      await expect(modal).toBeHidden({ timeout: 5000 });
+      await expect(modal).toBeHidden({ timeout: TIMEOUT_UI });
       return "created";
     } catch {
       // Blocked flow keeps modal open (for example duplicate prevention).
-      const closeButton = modal
-        .getByRole("button")
-        .filter({ hasText: /Close/ })
-        .first();
+      const closeButton = modal.getByRole("button", { name: /Close/i });
       await closeButton.click();
       await expect(modal).toBeHidden();
       return "blocked";
@@ -110,16 +84,13 @@ export class ModalPage extends BasePage {
 
   async submitCopyModal(): Promise<"copied" | "blocked"> {
     const modal = this.page.getByRole("dialog").first();
-    const submitButton = modal
-      .getByRole("button")
-      .filter({ hasText: /Save/ })
-      .first();
+    const submitButton = modal.getByRole("button", { name: /Save/i });
     await submitButton.click();
 
     // Copy stays on the dashboard (reloads report list) — success = modal closes.
     // Failure (API error) = modal stays open with an error alert.
     try {
-      await expect(modal).toBeHidden({ timeout: 15000 });
+      await expect(modal).toBeHidden({ timeout: TIMEOUT_LOADING });
       return "copied";
     } catch {
       // Log the API error message from the modal alert for diagnostics

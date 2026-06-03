@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { TIMEOUT_LOADING, TIMEOUT_NAVIGATION } from "../../utils/timeouts";
 
 export class BasePage {
   readonly page: Page;
@@ -12,7 +13,7 @@ export class BasePage {
     // domcontentloaded is ideal for local dev - fast and reliable
     await this.page.goto(route, {
       waitUntil: "domcontentloaded",
-      timeout: 30000,
+      timeout: TIMEOUT_NAVIGATION,
     });
   }
 
@@ -23,7 +24,7 @@ export class BasePage {
     await this.page
       .getByRole("status")
       .first()
-      .waitFor({ state: "hidden", timeout: 15000 })
+      .waitFor({ state: "hidden", timeout: TIMEOUT_LOADING })
       .catch(() => {
         // No spinner found or already hidden
       });
