@@ -95,6 +95,7 @@ export const MultiSelect = ({
               src={arrowIcon}
               className={isOpen ? "open" : "closed"}
               onClick={onClick}
+              alt={isOpen ? "down arrow" : "up arrow"}
             ></Image>
           )}
         </Box>

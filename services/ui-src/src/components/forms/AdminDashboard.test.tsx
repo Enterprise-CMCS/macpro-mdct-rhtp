@@ -9,6 +9,7 @@ import { AdminDashboard } from "./AdminDashboard";
 import { RouterWrappedComponent } from "utils/testing/mockRouter";
 import { mockReport, mockReport2 } from "utils/testing/mockForm";
 import userEvent from "@testing-library/user-event";
+import { testA11y } from "utils/testing/commonTests";
 
 const mockGetReport = vi.fn().mockResolvedValue([mockReport, mockReport2]);
 vi.mock("../../utils/api/requestMethods/report", () => ({
@@ -99,18 +100,31 @@ describe("<AdminDashboard />", () => {
     await waitFor(() => {
       expect(screen.queryByText("plan id")).toBeVisible();
     });
-    const sorts = [
-      "State/Territory",
-      "Report Name",
-      "Budget Period",
-      "Last Edited",
-      "Status",
-    ];
 
-    for (var i = 0; i < sorts.length; i++) {
-      const sortBtn = screen.getByRole("button", { name: sorts[i] });
+    const sortResult = async (
+      sort: string,
+      columns: number[],
+      results: string[]
+    ) => {
+      const content = screen.getAllByRole("cell");
+      const sortBtn = screen.getByRole("button", { name: sort });
       await userEvent.click(sortBtn);
-    }
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results);
+      await userEvent.click(sortBtn);
+      expect([
+        content[columns[0]].textContent,
+        content[columns[1]].textContent,
+      ]).toStrictEqual(results.toReversed());
+    };
+
+    await sortResult("State/Territory", [0, 7], ["Minnesota", "New Jersey"]);
+    await sortResult("Report Name", [1, 8], ["plan id", "plan mn id"]);
+    await sortResult("Budget Period", [2, 9], ["1", "2"]);
+    await sortResult("Last Edited", [3, 10], ["04/17/2026", "04/17/2026"]);
+    await sortResult("Status", [4, 11], ["In progress", "Not started"]);
   });
 
   it("View report", async () => {
@@ -121,4 +135,11 @@ describe("<AdminDashboard />", () => {
     await userEvent.click(reportBtn[0]);
     expect(mockUseNavigate).toHaveBeenCalled();
   });
+});
+describe("Test A11y", () => {
+  testA11y(
+    <RouterWrappedComponent>
+      <AdminDashboard />
+    </RouterWrappedComponent>
+  );
 });

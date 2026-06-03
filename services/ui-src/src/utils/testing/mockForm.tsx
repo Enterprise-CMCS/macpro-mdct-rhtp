@@ -36,6 +36,7 @@ export const mockReport: Report = {
   id: "NJGeneral123",
   status: ReportStatus.NOT_STARTED,
   submissionCount: 0,
+  lastEdited: 1776449695077,
   pages: [
     {
       id: "root",
@@ -84,12 +85,13 @@ export const mockReport2: Report = {
   created: 1776449695077,
   subType: RhtpSubType.ANNUAL,
   subTypeKey: "A1",
-  budgetPeriod: 1,
+  budgetPeriod: 2,
   name: "plan mn id",
   state: "MN",
   id: "MNGeneral123",
-  status: ReportStatus.NOT_STARTED,
+  status: ReportStatus.IN_PROGRESS,
   submissionCount: 0,
+  lastEdited: 1776449695077,
   pages: [
     {
       id: "root",

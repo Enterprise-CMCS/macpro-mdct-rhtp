@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MultiSelect } from "./Multiselect";
+import { testA11y } from "utils/testing/commonTests";
 
 const mockChanged = vi.fn();
 
@@ -63,4 +64,17 @@ describe("<MultiSelect />", () => {
     fireEvent.input(search, { target: { value: "" } });
     expect(screen.getByRole("checkbox", { name: "option 2" }));
   });
+});
+
+describe("Test A11y", () => {
+  testA11y(
+    <MultiSelect
+      label={"mock select"}
+      values={[]}
+      options={options}
+      onChange={mockChanged}
+      countLabel="options"
+      placeholder="search options"
+    />
+  );
 });
