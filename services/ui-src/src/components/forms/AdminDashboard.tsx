@@ -46,7 +46,9 @@ export const AdminDashboard = () => {
   const [budgetValue, setBudgetValue] = useState(
     searchParams.get("budgetPeriod") || "All"
   );
-  const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [selectedStates, setSelectedStates] = useState<string[]>(
+    searchParams.get("states")?.split(",") ?? []
+  );
   const states = buildStateOptions();
   const [lastSorted, setLastSorted] = useState<{
     sort: string;
@@ -55,7 +57,6 @@ export const AdminDashboard = () => {
 
   //when the page is loaded, we load the reports
   useEffect(() => {
-    console.log("load report");
     const reloadReports = (reportType: string) => {
       (async () => {
         setIsLoading(true);
@@ -69,7 +70,6 @@ export const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    console.log("selected states");
     const savingStates = selectedStates.join(",");
 
     if (selectedStates.length === 0 && budgetValue === "All") {
@@ -83,7 +83,6 @@ export const AdminDashboard = () => {
   }, [selectedStates, budgetValue]);
 
   useEffect(() => {
-    console.log("search params");
     const paramBudgetPeriod = searchParams.get("budgetPeriod");
     const paramStates = searchParams.get("states");
 
