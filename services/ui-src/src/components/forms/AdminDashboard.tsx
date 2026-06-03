@@ -61,7 +61,10 @@ export const AdminDashboard = () => {
       (async () => {
         setIsLoading(true);
         const result = await getReportByType(reportType);
-        setReports(result);
+        //set latest edit report to the top
+        setReports(
+          result.toSorted((a, b) => (b.lastEdited! < a.lastEdited! ? -1 : 1))
+        );
         setIsLoading(false);
       })();
     };
