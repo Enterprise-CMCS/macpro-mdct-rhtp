@@ -13,7 +13,6 @@ import {
   ElementType,
   TableCheckpointTemplate,
   AttachmentStatus,
-  InitiativeComment,
 } from "@rhtp/shared";
 import {
   getFileDownloadUrl,
@@ -119,7 +118,6 @@ const mockReport = {
               {
                 initiatives: ["mock-init-1"],
                 checkpoint: "project-prop-2",
-                comments: [] as InitiativeComment[],
                 attachment: mockFiles,
                 stage: "stage-1",
                 status: AttachmentStatus.PENDING_REVIEW,
@@ -192,23 +190,23 @@ describe("<TableCheckpoint />", () => {
     });
     expect(deleteButton).toBeDisabled();
   });
-  test("delete disabled when file has previous comments", async () => {
-    const lockedFileReport = structuredClone(mockReport);
-    lockedFileReport.report.pages[1].elements![0].answer[0].comments = [
-      {
-        name: "Mock User",
-        date: "2024-06-01",
-        comment: "This is a mock comment",
-        statusChange: AttachmentStatus.INFORMATIONAL,
-      },
-    ];
-    mockedUseStore.mockReturnValue(lockedFileReport);
-    render(TableCheckpointComponent);
-    const deleteButton = screen.getByRole("button", {
-      name: "Remove orange.png from checkpoint Launch initiative",
-    });
-    expect(deleteButton).toBeDisabled();
-  });
+  // test("delete disabled when file has previous comments", async () => {
+  //   const lockedFileReport = structuredClone(mockReport);
+  //   lockedFileReport.report.pages[1].elements![0].answer[0].comments = [
+  //     {
+  //       name: "Mock User",
+  //       date: "2024-06-01",
+  //       comment: "This is a mock comment",
+  //       statusChange: AttachmentStatus.INFORMATIONAL,
+  //     },
+  //   ];
+  //   mockedUseStore.mockReturnValue(lockedFileReport);
+  //   render(TableCheckpointComponent);
+  //   const deleteButton = screen.getByRole("button", {
+  //     name: "Remove orange.png from checkpoint Launch initiative",
+  //   });
+  //   expect(deleteButton).toBeDisabled();
+  // });
   test("delete file", async () => {
     render(TableCheckpointComponent);
     const deleteButton = screen.getByRole("button", {

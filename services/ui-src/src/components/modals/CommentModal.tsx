@@ -195,15 +195,14 @@ export const CommentModal = ({
       return;
     }
 
-    if (didStatusChange) {
-      allFiles[selectedAttachmentIndex] = {
-        ...allFiles[selectedAttachmentIndex],
-        ...(didStatusChange && {
-          status: displayValue.status as AttachmentStatus,
-        }),
-      };
-      updateElement({ answer: allFiles });
-    }
+    allFiles[selectedAttachmentIndex] = {
+      ...allFiles[selectedAttachmentIndex],
+      ...(didStatusChange && {
+        status: displayValue.status as AttachmentStatus,
+      }),
+      canDelete: false, // if a comment is added, the file can no longer be deleted
+    };
+    updateElement({ answer: allFiles });
 
     setCommentSubmitting(false);
     modalDisclosure.onClose();

@@ -65,20 +65,6 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
-export type ReportComment = {
-  name: string;
-  date: string;
-  comment: string;
-  isInternal: boolean;
-};
-
-export type InitiativeComment = {
-  name: string;
-  date: string;
-  comment?: string;
-  statusChange?: AttachmentStatus;
-};
-
 export enum CommentType {
   REPORT = "report",
   ATTACHMENT = "attachment",
@@ -111,7 +97,6 @@ export interface Report extends ReportOptions {
   submittedByEmail?: string;
   status: ReportStatus;
   submissionCount: number;
-  comments?: ReportComment[];
 }
 
 export type LiteReport = Omit<Report, "pages">;
@@ -433,7 +418,7 @@ export type InitiativeAnswerProp = {
   stage?: string;
   checkpoint?: string;
   status: AttachmentStatus;
-  comments: InitiativeComment[];
+  canDelete: boolean;
 };
 
 export type AttachmentTableTemplate = {

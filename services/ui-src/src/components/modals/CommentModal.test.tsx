@@ -37,7 +37,6 @@ const mockAllFiles = [
     attachment: mockSelectedFile,
     initiatives: ["test 1", "test 2"],
     status: AttachmentStatus.PENDING_REVIEW,
-    comments: [],
   },
 ];
 

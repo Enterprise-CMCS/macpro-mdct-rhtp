@@ -399,14 +399,7 @@ const attachmentTableSchema = object().shape({
         stage: string().notRequired(),
         checkpoint: string().notRequired(),
         status: string().required(),
-        comments: array().of(
-          object().shape({
-            name: string().required(),
-            date: string().required(),
-            comment: string().notRequired(),
-            statusChange: string().notRequired(),
-          })
-        ),
+        canDelete: boolean().notRequired(),
       })
     )
     .notRequired(),
@@ -547,13 +540,6 @@ export const isUpdateInitiativeBody = (
   });
 };
 
-const reportCommentSchema = object().shape({
-  name: string().required(),
-  date: string().required(),
-  comment: string().required(),
-  isInternal: boolean().required(),
-});
-
 const commentSchema = object().shape({
   contextId: string().required(),
   created: number().required(),
@@ -592,7 +578,6 @@ const reportValidateSchema = object().shape({
   subTypeKey: string().required(),
   budgetPeriod: number().min(0).max(5).required(),
   submissionCount: number().required(),
-  comments: array().of(reportCommentSchema).notRequired(),
   pages: pagesSchema,
 });
 
