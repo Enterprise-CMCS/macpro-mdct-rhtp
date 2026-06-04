@@ -72,6 +72,13 @@ export type ReportComment = {
   isInternal: boolean;
 };
 
+export type InitiativeComment = {
+  name: string;
+  date: string;
+  comment?: string;
+  statusChange?: AttachmentStatus;
+};
+
 export enum CommentType {
   REPORT = "report",
   ATTACHMENT = "attachment",
@@ -404,13 +411,6 @@ export type UseOfFundsTableTemplate = {
     recipientCategoryOptions: { label: string; value: string }[];
   };
   answer?: UseOfFundsTableItem[];
-};
-
-export type InitiativeComment = {
-  name: string;
-  date: string;
-  comment?: string;
-  statusChange?: AttachmentStatus;
 };
 
 export enum AttachmentStatus {

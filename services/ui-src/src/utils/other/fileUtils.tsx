@@ -20,7 +20,6 @@ import {
   ReportType,
   UploadListProp,
   AttachmentStatus,
-  InitiativeComment,
   Report,
 } from "@rhtp/shared";
 
