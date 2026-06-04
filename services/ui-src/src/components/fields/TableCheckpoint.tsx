@@ -378,9 +378,7 @@ export const TableCheckpoint = (
               onDeleteClick(row.file);
             }}
             aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
-            disabled={
-              !canDeleteAttachment(row.status, row.comments) || disabled
-            }
+            disabled={!canDeleteAttachment(row.status) || disabled}
           >
             <Image src={cancelIcon} alt="Remove" />
           </Button>

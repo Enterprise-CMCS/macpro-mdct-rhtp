@@ -90,12 +90,8 @@ export const canEditAttachment = (status: AttachmentStatus): boolean => {
   return true;
 };
 
-export const canDeleteAttachment = (
-  status: AttachmentStatus,
-  comments: InitiativeComment[]
-): boolean => {
-  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
-    return true;
+export const canDeleteAttachment = (status: AttachmentStatus): boolean => {
+  if (status === AttachmentStatus.PENDING_REVIEW) return true;
 
   return false;
 };

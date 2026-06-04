@@ -1,4 +1,8 @@
-import { PutCommand, paginateQuery, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+import {
+  PutCommand,
+  paginateQuery,
+  QueryCommandInput,
+} from "@aws-sdk/lib-dynamodb";
 import { collectPageItems, createClient } from "./dynamo/dynamodb-lib";
 import { Comment } from "@rhtp/shared";
 
@@ -14,15 +18,23 @@ export const putComment = async (comment: Comment) => {
   );
 };
 
-export const queryComments = async (contextId: string): Promise<Comment[]> => {
+export const queryComments = async (
+  contextId: string,
+  includeInternal: boolean
+): Promise<Comment[]> => {
   const params: QueryCommandInput = {
     TableName: commentsTableName,
     KeyConditionExpression: "contextId = :contextId",
     ExpressionAttributeValues: {
       ":contextId": contextId,
     },
-    ScanIndexForward: true, // ascending by created (chronological)
+    ScanIndexForward: false, // latest first
   };
+
+  if (!includeInternal) {
+    params.FilterExpression = "isInternal = :isInternal";
+    params.ExpressionAttributeValues![":isInternal"] = false;
+  }
 
   const response = paginateQuery({ client }, params);
   const items = await collectPageItems(response);

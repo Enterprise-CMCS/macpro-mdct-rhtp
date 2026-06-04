@@ -267,9 +267,7 @@ export const AttachmentTable = (
             variant="link"
             onClick={() => onDeleteClick(row)}
             aria-label={`Delete ${row.attachment.name}`}
-            disabled={
-              !canDeleteAttachment(row.status, row.comments) || disabled
-            }
+            disabled={!canDeleteAttachment(row.status) || disabled}
           >
             <Image src={cancelIcon} alt="Remove" minWidth="24px" />
           </Button>
