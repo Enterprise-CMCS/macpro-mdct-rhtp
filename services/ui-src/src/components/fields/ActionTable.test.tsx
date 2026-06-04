@@ -62,6 +62,7 @@ const mockActionTableElement: ActionTableTemplate = {
       { id: "status", value: "Abandoned" },
     ],
   ],
+  required: true,
 };
 
 describe("Test ActionTable component", () => {
