@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures/base";
 import { DashboardPage, DashboardState } from "./pageObjects/dashboard.page";
-import { ModalPage } from "./pageObjects/modal.page";
+import { ReportModalPage } from "./pageObjects/report-modal.page";
 import { reportType, stateAbbreviation } from "../utils/consts";
 
 test.describe("Report Creation", () => {
@@ -19,7 +19,7 @@ test.describe("Report Creation", () => {
   }) => {
     // Arrange
     const dashboard = new DashboardPage(statePage.page);
-    const modal = new ModalPage(statePage.page);
+    const modal = new ReportModalPage(statePage.page);
 
     // Act - Navigate to dashboard and detect state
     const dashboardState = await navigateAndGetState(dashboard);
@@ -65,7 +65,7 @@ test.describe("Report Creation", () => {
   }) => {
     // Arrange
     const dashboard = new DashboardPage(statePage.page);
-    const modal = new ModalPage(statePage.page);
+    const modal = new ReportModalPage(statePage.page);
 
     // Act - Navigate to dashboard and detect state
     const dashboardState = await navigateAndGetState(dashboard);
@@ -81,16 +81,6 @@ test.describe("Report Creation", () => {
 
     // Act - Open and submit copy modal
     await dashboard.openCopyModal();
-
-    // Some environments show a source-report dropdown; others present direct copy confirmation.
-    const hasSourceSelector = await modal.hasCopySourceSelector();
-    if (hasSourceSelector) {
-      const firstReportId = await modal.getFirstReportOptionValue();
-      if (firstReportId) {
-        await modal.selectCopyFromReport(firstReportId);
-      }
-    }
-
     const copyResult = await modal.submitCopyModal();
 
     // Assert - Copy was successful (or blocked by business rules, which is acceptable)

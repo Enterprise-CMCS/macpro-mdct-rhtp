@@ -10,7 +10,8 @@ export class BasePage {
 
   // ===== Navigation =====
   async navigateTo(route: string): Promise<void> {
-    // domcontentloaded is ideal for local dev - fast and reliable
+    // domcontentloaded is typically faster than "load" or "networkidle" and sufficient for our dashboard interactions
+    // We have explicit waits for spinners and modals to ensure the page is ready for interaction
     await this.page.goto(route, {
       waitUntil: "domcontentloaded",
       timeout: TIMEOUT_NAVIGATION,

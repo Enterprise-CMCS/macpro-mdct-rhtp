@@ -47,7 +47,7 @@ export class DashboardPage extends BasePage {
 
   private getUnsubmittedStatusCell() {
     return this.page
-      .getByRole("cell", { name: /^(Not started|In progress)$/i })
+      .getByRole("cell", { name: /^(Not started|In progress|In revision)$/i })
       .first();
   }
 

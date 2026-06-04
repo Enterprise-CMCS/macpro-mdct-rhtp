@@ -1,9 +1,6 @@
 /** Waiting for UI elements to appear or stabilize (status cells, dashboard ready, modal dismiss) */
 export const TIMEOUT_UI = 5000;
 
-/** Waiting for modal elements to become interactive */
-export const TIMEOUT_MODAL = 10000;
-
 /** Waiting for loading spinners to hide or API-backed modal submits to complete */
 export const TIMEOUT_LOADING = 15000;
 
