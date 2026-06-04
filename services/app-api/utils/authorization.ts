@@ -50,5 +50,5 @@ export const canReleaseReport = (user: User) => {
 };
 
 export const canReadAnyReport = (user: User) => {
-  return adminRoles.includes(user.role);
+  return statelessRoles.includes(user.role);
 };
