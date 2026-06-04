@@ -10,7 +10,7 @@ import {
   queryReportsByType,
   queryReportsForState,
 } from "../../storage/reports";
-import { canReadState, canReadType } from "../../utils/authorization";
+import { canReadState, canReadAnyReport } from "../../utils/authorization";
 import { error } from "../../utils/constants";
 
 export const getReport = handler(parseReportParameters, async (request) => {
@@ -46,7 +46,7 @@ export const getReportsByType = handler(parseReportType, async (request) => {
   const { reportType } = request.parameters;
   const user = request.user;
 
-  if (!canReadType(user)) {
+  if (!canReadAnyReport(user)) {
     return forbidden(error.UNAUTHORIZED);
   }
 

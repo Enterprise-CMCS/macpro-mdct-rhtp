@@ -2,7 +2,7 @@ import { Mock } from "vitest";
 import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, User } from "../../types/types";
-import { canReadState, canReadType } from "../../utils/authorization";
+import { canReadState, canReadAnyReport } from "../../utils/authorization";
 import { getReport, getReportsByType, getReportsForState } from "./get";
 import { authenticatedUser } from "../../utils/authentication";
 import { UserRoles } from "@rhtp/shared";
@@ -16,7 +16,7 @@ mockAuthenticatedUser.mockResolvedValue({
 
 vi.mock("../../utils/authorization", () => ({
   canReadState: vi.fn().mockReturnValue(true),
-  canReadType: vi.fn().mockReturnValue(true),
+  canReadAnyReport: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock("../../storage/reports", () => ({
@@ -97,7 +97,7 @@ describe("Test get report handler", () => {
     });
 
     it("should return 403 if user is not authorized", async () => {
-      (canReadType as Mock).mockReturnValueOnce(false);
+      (canReadAnyReport as Mock).mockReturnValueOnce(false);
       const response = await getReportsByType(testEvent);
       expect(response.statusCode).toBe(StatusCodes.Forbidden);
     });

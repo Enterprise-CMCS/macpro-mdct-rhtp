@@ -49,6 +49,6 @@ export const canReleaseReport = (user: User) => {
   return adminRoles.includes(user.role);
 };
 
-export const canReadType = (user: User) => {
-  return user.role == UserRoles.ADMIN;
+export const canReadAnyReport = (user: User) => {
+  return adminRoles.includes(user.role);
 };

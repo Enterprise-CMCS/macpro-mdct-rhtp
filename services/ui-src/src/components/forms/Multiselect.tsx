@@ -1,5 +1,5 @@
 import { Box, Checkbox, Image } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import arrowIcon from "assets/icons/arrows/icon_arrow_up_black.svg";
 
 interface Prop {
@@ -27,6 +27,26 @@ export const MultiSelect = ({
   const onClick = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    const clickOutOfBounds = (e: PointerEvent) => {
+      const multiselect = document.getElementById(`multiselect-field-${label}`);
+      const target = e.target as any;
+
+      if (multiselect && !multiselect.contains(target)) {
+        setSearch("");
+        setFilteredValues(options);
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("click", clickOutOfBounds);
+
+    //when component unmounts, it will run this function
+    return () => {
+      window.removeEventListener("click", clickOutOfBounds);
+    };
+  }, []);
 
   const onChecked = (selection: string) => {
     let newSelection = [...values];
@@ -73,21 +93,10 @@ export const MultiSelect = ({
     );
   };
 
-  window.addEventListener("click", (e) => {
-    const multiselect = document.getElementById("multiselect-field");
-    const target = e.target as any;
-
-    if (multiselect && !multiselect.contains(target)) {
-      setSearch("");
-      setFilteredValues(options);
-      setIsOpen(false);
-    }
-  });
-
   return (
     <Box sx={sx.container} id="multiselect">
       <Box className="ds-c-label">{label}</Box>
-      <Box position="relative" id="multiselect-field">
+      <Box position="relative" id={`multiselect-field-${label}`}>
         <Box className="displayContainer">
           {field()}
           {search.length <= 0 && (

@@ -91,10 +91,7 @@ export const queryReportsByType = async (reportType: ReportType) => {
     { client: dynamoClient },
     { TableName: reportTables[reportType] }
   );
-  const items: Record<string, any>[] = [];
-  for await (const page of pages) {
-    items.push(...(page.Items ?? []));
-  }
+  const items = await collectPageItems(pages);
   return items as LiteReport[];
 };
 

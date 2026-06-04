@@ -124,7 +124,7 @@ export const AdminDashboard = () => {
   };
 
   const tagLabel = (id: string) => {
-    return states.find((state) => state.value == id)?.label ?? "";
+    return StateNames[id as keyof typeof StateNames];
   };
 
   const removeTag = (deleteTag: string) => {
