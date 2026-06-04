@@ -72,6 +72,11 @@ export type ReportComment = {
   isInternal: boolean;
 };
 
+export enum CommentType {
+  REPORT = "report",
+  ATTACHMENT = "attachment",
+}
+
 export type Comment = {
   contextId: string;
   created: number;
@@ -79,6 +84,8 @@ export type Comment = {
   author: string;
   authorEmail: string;
   isInternal: boolean;
+  type: CommentType;
+  parentReportId?: string;
   comment?: string;
   statusChange?: AttachmentStatus;
 };

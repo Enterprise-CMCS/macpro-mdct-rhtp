@@ -19,6 +19,7 @@ import {
   CreateInitiativeOptions,
   UpdateInitiativeOptions,
   RhtpSubType,
+  Comment,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -553,6 +554,19 @@ const reportCommentSchema = object().shape({
   isInternal: boolean().required(),
 });
 
+const commentSchema = object().shape({
+  contextId: string().required(),
+  created: number().required(),
+  id: string().required(),
+  author: string().required(),
+  authorEmail: string().required(),
+  isInternal: boolean().required(),
+  type: string().required(),
+  comment: string().notRequired(),
+  statusChange: string().notRequired(),
+  parentReportId: string().notRequired(),
+});
+
 const reportValidateSchema = object().shape({
   id: string().notRequired(),
   state: string().required(),
@@ -591,4 +605,15 @@ export const validateReportPayload = async (payload: object | undefined) => {
   });
 
   return validatedPayload as Report;
+};
+
+export const validateCommentPayload = async (payload: object | undefined) => {
+  if (!payload) {
+    throw new Error(error.MISSING_DATA);
+  }
+  const validatedPayload = await commentSchema.validate(payload, {
+    stripUnknown: true,
+  });
+
+  return validatedPayload as Comment;
 };

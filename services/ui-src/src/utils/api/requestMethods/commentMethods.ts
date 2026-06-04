@@ -1,12 +1,22 @@
 import { apiLib } from "utils";
 import { getRequestHeaders } from "./getRequestHeaders";
-import { Comment } from "@rhtp/shared";
+import { Comment, CommentType } from "@rhtp/shared";
 
-export async function createComment(contextId: string, comment: string) {
+interface createCommentParams {
+  type: CommentType;
+  parentReportId?: string;
+  comment?: string;
+  statusChange?: string;
+}
+
+export async function createComment(
+  contextId: string,
+  bodyParams: createCommentParams
+) {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
-    body: { comment },
+    body: { ...bodyParams },
   };
 
   return await apiLib.post<Comment>(`/comments/${contextId}`, options);

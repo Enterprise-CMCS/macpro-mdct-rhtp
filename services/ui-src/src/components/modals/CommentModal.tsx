@@ -15,6 +15,7 @@ import {
   ReportStatus,
   UserRoles,
   FileStatusOptions,
+  CommentType,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
@@ -134,14 +135,16 @@ export const CommentModal = ({
 
   const onSubmit = async () => {
     console.log("slectedFile", allFiles[selectedAttachmentIndex]);
-    // const pastComments = await getComments(
-    //   allFiles[selectedAttachmentIndex].attachment.fileId
-    // );
-    // console.log("pastComments", pastComments);
-    // await createComment(
-    //   allFiles[selectedAttachmentIndex].attachment.fileId,
-    //   "later random Text 3"
-    // );
+    console.log("REPORT", report);
+    const pastComments = await getComments(
+      allFiles[selectedAttachmentIndex].attachment.fileId
+    );
+    console.log("pastComments", pastComments);
+    // await createComment(allFiles[selectedAttachmentIndex].attachment.fileId, {
+    //   comment: "Random Comment",
+    //   type: CommentType.ATTACHMENT,
+    //   parentReportId: report?.id,
+    // });
     if (selectedAttachmentIndex === -1 || commentsDisabled) {
       return modalDisclosure.onClose();
     }
