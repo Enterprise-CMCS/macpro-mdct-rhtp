@@ -17,6 +17,7 @@ import { UploadModal } from "components/modals/UploadModal";
 import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
+  canDeleteAttachment,
   canEditAttachment,
   downloadFile,
   removeFile,
@@ -376,7 +377,9 @@ export const TableCheckpoint = (
               onDeleteClick(row.file);
             }}
             aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
-            disabled={!row.canDelete || disabled}
+            disabled={
+              !canDeleteAttachment(row.status, row.canDelete) || disabled
+            }
           >
             <Image src={cancelIcon} alt="Remove" />
           </Button>

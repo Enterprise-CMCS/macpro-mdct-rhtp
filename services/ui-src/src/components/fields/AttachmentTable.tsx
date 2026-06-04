@@ -18,6 +18,7 @@ import {
   downloadFile,
   removeFile,
   canEditAttachment,
+  canDeleteAttachment,
 } from "utils/other/fileUtils";
 import {
   checkpointAttachableOptions,
@@ -103,7 +104,6 @@ export const AttachmentTable = (
   };
 
   const saveToReport = (uploads: UploadListProp[]) => {
-    console.log("SAVE TO REPORT RUNNING");
     const formattedUploads = uploads.map((upload) => ({
       attachment: upload,
       initiatives: [],
@@ -134,8 +134,6 @@ export const AttachmentTable = (
   };
 
   const onModalSubmit = () => {
-    console.log("ON MODAL SUBMIT RUNNING", uploadedFiles);
-    console.log("DISPLAY VALUE", displayValue);
     if (modalMode === "Delete") {
       removeAttachment(uploadedFiles[0]);
       return onClose();
@@ -274,7 +272,9 @@ export const AttachmentTable = (
             variant="link"
             onClick={() => onDeleteClick(row)}
             aria-label={`Delete ${row.attachment.name}`}
-            disabled={!row.canDelete || disabled}
+            disabled={
+              !canDeleteAttachment(row.status, row.canDelete) || disabled
+            }
           >
             <Image src={cancelIcon} alt="Remove" minWidth="24px" />
           </Button>

@@ -4,7 +4,7 @@ import { TextField } from "@cmsgov/design-system";
 import { AlertTypes, CommentType } from "@rhtp/shared";
 import { Alert } from "components/alerts/Alert";
 import { Modal } from "components/modals/Modal";
-import { putReport, useStore } from "utils";
+import { useStore } from "utils";
 import { createComment } from "utils/api/requestMethods/commentMethods";
 
 export const SubmitForReview = () => {
@@ -47,7 +47,6 @@ export const SubmitForReview = () => {
       return;
     }
 
-    await putReport(report);
     setDisplayValue("");
     setErrorMessage("");
     setIsSubmittedForReview(true);

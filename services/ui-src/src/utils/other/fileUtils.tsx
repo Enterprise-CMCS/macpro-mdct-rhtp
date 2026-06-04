@@ -89,6 +89,15 @@ export const canEditAttachment = (status: AttachmentStatus): boolean => {
   return true;
 };
 
+export const canDeleteAttachment = (
+  status: AttachmentStatus,
+  canDelete: boolean
+): boolean => {
+  if (status === AttachmentStatus.PENDING_REVIEW && canDelete) return true;
+
+  return false;
+};
+
 export const removeFile = async (
   reportType: ReportType,
   state: string,
