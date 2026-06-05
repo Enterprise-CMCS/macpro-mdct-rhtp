@@ -192,6 +192,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "getReportsByType", {
+    entry: "services/app-api/handlers/reports/get.ts",
+    handler: "getReportsByType",
+    path: "reports/{reportType}",
+    method: "GET",
+    ...commonProps,
+  });
+
   new Lambda(scope, "getReport", {
     entry: "services/app-api/handlers/reports/get.ts",
     handler: "getReport",

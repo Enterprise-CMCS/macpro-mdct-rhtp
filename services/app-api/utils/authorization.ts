@@ -48,3 +48,7 @@ export const canWriteBanner = (user: User) => {
 export const canReleaseReport = (user: User) => {
   return adminRoles.includes(user.role);
 };
+
+export const canReadAnyReport = (user: User) => {
+  return statelessRoles.includes(user.role);
+};

@@ -5,6 +5,7 @@ import {
   QueryCommandInput,
   UpdateCommand,
   DeleteCommand,
+  paginateScan,
 } from "@aws-sdk/lib-dynamodb";
 import {
   collectPageItems,
@@ -83,6 +84,15 @@ export const queryReportsForState = async (
   const reports = await collectPageItems(response);
 
   return reports as LiteReport[];
+};
+
+export const queryReportsByType = async (reportType: ReportType) => {
+  const pages = paginateScan(
+    { client: dynamoClient },
+    { TableName: reportTables[reportType] }
+  );
+  const items = await collectPageItems(pages);
+  return items as LiteReport[];
 };
 
 export const updateField = async (
