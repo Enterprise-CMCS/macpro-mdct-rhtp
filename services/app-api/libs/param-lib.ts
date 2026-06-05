@@ -118,5 +118,6 @@ export const parseContextId = (event: APIGatewayProxyEvent) => {
     logger.warn("Missing contextId in path");
     return undefined;
   }
+
   return { contextId };
 };

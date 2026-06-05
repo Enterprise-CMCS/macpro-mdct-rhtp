@@ -3,7 +3,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { CommentModal } from "./CommentModal";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
-import { AttachmentStatus, InitiativeAnswerProp, Comment } from "@rhtp/shared";
+import {
+  AttachmentStatus,
+  InitiativeAnswerProp,
+  Comment,
+  CommentType,
+} from "@rhtp/shared";
 import { useStore } from "utils";
 import {
   mockAdminUserStore,
@@ -21,6 +26,8 @@ const mockGetComments = vi.fn().mockResolvedValue([
     authorEmail: "mockEmail",
     isInternal: false,
     comment: "Mock comment",
+    type: CommentType.ATTACHMENT,
+    parentReportId: "mockReportId",
   } as Comment,
 ]);
 
