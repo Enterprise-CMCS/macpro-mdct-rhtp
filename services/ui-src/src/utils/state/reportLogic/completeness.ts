@@ -164,7 +164,8 @@ export const elementSatisfiesRequired = (
       .filter((column) => column.id != "prevValue");
     return answers.every((column) => column.value !== "");
   }
-  if (element.type === ElementType.AccordionGroup) {
+  //use of funds table does not want to be compared unless there's an any
+  if (element.type == (ElementType.UseOfFundsTable as any)) {
     console.log(element);
   }
 

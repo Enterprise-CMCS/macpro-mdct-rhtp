@@ -68,9 +68,25 @@ const buildRows = (
   return formattedRows;
 };
 
+const adjustElement = (element: ActionTableTemplate) => {
+  const previousValues =
+    element.answer
+      ?.flat()
+      .filter((answer) => answer.id === "prevValue" && answer.value != "") ??
+    [];
+
+  const showPrevColumn = previousValues?.length > 0;
+  const newElement = structuredClone(element);
+  if (!showPrevColumn) {
+    const index = newElement.rows.findIndex((row) => row.id === "prevValue");
+    if (index !== -1) newElement.rows.splice(index, 1);
+  }
+  return newElement;
+};
+
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { disabled, element } = props;
-  const { id, label, hintText, modal, rows, answer } = element;
+  const { id, label, hintText, modal, rows, answer } = adjustElement(element);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
