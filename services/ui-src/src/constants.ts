@@ -29,3 +29,12 @@ export const HELP_DESK_EMAIL_ADDRESS = "mdct_help@cms.hhs.gov" as const;
 // TIMEOUT PARAMS
 export const IDLE_WINDOW = 30 * 60 * 1000; // ms
 export const PROMPT_AT = 29 * 60 * 1000; //ms
+
+export const budgetPeriodFilterOptions = [
+  { label: "All", value: "All" },
+  { label: "Budget Period 1", value: 1 },
+  { label: "Budget Period 2", value: 2 },
+  { label: "Budget Period 3", value: 3 },
+  { label: "Budget Period 4", value: 4 },
+  { label: "Budget Period 5", value: 5 },
+];

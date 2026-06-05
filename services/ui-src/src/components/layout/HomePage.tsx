@@ -1,7 +1,7 @@
 import { Box, Heading, Text } from "@chakra-ui/react";
 import { BannerAreas } from "@rhtp/shared";
 import {
-  AdminDashSelector,
+  AdminDashboard,
   Banner,
   PageTemplate,
   RhtpIntroductionCard,
@@ -21,24 +21,21 @@ export const HomePage = () => {
           <Banner {...banner} key={banner.key} />
         </Box>
       ) : null}
-      <PageTemplate>
-        {userIsEndUser && !userIsAdmin ? (
-          <>
-            <Box>
-              <Heading as="h1" variant="h1" paddingBottom="spacer3">
-                Rural Health Transformation Program
-              </Heading>
-              <Text paddingBottom="spacer3">
-                Get started by completing the reports for your state or
-                territory.
-              </Text>
-            </Box>
-            <RhtpIntroductionCard />
-          </>
-        ) : (
-          <AdminDashSelector />
-        )}
-      </PageTemplate>
+      {userIsEndUser && !userIsAdmin ? (
+        <PageTemplate>
+          <Box>
+            <Heading as="h1" variant="h1" paddingBottom="spacer3">
+              Rural Health Transformation Program
+            </Heading>
+            <Text paddingBottom="spacer3">
+              Get started by completing the reports for your state or territory.
+            </Text>
+          </Box>
+          <RhtpIntroductionCard />
+        </PageTemplate>
+      ) : (
+        <AdminDashboard />
+      )}
     </>
   );
 };

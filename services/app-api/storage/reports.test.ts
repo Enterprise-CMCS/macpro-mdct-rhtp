@@ -2,6 +2,7 @@ import {
   deleteReport,
   getReport,
   putReport,
+  queryReportsByType,
   queryReportsForState,
 } from "./reports";
 import { Report, ReportType } from "@rhtp/shared";
@@ -11,6 +12,7 @@ import {
   PutCommand,
   QueryCommand,
   DeleteCommand,
+  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 
@@ -116,6 +118,26 @@ describe("Report storage helpers", () => {
           ProjectionExpression:
             "#id, #name, #state, #created, #status, #submissionCount, #lastEdited, #lastEditedBy, #type, #year, #lastEditedByEmail, #subType, #subTypeKey, #budgetPeriod, #copyFromReportId",
         },
+        expect.any(Function)
+      );
+    });
+  });
+
+  describe("queryReportsByType", () => {
+    test("should call DynamoDB to get report data", async () => {
+      const mockScan = vi.fn().mockResolvedValue({
+        Items: [mockReport],
+        LastEvaluatedKey: undefined,
+      });
+      mockDynamo.on(ScanCommand).callsFake(mockScan);
+
+      const reports = await queryReportsByType(ReportType.RHTP);
+
+      expect(reports).toEqual([mockReport]);
+      expect(mockScan).toHaveBeenCalledWith(
+        expect.objectContaining({
+          TableName: "local-rhtp-reports",
+        }),
         expect.any(Function)
       );
     });

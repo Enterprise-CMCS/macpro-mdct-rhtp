@@ -4,7 +4,12 @@ import { parseFileUploadDownloadParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { getReport } from "../../storage/reports";
-import { ElementType, ReportType, StateAbbr } from "@rhtp/shared";
+import {
+  AttachmentStatus,
+  ElementType,
+  ReportType,
+  StateAbbr,
+} from "@rhtp/shared";
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 import JSZip from "jszip";
 import { Readable } from "node:stream";
@@ -81,7 +86,13 @@ export const zipWorker = async (event: ZipWorkerEvent) => {
     (element) => element?.type === ElementType.AttachmentTable
   );
   const initAttachmentFiles =
-    initAttachment?.answer?.map((answer) => answer.attachment) ?? [];
+    initAttachment?.answer
+      ?.filter(
+        (attachment) =>
+          attachment.status !== AttachmentStatus.ARCHIVED &&
+          attachment.status !== AttachmentStatus.INFORMATIONAL
+      )
+      ?.map((answer) => answer.attachment) ?? [];
 
   const accordionGroups = flattenElements
     ?.filter((element) => element?.type === ElementType.AccordionGroup)

@@ -37,7 +37,7 @@ export { ActionTable } from "./fields/ActionTable";
 export { AttachmentTable } from "./fields/AttachmentTable";
 // forms
 export { AdminBannerForm } from "./forms/AdminBannerForm";
-export { AdminDashSelector } from "./forms/AdminDashSelector";
+export { AdminDashboard } from "./forms/AdminDashboard";
 // logins
 export { LoginCognito } from "./logins/LoginCognito";
 export { LoginIDM } from "./logins/LoginIDM";
