@@ -19,6 +19,7 @@ import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
+import { ReportCommentModal } from "components/modals/CommentModal";
 
 const buildStateOptions = () => {
   const stateValues = [];
@@ -55,19 +56,21 @@ export const AdminDashboard = () => {
     type: SORT_TYPE;
   }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
+  const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<Report>();
+
+  const reloadReports = async (reportType: string) => {
+    setIsLoading(true);
+    const result = await getReportByType(reportType);
+    //set latest edit report to the top
+    setReports(
+      result.toSorted((a, b) => (b.lastEdited! < a.lastEdited! ? -1 : 1))
+    );
+    setIsLoading(false);
+  };
+
   //when the page is loaded, we load the reports
   useEffect(() => {
-    const reloadReports = (reportType: string) => {
-      (async () => {
-        setIsLoading(true);
-        const result = await getReportByType(reportType);
-        //set latest edit report to the top
-        setReports(
-          result.toSorted((a, b) => (b.lastEdited! < a.lastEdited! ? -1 : 1))
-        );
-        setIsLoading(false);
-      })();
-    };
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
   }, []);
@@ -136,6 +139,17 @@ export const AdminDashboard = () => {
     });
   };
 
+  const openCommentsModal = (report: Report) => {
+    setSelectedReport(report);
+    setCommentModalOpen(true);
+  };
+
+  const closeCommentsModal = () => {
+    setSelectedReport(undefined);
+    setCommentModalOpen(false);
+    reloadReports(ReportType.RHTP);
+  };
+
   const buildRows = (reports: Report[]) => {
     return reports.map((report) => {
       const columnAction = (
@@ -146,7 +160,11 @@ export const AdminDashboard = () => {
           >
             View Report
           </Button>
-          <Button variant="link" fontWeight="bold">
+          <Button
+            variant="link"
+            fontWeight="bold"
+            onClick={() => openCommentsModal(report)}
+          >
             Comment/Status
           </Button>
         </HStack>
@@ -281,6 +299,13 @@ export const AdminDashboard = () => {
           )
         )}
       </Stack>
+      <ReportCommentModal
+        modalDisclosure={{
+          isOpen: commentModalOpen,
+          onClose: closeCommentsModal,
+        }}
+        selectedReport={selectedReport}
+      />
     </PageTemplate>
   );
 };

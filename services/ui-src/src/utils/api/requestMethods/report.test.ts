@@ -1,4 +1,5 @@
 import {
+  acceptReport,
   createReport,
   deleteReport,
   deleteReportsForState,
@@ -68,6 +69,10 @@ describe("utils/report", () => {
 
   test("releaseReport", async () => {
     await releaseReport(report);
+    expect(mockPut).toHaveBeenCalledTimes(1);
+  });
+  test("releaseReport", async () => {
+    await acceptReport(report);
     expect(mockPut).toHaveBeenCalledTimes(1);
   });
   test("deleteReport", async () => {

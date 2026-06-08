@@ -15,9 +15,100 @@ import {
   ReportStatus,
   UserRoles,
   FileStatusOptions,
+  Report,
 } from "@rhtp/shared";
-import { useStore } from "utils";
+import { acceptReport, releaseReport, useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
+
+const AdminReportStatusOptions = [
+  ReportStatus.SUBMITTED,
+  ReportStatus.ACCEPTED,
+  "Unlock",
+];
+
+export const ReportCommentModal = ({
+  modalDisclosure,
+  selectedReport,
+}: ReportCommentProps) => {
+  if (!selectedReport) return;
+  const { name, status } = selectedReport;
+  const { userIsAdmin } = useStore().user ?? {};
+  const disabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
+  const initialValues: {
+    comment: string;
+    status: string;
+  } = {
+    comment: "",
+    status: status,
+  };
+  const [displayValue, setDisplayValue] = useState(initialValues);
+  const [statusOptions, setStatusOptions] = useState<DropdownOption[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const statuses = new Set([...AdminReportStatusOptions, status]);
+    const statusOptions = [];
+    for (const status of statuses.values()) {
+      statusOptions.push({
+        label: status,
+        value: status,
+      });
+    }
+    setStatusOptions(statusOptions);
+  }, []);
+
+  const onChange = (
+    event: React.ChangeEvent<HTMLInputElement> | DropdownChangeObject
+  ) => {
+    const { name, value } = event.target;
+    setDisplayValue((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const onSubmit = async () => {
+    setSubmitting(true);
+
+    if (displayValue.status === "Unlock") {
+      await releaseReport(selectedReport);
+    } else if (displayValue.status === ReportStatus.ACCEPTED) {
+      await acceptReport(selectedReport);
+    }
+
+    modalDisclosure.onClose();
+    setSubmitting(false);
+  };
+
+  return (
+    <Modal
+      modalDisclosure={modalDisclosure}
+      content={{
+        heading: `Add comment to ${name || "report"}`,
+        actionButtonText: "Save",
+      }}
+      onConfirmHandler={onSubmit}
+      submitting={submitting}
+    >
+      <Dropdown
+        label="Status"
+        name="status"
+        onChange={onChange}
+        options={statusOptions}
+        value={displayValue.status}
+        disabled={disabled}
+      />
+    </Modal>
+  );
+};
+
+interface ReportCommentProps {
+  modalDisclosure: {
+    isOpen: boolean;
+    onClose: () => void;
+  };
+  selectedReport?: Report;
+}
 
 const PreviousComments = ({ comments }: { comments: InitiativeComment[] }) => {
   const timeSortedComments = comments.toSorted(
