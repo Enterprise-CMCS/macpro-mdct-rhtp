@@ -11,6 +11,7 @@ interface createCommentParams {
 
 export async function createComment(
   contextId: string,
+  state: string,
   bodyParams: createCommentParams
 ) {
   const requestHeaders = await getRequestHeaders();
@@ -19,14 +20,17 @@ export async function createComment(
     body: { ...bodyParams },
   };
 
-  return await apiLib.post<Comment>(`/comments/${contextId}`, options);
+  return await apiLib.post<Comment>(`/comments/${state}/${contextId}`, options);
 }
 
-export async function getComments(contextId: string) {
+export async function getComments(contextId: string, state: string) {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
   };
 
-  return await apiLib.get<Comment[]>(`/comments/${contextId}`, options);
+  return await apiLib.get<Comment[]>(
+    `/comments/${state}/${contextId}`,
+    options
+  );
 }

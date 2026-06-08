@@ -77,10 +77,14 @@ describe("SubmitForReview component", () => {
 
     test("open and submit modal", async () => {
       await openAndCompleteFormWithText("Please review");
-      expect(mockCreateComment).toHaveBeenCalledWith(mockUseStore.report?.id, {
-        comment: "Please review",
-        type: "report",
-      });
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockUseStore.report?.id,
+        mockUseStore.report?.state,
+        {
+          comment: "Please review",
+          type: "report",
+        }
+      );
       expect(screen.getByText("Submitted for Review")).toBeVisible();
     });
   });

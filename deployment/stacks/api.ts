@@ -328,7 +328,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "createComment", {
     entry: "services/app-api/handlers/comments/create.ts",
     handler: "createComment",
-    path: "comments/{contextId}",
+    path: "comments/{state}/{contextId}",
     method: "POST",
     ...commonProps,
   });
@@ -336,7 +336,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "getComments", {
     entry: "services/app-api/handlers/comments/fetch.ts",
     handler: "getComments",
-    path: "comments/{contextId}",
+    path: "comments/{state}/{contextId}",
     method: "GET",
     ...commonProps,
   });

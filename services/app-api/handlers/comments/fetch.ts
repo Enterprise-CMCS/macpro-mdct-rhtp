@@ -1,15 +1,24 @@
 import { handler } from "../../libs/handler-lib";
-import { parseContextId } from "../../libs/param-lib";
-import { ok } from "../../libs/response-lib";
+import { parseCommentPathParams } from "../../libs/param-lib";
+import { ok, forbidden } from "../../libs/response-lib";
 import { queryComments } from "../../storage/comments";
-import { canReadInternalComments } from "../../utils/authorization";
+import {
+  canReadInternalComments,
+  canReadState,
+} from "../../utils/authorization";
+import { error } from "../../utils/constants";
 
-export const getComments = handler(parseContextId, async (request) => {
-  const { contextId } = request.parameters;
+export const getComments = handler(parseCommentPathParams, async (request) => {
+  const { contextId, state } = request.parameters;
+  const { user } = request;
+
+  if (!canReadState(user, state)) {
+    return forbidden(error.UNAUTHORIZED);
+  }
 
   const comments = await queryComments(
     contextId,
-    canReadInternalComments(request.user)
+    canReadInternalComments(user)
   );
   return ok(comments);
 });

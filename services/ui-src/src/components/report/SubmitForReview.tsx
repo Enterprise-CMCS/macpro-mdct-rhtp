@@ -34,7 +34,7 @@ export const SubmitForReview = () => {
     setIsSubmitting(true);
 
     try {
-      await createComment(report.id, {
+      await createComment(report.id, report.state, {
         comment: displayValue,
         type: CommentType.REPORT,
       });

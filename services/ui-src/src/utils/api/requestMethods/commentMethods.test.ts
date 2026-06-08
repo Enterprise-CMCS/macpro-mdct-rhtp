@@ -26,7 +26,7 @@ describe("Test commentApi functions", () => {
   test("createComment", async () => {
     (apiLib.post as Mock).mockReturnValue(mockComment);
 
-    const result = await createComment(mockComment.contextId, {
+    const result = await createComment(mockComment.contextId, "mockState", {
       type: mockComment.type,
       comment: mockComment.comment,
       parentReportId: mockComment.parentReportId,
@@ -37,7 +37,7 @@ describe("Test commentApi functions", () => {
   test("getComments", async () => {
     (apiLib.get as Mock).mockReturnValue([mockComment]);
 
-    const result = await getComments(mockComment.contextId);
+    const result = await getComments(mockComment.contextId, "mockState");
     expect(result).toEqual([mockComment]);
   });
 });

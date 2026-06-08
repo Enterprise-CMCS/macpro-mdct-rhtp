@@ -42,9 +42,10 @@ const mockCreateComment = vi.fn().mockResolvedValue({
 } as Comment);
 
 vi.mock("utils/api/requestMethods/commentMethods", () => ({
-  getComments: (contextId: string) => mockGetComments(contextId),
-  createComment: (contextId: string, bodyParams: any) =>
-    mockCreateComment(contextId, bodyParams),
+  getComments: (contextId: string, state: string) =>
+    mockGetComments(contextId, state),
+  createComment: (contextId: string, state: string, bodyParams: any) =>
+    mockCreateComment(contextId, state, bodyParams),
 }));
 
 vi.mock("utils/state/useStore");
@@ -134,11 +135,15 @@ describe("CommentModal component", () => {
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Save"));
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
-      expect(mockCreateComment).toHaveBeenCalledWith(mockSelectedFile.fileId, {
-        comment: "Test comment",
-        type: "attachment",
-        parentReportId: mockUseStore.report?.id,
-      });
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockSelectedFile.fileId,
+        "PA",
+        {
+          comment: "Test comment",
+          type: "attachment",
+          parentReportId: mockUseStore.report?.id,
+        }
+      );
     });
   });
 
@@ -181,7 +186,7 @@ describe("CommentModal component", () => {
 
     test("Shows previous comments and status changes", async () => {
       const previousComments = screen.getAllByRole("textbox");
-      // expect(previousComments).toHaveLength(3); // one for new comment, two for existing, no textbox for empty comment with status change
+      expect(previousComments).toHaveLength(3); // one for new comment, two for existing, no textbox for empty comment with status change
       // most recent comment should be first in the list
       expect(previousComments[1]).toHaveValue("Second comment from cms user");
       expect(previousComments[2]).toHaveValue("First comment from cms user");
@@ -290,12 +295,16 @@ describe("CommentModal component", () => {
       );
       await userEvent.click(screen.getByText("Save"));
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
-      expect(mockCreateComment).toHaveBeenCalledWith(mockSelectedFile.fileId, {
-        comment: "",
-        type: "attachment",
-        parentReportId: mockUseStore.report?.id,
-        statusChange: AttachmentStatus.NEEDS_REVISION,
-      });
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockSelectedFile.fileId,
+        "PA",
+        {
+          comment: "",
+          type: "attachment",
+          parentReportId: mockUseStore.report?.id,
+          statusChange: AttachmentStatus.NEEDS_REVISION,
+        }
+      );
       expect(mockUpdateElement).toHaveBeenCalledWith(
         expect.objectContaining({
           answer: expect.arrayContaining([

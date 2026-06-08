@@ -6,9 +6,11 @@ import { getComments } from "./fetch";
 import { authenticatedUser } from "../../utils/authentication";
 import { UserRoles, Comment, CommentType } from "@rhtp/shared";
 import { queryComments } from "../../storage/comments";
+import { canReadState } from "../../utils/authorization";
 
 vi.mock("../../utils/authorization", () => ({
   canReadInternalComments: vi.fn().mockReturnValue(true),
+  canReadState: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock("../../utils/authentication");
@@ -39,12 +41,28 @@ const testEvent: APIGatewayProxyEvent = {
   headers: { "cognito-identity-id": "test" },
   pathParameters: {
     contextId: mockComment.contextId,
+    state: "PA",
   },
 };
 
 describe("Test fetchComments API method", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  test("Test missing path params", async () => {
+    const badTestEvent: APIGatewayProxyEvent = {
+      ...proxyEvent,
+      headers: { "cognito-identity-id": "test" },
+    };
+    const res = await getComments(badTestEvent);
+    expect(res.statusCode).toBe(StatusCodes.BadRequest);
+  });
+
+  it("should return 403 if user is not authorized", async () => {
+    (canReadState as Mock).mockReturnValueOnce(false);
+    const response = await getComments(testEvent);
+    expect(response.statusCode).toBe(StatusCodes.Forbidden);
   });
 
   test("Successful Comment Fetch", async () => {

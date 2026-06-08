@@ -121,7 +121,8 @@ export const CommentModal = ({
       setPastComments([]);
       try {
         const comments = await getComments(
-          allFiles[selectedAttachmentIndex].attachment.fileId
+          allFiles[selectedAttachmentIndex].attachment.fileId,
+          report?.state || ""
         );
         setPastComments(comments);
       } catch (error) {
@@ -178,12 +179,16 @@ export const CommentModal = ({
     }
 
     try {
-      await createComment(allFiles[selectedAttachmentIndex].attachment.fileId, {
-        comment: displayValue.comment,
-        type: CommentType.ATTACHMENT,
-        parentReportId: report?.id,
-        ...(didStatusChange && { statusChange: displayValue.status }),
-      });
+      await createComment(
+        allFiles[selectedAttachmentIndex].attachment.fileId,
+        report?.state || "",
+        {
+          comment: displayValue.comment,
+          type: CommentType.ATTACHMENT,
+          parentReportId: report?.id,
+          ...(didStatusChange && { statusChange: displayValue.status }),
+        }
+      );
     } catch (error) {
       console.error("Error creating comment:", error);
       setErrorMessages({
