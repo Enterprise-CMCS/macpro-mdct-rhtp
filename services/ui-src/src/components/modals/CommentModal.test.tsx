@@ -287,7 +287,7 @@ const ReportCommendModalComponent = (report = mockReport) => (
     selectedReport={report}
   />
 );
-describe.only("ReportCommentModal component", () => {
+describe("ReportCommentModal component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
