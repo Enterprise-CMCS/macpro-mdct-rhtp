@@ -9,7 +9,7 @@ import { AdminDashboard } from "./AdminDashboard";
 import { RouterWrappedComponent } from "utils/testing/mockRouter";
 import { mockReport, mockReport2 } from "utils/testing/mockForm";
 import userEvent from "@testing-library/user-event";
-import { testA11y } from "utils/testing/commonTests";
+import { testA11yAct } from "utils/testing/commonTests";
 
 const mockGetReport = vi.fn().mockResolvedValue([mockReport, mockReport2]);
 vi.mock("../../utils/api/requestMethods/report", () => ({
@@ -137,7 +137,7 @@ describe("<AdminDashboard />", () => {
   });
 });
 describe("Test A11y", () => {
-  testA11y(
+  testA11yAct(
     <RouterWrappedComponent>
       <AdminDashboard />
     </RouterWrappedComponent>
