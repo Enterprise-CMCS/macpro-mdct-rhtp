@@ -147,7 +147,6 @@ export const AdminDashboard = () => {
   const closeCommentsModal = () => {
     setSelectedReport(undefined);
     setCommentModalOpen(false);
-    reloadReports(ReportType.RHTP);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -305,6 +304,7 @@ export const AdminDashboard = () => {
           onClose: closeCommentsModal,
         }}
         selectedReport={selectedReport}
+        reloadReports={reloadReports}
       />
     </PageTemplate>
   );

@@ -16,6 +16,7 @@ import {
   UserRoles,
   FileStatusOptions,
   Report,
+  ReportType,
 } from "@rhtp/shared";
 import { acceptReport, releaseReport, useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
@@ -29,6 +30,7 @@ const AdminReportStatusOptions = [
 export const ReportCommentModal = ({
   modalDisclosure,
   selectedReport,
+  reloadReports,
 }: ReportCommentProps) => {
   if (!selectedReport) return;
   const { name, status } = selectedReport;
@@ -72,8 +74,13 @@ export const ReportCommentModal = ({
 
     if (displayValue.status === "Unlock") {
       await releaseReport(selectedReport);
-    } else if (displayValue.status === ReportStatus.ACCEPTED) {
+      reloadReports(ReportType.RHTP);
+    } else if (
+      displayValue.status === ReportStatus.ACCEPTED &&
+      displayValue.status !== status
+    ) {
       await acceptReport(selectedReport);
+      reloadReports(ReportType.RHTP);
     }
 
     modalDisclosure.onClose();
@@ -107,6 +114,7 @@ interface ReportCommentProps {
     isOpen: boolean;
     onClose: () => void;
   };
+  reloadReports: Function;
   selectedReport?: Report;
 }
 

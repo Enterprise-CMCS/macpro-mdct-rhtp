@@ -278,6 +278,8 @@ describe("CommentModal component", () => {
   testA11y(CommentModalComponent());
 });
 
+const mockReloadReports = vi.fn();
+
 const ReportCommendModalComponent = (report = mockReport) => (
   <ReportCommentModal
     modalDisclosure={{
@@ -285,6 +287,7 @@ const ReportCommendModalComponent = (report = mockReport) => (
       onClose: mockCloseHandler,
     }}
     selectedReport={report}
+    reloadReports={mockReloadReports}
   />
 );
 describe("ReportCommentModal component", () => {
@@ -331,6 +334,7 @@ describe("ReportCommentModal component", () => {
       await userEvent.click(screen.getByRole("option", { name: "Unlock" }));
       await userEvent.click(screen.getByText("Save"));
       expect(mockReleaseReport).toHaveBeenCalled();
+      expect(mockReloadReports).toHaveBeenCalled();
     });
 
     test("Admin can accept a submitted report", async () => {
@@ -340,6 +344,7 @@ describe("ReportCommentModal component", () => {
       await userEvent.click(screen.getByRole("option", { name: "Accepted" }));
       await userEvent.click(screen.getByText("Save"));
       expect(mockAcceptReport).toHaveBeenCalled();
+      expect(mockReloadReports).toHaveBeenCalled();
     });
   });
 
