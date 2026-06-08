@@ -24,8 +24,6 @@ describe("Selectors", () => {
 
   test("submittableMetricsSelector should return the readiness of the report", async () => {
     const result = submittableMetricsSelector(mockUseStore);
-
-    console.log("result", result);
     expect(result?.sections[0]?.submittable).toEqual(true);
     expect(result?.sections[0]?.displayStatus).toEqual(PageStatus.COMPLETE);
     expect(result?.submittable).toEqual(true);
