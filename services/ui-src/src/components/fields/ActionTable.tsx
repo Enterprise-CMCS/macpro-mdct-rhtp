@@ -69,18 +69,20 @@ const buildRows = (
 };
 
 const adjustElement = (element: ActionTableTemplate) => {
-  const previousValues =
-    element.answer
-      ?.flat()
-      .filter((answer) => answer.id === "prevValue" && answer.value != "") ??
-    [];
-
-  const showPrevColumn = previousValues?.length > 0;
   const newElement = structuredClone(element);
-  if (!showPrevColumn) {
-    const index = newElement.rows.findIndex((row) => row.id === "prevValue");
-    if (index !== -1) newElement.rows.splice(index, 1);
+  //if prevValue has no values in any row, it will hide the whole column
+  if (element.rows.some((row) => row.id === "prevValue")) {
+    const countFilledPrevValue = element.answer
+      ?.flat()
+      .filter(
+        (answer) => answer.id === "prevValue" && answer.value != ""
+      ).length;
+
+    if (countFilledPrevValue != undefined && countFilledPrevValue === 0) {
+      newElement.rows = newElement.rows.filter((row) => row.id !== "prevValue");
+    }
   }
+
   return newElement;
 };
 

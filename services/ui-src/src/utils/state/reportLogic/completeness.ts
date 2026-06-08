@@ -164,9 +164,9 @@ export const elementSatisfiesRequired = (
       .filter((column) => column.id != "prevValue");
     return answers.every((column) => column.value !== "");
   }
-  //use of funds table does not want to be compared unless there's an any
+  //NOTE: use of funds table does not want to be compared unless there's an any, fix when UseOfFundsTable have been swapped to and upload
   if (element.type == (ElementType.UseOfFundsTable as any)) {
-    console.log(element);
+    //TODO: add validation check for use of funds when component has been updated
   }
 
   return true;

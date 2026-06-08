@@ -31,7 +31,6 @@ export const elementSelector = (elementId: string) => {
 };
 
 export const currentPageCompletableSelector = (state: ReportState) => {
-  console.log("currentPageCompletableSelector");
   if (!state.report || !state.currentPageId) return false;
   return pageIsCompletable(state.report, state.currentPageId);
 };
@@ -48,7 +47,6 @@ export const submittableMetricsSelector = (state: ReportState) => {
     const pageIdx = pageMap.get(id);
     if (!pageIdx) return null;
     const section = report.pages[pageIdx] as ParentPageTemplate;
-    // TODO: fix to actually check status and readiness to submit
     const displayStatus = inferredReportStatus(report, section.id);
     let submittable = displayStatus === PageStatus.COMPLETE;
 
