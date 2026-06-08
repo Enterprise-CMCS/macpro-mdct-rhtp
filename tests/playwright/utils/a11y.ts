@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { a11yTags, a11yViewports } from "./consts";
 
 export async function checkPageAccessibility(page: Page) {
@@ -18,7 +18,7 @@ export async function checkAccessibilityAcrossViewports(
 
   for (const [device, viewport] of Object.entries(a11yViewports)) {
     await page.setViewportSize(viewport);
-    await page.locator("h1").first().waitFor({ state: "visible" });
+    await expect(page.locator("h1").first()).toBeVisible();
 
     const axeBuilder = new AxeBuilder({ page })
       .withTags(a11yTags)
