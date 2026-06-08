@@ -19,6 +19,7 @@ vi.mock("../apiLib", () => ({
 }));
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
+vi.spyOn(console, "log").mockImplementation(vi.fn()); // silence logs in test
 
 let originalFetch = window.fetch;
 
