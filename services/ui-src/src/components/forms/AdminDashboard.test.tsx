@@ -135,6 +135,20 @@ describe("<AdminDashboard />", () => {
     await userEvent.click(reportBtn[0]);
     expect(mockUseNavigate).toHaveBeenCalled();
   });
+
+  it("Can open and close comment modal", async () => {
+    const commentStatusButton = screen.getAllByRole("button", {
+      name: "Comment/Status",
+    })[0];
+    await userEvent.click(commentStatusButton);
+    expect(
+      screen.getByRole("heading", { name: /Add comment to/ })
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(
+      screen.queryByRole("heading", { name: /Add comment to/ })
+    ).not.toBeInTheDocument();
+  });
 });
 describe("Test A11y", () => {
   testA11yAct(
