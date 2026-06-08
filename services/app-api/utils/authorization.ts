@@ -61,3 +61,7 @@ export const canWriteComments = (user: User, state: StateAbbr) => {
 export const canReadInternalComments = (user: User) => {
   return adminRoles.includes(user.role);
 };
+
+export const canReadAnyReport = (user: User) => {
+  return statelessRoles.includes(user.role);
+};

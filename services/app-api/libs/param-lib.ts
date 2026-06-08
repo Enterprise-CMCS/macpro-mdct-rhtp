@@ -4,6 +4,17 @@ import { logger } from "./debug-lib";
 
 export const emptyParser = (_event: APIGatewayProxyEvent) => ({});
 
+export const parseReportType = (event: APIGatewayProxyEvent) => {
+  const { reportType } = event.pathParameters ?? {};
+
+  if (!isReportType(reportType)) {
+    logger.warn("Invalid report type in path");
+    return undefined;
+  }
+
+  return { reportType };
+};
+
 export const parseReportTypeAndState = (event: APIGatewayProxyEvent) => {
   const { reportType, state } = event.pathParameters ?? {};
 

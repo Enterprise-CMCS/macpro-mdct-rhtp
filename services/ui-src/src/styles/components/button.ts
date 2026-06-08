@@ -175,6 +175,14 @@ const sortVariant = {
   fontSize: "14px",
 };
 
+const tagVariant = {
+  background: "#E6F1F8",
+  border: "1px solid #0071BC",
+  borderRadius: "50px",
+  height: "30px",
+  fontSize: "14px",
+};
+
 const variants = {
   primary: primaryVariant,
   transparent: transparentVariant,
@@ -188,6 +196,7 @@ const variants = {
   danger: dangerVariant,
   return: returnVariant,
   sort: sortVariant,
+  tag: tagVariant,
 };
 
 const buttonTheme: ComponentStyleConfig = {

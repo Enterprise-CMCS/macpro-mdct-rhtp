@@ -11,8 +11,15 @@ const getTitle = (reportType: string) => {
 
 export const SubnavBar = ({ stateName, reportType }: Props) => {
   const { report, lastSavedTime } = useStore();
+  const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const saveStatusText = "Last saved " + lastSavedTime;
   const title = getTitle(reportType);
+
+  //different return route if user is an admin
+  const returnRoute =
+    userIsEndUser && !userIsAdmin
+      ? `/report/${report?.type}/${report?.state}`
+      : "/";
 
   return (
     <Flex sx={sx.subnavBar}>
@@ -34,7 +41,7 @@ export const SubnavBar = ({ stateName, reportType }: Props) => {
             )}
             <Link
               as={RouterLink}
-              to={`/report/${report?.type}/${report?.state}`}
+              to={returnRoute}
               sx={sx.leaveFormLink}
               variant="outlineButton"
             >

@@ -8,7 +8,7 @@ export const stateName = process.env.TEST_STATE_NAME || "District of Columbia";
 export const adminAuthPath: string = "playwright/.auth/admin.json";
 export const stateUserAuthPath: string = "playwright/.auth/user.json";
 
-export const expectedAdminHeading = "View State/Territory Reports";
+export const expectedAdminHeading = "Admin Dashboard";
 export const expectedStateUserHeading = "Rural Health Transformation Program";
 
 export const cognitoIdentityRoute = "https://cognito-identity.*.amazonaws.com/";

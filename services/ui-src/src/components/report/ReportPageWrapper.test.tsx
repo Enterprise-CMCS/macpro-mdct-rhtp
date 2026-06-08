@@ -1,70 +1,9 @@
 import { MockedFunction } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import {
-  ElementType,
-  PageType,
-  Report,
-  ReportStatus,
-  ReportType,
-  RhtpSubType,
-} from "@rhtp/shared";
 import { ReportPageWrapper } from "./ReportPageWrapper";
 import { useStore } from "utils";
-
-const testReport: Report = {
-  type: ReportType.RHTP,
-  created: 1776449695077,
-  subType: RhtpSubType.ANNUAL,
-  subTypeKey: "A1",
-  budgetPeriod: 1,
-  name: "plan id",
-  state: "NJ",
-  id: "NJGeneral123",
-  status: ReportStatus.NOT_STARTED,
-  submissionCount: 0,
-  pages: [
-    {
-      id: "root",
-      childPageIds: ["general-info", "mock-report-page"],
-    },
-    {
-      id: "general-info",
-      title: "General Information",
-      type: PageType.Standard,
-      sidebar: true,
-      elements: [
-        {
-          type: ElementType.Textbox,
-          id: "mock-textbox",
-          label: "Contact title",
-          required: true,
-          helperText:
-            "Enter person's title or a position title for CMS to contact with questions about this request.",
-        },
-        {
-          type: ElementType.Textbox,
-          id: "another-textbox",
-          required: true,
-          label: "Another textbox",
-        },
-      ],
-    },
-    {
-      id: "mock-report-page",
-      title: "Mock Report Page",
-      type: PageType.Standard,
-      sidebar: true,
-      elements: [
-        {
-          type: ElementType.Header,
-          id: "",
-          text: "Mock Report Page",
-        },
-      ],
-    },
-  ],
-};
+import { mockReport } from "utils/testing/mockForm";
 
 const mockUseParams = vi.fn();
 const mockNavigate = vi.fn();
@@ -75,7 +14,7 @@ vi.mock("react-router", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-const mockGetReport = vi.fn().mockResolvedValue(testReport);
+const mockGetReport = vi.fn().mockResolvedValue(mockReport);
 vi.mock("../../utils/api/requestMethods/report", () => ({
   getReport: () => mockGetReport(),
 }));
@@ -89,7 +28,7 @@ const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 const setupMockStore = (customState?: Partial<any>) => {
   mockedUseStore.mockImplementation((selector?) => {
     const mockState = {
-      report: testReport,
+      report: mockReport,
       pageMap: new Map([
         ["root", 0],
         ["general-info", 1],
