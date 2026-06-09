@@ -6,7 +6,6 @@ import {
   TableCheckpointTemplate,
   UploadListProp,
   AlertTypes,
-  InitiativeComment,
 } from "@rhtp/shared";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -52,7 +51,7 @@ type TableShape = {
     label: string;
     file: UploadListProp;
     status: AttachmentStatus;
-    comments: InitiativeComment[];
+    canDelete: boolean;
   }[];
 };
 
@@ -66,7 +65,7 @@ const buildRows = (
       | {
           file: UploadListProp;
           status: AttachmentStatus;
-          comments: InitiativeComment[];
+          canDelete: boolean;
         }[]
       | undefined;
   }[]
@@ -80,14 +79,14 @@ const buildRows = (
     };
     if (attachments) {
       const copy = [...attachments];
-      const { file, status, comments } = copy.shift() || {};
+      const { file, status, canDelete } = copy.shift() || {};
       prev.push({
         ...row,
         file: file ?? {},
         status: status ?? "",
-        comments: comments ?? [],
+        canDelete: canDelete ?? true,
       });
-      copy.forEach(({ file, status, comments }) =>
+      copy.forEach(({ file, status, canDelete }) =>
         prev.push({
           id,
           stageNo: "",
@@ -95,7 +94,7 @@ const buildRows = (
           completed: undefined,
           file,
           status,
-          comments,
+          canDelete,
         })
       );
     } else {
@@ -116,7 +115,7 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
         .map((upload) => ({
           file: upload.attachment,
           status: upload.status,
-          comments: upload.comments,
+          canDelete: upload.canDelete,
         }));
       return {
         label: checkpoint.label,
@@ -323,7 +322,7 @@ export const TableCheckpoint = (
       label: string;
       file: UploadListProp;
       status: AttachmentStatus;
-      comments: InitiativeComment[];
+      canDelete: boolean;
     }[]
   ) => {
     return rows.map((row) => {
@@ -379,7 +378,7 @@ export const TableCheckpoint = (
             }}
             aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
             disabled={
-              !canDeleteAttachment(row.status, row.comments) || disabled
+              !canDeleteAttachment(row.status, row.canDelete) || disabled
             }
           >
             <Image src={cancelIcon} alt="Remove" />

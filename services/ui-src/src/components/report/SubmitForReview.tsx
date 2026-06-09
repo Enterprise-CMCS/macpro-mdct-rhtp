@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { TextField } from "@cmsgov/design-system";
-import { AlertTypes, ReportComment } from "@rhtp/shared";
+import { AlertTypes, CommentType } from "@rhtp/shared";
 import { Alert } from "components/alerts/Alert";
 import { Modal } from "components/modals/Modal";
-import { putReport, useStore } from "utils";
+import { useStore } from "utils";
+import { createComment } from "utils/api/requestMethods/commentMethods";
 
 export const SubmitForReview = () => {
   const [displayValue, setDisplayValue] = useState("");
@@ -12,7 +13,7 @@ export const SubmitForReview = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittedForReview, setIsSubmittedForReview] = useState(false);
-  const { full_name, userIsEndUser } = useStore()?.user ?? {};
+  const { userIsEndUser } = useStore()?.user ?? {};
   const { report } = useStore();
 
   if (!report) {
@@ -32,20 +33,20 @@ export const SubmitForReview = () => {
     }
     setIsSubmitting(true);
 
-    const comment: ReportComment = {
-      name: full_name || "CMS State User",
-      date: new Date().toString(),
-      comment: displayValue,
-      isInternal: false,
-    };
-
-    if (report?.comments) {
-      report.comments.push(comment);
-    } else {
-      report.comments = [comment];
+    try {
+      await createComment(report.id, report.state, {
+        comment: displayValue,
+        type: CommentType.REPORT,
+      });
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      setErrorMessage(
+        "There was an error submitting your comment. Please try again."
+      );
+      setIsSubmitting(false);
+      return;
     }
 
-    await putReport(report);
     setDisplayValue("");
     setErrorMessage("");
     setIsSubmittedForReview(true);

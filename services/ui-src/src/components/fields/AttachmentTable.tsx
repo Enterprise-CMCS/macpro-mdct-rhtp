@@ -111,6 +111,7 @@ export const AttachmentTable = (
       checkpoint: "",
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
+      canDelete: true,
     }));
 
     const newValues = [...displayValue, ...formattedUploads];
@@ -146,16 +147,20 @@ export const AttachmentTable = (
       stage: getStageIdByCheckpointId(checkpoint),
       checkpoint,
       status: AttachmentStatus.PENDING_REVIEW,
-      comments:
-        displayValue.find((item) => item.attachment.fileId === upload.fileId)
-          ?.comments ?? [],
     }));
 
     const newValues = displayValue.map((item) => {
       const updatedItem = formattedUploadsToSave.find(
         (upload) => upload.attachment.fileId === item.attachment.fileId
       );
-      return updatedItem || item;
+      if (updatedItem) {
+        return {
+          ...item,
+          ...updatedItem,
+        };
+      } else {
+        return item;
+      }
     });
 
     props.updateElement({ answer: newValues });
@@ -268,7 +273,7 @@ export const AttachmentTable = (
             onClick={() => onDeleteClick(row)}
             aria-label={`Delete ${row.attachment.name}`}
             disabled={
-              !canDeleteAttachment(row.status, row.comments) || disabled
+              !canDeleteAttachment(row.status, row.canDelete) || disabled
             }
           >
             <Image src={cancelIcon} alt="Remove" minWidth="24px" />

@@ -122,3 +122,17 @@ export const parseFileUploadDownloadParameters = (
 
   return { state, reportType, id };
 };
+
+export const parseCommentPathParams = (event: APIGatewayProxyEvent) => {
+  const { contextId, state } = event.pathParameters ?? {};
+  if (!contextId) {
+    logger.warn("Missing contextId in path");
+    return undefined;
+  }
+  if (!isStateAbbr(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+
+  return { contextId, state };
+};

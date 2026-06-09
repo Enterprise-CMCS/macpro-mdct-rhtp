@@ -333,6 +333,22 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "createComment", {
+    entry: "services/app-api/handlers/comments/create.ts",
+    handler: "createComment",
+    path: "comments/{state}/{contextId}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getComments", {
+    entry: "services/app-api/handlers/comments/fetch.ts",
+    handler: "getComments",
+    path: "comments/{state}/{contextId}",
+    method: "GET",
+    ...commonProps,
+  });
+
   new LambdaDynamoEventSource(scope, "postKafkaData", {
     entry: "services/app-api/handlers/kafka/post/postKafkaData.ts",
     handler: "handler",

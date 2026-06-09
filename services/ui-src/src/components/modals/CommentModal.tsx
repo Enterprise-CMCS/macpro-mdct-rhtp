@@ -5,40 +5,41 @@ import {
   DropdownChangeObject,
   DropdownOption,
 } from "@cmsgov/design-system";
-import { Box, Divider, Heading, Text } from "@chakra-ui/react";
+import { Box, Divider, Heading, Text, Spinner } from "@chakra-ui/react";
 import { Modal } from "./Modal";
 import {
   InitiativeAnswerProp,
-  InitiativeComment,
   UploadListProp,
   AttachmentStatus,
   ReportStatus,
   UserRoles,
   FileStatusOptions,
+  CommentType,
+  Comment,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
+import {
+  createComment,
+  getComments,
+} from "utils/api/requestMethods/commentMethods";
 
-const PreviousComments = ({ comments }: { comments: InitiativeComment[] }) => {
-  const timeSortedComments = comments.toSorted(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-
+const PreviousComments = ({ comments }: { comments: Comment[] }) => {
   return (
     <Box marginTop={"spacer2"}>
       <Heading as={"h3"} fontWeight={"bold"}>
         Comments
       </Heading>
-      {timeSortedComments.map((comment, index) => (
+      {comments.map((comment, index) => (
         <Box marginTop={"spacer2"} key={`previous-comment-${index}`}>
-          <Text fontWeight={"heading_md"}>{comment.name}</Text>
+          <Text fontWeight={"heading_md"}>{comment.author}</Text>
           {comment.statusChange && (
             <Text fontWeight={"heading_md"}>
               Status changed to: {comment.statusChange}
             </Text>
           )}
           <Text fontSize={"body_sm"} color={"gray_dark"}>
-            {comment.date}
+            {new Date(comment.created).toLocaleString()}
           </Text>
           {comment.comment !== "" && (
             <TextField
@@ -62,13 +63,14 @@ export const CommentModal = ({
   updateElement,
   allFiles,
 }: Props) => {
-  const { full_name, userIsAdmin, userIsEndUser, userRole } =
-    useStore().user ?? {};
+  const { userIsAdmin, userIsEndUser, userRole } = useStore().user ?? {};
   const isStateUser = userRole === UserRoles.STATE_USER;
   const { report } = useStore();
-  const [pastComments, setPastComments] = useState<InitiativeComment[]>([]);
+  const [pastComments, setPastComments] = useState<Comment[]>([]);
   const [statusOptions, setStatusOptions] =
     useState<DropdownOption[]>(FileStatusOptions);
+  const [commentSubmitting, setCommentSubmitting] = useState<boolean>(false);
+  const [commentsLoading, setCommentsLoading] = useState<boolean>(false);
   const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
   const userCanAddComment =
     userIsEndUser || (userIsAdmin && adminCommentsEnabled);
@@ -92,6 +94,7 @@ export const CommentModal = ({
   const noErrorState = {
     comment: "",
     status: "",
+    overall: "",
   };
 
   const [displayValue, setDisplayValue] = useState(initialValues);
@@ -113,8 +116,29 @@ export const CommentModal = ({
     }
     setStatusOptions(statusOptions);
 
+    const fetchComments = async () => {
+      setCommentsLoading(true);
+      setPastComments([]);
+      try {
+        const comments = await getComments(
+          allFiles[selectedAttachmentIndex].attachment.fileId,
+          report?.state || ""
+        );
+        setPastComments(comments);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+        setErrorMessages({
+          ...errorMessages,
+          overall:
+            "There was an error fetching comments for this attachment. Please try again.",
+        });
+      } finally {
+        setCommentsLoading(false);
+      }
+    };
+
     if (selectedAttachmentIndex !== -1) {
-      setPastComments(allFiles[selectedAttachmentIndex].comments);
+      fetchComments();
     }
   }, [modalDisclosure.isOpen]);
 
@@ -128,8 +152,11 @@ export const CommentModal = ({
     }));
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    setCommentSubmitting(true);
+
     if (selectedAttachmentIndex === -1 || commentsDisabled) {
+      setCommentSubmitting(false);
       return modalDisclosure.onClose();
     }
 
@@ -141,12 +168,36 @@ export const CommentModal = ({
         ...errorMessages,
         comment: "A comment is required.",
       });
+      setCommentSubmitting(false);
       return;
     }
 
     // Comments are optional for admins
     if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
+      setCommentSubmitting(false);
       return modalDisclosure.onClose();
+    }
+
+    try {
+      await createComment(
+        allFiles[selectedAttachmentIndex].attachment.fileId,
+        report?.state || "",
+        {
+          comment: displayValue.comment,
+          type: CommentType.ATTACHMENT,
+          parentReportId: report?.id,
+          ...(didStatusChange && { statusChange: displayValue.status }),
+        }
+      );
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      setErrorMessages({
+        ...errorMessages,
+        overall:
+          "There was an error submitting your comment. Please try again.",
+      });
+      setCommentSubmitting(false);
+      return;
     }
 
     allFiles[selectedAttachmentIndex] = {
@@ -154,17 +205,11 @@ export const CommentModal = ({
       ...(didStatusChange && {
         status: displayValue.status as AttachmentStatus,
       }),
-      comments: [
-        ...allFiles[selectedAttachmentIndex].comments,
-        {
-          name: full_name || "CMS user",
-          date: new Date().toString(),
-          comment: displayValue.comment,
-          ...(didStatusChange && { statusChange: displayValue.status }),
-        },
-      ],
+      canDelete: false, // if a comment is added, the file can no longer be deleted
     };
     updateElement({ answer: allFiles });
+
+    setCommentSubmitting(false);
     modalDisclosure.onClose();
   };
 
@@ -186,7 +231,13 @@ export const CommentModal = ({
         actionButtonText: "Save",
       }}
       disableConfirm={commentsDisabled}
+      submitting={commentSubmitting}
     >
+      {errorMessages.overall && (
+        <Text fontSize="body_md" color="red" marginBottom={"spacer2"}>
+          {errorMessages.overall}
+        </Text>
+      )}
       <Dropdown
         label="Status"
         name="status"
@@ -214,6 +265,7 @@ export const CommentModal = ({
         errorMessage={errorMessages.comment}
       />
       <Divider marginTop={"spacer3"} borderColor={"black"} />
+      {commentsLoading ? <Spinner size="md" /> : null}
       {pastComments.length > 0 ? (
         <PreviousComments comments={pastComments} />
       ) : null}
