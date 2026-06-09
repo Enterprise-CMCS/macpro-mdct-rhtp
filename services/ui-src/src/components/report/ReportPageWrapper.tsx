@@ -17,7 +17,7 @@ import { currentPageSelector } from "utils/state/selectors";
 import nextArrowIcon from "assets/icons/arrows/icon_arrow_next_white.svg";
 import prevArrowIcon from "assets/icons/arrows/icon_arrow_prev_primary.svg";
 import { isReviewSubmitPage } from "types";
-import { PageElement, ReportStatus } from "@rhtp/shared";
+import { isCompleteStatus, PageElement } from "@rhtp/shared";
 import { ReportAutosaveContext } from "./ReportAutosaveProvider";
 import { SubmissionBar } from "./SubmissionBar";
 
@@ -80,8 +80,7 @@ export const ReportPageWrapper = () => {
   };
 
   const submittedView =
-    isReviewSubmitPage(currentPage) &&
-    report?.status === ReportStatus.SUBMITTED;
+    isReviewSubmitPage(currentPage) && isCompleteStatus(report?.status);
   const renderedElements = submittedView
     ? currentPage.submittedView
     : currentPage.elements;

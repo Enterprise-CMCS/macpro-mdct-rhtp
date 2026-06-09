@@ -2,7 +2,7 @@ import { MockedFunction } from "vitest";
 import { CommentModal, ReportCommentModal } from "./CommentModal";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { testA11y } from "utils/testing/commonTests";
+import { testA11yAct } from "utils/testing/commonTests";
 import {
   AttachmentStatus,
   InitiativeAnswerProp,
@@ -323,7 +323,7 @@ describe("CommentModal component", () => {
     });
   });
 
-  testA11y(CommentModalComponent());
+  testA11yAct(CommentModalComponent());
 });
 
 const mockReloadReports = vi.fn();
@@ -396,5 +396,5 @@ describe("ReportCommentModal component", () => {
     });
   });
 
-  testA11y(CommentModalComponent());
+  testA11yAct(CommentModalComponent());
 });

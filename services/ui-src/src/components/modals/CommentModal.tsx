@@ -18,6 +18,7 @@ import {
   ReportType,
   CommentType,
   Comment,
+  isCompleteStatus,
 } from "@rhtp/shared";
 import { acceptReport, releaseReport, useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
@@ -37,9 +38,9 @@ export const ReportCommentModal = ({
   selectedReport,
   reloadReports,
 }: ReportCommentProps) => {
-  if (!selectedReport) return;
   const { name, status } = selectedReport;
   const { userIsAdmin } = useStore().user ?? {};
+  // Can only modify dropdown if report is submitted and is admin user
   const disabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
   const initialValues: {
     comment: string;
@@ -119,8 +120,8 @@ interface ReportCommentProps {
     isOpen: boolean;
     onClose: () => void;
   };
+  selectedReport: Report;
   reloadReports: Function;
-  selectedReport?: Report;
 }
 
 const PreviousComments = ({ comments }: { comments: Comment[] }) => {
@@ -174,7 +175,7 @@ export const CommentModal = ({
   const userCanAddComment =
     userIsEndUser || (userIsAdmin && adminCommentsEnabled);
   const commentsDisabled =
-    report?.status === ReportStatus.SUBMITTED || !userCanAddComment;
+    isCompleteStatus(report?.status) || !userCanAddComment;
   const commentsOptional = userIsAdmin;
   const fileName = selectedFile?.name || "attachment";
   const selectedAttachmentIndex = allFiles.findIndex(

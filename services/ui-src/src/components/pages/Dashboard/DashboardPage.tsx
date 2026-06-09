@@ -5,8 +5,8 @@ import {
   isStateAbbr,
   isReportType,
   LiteReport,
-  ReportStatus,
   BannerArea,
+  isCompleteStatus,
 } from "@rhtp/shared";
 import { getReportName } from "types";
 import {
@@ -51,8 +51,8 @@ export const DashboardPage = () => {
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
   const reportName = getReportName(reportType);
   const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
-  const hasSubmittedReport = reports.some(
-    (report) => report.status === ReportStatus.SUBMITTED
+  const hasSubmittedReport = reports.some((report) =>
+    isCompleteStatus(report.status)
   );
 
   useEffect(() => {
@@ -76,8 +76,8 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     const noReports = reports.length === 0;
-    const allSubmittedReports = reports.every(
-      (report) => report.status === ReportStatus.SUBMITTED
+    const allSubmittedReports = reports.every((report) =>
+      isCompleteStatus(report.status)
     );
     setCanCreateReport(noReports || allSubmittedReports);
   }, [reports]);

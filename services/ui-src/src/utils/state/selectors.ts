@@ -1,8 +1,8 @@
 import {
   BannerArea,
+  isCompleteStatus,
   PageStatus,
   ParentPageTemplate,
-  ReportStatus,
 } from "@rhtp/shared";
 import { BannerState, ReportState } from "types";
 import { pageIsCompletable } from "./reportLogic/completeness";
@@ -58,8 +58,7 @@ export const submittableMetricsSelector = (state: ReportState) => {
   const allPagesSubmittable = sections.every(
     (sectionInfo) => !!sectionInfo?.submittable
   );
-  const submittable =
-    report.status !== ReportStatus.SUBMITTED && allPagesSubmittable;
+  const submittable = !isCompleteStatus(report.status) && allPagesSubmittable;
 
   return { sections: sections, submittable: submittable };
 };

@@ -8,7 +8,7 @@ import {
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-  ReportStatus,
+  isCompleteStatus,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
@@ -74,7 +74,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
-  const reportSubmitted = report?.status === ReportStatus.SUBMITTED;
+  const actionsDisabled = isCompleteStatus(report?.status);
   const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
@@ -170,7 +170,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           alignSelf="flex-start"
           leftIcon={
             <Image
-              src={reportSubmitted ? addGray : addPrimary}
+              src={actionsDisabled ? addGray : addPrimary}
               alt="Add icon"
             />
           }
@@ -178,7 +178,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
             setModalOpen(true);
             setModalData({ data: initial, index: undefined });
           }}
-          disabled={reportSubmitted}
+          disabled={actionsDisabled}
         >
           Add {label}
         </Button>
@@ -194,7 +194,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
             setModalOpen(false);
           },
         }}
-        disabled={reportSubmitted}
+        disabled={actionsDisabled}
       />
     </Flex>
   );

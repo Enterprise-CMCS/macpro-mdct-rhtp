@@ -298,14 +298,16 @@ export const AdminDashboard = () => {
           )
         )}
       </Stack>
-      <ReportCommentModal
-        modalDisclosure={{
-          isOpen: commentModalOpen,
-          onClose: closeCommentsModal,
-        }}
-        selectedReport={selectedReport}
-        reloadReports={reloadReports}
-      />
+      {selectedReport && (
+        <ReportCommentModal
+          modalDisclosure={{
+            isOpen: commentModalOpen,
+            onClose: closeCommentsModal,
+          }}
+          selectedReport={selectedReport}
+          reloadReports={reloadReports}
+        />
+      )}
     </PageTemplate>
   );
 };

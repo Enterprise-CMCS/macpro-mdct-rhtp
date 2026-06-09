@@ -9,7 +9,7 @@ import {
   DividerElement,
 } from "./Elements";
 import { assertExhaustive } from "types";
-import { ElementType, PageElement, ReportStatus } from "@rhtp/shared";
+import { ElementType, isCompleteStatus, PageElement } from "@rhtp/shared";
 import {
   DateField,
   DropdownField,
@@ -43,8 +43,7 @@ export const Page = ({ id, setElements, elements }: Props) => {
   const { report } = useStore();
 
   const buildElement = (element: PageElement, index: number) => {
-    const disabled =
-      !userIsEndUser || report?.status === ReportStatus.SUBMITTED;
+    const disabled = !userIsEndUser || isCompleteStatus(report?.status);
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([
         ...elements.slice(0, index),

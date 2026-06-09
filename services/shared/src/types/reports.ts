@@ -52,6 +52,15 @@ export enum ReportStatus {
   ACCEPTED = "Accepted",
 }
 
+export const CompletedReportStatuses = [
+  ReportStatus.SUBMITTED,
+  ReportStatus.ACCEPTED,
+];
+
+export const isCompleteStatus = (status: ReportStatus | undefined) => {
+  return status && CompletedReportStatuses.includes(status);
+};
+
 export enum AlertTypes {
   ERROR = "error",
   INFO = "info",

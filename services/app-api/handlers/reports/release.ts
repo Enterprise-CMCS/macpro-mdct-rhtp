@@ -18,7 +18,7 @@ export const releaseReport = handler(parseReportParameters, async (request) => {
 
   const report = await getReport(reportType, state, id);
 
-  // Report is not locked.
+  // Can only unlock from submitted status
   if (report?.status !== ReportStatus.SUBMITTED) {
     return ok(report);
   }
