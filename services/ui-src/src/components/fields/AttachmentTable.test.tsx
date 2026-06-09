@@ -56,7 +56,7 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
       stage: "stage-1",
       checkpoint: "project-prop-2",
       status: AttachmentStatus.PENDING_REVIEW,
-      comments: [],
+      canDelete: true,
     },
     {
       attachment: {
@@ -68,7 +68,7 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
       stage: "stage-2",
       checkpoint: "early-implementation-1",
       status: AttachmentStatus.LOCKED_FOR_SCORING,
-      comments: [],
+      canDelete: false,
     },
   ],
 };

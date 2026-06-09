@@ -19,6 +19,7 @@ import {
   CreateInitiativeOptions,
   UpdateInitiativeOptions,
   RhtpSubType,
+  Comment,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -398,14 +399,7 @@ const attachmentTableSchema = object().shape({
         stage: string().notRequired(),
         checkpoint: string().notRequired(),
         status: string().required(),
-        comments: array().of(
-          object().shape({
-            name: string().required(),
-            date: string().required(),
-            comment: string().notRequired(),
-            statusChange: string().notRequired(),
-          })
-        ),
+        canDelete: boolean().notRequired(),
       })
     )
     .notRequired(),
@@ -546,11 +540,17 @@ export const isUpdateInitiativeBody = (
   });
 };
 
-const reportCommentSchema = object().shape({
-  name: string().required(),
-  date: string().required(),
-  comment: string().required(),
+const commentSchema = object().shape({
+  contextId: string().required(),
+  created: number().required(),
+  id: string().required(),
+  author: string().required(),
+  authorEmail: string().required(),
   isInternal: boolean().required(),
+  type: string().required(),
+  comment: string().notRequired(),
+  statusChange: string().notRequired(),
+  parentReportId: string().notRequired(),
 });
 
 const reportValidateSchema = object().shape({
@@ -578,7 +578,6 @@ const reportValidateSchema = object().shape({
   subTypeKey: string().required(),
   budgetPeriod: number().min(0).max(5).required(),
   submissionCount: number().required(),
-  comments: array().of(reportCommentSchema).notRequired(),
   pages: pagesSchema,
 });
 
@@ -591,4 +590,15 @@ export const validateReportPayload = async (payload: object | undefined) => {
   });
 
   return validatedPayload as Report;
+};
+
+export const validateCommentPayload = async (payload: object | undefined) => {
+  if (!payload) {
+    throw new Error(error.MISSING_DATA);
+  }
+  const validatedPayload = await commentSchema.validate(payload, {
+    stripUnknown: true,
+  });
+
+  return validatedPayload as Comment;
 };

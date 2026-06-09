@@ -1,12 +1,7 @@
 import { Mock, MockedFunction } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { DashboardPage } from "components";
-import {
-  RouterWrappedComponent,
-  mockUseAdminStore,
-  mockUseReadOnlyUserStore,
-  mockUseStore,
-} from "utils/testing/setupTest";
+import { RouterWrappedComponent, mockUseStore } from "utils/testing/setupTest";
 import { useStore } from "utils";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Report } from "@rhtp/shared";
@@ -183,68 +178,5 @@ describe("DashboardPage with state user", () => {
     await userEvent.click(reportModalButton);
 
     expect(screen.getByText("Add New RHTP Report")).toBeInTheDocument();
-  });
-});
-
-describe("DashboardPage with Read only user", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockedUseStore.mockReturnValue(mockUseReadOnlyUserStore);
-    mockGetReportsForState.mockResolvedValue(mockReportsInDatabase);
-  });
-  test("should not render the Start Report button when user is read only", async () => {
-    render(dashboardComponent);
-    await waitFor(() => {
-      expect(getReportsForState).toHaveBeenCalled();
-      expect(screen.getByText("Mock Report Name")).toBeInTheDocument();
-    });
-
-    const startReportButton = screen.queryByRole("button", {
-      name: "Start RHTP",
-    });
-    expect(startReportButton).not.toBeInTheDocument();
-  });
-});
-
-describe("DashboardPage with Admin user", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockedUseStore.mockReturnValue(mockUseAdminStore);
-    mockGetReportsForState.mockResolvedValue(mockReportsInDatabase);
-  });
-  test("should render the Start Report button for admin users at start of report", async () => {
-    render(dashboardComponent);
-    await waitFor(() => {
-      expect(getReportsForState).toHaveBeenCalled();
-      expect(screen.getByText("Mock Report Name")).toBeInTheDocument();
-    });
-
-    const startReportButton = screen.queryByRole("button", {
-      name: "Start RHTP",
-    });
-    expect(startReportButton).not.toBeInTheDocument();
-  });
-
-  test("should render an empty state when there are no reports", async () => {
-    (getReportsForState as Mock).mockResolvedValue([]);
-
-    render(dashboardComponent);
-    await waitFor(() => {
-      expect(getReportsForState).toHaveBeenCalled();
-    });
-
-    expect(
-      screen.getByRole("heading", {
-        name: "Colorado RHTP",
-      })
-    ).toBeVisible();
-    expect(
-      screen.getByText(
-        "Once a state or territory begins a RHTP Report, you will be able to view it here.",
-        {
-          exact: false,
-        }
-      )
-    ).toBeVisible();
   });
 });

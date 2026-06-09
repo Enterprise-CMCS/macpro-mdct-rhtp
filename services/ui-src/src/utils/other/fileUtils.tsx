@@ -20,7 +20,6 @@ import {
   ReportType,
   UploadListProp,
   AttachmentStatus,
-  InitiativeComment,
   Report,
 } from "@rhtp/shared";
 
@@ -92,10 +91,9 @@ export const canEditAttachment = (status: AttachmentStatus): boolean => {
 
 export const canDeleteAttachment = (
   status: AttachmentStatus,
-  comments: InitiativeComment[]
+  canDelete: boolean
 ): boolean => {
-  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
-    return true;
+  if (status === AttachmentStatus.PENDING_REVIEW && canDelete) return true;
 
   return false;
 };

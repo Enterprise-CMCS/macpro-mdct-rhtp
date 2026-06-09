@@ -1,11 +1,13 @@
 import { MockedFunction } from "vitest";
-import { render, screen } from "@testing-library/react";
 import { CommentModal, ReportCommentModal } from "./CommentModal";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { testA11y } from "utils/testing/commonTests";
 import {
   AttachmentStatus,
   InitiativeAnswerProp,
+  Comment,
+  CommentType,
   ReportStatus,
 } from "@rhtp/shared";
 import { acceptReport, releaseReport, useStore } from "utils";
@@ -16,6 +18,37 @@ import {
 } from "utils/testing/setupTest";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { mockReport } from "utils/testing/mockForm";
+
+const mockGetComments = vi.fn().mockResolvedValue([
+  {
+    contextId: "mockContextId",
+    created: 123456,
+    id: "mockId",
+    author: "Mock Author",
+    authorEmail: "mockEmail",
+    isInternal: false,
+    comment: "Mock comment",
+    type: CommentType.ATTACHMENT,
+    parentReportId: "mockReportId",
+  } as Comment,
+]);
+
+const mockCreateComment = vi.fn().mockResolvedValue({
+  contextId: "mockContextId",
+  created: 123456,
+  id: "mockId",
+  author: "Mock Author",
+  authorEmail: "mockEmail",
+  isInternal: false,
+  comment: "Mock comment",
+} as Comment);
+
+vi.mock("utils/api/requestMethods/commentMethods", () => ({
+  getComments: (contextId: string, state: string) =>
+    mockGetComments(contextId, state),
+  createComment: (contextId: string, state: string, bodyParams: any) =>
+    mockCreateComment(contextId, state, bodyParams),
+}));
 
 vi.mock("utils/state/useStore");
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
@@ -46,7 +79,7 @@ const mockAllFiles = [
     attachment: mockSelectedFile,
     initiatives: ["test 1", "test 2"],
     status: AttachmentStatus.PENDING_REVIEW,
-    comments: [],
+    canDelete: true,
   },
 ];
 
@@ -76,11 +109,17 @@ const CommentModalComponent = (
   );
 };
 
+const renderCommentModal = async () => {
+  render(CommentModalComponent());
+  await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
+};
+
 describe("CommentModal component", () => {
   describe("with no comments", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       vi.clearAllMocks();
-      render(CommentModalComponent());
+      mockGetComments.mockResolvedValueOnce([]);
+      await renderCommentModal();
     });
 
     test("shows the contents", () => {
@@ -102,52 +141,53 @@ describe("CommentModal component", () => {
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Save"));
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
-      expect(mockUpdateElement).toHaveBeenCalledWith(
-        expect.objectContaining({
-          answer: expect.arrayContaining([
-            expect.objectContaining({
-              comments: [
-                expect.objectContaining({
-                  name: mockUseStore.user?.full_name,
-                  comment: "Test comment",
-                }),
-              ],
-            }),
-          ]),
-        })
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockSelectedFile.fileId,
+        "PA",
+        {
+          comment: "Test comment",
+          type: "attachment",
+          parentReportId: mockUseStore.report?.id,
+        }
       );
     });
   });
 
   describe("with previous comments", () => {
-    const mockPreviousCommentsInFile = [
-      {
-        attachment: mockSelectedFile,
-        initiatives: ["test 1", "test 2"],
-        status: AttachmentStatus.PENDING_REVIEW,
-        comments: [
-          {
-            name: "CMS User",
-            date: "Thu Jan 1 2026 00:00:00 GMT-0400 (Eastern Daylight Time)",
-            comment: "First comment from cms user",
-          },
-          {
-            name: "CMS User",
-            date: "Thu Feb 5 2026 00:00:00 GMT-0400 (Eastern Daylight Time)",
-            comment: "Second comment from cms user",
-          },
-          {
-            name: "CMS User",
-            date: "Thu Feb 12 2026 00:00:00 GMT-0400 (Eastern Daylight Time)",
-            comment: "",
-            statusChange: AttachmentStatus.PENDING_REVIEW,
-          },
-        ],
-      },
-    ];
-    beforeEach(() => {
+    beforeEach(async () => {
       vi.clearAllMocks();
-      render(CommentModalComponent(mockPreviousCommentsInFile));
+      mockGetComments.mockResolvedValueOnce([
+        {
+          contextId: "mockContextId",
+          created: 123456,
+          id: "mockId",
+          author: "CMS User",
+          authorEmail: "mockEmail",
+          isInternal: false,
+          comment: "",
+          statusChange: AttachmentStatus.PENDING_REVIEW,
+        },
+        {
+          contextId: "mockContextId",
+          created: 123456,
+          id: "mockId",
+          author: "CMS User",
+          authorEmail: "mockEmail",
+          isInternal: false,
+          comment: "Second comment from cms user",
+        },
+        {
+          contextId: "mockContextId",
+          created: 123456,
+          id: "mockId",
+          author: "CMS User",
+          authorEmail: "mockEmail",
+          isInternal: false,
+          comment: "First comment from cms user",
+        },
+      ] as Comment[]);
+
+      await renderCommentModal();
     });
 
     test("Shows previous comments and status changes", async () => {
@@ -167,16 +207,16 @@ describe("CommentModal component", () => {
       vi.clearAllMocks();
     });
 
-    test("state user can edit comment box always", () => {
+    test("state user can edit comment box always", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      render(CommentModalComponent());
+      await renderCommentModal();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
     });
 
     test("state user must leave a comment to submit", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      render(CommentModalComponent());
+      await renderCommentModal();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
       await userEvent.click(screen.getByText("Save"));
@@ -185,7 +225,7 @@ describe("CommentModal component", () => {
 
     test("state user can edit attachment status to certain options", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      render(CommentModalComponent());
+      await renderCommentModal();
       const statusButton = screen.getAllByLabelText("Status")[1];
       await userEvent.click(statusButton);
       expect(
@@ -203,42 +243,44 @@ describe("CommentModal component", () => {
       expect(screen.getByRole("option", { name: "Archived" })).toBeVisible();
     });
 
-    test("admin user can edit when flag true", () => {
+    test("admin user can edit when flag true", async () => {
       mockFlags.mockReturnValue({
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      render(CommentModalComponent());
+      await renderCommentModal();
       const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeEnabled();
     });
 
-    test("admin user cannot edit when flag false", () => {
+    test("admin user cannot edit when flag false", async () => {
       mockFlags.mockReturnValue({
         adminCommentsEnabled: false,
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      render(CommentModalComponent());
+      await renderCommentModal();
+      await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
       const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeDisabled();
     });
 
-    test("other users can never edit", () => {
+    test("other users can never edit", async () => {
       mockFlags.mockReturnValue({
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
-      render(CommentModalComponent());
+      await renderCommentModal();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
     });
 
-    test("cannot add comments when disabled", () => {
+    test("cannot add comments when disabled", async () => {
       mockFlags.mockReturnValue({
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockUseStore); // state user
       render(CommentModalComponent(mockAllFiles, true)); // set disabled true
+      await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
     });
@@ -247,8 +289,11 @@ describe("CommentModal component", () => {
       mockFlags.mockReturnValue({
         adminCommentsEnabled: true,
       });
-      mockedUseStore.mockReturnValue(mockAdminUserStore);
-      render(CommentModalComponent());
+      mockedUseStore.mockReturnValue({
+        ...mockUseStore,
+        ...mockAdminUserStore,
+      });
+      await renderCommentModal();
       const statusButton = screen.getAllByLabelText("Status")[1];
       await userEvent.click(statusButton);
       await userEvent.click(
@@ -256,17 +301,20 @@ describe("CommentModal component", () => {
       );
       await userEvent.click(screen.getByText("Save"));
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockSelectedFile.fileId,
+        "PA",
+        {
+          comment: "",
+          type: "attachment",
+          parentReportId: mockUseStore.report?.id,
+          statusChange: AttachmentStatus.NEEDS_REVISION,
+        }
+      );
       expect(mockUpdateElement).toHaveBeenCalledWith(
         expect.objectContaining({
           answer: expect.arrayContaining([
             expect.objectContaining({
-              comments: expect.arrayContaining([
-                expect.objectContaining({
-                  name: mockAdminUserStore.user?.full_name,
-                  comment: "",
-                  statusChange: AttachmentStatus.NEEDS_REVISION,
-                }),
-              ]),
               status: AttachmentStatus.NEEDS_REVISION,
             }),
           ]),

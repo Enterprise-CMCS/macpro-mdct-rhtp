@@ -66,11 +66,22 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
-export type ReportComment = {
-  name: string;
-  date: string;
-  comment: string;
+export enum CommentType {
+  REPORT = "report",
+  ATTACHMENT = "attachment",
+}
+
+export type Comment = {
+  contextId: string;
+  created: number;
+  id: string;
+  author: string;
+  authorEmail: string;
   isInternal: boolean;
+  type: CommentType;
+  parentReportId?: string;
+  comment?: string;
+  statusChange?: AttachmentStatus;
 };
 
 export interface Report extends ReportOptions {
@@ -87,7 +98,6 @@ export interface Report extends ReportOptions {
   submittedByEmail?: string;
   status: ReportStatus;
   submissionCount: number;
-  comments?: ReportComment[];
 }
 
 export type LiteReport = Omit<Report, "pages">;
@@ -389,13 +399,6 @@ export type UseOfFundsTableTemplate = {
   answer?: UseOfFundsTableItem[];
 };
 
-export type InitiativeComment = {
-  name: string;
-  date: string;
-  comment?: string;
-  statusChange?: AttachmentStatus;
-};
-
 export enum AttachmentStatus {
   PENDING_REVIEW = "Pending Review", // State driven
   NEEDS_REVISION = "Needs Revision", // CMS driven
@@ -416,7 +419,7 @@ export type InitiativeAnswerProp = {
   stage?: string;
   checkpoint?: string;
   status: AttachmentStatus;
-  comments: InitiativeComment[];
+  canDelete: boolean;
 };
 
 export type AttachmentTableTemplate = {

@@ -14,7 +14,6 @@ import {
   DashboardTable,
   CreateReportModal,
   AccordionItem,
-  UnlockModal,
   Banner,
 } from "components";
 import {
@@ -38,7 +37,6 @@ import { activeBannerSelector } from "utils/state/selectors";
 import { budgetPeriodFilterOptions } from "./../../../constants";
 
 export const DashboardPage = () => {
-  const { userIsEndUser, userIsAdmin } = useStore().user ?? {};
   const { reportType, state } = useParams();
   const banner = useStore(activeBannerSelector(reportType as BannerArea));
   const [isLoading, setIsLoading] = useState(true);
@@ -100,12 +98,6 @@ export const DashboardPage = () => {
     onClose: createReportModalOnCloseHandler,
   } = useDisclosure();
 
-  const {
-    isOpen: unlockModalIsOpen,
-    onOpen: unlockModalOnOpenHandler,
-    onClose: unlockModalOnCloseHandler,
-  } = useDisclosure();
-
   const handleBudgetPeriodChange = (evt: { target: { value: string } }) => {
     setDropdownValue(evt.target.value);
   };
@@ -139,65 +131,41 @@ export const DashboardPage = () => {
           defaultIndex={[-1]} // sets the accordion to closed by default
         >
           <AccordionItem label="Instructions" sx={sx.accordionItem}>
-            {userIsAdmin ? (
-              <Box sx={sx.accordionPanel}>
-                <Heading fontSize="heading_md" fontWeight="heading_md">
-                  Admin Instructions
-                </Heading>
-                <ul>
-                  <li>
-                    To view a state or territory’s submission, use “View”.
-                  </li>
-                  <li>
-                    To allow a state or territory to make corrections or edits
-                    to a submission use “Unlock” to release the submission. The
-                    status will change to “In revision”.
-                  </li>
-                  <li>
-                    Submission count is shown in the # column. Submissions
-                    started and submitted once have a count of 1. When a state
-                    or territory resubmits a previous submission, the count
-                    increases by 1.
-                  </li>
-                </ul>
-              </Box>
-            ) : (
-              <Box sx={sx.accordionPanel}>
-                <p>
-                  <strong>Creating a New Report</strong>
-                </p>
-                <p>
-                  Click the <b>“Start {reportName}”</b> button to begin creating
-                  your report. A series of questions will appear to gather the
-                  necessary information for your report. Fill out each field
-                  accurately to ensure your report is complete. Before
-                  submitting, review the information you’ve provided. If
-                  everything looks good, confirm your entries and proceed.
-                </p>
-                <p>
-                  <strong>Understanding Report Statuses</strong>
-                </p>
-                <ul>
-                  <li>
-                    <strong>Not started:</strong> The report has been created
-                    but no data has been entered or actions taken.
-                  </li>
-                  <li>
-                    <strong>In progress:</strong> The report is actively being
-                    worked on, with some or all data entered.
-                  </li>
-                  <li>
-                    <strong>Submitted:</strong> The report has been completed
-                    and submitted to CMS for review.
-                  </li>
-                  <li>
-                    <strong>In revision:</strong> The report has been sent back
-                    to the state for revisions or additional information after
-                    submission.
-                  </li>
-                </ul>
-              </Box>
-            )}
+            <Box sx={sx.accordionPanel}>
+              <p>
+                <strong>Creating a New Report</strong>
+              </p>
+              <p>
+                Click the <b>“Start {reportName}”</b> button to begin creating
+                your report. A series of questions will appear to gather the
+                necessary information for your report. Fill out each field
+                accurately to ensure your report is complete. Before submitting,
+                review the information you’ve provided. If everything looks
+                good, confirm your entries and proceed.
+              </p>
+              <p>
+                <strong>Understanding Report Statuses</strong>
+              </p>
+              <ul>
+                <li>
+                  <strong>Not started:</strong> The report has been created but
+                  no data has been entered or actions taken.
+                </li>
+                <li>
+                  <strong>In progress:</strong> The report is actively being
+                  worked on, with some or all data entered.
+                </li>
+                <li>
+                  <strong>Submitted:</strong> The report has been completed and
+                  submitted to CMS for review.
+                </li>
+                <li>
+                  <strong>In revision:</strong> The report has been sent back to
+                  the state for revisions or additional information after
+                  submission.
+                </li>
+              </ul>
+            </Box>
           </AccordionItem>
         </Accordion>
       </Box>
@@ -214,42 +182,29 @@ export const DashboardPage = () => {
             Filter
           </Button>
         </Flex>
-        {!isLoading && (
-          <DashboardTable
-            reports={filteredReports}
-            unlockModalOnOpenHandler={unlockModalOnOpenHandler}
-          />
-        )}
+        {!isLoading && <DashboardTable reports={filteredReports} />}
         {isLoading && (
           <Flex justify="center">
             <Spinner size="md" />
           </Flex>
         )}
-        {reports.length === 0 &&
-          (userIsAdmin ? (
-            <Text variant="tableEmpty">
-              Once a state or territory begins a {reportName} Report, you will
-              be able to view it here.
-            </Text>
-          ) : (
-            <Text variant="tableEmpty">
-              Keep track of your {reportName}s, once you start a report you can
-              access it here.
-            </Text>
-          ))}
-        {userIsEndUser && (
-          <Flex justifyContent="center">
-            <Button
-              onClick={createReportModalOnOpenHandler}
-              type="submit"
-              disabled={!canCreateReport}
-            >
-              {hasSubmittedReport
-                ? `Copy ${reportName} Submission`
-                : `Start ${reportName} Report`}
-            </Button>
-          </Flex>
+        {reports.length === 0 && (
+          <Text variant="tableEmpty">
+            Keep track of your {reportName}s, once you start a report you can
+            access it here.
+          </Text>
         )}
+        <Flex justifyContent="center">
+          <Button
+            onClick={createReportModalOnOpenHandler}
+            type="submit"
+            disabled={!canCreateReport}
+          >
+            {hasSubmittedReport
+              ? `Copy ${reportName} Submission`
+              : `Start ${reportName} Report`}
+          </Button>
+        </Flex>
       </Flex>
       <CreateReportModal
         activeState={state!}
@@ -260,12 +215,6 @@ export const DashboardPage = () => {
         }}
         reportHandler={reloadReports}
       />
-      <UnlockModal
-        modalDisclosure={{
-          isOpen: unlockModalIsOpen,
-          onClose: unlockModalOnCloseHandler,
-        }}
-      ></UnlockModal>
     </PageTemplate>
   );
 };
