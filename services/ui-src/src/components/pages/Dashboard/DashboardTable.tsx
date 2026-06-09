@@ -8,36 +8,23 @@ import {
   Text,
   Divider,
   HStack,
-  Spinner,
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
 import { LiteReport, ReportStatus } from "@rhtp/shared";
-import {
-  formatMonthDayYear,
-  releaseReport,
-  reportBasePath,
-  useStore,
-} from "utils";
-import { useState, Fragment } from "react";
+import { formatMonthDayYear, reportBasePath, useStore } from "utils";
+import { Fragment } from "react";
 
 interface DashboardTableProps {
   reports: LiteReport[];
-  unlockModalOnOpenHandler: () => void;
 }
 
-interface TableProps extends Omit<
-  DashboardTableProps,
-  "unlockModalOnOpenHandler"
-> {
+interface TableProps extends DashboardTableProps {
   tableContent: { caption: string; headRow: string[] };
   showReportSubmissionsColumn: boolean | undefined;
   showAdminControlsColumn: boolean | undefined;
   navigate: NavigateFunction;
   userIsEndUser: boolean | undefined;
-  toggleRelease: (rowIndex: number) => void;
-  /** Used to store the unlock index of the table row */
-  unlocking: number | undefined;
 }
 
 export const getStatus = (report: LiteReport) => {
@@ -53,7 +40,7 @@ export const getStatus = (report: LiteReport) => {
 export const HorizontalTable = (props: TableProps) => {
   return (
     <Table content={props.tableContent}>
-      {props.reports.map((report, idx) => (
+      {props.reports.map((report) => (
         <Tr key={report.id}>
           <Td
             fontWeight={"bold"}
@@ -87,26 +74,6 @@ export const HorizontalTable = (props: TableProps) => {
                 : "View"}
             </Button>
           </Td>
-          {props.showAdminControlsColumn && (
-            <>
-              <td>
-                <Button
-                  variant="link"
-                  fontSize="body_sm"
-                  onClick={async () => await props.toggleRelease(idx)}
-                  disabled={
-                    report.status !== ReportStatus.SUBMITTED ||
-                    props.unlocking === idx
-                  }
-                >
-                  {props.unlocking === idx && (
-                    <Spinner size="sm" marginRight="spacer_half" />
-                  )}
-                  Unlock
-                </Button>
-              </td>
-            </>
-          )}
         </Tr>
       ))}
     </Table>
@@ -160,25 +127,6 @@ export const VerticalTable = (props: TableProps) => {
                 ? "Edit"
                 : "View"}
             </Button>
-            {props.showAdminControlsColumn && (
-              <>
-                <td>
-                  <Button
-                    variant="link"
-                    onClick={async () => await props.toggleRelease(idx)}
-                    disabled={
-                      report.status !== ReportStatus.SUBMITTED ||
-                      props.unlocking === idx
-                    }
-                  >
-                    {props.unlocking === idx && (
-                      <Spinner size="sm" marginRight="spacer_half" />
-                    )}
-                    Unlock
-                  </Button>
-                </td>
-              </>
-            )}
           </HStack>
           <Divider></Divider>
         </Fragment>
@@ -187,13 +135,9 @@ export const VerticalTable = (props: TableProps) => {
   );
 };
 
-export const DashboardTable = ({
-  reports,
-  unlockModalOnOpenHandler,
-}: DashboardTableProps) => {
+export const DashboardTable = ({ reports }: DashboardTableProps) => {
   const navigate = useNavigate();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
-  const [unlocking, setUnlocking] = useState<number>();
 
   // Translate role to defined behaviors
   const showReportSubmissionsColumn = userIsAdmin;
@@ -209,16 +153,6 @@ export const DashboardTable = ({
     headRow: headers,
   };
 
-  const toggleRelease = async (idx: number) => {
-    setUnlocking(idx);
-    const report = reports[idx];
-    await releaseReport(report);
-    unlockModalOnOpenHandler();
-    report.status = ReportStatus.IN_PROGRESS;
-    reports[idx] = report;
-    setUnlocking(undefined);
-  };
-
   return (
     <>
       <Hide below="sm">
@@ -229,8 +163,6 @@ export const DashboardTable = ({
           showAdminControlsColumn,
           navigate,
           userIsEndUser,
-          toggleRelease,
-          unlocking,
         })}
       </Hide>
       <Show below="sm">
@@ -241,8 +173,6 @@ export const DashboardTable = ({
           showAdminControlsColumn,
           navigate,
           userIsEndUser,
-          toggleRelease,
-          unlocking,
         })}
       </Show>
     </>
