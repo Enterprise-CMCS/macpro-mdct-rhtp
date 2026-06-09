@@ -14,6 +14,7 @@ import { NavigateFunction, useNavigate } from "react-router";
 import { LiteReport, ReportStatus } from "@rhtp/shared";
 import { formatMonthDayYear, reportBasePath, useStore } from "utils";
 import { Fragment } from "react";
+import { getStatus } from "utils/other/status";
 
 interface DashboardTableProps {
   reports: LiteReport[];
@@ -26,16 +27,6 @@ interface TableProps extends DashboardTableProps {
   navigate: NavigateFunction;
   userIsEndUser: boolean | undefined;
 }
-
-export const getStatus = (report: LiteReport) => {
-  if (
-    report.status === ReportStatus.IN_PROGRESS &&
-    report.submissionCount >= 1
-  ) {
-    return "In revision";
-  }
-  return report.status;
-};
 
 export const HorizontalTable = (props: TableProps) => {
   return (
