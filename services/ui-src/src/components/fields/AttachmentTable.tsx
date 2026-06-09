@@ -11,7 +11,6 @@ import {
   AlertTypes,
   InitiativeAnswerProp,
   AttachmentStatus,
-  dropdownEmptyOption,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import {
@@ -24,7 +23,6 @@ import {
   checkpointAttachableOptions,
   checkpointList,
   getStageIdByCheckpointId,
-  stageList,
 } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
@@ -50,13 +48,6 @@ export const AttachmentTable = (
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([]);
-  const stageOption = [
-    dropdownEmptyOption,
-    ...stageList.map((checks) => ({
-      label: `${checks.stage} ${checks.label}`,
-      value: checks.id,
-    })),
-  ];
   const [checkpoint, setCheckpoint] = useState("");
   const [tableRows, setTableRows] = useState<
     (string | JSX.Element | undefined)[][]
@@ -218,6 +209,15 @@ export const AttachmentTable = (
     return initiativeOptions.every((option) => option.checked != true);
   };
 
+  const getCheckpointDisplayName = (answer: InitiativeAnswerProp) => {
+    const checkpoint = checkpointList.find(
+      ({ id }) => id === answer.checkpoint
+    );
+    return checkpoint
+      ? `${checkpoint.checkpointNumber} ${checkpoint.label}`
+      : "";
+  };
+
   const rows = (values: InitiativeAnswerProp[]) => {
     return values.map((row) => {
       const columnAttachmentName = (
@@ -238,14 +238,8 @@ export const AttachmentTable = (
                   `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
               )
               .join(", ");
-      const columnStage =
-        row.stage == undefined || !("stage" in row)
-          ? "N/A"
-          : stageOption.find(({ value }) => value === row.stage)?.label;
       const columnCheckpoint =
-        row.checkpoint == ""
-          ? "N/A"
-          : checkpointList.find(({ id }) => id === row.checkpoint)?.label;
+        row.checkpoint == "" ? "N/A" : getCheckpointDisplayName(row);
       const columnActions = (
         <HStack>
           <Button
@@ -279,7 +273,6 @@ export const AttachmentTable = (
       return [
         columnAttachmentName,
         columnInitiatives,
-        columnStage,
         columnCheckpoint,
         row.status,
         columnActions,
@@ -297,16 +290,8 @@ export const AttachmentTable = (
             (opt) => opt.id === answer.initiatives[0]
           )?.initiativeNumber;
           return initNumber ?? "";
-        case "Stage":
-          const stageLabel = stageOption.find(
-            (opt) => opt.value === answer.stage
-          )?.label;
-          return stageLabel ?? "";
         case "Checkpoint":
-          const checkpointLabel = checkpointList.find(
-            ({ id }) => id === answer.checkpoint
-          )?.label;
-          return checkpointLabel ?? "";
+          return getCheckpointDisplayName(answer);
         case "Status":
           return answer.status;
         default:
@@ -369,7 +354,6 @@ export const AttachmentTable = (
         [
           { label: "Attachment name", sortable: true },
           { label: "Initiatives", sortable: true },
-          { label: "Stage", sortable: true },
           { label: "Checkpoint", sortable: true },
           { label: "Status", sortable: true },
           { label: "Actions" },
