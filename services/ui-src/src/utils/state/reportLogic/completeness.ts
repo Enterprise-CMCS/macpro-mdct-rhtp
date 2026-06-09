@@ -83,10 +83,10 @@ export const pageIsCompletable = (report: Report, pageId: string) => {
   //Check initiative pages separately
   if (pageId === "initiatives") {
     const initiativePages = report.pages.filter(
-      (page) => "initiativeNumber" in page
+      (page) => "initiativeNumber" in page && page.status !== "Abandoned"
     );
     for (const page of initiativePages) {
-      for (const element of page.elements) {
+      for (const element of page.elements!) {
         const satisfied = elementSatisfiesRequired(
           element,
           targetPage.elements
@@ -159,9 +159,17 @@ export const elementSatisfiesRequired = (
     element.type === ElementType.ActionTable &&
     element.id === "metrics-table"
   ) {
-    const answers = element.answer
-      .flat()
-      .filter((column) => column.id != "prevValue");
+    //only get metric rows that haven't been abandoned
+    const activeElements = element.answer
+      .filter((rows) =>
+        rows.find(
+          (column) => column.id === "status" && column.value !== "Abandoned"
+        )
+      )
+      .flat();
+    const answers = activeElements.filter(
+      (column) => column.id != "prevValue" && column.id != "no"
+    );
     return answers.every((column) => column.value !== "");
   }
   //NOTE: use of funds table does not want to be compared unless there's an any, fix when UseOfFundsTable have been swapped to and upload
