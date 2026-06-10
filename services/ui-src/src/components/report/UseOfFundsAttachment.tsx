@@ -47,6 +47,10 @@ export const UseOfFundsAttachmentElement = (
     onDeleteModalClose();
   };
 
+  const isDisabled = () => {
+    return disabled || files.length > 0;
+  };
+
   return (
     <Fragment>
       <Button
@@ -54,8 +58,8 @@ export const UseOfFundsAttachmentElement = (
         onClick={() => {
           setModalOpen(true);
         }}
-        disabled={disabled || files.length > 0}
-        leftIcon={<Image src={disabled ? addGray : addIcon} />}
+        disabled={isDisabled()}
+        leftIcon={<Image src={isDisabled() ? addGray : addIcon} />}
       >
         Add Use of Funds
       </Button>
@@ -66,10 +70,12 @@ export const UseOfFundsAttachmentElement = (
             setModalOpen(false);
           },
         }}
+        modalHeading={"Add Use of Funds"}
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
         uploadedSubLabel={""}
+        multiple={false}
       ></UploadModal>
       {uploadListRender(
         reportType,

@@ -19,6 +19,7 @@ interface Props {
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
   uploadedSubLabel: string;
+  multiple?: boolean;
 }
 
 export const UploadArea = ({
@@ -27,6 +28,7 @@ export const UploadArea = ({
   deleteFromReport,
   uploadAreaHidden = false,
   uploadedSubLabel,
+  multiple = true,
 }: Props) => {
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
@@ -83,7 +85,13 @@ export const UploadArea = ({
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
       .filter((file) => file != null);
-    filterFilesAndStartUpload(files);
+
+    if (files.length > 1 && !multiple) {
+      setUploadErrors(["Only 1 file is allowed to be uploaded"]);
+    } else {
+      setUploadErrors([]);
+      filterFilesAndStartUpload(files);
+    }
   };
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,12 +114,18 @@ export const UploadArea = ({
     return savedFiles;
   };
 
+  const hideUploadArea = () => {
+    return uploadAreaHidden || (!multiple && answer.length > 0);
+  };
+
   return (
     <VStack sx={sx.container} gap="1rem" alignItems="flex-start">
-      {!uploadAreaHidden && (
+      {!hideUploadArea() && (
         <>
           <div>
-            <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
+            <Text sx={sx.uploadedLabel}>
+              Select a {multiple ? "file or files" : "file"} to upload
+            </Text>
             <Text sx={sx.uploadedSubLabel}>
               Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
             </Text>
@@ -124,13 +138,13 @@ export const UploadArea = ({
             aria-label="file drop area"
           >
             <span>
-              Drag files here or
+              Drag {multiple ? "files" : "file"} here or
               <label id="drop-zone">
                 Choose from folder
                 <input
                   type="file"
                   id="file-input"
-                  multiple
+                  multiple={multiple}
                   accept={acceptedFileTypes.join(",")}
                   onChange={onFileChange}
                 />
@@ -145,7 +159,9 @@ export const UploadArea = ({
             </Box>
           )}
 
-          <Text sx={sx.uploadedLabel}>Selected Files</Text>
+          <Text sx={sx.uploadedLabel}>
+            Selected {multiple ? "Files" : "File"}
+          </Text>
           {uploadListRender(
             reportType,
             state,
@@ -156,7 +172,9 @@ export const UploadArea = ({
         </>
       )}
       <div>
-        <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
+        <Text sx={sx.uploadedLabel}>
+          Uploaded {multiple ? "Files" : "File"}
+        </Text>
         <Text sx={sx.uploadedSubLabel}>{uploadedSubLabel}</Text>
       </div>
       {uploadListRender(
