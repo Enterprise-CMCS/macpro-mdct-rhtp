@@ -264,21 +264,16 @@ describe("<AttachmentTable />", () => {
       ]).toStrictEqual(results.toReversed());
     };
 
-    await sortResult("Attachment name", [0, 6], ["mock-file", "mock-file-2"]);
-    await sortResult("Initiatives", [1, 7], ["#123", "#123"]);
-    await sortResult(
-      "Stage",
-      [2, 8],
-      ["1 Project Preparation", "2 Early Implementation"]
-    );
+    await sortResult("Attachment name", [0, 5], ["mock-file", "mock-file-2"]);
+    await sortResult("Initiatives", [1, 6], ["#123", "#123"]);
     await sortResult(
       "Checkpoint",
-      [3, 9],
-      ["Continue initiative activities", "Launch initiative"]
+      [2, 7],
+      ["1.2 Launch initiative", "2.1 Continue initiative activities"]
     );
     await sortResult(
       "Status",
-      [4, 10],
+      [3, 8],
       ["Locked for Scoring", "Pending Review"]
     );
   });
