@@ -1,13 +1,16 @@
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 import { putNotification } from "./notifications";
+import { StateAbbr } from "@rhtp/shared";
 
 const mockDynamo = mockClient(DynamoDBDocumentClient);
 
 const mockNotificationData = {
+  recipient: "email@test.com",
+  created: Date.now(),
   contextId: "123",
   emailId: "3-2-1",
-  created: Date.now(),
+  state: "PA" as StateAbbr,
   recipients: {
     to: ["email@test.com, test@email.com"],
   },

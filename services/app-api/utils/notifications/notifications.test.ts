@@ -27,6 +27,7 @@ const mockNotificationData = {
   },
   report: {
     id: "123",
+    state: "AK",
   } as Report,
   user: {
     fullName: "Mock User",
@@ -37,8 +38,11 @@ const mockNotificationData = {
 const mockExpectedNotificationBody = {
   contextId: "123",
   emailId: "3-2-1",
+  state: "AK",
   recipients: {
     to: ["email@test.com", "test@email.com"],
+    cc: [],
+    bcc: [],
   },
   message: {
     Subject: { Data: "Test Email" },
@@ -64,9 +68,20 @@ describe("Notification utility", () => {
 
       await saveNotification(emailResponse, emailTemplate, report, user);
 
-      expect(mockPutNotification).toHaveBeenCalledWith(
+      expect(mockPutNotification).toHaveBeenCalledTimes(2);
+      // where n is 1-indexed
+      expect(mockPutNotification).toHaveBeenNthCalledWith(
+        1,
         expect.objectContaining({
           ...mockExpectedNotificationBody,
+          recipient: mockExpectedNotificationBody.recipients.to[0],
+        })
+      );
+      expect(mockPutNotification).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          ...mockExpectedNotificationBody,
+          recipient: mockExpectedNotificationBody.recipients.to[1],
         })
       );
     });

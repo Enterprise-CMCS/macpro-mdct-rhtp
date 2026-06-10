@@ -59,10 +59,10 @@ export function createDataComponents(props: CreateDataComponentsProps) {
       isDev,
       name: "notifications",
       partitionKey: {
-        name: "contextId",
+        name: "recipient",
         type: dynamodb.AttributeType.STRING,
       },
-      sortKey: { name: "emailId", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "created", type: dynamodb.AttributeType.NUMBER },
     }),
   ];
 
