@@ -1,0 +1,134 @@
+import { Box, Button, Image, Text } from "@chakra-ui/react";
+import {
+  AlertTypes,
+  UploadListProp,
+  UseOfFundsAttachmentTemplate,
+} from "@rhtp/shared";
+import { PageElementProps } from "./Elements";
+import { Fragment, useState } from "react";
+import addIcon from "assets/icons/add/icon_add_blue.svg";
+import addGray from "assets/icons/add/icon_add_gray.svg";
+import { useStore } from "utils";
+import { UploadModal } from "components/modals/UploadModal";
+import {
+  uploadListRender,
+  downloadFile,
+  removeFile,
+} from "utils/other/fileUtils";
+import { Modal } from "components/modals/Modal";
+import { Alert } from "components/alerts/Alert";
+
+export const UseOfFundsAttachmentElement = (
+  props: PageElementProps<UseOfFundsAttachmentTemplate>
+) => {
+  const { disabled, element, updateElement } = props;
+  const { report } = useStore();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const { id, state, type: reportType } = report!;
+  const { answer } = element;
+  const files = answer ?? [];
+
+  const saveToReport = (newFiles: UploadListProp[]) => {
+    updateElement({ answer: newFiles });
+  };
+
+  const onDeleteModalOpen = () => {
+    setDeleteModalOpen(true);
+  };
+
+  const onDeleteModalClose = () => {
+    setDeleteModalOpen(false);
+  };
+
+  const onRemove = () => {
+    updateElement({ answer: [] });
+    removeFile(reportType, state, id, files[0]);
+    onDeleteModalClose();
+  };
+
+  return (
+    <Fragment>
+      <Button
+        variant={"outline"}
+        onClick={() => {
+          setModalOpen(true);
+        }}
+        disabled={disabled || files.length > 0}
+        leftIcon={<Image src={disabled ? addGray : addIcon} />}
+      >
+        Add Use of Funds
+      </Button>
+      <UploadModal
+        modalDisclosure={{
+          isOpen: modalOpen,
+          onClose: () => {
+            setModalOpen(false);
+          },
+        }}
+        answer={files}
+        saveToReport={saveToReport}
+        deleteFromReport={onRemove}
+        uploadedSubLabel={""}
+      ></UploadModal>
+      {uploadListRender(
+        reportType,
+        state,
+        id,
+        files,
+        onDeleteModalOpen,
+        downloadFile
+      )}
+
+      <Modal
+        modalDisclosure={{
+          isOpen: deleteModalOpen,
+          onClose: onDeleteModalClose,
+        }}
+        onConfirmHandler={onRemove}
+        content={{
+          heading: "Delete Attachment",
+          actionButtonText: "Delete",
+        }}
+      >
+        <Alert status={AlertTypes.WARNING} title="Warning">
+          Deleting this attachment will remove it from the state policy
+          commitment
+        </Alert>
+        <Box mt={"spacer3"} mb={"spacer_half"}>
+          <Text sx={sx.uploadedLabel}>File</Text>
+          {/* <Text sx={sx.uploadedSubLabel}>{uploadedSubLabel}</Text> */}
+        </Box>
+        {uploadListRender(
+          reportType,
+          state,
+          id,
+          files,
+          onRemove,
+          downloadFile,
+          true // hide remove icon in delete modal
+        )}
+      </Modal>
+    </Fragment>
+  );
+};
+
+// The pdf rendering of UseOfFundsAttachmentElement component
+export const UseOfFundsAttachmentElementExport = (
+  element: UseOfFundsAttachmentTemplate
+) => {
+  console.log("element", element);
+  return <div>empty div for now</div>;
+};
+
+const sx = {
+  uploadedLabel: {
+    marginBottom: ".50rem",
+    fontWeight: "600",
+  },
+  uploadedSubLabel: {
+    fontSize: "body_sm",
+    fontWeight: "body_sm",
+    color: "gray_dark",
+  },
+};

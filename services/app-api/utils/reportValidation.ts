@@ -135,43 +135,24 @@ const accordionTemplateSchema = object().shape({
   value: string().required(),
 });
 
-const useOfFundsTableSchema = object().shape({
-  type: string().required().matches(new RegExp(ElementType.UseOfFundsTable)),
+const UseOfFundsAttachmentSchema = object().shape({
+  type: string()
+    .required()
+    .matches(new RegExp(ElementType.UseOfFundsAttachment)),
   id: string().required(),
-  dropDownOptions: object().shape({
-    budgetPeriodOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
-    useOfFundsOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
-    recipientCategoryOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
-  }),
   answer: array()
     .of(
       object().shape({
-        id: string().required(),
-        budgetPeriod: string().required(),
-        spentFunds: string().required(),
-        description: string().required(),
-        initiative: string().required(),
-        useOfFunds: string().required(),
-        recipientName: string().required(),
-        recipientCategory: string().required(),
+        name: string()
+          .transform((value) => (value === "" ? undefined : value))
+          .default("Uploaded File")
+          .required(),
+        size: number().required(),
+        fileId: string().required(),
       })
     )
     .notRequired(),
+  required: boolean().required(),
 });
 
 const pageElementSchema = lazy((value: PageElement): Schema => {
@@ -215,8 +196,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
       return tableCheckpointTemplateSchema;
-    case ElementType.UseOfFundsTable:
-      return useOfFundsTableSchema;
+    case ElementType.UseOfFundsAttachment:
+      return UseOfFundsAttachmentSchema;
     case ElementType.InitiativesTable:
       return initiativesTableSchema;
     case ElementType.AttachmentArea:

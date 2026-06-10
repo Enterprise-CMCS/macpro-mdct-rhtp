@@ -26,6 +26,9 @@ const uploadVariant = {
       borderRadius: "25px",
       border: "2px solid #0071BC",
     },
+    "&:not(:last-child)": {
+      marginBottom: "1.25rem",
+    },
   },
 };
 

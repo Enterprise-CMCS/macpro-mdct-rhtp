@@ -189,7 +189,7 @@ export enum ElementType {
   InitiativesTable = "initiativesTable",
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
-  UseOfFundsTable = "useOfFundsTable",
+  UseOfFundsAttachment = "useOfFundsAttachment",
   ActionTable = "actionTable",
   AttachmentTable = "attachmentTable",
   SubmitForReview = "submitForReview",
@@ -216,7 +216,7 @@ export type PageElement =
   | InitiativesTableTemplate
   | TableCheckpointTemplate
   | AccordionGroupTemplate
-  | UseOfFundsTableTemplate
+  | UseOfFundsAttachmentTemplate
   | AttachmentAreaTemplate
   | AttachmentTableTemplate
   | ActionTableTemplate
@@ -386,26 +386,11 @@ export interface AccordionGroupTemplate {
   answer?: boolean[];
 }
 
-export type UseOfFundsTableItem = {
+export type UseOfFundsAttachmentTemplate = {
+  type: ElementType.UseOfFundsAttachment;
   id: string;
-  budgetPeriod: string;
-  spentFunds: string;
-  description: string;
-  initiative: string;
-  useOfFunds: string;
-  recipientName: string;
-  recipientCategory: string;
-};
-
-export type UseOfFundsTableTemplate = {
-  type: ElementType.UseOfFundsTable;
-  id: string;
-  dropDownOptions: {
-    budgetPeriodOptions: { label: string; value: string }[];
-    useOfFundsOptions: { label: string; value: string }[];
-    recipientCategoryOptions: { label: string; value: string }[];
-  };
-  answer?: UseOfFundsTableItem[];
+  answer?: UploadListProp[];
+  required: boolean;
 };
 
 export enum AttachmentStatus {
