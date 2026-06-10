@@ -2,7 +2,14 @@ import React from "react";
 import * as domMatchers from "@testing-library/jest-dom/matchers";
 import * as framerMotion from "framer-motion";
 import { UserState, ReportState, DevToolsState, BannerState } from "types";
-import { ReportType, ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
+import {
+  ReportType,
+  ReportStatus,
+  RhtpSubType,
+  UserRoles,
+  PageType,
+  ElementType,
+} from "@rhtp/shared";
 
 /*
  * @testing-library defines custom matchers for DOM nodes.
@@ -174,6 +181,26 @@ export const mockReportStore: ReportState = {
       {
         id: "root",
         childPageIds: ["MOCK-1", "MOCK-2"],
+      },
+      {
+        id: "MOCK-1",
+        type: PageType.Standard,
+        title: "mock 1",
+        elements: [
+          {
+            id: "mock-textbox",
+            label: "textbox",
+            type: ElementType.Textbox,
+            required: true,
+            answer: "test",
+          },
+        ],
+      },
+      {
+        id: "MOCK-2",
+        type: PageType.Standard,
+        title: "mock 2",
+        elements: [],
       },
     ],
   },

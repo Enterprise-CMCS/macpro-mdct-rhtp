@@ -1,7 +1,16 @@
 import { getReport as getReportFromDatabase } from "../../storage/reports";
-import { ActionAnswerShape, PageElement, Report } from "@rhtp/shared";
+import {
+  ActionAnswerShape,
+  PageElement,
+  Report,
+  RhtpSubType,
+} from "@rhtp/shared";
 
-const copyAnswer = (oldElements: PageElement[], newElements: PageElement[]) => {
+const copyAnswer = (
+  oldElements: PageElement[],
+  newElements: PageElement[],
+  newSubType: RhtpSubType
+) => {
   for (const oldElement of oldElements) {
     if (!("answer" in oldElement)) continue;
 
@@ -9,7 +18,11 @@ const copyAnswer = (oldElements: PageElement[], newElements: PageElement[]) => {
       (newElement) => newElement.id === oldElement.id
     );
     if (newElement?.type === oldElement.type) {
-      if (newElement.id === "metrics-table") {
+      //special copy of metrics table when it's a new annual report
+      if (
+        newElement.id === "metrics-table" &&
+        newSubType === RhtpSubType.ANNUAL
+      ) {
         newElement.answer = copyMetricAnswers(
           oldElement.answer as ActionAnswerShape[]
         );
@@ -33,7 +46,7 @@ const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
 };
 
 export const copyReport = async (newReport: Report) => {
-  const { copyFromReportId, pages: newPages, state, type } = newReport;
+  const { copyFromReportId, pages: newPages, state, type, subType } = newReport;
   const reportToCopy = await getReportFromDatabase(
     type,
     state,
@@ -57,7 +70,7 @@ export const copyReport = async (newReport: Report) => {
         newPage.status = oldPage.status;
       }
 
-      copyAnswer(oldPage.elements, newElements);
+      copyAnswer(oldPage.elements, newElements, subType);
     }
   }
 };
