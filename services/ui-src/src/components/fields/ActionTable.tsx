@@ -68,9 +68,27 @@ const buildRows = (
   return formattedRows;
 };
 
+const adjustElement = (element: ActionTableTemplate) => {
+  const newElement = structuredClone(element);
+  //if prevValue has no values in any row, it will hide the whole column
+  if (element.rows.some((row) => row.id === "prevValue")) {
+    const countFilledPrevValue = element.answer
+      ?.flat()
+      .filter(
+        (answer) => answer.id === "prevValue" && answer.value != ""
+      ).length;
+
+    if (countFilledPrevValue != undefined && countFilledPrevValue === 0) {
+      newElement.rows = newElement.rows.filter((row) => row.id !== "prevValue");
+    }
+  }
+
+  return newElement;
+};
+
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { disabled, element } = props;
-  const { id, label, hintText, modal, rows, answer } = element;
+  const { id, label, hintText, modal, rows, answer } = adjustElement(element);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();

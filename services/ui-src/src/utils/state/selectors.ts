@@ -5,7 +5,7 @@ import {
   ParentPageTemplate,
 } from "@rhtp/shared";
 import { BannerState, ReportState } from "types";
-import { pageIsCompletable } from "./reportLogic/completeness";
+import { inferredReportStatus } from "./reportLogic/completeness";
 import { compareDates, parseAsLocalDate } from "utils/other/time";
 
 export const currentPageSelector = (state: ReportState) => {
@@ -17,19 +17,6 @@ export const currentPageSelector = (state: ReportState) => {
 
   const currentPage = report.pages[pageMap.get(currentPageId)!];
   return currentPage;
-};
-
-export const elementSelector = (elementId: string) => {
-  return (state: ReportState) => {
-    const currentPage = currentPageSelector(state);
-    const element = currentPage?.elements?.find((el) => el.id === elementId);
-    return element;
-  };
-};
-
-export const currentPageCompletableSelector = (state: ReportState) => {
-  if (!state.report || !state.currentPageId) return false;
-  return pageIsCompletable(state.report, state.currentPageId);
 };
 
 export const submittableMetricsSelector = (state: ReportState) => {
@@ -44,9 +31,8 @@ export const submittableMetricsSelector = (state: ReportState) => {
     const pageIdx = pageMap.get(id);
     if (!pageIdx) return null;
     const section = report.pages[pageIdx] as ParentPageTemplate;
-    // TODO: fix to actually check status and readiness to submit
-    const displayStatus = PageStatus.IN_PROGRESS;
-    const submittable = true;
+    const displayStatus = inferredReportStatus(report, section.id);
+    let submittable = displayStatus === PageStatus.COMPLETE;
 
     return {
       section: section,

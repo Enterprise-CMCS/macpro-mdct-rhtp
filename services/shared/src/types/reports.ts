@@ -476,6 +476,7 @@ export interface ActionTableTemplate {
   answer?: ActionAnswerShape[];
   quarterly?: boolean;
   disabled?: boolean;
+  required: boolean;
 }
 
 export interface SubmitForReviewTemplate {

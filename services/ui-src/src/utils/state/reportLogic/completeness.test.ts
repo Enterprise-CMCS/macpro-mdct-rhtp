@@ -1,4 +1,5 @@
 import {
+  ActionTableTemplate,
   ElementType,
   FormPageTemplate,
   ListInputTemplate,
@@ -152,6 +153,61 @@ describe("pageIsCompletable", () => {
     } as Report;
     expect(pageIsCompletable(report, "my-id")).toBeTruthy();
   });
+  test("is completable when element type is an AccordionGroup", () => {
+    const report = {
+      pages: [
+        {
+          id: "my-id",
+          status: PageStatus.IN_PROGRESS,
+          elements: [
+            {
+              type: ElementType.AccordionGroup,
+              id: "accordion",
+              accordions: [
+                {
+                  label: "",
+                  children: [
+                    {
+                      id: "good-question",
+                      type: ElementType.Textbox,
+                      answer: "WOW",
+                      required: true,
+                    },
+                  ],
+                },
+              ],
+              required: true,
+            },
+          ],
+        },
+      ],
+    } as Report;
+    expect(pageIsCompletable(report, "my-id")).toBeTruthy();
+  });
+  test("is completable when pageId is initiatives ", () => {
+    const report = {
+      pages: [
+        {
+          id: "initiatives",
+          status: PageStatus.IN_PROGRESS,
+          elements: [{}],
+        },
+        {
+          id: "init-123",
+          initiativeNumber: "123",
+          elements: [
+            {
+              id: "good-question",
+              type: ElementType.Textbox,
+              answer: "WOW",
+              required: true,
+            },
+          ],
+        },
+      ],
+    } as Report;
+    expect(pageIsCompletable(report, "initiatives")).toBeTruthy();
+  });
 });
 
 describe("elementSatisfiesRequired", () => {
@@ -226,5 +282,19 @@ describe("elementSatisfiesRequired", () => {
       answer: [""],
     } as ListInputTemplate;
     expect(elementSatisfiesRequired(element, [element])).toBeFalsy();
+  });
+
+  test("handles Metrics Table", () => {
+    const element = {
+      type: ElementType.ActionTable,
+      id: "metrics-table",
+      label: "action table",
+      hintText: "hint text",
+      modal: { title: "", elements: [] },
+      rows: [{ id: "row", type: ElementType.Paragraph, header: "" }],
+      answer: [[{ id: "row", value: "2" as string }]],
+      required: true,
+    } as ActionTableTemplate;
+    expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
   });
 });
