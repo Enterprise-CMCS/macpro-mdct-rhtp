@@ -7,7 +7,7 @@ import { submitReport, useStore, reportBasePath } from "utils";
 import { SubmitReportModal } from "./SubmitReportModal";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
-import { ReportStatus } from "@rhtp/shared";
+import { isCompleteStatus } from "@rhtp/shared";
 import { getZipFile } from "utils/other/fileUtils";
 
 export const SubmissionBar = () => {
@@ -21,7 +21,7 @@ export const SubmissionBar = () => {
   }
 
   const isPdfActive = useFlags()?.viewPdf;
-  const isSubmitted = report.status === ReportStatus.SUBMITTED;
+  const isSubmitted = isCompleteStatus(report.status);
 
   const onSubmit = async () => {
     setModalOpen(false);

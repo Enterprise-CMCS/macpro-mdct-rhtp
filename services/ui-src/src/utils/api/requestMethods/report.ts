@@ -86,6 +86,18 @@ export async function releaseReport(report: LiteReport) {
   );
 }
 
+export async function acceptReport(report: LiteReport) {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  await apiLib.put(
+    `/reports/accept/${report.type}/${report.state}/${report.id}`,
+    options
+  );
+}
+
 export async function deleteReport(
   reportType: string,
   state: string,

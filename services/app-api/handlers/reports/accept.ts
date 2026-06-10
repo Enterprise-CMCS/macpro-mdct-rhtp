@@ -8,25 +8,23 @@ import { ReportStatus } from "@rhtp/shared";
 import { sendEmail } from "../../utils/notifications/email";
 import { logger } from "../../libs/debug-lib";
 
-export const releaseReport = handler(parseReportParameters, async (request) => {
+export const acceptReport = handler(parseReportParameters, async (request) => {
   const { reportType, state, id } = request.parameters;
   const user = request.user;
 
+  // release and accept use the same roles
   if (!canReleaseReport(user)) {
     return forbidden(error.UNAUTHORIZED);
   }
 
   const report = await getReport(reportType, state, id);
 
-  // Can only unlock from submitted status
+  // Can only accept from submitted status
   if (report?.status !== ReportStatus.SUBMITTED) {
     return ok(report);
   }
 
-  report.status = ReportStatus.IN_PROGRESS;
-  report.submitted = undefined;
-  report.submittedBy = undefined;
-  report.submittedByEmail = undefined;
+  report.status = ReportStatus.ACCEPTED;
 
   // save the report that's being submitted (with the new information on top of it)
   await putReport(report);

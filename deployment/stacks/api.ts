@@ -259,6 +259,15 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "acceptReport", {
+    entry: "services/app-api/handlers/reports/accept.ts",
+    handler: "acceptReport",
+    path: "reports/accept/{reportType}/{state}/{id}",
+    method: "PUT",
+    additionalPolicies: [sesPolicy],
+    ...commonProps,
+  });
+
   new Lambda(scope, "createUpload", {
     entry: "services/app-api/handlers/uploads/create.ts",
     handler: "createUpload",

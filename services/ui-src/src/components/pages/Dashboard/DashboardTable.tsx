@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
-import { LiteReport, ReportStatus } from "@rhtp/shared";
+import { isCompleteStatus, LiteReport } from "@rhtp/shared";
 import { formatMonthDayYear, reportBasePath, useStore } from "utils";
 import { Fragment } from "react";
 import { getStatus } from "utils/other/status";
@@ -55,12 +55,12 @@ export const HorizontalTable = (props: TableProps) => {
               variant="outline"
               width="100%"
               aria-label={
-                report.status !== ReportStatus.SUBMITTED
+                !isCompleteStatus(report.status)
                   ? `Edit ${report.name} report`
                   : `View ${report.name} report`
               }
             >
-              {props.userIsEndUser && report.status !== ReportStatus.SUBMITTED
+              {props.userIsEndUser && !isCompleteStatus(report.status)
                 ? "Edit"
                 : "View"}
             </Button>
@@ -109,12 +109,12 @@ export const VerticalTable = (props: TableProps) => {
               height="30px"
               fontSize="body_sm"
               aria-label={
-                report.status !== ReportStatus.SUBMITTED
+                !isCompleteStatus(report.status)
                   ? "Edit " + report.name + " report"
                   : "View " + report.name + " report"
               }
             >
-              {props.userIsEndUser && report.status !== ReportStatus.SUBMITTED
+              {props.userIsEndUser && !isCompleteStatus(report.status)
                 ? "Edit"
                 : "View"}
             </Button>
