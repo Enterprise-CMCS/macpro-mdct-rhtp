@@ -2,7 +2,7 @@ import { sendEmail } from "./email";
 import sesLib from "../../libs/ses-lib";
 import { validReport } from "../tests/mockReport";
 import { User } from "../../types/types";
-import { saveNotification } from "./notifications";
+import { saveNotifications } from "./notifications";
 
 vi.mock("../../libs/ses-lib", () => ({
   default: {
@@ -11,7 +11,7 @@ vi.mock("../../libs/ses-lib", () => ({
 }));
 
 vi.mock("./notifications");
-const mockSaveNotification = vi.mocked(saveNotification);
+const mockSaveNotifications = vi.mocked(saveNotifications);
 
 const mockUser = {
   fullName: "Mock User",
@@ -26,7 +26,7 @@ describe("sendEmail", () => {
   test("should not issue a send email command when no email in report", async () => {
     await sendEmail(validReport, mockUser);
     expect(sesLib.sendSesEmail).not.toHaveBeenCalled();
-    expect(mockSaveNotification).not.toHaveBeenCalled();
+    expect(mockSaveNotifications).not.toHaveBeenCalled();
   });
 
   test("should issue a send email command when email in report", async () => {
@@ -35,6 +35,6 @@ describe("sendEmail", () => {
     reportWithEmail.pages[1].elements[2].answer = "test@email.com";
     await sendEmail(reportWithEmail, mockUser);
     expect(sesLib.sendSesEmail).toHaveBeenCalledTimes(1);
-    expect(mockSaveNotification).toHaveBeenCalled();
+    expect(mockSaveNotifications).toHaveBeenCalled();
   });
 });

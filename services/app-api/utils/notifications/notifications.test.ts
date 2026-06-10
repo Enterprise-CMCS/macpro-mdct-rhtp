@@ -1,4 +1,4 @@
-import { saveNotification } from "./notifications";
+import { saveNotifications } from "./notifications";
 import { Report } from "@rhtp/shared";
 import { putNotification } from "../../storage/notifications";
 import { SendEmailCommandOutput } from "@aws-sdk/client-ses";
@@ -61,12 +61,12 @@ describe("Notification utility", () => {
     vi.clearAllMocks();
   });
 
-  describe("saveNotification", () => {
+  describe("saveNotifications", () => {
     test("should trigger save command to notifications table", async () => {
       const { emailResponse, emailTemplate, report, user } =
         mockNotificationData;
 
-      await saveNotification(emailResponse, emailTemplate, report, user);
+      await saveNotifications(emailResponse, emailTemplate, report, user);
 
       expect(mockPutNotification).toHaveBeenCalledTimes(2);
       // where n is 1-indexed

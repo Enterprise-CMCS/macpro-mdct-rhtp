@@ -3,7 +3,7 @@ import sesLib from "../../libs/ses-lib";
 import { logger } from "../../libs/debug-lib";
 import { isLocalStack } from "../../libs/localstack";
 import { User } from "../../types/types";
-import { saveNotification } from "./notifications";
+import { saveNotifications } from "./notifications";
 
 const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
 
@@ -70,7 +70,7 @@ export const sendEmail = async (report: Report, user: User) => {
   );
   if (!isLocalStack()) {
     const res = await sesLib.sendSesEmail(emailTemplate);
-    await saveNotification(res, emailTemplate, report, user);
+    await saveNotifications(res, emailTemplate, report, user);
   } else {
     logger.info("Skipping email in dev env");
   }

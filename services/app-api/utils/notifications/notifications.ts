@@ -25,7 +25,7 @@ const saveNotificationPerRecipient = async (
   }
 };
 
-export const saveNotification = async (
+export const saveNotifications = async (
   emailResponse: SendEmailCommandOutput,
   emailTemplate: SendEmailRequest,
   report: Report,
