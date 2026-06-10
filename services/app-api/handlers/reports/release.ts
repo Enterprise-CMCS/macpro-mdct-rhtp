@@ -32,7 +32,7 @@ export const releaseReport = handler(parseReportParameters, async (request) => {
   await putReport(report);
 
   try {
-    await sendEmail(report);
+    await sendEmail(report, user);
   } catch (error) {
     // log and allow call to succeed even if email fails
     logger.error(error);
