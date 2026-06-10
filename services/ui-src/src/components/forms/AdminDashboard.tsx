@@ -19,6 +19,7 @@ import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
+import { getStatus } from "utils/other/status";
 
 const buildStateOptions = () => {
   const stateValues = [];
@@ -157,7 +158,7 @@ export const AdminDashboard = () => {
         report.name,
         report.budgetPeriod,
         formatMonthDayYear(report.lastEdited!),
-        report.status,
+        getStatus(report),
         report.submissionCount,
         columnAction,
       ];
@@ -176,7 +177,7 @@ export const AdminDashboard = () => {
         case "Last Edited":
           return answer.lastEdited!;
         case "Status":
-          return answer.status;
+          return getStatus(answer);
         default:
           return "";
       }
