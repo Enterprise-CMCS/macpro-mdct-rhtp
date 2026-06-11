@@ -83,6 +83,12 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     }
   );
 
+  new sns.Subscription(scope, "email-subscription", {
+    topic: sns.Topic.fromTopicArn(scope, "emailTopic", topic.topicArn),
+    endpoint: "garrett.rabian@coforma.io",
+    protocol: sns.SubscriptionProtocol.EMAIL,
+  });
+
   configSet.addEventDestination("sns", {
     destination: ses.EventDestination.snsTopic(topic),
     configurationSetEventDestinationName: `email-notifications`,
