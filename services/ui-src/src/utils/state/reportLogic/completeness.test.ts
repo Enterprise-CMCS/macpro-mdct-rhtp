@@ -8,6 +8,7 @@ import {
   RadioTemplate,
   Report,
   TextboxTemplate,
+  UseOfFundsAttachmentTemplate,
 } from "@rhtp/shared";
 import {
   elementSatisfiesRequired,
@@ -295,6 +296,16 @@ describe("elementSatisfiesRequired", () => {
       answer: [[{ id: "row", value: "2" as string }]],
       required: true,
     } as ActionTableTemplate;
+    expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
+  });
+
+  test("handles UseOfFundsAttachment", () => {
+    const element = {
+      type: ElementType.UseOfFundsAttachment,
+      id: "use-of-funds",
+      answer: [{ name: "mock-file-name", size: 100, fileId: "mock-id" }],
+      required: true,
+    } as UseOfFundsAttachmentTemplate;
     expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
   });
 });

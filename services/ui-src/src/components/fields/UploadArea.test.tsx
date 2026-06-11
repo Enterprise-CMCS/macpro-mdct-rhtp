@@ -81,11 +81,29 @@ describe("<Upload />", () => {
 
     const dropArea = screen.getByLabelText("file drop area");
     await act(async () => {
-      await fireEvent.drop(dropArea, {
+      fireEvent.drop(dropArea, {
         dataTransfer: { items: [{ getAsFile: () => mockPng }] },
       });
     });
     expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
+  });
+
+  test("an error displays when trying to upload multiples to a single file upload", async () => {
+    const newProps = { ...props, multiple: false, answer: [] };
+    await act(async () => {
+      render(<UploadArea {...newProps} />);
+    });
+    const dropArea = screen.getByLabelText("file drop area");
+    await act(async () => {
+      fireEvent.drop(dropArea, {
+        dataTransfer: {
+          items: [{ getAsFile: () => mockPng }, { getAsFile: () => mockPng }],
+        },
+      });
+    });
+    expect(
+      screen.getByText("Only 1 file is allowed to be uploaded")
+    ).toBeInTheDocument();
   });
 
   test("test file download", async () => {
