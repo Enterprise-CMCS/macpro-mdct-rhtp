@@ -418,8 +418,7 @@ export const TableCheckpoint = (
   ) => {
     const styling = ["white"];
     for (var i = 1; i < rows.length; i++) {
-      // eslint-disable-next-line no-console
-      const prevColor = styling.at(-1) ?? "";
+      const prevColor = styling.at(-1)!;
       const nextColor = prevColor == "white" ? "grey" : "white";
       styling.push(rows[i].stageNo == "" ? prevColor : nextColor);
     }
