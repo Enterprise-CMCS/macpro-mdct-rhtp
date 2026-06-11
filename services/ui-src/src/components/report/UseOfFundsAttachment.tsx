@@ -93,7 +93,7 @@ export const UseOfFundsAttachmentElement = (
         }}
         onConfirmHandler={onRemove}
         content={{
-          heading: "Delete Attachment",
+          heading: "Delete Use of Funds",
           actionButtonText: "Delete",
         }}
       >
