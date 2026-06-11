@@ -6,7 +6,9 @@ import {
   aws_s3 as s3,
   aws_ec2 as ec2,
   aws_ses as ses,
+  aws_sns as sns,
   aws_iam as iam,
+  // aws_cloudwatch as cloudwatch,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -17,6 +19,7 @@ import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { DynamoDBTable } from "../constructs/dynamodb-table.ts";
 import { isLocalStack } from "../local/util.ts";
 import { LambdaDynamoEventSource } from "../constructs/lambda-dynamo-event.ts";
+// import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 
 interface CreateApiComponentsProps {
   scope: Construct;
@@ -67,8 +70,38 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   //   resources: ["*"],
   // });
   // if (!isDev) {
+
+  const topic = new sns.Topic(scope, "emailTopic");
+
+  const configSet = new ses.ConfigurationSet(
+    scope,
+    "email-delivery-configuration-set",
+    {
+      sendingEnabled: true,
+      configurationSetName: `email-notifications`,
+      reputationMetrics: true,
+    }
+  );
+
+  configSet.addEventDestination("sns", {
+    destination: ses.EventDestination.snsTopic(topic),
+    configurationSetEventDestinationName: `email-notifications`,
+    enabled: true,
+    events: [
+      ses.EmailSendingEvent.SEND,
+      ses.EmailSendingEvent.REJECT,
+      ses.EmailSendingEvent.BOUNCE,
+      ses.EmailSendingEvent.COMPLAINT,
+      ses.EmailSendingEvent.DELIVERY,
+      ses.EmailSendingEvent.OPEN,
+      ses.EmailSendingEvent.RENDERING_FAILURE,
+      ses.EmailSendingEvent.CLICK,
+    ],
+  });
+
   const senderIdentity = new ses.EmailIdentity(scope, "SenderDomainIdentity", {
     identity: ses.Identity.domain("tmp.test.com"),
+    configurationSet: configSet,
   });
 
   const sesPolicy = new iam.PolicyStatement({
@@ -77,6 +110,24 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     resources: [senderIdentity.emailIdentityArn],
   });
   // }
+
+  // const alarm = new cloudwatch.Alarm(scope, `ses-alarm`, {
+  //   metric: new cloudwatch.Metric({
+  //     namespace: 'AWS/SES',
+  //     metricName: "Reject",
+  //     statistic: 'Sum',
+  //   }),
+  //   threshold: 1,
+  //   evaluationPeriods: 5,
+  //   comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+  //   actionsEnabled: true,
+  //   alarmDescription: `SES Account Reject Alarm`,
+  //   treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
+  //   alarmName: `ses-account-reject-alarm`,
+  //   datapointsToAlarm: 1,
+  // })
+
+  // alarm.addAlarmAction(new SnsAction(topic))
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
