@@ -1,4 +1,4 @@
-import { Box, Button, Image, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Image, Text } from "@chakra-ui/react";
 import {
   AlertTypes,
   UploadListProp,
@@ -17,6 +17,7 @@ import {
 } from "utils/other/fileUtils";
 import { Modal } from "components/modals/Modal";
 import { Alert } from "components/alerts/Alert";
+import { Hint } from "@cmsgov/design-system";
 
 export const UseOfFundsAttachmentElement = (
   props: PageElementProps<UseOfFundsAttachmentTemplate>
@@ -77,6 +78,12 @@ export const UseOfFundsAttachmentElement = (
         uploadedSubLabel={""}
         multiple={false}
       ></UploadModal>
+      <div>
+        <Heading as="h2" fontWeight="bold" marginBottom=".5rem">
+          Uploaded Attachment
+        </Heading>
+        <Hint id={id}>[placeholder]</Hint>
+      </div>
       {uploadListRender(
         reportType,
         state,
