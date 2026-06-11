@@ -5,7 +5,7 @@ import { isLocalStack } from "../../libs/localstack";
 import { User } from "../../types/types";
 import { saveNotifications } from "./notifications";
 
-const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
+const FROM_ADDRESS = "MDCT_NoReply@tmp.test.com";
 
 const getTemplate = (
   name: string,
