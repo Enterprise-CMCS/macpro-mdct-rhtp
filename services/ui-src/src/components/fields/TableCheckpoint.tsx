@@ -32,7 +32,7 @@ import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider"
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
-import { CommentModal } from "components/modals/CommentModal";
+import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
 import { Alert } from "components";
 import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
@@ -458,7 +458,7 @@ export const TableCheckpoint = (
         }
         onModalSubmit={onModalSubmit}
       />
-      <CommentModal
+      <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,
           onClose: () => {

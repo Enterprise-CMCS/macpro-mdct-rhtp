@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   TextField,
   Dropdown,
@@ -20,6 +20,8 @@ import {
   Button,
   Image,
   Flex,
+  UnorderedList,
+  ListItem,
 } from "@chakra-ui/react";
 import { Modal } from "./Modal";
 import {
@@ -49,7 +51,7 @@ const AdminReportStatusOptions = [
   "Unlock",
 ];
 
-export const ReportCommentModal = ({
+export const ReportCommentDrawer = ({
   modalDisclosure,
   selectedReport,
   reloadReports,
@@ -173,7 +175,7 @@ const PreviousComments = ({ comments }: { comments: Comment[] }) => {
   );
 };
 
-export const CommentModal = ({
+export const AttachmentCommentDrawer = ({
   modalDisclosure,
   selectedFile,
   updateElement,
@@ -333,9 +335,30 @@ export const CommentModal = ({
     pastComments.length === 0
       ? `Add Comment to ${fileName}`
       : `Comments for ${fileName}`;
-  const modalSubHeading = userIsAdmin
-    ? "Use the fields below to manage the attachment status and leave comments for the state."
-    : "Leave a comment for your CMS Project Officer below";
+  const modalSubHeading = userIsAdmin ? (
+    <Fragment>
+      <Text sx={sx.drawerSubheadingText}>
+        Use the fields below to manage the attachment status and leave comments
+        for the state. Certain statuses restrict the ability to modify or remove
+        files:
+      </Text>
+      <UnorderedList sx={sx.drawerSubheadingList}>
+        <ListItem>
+          <b>Needs Revision, Informational, Archived:</b> Needs Revision,
+          Informational, Archived: The attachment will no longer be able to be
+          deleted.
+        </ListItem>
+        <ListItem>
+          <b>Locked for Scoring:</b> The attachment is locked and cannot be
+          edited or deleted.
+        </ListItem>
+      </UnorderedList>
+    </Fragment>
+  ) : (
+    <Text sx={sx.drawerSubheadingText}>
+      Leave a comment for your CMS Project Officer below
+    </Text>
+  );
 
   return (
     <Drawer
@@ -359,11 +382,7 @@ export const CommentModal = ({
           <Heading as="h1" sx={sx.drawerHeaderText}>
             {modalHeading}
           </Heading>
-          {modalSubHeading && (
-            <Text fontSize="body_md" fontWeight="normal" marginTop="spacer1">
-              {modalSubHeading}
-            </Text>
-          )}
+          {modalSubHeading}
         </DrawerHeader>
         <DrawerBody>
           {errorMessages.overall && (
@@ -429,6 +448,16 @@ const sx = {
     position: "absolute",
     right: "spacer4",
     top: "spacer2",
+  },
+  drawerSubheadingText: {
+    fontSize: "body_md",
+    fontWeight: "normal",
+    marginTop: "spacer1",
+    marginBottom: "spacer2",
+  },
+  drawerSubheadingList: {
+    fontSize: "body_md",
+    fontWeight: "normal",
   },
 };
 interface Props {

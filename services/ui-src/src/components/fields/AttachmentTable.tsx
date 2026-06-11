@@ -1,7 +1,7 @@
 import { Button, Stack, Image, HStack, Text } from "@chakra-ui/react";
 import { ChoiceList, Dropdown } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
-import { CommentModal } from "components/modals/CommentModal";
+import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useEffect, useState } from "react";
 import {
@@ -414,7 +414,7 @@ export const AttachmentTable = (
           "These files have been attached to the stage and checkpoint selected above."
         }
       />
-      <CommentModal
+      <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,
           onClose: () => {

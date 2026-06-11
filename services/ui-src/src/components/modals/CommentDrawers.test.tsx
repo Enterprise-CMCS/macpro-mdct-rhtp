@@ -1,5 +1,5 @@
 import { MockedFunction } from "vitest";
-import { CommentModal, ReportCommentModal } from "./CommentModal";
+import { AttachmentCommentDrawer, ReportCommentDrawer } from "./CommentDrawers";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
@@ -83,7 +83,7 @@ const mockAllFiles = [
   },
 ];
 
-const CommentModalComponent = (
+const AttachmentCommentDrawerComponent = (
   allFiles: InitiativeAnswerProp[] = mockAllFiles,
   disabled: boolean = false
 ) => {
@@ -97,7 +97,7 @@ const CommentModalComponent = (
     });
   }
   return (
-    <CommentModal
+    <AttachmentCommentDrawer
       modalDisclosure={{
         isOpen: true,
         onClose: mockCloseHandler,
@@ -109,17 +109,17 @@ const CommentModalComponent = (
   );
 };
 
-const renderCommentModal = async () => {
-  render(CommentModalComponent());
+const renderAttachmentCommentDrawer = async () => {
+  render(AttachmentCommentDrawerComponent());
   await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
 };
 
-describe("CommentModal component", () => {
+describe("AttachmentCommentDrawer component", () => {
   describe("with no comments", () => {
     beforeEach(async () => {
       vi.clearAllMocks();
       mockGetComments.mockResolvedValueOnce([]);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
     });
 
     test("shows the contents", () => {
@@ -187,7 +187,7 @@ describe("CommentModal component", () => {
         },
       ] as Comment[]);
 
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
     });
 
     test("Shows previous comments and status changes", async () => {
@@ -209,14 +209,14 @@ describe("CommentModal component", () => {
 
     test("state user can edit comment box always", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
     });
 
     test("state user must leave a comment to submit", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
       await userEvent.click(screen.getByText("Save"));
@@ -225,7 +225,7 @@ describe("CommentModal component", () => {
 
     test("state user can edit attachment status to certain options", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const statusButton = screen.getAllByLabelText("Status")[1];
       await userEvent.click(statusButton);
       expect(
@@ -248,7 +248,7 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeEnabled();
     });
@@ -258,7 +258,7 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: false,
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
       const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeDisabled();
@@ -269,7 +269,7 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
     });
@@ -279,7 +279,7 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockUseStore); // state user
-      render(CommentModalComponent(mockAllFiles, true)); // set disabled true
+      render(AttachmentCommentDrawerComponent(mockAllFiles, true)); // set disabled true
       await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
@@ -293,7 +293,7 @@ describe("CommentModal component", () => {
         ...mockUseStore,
         ...mockAdminUserStore,
       });
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const statusButton = screen.getAllByLabelText("Status")[1];
       await userEvent.click(statusButton);
       await userEvent.click(
@@ -323,13 +323,13 @@ describe("CommentModal component", () => {
     });
   });
 
-  testA11yAct(CommentModalComponent());
+  testA11yAct(AttachmentCommentDrawerComponent());
 });
 
 const mockReloadReports = vi.fn();
 
 const ReportCommendModalComponent = (report = mockReport) => (
-  <ReportCommentModal
+  <ReportCommentDrawer
     modalDisclosure={{
       isOpen: true,
       onClose: mockCloseHandler,
@@ -338,7 +338,7 @@ const ReportCommendModalComponent = (report = mockReport) => (
     reloadReports={mockReloadReports}
   />
 );
-describe("ReportCommentModal component", () => {
+describe("ReportCommentDrawer component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -396,5 +396,5 @@ describe("ReportCommentModal component", () => {
     });
   });
 
-  testA11yAct(CommentModalComponent());
+  testA11yAct(AttachmentCommentDrawerComponent());
 });

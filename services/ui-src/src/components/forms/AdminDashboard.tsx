@@ -19,7 +19,7 @@ import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
-import { ReportCommentModal } from "components/modals/CommentModal";
+import { ReportCommentDrawer } from "components/modals/CommentDrawers";
 import { getStatus } from "utils/other/status";
 
 const buildStateOptions = () => {
@@ -57,7 +57,8 @@ export const AdminDashboard = () => {
     type: SORT_TYPE;
   }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
-  const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [AttachmentCommentDrawerOpen, setAttachmentCommentDrawerOpen] =
+    useState(false);
   const [selectedReport, setSelectedReport] = useState<Report>();
 
   const reloadReports = async (reportType: string) => {
@@ -142,12 +143,12 @@ export const AdminDashboard = () => {
 
   const openCommentsModal = (report: Report) => {
     setSelectedReport(report);
-    setCommentModalOpen(true);
+    setAttachmentCommentDrawerOpen(true);
   };
 
   const closeCommentsModal = () => {
     setSelectedReport(undefined);
-    setCommentModalOpen(false);
+    setAttachmentCommentDrawerOpen(false);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -300,9 +301,9 @@ export const AdminDashboard = () => {
         )}
       </Stack>
       {selectedReport && (
-        <ReportCommentModal
+        <ReportCommentDrawer
           modalDisclosure={{
-            isOpen: commentModalOpen,
+            isOpen: AttachmentCommentDrawerOpen,
             onClose: closeCommentsModal,
           }}
           selectedReport={selectedReport}
