@@ -151,8 +151,6 @@ const PreviousComments = ({
   comments: Comment[];
   userIsAdmin: boolean;
 }) => {
-  console.log("comments to display", comments);
-
   return (
     <Box marginTop={"spacer2"}>
       <Heading as={"h3"} fontWeight={"bold"}>
@@ -455,7 +453,8 @@ export const AttachmentCommentDrawer = ({
             />
             {userIsAdmin && (
               <ChoiceList
-                label="Abandon initiative?"
+                label="External or Internal Comment"
+                hint="Choose whether this comment is hidden from the state or shared."
                 name="commentType"
                 type="radio"
                 onChange={onChange}
@@ -471,7 +470,6 @@ export const AttachmentCommentDrawer = ({
               />
             )}
           </Flex>
-
           <Button
             onClick={onSubmit}
             isDisabled={commentsDisabled}

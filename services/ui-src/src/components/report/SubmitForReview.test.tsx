@@ -83,6 +83,7 @@ describe("SubmitForReview component", () => {
         {
           comment: "Please review",
           type: "report",
+          isInternal: false,
         }
       );
       expect(screen.getByText("Submitted for Review")).toBeVisible();

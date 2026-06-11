@@ -9,7 +9,6 @@ import { putComment } from "../../storage/comments";
 import { canWriteComments } from "../../utils/authorization";
 
 vi.mock("../../utils/authorization", () => ({
-  canReadInternalComments: vi.fn().mockReturnValue(true),
   canWriteComments: vi.fn().mockReturnValue(true),
 }));
 
@@ -49,6 +48,7 @@ const testEvent: APIGatewayProxyEvent = {
     type: mockComment.type,
     comment: mockComment.comment,
     parentReportId: mockComment.parentReportId,
+    isInternal: mockComment.isInternal,
   }),
 };
 
@@ -80,7 +80,6 @@ describe("Test createComment API method", () => {
       ...mockComment,
       created: expect.any(Number),
       id: expect.any(String),
-      isInternal: true,
     });
   });
 });
