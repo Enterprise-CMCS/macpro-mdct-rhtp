@@ -5,7 +5,22 @@ import {
   DropdownChangeObject,
   DropdownOption,
 } from "@cmsgov/design-system";
-import { Box, Divider, Heading, Text, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Divider,
+  Heading,
+  Text,
+  Spinner,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+  Button,
+  Image,
+  Flex,
+} from "@chakra-ui/react";
 import { Modal } from "./Modal";
 import {
   InitiativeAnswerProp,
@@ -26,6 +41,7 @@ import {
   createComment,
   getComments,
 } from "utils/api/requestMethods/commentMethods";
+import closeIcon from "assets/icons/close/icon_close_primary.svg";
 
 const AdminReportStatusOptions = [
   ReportStatus.SUBMITTED,
@@ -322,57 +338,99 @@ export const CommentModal = ({
     : "Leave a comment for your CMS Project Officer below";
 
   return (
-    <Modal
-      modalDisclosure={modalDisclosure}
-      onConfirmHandler={onSubmit}
-      content={{
-        heading: modalHeading,
-        subheading: modalSubHeading,
-        actionButtonText: "Save",
-      }}
-      disableConfirm={commentsDisabled}
-      submitting={commentSubmitting}
+    <Drawer
+      isOpen={modalDisclosure.isOpen}
+      onClose={modalDisclosure.onClose}
+      placement="right"
     >
-      {errorMessages.overall && (
-        <Text fontSize="body_md" color="red" marginBottom={"spacer2"}>
-          {errorMessages.overall}
-        </Text>
-      )}
-      <Dropdown
-        label="Status"
-        name="status"
-        onChange={onChange}
-        options={statusOptions}
-        value={displayValue.status}
-        disabled={statusDisabled}
-        errorMessage={errorMessages.status}
-      />
-      <TextField
-        name={"comment"}
-        label={
-          <>
-            Comment
-            {commentsOptional && (
-              <span className="optionalText"> (optional)</span>
-            )}
-          </>
-        }
-        onChange={onChange}
-        value={displayValue.comment}
-        disabled={commentsDisabled}
-        multiline
-        rows={3}
-        errorMessage={errorMessages.comment}
-      />
-      <Divider marginTop={"spacer3"} borderColor={"black"} />
-      {commentsLoading ? <Spinner size="md" /> : null}
-      {pastComments.length > 0 ? (
-        <PreviousComments comments={pastComments} />
-      ) : null}
-    </Modal>
+      <DrawerOverlay />
+      <DrawerContent maxWidth={"50vw"}>
+        <Flex sx={sx.drawerCloseContainer}>
+          <Button
+            leftIcon={<Image src={closeIcon} alt="Close" />}
+            variant="link"
+            onClick={modalDisclosure.onClose}
+            fontWeight="bold"
+          >
+            Close
+          </Button>
+        </Flex>
+        <DrawerHeader>
+          <Heading as="h1" sx={sx.drawerHeaderText}>
+            {modalHeading}
+          </Heading>
+          {modalSubHeading && (
+            <Text fontSize="body_md" fontWeight="normal" marginTop="spacer1">
+              {modalSubHeading}
+            </Text>
+          )}
+        </DrawerHeader>
+        <DrawerBody>
+          {errorMessages.overall && (
+            <Text fontSize="body_md" color="red" marginBottom={"spacer2"}>
+              {errorMessages.overall}
+            </Text>
+          )}
+          <Dropdown
+            label="Status"
+            name="status"
+            onChange={onChange}
+            options={statusOptions}
+            value={displayValue.status}
+            disabled={statusDisabled}
+            errorMessage={errorMessages.status}
+          />
+          <TextField
+            name={"comment"}
+            label={
+              <>
+                Comment
+                {commentsOptional && (
+                  <span className="optionalText"> (optional)</span>
+                )}
+              </>
+            }
+            onChange={onChange}
+            value={displayValue.comment}
+            disabled={commentsDisabled}
+            multiline
+            rows={3}
+            errorMessage={errorMessages.comment}
+          />
+          <Divider marginTop={"spacer3"} borderColor={"black"} />
+          {commentsLoading ? <Spinner size="md" /> : null}
+          {pastComments.length > 0 ? (
+            <PreviousComments comments={pastComments} />
+          ) : null}
+        </DrawerBody>
+        <DrawerFooter gap="spacer2">
+          <Button variant="outline" onClick={modalDisclosure.onClose}>
+            Close
+          </Button>
+          <Button
+            onClick={onSubmit}
+            isDisabled={commentsDisabled}
+            isLoading={commentSubmitting}
+          >
+            Save
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 };
 
+const sx = {
+  drawerHeaderText: {
+    fontSize: "heading_2xl",
+    fontWeight: "heading_2xl",
+  },
+  drawerCloseContainer: {
+    position: "absolute",
+    right: "spacer4",
+    top: "spacer2",
+  },
+};
 interface Props {
   modalDisclosure: {
     isOpen: boolean;
