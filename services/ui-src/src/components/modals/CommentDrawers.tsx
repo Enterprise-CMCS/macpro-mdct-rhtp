@@ -45,6 +45,7 @@ import {
   getComments,
 } from "utils/api/requestMethods/commentMethods";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
+import lockIcon from "assets/icons/icon_lock.svg";
 
 const AdminReportStatusOptions = [
   ReportStatus.SUBMITTED,
@@ -143,23 +144,54 @@ interface ReportCommentProps {
   reloadReports: Function;
 }
 
-const PreviousComments = ({ comments }: { comments: Comment[] }) => {
+const PreviousComments = ({
+  comments,
+  userIsAdmin,
+}: {
+  comments: Comment[];
+  userIsAdmin: boolean;
+}) => {
+  console.log("comments to display", comments);
+
   return (
     <Box marginTop={"spacer2"}>
       <Heading as={"h3"} fontWeight={"bold"}>
-        Comments
+        Previous Comments
       </Heading>
       {comments.map((comment, index) => (
-        <Box marginTop={"spacer2"} key={`previous-comment-${index}`}>
-          <Text fontWeight={"heading_md"}>{comment.author}</Text>
+        <Box
+          marginTop={"spacer4"}
+          key={`previous-comment-${index}`}
+          gap={"spacer1"}
+          display="flex"
+          alignItems="left"
+          flexDirection="column"
+        >
+          <Flex alignItems={"center"} gap={"spacer2"}>
+            <Text fontWeight={"heading_md"}>{comment.author}</Text>
+            <Text fontSize={"heading_md"} color={"gray_dark"}>
+              {new Date(comment.created).toLocaleString()}
+            </Text>
+          </Flex>
+
           {comment.statusChange && (
-            <Text fontWeight={"heading_md"}>
+            <Text fontWeight={"body_sm"} color={"gray_dark"}>
               Status changed to: {comment.statusChange}
             </Text>
           )}
-          <Text fontSize={"body_sm"} color={"gray_dark"}>
-            {new Date(comment.created).toLocaleString()}
-          </Text>
+          {userIsAdmin &&
+            (comment.isInternal ? (
+              <Flex alignItems="center" gap="spacer1">
+                <Image src={lockIcon} alt="lock icon" sx={sx.icon} />
+                <Text fontWeight={"body_sm"} color={"gray_dark"}>
+                  CMS Internal
+                </Text>
+              </Flex>
+            ) : (
+              <Text fontWeight={"body_sm"} color={"gray_dark"}>
+                Shared with State
+              </Text>
+            ))}
           {comment.comment !== "" && (
             <TextField
               id={`previous-comment-${index}`}
@@ -168,6 +200,13 @@ const PreviousComments = ({ comments }: { comments: Comment[] }) => {
               value={comment.comment}
               disabled={true}
               multiline
+              style={
+                {
+                  "--text-input__background-color--disabled": comment.isInternal
+                    ? "#e6f9fd"
+                    : "",
+                } as React.CSSProperties
+              }
             />
           )}
         </Box>
@@ -274,7 +313,6 @@ export const AttachmentCommentDrawer = ({
   };
 
   const onSubmit = async () => {
-    console.log("Submitting comment with values:", displayValue);
     setCommentSubmitting(true);
 
     if (selectedAttachmentIndex === -1 || commentsDisabled) {
@@ -363,6 +401,10 @@ export const AttachmentCommentDrawer = ({
             <Heading as="h1" sx={sx.drawerHeaderText}>
               Add comment to attachment
             </Heading>
+          </Flex>
+        </DrawerHeader>
+        <DrawerBody>
+          <Flex direction="column" gap="spacer4" marginBottom="spacer4">
             <Text sx={sx.drawerSubheading}>
               {userSpecificSubheading} Certain statuses restrict the ability to
               modify or remove files:
@@ -380,11 +422,6 @@ export const AttachmentCommentDrawer = ({
             <Text fontSize="body_lg" fontWeight="body_lg">
               <b>Attachment:</b> {fileName}
             </Text>
-          </Flex>
-        </DrawerHeader>
-        <DrawerBody>
-          <Flex direction="column" gap="spacer4" marginBottom="spacer4">
-            {" "}
             {errorMessages.overall && (
               <Text fontSize="body_md" color="red">
                 {errorMessages.overall}
@@ -444,9 +481,17 @@ export const AttachmentCommentDrawer = ({
             Add comment
           </Button>
           <Divider marginTop={"spacer3"} borderColor={"black"} />
-          {commentsLoading ? <Spinner size="md" /> : null}
+          {commentsLoading ? (
+            <Flex gap="spacer2" alignItems="center" marginTop="spacer4">
+              <Spinner size="md" />
+              <Text>Comments loading...</Text>
+            </Flex>
+          ) : null}
           {pastComments.length > 0 ? (
-            <PreviousComments comments={pastComments} />
+            <PreviousComments
+              comments={pastComments}
+              userIsAdmin={userIsAdmin!}
+            />
           ) : null}
         </DrawerBody>
         <DrawerFooter>
@@ -472,6 +517,9 @@ const sx = {
   drawerSubheading: {
     fontSize: "body_md",
     fontWeight: "normal",
+  },
+  icon: {
+    boxSize: "16px",
   },
 };
 interface Props {
