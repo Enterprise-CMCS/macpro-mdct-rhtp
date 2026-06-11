@@ -56,7 +56,8 @@ const HorizontalTable = (
   headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
   sorting: (header: string, type: SORT_TYPE) => void,
-  variant: string
+  variant: string,
+  styleOverride?: string[]
 ) => {
   const onSort = (sortName: string) => {
     const type =
@@ -96,7 +97,10 @@ const HorizontalTable = (
       </Thead>
       <Tbody>
         {rows.map((column: TableRowType[], rowIndex) => (
-          <Tr key={`row-${rowIndex}`}>
+          <Tr
+            key={`row-${rowIndex}`}
+            className={styleOverride?.[rowIndex] ?? ""}
+          >
             {column.map((data, dataIndex) => (
               <Td key={`data-${rowIndex}-${dataIndex}`}>{data}</Td>
             ))}
@@ -139,12 +143,13 @@ export const ResponsiveTable = (
   headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
   variant?: string,
-  sorting: (header: string, type: SORT_TYPE) => void = () => {}
+  sorting: (header: string, type: SORT_TYPE) => void = () => {},
+  styleOverride?: string[]
 ) => {
   return (
     <>
       <Hide below="md" key="table">
-        {HorizontalTable(headers, rows, sorting, variant ?? "")}
+        {HorizontalTable(headers, rows, sorting, variant ?? "", styleOverride)}
       </Hide>
       <Show below="md" key="table-mobile">
         {VerticalTable(

@@ -406,6 +406,26 @@ export const TableCheckpoint = (
     { label: "Actions" },
   ];
 
+  const buildStyle = (
+    rows: {
+      id: string;
+      stageNo: string;
+      label: string;
+      file: UploadListProp;
+      status: AttachmentStatus;
+      canDelete: boolean;
+    }[]
+  ) => {
+    const styling = ["white"];
+    for (var i = 1; i < rows.length; i++) {
+      // eslint-disable-next-line no-console
+      const prevColor = styling.at(-1) ?? "";
+      const nextColor = prevColor == "white" ? "grey" : "white";
+      styling.push(rows[i].stageNo == "" ? prevColor : nextColor);
+    }
+    return styling;
+  };
+
   return (
     <Stack gap="1.25rem" width="100%">
       {tables.map((table, tableIndex) => (
@@ -421,7 +441,13 @@ export const TableCheckpoint = (
           >
             Upload attachments
           </Button>
-          {ResponsiveTable(header, getRows(table.rows), "metric")}
+          {ResponsiveTable(
+            header,
+            getRows(table.rows),
+            "metric",
+            () => {},
+            buildStyle(table.rows)
+          )}
         </Stack>
       ))}
       <UploadModal
