@@ -84,7 +84,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   );
 
   new sns.Subscription(scope, "email-subscription", {
-    topic: sns.Topic.fromTopicArn(scope, "emailTopic", topic.topicArn),
+    topic: sns.Topic.fromTopicArn(scope, "email-topic", topic.topicArn),
     endpoint: "garrett.rabian@coforma.io",
     protocol: sns.SubscriptionProtocol.EMAIL,
   });
