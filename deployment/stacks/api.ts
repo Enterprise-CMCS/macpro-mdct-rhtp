@@ -68,7 +68,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   // });
   // if (!isDev) {
   const senderIdentity = new ses.EmailIdentity(scope, "SenderDomainIdentity", {
-    identity: ses.Identity.domain("cms.hhs.gov"),
+    identity: ses.Identity.domain("tmp.test.com"),
   });
 
   const sesPolicy = new iam.PolicyStatement({
