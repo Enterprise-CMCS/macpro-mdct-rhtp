@@ -358,7 +358,7 @@ describe("AttachmentCommentDrawer component", () => {
 
 const mockReloadReports = vi.fn();
 
-const ReportCommendModalComponent = (report = mockReport) => (
+const ReportCommentDrawerComponent = (report = mockReport) => (
   <ReportCommentDrawer
     modalDisclosure={{
       isOpen: true,
@@ -374,7 +374,7 @@ describe("ReportCommentDrawer component", () => {
   });
   describe("unsubmitted report", () => {
     beforeEach(() => {
-      render(ReportCommendModalComponent());
+      render(ReportCommentDrawerComponent());
     });
     test("shows the contents", () => {
       expect(
@@ -402,7 +402,7 @@ describe("ReportCommentDrawer component", () => {
     };
     beforeEach(() => {
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      render(ReportCommendModalComponent(mockSubmittedReport));
+      render(ReportCommentDrawerComponent(mockSubmittedReport));
     });
 
     test("Admin can release a submitted report", async () => {
@@ -426,5 +426,5 @@ describe("ReportCommentDrawer component", () => {
     });
   });
 
-  testA11yAct(AttachmentCommentDrawerComponent());
+  testA11yAct(ReportCommentDrawerComponent());
 });

@@ -57,8 +57,7 @@ export const AdminDashboard = () => {
     type: SORT_TYPE;
   }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
-  const [AttachmentCommentDrawerOpen, setAttachmentCommentDrawerOpen] =
-    useState(false);
+  const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report>();
 
   const reloadReports = async (reportType: string) => {
@@ -141,14 +140,14 @@ export const AdminDashboard = () => {
     });
   };
 
-  const openCommentsModal = (report: Report) => {
+  const openCommentsDrawer = (report: Report) => {
     setSelectedReport(report);
-    setAttachmentCommentDrawerOpen(true);
+    setCommentDrawerOpen(true);
   };
 
-  const closeCommentsModal = () => {
+  const closeCommentsDrawer = () => {
     setSelectedReport(undefined);
-    setAttachmentCommentDrawerOpen(false);
+    setCommentDrawerOpen(false);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -164,7 +163,7 @@ export const AdminDashboard = () => {
           <Button
             variant="link"
             fontWeight="bold"
-            onClick={() => openCommentsModal(report)}
+            onClick={() => openCommentsDrawer(report)}
           >
             Comment/Status
           </Button>
@@ -303,8 +302,8 @@ export const AdminDashboard = () => {
       {selectedReport && (
         <ReportCommentDrawer
           modalDisclosure={{
-            isOpen: AttachmentCommentDrawerOpen,
-            onClose: closeCommentsModal,
+            isOpen: commentDrawerOpen,
+            onClose: closeCommentsDrawer,
           }}
           selectedReport={selectedReport}
           reloadReports={reloadReports}
