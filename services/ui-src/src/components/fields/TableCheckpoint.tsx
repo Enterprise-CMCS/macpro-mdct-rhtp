@@ -406,6 +406,7 @@ export const TableCheckpoint = (
     { label: "Actions" },
   ];
 
+  //This generates the zebra styling for the table rows when multiple files are tied to a shared checkpoint
   const buildStyle = (
     rows: {
       id: string;
