@@ -101,9 +101,7 @@ describe("<Upload />", () => {
         },
       });
     });
-    expect(
-      screen.getByText("Only 1 file is allowed to be uploaded")
-    ).toBeInTheDocument();
+    expect(screen.getByText("File is limited to 1")).toBeInTheDocument();
   });
 
   test("test file download", async () => {
