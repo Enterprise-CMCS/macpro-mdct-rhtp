@@ -51,6 +51,13 @@ const props = {
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
+const mockInvalidPng = new File(["0xMockPngData"], ".png", {
+  type: "image/png",
+});
+const mockInvalidType = new File(["0xMockEpubData"], "bar.epub", {
+  type: "application/epub+zip",
+});
+
 window.open = vi.fn();
 
 describe("<Upload />", () => {
@@ -114,6 +121,42 @@ describe("<Upload />", () => {
     });
     await userEvent.click(screen.getByRole("button", { name: "mock-name" }));
     expect(getFileDownloadUrl).toHaveBeenCalled();
+  });
+
+  test("error when invalid file name", async () => {
+    await act(async () => {
+      render(<UploadArea {...props} />);
+    });
+    const dropArea = screen.getByLabelText("file drop area");
+    await act(async () => {
+      fireEvent.drop(dropArea, {
+        dataTransfer: {
+          items: [{ getAsFile: () => mockInvalidPng }],
+        },
+      });
+    });
+    expect(
+      screen.getByText("File .png has an invalid name and was not uploaded")
+    ).toBeInTheDocument();
+  });
+
+  test("error when invalid file type", async () => {
+    await act(async () => {
+      render(<UploadArea {...props} />);
+    });
+    const dropArea = screen.getByLabelText("file drop area");
+    await act(async () => {
+      fireEvent.drop(dropArea, {
+        dataTransfer: {
+          items: [{ getAsFile: () => mockInvalidType }],
+        },
+      });
+    });
+    expect(
+      screen.getByText(
+        "File bar.epub has unsupported file type and was not uploaded"
+      )
+    ).toBeInTheDocument();
   });
 
   test("test deleting a file", async () => {
