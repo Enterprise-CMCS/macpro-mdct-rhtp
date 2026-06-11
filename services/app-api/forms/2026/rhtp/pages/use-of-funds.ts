@@ -25,7 +25,7 @@ export const useOfFunds: FormPageTemplate = {
     {
       type: ElementType.Paragraph,
       id: "use-of-funds-main-instructions",
-      text: "Select “Add use of Funds” option below to attach the Use of Funds file for this reporting period.",
+      text: "Select “Add Use of Funds” option below to attach the Use of Funds file for this reporting period.",
     },
     UseOfFundsAttachmentElement,
   ],

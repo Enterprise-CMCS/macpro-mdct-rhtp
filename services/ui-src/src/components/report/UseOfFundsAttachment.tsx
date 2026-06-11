@@ -106,7 +106,6 @@ export const UseOfFundsAttachmentElement = (
         </Alert>
         <Box mt={"spacer3"} mb={"spacer_half"}>
           <Text sx={sx.uploadedLabel}>File</Text>
-          {/* <Text sx={sx.uploadedSubLabel}>{uploadedSubLabel}</Text> */}
         </Box>
         {uploadListRender(
           reportType,
@@ -134,10 +133,5 @@ const sx = {
   uploadedLabel: {
     marginBottom: ".50rem",
     fontWeight: "600",
-  },
-  uploadedSubLabel: {
-    fontSize: "body_sm",
-    fontWeight: "body_sm",
-    color: "gray_dark",
   },
 };

@@ -157,8 +157,10 @@ export const UploadArea = ({
           </Box>
           {uploadErrors.length > 0 && (
             <Box>
-              {uploadErrors.map((error) => (
-                <Text sx={sx.uploadErrorLabel}>{error}</Text>
+              {uploadErrors.map((error, index) => (
+                <Text sx={sx.uploadErrorLabel} key={`upload-error-${index}`}>
+                  {error}
+                </Text>
               ))}
             </Box>
           )}

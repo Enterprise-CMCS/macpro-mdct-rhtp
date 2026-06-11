@@ -151,6 +151,8 @@ const UseOfFundsAttachmentSchema = object().shape({
         fileId: string().required(),
       })
     )
+    .min(0)
+    .max(1)
     .notRequired(),
   required: boolean().required(),
 });
