@@ -32,7 +32,7 @@ export const UploadArea = ({
 }: Props) => {
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
-  const [filesToUpload, setFilesToUpload] = useState<File[]>();
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
 
   useEffect(() => {
@@ -45,6 +45,10 @@ export const UploadArea = ({
       fetchData();
     }
   }, [filesToUpload]);
+
+  const hideUploadArea = () => {
+    return !multiple && (answer.length > 0 || filesToUpload.length > 0);
+  };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -82,12 +86,14 @@ export const UploadArea = ({
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    if (hideUploadArea()) return;
+
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
       .filter((file) => file != null);
 
     if (files.length > 1 && !multiple) {
-      setUploadErrors(["Only 1 file is allowed to be uploaded"]);
+      setUploadErrors(["File is limited to 1"]);
     } else {
       setUploadErrors([]);
       filterFilesAndStartUpload(files);
@@ -114,13 +120,9 @@ export const UploadArea = ({
     return savedFiles;
   };
 
-  const hideUploadArea = () => {
-    return uploadAreaHidden || (!multiple && answer.length > 0);
-  };
-
   return (
     <VStack sx={sx.container} gap="1rem" alignItems="flex-start">
-      {!hideUploadArea() && (
+      {!uploadAreaHidden && (
         <>
           <div>
             <Text sx={sx.uploadedLabel}>
@@ -136,6 +138,7 @@ export const UploadArea = ({
             onDragOver={handleDragOver}
             width="100%"
             aria-label="file drop area"
+            className={hideUploadArea() ? "disabled" : ""}
           >
             <span>
               Drag {multiple ? "files" : "file"} here or
@@ -147,6 +150,7 @@ export const UploadArea = ({
                   multiple={multiple}
                   accept={acceptedFileTypes.join(",")}
                   onChange={onFileChange}
+                  disabled={hideUploadArea()}
                 />
               </label>
             </span>
@@ -236,6 +240,10 @@ const sx = {
 
     "#file-input": {
       display: "none",
+    },
+
+    "&.disabled": {
+      opacity: "0.4",
     },
   },
 };

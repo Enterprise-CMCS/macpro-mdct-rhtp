@@ -7,7 +7,7 @@ import {
 
 const UseOfFundsAttachmentElement: UseOfFundsAttachmentTemplate = {
   type: ElementType.UseOfFundsAttachment,
-  id: "use-of-funds-table",
+  id: "use-of-funds-attachment",
   required: true,
 };
 
