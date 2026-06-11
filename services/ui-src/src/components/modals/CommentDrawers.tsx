@@ -1,9 +1,10 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TextField,
   Dropdown,
   DropdownChangeObject,
   DropdownOption,
+  ChoiceList,
 } from "@cmsgov/design-system";
 import {
   Box,
@@ -207,12 +208,14 @@ export const AttachmentCommentDrawer = ({
   const initialValues = {
     comment: "",
     status: fileStatus,
+    commentType: "external",
   };
 
   const noErrorState = {
     comment: "",
     status: "",
     overall: "",
+    commentType: "",
   };
 
   const [displayValue, setDisplayValue] = useState(initialValues);
@@ -271,6 +274,7 @@ export const AttachmentCommentDrawer = ({
   };
 
   const onSubmit = async () => {
+    console.log("Submitting comment with values:", displayValue);
     setCommentSubmitting(true);
 
     if (selectedAttachmentIndex === -1 || commentsDisabled) {
@@ -304,6 +308,7 @@ export const AttachmentCommentDrawer = ({
           comment: displayValue.comment,
           type: CommentType.ATTACHMENT,
           parentReportId: report?.id,
+          isInternal: displayValue.commentType === "internal",
           ...(didStatusChange && { statusChange: displayValue.status }),
         }
       );
@@ -331,34 +336,9 @@ export const AttachmentCommentDrawer = ({
     modalDisclosure.onClose();
   };
 
-  const modalHeading =
-    pastComments.length === 0
-      ? `Add Comment to ${fileName}`
-      : `Comments for ${fileName}`;
-  const modalSubHeading = userIsAdmin ? (
-    <Fragment>
-      <Text sx={sx.drawerSubheadingText}>
-        Use the fields below to manage the attachment status and leave comments
-        for the state. Certain statuses restrict the ability to modify or remove
-        files:
-      </Text>
-      <UnorderedList sx={sx.drawerSubheadingList}>
-        <ListItem>
-          <b>Needs Revision, Informational, Archived:</b> Needs Revision,
-          Informational, Archived: The attachment will no longer be able to be
-          deleted.
-        </ListItem>
-        <ListItem>
-          <b>Locked for Scoring:</b> The attachment is locked and cannot be
-          edited or deleted.
-        </ListItem>
-      </UnorderedList>
-    </Fragment>
-  ) : (
-    <Text sx={sx.drawerSubheadingText}>
-      Leave a comment for your CMS Project Officer below
-    </Text>
-  );
+  const userSpecificSubheading = userIsAdmin
+    ? "Use the fields below to manage the attachment status and leave comments for the state."
+    : "Use the fields below to manage the attachment status and leave comments for your CMS Project Officer.";
 
   return (
     <Drawer
@@ -379,59 +359,99 @@ export const AttachmentCommentDrawer = ({
           </Button>
         </Flex>
         <DrawerHeader>
-          <Heading as="h1" sx={sx.drawerHeaderText}>
-            {modalHeading}
-          </Heading>
-          {modalSubHeading}
+          <Flex direction="column" gap="spacer3">
+            <Heading as="h1" sx={sx.drawerHeaderText}>
+              Add comment to attachment
+            </Heading>
+            <Text sx={sx.drawerSubheading}>
+              {userSpecificSubheading} Certain statuses restrict the ability to
+              modify or remove files:
+            </Text>
+            <UnorderedList sx={sx.drawerSubheading}>
+              <ListItem>
+                <b>Needs Revision, Informational, Archived:</b> The attachment
+                will no longer be able to be deleted.
+              </ListItem>
+              <ListItem>
+                <b>Locked for Scoring:</b> The attachment is locked and cannot
+                be edited or deleted.
+              </ListItem>
+            </UnorderedList>
+            <Text fontSize="body_lg" fontWeight="body_lg">
+              <b>Attachment:</b> {fileName}
+            </Text>
+          </Flex>
         </DrawerHeader>
         <DrawerBody>
-          {errorMessages.overall && (
-            <Text fontSize="body_md" color="red" marginBottom={"spacer2"}>
-              {errorMessages.overall}
-            </Text>
-          )}
-          <Dropdown
-            label="Status"
-            name="status"
-            onChange={onChange}
-            options={statusOptions}
-            value={displayValue.status}
-            disabled={statusDisabled}
-            errorMessage={errorMessages.status}
-          />
-          <TextField
-            name={"comment"}
-            label={
-              <>
-                Comment
-                {commentsOptional && (
-                  <span className="optionalText"> (optional)</span>
-                )}
-              </>
-            }
-            onChange={onChange}
-            value={displayValue.comment}
-            disabled={commentsDisabled}
-            multiline
-            rows={3}
-            errorMessage={errorMessages.comment}
-          />
+          <Flex direction="column" gap="spacer4" marginBottom="spacer4">
+            {" "}
+            {errorMessages.overall && (
+              <Text fontSize="body_md" color="red">
+                {errorMessages.overall}
+              </Text>
+            )}
+            <Dropdown
+              label="Status"
+              name="status"
+              onChange={onChange}
+              options={statusOptions}
+              value={displayValue.status}
+              disabled={statusDisabled}
+              errorMessage={errorMessages.status}
+            />
+            <TextField
+              name={"comment"}
+              label={
+                <>
+                  Comment
+                  {commentsOptional && (
+                    <span className="optionalText"> (optional)</span>
+                  )}
+                </>
+              }
+              onChange={onChange}
+              value={displayValue.comment}
+              disabled={commentsDisabled}
+              multiline
+              rows={3}
+              errorMessage={errorMessages.comment}
+            />
+            {userIsAdmin && (
+              <ChoiceList
+                label="Abandon initiative?"
+                name="commentType"
+                type="radio"
+                onChange={onChange}
+                errorMessage={errorMessages.commentType}
+                choices={[
+                  {
+                    label: "External (Shared with States)",
+                    value: "external",
+                    defaultChecked: true,
+                  },
+                  { label: "Internal (CMS Only)", value: "internal" },
+                ]}
+              />
+            )}
+          </Flex>
+
+          <Button
+            onClick={onSubmit}
+            isDisabled={commentsDisabled}
+            isLoading={commentSubmitting}
+            variant="outline"
+          >
+            Add comment
+          </Button>
           <Divider marginTop={"spacer3"} borderColor={"black"} />
           {commentsLoading ? <Spinner size="md" /> : null}
           {pastComments.length > 0 ? (
             <PreviousComments comments={pastComments} />
           ) : null}
         </DrawerBody>
-        <DrawerFooter gap="spacer2">
+        <DrawerFooter>
           <Button variant="outline" onClick={modalDisclosure.onClose}>
             Close
-          </Button>
-          <Button
-            onClick={onSubmit}
-            isDisabled={commentsDisabled}
-            isLoading={commentSubmitting}
-          >
-            Save
           </Button>
         </DrawerFooter>
       </DrawerContent>
@@ -449,13 +469,7 @@ const sx = {
     right: "spacer4",
     top: "spacer2",
   },
-  drawerSubheadingText: {
-    fontSize: "body_md",
-    fontWeight: "normal",
-    marginTop: "spacer1",
-    marginBottom: "spacer2",
-  },
-  drawerSubheadingList: {
+  drawerSubheading: {
     fontSize: "body_md",
     fontWeight: "normal",
   },

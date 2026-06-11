@@ -37,6 +37,7 @@ export const SubmitForReview = () => {
       await createComment(report.id, report.state, {
         comment: displayValue,
         type: CommentType.REPORT,
+        isInternal: false,
       });
     } catch (error) {
       console.error("Error creating comment:", error);

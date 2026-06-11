@@ -28,9 +28,6 @@ export const createComment = handler(
       id: randomUUID(),
       author: user.fullName,
       authorEmail: user.email,
-      // TODO: This will eventually need to change to allow internal users to select
-      // whether a comment is internal or not
-      isInternal: canReadInternalComments(user),
     };
     let validatedComment;
     try {
