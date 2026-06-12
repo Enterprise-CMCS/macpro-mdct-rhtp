@@ -8,6 +8,7 @@ import {
   aws_ses as ses,
   aws_sns as sns,
   aws_iam as iam,
+  Aws,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -78,7 +79,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
           `${project}-${stage}-failed-email-topic`,
           topic.topicArn
         ),
-        endpoint: "garrett.rabian@coforma.io",
+        endpoint: "mdct-integrations@coforma.io",
         protocol: sns.SubscriptionProtocol.EMAIL,
       }
     );
@@ -116,7 +117,10 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     sesPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: ["ses:SendEmail", "ses:SendRawEmail"],
-      resources: [senderIdentity.emailIdentityArn],
+      resources: [
+        senderIdentity.emailIdentityArn,
+        `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:configuration-set/${configSet.configurationSetName}`,
+      ],
     });
   }
 
