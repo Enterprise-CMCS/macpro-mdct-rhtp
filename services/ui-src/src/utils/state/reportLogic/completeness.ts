@@ -172,9 +172,8 @@ export const elementSatisfiesRequired = (
     );
     return answers.every((column) => column.value !== "");
   }
-  //NOTE: use of funds table does not want to be compared unless there's an any, fix when UseOfFundsTable have been swapped to and upload
-  if (element.type == (ElementType.UseOfFundsTable as any)) {
-    //TODO: add validation check for use of funds when component has been updated
+  if (element.type == ElementType.UseOfFundsAttachment) {
+    return element.answer.length > 0;
   }
 
   return true;

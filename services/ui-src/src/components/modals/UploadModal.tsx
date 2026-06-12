@@ -16,6 +16,7 @@ export const UploadModal = ({
   actionButtonText = "Done",
   uploadAreaHidden = false,
   uploadedSubLabel,
+  multiple = true,
 }: Props) => {
   return (
     <Modal
@@ -36,6 +37,7 @@ export const UploadModal = ({
           deleteFromReport={deleteFromReport}
           uploadAreaHidden={uploadAreaHidden}
           uploadedSubLabel={uploadedSubLabel}
+          multiple={multiple}
         />
       </Stack>
     </Modal>
@@ -57,4 +59,5 @@ interface Props {
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
   uploadedSubLabel: string;
+  multiple?: boolean;
 }

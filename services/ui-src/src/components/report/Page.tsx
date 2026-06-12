@@ -28,7 +28,7 @@ import {
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
-import { UseOfFundsTableElement } from "./UseOfFundsTable";
+import { UseOfFundsAttachmentElement } from "./UseOfFundsAttachment";
 import { AttachmentArea } from "components/fields/AttachmentArea";
 import { SubmitForReview } from "./SubmitForReview";
 
@@ -89,9 +89,11 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <ListInput {...{ updateElement, disabled, element }} />;
       case ElementType.TableCheckpoint:
         return <TableCheckpoint {...{ updateElement, disabled, element }} />;
-      case ElementType.UseOfFundsTable:
+      case ElementType.UseOfFundsAttachment:
         return (
-          <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
+          <UseOfFundsAttachmentElement
+            {...{ updateElement, disabled, element }}
+          />
         );
       case ElementType.InitiativesTable:
         return <InitiativesTable {...{ disabled, element }} />;

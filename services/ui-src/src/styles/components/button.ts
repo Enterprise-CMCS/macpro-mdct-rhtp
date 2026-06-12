@@ -86,6 +86,7 @@ const outlineVariant = () => ({
 const linkVariant = () => ({
   ...theme.components.Button.variants.transparent,
   textDecoration: "underline",
+  textWrap: "auto",
   _hover: {
     color: "#0071bc",
     opacity: "0.4",
