@@ -94,7 +94,7 @@ const buildRows = (
           completed: undefined,
           file,
           status,
-          canDelete,
+          canDelete: canDelete ?? true,
         })
       );
     } else {
