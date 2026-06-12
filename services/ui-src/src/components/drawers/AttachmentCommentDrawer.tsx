@@ -7,7 +7,6 @@ import {
   ChoiceList,
 } from "@cmsgov/design-system";
 import {
-  Box,
   Divider,
   Heading,
   Text,
@@ -24,194 +23,24 @@ import {
   UnorderedList,
   ListItem,
 } from "@chakra-ui/react";
-import { Modal } from "./Modal";
 import {
   InitiativeAnswerProp,
   UploadListProp,
   AttachmentStatus,
-  ReportStatus,
   UserRoles,
   FileStatusOptions,
-  Report,
-  ReportType,
   CommentType,
   Comment,
   isCompleteStatus,
 } from "@rhtp/shared";
-import { acceptReport, releaseReport, useStore } from "utils";
+import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import {
   createComment,
   getComments,
 } from "utils/api/requestMethods/commentMethods";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
-import lockIcon from "assets/icons/icon_lock.svg";
-
-const AdminReportStatusOptions = [
-  ReportStatus.SUBMITTED,
-  ReportStatus.ACCEPTED,
-  "Unlock",
-];
-
-export const ReportCommentDrawer = ({
-  modalDisclosure,
-  selectedReport,
-  reloadReports,
-}: ReportCommentProps) => {
-  const { name, status } = selectedReport;
-  const { userIsAdmin } = useStore().user ?? {};
-  // Can only modify dropdown if report is submitted and is admin user
-  const disabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
-  const initialValues: {
-    comment: string;
-    status: string;
-  } = {
-    comment: "",
-    status: status,
-  };
-  const [displayValue, setDisplayValue] = useState(initialValues);
-  const [statusOptions, setStatusOptions] = useState<DropdownOption[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    const statuses = new Set([...AdminReportStatusOptions, status]);
-    const statusOptions = [];
-    for (const status of statuses.values()) {
-      statusOptions.push({
-        label: status,
-        value: status,
-      });
-    }
-    setStatusOptions(statusOptions);
-  }, []);
-
-  const onChange = (
-    event: React.ChangeEvent<HTMLInputElement> | DropdownChangeObject
-  ) => {
-    const { name, value } = event.target;
-    setDisplayValue((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const onSubmit = async () => {
-    setSubmitting(true);
-
-    if (displayValue.status === "Unlock") {
-      await releaseReport(selectedReport);
-      reloadReports(ReportType.RHTP);
-    } else if (
-      displayValue.status === ReportStatus.ACCEPTED &&
-      displayValue.status !== status
-    ) {
-      await acceptReport(selectedReport);
-      reloadReports(ReportType.RHTP);
-    }
-
-    modalDisclosure.onClose();
-    setSubmitting(false);
-  };
-
-  return (
-    <Modal
-      modalDisclosure={modalDisclosure}
-      content={{
-        heading: `Add comment to ${name || "report"}`,
-        actionButtonText: "Save",
-      }}
-      onConfirmHandler={onSubmit}
-      submitting={submitting}
-    >
-      <Dropdown
-        label="Status"
-        name="status"
-        onChange={onChange}
-        options={statusOptions}
-        value={displayValue.status}
-        disabled={disabled}
-      />
-    </Modal>
-  );
-};
-
-interface ReportCommentProps {
-  modalDisclosure: {
-    isOpen: boolean;
-    onClose: () => void;
-  };
-  selectedReport: Report;
-  reloadReports: Function;
-}
-
-const PreviousComments = ({
-  comments,
-  userIsAdmin,
-}: {
-  comments: Comment[];
-  userIsAdmin: boolean;
-}) => {
-  return (
-    <Box marginTop={"spacer2"}>
-      <Heading as={"h3"} fontWeight={"bold"}>
-        Previous Comments
-      </Heading>
-      {comments.map((comment, index) => (
-        <Box
-          marginTop={"spacer4"}
-          key={`previous-comment-${index}`}
-          gap={"spacer1"}
-          display="flex"
-          alignItems="left"
-          flexDirection="column"
-        >
-          <Flex alignItems={"center"} gap={"spacer2"}>
-            <Text fontWeight={"heading_md"}>{comment.author}</Text>
-            <Text fontSize={"heading_md"} color={"gray_dark"}>
-              {new Date(comment.created).toLocaleString()}
-            </Text>
-          </Flex>
-
-          {comment.statusChange && (
-            <Text fontWeight={"body_sm"} color={"gray_dark"}>
-              Status changed to: {comment.statusChange}
-            </Text>
-          )}
-          {userIsAdmin &&
-            (comment.isInternal ? (
-              <Flex alignItems="center" gap="spacer1">
-                <Image src={lockIcon} alt="lock icon" sx={sx.icon} />
-                <Text fontWeight={"body_sm"} color={"gray_dark"}>
-                  CMS Internal
-                </Text>
-              </Flex>
-            ) : (
-              <Text fontWeight={"body_sm"} color={"gray_dark"}>
-                Shared with State
-              </Text>
-            ))}
-          {comment.comment !== "" && (
-            <TextField
-              id={`previous-comment-${index}`}
-              name={`previous-comment-${index}`}
-              label={""}
-              value={comment.comment}
-              disabled={true}
-              multiline
-              style={
-                {
-                  "--text-input__background-color--disabled": comment.isInternal
-                    ? "#e6f9fd"
-                    : "",
-                } as React.CSSProperties
-              }
-            />
-          )}
-        </Box>
-      ))}
-    </Box>
-  );
-};
+import { PreviousComments } from "./PreviousComments";
 
 export const AttachmentCommentDrawer = ({
   modalDisclosure,
@@ -519,9 +348,6 @@ const sx = {
   drawerSubheading: {
     fontSize: "body_md",
     fontWeight: "normal",
-  },
-  icon: {
-    boxSize: "16px",
   },
 };
 interface Props {

@@ -1,5 +1,5 @@
 import { MockedFunction } from "vitest";
-import { AttachmentCommentDrawer, ReportCommentDrawer } from "./CommentDrawers";
+import { AttachmentCommentDrawer } from "./AttachmentCommentDrawer";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
@@ -8,16 +8,14 @@ import {
   InitiativeAnswerProp,
   Comment,
   CommentType,
-  ReportStatus,
 } from "@rhtp/shared";
-import { acceptReport, releaseReport, useStore } from "utils";
+import { useStore } from "utils";
 import {
   mockAdminUserStore,
   mockHelpDeskUserStore,
   mockUseStore,
 } from "utils/testing/setupTest";
 import { useFlags } from "launchdarkly-react-client-sdk";
-import { mockReport } from "utils/testing/mockForm";
 
 const mockGetComments = vi.fn().mockResolvedValue([
   {
@@ -62,8 +60,6 @@ mockFlags.mockReturnValue({
 });
 
 vi.mock("utils/api/requestMethods/report");
-const mockReleaseReport = vi.mocked(releaseReport);
-const mockAcceptReport = vi.mocked(acceptReport);
 
 const mockCloseHandler = vi.fn();
 const mockUpdateElement = vi.fn();
@@ -351,77 +347,4 @@ describe("AttachmentCommentDrawer component", () => {
   });
 
   testA11yAct(AttachmentCommentDrawerComponent());
-});
-
-const mockReloadReports = vi.fn();
-
-const ReportCommentDrawerComponent = (report = mockReport) => (
-  <ReportCommentDrawer
-    modalDisclosure={{
-      isOpen: true,
-      onClose: mockCloseHandler,
-    }}
-    selectedReport={report}
-    reloadReports={mockReloadReports}
-  />
-);
-describe("ReportCommentDrawer component", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-  describe("unsubmitted report", () => {
-    beforeEach(() => {
-      render(ReportCommentDrawerComponent());
-    });
-    test("shows the contents", () => {
-      expect(
-        screen.getByRole("heading", {
-          name: `Add comment to ${mockReport.name}`,
-        })
-      ).toBeInTheDocument();
-      expect(screen.getAllByLabelText("Status")[1]).toBeInTheDocument();
-    });
-
-    test("Modals close button can be clicked", async () => {
-      await userEvent.click(screen.getByText("Close"));
-      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
-    });
-
-    test("Status dropdown disabled for unsubmitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status")[1];
-      expect(statusDropdown).toBeDisabled();
-    });
-  });
-  describe("submitted report", () => {
-    const mockSubmittedReport = {
-      ...mockReport,
-      status: ReportStatus.SUBMITTED,
-    };
-    beforeEach(() => {
-      mockedUseStore.mockReturnValue(mockAdminUserStore);
-      render(ReportCommentDrawerComponent(mockSubmittedReport));
-    });
-
-    test("Admin can release a submitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status")[1];
-      expect(statusDropdown).toBeEnabled();
-      await userEvent.click(statusDropdown);
-      await userEvent.click(screen.getByRole("option", { name: "Unlock" }));
-      await userEvent.click(screen.getByText("Save"));
-      expect(mockReleaseReport).toHaveBeenCalled();
-      expect(mockReloadReports).toHaveBeenCalled();
-    });
-
-    test("Admin can accept a submitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status")[1];
-      expect(statusDropdown).toBeEnabled();
-      await userEvent.click(statusDropdown);
-      await userEvent.click(screen.getByRole("option", { name: "Accepted" }));
-      await userEvent.click(screen.getByText("Save"));
-      expect(mockAcceptReport).toHaveBeenCalled();
-      expect(mockReloadReports).toHaveBeenCalled();
-    });
-  });
-
-  testA11yAct(ReportCommentDrawerComponent());
 });

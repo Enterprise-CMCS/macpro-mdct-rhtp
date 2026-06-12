@@ -1,7 +1,7 @@
 import { Button, Stack, Image, HStack, Text } from "@chakra-ui/react";
 import { ChoiceList, Dropdown } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
-import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
+import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDrawer";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useEffect, useState } from "react";
 import {
