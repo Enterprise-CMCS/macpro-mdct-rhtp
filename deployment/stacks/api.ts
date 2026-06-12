@@ -8,6 +8,7 @@ import {
   aws_ses as ses,
   aws_sns as sns,
   aws_iam as iam,
+  Aws,
   CfnOutput,
   Duration,
   RemovalPolicy,
@@ -110,7 +111,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     actions: ["ses:SendEmail", "ses:SendRawEmail"],
     resources: [
       senderIdentity.emailIdentityArn,
-      configSet.configurationSetName,
+      `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:configuration-set/${configSet.configurationSetName}`,
     ],
   });
   // }
