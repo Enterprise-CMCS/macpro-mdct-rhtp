@@ -48,3 +48,20 @@ export const canWriteBanner = (user: User) => {
 export const canReleaseReport = (user: User) => {
   return adminRoles.includes(user.role);
 };
+
+export const canWriteComments = (user: User, state: StateAbbr) => {
+  if (adminRoles.includes(user.role)) return true;
+
+  if (user.role == UserRoles.STATE_USER && user.state === state) {
+    return true;
+  }
+  return false;
+};
+
+export const canReadInternalComments = (user: User) => {
+  return adminRoles.includes(user.role);
+};
+
+export const canReadAnyReport = (user: User) => {
+  return statelessRoles.includes(user.role);
+};

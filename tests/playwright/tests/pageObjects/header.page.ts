@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 
 export class HeaderPage {
   readonly page: Page;
@@ -23,7 +23,7 @@ export class HeaderPage {
 
   async openAccountMenu() {
     await this.accountButton.click();
-    await this.manageAccountMenuItem.waitFor({ state: "visible" });
+    await expect(this.manageAccountMenuItem).toBeVisible();
   }
 
   async goToHelp() {

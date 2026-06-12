@@ -44,6 +44,26 @@ export function createDataComponents(props: CreateDataComponentsProps) {
       },
       sortKey: { name: "fileId", type: dynamodb.AttributeType.STRING },
     }),
+    new DynamoDBTable(scope, "Comments", {
+      stage,
+      isDev,
+      name: "comments",
+      partitionKey: {
+        name: "contextId",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: { name: "created", type: dynamodb.AttributeType.NUMBER },
+    }),
+    new DynamoDBTable(scope, "Notifications", {
+      stage,
+      isDev,
+      name: "notifications",
+      partitionKey: {
+        name: "recipient",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: { name: "created", type: dynamodb.AttributeType.NUMBER },
+    }),
   ];
 
   return { tables };

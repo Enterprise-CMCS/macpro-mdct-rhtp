@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { TIMEOUT_LOADING, TIMEOUT_NAVIGATION } from "../../utils/timeouts";
 
 export class BasePage {
   readonly page: Page;
@@ -7,22 +8,26 @@ export class BasePage {
     this.page = page;
   }
 
-  protected waitForApiResponse(
-    method: string,
-    status: number,
-    urlPattern?: string
-  ) {
-    return this.page.waitForResponse((response) => {
-      const matchesMethod = response.request().method() === method;
-      const matchesStatus = response.status() === status;
-      const matchesUrl = urlPattern
-        ? response.url().includes(urlPattern)
-        : true;
-      return matchesMethod && matchesStatus && matchesUrl;
+  // ===== Navigation =====
+  async navigateTo(route: string): Promise<void> {
+    // domcontentloaded is typically faster than "load" or "networkidle" and sufficient for our dashboard interactions
+    // We have explicit waits for spinners and modals to ensure the page is ready for interaction
+    await this.page.goto(route, {
+      waitUntil: "domcontentloaded",
+      timeout: TIMEOUT_NAVIGATION,
     });
   }
 
-  protected waitForReportResponse(method: string, status: number) {
-    return this.waitForApiResponse(method, status, "/reports/");
+  // ===== Page State & Loading =====
+  async waitForLoadingComplete(): Promise<void> {
+    // Wait for any loading spinners to disappear (if they exist)
+    // Use implicit retry logic via waitFor rather than explicit expect
+    await this.page
+      .getByRole("status")
+      .first()
+      .waitFor({ state: "hidden", timeout: TIMEOUT_LOADING })
+      .catch(() => {
+        // No spinner found or already hidden
+      });
   }
 }

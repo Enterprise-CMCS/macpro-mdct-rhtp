@@ -80,9 +80,41 @@ export const pageIsCompletable = (report: Report, pageId: string) => {
   if (!targetPage) return false;
   if (!targetPage.elements) return true;
 
-  for (const element of targetPage.elements) {
-    const satisfied = elementSatisfiesRequired(element, targetPage.elements);
-    if (!satisfied) return false;
+  //Check initiative pages separately
+  if (pageId === "initiatives") {
+    const initiativePages = report.pages.filter(
+      (page) => "initiativeNumber" in page && page.status !== "Abandoned"
+    );
+    for (const page of initiativePages) {
+      for (const element of page.elements!) {
+        const satisfied = elementSatisfiesRequired(
+          element,
+          targetPage.elements
+        );
+        if (!satisfied) return false;
+      }
+    }
+  } else {
+    for (const element of targetPage.elements) {
+      if (element.type === ElementType.AccordionGroup) {
+        const accordionElements = element.accordions.flatMap(
+          (accordion) => accordion.children
+        );
+        for (const element of accordionElements) {
+          const satisfied = elementSatisfiesRequired(
+            element,
+            targetPage.elements
+          );
+          if (!satisfied) return false;
+        }
+      } else {
+        const satisfied = elementSatisfiesRequired(
+          element,
+          targetPage.elements
+        );
+        if (!satisfied) return false;
+      }
+    }
   }
 
   return true;
@@ -122,6 +154,26 @@ export const elementSatisfiesRequired = (
         if (!satisfied) return false;
       }
     }
+  }
+  if (
+    element.type === ElementType.ActionTable &&
+    element.id === "metrics-table"
+  ) {
+    //only get metric rows that haven't been abandoned
+    const activeElements = element.answer
+      .filter((rows) =>
+        rows.find(
+          (column) => column.id === "status" && column.value !== "Abandoned"
+        )
+      )
+      .flat();
+    const answers = activeElements.filter(
+      (column) => column.id != "prevValue" && column.id != "no"
+    );
+    return answers.every((column) => column.value !== "");
+  }
+  if (element.type == ElementType.UseOfFundsAttachment) {
+    return element.answer.length > 0;
   }
 
   return true;

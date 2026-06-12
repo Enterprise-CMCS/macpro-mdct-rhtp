@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { Link as RouterLink } from "react-router";
-import { Stack, Box, Button, Spinner, Image } from "@chakra-ui/react";
+import { Stack, Box, Button, Spinner, Image, Flex } from "@chakra-ui/react";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { submitReport, useStore, reportBasePath } from "utils";
-import { createZipFile } from "utils/other/zip";
 import { SubmitReportModal } from "./SubmitReportModal";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
-import { ReportStatus } from "@rhtp/shared";
+import { isCompleteStatus } from "@rhtp/shared";
+import { getZipFile } from "utils/other/fileUtils";
 
 export const SubmissionBar = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =
@@ -21,7 +21,7 @@ export const SubmissionBar = () => {
   }
 
   const isPdfActive = useFlags()?.viewPdf;
-  const isSubmitted = report.status === ReportStatus.SUBMITTED;
+  const isSubmitted = isCompleteStatus(report.status);
 
   const onSubmit = async () => {
     setModalOpen(false);
@@ -39,6 +39,21 @@ export const SubmissionBar = () => {
 
   const displayModal = () => {
     setModalComponent(modal, "Are you sure you want to submit?");
+  };
+
+  const [isZipLoading, setIsZipLoading] = useState(false);
+
+  const getZipClick = async () => {
+    setIsZipLoading(true);
+    try {
+      await getZipFile(report);
+    } catch (error) {
+      // TODO: better visual handing of this error for client?
+      // or not, because the timeout is 15 minutes
+      console.error("Error fetching ZIP file:", error);
+    }
+
+    setIsZipLoading(false);
   };
 
   return (
@@ -69,8 +84,14 @@ export const SubmissionBar = () => {
           colorScheme="blue"
           variant={isSubmitted ? "outline" : "link"}
           fontWeight="bold"
-          onClick={() => createZipFile(report)}
+          onClick={getZipClick}
+          disabled={isZipLoading}
         >
+          {isZipLoading && (
+            <Flex justify="center">
+              <Spinner size="md" />
+            </Flex>
+          )}
           ZIP Files
         </Button>
       </Box>

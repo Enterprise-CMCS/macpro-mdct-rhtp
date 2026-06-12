@@ -2,6 +2,8 @@ import { Report, ReportPages, ReportStatus } from "@rhtp/shared";
 import sesLib from "../../libs/ses-lib";
 import { logger } from "../../libs/debug-lib";
 import { isLocalStack } from "../../libs/localstack";
+import { User } from "../../types/types";
+import { saveNotifications } from "./notifications";
 
 const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
 
@@ -55,7 +57,7 @@ const getRecipients = (pages: ReportPages) => {
   return emails || [];
 };
 
-export const sendEmail = async (report: Report) => {
+export const sendEmail = async (report: Report, user: User) => {
   const { name, pages, status } = report;
   const recipients = getRecipients(pages);
   if (recipients.length === 0) return;
@@ -67,7 +69,8 @@ export const sendEmail = async (report: Report) => {
     emailTemplate
   );
   if (!isLocalStack()) {
-    await sesLib.sendSesEmail(emailTemplate);
+    const res = await sesLib.sendSesEmail(emailTemplate);
+    await saveNotifications(res, emailTemplate, report, user);
   } else {
     logger.info("Skipping email in dev env");
   }

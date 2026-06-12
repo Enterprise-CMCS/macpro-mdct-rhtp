@@ -175,6 +175,7 @@ export const metricTable = (
       { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },
     ],
     answer: [],
+    required: true,
   };
 
   const metricAnswers: any[] = [];
@@ -197,7 +198,7 @@ export const metricTable = (
 const checkpointsTables: TableCheckpointTemplate = {
   type: ElementType.TableCheckpoint,
   id: "checkpoint-table",
-  required: true,
+  required: false,
 };
 
 // TODO - better array typing and parsing once we have initiatives by state

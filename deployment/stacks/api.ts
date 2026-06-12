@@ -6,13 +6,16 @@ import {
   aws_s3 as s3,
   aws_ec2 as ec2,
   aws_ses as ses,
+  aws_sns as sns,
   aws_iam as iam,
+  Aws,
   CfnOutput,
   Duration,
   RemovalPolicy,
 } from "aws-cdk-lib";
 import { Lambda } from "../constructs/lambda.ts";
 import { WafConstruct } from "../constructs/waf.ts";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { DynamoDBTable } from "../constructs/dynamodb-table.ts";
 import { isLocalStack } from "../local/util.ts";
 import { LambdaDynamoEventSource } from "../constructs/lambda-dynamo-event.ts";
@@ -66,18 +69,58 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     resources: ["*"],
   });
   if (!isDev) {
+    const topic = new sns.Topic(scope, `${project}-${stage}-failedEmailTopic`);
+    new sns.Subscription(
+      scope,
+      `${project}-${stage}-failed-email-subscription`,
+      {
+        topic: sns.Topic.fromTopicArn(
+          scope,
+          `${project}-${stage}-failed-email-topic`,
+          topic.topicArn
+        ),
+        endpoint: "mdct-integrations@coforma.io",
+        protocol: sns.SubscriptionProtocol.EMAIL,
+      }
+    );
+
+    const configSet = new ses.ConfigurationSet(
+      scope,
+      `${project}-${stage}-email-configuration-set`,
+      {
+        sendingEnabled: true,
+        configurationSetName: `${project}-${stage}-email-configuration-set`,
+        reputationMetrics: true,
+      }
+    );
+
+    configSet.addEventDestination("sns", {
+      destination: ses.EventDestination.snsTopic(topic),
+      configurationSetEventDestinationName: `${project}-${stage}-email-topic`,
+      enabled: true,
+      events: [
+        ses.EmailSendingEvent.REJECT,
+        ses.EmailSendingEvent.BOUNCE,
+        ses.EmailSendingEvent.COMPLAINT,
+      ],
+    });
+
     const senderIdentity = new ses.EmailIdentity(
       scope,
       "SenderDomainIdentity",
       {
         identity: ses.Identity.domain("cms.hhs.gov"),
+        configurationSet: configSet,
       }
     );
 
     sesPolicy = new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: ["ses:SendEmail", "ses:SendRawEmail"],
-      resources: [senderIdentity.emailIdentityArn],
+      resources: [
+        senderIdentity.emailIdentityArn,
+        `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:configuration-set/${configSet.configurationSetName}`,
+      ],
     });
   }
 
@@ -191,6 +234,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "getReportsByType", {
+    entry: "services/app-api/handlers/reports/get.ts",
+    handler: "getReportsByType",
+    path: "reports/{reportType}",
+    method: "GET",
+    ...commonProps,
+  });
+
   new Lambda(scope, "getReport", {
     entry: "services/app-api/handlers/reports/get.ts",
     handler: "getReport",
@@ -250,6 +301,15 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "acceptReport", {
+    entry: "services/app-api/handlers/reports/accept.ts",
+    handler: "acceptReport",
+    path: "reports/accept/{reportType}/{state}/{id}",
+    method: "PUT",
+    additionalPolicies: [sesPolicy],
+    ...commonProps,
+  });
+
   new Lambda(scope, "createUpload", {
     entry: "services/app-api/handlers/uploads/create.ts",
     handler: "createUpload",
@@ -266,10 +326,36 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "getUploadsByReportId", {
-    entry: "services/app-api/handlers/uploads/get.ts",
-    handler: "getUploadsByReportId",
-    path: "/reports/{reportType}/{state}/{id}/files/",
+  const zipWorkerLambda = new Lambda(scope, "zipWorker", {
+    entry: "services/app-api/handlers/uploads/zip.ts",
+    handler: "zipWorker",
+    memorySize: 10240,
+    timeout: Duration.minutes(15),
+    ...commonProps,
+  });
+
+  new Lambda(scope, "triggerZipGeneration", {
+    entry: "services/app-api/handlers/uploads/zip.ts",
+    handler: "triggerZipGeneration",
+    path: "/reports/{reportType}/{state}/{id}/files/zip",
+    method: "POST",
+    additionalPolicies: [
+      new PolicyStatement({
+        actions: ["lambda:InvokeFunction"],
+        resources: [zipWorkerLambda.lambda.functionArn],
+      }),
+    ],
+    ...commonProps,
+    environment: {
+      ...commonProps.environment,
+      zipWorkerFunctionName: zipWorkerLambda.lambda.functionName,
+    },
+  });
+
+  new Lambda(scope, "getZipStatus", {
+    entry: "services/app-api/handlers/uploads/zip.ts",
+    handler: "getZipStatus",
+    path: "/reports/{reportType}/{state}/{id}/files/zip",
     method: "GET",
     ...commonProps,
   });
@@ -295,6 +381,22 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "updateInitiative",
     path: "reports/{reportType}/{state}/{id}/initiatives/{initiativeId}",
     method: "PUT",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "createComment", {
+    entry: "services/app-api/handlers/comments/create.ts",
+    handler: "createComment",
+    path: "comments/{state}/{contextId}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getComments", {
+    entry: "services/app-api/handlers/comments/fetch.ts",
+    handler: "getComments",
+    path: "comments/{state}/{contextId}",
+    method: "GET",
     ...commonProps,
   });
 

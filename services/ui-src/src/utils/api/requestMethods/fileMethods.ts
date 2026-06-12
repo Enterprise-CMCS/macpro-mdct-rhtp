@@ -6,11 +6,6 @@ interface PathURL {
   fileId: string;
 }
 
-interface ZipData {
-  name: string;
-  bytes: string;
-}
-
 export const recordFileInDatabaseAndGetUploadUrl = async (
   reportType: string,
   state: string,
@@ -37,20 +32,42 @@ export const recordFileInDatabaseAndGetUploadUrl = async (
   return { presignedUploadUrl: psurl, fileId };
 };
 
-export const getFileBytes = async (
+interface ZipStatusResponse {
+  status: "ready" | "pending";
+  psurl?: string;
+}
+
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLLS = 300; // 15 minutes at 3-second intervals
+
+export const getZipPresignedUrl = async (
   reportType: string,
   state: string,
   id: string
 ) => {
   const requestHeaders = await getRequestHeaders();
-  const options = {
-    headers: { ...requestHeaders },
-  };
-  const response = await apiLib.get<ZipData[]>(
-    `/reports/${reportType}/${state}/${id}/files/`,
-    options
+
+  await apiLib.post<{ status: string }>(
+    `/reports/${reportType}/${state}/${id}/files/zip`,
+    { headers: { ...requestHeaders }, body: {} }
   );
-  return response ?? [];
+
+  for (let i = 0; i < MAX_POLLS; i++) {
+    await new Promise<void>((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    console.log(`Polling for zip status... (attempt ${i + 1}/${MAX_POLLS})`);
+
+    const freshHeaders = await getRequestHeaders();
+    const result = await apiLib.get<ZipStatusResponse>(
+      `/reports/${reportType}/${state}/${id}/files/zip`,
+      { headers: { ...freshHeaders } }
+    );
+
+    if (result.status === "ready" && result.psurl) {
+      return result.psurl;
+    }
+  }
+
+  throw new Error("Zip generation timed out");
 };
 
 export const uploadFileToS3 = async (

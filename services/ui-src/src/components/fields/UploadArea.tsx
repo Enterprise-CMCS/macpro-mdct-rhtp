@@ -4,13 +4,13 @@ import { UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
-} from "utils/api/requestMethods/upload";
+} from "utils/api/requestMethods/fileMethods";
 import {
   acceptedFileTypes,
   downloadFile,
   getFileWithSafeName,
   uploadListRender,
-} from "utils/other/upload";
+} from "utils/other/fileUtils";
 import { useStore } from "utils";
 
 interface Props {
@@ -19,18 +19,20 @@ interface Props {
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
   uploadedSubLabel: string;
+  multiple?: boolean;
 }
 
-export const Upload = ({
+export const UploadArea = ({
   answer,
   saveToReport,
   deleteFromReport,
   uploadAreaHidden = false,
   uploadedSubLabel,
+  multiple = true,
 }: Props) => {
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
-  const [filesToUpload, setFilesToUpload] = useState<File[]>();
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
 
   useEffect(() => {
@@ -43,6 +45,10 @@ export const Upload = ({
       fetchData();
     }
   }, [filesToUpload]);
+
+  const hideUploadArea = () => {
+    return !multiple && (answer.length > 0 || filesToUpload.length > 0);
+  };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -80,10 +86,18 @@ export const Upload = ({
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    if (hideUploadArea()) return;
+
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
       .filter((file) => file != null);
-    filterFilesAndStartUpload(files);
+
+    if (files.length > 1 && !multiple) {
+      setUploadErrors(["File is limited to 1"]);
+    } else {
+      setUploadErrors([]);
+      filterFilesAndStartUpload(files);
+    }
   };
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +125,9 @@ export const Upload = ({
       {!uploadAreaHidden && (
         <>
           <div>
-            <Text sx={sx.uploadedLabel}>Select a file or files to upload</Text>
+            <Text sx={sx.uploadedLabel}>
+              Select a {multiple ? "file or files" : "file"} to upload
+            </Text>
             <Text sx={sx.uploadedSubLabel}>
               Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
             </Text>
@@ -122,30 +138,36 @@ export const Upload = ({
             onDragOver={handleDragOver}
             width="100%"
             aria-label="file drop area"
+            className={hideUploadArea() ? "disabled" : ""}
           >
             <span>
-              Drag files here or
+              Drag {multiple ? "files" : "file"} here or
               <label id="drop-zone">
                 Choose from folder
                 <input
                   type="file"
                   id="file-input"
-                  multiple
+                  multiple={multiple}
                   accept={acceptedFileTypes.join(",")}
                   onChange={onFileChange}
+                  disabled={hideUploadArea()}
                 />
               </label>
             </span>
           </Box>
           {uploadErrors.length > 0 && (
             <Box>
-              {uploadErrors.map((error) => (
-                <Text sx={sx.uploadErrorLabel}>{error}</Text>
+              {uploadErrors.map((error, index) => (
+                <Text sx={sx.uploadErrorLabel} key={`upload-error-${index}`}>
+                  {error}
+                </Text>
               ))}
             </Box>
           )}
 
-          <Text sx={sx.uploadedLabel}>Selected Files</Text>
+          <Text sx={sx.uploadedLabel}>
+            Selected {multiple ? "Files" : "File"}
+          </Text>
           {uploadListRender(
             reportType,
             state,
@@ -156,7 +178,9 @@ export const Upload = ({
         </>
       )}
       <div>
-        <Text sx={sx.uploadedLabel}>Uploaded Files</Text>
+        <Text sx={sx.uploadedLabel}>
+          Uploaded {multiple ? "Files" : "File"}
+        </Text>
         <Text sx={sx.uploadedSubLabel}>{uploadedSubLabel}</Text>
       </div>
       {uploadListRender(
@@ -218,6 +242,10 @@ const sx = {
 
     "#file-input": {
       display: "none",
+    },
+
+    "&.disabled": {
+      opacity: "0.4",
     },
   },
 };

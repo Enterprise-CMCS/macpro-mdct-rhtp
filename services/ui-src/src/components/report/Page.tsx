@@ -9,7 +9,7 @@ import {
   DividerElement,
 } from "./Elements";
 import { assertExhaustive } from "types";
-import { ElementType, PageElement, ReportStatus } from "@rhtp/shared";
+import { ElementType, isCompleteStatus, PageElement } from "@rhtp/shared";
 import {
   DateField,
   DropdownField,
@@ -28,7 +28,7 @@ import {
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
-import { UseOfFundsTableElement } from "./UseOfFundsTable";
+import { UseOfFundsAttachmentElement } from "./UseOfFundsAttachment";
 import { AttachmentArea } from "components/fields/AttachmentArea";
 import { SubmitForReview } from "./SubmitForReview";
 
@@ -43,8 +43,7 @@ export const Page = ({ id, setElements, elements }: Props) => {
   const { report } = useStore();
 
   const buildElement = (element: PageElement, index: number) => {
-    const disabled =
-      !userIsEndUser || report?.status === ReportStatus.SUBMITTED;
+    const disabled = !userIsEndUser || isCompleteStatus(report?.status);
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([
         ...elements.slice(0, index),
@@ -90,9 +89,11 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <ListInput {...{ updateElement, disabled, element }} />;
       case ElementType.TableCheckpoint:
         return <TableCheckpoint {...{ updateElement, disabled, element }} />;
-      case ElementType.UseOfFundsTable:
+      case ElementType.UseOfFundsAttachment:
         return (
-          <UseOfFundsTableElement {...{ updateElement, disabled, element }} />
+          <UseOfFundsAttachmentElement
+            {...{ updateElement, disabled, element }}
+          />
         );
       case ElementType.InitiativesTable:
         return <InitiativesTable {...{ disabled, element }} />;
