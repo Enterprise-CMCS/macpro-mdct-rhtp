@@ -223,6 +223,7 @@ export const TableCheckpoint = (
       comments: [],
       attachment: file,
       status: AttachmentStatus.PENDING_REVIEW,
+      canDelete: true,
     }));
   };
 
