@@ -258,6 +258,27 @@ export const AttachmentCommentDrawer = ({
   const [displayValue, setDisplayValue] = useState(initialValues);
   const [errorMessages, setErrorMessages] = useState(noErrorState);
 
+  const fetchComments = async () => {
+    setCommentsLoading(true);
+    setPastComments([]);
+    try {
+      const comments = await getComments(
+        allFiles[selectedAttachmentIndex].attachment.fileId,
+        report?.state || ""
+      );
+      setPastComments(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      setErrorMessages({
+        ...errorMessages,
+        overall:
+          "There was an error fetching comments for this attachment. Please try again.",
+      });
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setErrorMessages(noErrorState);
     setDisplayValue(initialValues);
@@ -273,27 +294,6 @@ export const AttachmentCommentDrawer = ({
       );
     }
     setStatusOptions(statusOptions);
-
-    const fetchComments = async () => {
-      setCommentsLoading(true);
-      setPastComments([]);
-      try {
-        const comments = await getComments(
-          allFiles[selectedAttachmentIndex].attachment.fileId,
-          report?.state || ""
-        );
-        setPastComments(comments);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-        setErrorMessages({
-          ...errorMessages,
-          overall:
-            "There was an error fetching comments for this attachment. Please try again.",
-        });
-      } finally {
-        setCommentsLoading(false);
-      }
-    };
 
     if (selectedAttachmentIndex !== -1) {
       fetchComments();
@@ -312,31 +312,35 @@ export const AttachmentCommentDrawer = ({
 
   const onSubmit = async () => {
     setCommentSubmitting(true);
-
-    if (selectedAttachmentIndex === -1 || commentsDisabled) {
-      setCommentSubmitting(false);
-      return modalDisclosure.onClose();
-    }
-
-    const didStatusChange =
-      displayValue.status !== allFiles[selectedAttachmentIndex].status;
-    const commentsEmpty = displayValue.comment.trim() === "";
-    if (commentsEmpty && !commentsOptional) {
-      setErrorMessages({
-        ...errorMessages,
-        comment: "A comment is required.",
-      });
-      setCommentSubmitting(false);
-      return;
-    }
-
-    // Comments are optional for admins
-    if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
-      setCommentSubmitting(false);
-      return modalDisclosure.onClose();
-    }
+    setErrorMessages(noErrorState);
 
     try {
+      if (selectedAttachmentIndex === -1 || commentsDisabled) {
+        setCommentSubmitting(false);
+        return;
+      }
+
+      const didStatusChange =
+        displayValue.status !== allFiles[selectedAttachmentIndex].status;
+      const commentsEmpty = displayValue.comment.trim() === "";
+      if (commentsEmpty && !commentsOptional) {
+        setErrorMessages({
+          ...errorMessages,
+          comment: "A comment is required.",
+        });
+        return;
+      }
+
+      // Comments are optional for admins
+      if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
+        setCommentSubmitting(false);
+        setErrorMessages({
+          ...errorMessages,
+          overall: "Must modify Status or provide a Comment to submit.",
+        });
+        return;
+      }
+
       await createComment(
         allFiles[selectedAttachmentIndex].attachment.fileId,
         report?.state || "",
@@ -348,6 +352,20 @@ export const AttachmentCommentDrawer = ({
           ...(didStatusChange && { statusChange: displayValue.status }),
         }
       );
+
+      allFiles[selectedAttachmentIndex] = {
+        ...allFiles[selectedAttachmentIndex],
+        ...(didStatusChange && {
+          status: displayValue.status as AttachmentStatus,
+        }),
+        canDelete: false, // if a comment is added, the file can no longer be deleted
+      };
+      updateElement({ answer: allFiles });
+      fetchComments();
+      setDisplayValue((prev) => ({
+        ...prev,
+        comment: "",
+      }));
     } catch (error) {
       console.error("Error creating comment:", error);
       setErrorMessages({
@@ -355,21 +373,9 @@ export const AttachmentCommentDrawer = ({
         overall:
           "There was an error submitting your comment. Please try again.",
       });
+    } finally {
       setCommentSubmitting(false);
-      return;
     }
-
-    allFiles[selectedAttachmentIndex] = {
-      ...allFiles[selectedAttachmentIndex],
-      ...(didStatusChange && {
-        status: displayValue.status as AttachmentStatus,
-      }),
-      canDelete: false, // if a comment is added, the file can no longer be deleted
-    };
-    updateElement({ answer: allFiles });
-
-    setCommentSubmitting(false);
-    modalDisclosure.onClose();
   };
 
   const userSpecificSubheading = userIsAdmin
@@ -383,7 +389,7 @@ export const AttachmentCommentDrawer = ({
       placement="right"
     >
       <DrawerOverlay />
-      <DrawerContent maxWidth={"50vw"}>
+      <DrawerContent maxWidth={"576px"}>
         <Flex sx={sx.drawerCloseContainer}>
           <Button
             leftIcon={<Image src={closeIcon} alt="Close" />}
@@ -434,23 +440,6 @@ export const AttachmentCommentDrawer = ({
               disabled={statusDisabled}
               errorMessage={errorMessages.status}
             />
-            <TextField
-              name={"comment"}
-              label={
-                <>
-                  Comment
-                  {commentsOptional && (
-                    <span className="optionalText"> (optional)</span>
-                  )}
-                </>
-              }
-              onChange={onChange}
-              value={displayValue.comment}
-              disabled={commentsDisabled}
-              multiline
-              rows={3}
-              errorMessage={errorMessages.comment}
-            />
             {userIsAdmin && (
               <ChoiceList
                 label="External or Internal Comment"
@@ -469,6 +458,23 @@ export const AttachmentCommentDrawer = ({
                 ]}
               />
             )}
+            <TextField
+              name={"comment"}
+              label={
+                <>
+                  Comment
+                  {commentsOptional && (
+                    <span className="optionalText"> (optional)</span>
+                  )}
+                </>
+              }
+              onChange={onChange}
+              value={displayValue.comment}
+              disabled={commentsDisabled}
+              multiline
+              rows={3}
+              errorMessage={errorMessages.comment}
+            />
           </Flex>
           <Button
             onClick={onSubmit}
@@ -493,9 +499,7 @@ export const AttachmentCommentDrawer = ({
           ) : null}
         </DrawerBody>
         <DrawerFooter>
-          <Button variant="outline" onClick={modalDisclosure.onClose}>
-            Close
-          </Button>
+          <Button onClick={modalDisclosure.onClose}>Close</Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

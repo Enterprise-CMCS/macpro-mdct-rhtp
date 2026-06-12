@@ -140,7 +140,6 @@ describe("AttachmentCommentDrawer component", () => {
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Add comment"));
-      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
       expect(mockCreateComment).toHaveBeenCalledWith(
         mockSelectedFile.fileId,
         "PA",
@@ -301,7 +300,6 @@ describe("AttachmentCommentDrawer component", () => {
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Internal (CMS Only)"));
       await userEvent.click(screen.getByText("Add comment"));
-      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
       expect(mockCreateComment).toHaveBeenCalledWith(
         mockSelectedFile.fileId,
         "PA",
@@ -329,7 +327,6 @@ describe("AttachmentCommentDrawer component", () => {
         screen.getByRole("option", { name: "Needs Revision" })
       );
       await userEvent.click(screen.getByText("Add comment"));
-      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
       expect(mockCreateComment).toHaveBeenCalledWith(
         mockSelectedFile.fileId,
         "PA",
