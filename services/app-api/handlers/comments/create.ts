@@ -3,10 +3,7 @@ import { handler } from "../../libs/handler-lib";
 import { parseCommentPathParams } from "../../libs/param-lib";
 import { badRequest, created, forbidden } from "../../libs/response-lib";
 import { putComment } from "../../storage/comments";
-import {
-  canReadInternalComments,
-  canWriteComments,
-} from "../../utils/authorization";
+import { canWriteComments } from "../../utils/authorization";
 import { logger } from "../../libs/debug-lib";
 import { validateCommentPayload } from "../../utils/reportValidation";
 import { error } from "../../utils/constants";
@@ -28,9 +25,6 @@ export const createComment = handler(
       id: randomUUID(),
       author: user.fullName,
       authorEmail: user.email,
-      // TODO: This will eventually need to change to allow internal users to select
-      // whether a comment is internal or not
-      isInternal: canReadInternalComments(user),
     };
     let validatedComment;
     try {

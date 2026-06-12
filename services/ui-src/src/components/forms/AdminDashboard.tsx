@@ -19,7 +19,7 @@ import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
-import { ReportCommentModal } from "components/modals/CommentModal";
+import { ReportCommentDrawer } from "components/modals/CommentDrawers";
 import { getStatus } from "utils/other/status";
 
 const buildStateOptions = () => {
@@ -57,7 +57,7 @@ export const AdminDashboard = () => {
     type: SORT_TYPE;
   }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
-  const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report>();
 
   const reloadReports = async (reportType: string) => {
@@ -140,14 +140,14 @@ export const AdminDashboard = () => {
     });
   };
 
-  const openCommentsModal = (report: Report) => {
+  const openCommentsDrawer = (report: Report) => {
     setSelectedReport(report);
-    setCommentModalOpen(true);
+    setCommentDrawerOpen(true);
   };
 
-  const closeCommentsModal = () => {
+  const closeCommentsDrawer = () => {
     setSelectedReport(undefined);
-    setCommentModalOpen(false);
+    setCommentDrawerOpen(false);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -163,7 +163,7 @@ export const AdminDashboard = () => {
           <Button
             variant="link"
             fontWeight="bold"
-            onClick={() => openCommentsModal(report)}
+            onClick={() => openCommentsDrawer(report)}
           >
             Comment/Status
           </Button>
@@ -300,10 +300,10 @@ export const AdminDashboard = () => {
         )}
       </Stack>
       {selectedReport && (
-        <ReportCommentModal
+        <ReportCommentDrawer
           modalDisclosure={{
-            isOpen: commentModalOpen,
-            onClose: closeCommentsModal,
+            isOpen: commentDrawerOpen,
+            onClose: closeCommentsDrawer,
           }}
           selectedReport={selectedReport}
           reloadReports={reloadReports}

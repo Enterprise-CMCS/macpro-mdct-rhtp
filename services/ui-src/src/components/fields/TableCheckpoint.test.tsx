@@ -20,7 +20,7 @@ import {
 } from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
-import { CommentModal } from "components/modals/CommentModal";
+import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
 import { removeFile } from "utils/other/fileUtils";
 
 vi.mock("utils/state/useStore");
@@ -75,8 +75,8 @@ vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
     ]),
 }));
 
-vi.mock("components/modals/CommentModal");
-const mockCommentModal = vi.mocked(CommentModal);
+vi.mock("components/modals/CommentDrawers");
+const mockCommentDrawer = vi.mocked(AttachmentCommentDrawer);
 
 const mockTableCheckpointElement: TableCheckpointTemplate = {
   id: "mock-TableCheckpoint-id",
@@ -178,7 +178,7 @@ describe("<TableCheckpoint />", () => {
     });
     expect(commentButton).toBeVisible();
     await userEvent.click(commentButton);
-    expect(mockCommentModal).toHaveBeenCalled();
+    expect(mockCommentDrawer).toHaveBeenCalled();
   });
   test("delete disabled when file status locked", async () => {
     const lockedFileReport = structuredClone(mockReport);

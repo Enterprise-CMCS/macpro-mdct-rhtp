@@ -30,6 +30,7 @@ describe("Test commentApi functions", () => {
       type: mockComment.type,
       comment: mockComment.comment,
       parentReportId: mockComment.parentReportId,
+      isInternal: mockComment.isInternal,
     });
     expect(result).toEqual(mockComment);
   });

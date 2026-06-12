@@ -1,5 +1,5 @@
 import { MockedFunction } from "vitest";
-import { CommentModal, ReportCommentModal } from "./CommentModal";
+import { AttachmentCommentDrawer, ReportCommentDrawer } from "./CommentDrawers";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
@@ -83,7 +83,7 @@ const mockAllFiles = [
   },
 ];
 
-const CommentModalComponent = (
+const AttachmentCommentDrawerComponent = (
   allFiles: InitiativeAnswerProp[] = mockAllFiles,
   disabled: boolean = false
 ) => {
@@ -97,7 +97,7 @@ const CommentModalComponent = (
     });
   }
   return (
-    <CommentModal
+    <AttachmentCommentDrawer
       modalDisclosure={{
         isOpen: true,
         onClose: mockCloseHandler,
@@ -109,22 +109,22 @@ const CommentModalComponent = (
   );
 };
 
-const renderCommentModal = async () => {
-  render(CommentModalComponent());
+const renderAttachmentCommentDrawer = async () => {
+  render(AttachmentCommentDrawerComponent());
   await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
 };
 
-describe("CommentModal component", () => {
+describe("AttachmentCommentDrawer component", () => {
   describe("with no comments", () => {
     beforeEach(async () => {
       vi.clearAllMocks();
       mockGetComments.mockResolvedValueOnce([]);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
     });
 
     test("shows the contents", () => {
       expect(
-        screen.getByRole("heading", { name: "Add Comment to test.png" })
+        screen.getByRole("heading", { name: "Add comment to attachment" })
       ).toBeInTheDocument();
       expect(
         screen.getByRole("textbox", { name: "Comment" })
@@ -132,14 +132,14 @@ describe("CommentModal component", () => {
     });
 
     test("Modals close button can be clicked", async () => {
-      await userEvent.click(screen.getByText("Close"));
+      await userEvent.click(screen.getAllByText("Close")[0]);
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
     });
 
     test("Fill and save comment", async () => {
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       await userEvent.type(commentInput, "Test comment");
-      await userEvent.click(screen.getByText("Save"));
+      await userEvent.click(screen.getByText("Add comment"));
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
       expect(mockCreateComment).toHaveBeenCalledWith(
         mockSelectedFile.fileId,
@@ -148,6 +148,7 @@ describe("CommentModal component", () => {
           comment: "Test comment",
           type: "attachment",
           parentReportId: mockUseStore.report?.id,
+          isInternal: false,
         }
       );
     });
@@ -187,7 +188,7 @@ describe("CommentModal component", () => {
         },
       ] as Comment[]);
 
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
     });
 
     test("Shows previous comments and status changes", async () => {
@@ -209,23 +210,23 @@ describe("CommentModal component", () => {
 
     test("state user can edit comment box always", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
     });
 
     test("state user must leave a comment to submit", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeEnabled();
-      await userEvent.click(screen.getByText("Save"));
+      await userEvent.click(screen.getByText("Add comment"));
       expect(screen.getByText("A comment is required.")).toBeVisible();
     });
 
     test("state user can edit attachment status to certain options", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const statusButton = screen.getAllByLabelText("Status")[1];
       await userEvent.click(statusButton);
       expect(
@@ -248,7 +249,7 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeEnabled();
     });
@@ -258,7 +259,7 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: false,
       });
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
       const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeDisabled();
@@ -269,7 +270,7 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
     });
@@ -279,10 +280,38 @@ describe("CommentModal component", () => {
         adminCommentsEnabled: true,
       });
       mockedUseStore.mockReturnValue(mockUseStore); // state user
-      render(CommentModalComponent(mockAllFiles, true)); // set disabled true
+      render(AttachmentCommentDrawerComponent(mockAllFiles, true)); // set disabled true
       await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
       const commentInput = screen.getByRole("textbox", { name: "Comment" });
       expect(commentInput).toBeDisabled();
+    });
+
+    test("admin user can make internal comments", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue({
+        ...mockUseStore,
+        ...mockAdminUserStore,
+      });
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", {
+        name: "Comment(optional)",
+      });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Internal (CMS Only)"));
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockSelectedFile.fileId,
+        "PA",
+        {
+          comment: "Test comment",
+          type: "attachment",
+          parentReportId: mockUseStore.report?.id,
+          isInternal: true,
+        }
+      );
     });
 
     test("admin user can edit attachment status", async () => {
@@ -293,13 +322,13 @@ describe("CommentModal component", () => {
         ...mockUseStore,
         ...mockAdminUserStore,
       });
-      await renderCommentModal();
+      await renderAttachmentCommentDrawer();
       const statusButton = screen.getAllByLabelText("Status")[1];
       await userEvent.click(statusButton);
       await userEvent.click(
         screen.getByRole("option", { name: "Needs Revision" })
       );
-      await userEvent.click(screen.getByText("Save"));
+      await userEvent.click(screen.getByText("Add comment"));
       expect(mockCloseHandler).toHaveBeenCalledTimes(1);
       expect(mockCreateComment).toHaveBeenCalledWith(
         mockSelectedFile.fileId,
@@ -309,6 +338,7 @@ describe("CommentModal component", () => {
           type: "attachment",
           parentReportId: mockUseStore.report?.id,
           statusChange: AttachmentStatus.NEEDS_REVISION,
+          isInternal: false,
         }
       );
       expect(mockUpdateElement).toHaveBeenCalledWith(
@@ -323,13 +353,13 @@ describe("CommentModal component", () => {
     });
   });
 
-  testA11yAct(CommentModalComponent());
+  testA11yAct(AttachmentCommentDrawerComponent());
 });
 
 const mockReloadReports = vi.fn();
 
-const ReportCommendModalComponent = (report = mockReport) => (
-  <ReportCommentModal
+const ReportCommentDrawerComponent = (report = mockReport) => (
+  <ReportCommentDrawer
     modalDisclosure={{
       isOpen: true,
       onClose: mockCloseHandler,
@@ -338,13 +368,13 @@ const ReportCommendModalComponent = (report = mockReport) => (
     reloadReports={mockReloadReports}
   />
 );
-describe("ReportCommentModal component", () => {
+describe("ReportCommentDrawer component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
   describe("unsubmitted report", () => {
     beforeEach(() => {
-      render(ReportCommendModalComponent());
+      render(ReportCommentDrawerComponent());
     });
     test("shows the contents", () => {
       expect(
@@ -372,7 +402,7 @@ describe("ReportCommentModal component", () => {
     };
     beforeEach(() => {
       mockedUseStore.mockReturnValue(mockAdminUserStore);
-      render(ReportCommendModalComponent(mockSubmittedReport));
+      render(ReportCommentDrawerComponent(mockSubmittedReport));
     });
 
     test("Admin can release a submitted report", async () => {
@@ -396,5 +426,5 @@ describe("ReportCommentModal component", () => {
     });
   });
 
-  testA11yAct(CommentModalComponent());
+  testA11yAct(ReportCommentDrawerComponent());
 });
