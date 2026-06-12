@@ -2,17 +2,21 @@ import { Heading } from "@chakra-ui/react";
 import { ElementType, PageElement } from "@rhtp/shared";
 import { notAnsweredText } from "../../constants";
 import { UseOfFundsAttachmentElementExport } from "components/report/UseOfFundsAttachment";
+import { ActionTableExport } from "components/fields/ActionTable";
+import { TableCheckpointExport } from "components/fields/TableCheckpoint";
 
 //elements that are rendered as part of the table that does not need a unique renderer
 const tableElementList = [
   ElementType.Textbox,
   ElementType.Radio,
   ElementType.TextAreaField,
+  ElementType.NumberField,
 ];
 
 const renderElementList = [
   ...tableElementList,
   ElementType.SubHeader,
+  ElementType.Paragraph,
   ElementType.TableCheckpoint,
   ElementType.AttachmentArea,
   ElementType.AccordionGroup,
@@ -36,7 +40,7 @@ export const renderElements = (element: PageElement) => {
         </Heading>
       );
     case ElementType.TableCheckpoint:
-      return "TBD";
+      return TableCheckpointExport(element);
     case ElementType.UseOfFundsAttachment:
       return UseOfFundsAttachmentElementExport(element);
     case ElementType.AttachmentArea:
@@ -44,7 +48,7 @@ export const renderElements = (element: PageElement) => {
     case ElementType.AccordionGroup:
       return "TBD";
     case ElementType.ActionTable:
-      return "TBD";
+      return ActionTableExport(element);
     case ElementType.AttachmentTable:
       return "TBD";
   }
