@@ -15,7 +15,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { formatMonthDayYear, useStore } from "utils";
-import { Report, ReportPages, StateNames } from "@rhtp/shared";
+import { Report, ReportPage, ReportPages, StateNames } from "@rhtp/shared";
 import { getReportName } from "types";
 import { ExportedReportBanner, ExportedReportWrapper } from "components";
 import { shouldRender } from "./ExportedReportPageHelpers";
@@ -107,7 +107,21 @@ export const reportSubmissionSetUp = (_report: Report) => {
 export const renderReportSections = (reportPages: ReportPages) => {
   reportPages = reportPages.filter(shouldRender);
 
-  return reportPages.map((section, idx) => {
+  const sortedReports = reportPages.reduce(
+    (acc: ReportPage[][], curr) => {
+      const index = "initiativeNumber" in curr ? 0 : 1;
+      acc[index].push(curr);
+      return acc;
+    },
+    [[], []]
+  );
+
+  const indexOfInitiative = sortedReports[1].findIndex(
+    (report) => report.id === "initiatives"
+  );
+  sortedReports[1].splice(indexOfInitiative + 1, 0, ...sortedReports[0]);
+
+  return sortedReports[1].map((section, idx) => {
     return (
       <Box key={`${section.id}.${idx}`}>
         <Flex flexDirection="column">

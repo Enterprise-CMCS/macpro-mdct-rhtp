@@ -106,16 +106,19 @@ const exportVariant = {
 };
 
 const reportDetailsVariant = {
-  tr: {
-    "th, td": {
-      borderColor: "transparent",
+  table: {
+    tr: {
+      border: "none",
+      "th, td": {
+        borderColor: "transparent",
+      },
     },
-  },
-  td: {
-    fontSize: "body_sm",
-    padding: "0",
-    color: "black",
-    width: "25%",
+    td: {
+      fontSize: "body_sm",
+      padding: "0",
+      color: "black",
+      width: "25%",
+    },
   },
 };
 

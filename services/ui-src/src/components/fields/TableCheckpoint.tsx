@@ -510,3 +510,8 @@ const sx = {
     },
   },
 };
+
+export const TableCheckpointExport = (element: TableCheckpointTemplate) => {
+  console.log(element);
+  return <div>Hello</div>;
+};
