@@ -131,6 +131,7 @@ export const uploadListRender = (
                   <Button
                     variant="link"
                     onClick={() => onClick(reportType, state, id, file)}
+                    textAlign="left"
                   >
                     {file.name}
                   </Button>

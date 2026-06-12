@@ -26,6 +26,8 @@ const copyAnswer = (
         newElement.answer = copyMetricAnswers(
           oldElement.answer as ActionAnswerShape[]
         );
+      } else if (newElement.id === "use-of-funds-attachment") {
+        newElement.answer = [];
       } else {
         newElement.answer = oldElement.answer;
       }
