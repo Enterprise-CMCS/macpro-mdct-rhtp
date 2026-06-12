@@ -68,53 +68,61 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     actions: ["ses:SendEmail", "ses:SendRawEmail"],
     resources: ["*"],
   });
-  // if (!isDev) {
-  const topic = new sns.Topic(scope, `${project}-${stage}-failedEmailTopic`);
-  new sns.Subscription(scope, `${project}-${stage}-failed-email-subscription`, {
-    topic: sns.Topic.fromTopicArn(
+  if (!isDev) {
+    const topic = new sns.Topic(scope, `${project}-${stage}-failedEmailTopic`);
+    new sns.Subscription(
       scope,
-      `${project}-${stage}-failed-email-topic`,
-      topic.topicArn
-    ),
-    endpoint: "garrett.rabian@coforma.io",
-    protocol: sns.SubscriptionProtocol.EMAIL,
-  });
+      `${project}-${stage}-failed-email-subscription`,
+      {
+        topic: sns.Topic.fromTopicArn(
+          scope,
+          `${project}-${stage}-failed-email-topic`,
+          topic.topicArn
+        ),
+        endpoint: "mdct-integrations@coforma.io",
+        protocol: sns.SubscriptionProtocol.EMAIL,
+      }
+    );
 
-  const configSet = new ses.ConfigurationSet(
-    scope,
-    `${project}-${stage}-email-configuration-set`,
-    {
-      sendingEnabled: true,
-      configurationSetName: `${project}-${stage}-email-configuration-set`,
-      reputationMetrics: true,
-    }
-  );
+    const configSet = new ses.ConfigurationSet(
+      scope,
+      `${project}-${stage}-email-configuration-set`,
+      {
+        sendingEnabled: true,
+        configurationSetName: `${project}-${stage}-email-configuration-set`,
+        reputationMetrics: true,
+      }
+    );
 
-  configSet.addEventDestination("sns", {
-    destination: ses.EventDestination.snsTopic(topic),
-    configurationSetEventDestinationName: `${project}-${stage}-email-topic`,
-    enabled: true,
-    events: [
-      ses.EmailSendingEvent.REJECT,
-      ses.EmailSendingEvent.BOUNCE,
-      ses.EmailSendingEvent.COMPLAINT,
-    ],
-  });
+    configSet.addEventDestination("sns", {
+      destination: ses.EventDestination.snsTopic(topic),
+      configurationSetEventDestinationName: `${project}-${stage}-email-topic`,
+      enabled: true,
+      events: [
+        ses.EmailSendingEvent.REJECT,
+        ses.EmailSendingEvent.BOUNCE,
+        ses.EmailSendingEvent.COMPLAINT,
+      ],
+    });
 
-  const senderIdentity = new ses.EmailIdentity(scope, "SenderDomainIdentity", {
-    identity: ses.Identity.domain("cms.test.gov"),
-    configurationSet: configSet,
-  });
+    const senderIdentity = new ses.EmailIdentity(
+      scope,
+      "SenderDomainIdentity",
+      {
+        identity: ses.Identity.domain("cms.hhs.gov"),
+        configurationSet: configSet,
+      }
+    );
 
-  sesPolicy = new iam.PolicyStatement({
-    effect: iam.Effect.ALLOW,
-    actions: ["ses:SendEmail", "ses:SendRawEmail"],
-    resources: [
-      senderIdentity.emailIdentityArn,
-      `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:configuration-set/${configSet.configurationSetName}`,
-    ],
-  });
-  // }
+    sesPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["ses:SendEmail", "ses:SendRawEmail"],
+      resources: [
+        senderIdentity.emailIdentityArn,
+        `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:configuration-set/${configSet.configurationSetName}`,
+      ],
+    });
+  }
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,
