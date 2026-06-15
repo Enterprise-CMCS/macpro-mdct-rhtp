@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   TextField,
   Dropdown,
@@ -37,6 +37,7 @@ import {
   CommentType,
   Comment,
   isCompleteStatus,
+  LiteReport,
 } from "@rhtp/shared";
 import { acceptReport, releaseReport, useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
@@ -45,7 +46,7 @@ import {
   getComments,
 } from "utils/api/requestMethods/commentMethods";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
-import lockIcon from "assets/icons/icon_lock.svg";
+import { PreviousComments } from "./PreviousComments";
 
 const AdminReportStatusOptions = [
   ReportStatus.SUBMITTED,
@@ -57,23 +58,61 @@ export const ReportCommentDrawer = ({
   modalDisclosure,
   selectedReport,
   reloadReports,
-}: ReportCommentProps) => {
-  const { name, status } = selectedReport;
-  const { userIsAdmin } = useStore().user ?? {};
-  // Can only modify dropdown if report is submitted and is admin user
-  const disabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
+}: Props) => {
+  const { name, status, state, id } = selectedReport;
+  const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
+
   const initialValues: {
     comment: string;
     status: string;
+    commentType: "external" | "internal";
   } = {
     comment: "",
     status: status,
+    commentType: "external",
   };
+
+  const noErrorState = {
+    comment: "",
+    status: "",
+    overall: "",
+    commentType: "",
+  };
+
   const [displayValue, setDisplayValue] = useState(initialValues);
+  const [errorMessages, setErrorMessages] = useState(noErrorState);
+  const [commentsLoading, setCommentsLoading] = useState<boolean>(false);
   const [statusOptions, setStatusOptions] = useState<DropdownOption[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [pastComments, setPastComments] = useState<Comment[]>([]);
+
+  const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
+  const userCanAddComment =
+    userIsEndUser || (userIsAdmin && adminCommentsEnabled);
+
+  const commentsOptional = userIsAdmin;
+  const statusDisabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
+
+  const fetchComments = async () => {
+    setCommentsLoading(true);
+    setPastComments([]);
+    try {
+      const comments = await getComments(id, state);
+      setPastComments(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      setErrorMessages({
+        ...errorMessages,
+        overall:
+          "There was an error fetching comments for this report. Please try again.",
+      });
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
 
   useEffect(() => {
+    fetchComments();
     const statuses = new Set([...AdminReportStatusOptions, status]);
     const statusOptions = [];
     for (const status of statuses.values()) {
@@ -97,7 +136,7 @@ export const ReportCommentDrawer = ({
 
   const onSubmit = async () => {
     setSubmitting(true);
-
+    console.log("Submitting comment:", displayValue);
     if (displayValue.status === "Unlock") {
       await releaseReport(selectedReport);
       reloadReports(ReportType.RHTP);
@@ -113,33 +152,163 @@ export const ReportCommentDrawer = ({
     setSubmitting(false);
   };
 
+  const userSpecificSubheading = userIsAdmin
+    ? "[Instructional text]"
+    : "Enter a comment below to comment on the report. A notification will be sent to your CMS Project Officer.";
+
   return (
-    <Modal
-      modalDisclosure={modalDisclosure}
-      content={{
-        heading: `Add comment to ${name || "report"}`,
-        actionButtonText: "Save",
-      }}
-      onConfirmHandler={onSubmit}
-      submitting={submitting}
+    <Drawer
+      isOpen={modalDisclosure.isOpen}
+      onClose={modalDisclosure.onClose}
+      placement="right"
     >
-      <Dropdown
-        label="Status"
-        name="status"
-        onChange={onChange}
-        options={statusOptions}
-        value={displayValue.status}
-        disabled={disabled}
-      />
-    </Modal>
+      <DrawerOverlay />
+      <DrawerContent maxWidth={"576px"}>
+        <Flex sx={sx.drawerCloseContainer}>
+          <Button
+            leftIcon={<Image src={closeIcon} alt="Close" />}
+            variant="link"
+            onClick={modalDisclosure.onClose}
+            fontWeight="bold"
+          >
+            Close
+          </Button>
+        </Flex>
+        <DrawerHeader>
+          <Flex direction="column" gap="spacer3">
+            <Heading as="h1" sx={sx.drawerHeaderText}>
+              Add comment to report
+            </Heading>
+          </Flex>
+        </DrawerHeader>
+        <DrawerBody>
+          <Flex direction="column" gap="spacer4" marginBottom="spacer4">
+            <Text sx={sx.drawerSubheading}>{userSpecificSubheading}</Text>
+            <Text fontSize="body_lg" fontWeight="body_lg">
+              <b>Report:</b> {name}
+            </Text>
+            {errorMessages.overall && (
+              <Text fontSize="body_md" color="red">
+                {errorMessages.overall}
+              </Text>
+            )}
+
+            {userIsAdmin && (
+              <Fragment>
+                <Dropdown
+                  label="Status"
+                  name="status"
+                  onChange={onChange}
+                  options={statusOptions}
+                  value={displayValue.status}
+                  disabled={statusDisabled}
+                  errorMessage={errorMessages.status}
+                />
+                <ChoiceList
+                  label="External or Internal Comment"
+                  hint="Choose whether this comment is hidden from the state or shared."
+                  name="commentType"
+                  type="radio"
+                  onChange={onChange}
+                  errorMessage={errorMessages.commentType}
+                  choices={[
+                    {
+                      label: "External (Shared with States)",
+                      value: "external",
+                      defaultChecked: true,
+                    },
+                    { label: "Internal (CMS Only)", value: "internal" },
+                  ]}
+                />
+              </Fragment>
+            )}
+            <TextField
+              name={"comment"}
+              label={
+                <>
+                  Comment
+                  {commentsOptional && (
+                    <span className="optionalText"> (optional)</span>
+                  )}
+                </>
+              }
+              onChange={onChange}
+              value={displayValue.comment}
+              disabled={!userCanAddComment}
+              multiline
+              rows={3}
+              errorMessage={errorMessages.comment}
+            />
+          </Flex>
+          <Button
+            onClick={onSubmit}
+            isDisabled={!userCanAddComment}
+            isLoading={submitting}
+            variant="outline"
+          >
+            Add comment
+          </Button>
+          <Divider marginTop={"spacer3"} borderColor={"black"} />
+          {commentsLoading ? (
+            <Flex gap="spacer2" alignItems="center" marginTop="spacer4">
+              <Spinner size="md" />
+              <Text>Comments loading...</Text>
+            </Flex>
+          ) : null}
+          {pastComments.length > 0 ? (
+            <PreviousComments
+              comments={pastComments}
+              userIsAdmin={userIsAdmin!}
+            />
+          ) : null}
+        </DrawerBody>
+        <DrawerFooter>
+          <Button onClick={modalDisclosure.onClose}>Close</Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+    // <Modal
+    //   modalDisclosure={modalDisclosure}
+    //   content={{
+    //     heading: `Add comment to ${name || "report"}`,
+    //     actionButtonText: "Save",
+    //   }}
+    //   onConfirmHandler={onSubmit}
+    //   submitting={submitting}
+    // >
+    //   <Dropdown
+    //     label="Status"
+    //     name="status"
+    //     onChange={onChange}
+    //     options={statusOptions}
+    //     value={displayValue.status}
+    //     disabled={disabled}
+    //   />
+    // </Modal>
   );
 };
 
-interface ReportCommentProps {
+const sx = {
+  drawerHeaderText: {
+    fontSize: "heading_2xl",
+    fontWeight: "heading_2xl",
+  },
+  drawerCloseContainer: {
+    position: "absolute",
+    right: "spacer4",
+    top: "spacer2",
+  },
+  drawerSubheading: {
+    fontSize: "body_md",
+    fontWeight: "normal",
+  },
+};
+
+interface Props {
   modalDisclosure: {
     isOpen: boolean;
     onClose: () => void;
   };
-  selectedReport: Report;
+  selectedReport: Report | LiteReport;
   reloadReports: Function;
 }

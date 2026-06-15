@@ -99,7 +99,7 @@ export const SubmissionBar = () => {
         <Button
           alignSelf="flex-end"
           onClick={async () => displayModal()}
-          disabled={!submittableMetrics?.submittable || submitting}
+          disabled={false}
         >
           {submitting && <Spinner size="sm" marginRight="spacer2" />}
           {`Submit ${report.type} Report`}

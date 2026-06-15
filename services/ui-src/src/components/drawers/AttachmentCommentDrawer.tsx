@@ -350,6 +350,7 @@ const sx = {
     fontWeight: "normal",
   },
 };
+
 interface Props {
   modalDisclosure: {
     isOpen: boolean;
