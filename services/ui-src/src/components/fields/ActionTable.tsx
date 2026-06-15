@@ -1,4 +1,4 @@
-import { Flex, Button, Image, Heading } from "@chakra-ui/react";
+import { Flex, Button, Image, Heading, Stack } from "@chakra-ui/react";
 import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
@@ -233,11 +233,11 @@ export const ActionTableExport = (element: ActionTableTemplate) => {
   const rows = element.answer?.map((row, index) => buildRow(row, index)) ?? [];
 
   return (
-    <>
+    <Stack width="720px" key={element.id}>
       <Heading as="h2" className="chakra-heading" fontWeight="bold">
         {element.label}
       </Heading>
-      {ResponsiveTable(headers, rows)}
-    </>
+      {ResponsiveTable(headers, rows, "pdf")}
+    </Stack>
   );
 };

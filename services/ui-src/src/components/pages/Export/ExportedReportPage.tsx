@@ -155,7 +155,6 @@ export const sx = {
       color: "black",
     },
     h4: {
-      marginBottom: "-spacer1",
       color: "black",
     },
     ".performance-rate-header": {

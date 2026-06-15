@@ -8,6 +8,9 @@ import { notAnsweredText } from "../../constants";
 import { UseOfFundsAttachmentElementExport } from "components/report/UseOfFundsAttachment";
 import { ActionTableExport } from "components/fields/ActionTable";
 import { TableCheckpointExport } from "components/fields/TableCheckpoint";
+import { parseHtml } from "utils";
+
+const specificIds = ["initiatives-instructions", "initiative-instructions"];
 
 //elements that are rendered as part of the table that does not need a unique renderer
 const tableElementList = [
@@ -20,6 +23,7 @@ const tableElementList = [
 const renderElementList = [
   ...tableElementList,
   ElementType.SubHeader,
+  ElementType.Paragraph,
   ElementType.TableCheckpoint,
   ElementType.AttachmentArea,
   ElementType.AccordionGroup,
@@ -38,10 +42,14 @@ export const renderElements = (element: PageElement) => {
   switch (type) {
     case ElementType.SubHeader:
       return (
-        <Heading as="h4" variant="nestedHeading">
+        <Heading as="h3" variant="nestedHeading" my="2rem" key={element.id}>
           {element.text}
         </Heading>
       );
+    case ElementType.Paragraph:
+      if (specificIds.includes(element.id))
+        return <div key={element.id}>{parseHtml(element.text)}</div>;
+      return;
     case ElementType.TableCheckpoint:
       return TableCheckpointExport(
         element as TableCheckpointTemplate & { initId: string }

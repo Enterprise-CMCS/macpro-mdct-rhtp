@@ -1,4 +1,11 @@
-import { Stack, Button, Checkbox, Image, Flex } from "@chakra-ui/react";
+import {
+  Stack,
+  Button,
+  Checkbox,
+  Image,
+  Flex,
+  Heading,
+} from "@chakra-ui/react";
 import {
   AttachmentStatus,
   ElementType,
@@ -554,12 +561,12 @@ export const TableCheckpointExport = (
   };
 
   return (
-    <>
-      {data.map((item, index) => (
-        <Stack gap="1.5rem">
-          <div key={`checkpoints-${index}`}>
+    <Stack gap="2em" key={element.id}>
+      {data.map((item) => (
+        <Stack gap="2rem" key={item.label}>
+          <Heading as="h4" fontSize="16px" fontWeight="bold">
             Stage {item.stage}: {item.label}
-          </div>
+          </Heading>
           {ResponsiveTable(
             [
               { label: "#" },
@@ -568,10 +575,17 @@ export const TableCheckpointExport = (
               { label: "Attachments" },
               { label: "Status" },
             ],
-            buildRows(item)
+            buildRows(item),
+            "pdf",
+            () => {},
+            item.rows.map((_row, index) =>
+              item.rows.at(index + 1) && item.rows.at(index + 1).stageNo == ""
+                ? "borderless"
+                : ""
+            )
           )}
         </Stack>
       ))}
-    </>
+    </Stack>
   );
 };
