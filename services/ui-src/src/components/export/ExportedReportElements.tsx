@@ -1,5 +1,9 @@
 import { Heading } from "@chakra-ui/react";
-import { ElementType, PageElement } from "@rhtp/shared";
+import {
+  ElementType,
+  PageElement,
+  TableCheckpointTemplate,
+} from "@rhtp/shared";
 import { notAnsweredText } from "../../constants";
 import { UseOfFundsAttachmentElementExport } from "components/report/UseOfFundsAttachment";
 import { ActionTableExport } from "components/fields/ActionTable";
@@ -16,7 +20,6 @@ const tableElementList = [
 const renderElementList = [
   ...tableElementList,
   ElementType.SubHeader,
-  ElementType.Paragraph,
   ElementType.TableCheckpoint,
   ElementType.AttachmentArea,
   ElementType.AccordionGroup,
@@ -40,7 +43,9 @@ export const renderElements = (element: PageElement) => {
         </Heading>
       );
     case ElementType.TableCheckpoint:
-      return TableCheckpointExport(element);
+      return TableCheckpointExport(
+        element as TableCheckpointTemplate & { initId: string }
+      );
     case ElementType.UseOfFundsAttachment:
       return UseOfFundsAttachmentElementExport(element);
     case ElementType.AttachmentArea:

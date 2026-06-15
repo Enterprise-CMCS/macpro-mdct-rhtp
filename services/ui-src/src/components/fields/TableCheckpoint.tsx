@@ -136,6 +136,15 @@ const getFilesFromTable = (tables: TableShape[], checkpoint: string) => {
     .map((filter) => filter.file);
 };
 
+const header = [
+  { label: "#" },
+  { label: "Checkpoint" },
+  { label: "Ready for CMS Review" },
+  { label: "Attachments" },
+  { label: "Status" },
+  { label: "Actions" },
+];
+
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
 ) => {
@@ -397,15 +406,6 @@ export const TableCheckpoint = (
     });
   };
 
-  const header = [
-    { label: "#" },
-    { label: "Checkpoint" },
-    { label: "Ready for CMS Review" },
-    { label: "Attachments" },
-    { label: "Status" },
-    { label: "Actions" },
-  ];
-
   return (
     <Stack gap="1.25rem" width="100%">
       {tables.map((table, tableIndex) => (
@@ -484,7 +484,67 @@ const sx = {
   },
 };
 
-export const TableCheckpointExport = (element: TableCheckpointTemplate) => {
-  console.log(element);
-  return <div>Hello</div>;
+export const TableCheckpointExport = (
+  element: TableCheckpointTemplate & { initId: string }
+) => {
+  const { report } = useStore();
+  const { answer, initId } = element;
+
+  if (!initId) return;
+
+  const attachments = report?.pages
+    .flatMap((page) => page.elements)
+    .find((element) => element?.type === ElementType.AttachmentTable)?.answer;
+
+  const files =
+    attachments?.filter((data) => data.initiatives.includes(initId)) ?? [];
+
+  const data = buildTables(files);
+
+  const buildRows = (table: {
+    stage: number;
+    label: string;
+    checkpoints: {
+      id: string;
+      checkpointNumber: string;
+      label: string;
+      attachable: boolean;
+    }[];
+    rows: any[];
+  }) => {
+    return table.rows.map((row) => {
+      const readyForCMS = answer?.find((value) => value.id === row.id)?.checked
+        ? "Yes"
+        : "No";
+      return [
+        row.stageNo,
+        row.label,
+        readyForCMS,
+        "file" in row ? (row?.file?.name ?? "No attachment") : "Not applicable",
+        row.status,
+      ];
+    });
+  };
+
+  return (
+    <>
+      {data.map((item, index) => (
+        <Stack gap="1.5rem">
+          <div key={`checkpoints-${index}`}>
+            Stage {item.stage}: {item.label}
+          </div>
+          {ResponsiveTable(
+            [
+              { label: "#" },
+              { label: "Checkpoint" },
+              { label: "Ready for CMS Review" },
+              { label: "Attachments" },
+              { label: "Status" },
+            ],
+            buildRows(item)
+          )}
+        </Stack>
+      ))}
+    </>
+  );
 };

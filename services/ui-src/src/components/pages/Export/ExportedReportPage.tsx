@@ -119,6 +119,14 @@ export const renderReportSections = (reportPages: ReportPages) => {
   const indexOfInitiative = sortedReports[1].findIndex(
     (report) => report.id === "initiatives"
   );
+
+  for (const init of sortedReports[0]) {
+    init.elements = init.elements?.map((element) => ({
+      ...element,
+      initId: init.id,
+    }));
+  }
+
   sortedReports[1].splice(indexOfInitiative + 1, 0, ...sortedReports[0]);
 
   return sortedReports[1].map((section, idx) => {
