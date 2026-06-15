@@ -5,10 +5,10 @@ import { NotificationsPage } from "./NotificationsPage";
 describe("NotificationsPage component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    render(<NotificationsPage />);
   });
 
   test("renders", () => {
-    render(<NotificationsPage />);
     expect(
       screen.getByRole("heading", { name: "Notifications Settings" })
     ).toBeVisible();
@@ -16,7 +16,6 @@ describe("NotificationsPage component", () => {
   });
 
   test("add email modal opens and has inputs", async () => {
-    render(<NotificationsPage />);
     const addEmailButton = screen.getByRole("button", { name: "Add email" });
     await userEvent.click(addEmailButton);
     expect(
@@ -31,7 +30,6 @@ describe("NotificationsPage component", () => {
   });
 
   test("email modal shows errors when input invalid", async () => {
-    render(<NotificationsPage />);
     const addEmailButton = screen.getByRole("button", { name: "Add email" });
     await userEvent.click(addEmailButton);
     expect(
@@ -47,7 +45,6 @@ describe("NotificationsPage component", () => {
   });
 
   test("modal closes on submit with valid inputs", async () => {
-    render(<NotificationsPage />);
     const addEmailButton = screen.getByRole("button", { name: "Add email" });
     await userEvent.click(addEmailButton);
     expect(
@@ -55,7 +52,8 @@ describe("NotificationsPage component", () => {
     ).toBeInTheDocument();
 
     const emailInput = screen.getByRole("textbox", { name: "Email" });
-    await userEvent.type(emailInput, "valid@email.com");
+    await userEvent.click(emailInput);
+    await userEvent.paste("valid@email.com");
 
     const dropdownBtn = screen.getByRole("button", { name: "States select" });
     await userEvent.click(dropdownBtn);
