@@ -22,7 +22,7 @@ import { budgetPeriodFilterOptions } from "./../../constants";
 import { ReportCommentDrawer } from "components/modals/CommentDrawers";
 import { getStatus } from "utils/other/status";
 
-const buildStateOptions = () => {
+export const buildStateOptions = () => {
   const stateValues = [];
   for (const [key, value] of Object.entries(StateNames)) {
     stateValues.push({
