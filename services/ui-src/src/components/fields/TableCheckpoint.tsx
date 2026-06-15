@@ -32,7 +32,7 @@ import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider"
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
-import { CommentModal } from "components/modals/CommentModal";
+import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
 import { Alert } from "components";
 import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
@@ -94,7 +94,7 @@ const buildRows = (
           completed: undefined,
           file,
           status,
-          canDelete,
+          canDelete: canDelete ?? true,
         })
       );
     } else {
@@ -135,15 +135,6 @@ const getFilesFromTable = (tables: TableShape[], checkpoint: string) => {
     .filter((row) => row.id === checkpoint && row.file.fileId)
     .map((filter) => filter.file);
 };
-
-const header = [
-  { label: "#" },
-  { label: "Checkpoint" },
-  { label: "Ready for CMS Review" },
-  { label: "Attachments" },
-  { label: "Status" },
-  { label: "Actions" },
-];
 
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
@@ -232,6 +223,7 @@ export const TableCheckpoint = (
       comments: [],
       attachment: file,
       status: AttachmentStatus.PENDING_REVIEW,
+      canDelete: true,
     }));
   };
 
@@ -406,6 +398,35 @@ export const TableCheckpoint = (
     });
   };
 
+  const header = [
+    { label: "#" },
+    { label: "Checkpoint" },
+    { label: "Ready for CMS Review" },
+    { label: "Attachments" },
+    { label: "Status" },
+    { label: "Actions" },
+  ];
+
+  //This generates the zebra styling for the table rows when multiple files are tied to a shared checkpoint
+  const buildStyle = (
+    rows: {
+      id: string;
+      stageNo: string;
+      label: string;
+      file: UploadListProp;
+      status: AttachmentStatus;
+      canDelete: boolean;
+    }[]
+  ) => {
+    const styling = ["white"];
+    for (var i = 1; i < rows.length; i++) {
+      const prevColor = styling.at(-1)!;
+      const nextColor = prevColor == "white" ? "grey" : "white";
+      styling.push(rows[i].stageNo == "" ? prevColor : nextColor);
+    }
+    return styling;
+  };
+
   return (
     <Stack gap="1.25rem" width="100%">
       {tables.map((table, tableIndex) => (
@@ -421,7 +442,13 @@ export const TableCheckpoint = (
           >
             Upload attachments
           </Button>
-          {ResponsiveTable(header, getRows(table.rows), "metric")}
+          {ResponsiveTable(
+            header,
+            getRows(table.rows),
+            "metric",
+            () => {},
+            buildStyle(table.rows)
+          )}
         </Stack>
       ))}
       <UploadModal
@@ -458,7 +485,7 @@ export const TableCheckpoint = (
         }
         onModalSubmit={onModalSubmit}
       />
-      <CommentModal
+      <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,
           onClose: () => {

@@ -133,9 +133,16 @@ const metricVariant = {
     tr: {
       padding: "1rem",
       border: "none",
-    },
-    "tr:nth-of-type(even)": {
-      background: "gray_lightest_highlight",
+
+      "&:nth-of-type(even)": {
+        background: "gray_lightest_highlight",
+      },
+      "&.white": {
+        background: "white",
+      },
+      "&.grey": {
+        background: "gray_lightest_highlight",
+      },
     },
     td: {
       border: "none",

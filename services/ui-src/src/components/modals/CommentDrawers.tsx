@@ -4,8 +4,26 @@ import {
   Dropdown,
   DropdownChangeObject,
   DropdownOption,
+  ChoiceList,
 } from "@cmsgov/design-system";
-import { Box, Divider, Heading, Text, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Divider,
+  Heading,
+  Text,
+  Spinner,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+  Button,
+  Image,
+  Flex,
+  UnorderedList,
+  ListItem,
+} from "@chakra-ui/react";
 import { Modal } from "./Modal";
 import {
   InitiativeAnswerProp,
@@ -26,6 +44,8 @@ import {
   createComment,
   getComments,
 } from "utils/api/requestMethods/commentMethods";
+import closeIcon from "assets/icons/close/icon_close_primary.svg";
+import lockIcon from "assets/icons/icon_lock.svg";
 
 const AdminReportStatusOptions = [
   ReportStatus.SUBMITTED,
@@ -33,7 +53,7 @@ const AdminReportStatusOptions = [
   "Unlock",
 ];
 
-export const ReportCommentModal = ({
+export const ReportCommentDrawer = ({
   modalDisclosure,
   selectedReport,
   reloadReports,
@@ -124,23 +144,52 @@ interface ReportCommentProps {
   reloadReports: Function;
 }
 
-const PreviousComments = ({ comments }: { comments: Comment[] }) => {
+const PreviousComments = ({
+  comments,
+  userIsAdmin,
+}: {
+  comments: Comment[];
+  userIsAdmin: boolean;
+}) => {
   return (
     <Box marginTop={"spacer2"}>
       <Heading as={"h3"} fontWeight={"bold"}>
-        Comments
+        Previous Comments
       </Heading>
       {comments.map((comment, index) => (
-        <Box marginTop={"spacer2"} key={`previous-comment-${index}`}>
-          <Text fontWeight={"heading_md"}>{comment.author}</Text>
+        <Box
+          marginTop={"spacer4"}
+          key={`previous-comment-${index}`}
+          gap={"spacer1"}
+          display="flex"
+          alignItems="left"
+          flexDirection="column"
+        >
+          <Flex alignItems={"center"} gap={"spacer2"}>
+            <Text fontWeight={"heading_md"}>{comment.author}</Text>
+            <Text fontSize={"heading_md"} color={"gray_dark"}>
+              {new Date(comment.created).toLocaleString()}
+            </Text>
+          </Flex>
+
           {comment.statusChange && (
-            <Text fontWeight={"heading_md"}>
+            <Text fontWeight={"body_sm"} color={"gray_dark"}>
               Status changed to: {comment.statusChange}
             </Text>
           )}
-          <Text fontSize={"body_sm"} color={"gray_dark"}>
-            {new Date(comment.created).toLocaleString()}
-          </Text>
+          {userIsAdmin &&
+            (comment.isInternal ? (
+              <Flex alignItems="center" gap="spacer1">
+                <Image src={lockIcon} alt="lock icon" sx={sx.icon} />
+                <Text fontWeight={"body_sm"} color={"gray_dark"}>
+                  CMS Internal
+                </Text>
+              </Flex>
+            ) : (
+              <Text fontWeight={"body_sm"} color={"gray_dark"}>
+                Shared with State
+              </Text>
+            ))}
           {comment.comment !== "" && (
             <TextField
               id={`previous-comment-${index}`}
@@ -149,6 +198,13 @@ const PreviousComments = ({ comments }: { comments: Comment[] }) => {
               value={comment.comment}
               disabled={true}
               multiline
+              style={
+                {
+                  "--text-input__background-color--disabled": comment.isInternal
+                    ? "#e6f9fd"
+                    : "",
+                } as React.CSSProperties
+              }
             />
           )}
         </Box>
@@ -157,7 +213,7 @@ const PreviousComments = ({ comments }: { comments: Comment[] }) => {
   );
 };
 
-export const CommentModal = ({
+export const AttachmentCommentDrawer = ({
   modalDisclosure,
   selectedFile,
   updateElement,
@@ -189,12 +245,14 @@ export const CommentModal = ({
   const initialValues = {
     comment: "",
     status: fileStatus,
+    commentType: "external",
   };
 
   const noErrorState = {
     comment: "",
     status: "",
     overall: "",
+    commentType: "",
   };
 
   const [displayValue, setDisplayValue] = useState(initialValues);
@@ -286,6 +344,7 @@ export const CommentModal = ({
           comment: displayValue.comment,
           type: CommentType.ATTACHMENT,
           parentReportId: report?.id,
+          isInternal: displayValue.commentType === "internal",
           ...(didStatusChange && { statusChange: displayValue.status }),
         }
       );
@@ -313,66 +372,154 @@ export const CommentModal = ({
     modalDisclosure.onClose();
   };
 
-  const modalHeading =
-    pastComments.length === 0
-      ? `Add Comment to ${fileName}`
-      : `Comments for ${fileName}`;
-  const modalSubHeading = userIsAdmin
+  const userSpecificSubheading = userIsAdmin
     ? "Use the fields below to manage the attachment status and leave comments for the state."
-    : "Leave a comment for your CMS Project Officer below";
+    : "Use the fields below to manage the attachment status and leave comments for your CMS Project Officer.";
 
   return (
-    <Modal
-      modalDisclosure={modalDisclosure}
-      onConfirmHandler={onSubmit}
-      content={{
-        heading: modalHeading,
-        subheading: modalSubHeading,
-        actionButtonText: "Save",
-      }}
-      disableConfirm={commentsDisabled}
-      submitting={commentSubmitting}
+    <Drawer
+      isOpen={modalDisclosure.isOpen}
+      onClose={modalDisclosure.onClose}
+      placement="right"
     >
-      {errorMessages.overall && (
-        <Text fontSize="body_md" color="red" marginBottom={"spacer2"}>
-          {errorMessages.overall}
-        </Text>
-      )}
-      <Dropdown
-        label="Status"
-        name="status"
-        onChange={onChange}
-        options={statusOptions}
-        value={displayValue.status}
-        disabled={statusDisabled}
-        errorMessage={errorMessages.status}
-      />
-      <TextField
-        name={"comment"}
-        label={
-          <>
-            Comment
-            {commentsOptional && (
-              <span className="optionalText"> (optional)</span>
+      <DrawerOverlay />
+      <DrawerContent maxWidth={"50vw"}>
+        <Flex sx={sx.drawerCloseContainer}>
+          <Button
+            leftIcon={<Image src={closeIcon} alt="Close" />}
+            variant="link"
+            onClick={modalDisclosure.onClose}
+            fontWeight="bold"
+          >
+            Close
+          </Button>
+        </Flex>
+        <DrawerHeader>
+          <Flex direction="column" gap="spacer3">
+            <Heading as="h1" sx={sx.drawerHeaderText}>
+              Add comment to attachment
+            </Heading>
+          </Flex>
+        </DrawerHeader>
+        <DrawerBody>
+          <Flex direction="column" gap="spacer4" marginBottom="spacer4">
+            <Text sx={sx.drawerSubheading}>
+              {userSpecificSubheading} Certain statuses restrict the ability to
+              modify or remove files:
+            </Text>
+            <UnorderedList sx={sx.drawerSubheading}>
+              <ListItem>
+                <b>Needs Revision, Informational, Archived:</b> The attachment
+                will no longer be able to be deleted.
+              </ListItem>
+              <ListItem>
+                <b>Locked for Scoring:</b> The attachment is locked and cannot
+                be edited or deleted.
+              </ListItem>
+            </UnorderedList>
+            <Text fontSize="body_lg" fontWeight="body_lg">
+              <b>Attachment:</b> {fileName}
+            </Text>
+            {errorMessages.overall && (
+              <Text fontSize="body_md" color="red">
+                {errorMessages.overall}
+              </Text>
             )}
-          </>
-        }
-        onChange={onChange}
-        value={displayValue.comment}
-        disabled={commentsDisabled}
-        multiline
-        rows={3}
-        errorMessage={errorMessages.comment}
-      />
-      <Divider marginTop={"spacer3"} borderColor={"black"} />
-      {commentsLoading ? <Spinner size="md" /> : null}
-      {pastComments.length > 0 ? (
-        <PreviousComments comments={pastComments} />
-      ) : null}
-    </Modal>
+            <Dropdown
+              label="Status"
+              name="status"
+              onChange={onChange}
+              options={statusOptions}
+              value={displayValue.status}
+              disabled={statusDisabled}
+              errorMessage={errorMessages.status}
+            />
+            <TextField
+              name={"comment"}
+              label={
+                <>
+                  Comment
+                  {commentsOptional && (
+                    <span className="optionalText"> (optional)</span>
+                  )}
+                </>
+              }
+              onChange={onChange}
+              value={displayValue.comment}
+              disabled={commentsDisabled}
+              multiline
+              rows={3}
+              errorMessage={errorMessages.comment}
+            />
+            {userIsAdmin && (
+              <ChoiceList
+                label="External or Internal Comment"
+                hint="Choose whether this comment is hidden from the state or shared."
+                name="commentType"
+                type="radio"
+                onChange={onChange}
+                errorMessage={errorMessages.commentType}
+                choices={[
+                  {
+                    label: "External (Shared with States)",
+                    value: "external",
+                    defaultChecked: true,
+                  },
+                  { label: "Internal (CMS Only)", value: "internal" },
+                ]}
+              />
+            )}
+          </Flex>
+          <Button
+            onClick={onSubmit}
+            isDisabled={commentsDisabled}
+            isLoading={commentSubmitting}
+            variant="outline"
+          >
+            Add comment
+          </Button>
+          <Divider marginTop={"spacer3"} borderColor={"black"} />
+          {commentsLoading ? (
+            <Flex gap="spacer2" alignItems="center" marginTop="spacer4">
+              <Spinner size="md" />
+              <Text>Comments loading...</Text>
+            </Flex>
+          ) : null}
+          {pastComments.length > 0 ? (
+            <PreviousComments
+              comments={pastComments}
+              userIsAdmin={userIsAdmin!}
+            />
+          ) : null}
+        </DrawerBody>
+        <DrawerFooter>
+          <Button variant="outline" onClick={modalDisclosure.onClose}>
+            Close
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 };
 
+const sx = {
+  drawerHeaderText: {
+    fontSize: "heading_2xl",
+    fontWeight: "heading_2xl",
+  },
+  drawerCloseContainer: {
+    position: "absolute",
+    right: "spacer4",
+    top: "spacer2",
+  },
+  drawerSubheading: {
+    fontSize: "body_md",
+    fontWeight: "normal",
+  },
+  icon: {
+    boxSize: "16px",
+  },
+};
 interface Props {
   modalDisclosure: {
     isOpen: boolean;

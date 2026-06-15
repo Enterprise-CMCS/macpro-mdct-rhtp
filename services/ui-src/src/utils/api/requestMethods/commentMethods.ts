@@ -7,6 +7,7 @@ interface createCommentParams {
   parentReportId?: string;
   comment?: string;
   statusChange?: string;
+  isInternal: boolean;
 }
 
 export async function createComment(
