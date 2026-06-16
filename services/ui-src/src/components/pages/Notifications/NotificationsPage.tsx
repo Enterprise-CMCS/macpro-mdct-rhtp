@@ -18,8 +18,8 @@ import { useState } from "react";
 import { Modal } from "components/modals/Modal";
 import { TextField } from "@cmsgov/design-system";
 import { MultiSelect } from "components/forms/Multiselect";
-import { buildStateOptions } from "components/forms/AdminDashboard";
 import { isEmail } from "utils/validation/inputValidation";
+import { StateDropdownOptions } from "@rhtp/shared";
 
 const defaultValue: {
   email: string;
@@ -41,7 +41,6 @@ const errorContent = {
 };
 
 const AddEmailModal = ({ modalDisclosure }: AddEmailModalProps) => {
-  const STATE_OPTIONS = buildStateOptions();
   const [displayValue, setDisplayValue] = useState(defaultValue);
   const [errorMessage, setErrorMessage] = useState(defaultErrorMessage);
 
@@ -130,7 +129,7 @@ const AddEmailModal = ({ modalDisclosure }: AddEmailModalProps) => {
           label="States"
           placeholder=""
           countLabel="States"
-          options={STATE_OPTIONS}
+          options={StateDropdownOptions}
           values={displayValue.states}
           onChange={(selected) => onStateSelectionChange(selected)}
           errorMessage={errorMessage.states}

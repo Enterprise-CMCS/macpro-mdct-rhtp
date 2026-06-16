@@ -45,25 +45,21 @@ describe("NotificationsPage component", () => {
   });
 
   test("modal closes on submit with valid inputs", async () => {
-    const addEmailButton = screen.getByRole("button", { name: "Add email" });
+    const addEmailButton = screen.getByText("Add email");
     await userEvent.click(addEmailButton);
-    expect(
-      screen.getByRole("heading", { name: "Add Email" })
-    ).toBeInTheDocument();
+    expect(screen.getByText("Add Email")).toBeInTheDocument();
 
-    const emailInput = screen.getByRole("textbox", { name: "Email" });
+    const emailInput = screen.getByLabelText("Email");
     await userEvent.click(emailInput);
     await userEvent.paste("valid@email.com");
 
-    const dropdownBtn = screen.getByRole("button", { name: "States select" });
+    const dropdownBtn = screen.getByLabelText("States select");
     await userEvent.click(dropdownBtn);
-    const optCheckbox1 = screen.getByRole("checkbox", { name: "Alabama" });
+    const optCheckbox1 = screen.getByLabelText("Alabama");
     await userEvent.click(optCheckbox1);
 
-    const submitButton = screen.getByRole("button", { name: "Save" });
+    const submitButton = screen.getByText("Save");
     await userEvent.click(submitButton);
-    expect(
-      screen.queryByRole("heading", { name: "Add Email" })
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Add Email")).not.toBeInTheDocument();
   });
 });
