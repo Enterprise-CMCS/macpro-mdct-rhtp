@@ -1,7 +1,7 @@
 import { Heading } from "@chakra-ui/react";
 import { ElementType, PageElement } from "@rhtp/shared";
 import { notAnsweredText } from "../../constants";
-import { UseOfFundsTableElementExport } from "components/report/UseOfFundsTable";
+import { UseOfFundsAttachmentElementExport } from "components/report/UseOfFundsAttachment";
 
 //elements that are rendered as part of the table that does not need a unique renderer
 const tableElementList = [
@@ -37,8 +37,8 @@ export const renderElements = (element: PageElement) => {
       );
     case ElementType.TableCheckpoint:
       return "TBD";
-    case ElementType.UseOfFundsTable:
-      return UseOfFundsTableElementExport(element);
+    case ElementType.UseOfFundsAttachment:
+      return UseOfFundsAttachmentElementExport(element);
     case ElementType.AttachmentArea:
       return "TBD";
     case ElementType.AccordionGroup:

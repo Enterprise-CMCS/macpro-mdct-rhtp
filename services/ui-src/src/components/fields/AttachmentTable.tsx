@@ -1,7 +1,7 @@
 import { Button, Stack, Image, HStack, Text } from "@chakra-ui/react";
 import { ChoiceList, Dropdown } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
-import { CommentModal } from "components/modals/CommentModal";
+import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useEffect, useState } from "react";
 import {
@@ -11,7 +11,6 @@ import {
   AlertTypes,
   InitiativeAnswerProp,
   AttachmentStatus,
-  dropdownEmptyOption,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import {
@@ -19,12 +18,11 @@ import {
   removeFile,
   canEditAttachment,
   canDeleteAttachment,
-} from "utils/other/upload";
+} from "utils/other/fileUtils";
 import {
   checkpointAttachableOptions,
   checkpointList,
   getStageIdByCheckpointId,
-  stageList,
 } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
@@ -50,13 +48,6 @@ export const AttachmentTable = (
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([]);
-  const stageOption = [
-    dropdownEmptyOption,
-    ...stageList.map((checks) => ({
-      label: `${checks.stage} ${checks.label}`,
-      value: checks.id,
-    })),
-  ];
   const [checkpoint, setCheckpoint] = useState("");
   const [tableRows, setTableRows] = useState<
     (string | JSX.Element | undefined)[][]
@@ -111,6 +102,7 @@ export const AttachmentTable = (
       checkpoint: "",
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
+      canDelete: true,
     }));
 
     const newValues = [...displayValue, ...formattedUploads];
@@ -146,16 +138,20 @@ export const AttachmentTable = (
       stage: getStageIdByCheckpointId(checkpoint),
       checkpoint,
       status: AttachmentStatus.PENDING_REVIEW,
-      comments:
-        displayValue.find((item) => item.attachment.fileId === upload.fileId)
-          ?.comments ?? [],
     }));
 
     const newValues = displayValue.map((item) => {
       const updatedItem = formattedUploadsToSave.find(
         (upload) => upload.attachment.fileId === item.attachment.fileId
       );
-      return updatedItem || item;
+      if (updatedItem) {
+        return {
+          ...item,
+          ...updatedItem,
+        };
+      } else {
+        return item;
+      }
     });
 
     props.updateElement({ answer: newValues });
@@ -218,6 +214,15 @@ export const AttachmentTable = (
     return initiativeOptions.every((option) => option.checked != true);
   };
 
+  const getCheckpointDisplayName = (answer: InitiativeAnswerProp) => {
+    const checkpoint = checkpointList.find(
+      ({ id }) => id === answer.checkpoint
+    );
+    return checkpoint
+      ? `${checkpoint.checkpointNumber} ${checkpoint.label}`
+      : "";
+  };
+
   const rows = (values: InitiativeAnswerProp[]) => {
     return values.map((row) => {
       const columnAttachmentName = (
@@ -238,14 +243,8 @@ export const AttachmentTable = (
                   `#${initiatives.find((opt) => opt.id === id)?.initiativeNumber}`
               )
               .join(", ");
-      const columnStage =
-        row.stage == undefined || !("stage" in row)
-          ? "N/A"
-          : stageOption.find(({ value }) => value === row.stage)?.label;
       const columnCheckpoint =
-        row.checkpoint == ""
-          ? "N/A"
-          : checkpointList.find(({ id }) => id === row.checkpoint)?.label;
+        row.checkpoint == "" ? "N/A" : getCheckpointDisplayName(row);
       const columnActions = (
         <HStack>
           <Button
@@ -268,7 +267,7 @@ export const AttachmentTable = (
             onClick={() => onDeleteClick(row)}
             aria-label={`Delete ${row.attachment.name}`}
             disabled={
-              !canDeleteAttachment(row.status, row.comments) || disabled
+              !canDeleteAttachment(row.status, row.canDelete) || disabled
             }
           >
             <Image src={cancelIcon} alt="Remove" minWidth="24px" />
@@ -279,7 +278,6 @@ export const AttachmentTable = (
       return [
         columnAttachmentName,
         columnInitiatives,
-        columnStage,
         columnCheckpoint,
         row.status,
         columnActions,
@@ -297,16 +295,8 @@ export const AttachmentTable = (
             (opt) => opt.id === answer.initiatives[0]
           )?.initiativeNumber;
           return initNumber ?? "";
-        case "Stage":
-          const stageLabel = stageOption.find(
-            (opt) => opt.value === answer.stage
-          )?.label;
-          return stageLabel ?? "";
         case "Checkpoint":
-          const checkpointLabel = checkpointList.find(
-            ({ id }) => id === answer.checkpoint
-          )?.label;
-          return checkpointLabel ?? "";
+          return getCheckpointDisplayName(answer);
         case "Status":
           return answer.status;
         default:
@@ -369,7 +359,6 @@ export const AttachmentTable = (
         [
           { label: "Attachment name", sortable: true },
           { label: "Initiatives", sortable: true },
-          { label: "Stage", sortable: true },
           { label: "Checkpoint", sortable: true },
           { label: "Status", sortable: true },
           { label: "Actions" },
@@ -425,7 +414,7 @@ export const AttachmentTable = (
           "These files have been attached to the stage and checkpoint selected above."
         }
       />
-      <CommentModal
+      <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,
           onClose: () => {

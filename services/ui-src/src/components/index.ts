@@ -37,7 +37,7 @@ export { ActionTable } from "./fields/ActionTable";
 export { AttachmentTable } from "./fields/AttachmentTable";
 // forms
 export { AdminBannerForm } from "./forms/AdminBannerForm";
-export { AdminDashSelector } from "./forms/AdminDashSelector";
+export { AdminDashboard } from "./forms/AdminDashboard";
 // logins
 export { LoginCognito } from "./logins/LoginCognito";
 export { LoginIDM } from "./logins/LoginIDM";
@@ -64,7 +64,6 @@ export { MenuOption } from "./menus/MenuOption";
 // modals
 export { Modal } from "./modals/Modal";
 export { CreateReportModal } from "./modals/CreateReportModal";
-export { UnlockModal } from "./modals/UnlockModal";
 // Redirects
 export { PostLogoutRedirect } from "./PostLogoutRedirect/index";
 // tables

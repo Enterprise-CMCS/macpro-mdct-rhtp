@@ -8,7 +8,7 @@ import {
   ok,
 } from "../../../libs/response-lib";
 import { getReport, putReport } from "../../../storage/reports";
-import { ReportStatus } from "@rhtp/shared";
+import { isCompleteStatus, ReportStatus } from "@rhtp/shared";
 import { canWriteInitiatives } from "../../../utils/authorization";
 import { error } from "../../../utils/constants";
 import { buildInitiativePages } from "../../../forms/2026/rhtp/pages/initiatives/initiatives";
@@ -37,7 +37,7 @@ export const createInitiative = handler(
 
     let report = await getReport(reportType, state, id);
     if (!report) return notFound();
-    if (report.status === ReportStatus.SUBMITTED) {
+    if (isCompleteStatus(report.status)) {
       return badRequest("Invalid request");
     }
 

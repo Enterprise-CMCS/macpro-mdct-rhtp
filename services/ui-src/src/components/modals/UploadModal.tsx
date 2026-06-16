@@ -1,6 +1,6 @@
 import { Stack } from "@chakra-ui/react";
 import { Modal } from "components";
-import { Upload } from "components/fields/Upload";
+import { UploadArea } from "components/fields/UploadArea";
 import { JSX } from "react";
 import { UploadListProp } from "@rhtp/shared";
 
@@ -16,6 +16,7 @@ export const UploadModal = ({
   actionButtonText = "Done",
   uploadAreaHidden = false,
   uploadedSubLabel,
+  multiple = true,
 }: Props) => {
   return (
     <Modal
@@ -30,12 +31,13 @@ export const UploadModal = ({
     >
       <Stack gap="1.5rem">
         {selections ?? ""}
-        <Upload
+        <UploadArea
           answer={answer}
           saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
           uploadAreaHidden={uploadAreaHidden}
           uploadedSubLabel={uploadedSubLabel}
+          multiple={multiple}
         />
       </Stack>
     </Modal>
@@ -57,4 +59,5 @@ interface Props {
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
   uploadedSubLabel: string;
+  multiple?: boolean;
 }

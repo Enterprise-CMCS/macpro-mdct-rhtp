@@ -1,8 +1,10 @@
 import {
+  acceptReport,
   createReport,
   deleteReport,
   deleteReportsForState,
   getReport,
+  getReportByType,
   getReportsForState,
   putReport,
   releaseReport,
@@ -45,6 +47,11 @@ describe("utils/report", () => {
     expect(mockGet).toHaveBeenCalledTimes(1);
   });
 
+  test("getReportByType", async () => {
+    await getReportByType("reportTyppe");
+    expect(mockGet).toHaveBeenCalledTimes(1);
+  });
+
   test("createReport", async () => {
     await createReport("reportType", "PA");
     expect(mockPost).toHaveBeenCalledTimes(1);
@@ -62,6 +69,10 @@ describe("utils/report", () => {
 
   test("releaseReport", async () => {
     await releaseReport(report);
+    expect(mockPut).toHaveBeenCalledTimes(1);
+  });
+  test("releaseReport", async () => {
+    await acceptReport(report);
     expect(mockPut).toHaveBeenCalledTimes(1);
   });
   test("deleteReport", async () => {

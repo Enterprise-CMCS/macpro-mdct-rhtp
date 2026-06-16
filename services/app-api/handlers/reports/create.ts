@@ -5,7 +5,7 @@ import { canWriteState } from "../../utils/authorization";
 import { error, RhtpSubTypeTemplateMap } from "../../utils/constants";
 import { buildReport } from "../../utils/reports/buildReport";
 import { putReport, queryReportsForState } from "../../storage/reports";
-import { RhtpSubType, ReportStatus, ReportOptions } from "@rhtp/shared";
+import { RhtpSubType, ReportOptions, isCompleteStatus } from "@rhtp/shared";
 import { isCreateReportOptions } from "../../utils/reportValidation";
 import { isFeatureFlagEnabled } from "../../utils/featureFlags";
 
@@ -37,7 +37,7 @@ export const createReport = handler(
         }
       }, reports[0]);
 
-      if (latestReport.status !== ReportStatus.SUBMITTED) {
+      if (!isCompleteStatus(latestReport.status)) {
         return badRequest(
           "A new report cannot be created until the previous report is submitted."
         );

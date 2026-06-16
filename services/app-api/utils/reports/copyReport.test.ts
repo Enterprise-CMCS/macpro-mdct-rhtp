@@ -94,6 +94,18 @@ const mockOldReport: Report = {
           required: true,
           answer: metricAnswers,
         } as unknown as ActionTableTemplate,
+        {
+          id: "use-of-funds-attachment",
+          type: ElementType.UseOfFundsAttachment,
+          answer: [
+            {
+              name: "file-name",
+              size: 100,
+              fileId: "file-id",
+            },
+          ],
+          required: true,
+        },
       ],
     },
   ],
@@ -164,5 +176,8 @@ describe("copyReport util", () => {
         }),
       ])
     );
+
+    const existingUseOfFunds = mockNewReport.pages[1].elements[3].answer;
+    expect(existingUseOfFunds).toEqual([]);
   });
 });

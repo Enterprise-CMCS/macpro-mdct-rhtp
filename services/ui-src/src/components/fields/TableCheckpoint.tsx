@@ -6,7 +6,6 @@ import {
   TableCheckpointTemplate,
   UploadListProp,
   AlertTypes,
-  InitiativeComment,
 } from "@rhtp/shared";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -22,7 +21,7 @@ import {
   canEditAttachment,
   downloadFile,
   removeFile,
-} from "utils/other/upload";
+} from "utils/other/fileUtils";
 import {
   checkpointAttachableOptions,
   checkpointList,
@@ -33,7 +32,7 @@ import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider"
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
-import { CommentModal } from "components/modals/CommentModal";
+import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
 import { Alert } from "components";
 import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
@@ -52,7 +51,7 @@ type TableShape = {
     label: string;
     file: UploadListProp;
     status: AttachmentStatus;
-    comments: InitiativeComment[];
+    canDelete: boolean;
   }[];
 };
 
@@ -66,7 +65,7 @@ const buildRows = (
       | {
           file: UploadListProp;
           status: AttachmentStatus;
-          comments: InitiativeComment[];
+          canDelete: boolean;
         }[]
       | undefined;
   }[]
@@ -80,14 +79,14 @@ const buildRows = (
     };
     if (attachments) {
       const copy = [...attachments];
-      const { file, status, comments } = copy.shift() || {};
+      const { file, status, canDelete } = copy.shift() || {};
       prev.push({
         ...row,
         file: file ?? {},
         status: status ?? "",
-        comments: comments ?? [],
+        canDelete: canDelete ?? true,
       });
-      copy.forEach(({ file, status, comments }) =>
+      copy.forEach(({ file, status, canDelete }) =>
         prev.push({
           id,
           stageNo: "",
@@ -95,7 +94,7 @@ const buildRows = (
           completed: undefined,
           file,
           status,
-          comments,
+          canDelete: canDelete ?? true,
         })
       );
     } else {
@@ -116,7 +115,7 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
         .map((upload) => ({
           file: upload.attachment,
           status: upload.status,
-          comments: upload.comments,
+          canDelete: upload.canDelete,
         }));
       return {
         label: checkpoint.label,
@@ -224,6 +223,7 @@ export const TableCheckpoint = (
       comments: [],
       attachment: file,
       status: AttachmentStatus.PENDING_REVIEW,
+      canDelete: true,
     }));
   };
 
@@ -323,7 +323,7 @@ export const TableCheckpoint = (
       label: string;
       file: UploadListProp;
       status: AttachmentStatus;
-      comments: InitiativeComment[];
+      canDelete: boolean;
     }[]
   ) => {
     return rows.map((row) => {
@@ -379,7 +379,7 @@ export const TableCheckpoint = (
             }}
             aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
             disabled={
-              !canDeleteAttachment(row.status, row.comments) || disabled
+              !canDeleteAttachment(row.status, row.canDelete) || disabled
             }
           >
             <Image src={cancelIcon} alt="Remove" />
@@ -407,6 +407,26 @@ export const TableCheckpoint = (
     { label: "Actions" },
   ];
 
+  //This generates the zebra styling for the table rows when multiple files are tied to a shared checkpoint
+  const buildStyle = (
+    rows: {
+      id: string;
+      stageNo: string;
+      label: string;
+      file: UploadListProp;
+      status: AttachmentStatus;
+      canDelete: boolean;
+    }[]
+  ) => {
+    const styling = ["white"];
+    for (var i = 1; i < rows.length; i++) {
+      const prevColor = styling.at(-1)!;
+      const nextColor = prevColor == "white" ? "grey" : "white";
+      styling.push(rows[i].stageNo == "" ? prevColor : nextColor);
+    }
+    return styling;
+  };
+
   return (
     <Stack gap="1.25rem" width="100%">
       {tables.map((table, tableIndex) => (
@@ -422,7 +442,13 @@ export const TableCheckpoint = (
           >
             Upload attachments
           </Button>
-          {ResponsiveTable(header, getRows(table.rows), "metric")}
+          {ResponsiveTable(
+            header,
+            getRows(table.rows),
+            "metric",
+            () => {},
+            buildStyle(table.rows)
+          )}
         </Stack>
       ))}
       <UploadModal
@@ -459,7 +485,7 @@ export const TableCheckpoint = (
         }
         onModalSubmit={onModalSubmit}
       />
-      <CommentModal
+      <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,
           onClose: () => {

@@ -51,17 +51,26 @@ const mockActionTableElement: ActionTableTemplate = {
       header: "Status",
       type: ElementType.Paragraph,
     },
+    {
+      id: "prevValue",
+      header: "Previous Value",
+      type: ElementType.Textbox,
+      disabled: true,
+    },
   ],
   answer: [
     [
       { id: "mock-text", value: "hello" },
       { id: "status", value: "active" },
+      { id: "prevValue", value: "" },
     ],
     [
       { id: "mock-text", value: "bye" },
       { id: "status", value: "Abandoned" },
+      { id: "prevValue", value: "" },
     ],
   ],
+  required: true,
 };
 
 describe("Test ActionTable component", () => {
@@ -83,9 +92,15 @@ describe("Test ActionTable component", () => {
       ).toBe(2);
       const { rows } = mockActionTableElement;
       rows.forEach((row) => {
-        expect(
-          screen.getByRole("columnheader", { name: row.header })
-        ).toBeVisible();
+        if (row.id !== "prevValue") {
+          expect(
+            screen.getByRole("columnheader", { name: row.header })
+          ).toBeVisible();
+        } else {
+          expect(
+            screen.queryByRole("columnheader", { name: row.header })
+          ).not.toBeInTheDocument();
+        }
       });
       expect(
         screen.getByRole("columnheader", { name: "Actions" })
@@ -138,9 +153,15 @@ describe("Test ActionTable component", () => {
       ).not.toBeInTheDocument();
       const { rows } = mockActionTableElement;
       rows.forEach((row) => {
-        expect(
-          screen.getByRole("columnheader", { name: row.header })
-        ).toBeVisible();
+        if (row.id !== "prevValue") {
+          expect(
+            screen.getByRole("columnheader", { name: row.header })
+          ).toBeVisible();
+        } else {
+          expect(
+            screen.queryByRole("columnheader", { name: row.header })
+          ).not.toBeInTheDocument();
+        }
       });
       expect(
         screen.queryByRole("columnheader", { name: "Actions" })

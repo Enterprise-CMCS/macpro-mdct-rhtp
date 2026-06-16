@@ -10,7 +10,7 @@ import {
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
-import { removeFile } from "utils/other/upload";
+import { removeFile } from "utils/other/fileUtils";
 
 vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ pageId: "mock-init-1" }),
@@ -19,7 +19,7 @@ vi.mock("react-router", () => ({
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 
-vi.mock("utils/api/requestMethods/upload", () => ({
+vi.mock("utils/api/requestMethods/fileMethods", () => ({
   uploadFileToS3: vi.fn(),
   recordFileInDatabaseAndGetUploadUrl: vi
     .fn()
@@ -31,7 +31,7 @@ vi.mock("utils/api/requestMethods/upload", () => ({
     ]),
 }));
 
-vi.mock("utils/other/upload", async (importOriginal) => ({
+vi.mock("utils/other/fileUtils", async (importOriginal) => ({
   ...(await importOriginal()),
   removeFile: vi.fn(),
 }));
@@ -56,7 +56,7 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
       stage: "stage-1",
       checkpoint: "project-prop-2",
       status: AttachmentStatus.PENDING_REVIEW,
-      comments: [],
+      canDelete: true,
     },
     {
       attachment: {
@@ -68,7 +68,7 @@ const mockAttachmentAreaElement: AttachmentTableTemplate = {
       stage: "stage-2",
       checkpoint: "early-implementation-1",
       status: AttachmentStatus.LOCKED_FOR_SCORING,
-      comments: [],
+      canDelete: false,
     },
   ],
 };
@@ -264,21 +264,16 @@ describe("<AttachmentTable />", () => {
       ]).toStrictEqual(results.toReversed());
     };
 
-    await sortResult("Attachment name", [0, 6], ["mock-file", "mock-file-2"]);
-    await sortResult("Initiatives", [1, 7], ["#123", "#123"]);
-    await sortResult(
-      "Stage",
-      [2, 8],
-      ["1 Project Preparation", "2 Early Implementation"]
-    );
+    await sortResult("Attachment name", [0, 5], ["mock-file", "mock-file-2"]);
+    await sortResult("Initiatives", [1, 6], ["#123", "#123"]);
     await sortResult(
       "Checkpoint",
-      [3, 9],
-      ["Continue initiative activities", "Launch initiative"]
+      [2, 7],
+      ["1.2 Launch initiative", "2.1 Continue initiative activities"]
     );
     await sortResult(
       "Status",
-      [4, 10],
+      [3, 8],
       ["Locked for Scoring", "Pending Review"]
     );
   });

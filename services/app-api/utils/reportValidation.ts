@@ -19,6 +19,7 @@ import {
   CreateInitiativeOptions,
   UpdateInitiativeOptions,
   RhtpSubType,
+  Comment,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -134,43 +135,26 @@ const accordionTemplateSchema = object().shape({
   value: string().required(),
 });
 
-const useOfFundsTableSchema = object().shape({
-  type: string().required().matches(new RegExp(ElementType.UseOfFundsTable)),
+const UseOfFundsAttachmentSchema = object().shape({
+  type: string()
+    .required()
+    .matches(new RegExp(ElementType.UseOfFundsAttachment)),
   id: string().required(),
-  dropDownOptions: object().shape({
-    budgetPeriodOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
-    useOfFundsOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
-    recipientCategoryOptions: array().of(
-      object().shape({
-        label: string().required(),
-        value: string().notRequired(),
-      })
-    ),
-  }),
   answer: array()
     .of(
       object().shape({
-        id: string().required(),
-        budgetPeriod: string().required(),
-        spentFunds: string().required(),
-        description: string().required(),
-        initiative: string().required(),
-        useOfFunds: string().required(),
-        recipientName: string().required(),
-        recipientCategory: string().required(),
+        name: string()
+          .transform((value) => (value === "" ? undefined : value))
+          .default("Uploaded File")
+          .required(),
+        size: number().required(),
+        fileId: string().required(),
       })
     )
+    .min(0)
+    .max(1)
     .notRequired(),
+  required: boolean().required(),
 });
 
 const pageElementSchema = lazy((value: PageElement): Schema => {
@@ -214,8 +198,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
       return tableCheckpointTemplateSchema;
-    case ElementType.UseOfFundsTable:
-      return useOfFundsTableSchema;
+    case ElementType.UseOfFundsAttachment:
+      return UseOfFundsAttachmentSchema;
     case ElementType.InitiativesTable:
       return initiativesTableSchema;
     case ElementType.AttachmentArea:
@@ -373,6 +357,7 @@ const actionTableSchema = object().shape({
   answer: array().of(mixed()).notRequired(),
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
+  required: boolean().required(),
 });
 
 const initiativesTableSchema = object().shape({
@@ -398,14 +383,7 @@ const attachmentTableSchema = object().shape({
         stage: string().notRequired(),
         checkpoint: string().notRequired(),
         status: string().required(),
-        comments: array().of(
-          object().shape({
-            name: string().required(),
-            date: string().required(),
-            comment: string().notRequired(),
-            statusChange: string().notRequired(),
-          })
-        ),
+        canDelete: boolean().notRequired(),
       })
     )
     .notRequired(),
@@ -546,11 +524,17 @@ export const isUpdateInitiativeBody = (
   });
 };
 
-const reportCommentSchema = object().shape({
-  name: string().required(),
-  date: string().required(),
-  comment: string().required(),
+const commentSchema = object().shape({
+  contextId: string().required(),
+  created: number().required(),
+  id: string().required(),
+  author: string().required(),
+  authorEmail: string().required(),
   isInternal: boolean().required(),
+  type: string().required(),
+  comment: string().notRequired(),
+  statusChange: string().notRequired(),
+  parentReportId: string().notRequired(),
 });
 
 const reportValidateSchema = object().shape({
@@ -578,7 +562,6 @@ const reportValidateSchema = object().shape({
   subTypeKey: string().required(),
   budgetPeriod: number().min(0).max(5).required(),
   submissionCount: number().required(),
-  comments: array().of(reportCommentSchema).notRequired(),
   pages: pagesSchema,
 });
 
@@ -591,4 +574,15 @@ export const validateReportPayload = async (payload: object | undefined) => {
   });
 
   return validatedPayload as Report;
+};
+
+export const validateCommentPayload = async (payload: object | undefined) => {
+  if (!payload) {
+    throw new Error(error.MISSING_DATA);
+  }
+  const validatedPayload = await commentSchema.validate(payload, {
+    stripUnknown: true,
+  });
+
+  return validatedPayload as Comment;
 };

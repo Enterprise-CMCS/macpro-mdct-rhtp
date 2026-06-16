@@ -31,10 +31,6 @@ test.describe("admin user home page", () => {
     await adminPage.page.goto("/");
   });
 
-  test("should render a visible state dropdown", async ({ adminPage }) => {
-    await expect(adminPage.page.locator('select[name="state"]')).toBeVisible();
-  });
-
   test("should be accessible across all device viewports @a11y", async ({
     adminPage,
   }) => {

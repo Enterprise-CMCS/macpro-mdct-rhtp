@@ -28,6 +28,15 @@ export async function getReport(reportType: string, state: string, id: string) {
   )!;
 }
 
+export async function getReportByType(reportType: string) {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  return await apiLib.get<Report[]>(`/reports/${reportType}`, options)!;
+}
+
 export async function putReport(report: Report) {
   const requestHeaders = await getRequestHeaders();
   const options = {
@@ -73,6 +82,18 @@ export async function releaseReport(report: LiteReport) {
 
   await apiLib.put(
     `/reports/release/${report.type}/${report.state}/${report.id}`,
+    options
+  );
+}
+
+export async function acceptReport(report: LiteReport) {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  await apiLib.put(
+    `/reports/accept/${report.type}/${report.state}/${report.id}`,
     options
   );
 }

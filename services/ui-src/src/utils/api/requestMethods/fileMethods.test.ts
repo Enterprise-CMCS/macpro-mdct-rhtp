@@ -5,8 +5,8 @@ import {
   uploadFileToS3,
   getFileDownloadUrl,
   deleteUploadedFile,
-  getFileBytes,
-} from "./upload";
+  getZipPresignedUrl,
+} from "./fileMethods";
 import { ReportType } from "@rhtp/shared";
 
 vi.mock("../apiLib", () => ({
@@ -19,6 +19,7 @@ vi.mock("../apiLib", () => ({
 }));
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
+vi.spyOn(console, "log").mockImplementation(vi.fn()); // silence logs in test
 
 let originalFetch = window.fetch;
 
@@ -64,10 +65,13 @@ describe("Test fileApi functions", () => {
       }
     );
   });
-  test("getFileBytes", async () => {
-    const zipData = [{ name: "file-name", bytes: "abced" }];
-    (apiLib.get as Mock).mockReturnValue(zipData);
-    const result = await getFileBytes("RHTP", "PA", "mock-id");
-    expect(result).toBe(zipData);
+  test("getZipPresignedUrl", async () => {
+    const mockUrl = {
+      psurl: "https://example.com/report.zip",
+      status: "ready",
+    };
+    (apiLib.get as Mock).mockReturnValue(mockUrl);
+    const result = await getZipPresignedUrl("RHTP", "PA", "mock-id");
+    expect(result).toBe(mockUrl.psurl);
   });
 });
