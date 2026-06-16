@@ -168,6 +168,7 @@ export const ReportCommentDrawer = ({
         ...(didStatusChange && { statusChange: displayValue.status }),
       });
 
+      // Force close because status changed and need to refetch reports to get new status
       if (didStatusChange) return modalDisclosure.onClose();
 
       fetchComments();
@@ -302,24 +303,6 @@ export const ReportCommentDrawer = ({
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-    // <Modal
-    //   modalDisclosure={modalDisclosure}
-    //   content={{
-    //     heading: `Add comment to ${name || "report"}`,
-    //     actionButtonText: "Save",
-    //   }}
-    //   onConfirmHandler={onSubmit}
-    //   submitting={submitting}
-    // >
-    //   <Dropdown
-    //     label="Status"
-    //     name="status"
-    //     onChange={onChange}
-    //     options={statusOptions}
-    //     value={displayValue.status}
-    //     disabled={disabled}
-    //   />
-    // </Modal>
   );
 };
 

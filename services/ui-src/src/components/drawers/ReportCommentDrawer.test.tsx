@@ -5,7 +5,11 @@ import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
 import { Comment, CommentType, ReportStatus } from "@rhtp/shared";
 import { acceptReport, releaseReport, useStore } from "utils";
-import { mockAdminUserStore, mockUseStore } from "utils/testing/setupTest";
+import {
+  mockAdminUserStore,
+  mockHelpDeskUserStore,
+  mockUseStore,
+} from "utils/testing/setupTest";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { mockReport } from "utils/testing/mockForm";
 
@@ -124,6 +128,153 @@ describe("ReportCommentDrawer component", () => {
       await userEvent.click(screen.getByRole("option", { name: "Accepted" }));
       await userEvent.click(screen.getByText("Add comment"));
       expect(mockAcceptReport).toHaveBeenCalled();
+    });
+  });
+
+  describe("Comment functionality", () => {
+    describe("with previous comments", () => {
+      beforeEach(async () => {
+        vi.clearAllMocks();
+        mockGetComments.mockResolvedValueOnce([
+          {
+            contextId: "mockContextId",
+            created: 123456,
+            id: "mockId",
+            author: "CMS User",
+            authorEmail: "mockEmail",
+            isInternal: false,
+            comment: "",
+            statusChange: ReportStatus.ACCEPTED,
+          },
+          {
+            contextId: "mockContextId",
+            created: 123456,
+            id: "mockId",
+            author: "CMS User",
+            authorEmail: "mockEmail",
+            isInternal: false,
+            comment: "Second comment from cms user",
+          },
+          {
+            contextId: "mockContextId",
+            created: 123456,
+            id: "mockId",
+            author: "CMS User",
+            authorEmail: "mockEmail",
+            isInternal: false,
+            comment: "First comment from cms user",
+          },
+        ] as Comment[]);
+
+        await renderReportCommentDrawerComponent();
+      });
+
+      test("Shows previous comments and status changes", async () => {
+        const previousComments = screen.getAllByRole("textbox");
+        expect(previousComments).toHaveLength(3); // one for new comment, two for existing, no textbox for empty comment with status change
+        // most recent comment should be first in the list
+        expect(previousComments[1]).toHaveValue("Second comment from cms user");
+        expect(previousComments[2]).toHaveValue("First comment from cms user");
+        expect(
+          screen.getByText("Status changed to: Accepted")
+        ).toBeInTheDocument();
+      });
+
+      test("Fill and save comment", async () => {
+        const commentInput = screen.getByRole("textbox", {
+          name: "Comment(optional)",
+        });
+        await userEvent.type(commentInput, "Test comment");
+        await userEvent.click(screen.getByText("Add comment"));
+        expect(mockCreateComment).toHaveBeenCalledWith(
+          mockReport.id,
+          mockReport.state,
+          {
+            comment: "Test comment",
+            type: "report",
+            isInternal: false,
+          }
+        );
+      });
+    });
+  });
+
+  describe("test permissions", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    test("state user can edit comment box always", async () => {
+      mockedUseStore.mockReturnValue(mockUseStore);
+      await renderReportCommentDrawerComponent();
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeEnabled();
+    });
+
+    test("state user must leave a comment to submit", async () => {
+      mockedUseStore.mockReturnValue(mockUseStore);
+      await renderReportCommentDrawerComponent();
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeEnabled();
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(screen.getByText("A comment is required.")).toBeVisible();
+    });
+
+    test("admin user can edit when flag true", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockAdminUserStore);
+      await renderReportCommentDrawerComponent();
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
+      expect(commentInput).toBeEnabled();
+    });
+
+    test("admin user cannot edit when flag false", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: false,
+      });
+      mockedUseStore.mockReturnValue(mockAdminUserStore);
+      await renderReportCommentDrawerComponent();
+      await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
+      expect(commentInput).toBeDisabled();
+    });
+
+    test("other users can never edit", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
+      await renderReportCommentDrawerComponent();
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeDisabled();
+    });
+
+    test("admin user can make internal comments", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue({
+        ...mockUseStore,
+        ...mockAdminUserStore,
+      });
+      await renderReportCommentDrawerComponent();
+      const commentInput = screen.getByRole("textbox", {
+        name: "Comment(optional)",
+      });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Internal (CMS Only)"));
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockReport.id,
+        mockReport.state,
+        {
+          comment: "Test comment",
+          type: "report",
+          isInternal: true,
+        }
+      );
     });
   });
 
