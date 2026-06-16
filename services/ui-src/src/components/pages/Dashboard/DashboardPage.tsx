@@ -182,12 +182,7 @@ export const DashboardPage = () => {
             Filter
           </Button>
         </Flex>
-        {!isLoading && (
-          <DashboardTable
-            reports={filteredReports}
-            reloadReports={reloadReports}
-          />
-        )}
+        {!isLoading && <DashboardTable reports={filteredReports} />}
         {isLoading && (
           <Flex justify="center">
             <Spinner size="md" />

@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
-import { isCompleteStatus, LiteReport } from "@rhtp/shared";
+import { LiteReport } from "@rhtp/shared";
 import { formatMonthDayYear, reportBasePath, useStore } from "utils";
 import { Fragment, useState } from "react";
 import { getStatus } from "utils/other/status";
@@ -19,7 +19,6 @@ import { ReportCommentDrawer } from "components/drawers/ReportCommentDrawer";
 
 interface DashboardTableProps {
   reports: LiteReport[];
-  reloadReports?: Function;
 }
 
 interface TableProps extends DashboardTableProps {
@@ -125,10 +124,7 @@ export const VerticalTable = (props: TableProps) => {
   );
 };
 
-export const DashboardTable = ({
-  reports,
-  reloadReports,
-}: DashboardTableProps) => {
+export const DashboardTable = ({ reports }: DashboardTableProps) => {
   const navigate = useNavigate();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
@@ -189,7 +185,6 @@ export const DashboardTable = ({
             onClose: closeCommentsDrawer,
           }}
           selectedReport={selectedReport}
-          reloadReports={reloadReports!}
         />
       )}
     </>

@@ -7,7 +7,6 @@ import {
   ChoiceList,
 } from "@cmsgov/design-system";
 import {
-  Box,
   Divider,
   Heading,
   Text,
@@ -21,22 +20,12 @@ import {
   Button,
   Image,
   Flex,
-  UnorderedList,
-  ListItem,
 } from "@chakra-ui/react";
-import { Modal } from "../modals/Modal";
 import {
-  InitiativeAnswerProp,
-  UploadListProp,
-  AttachmentStatus,
   ReportStatus,
-  UserRoles,
-  FileStatusOptions,
   Report,
-  ReportType,
   CommentType,
   Comment,
-  isCompleteStatus,
   LiteReport,
 } from "@rhtp/shared";
 import { acceptReport, releaseReport, useStore } from "utils";
@@ -57,7 +46,6 @@ const AdminReportStatusOptions = [
 export const ReportCommentDrawer = ({
   modalDisclosure,
   selectedReport,
-  reloadReports,
 }: Props) => {
   const { name, status, state, id } = selectedReport;
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
@@ -139,8 +127,6 @@ export const ReportCommentDrawer = ({
     setSubmitting(true);
     setErrorMessages(noErrorState);
 
-    console.log("Submitting comment:", displayValue);
-
     try {
       if (commentsDisabled) {
         setSubmitting(false);
@@ -162,7 +148,7 @@ export const ReportCommentDrawer = ({
         setSubmitting(false);
         setErrorMessages({
           ...errorMessages,
-          comment: "Must provide a Comment to submit.",
+          overall: "Must change Status or provide a Comment to submit.",
         });
         return;
       }
@@ -182,7 +168,8 @@ export const ReportCommentDrawer = ({
         ...(didStatusChange && { statusChange: displayValue.status }),
       });
 
-      reloadReports(ReportType.RHTP, state);
+      if (didStatusChange) return modalDisclosure.onClose();
+
       fetchComments();
       setDisplayValue((prev) => ({
         ...prev,
@@ -358,5 +345,4 @@ interface Props {
     onClose: () => void;
   };
   selectedReport: Report | LiteReport;
-  reloadReports: Function;
 }
