@@ -202,6 +202,18 @@ export const mockReportStore: ReportState = {
         title: "mock 2",
         elements: [],
       },
+      {
+        id: "init-attachment",
+        type: PageType.Standard,
+        title: "initiative attachments",
+        elements: [
+          {
+            id: "init-attach-table",
+            type: ElementType.AttachmentTable,
+            answer: [],
+          },
+        ],
+      },
     ],
   },
   loadReport: () => {},
