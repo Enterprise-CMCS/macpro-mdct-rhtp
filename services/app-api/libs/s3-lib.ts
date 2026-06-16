@@ -2,6 +2,8 @@ import {
   S3Client,
   DeleteObjectRequest,
   DeleteObjectCommand,
+  HeadObjectRequest,
+  HeadObjectCommand,
   PutObjectRequest,
   PutObjectCommand,
   GetObjectRequest,
@@ -23,6 +25,9 @@ export default {
   deleteObject: (params: DeleteObjectRequest) =>
     client.send(new DeleteObjectCommand(params)),
 
+  headObject: (params: HeadObjectRequest) =>
+    client.send(new HeadObjectCommand(params)),
+
   createPresignedPost: (params: PutObjectRequest) =>
     getSignedUrl(client, new PutObjectCommand(params), { expiresIn: 600 }),
 
@@ -33,5 +38,8 @@ export default {
   },
   getObject: (params: GetObjectRequest) => {
     return client.send(new GetObjectCommand(params));
+  },
+  putObject: (params: PutObjectRequest) => {
+    return client.send(new PutObjectCommand(params));
   },
 };

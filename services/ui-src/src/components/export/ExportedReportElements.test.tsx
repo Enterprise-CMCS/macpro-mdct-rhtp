@@ -53,6 +53,7 @@ describe("Test ExportedReportElements", () => {
         elements: [],
       },
       rows: [],
+      required: true,
     });
     render(element);
     expect(screen.getByText("TBD")).toBeInTheDocument();

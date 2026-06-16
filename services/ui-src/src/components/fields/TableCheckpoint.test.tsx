@@ -13,16 +13,15 @@ import {
   ElementType,
   TableCheckpointTemplate,
   AttachmentStatus,
-  InitiativeComment,
 } from "@rhtp/shared";
 import {
   getFileDownloadUrl,
   recordFileInDatabaseAndGetUploadUrl,
-} from "utils/api/requestMethods/upload";
+} from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
-import { CommentModal } from "components/modals/CommentModal";
-import { removeFile } from "utils/other/upload";
+import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
+import { removeFile } from "utils/other/fileUtils";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
@@ -31,7 +30,7 @@ vi.mock("react-router", () => ({
   useParams: vi.fn().mockReturnValue({ pageId: "mock-init-1" }),
 }));
 
-vi.mock("utils/other/upload", async (importOriginal) => ({
+vi.mock("utils/other/fileUtils", async (importOriginal) => ({
   ...(await importOriginal()),
   removeFile: vi.fn(),
 }));
@@ -61,7 +60,7 @@ vi.mock("utils/state/reportLogic/reportActions", () => ({
     ),
 }));
 
-vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
+vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
   ...(await importOriginal()),
   getFileDownloadUrl: vi.fn(),
   deleteUploadedFile: vi.fn(),
@@ -76,8 +75,8 @@ vi.mock("utils/api/requestMethods/upload", async (importOriginal) => ({
     ]),
 }));
 
-vi.mock("components/modals/CommentModal");
-const mockCommentModal = vi.mocked(CommentModal);
+vi.mock("components/modals/CommentDrawers");
+const mockCommentDrawer = vi.mocked(AttachmentCommentDrawer);
 
 const mockTableCheckpointElement: TableCheckpointTemplate = {
   id: "mock-TableCheckpoint-id",
@@ -119,10 +118,10 @@ const mockReport = {
               {
                 initiatives: ["mock-init-1"],
                 checkpoint: "project-prop-2",
-                comments: [] as InitiativeComment[],
                 attachment: mockFiles,
                 stage: "stage-1",
                 status: AttachmentStatus.PENDING_REVIEW,
+                canDelete: true,
               },
             ],
           },
@@ -179,7 +178,7 @@ describe("<TableCheckpoint />", () => {
     });
     expect(commentButton).toBeVisible();
     await userEvent.click(commentButton);
-    expect(mockCommentModal).toHaveBeenCalled();
+    expect(mockCommentDrawer).toHaveBeenCalled();
   });
   test("delete disabled when file status locked", async () => {
     const lockedFileReport = structuredClone(mockReport);
@@ -192,16 +191,9 @@ describe("<TableCheckpoint />", () => {
     });
     expect(deleteButton).toBeDisabled();
   });
-  test("delete disabled when file has previous comments", async () => {
+  test("delete disabled when file has canDelete set to true", async () => {
     const lockedFileReport = structuredClone(mockReport);
-    lockedFileReport.report.pages[1].elements![0].answer[0].comments = [
-      {
-        name: "Mock User",
-        date: "2024-06-01",
-        comment: "This is a mock comment",
-        statusChange: AttachmentStatus.INFORMATIONAL,
-      },
-    ];
+    lockedFileReport.report.pages[1].elements![0].answer[0].canDelete = false;
     mockedUseStore.mockReturnValue(lockedFileReport);
     render(TableCheckpointComponent);
     const deleteButton = screen.getByRole("button", {

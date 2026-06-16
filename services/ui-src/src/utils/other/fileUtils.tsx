@@ -11,7 +11,8 @@ import {
 import {
   deleteUploadedFile,
   getFileDownloadUrl,
-} from "../api/requestMethods/upload";
+  getZipPresignedUrl,
+} from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
@@ -19,7 +20,7 @@ import {
   ReportType,
   UploadListProp,
   AttachmentStatus,
-  InitiativeComment,
+  Report,
 } from "@rhtp/shared";
 
 export const acceptedFileTypes = [
@@ -71,6 +72,17 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
+export const getZipFile = async (report: Report) => {
+  const { state, id, type } = report;
+
+  const fileLink = await getZipPresignedUrl(type, state, id);
+  const sanitizeLink = DOMPurify.sanitize(fileLink);
+
+  const link = document.createElement("a");
+  link.href = sanitizeLink;
+  link.click();
+};
+
 export const canEditAttachment = (status: AttachmentStatus): boolean => {
   if (status === AttachmentStatus.LOCKED_FOR_SCORING) return false;
 
@@ -79,10 +91,9 @@ export const canEditAttachment = (status: AttachmentStatus): boolean => {
 
 export const canDeleteAttachment = (
   status: AttachmentStatus,
-  comments: InitiativeComment[]
+  canDelete: boolean
 ): boolean => {
-  if (status === AttachmentStatus.PENDING_REVIEW && comments.length === 0)
-    return true;
+  if (status === AttachmentStatus.PENDING_REVIEW && canDelete) return true;
 
   return false;
 };
@@ -120,6 +131,7 @@ export const uploadListRender = (
                   <Button
                     variant="link"
                     onClick={() => onClick(reportType, state, id, file)}
+                    textAlign="left"
                   >
                     {file.name}
                   </Button>

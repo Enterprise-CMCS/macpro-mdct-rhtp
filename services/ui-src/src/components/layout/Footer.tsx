@@ -89,7 +89,7 @@ const sx = {
     flexShrink: "0",
     ".desktop &": {
       position: "sticky",
-      zIndex: "sticky",
+      zIndex: "1000",
     },
     "@media print": {
       display: "none",

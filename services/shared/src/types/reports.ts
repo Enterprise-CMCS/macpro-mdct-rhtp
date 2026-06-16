@@ -49,7 +49,17 @@ export enum ReportStatus {
   NOT_STARTED = "Not started",
   IN_PROGRESS = "In progress",
   SUBMITTED = "Submitted",
+  ACCEPTED = "Accepted",
 }
+
+export const CompletedReportStatuses = [
+  ReportStatus.SUBMITTED,
+  ReportStatus.ACCEPTED,
+];
+
+export const isCompleteStatus = (status: ReportStatus | undefined) => {
+  return status && CompletedReportStatuses.includes(status);
+};
 
 export enum AlertTypes {
   ERROR = "error",
@@ -65,11 +75,22 @@ export enum PageStatus {
   COMPLETE = "Complete",
 }
 
-export type ReportComment = {
-  name: string;
-  date: string;
-  comment: string;
+export enum CommentType {
+  REPORT = "report",
+  ATTACHMENT = "attachment",
+}
+
+export type Comment = {
+  contextId: string;
+  created: number;
+  id: string;
+  author: string;
+  authorEmail: string;
   isInternal: boolean;
+  type: CommentType;
+  parentReportId?: string;
+  comment?: string;
+  statusChange?: AttachmentStatus;
 };
 
 export interface Report extends ReportOptions {
@@ -86,7 +107,6 @@ export interface Report extends ReportOptions {
   submittedByEmail?: string;
   status: ReportStatus;
   submissionCount: number;
-  comments?: ReportComment[];
 }
 
 export type LiteReport = Omit<Report, "pages">;
@@ -169,7 +189,7 @@ export enum ElementType {
   InitiativesTable = "initiativesTable",
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
-  UseOfFundsTable = "useOfFundsTable",
+  UseOfFundsAttachment = "useOfFundsAttachment",
   ActionTable = "actionTable",
   AttachmentTable = "attachmentTable",
   SubmitForReview = "submitForReview",
@@ -196,7 +216,7 @@ export type PageElement =
   | InitiativesTableTemplate
   | TableCheckpointTemplate
   | AccordionGroupTemplate
-  | UseOfFundsTableTemplate
+  | UseOfFundsAttachmentTemplate
   | AttachmentAreaTemplate
   | AttachmentTableTemplate
   | ActionTableTemplate
@@ -366,41 +386,26 @@ export interface AccordionGroupTemplate {
   answer?: boolean[];
 }
 
-export type UseOfFundsTableItem = {
+export type UseOfFundsAttachmentTemplate = {
+  type: ElementType.UseOfFundsAttachment;
   id: string;
-  budgetPeriod: string;
-  spentFunds: string;
-  description: string;
-  initiative: string;
-  useOfFunds: string;
-  recipientName: string;
-  recipientCategory: string;
-};
-
-export type UseOfFundsTableTemplate = {
-  type: ElementType.UseOfFundsTable;
-  id: string;
-  dropDownOptions: {
-    budgetPeriodOptions: { label: string; value: string }[];
-    useOfFundsOptions: { label: string; value: string }[];
-    recipientCategoryOptions: { label: string; value: string }[];
-  };
-  answer?: UseOfFundsTableItem[];
-};
-
-export type InitiativeComment = {
-  name: string;
-  date: string;
-  comment?: string;
-  statusChange?: AttachmentStatus;
+  answer?: UploadListProp[];
+  required: boolean;
 };
 
 export enum AttachmentStatus {
   PENDING_REVIEW = "Pending Review", // State driven
   NEEDS_REVISION = "Needs Revision", // CMS driven
   LOCKED_FOR_SCORING = "Locked for Scoring", // CMS driven
-  INFORMATIONAL = "Informational", // CMS driven
+  INFORMATIONAL = "Informational",
+  ARCHIVED = "Archived",
 }
+
+export const FileStatusOptions = Object.values(AttachmentStatus).map(
+  (status) => {
+    return { label: status, value: status };
+  }
+);
 
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
@@ -408,7 +413,7 @@ export type InitiativeAnswerProp = {
   stage?: string;
   checkpoint?: string;
   status: AttachmentStatus;
-  comments: InitiativeComment[];
+  canDelete: boolean;
 };
 
 export type AttachmentTableTemplate = {
@@ -456,6 +461,7 @@ export interface ActionTableTemplate {
   answer?: ActionAnswerShape[];
   quarterly?: boolean;
   disabled?: boolean;
+  required: boolean;
 }
 
 export interface SubmitForReviewTemplate {

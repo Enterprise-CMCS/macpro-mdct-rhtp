@@ -43,6 +43,11 @@ export async function interceptAndStoreIdentityRequest(
   userType: "ADMIN" | "STATE"
 ): Promise<void> {
   let credentialsCaptured = false;
+  let resolveCredentialsCaptured: (() => void) | null = null;
+
+  const credentialsCapturedPromise = new Promise<void>((resolve) => {
+    resolveCredentialsCaptured = resolve;
+  });
 
   const routeHandler = async (route: any) => {
     const request = route.request();
@@ -67,6 +72,7 @@ export async function interceptAndStoreIdentityRequest(
             process.env[`${userType}_AWS_SESSION_TOKEN`] =
               responseBody.Credentials.SessionToken;
             credentialsCaptured = true;
+            resolveCredentialsCaptured?.();
           }
         } catch (error) {
           console.error("Error parsing cognito-identity response:", error);
@@ -95,13 +101,12 @@ export async function interceptAndStoreIdentityRequest(
 
   await page.route(cognitoIdentityRoute, routeHandler);
 
-  // Wait for credentials to be captured or timeout
-  const startTime = Date.now();
-  const timeout = 10000; // 10 seconds
-
-  while (!credentialsCaptured && Date.now() - startTime < timeout) {
-    await page.waitForTimeout(100); // Poll every 100ms
-  }
+  // Wait for credentials to be captured or timeout (event-driven, no polling)
+  const timeoutMs = 10000;
+  await Promise.race([
+    credentialsCapturedPromise,
+    new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+  ]);
 
   if (!credentialsCaptured) {
     console.warn(

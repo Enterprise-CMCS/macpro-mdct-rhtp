@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "~3.1032.0",
+    "@aws-sdk/client-lambda": "~3.1032.0",
     "@aws-sdk/client-ses": "~3.1032.0",
     "@aws-sdk/lib-dynamodb": "~3.1032.0",
     "@aws-sdk/s3-request-presigner": "~3.1032.0",
@@ -16,6 +17,7 @@
     "@rhtp/shared": "workspace:*",
     "dompurify": "^3.4.0",
     "jsdom": "^26.0.0",
+    "jszip": "3.10.1",
     "jwt-decode": "3.1.2",
     "kafkajs": "^2.2.4",
     "ksuid": "^3.0.0",
