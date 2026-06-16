@@ -10,11 +10,13 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router";
 import { MenuOption } from "components";
-import { useBreakpoint } from "utils";
+import { useBreakpoint, useStore } from "utils";
 import chevronDownIcon from "assets/icons/arrows/icon_arrow_down.svg";
 import gearIcon from "assets/icons/icon_gear.svg";
+import { UserRoles } from "@rhtp/shared";
 
 export const AdminMenu = () => {
+  const { userRole } = useStore().user ?? {};
   const { isMobile } = useBreakpoint();
 
   return (
@@ -42,6 +44,13 @@ export const AdminMenu = () => {
             <MenuOption role="button" text="Banner Editor" />
           </MenuItem>
         </Link>
+        {userRole === UserRoles.APPROVER && (
+          <Link as={RouterLink} to="/notifications" variant="unstyled">
+            <MenuItem sx={sx.menuItem}>
+              <MenuOption role="button" text="Notifications" />
+            </MenuItem>
+          </Link>
+        )}
       </MenuList>
     </MenuRoot>
   );

@@ -70,19 +70,15 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   });
   if (!isDev) {
     const topic = new sns.Topic(scope, `${project}-${stage}-failedEmailTopic`);
-    new sns.Subscription(
-      scope,
-      `${project}-${stage}-failed-email-subscription`,
-      {
-        topic: sns.Topic.fromTopicArn(
-          scope,
-          `${project}-${stage}-failed-email-topic`,
-          topic.topicArn
-        ),
-        endpoint: "mdct-integrations@coforma.io",
-        protocol: sns.SubscriptionProtocol.EMAIL,
-      }
-    );
+    new sns.Subscription(scope, `${project}-${stage}-email-subscription`, {
+      topic: sns.Topic.fromTopicArn(
+        scope,
+        `${project}-${stage}-failed-email-topic`,
+        topic.topicArn
+      ),
+      endpoint: "mdct-integrations@coforma.io",
+      protocol: sns.SubscriptionProtocol.EMAIL,
+    });
 
     const configSet = new ses.ConfigurationSet(
       scope,
