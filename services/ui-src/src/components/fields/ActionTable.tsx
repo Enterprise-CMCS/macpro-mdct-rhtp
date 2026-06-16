@@ -219,8 +219,17 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 };
 
 export const ActionTableExport = (element: ActionTableTemplate) => {
-  const headers = element.rows.map((row) => ({ label: row.header }));
-  const ids = element.rows.map((row) => row.id);
+  const showPrevValue = element.answer
+    ?.flat()
+    .filter((item) => item.id === "prevValue")
+    .every((item) => item.value !== "");
+
+  const filteredRows = showPrevValue
+    ? element.rows
+    : element.rows.filter((row) => row.id != "prevValue");
+
+  const headers = filteredRows.map((row) => ({ label: row.header }));
+  const ids = filteredRows.map((row) => row.id);
 
   const buildRow = (element: ActionAnswerShape, index: number) => {
     return ids.map((id) => {
