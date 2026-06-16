@@ -116,6 +116,13 @@ export const VerticalTable = (props: TableProps) => {
             >
               View Report
             </Button>
+            <Button
+              variant="link"
+              fontWeight="bold"
+              onClick={() => props.openCommentsDrawer(report)}
+            >
+              Comment
+            </Button>
           </HStack>
           <Divider></Divider>
         </Fragment>
