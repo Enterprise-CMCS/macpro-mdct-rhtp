@@ -95,27 +95,29 @@ const exportVariant = {
         fontWeight: "heading_sm_bold",
         color: "black",
       },
-      "&:first-child": {
-        "p:nth-child(2)": {
+      "&:first-of-type": {
+        "p:nth-of-type(2)": {
           color: "gray_medium",
         },
       },
-      "vertical-align": "top",
     },
   },
 };
 
 const reportDetailsVariant = {
-  tr: {
-    "th, td": {
-      borderColor: "transparent",
+  table: {
+    tr: {
+      border: "none",
+      "th, td": {
+        borderColor: "transparent",
+      },
     },
-  },
-  td: {
-    fontSize: "body_sm",
-    padding: "0",
-    color: "black",
-    width: "25%",
+    td: {
+      fontSize: "body_sm",
+      padding: "0",
+      color: "black",
+      width: "25%",
+    },
   },
 };
 
@@ -197,6 +199,19 @@ const initiativeVariant = {
   },
 };
 
+const pdfVariant = {
+  table: {
+    th: {
+      borderBottomWidth: "2px",
+    },
+    tr: {
+      "&.borderless": {
+        border: "0",
+      },
+    },
+  },
+};
+
 const variants = {
   striped: stripedVariant,
   status: statusVariant,
@@ -204,6 +219,7 @@ const variants = {
   reportDetails: reportDetailsVariant,
   metric: metricVariant,
   initiative: initiativeVariant,
+  pdf: pdfVariant,
 };
 
 const sizes = {};

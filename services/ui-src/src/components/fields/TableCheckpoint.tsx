@@ -1,4 +1,11 @@
-import { Stack, Button, Checkbox, Image, Flex } from "@chakra-ui/react";
+import {
+  Stack,
+  Button,
+  Checkbox,
+  Image,
+  Flex,
+  Heading,
+} from "@chakra-ui/react";
 import {
   AttachmentStatus,
   ElementType,
@@ -509,4 +516,76 @@ const sx = {
       border: "2px solid black",
     },
   },
+};
+
+export const TableCheckpointExport = (
+  element: TableCheckpointTemplate & { initId: string }
+) => {
+  const { report } = useStore();
+  const { answer, initId } = element;
+
+  if (!initId) return;
+
+  const attachments = report?.pages
+    .flatMap((page) => page.elements)
+    .find((element) => element?.type === ElementType.AttachmentTable)?.answer;
+
+  const files =
+    attachments?.filter((data) => data.initiatives.includes(initId)) ?? [];
+
+  const data = buildTables(files);
+
+  const buildRows = (table: {
+    stage: number;
+    label: string;
+    checkpoints: {
+      id: string;
+      checkpointNumber: string;
+      label: string;
+      attachable: boolean;
+    }[];
+    rows: any[];
+  }) => {
+    return table.rows.map((row) => {
+      const readyForCMS = answer?.find((value) => value.id === row.id)?.checked
+        ? "Yes"
+        : "No";
+      return [
+        row.stageNo,
+        row.label,
+        readyForCMS,
+        "file" in row ? (row?.file?.name ?? "No attachment") : "Not applicable",
+        row.status,
+      ];
+    });
+  };
+
+  return (
+    <Stack gap="2em" key={element.id}>
+      {data.map((item) => (
+        <Stack gap="2rem" key={item.label}>
+          <Heading as="h4" fontSize="16px" fontWeight="bold">
+            Stage {item.stage}: {item.label}
+          </Heading>
+          {ResponsiveTable(
+            [
+              { label: "#" },
+              { label: "Checkpoint" },
+              { label: "Ready for CMS Review" },
+              { label: "Attachments" },
+              { label: "Status" },
+            ],
+            buildRows(item),
+            "pdf",
+            () => {},
+            item.rows.map((_row, index) =>
+              item.rows.at(index + 1) && item.rows.at(index + 1).stageNo == ""
+                ? "borderless"
+                : ""
+            )
+          )}
+        </Stack>
+      ))}
+    </Stack>
+  );
 };
