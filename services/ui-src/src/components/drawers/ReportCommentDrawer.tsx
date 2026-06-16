@@ -89,6 +89,7 @@ export const ReportCommentDrawer = ({
   const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
   const userCanAddComment =
     userIsEndUser || (userIsAdmin && adminCommentsEnabled);
+  const commentsDisabled = !userCanAddComment;
 
   const commentsOptional = userIsAdmin;
   const statusDisabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
@@ -136,20 +137,67 @@ export const ReportCommentDrawer = ({
 
   const onSubmit = async () => {
     setSubmitting(true);
-    console.log("Submitting comment:", displayValue);
-    if (displayValue.status === "Unlock") {
-      await releaseReport(selectedReport);
-      reloadReports(ReportType.RHTP);
-    } else if (
-      displayValue.status === ReportStatus.ACCEPTED &&
-      displayValue.status !== status
-    ) {
-      await acceptReport(selectedReport);
-      reloadReports(ReportType.RHTP);
-    }
+    setErrorMessages(noErrorState);
 
-    modalDisclosure.onClose();
-    setSubmitting(false);
+    console.log("Submitting comment:", displayValue);
+
+    try {
+      if (commentsDisabled) {
+        setSubmitting(false);
+        return;
+      }
+
+      const didStatusChange = displayValue.status !== status;
+      const commentsEmpty = displayValue.comment.trim() === "";
+      if (commentsEmpty && !commentsOptional) {
+        setErrorMessages({
+          ...errorMessages,
+          comment: "A comment is required.",
+        });
+        return;
+      }
+
+      // Comments are optional for admins
+      if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
+        setSubmitting(false);
+        setErrorMessages({
+          ...errorMessages,
+          comment: "Must provide a Comment to submit.",
+        });
+        return;
+      }
+
+      if (!statusDisabled && didStatusChange) {
+        if (displayValue.status === "Unlock") {
+          await releaseReport(selectedReport);
+        } else if (displayValue.status === ReportStatus.ACCEPTED) {
+          await acceptReport(selectedReport);
+        }
+      }
+
+      await createComment(id, state, {
+        comment: displayValue.comment,
+        type: CommentType.REPORT,
+        isInternal: displayValue.commentType === "internal",
+        ...(didStatusChange && { statusChange: displayValue.status }),
+      });
+
+      reloadReports(ReportType.RHTP, state);
+      fetchComments();
+      setDisplayValue((prev) => ({
+        ...prev,
+        comment: "",
+      }));
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      setErrorMessages({
+        ...errorMessages,
+        overall:
+          "There was an error submitting your comment. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const userSpecificSubheading = userIsAdmin
@@ -234,7 +282,7 @@ export const ReportCommentDrawer = ({
               }
               onChange={onChange}
               value={displayValue.comment}
-              disabled={!userCanAddComment}
+              disabled={commentsDisabled}
               multiline
               rows={3}
               errorMessage={errorMessages.comment}
@@ -242,7 +290,7 @@ export const ReportCommentDrawer = ({
           </Flex>
           <Button
             onClick={onSubmit}
-            isDisabled={!userCanAddComment}
+            isDisabled={commentsDisabled}
             isLoading={submitting}
             variant="outline"
           >
