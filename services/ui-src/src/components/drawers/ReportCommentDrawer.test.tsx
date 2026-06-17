@@ -117,6 +117,7 @@ describe("ReportCommentDrawer component", () => {
       expect(statusDropdown).toBeEnabled();
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Unlock" }));
+      await userEvent.click(screen.getByText("External (Shared with States)"));
       await userEvent.click(screen.getByText("Add comment"));
       expect(mockReleaseReport).toHaveBeenCalled();
     });
@@ -126,6 +127,7 @@ describe("ReportCommentDrawer component", () => {
       expect(statusDropdown).toBeEnabled();
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Accepted" }));
+      await userEvent.click(screen.getByText("External (Shared with States)"));
       await userEvent.click(screen.getByText("Add comment"));
       expect(mockAcceptReport).toHaveBeenCalled();
     });
@@ -185,6 +187,9 @@ describe("ReportCommentDrawer component", () => {
           name: "Comment(optional)",
         });
         await userEvent.type(commentInput, "Test comment");
+        await userEvent.click(
+          screen.getByText("External (Shared with States)")
+        );
         await userEvent.click(screen.getByText("Add comment"));
         expect(mockCreateComment).toHaveBeenCalledWith(
           mockReport.id,
@@ -275,6 +280,23 @@ describe("ReportCommentDrawer component", () => {
           isInternal: true,
         }
       );
+    });
+
+    test("admin user gets error if they do not select a comment type", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue({
+        ...mockUseStore,
+        ...mockAdminUserStore,
+      });
+      await renderReportCommentDrawerComponent();
+      const commentInput = screen.getByRole("textbox", {
+        name: "Comment(optional)",
+      });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(screen.getByText("Please select a comment type.")).toBeVisible();
     });
   });
 

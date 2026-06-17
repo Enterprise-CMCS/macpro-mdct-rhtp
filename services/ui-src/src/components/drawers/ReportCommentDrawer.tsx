@@ -53,11 +53,11 @@ export const ReportCommentDrawer = ({
   const initialValues: {
     comment: string;
     status: string;
-    commentType: "external" | "internal";
+    commentType: "external" | "internal" | "";
   } = {
     comment: "",
     status: status,
-    commentType: "external",
+    commentType: userIsAdmin ? "" : "external",
   };
 
   const noErrorState = {
@@ -129,7 +129,14 @@ export const ReportCommentDrawer = ({
 
     try {
       if (commentsDisabled) {
-        setSubmitting(false);
+        return;
+      }
+
+      if (displayValue.commentType === "" && userIsAdmin) {
+        setErrorMessages({
+          ...errorMessages,
+          commentType: "Please select a comment type.",
+        });
         return;
       }
 
@@ -145,7 +152,6 @@ export const ReportCommentDrawer = ({
 
       // Comments are optional for admins
       if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
-        setSubmitting(false);
         setErrorMessages({
           ...errorMessages,
           overall: "Must change Status or provide a Comment to submit.",
@@ -169,7 +175,7 @@ export const ReportCommentDrawer = ({
       });
 
       // Force close because status changed and need to refetch reports to get new status
-      if (didStatusChange) return modalDisclosure.onClose();
+      if (didStatusChange) return modalDisclosure.onClose(true);
 
       fetchComments();
       setDisplayValue((prev) => ({
@@ -204,7 +210,7 @@ export const ReportCommentDrawer = ({
           <Button
             leftIcon={<Image src={closeIcon} alt="Close" />}
             variant="link"
-            onClick={modalDisclosure.onClose}
+            onClick={() => modalDisclosure.onClose()}
             fontWeight="bold"
           >
             Close
@@ -251,7 +257,6 @@ export const ReportCommentDrawer = ({
                     {
                       label: "External (Shared with States)",
                       value: "external",
-                      defaultChecked: true,
                     },
                     { label: "Internal (CMS Only)", value: "internal" },
                   ]}
@@ -299,7 +304,7 @@ export const ReportCommentDrawer = ({
           ) : null}
         </DrawerBody>
         <DrawerFooter>
-          <Button onClick={modalDisclosure.onClose}>Close</Button>
+          <Button onClick={() => modalDisclosure.onClose()}>Close</Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -325,7 +330,7 @@ const sx = {
 interface Props {
   modalDisclosure: {
     isOpen: boolean;
-    onClose: () => void;
+    onClose: (shouldReport?: boolean) => void;
   };
   selectedReport: Report | LiteReport;
 }

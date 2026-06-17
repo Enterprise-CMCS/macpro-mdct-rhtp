@@ -145,10 +145,10 @@ export const AdminDashboard = () => {
     setCommentDrawerOpen(true);
   };
 
-  const closeCommentsDrawer = () => {
+  const closeCommentsDrawer = (shouldReload?: boolean) => {
     setSelectedReport(undefined);
     setCommentDrawerOpen(false);
-    reloadReports(ReportType.RHTP);
+    if (shouldReload) reloadReports(ReportType.RHTP);
   };
 
   const buildRows = (reports: Report[]) => {

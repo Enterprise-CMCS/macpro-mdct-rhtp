@@ -308,6 +308,23 @@ describe("AttachmentCommentDrawer component", () => {
       );
     });
 
+    test("admin user gets error if they do not select a comment type", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue({
+        ...mockUseStore,
+        ...mockAdminUserStore,
+      });
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", {
+        name: "Comment(optional)",
+      });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(screen.getByText("Please select a comment type.")).toBeVisible();
+    });
+
     test("admin user can edit attachment status", async () => {
       mockFlags.mockReturnValue({
         adminCommentsEnabled: true,
@@ -322,6 +339,7 @@ describe("AttachmentCommentDrawer component", () => {
       await userEvent.click(
         screen.getByRole("option", { name: "Needs Revision" })
       );
+      await userEvent.click(screen.getByText("External (Shared with States)"));
       await userEvent.click(screen.getByText("Add comment"));
       expect(mockCreateComment).toHaveBeenCalledWith(
         mockSelectedFile.fileId,

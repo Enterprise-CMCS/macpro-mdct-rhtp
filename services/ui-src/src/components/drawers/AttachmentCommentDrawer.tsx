@@ -74,7 +74,7 @@ export const AttachmentCommentDrawer = ({
   const initialValues = {
     comment: "",
     status: fileStatus,
-    commentType: "external",
+    commentType: userIsAdmin ? "" : "external",
   };
 
   const noErrorState = {
@@ -149,6 +149,14 @@ export const AttachmentCommentDrawer = ({
         return;
       }
 
+      if (displayValue.commentType === "" && userIsAdmin) {
+        setErrorMessages({
+          ...errorMessages,
+          commentType: "Please select a comment type.",
+        });
+        return;
+      }
+
       const didStatusChange =
         displayValue.status !== allFiles[selectedAttachmentIndex].status;
       const commentsEmpty = displayValue.comment.trim() === "";
@@ -162,7 +170,6 @@ export const AttachmentCommentDrawer = ({
 
       // Comments are optional for admins
       if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
-        setCommentSubmitting(false);
         setErrorMessages({
           ...errorMessages,
           overall: "Must modify Status or provide a Comment to submit.",
@@ -281,7 +288,6 @@ export const AttachmentCommentDrawer = ({
                   {
                     label: "External (Shared with States)",
                     value: "external",
-                    defaultChecked: true,
                   },
                   { label: "Internal (CMS Only)", value: "internal" },
                 ]}
