@@ -140,6 +140,7 @@ const UseOfFundsAttachmentSchema = object().shape({
     .required()
     .matches(new RegExp(ElementType.UseOfFundsAttachment)),
   id: string().required(),
+  label: string().required(),
   answer: array()
     .of(
       object().shape({

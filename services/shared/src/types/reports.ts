@@ -389,6 +389,7 @@ export interface AccordionGroupTemplate {
 export type UseOfFundsAttachmentTemplate = {
   type: ElementType.UseOfFundsAttachment;
   id: string;
+  label: string;
   answer?: UploadListProp[];
   required: boolean;
 };

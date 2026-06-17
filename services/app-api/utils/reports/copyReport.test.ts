@@ -97,6 +97,7 @@ const mockOldReport: Report = {
         {
           id: "use-of-funds-attachment",
           type: ElementType.UseOfFundsAttachment,
+          label: "mock label",
           answer: [
             {
               name: "file-name",

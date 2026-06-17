@@ -18,6 +18,7 @@ const tableElementList = [
   ElementType.Radio,
   ElementType.TextAreaField,
   ElementType.NumberField,
+  ElementType.UseOfFundsAttachment,
 ];
 
 const renderElementList = [

@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Image, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import {
   AlertTypes,
   UploadListProp,
@@ -26,7 +26,7 @@ export const UseOfFundsAttachmentElement = (
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const { id, state, type: reportType } = report!;
-  const { answer } = element;
+  const { answer, label } = element;
   const files = answer ?? [];
 
   const saveToReport = (newFiles: UploadListProp[]) => {
@@ -77,9 +77,11 @@ export const UseOfFundsAttachmentElement = (
         uploadedSubLabel={""}
         multiple={false}
       ></UploadModal>
-      <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
-        Uploaded Attachment
-      </Heading>
+      {files.length > 0 && (
+        <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
+          {label}
+        </Heading>
+      )}
       {uploadListRender(
         reportType,
         state,
@@ -125,8 +127,14 @@ export const UseOfFundsAttachmentElement = (
 export const UseOfFundsAttachmentElementExport = (
   element: UseOfFundsAttachmentTemplate
 ) => {
-  console.log("element", element);
-  return <div>empty div for now</div>;
+  const name = element.answer?.[0].name ?? "Not answered";
+  const size = element.answer?.[0].size;
+  return (
+    <Stack>
+      <span>{name}</span>
+      <span>{size}</span>
+    </Stack>
+  );
 };
 
 const sx = {
