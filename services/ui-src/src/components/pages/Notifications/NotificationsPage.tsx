@@ -54,14 +54,14 @@ const DeleteRecipientModal = ({
     <Modal
       modalDisclosure={modalDisclosure}
       content={{
-        heading: `Delete recipient: ${email}`,
+        heading: `Are you sure you want to delete ${email}?`,
+        subheading:
+          "Deleting this user from the notifications center will disable any future notifications from being sent or received to the email address listed above.",
         actionButtonText: "Delete",
       }}
       onConfirmHandler={onDelete}
       submitting={loading}
-    >
-      <Box>hi</Box>
-    </Modal>
+    />
   );
 };
 
@@ -157,7 +157,7 @@ const EditRecipientModal = ({
         onClose: onClose,
       }}
       content={{
-        heading: "Add Email",
+        heading: "Edit assigned states",
         actionButtonText: "Save",
       }}
       onConfirmHandler={onSubmit}
