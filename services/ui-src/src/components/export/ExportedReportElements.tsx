@@ -19,6 +19,7 @@ const tableElementList = [
   ElementType.TextAreaField,
   ElementType.NumberField,
   ElementType.UseOfFundsAttachment,
+  ElementType.AccordionGroup,
 ];
 
 const renderElementList = [
@@ -27,7 +28,6 @@ const renderElementList = [
   ElementType.Paragraph,
   ElementType.TableCheckpoint,
   ElementType.AttachmentArea,
-  ElementType.AccordionGroup,
   ElementType.ActionTable,
   ElementType.AttachmentTable,
 ];

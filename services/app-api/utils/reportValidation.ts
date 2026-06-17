@@ -275,7 +275,7 @@ const accordionGroupTemplateSchema = object().shape({
     .of(
       object().shape({
         label: string().required(),
-        children: lazy(() => array().of(pageElementSchema).required()),
+        elements: lazy(() => array().of(pageElementSchema).required()),
       })
     )
     .required(),

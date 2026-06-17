@@ -164,7 +164,7 @@ export enum PageType {
 
 export type AccordionGroupItem = {
   label: string;
-  children: PageElement[];
+  elements: PageElement[];
 };
 
 export enum ElementType {

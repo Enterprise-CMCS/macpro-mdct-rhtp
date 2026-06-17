@@ -8,7 +8,7 @@ import { PageElementProps } from "./Elements";
 import { Fragment, useState } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-import { useStore } from "utils";
+import { bytesToKiloBytes, useStore } from "utils";
 import { UploadModal } from "components/modals/UploadModal";
 import {
   uploadListRender,
@@ -132,7 +132,7 @@ export const UseOfFundsAttachmentElementExport = (
   return (
     <Stack>
       <span>{name}</span>
-      <span>{size}</span>
+      {size && <span>{bytesToKiloBytes(size)}</span>}
     </Stack>
   );
 };

@@ -17,7 +17,7 @@ export const AccordionGroup = (
     props.updateElement({
       accordions: [
         ...accordions.slice(0, index),
-        { ...updatedAnswer, children: element },
+        { ...updatedAnswer, elements: element },
         ...accordions.slice(index + 1),
       ],
     });
@@ -69,7 +69,7 @@ export const AccordionGroup = (
             <Page
               id="radio-children"
               setElements={(element) => setAccordionChildren(element, index)}
-              elements={accordion.children}
+              elements={accordion.elements}
             />
           </AccordionItem>
         ))}
