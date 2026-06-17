@@ -9,7 +9,7 @@ export const AccordionGroup = (
   props: PageElementProps<AccordionGroupTemplate>
 ) => {
   const { accordions } = props.element;
-  const [accordionState, setAccordionState] = useState<number[]>([]);
+  const [accordionState, setAccordionState] = useState<number[]>([0]);
 
   const setAccordionChildren = (element: PageElement[], index: number) => {
     const updatedAnswer = accordions[index];

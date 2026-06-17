@@ -127,8 +127,6 @@ export const renderReportSections = (reportPages: ReportPages) => {
     }));
   }
 
-  console.log(sortedReports[1]);
-
   sortedReports[1].splice(indexOfInitiative + 1, 0, ...sortedReports[0]);
 
   return sortedReports[1].map((section, idx) => {

@@ -17,6 +17,7 @@ import {
 } from "utils/other/fileUtils";
 import { Modal } from "components/modals/Modal";
 import { Alert } from "components/alerts/Alert";
+import { notAnsweredText } from "../../constants";
 
 export const UseOfFundsAttachmentElement = (
   props: PageElementProps<UseOfFundsAttachmentTemplate>
@@ -127,14 +128,18 @@ export const UseOfFundsAttachmentElement = (
 export const UseOfFundsAttachmentElementExport = (
   element: UseOfFundsAttachmentTemplate
 ) => {
-  const name = element.answer?.[0].name ?? "Not answered";
-  const size = element.answer?.[0].size;
-  return (
-    <Stack>
-      <span>{name}</span>
-      {size && <span>{bytesToKiloBytes(size)}</span>}
-    </Stack>
-  );
+  if (element.answer && element.answer.length > 0) {
+    const name = element.answer[0].name;
+    const size = element.answer[0].size;
+    return (
+      <Stack>
+        <span>{name}</span>
+        <span>{bytesToKiloBytes(size)} KB</span>
+      </Stack>
+    );
+  } else {
+    return notAnsweredText;
+  }
 };
 
 const sx = {

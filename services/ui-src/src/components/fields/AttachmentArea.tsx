@@ -7,7 +7,7 @@ import { PageElementProps } from "components/report/Elements";
 import { Button, Stack, Image, Text, Box } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
-import { useStore } from "utils";
+import { bytesToKiloBytes, useStore } from "utils";
 import {
   downloadFile,
   uploadListRender,
@@ -18,6 +18,7 @@ import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { Modal } from "components/modals/Modal";
 import { Alert } from "components/alerts/Alert";
+import { notAnsweredText } from "../../constants";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
@@ -130,6 +131,21 @@ export const AttachmentArea = (
       </Modal>
     </Stack>
   );
+};
+
+export const AttachmentAreaExport = (element: AttachmentAreaTemplate) => {
+  if (element.answer && element.answer.length > 0) {
+    const name = element.answer[0].name;
+    const size = element.answer[0].size;
+    return (
+      <Stack>
+        <span>{name}</span>
+        <span>{bytesToKiloBytes(size)} KB</span>
+      </Stack>
+    );
+  } else {
+    return notAnsweredText;
+  }
 };
 
 const sx = {

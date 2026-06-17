@@ -9,6 +9,7 @@ import { UseOfFundsAttachmentElementExport } from "components/report/UseOfFundsA
 import { ActionTableExport } from "components/fields/ActionTable";
 import { TableCheckpointExport } from "components/fields/TableCheckpoint";
 import { parseHtml } from "utils";
+import { AttachmentAreaExport } from "components/fields/AttachmentArea";
 
 const specificIds = ["initiatives-instructions", "initiative-instructions"];
 
@@ -19,7 +20,9 @@ const tableElementList = [
   ElementType.TextAreaField,
   ElementType.NumberField,
   ElementType.UseOfFundsAttachment,
-  ElementType.AccordionGroup,
+  ElementType.Dropdown,
+  ElementType.ListInput,
+  ElementType.AttachmentArea,
 ];
 
 const renderElementList = [
@@ -29,7 +32,6 @@ const renderElementList = [
   ElementType.TableCheckpoint,
   ElementType.AttachmentArea,
   ElementType.ActionTable,
-  ElementType.AttachmentTable,
 ];
 
 export const shouldUseTable = (type: ElementType) => {
@@ -58,13 +60,12 @@ export const renderElements = (element: PageElement) => {
     case ElementType.UseOfFundsAttachment:
       return UseOfFundsAttachmentElementExport(element);
     case ElementType.AttachmentArea:
-      return "TBD";
-    case ElementType.AccordionGroup:
-      return "TBD";
+      return AttachmentAreaExport(element);
     case ElementType.ActionTable:
       return ActionTableExport(element);
+    case ElementType.AccordionGroup:
     case ElementType.AttachmentTable:
-      return "TBD";
+      return "";
   }
 
   if (!("answer" in element)) {
