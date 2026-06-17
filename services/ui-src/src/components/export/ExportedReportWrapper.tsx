@@ -75,19 +75,17 @@ export const ExportedReportWrapper = ({ section }: Props) => {
         ];
       } else if (element.type === ElementType.AccordionGroup) {
         const expandedElements: PageElement[] = [];
-        for (var i = 0; i < element.accordions.length; i++) {
+        for (const accordion of element.accordions) {
           expandedElements.push({
-            id: `accordion-${i}`,
-            text: element.accordions[i].label,
+            id: accordion.label,
+            text: accordion.label,
             type: ElementType.SubHeader,
           });
-          const childElements = element.accordions[i].elements.flatMap(
-            (element) => renderExpandedAnswers(element)
+          const childElements = accordion.elements.flatMap((element) =>
+            renderExpandedAnswers(element)
           );
-
           expandedElements.push(...childElements);
         }
-
         return expandedElements;
       } else {
         // All other element types stand on their own.

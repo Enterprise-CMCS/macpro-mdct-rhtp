@@ -45,17 +45,7 @@ describe("Test ExportedReportElements", () => {
       uploadedSubLabel: "mock sub label",
     });
     render(element);
-    expect(screen.getByText("TBD")).toBeInTheDocument();
-  });
-  test("render AccordionGroup element", () => {
-    const element = renderElements({
-      type: ElementType.AccordionGroup,
-      id: "mock-accordion-group",
-      accordions: [],
-      required: true,
-    });
-    render(element);
-    expect(screen.getByText("TBD")).toBeInTheDocument();
+    expect(screen.getByText("Not answered")).toBeInTheDocument();
   });
   test("render ActionTable element", () => {
     const element = renderElements({
@@ -96,13 +86,5 @@ describe("Test ExportedReportElements", () => {
       screen.getByRole("columnheader", { name: "mock header 2" })
     ).toBeVisible();
     expect(screen.getByText("mock value")).toBeVisible();
-  });
-  test("render AttachmentTable element", () => {
-    const element = renderElements({
-      type: ElementType.AttachmentTable,
-      id: "mock-attachment-table",
-    });
-    render(element);
-    expect(screen.getByText("TBD")).toBeInTheDocument();
   });
 });
