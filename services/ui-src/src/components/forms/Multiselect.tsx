@@ -43,11 +43,15 @@ export const MultiSelect = ({
       }
     };
 
-    window.addEventListener("click", clickOutOfBounds);
+    //hotfix: when trying to use multiselect in a charkra modal, addEventListener does not register clicks unless it's attached to the modal itself
+    const modal = document.getElementsByClassName("chakra-modal__content");
+    const view = modal.length > 0 ? modal[0] : window;
+
+    (view as HTMLElement).addEventListener("click", clickOutOfBounds);
 
     //when component unmounts, it will run this function
     return () => {
-      window.removeEventListener("click", clickOutOfBounds);
+      (view as HTMLElement).removeEventListener("click", clickOutOfBounds);
     };
   }, []);
 
