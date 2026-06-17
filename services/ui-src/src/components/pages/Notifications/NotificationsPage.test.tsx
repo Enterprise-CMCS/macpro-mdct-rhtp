@@ -1,11 +1,22 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NotificationsPage } from "./NotificationsPage";
+import {
+  createNotificationRecipient,
+  getNotificationRecipients,
+} from "utils/api/requestMethods/notificationRecipients";
+import { NotificationRecipientRecord } from "@rhtp/shared";
+
+vi.mock("utils/api/requestMethods/notificationRecipients");
+const mockCreateRecipient = vi.mocked(createNotificationRecipient);
+const mockGetRecipients = vi
+  .mocked(getNotificationRecipients)
+  .mockResolvedValue([] as NotificationRecipientRecord[]);
 
 describe("NotificationsPage component", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    render(<NotificationsPage />);
+    await act(async () => await render(<NotificationsPage />));
   });
 
   test("renders", () => {
@@ -13,6 +24,7 @@ describe("NotificationsPage component", () => {
       screen.getByRole("heading", { name: "Notifications Settings" })
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Add email" })).toBeVisible();
+    expect(mockGetRecipients).toHaveBeenCalled();
   });
 
   test("add email modal opens and has inputs", async () => {
@@ -60,6 +72,10 @@ describe("NotificationsPage component", () => {
 
     const submitButton = screen.getByText("Save");
     await userEvent.click(submitButton);
-    expect(screen.queryByText("Add Email")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText("Add Email")).not.toBeInTheDocument();
+    });
+    expect(mockCreateRecipient).toHaveBeenCalled();
+    expect(mockGetRecipients).toHaveBeenCalled();
   });
 });
