@@ -38,7 +38,7 @@ describe("<AdminDashboard />", () => {
       screen.getByRole("heading", { name: "Admin Dashboard" })
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Instructions" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "States Filter" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "States select" })).toBeVisible();
     expect(
       screen.getByRole("button", { name: "All Budget Period" })
     ).toBeVisible();
@@ -59,7 +59,7 @@ describe("<AdminDashboard />", () => {
     await waitFor(() => {
       expect(screen.getByText("plan id")).toBeVisible();
     });
-    const stateFilter = screen.getByRole("button", { name: "States Filter" });
+    const stateFilter = screen.getByRole("button", { name: "States select" });
     fireEvent.click(stateFilter);
 
     const search = screen.getByRole("searchbox", {

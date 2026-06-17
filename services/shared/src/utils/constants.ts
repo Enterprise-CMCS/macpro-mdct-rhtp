@@ -64,3 +64,10 @@ export const StateNames = {
 } as const;
 
 export const dropdownEmptyOption = { label: "- Select an option -", value: "" };
+
+export const StateDropdownOptions = Object.entries(StateNames).map(
+  ([key, value]) => ({
+    label: value,
+    value: key,
+  })
+);
