@@ -362,13 +362,12 @@ export const TableCheckpoint = (
         );
 
       const columnActions = "file" in row && row.file.fileId && (
-        <Flex>
+        <Flex gap=".5rem">
           <Button
             variant="outline"
             onClick={() => onEditClick(row.file)}
             aria-label={`Edit file or info for ${row.file.name}`}
             disabled={!canEditAttachment(row.status) || disabled}
-            marginRight={"1rem"}
           >
             Edit
           </Button>
