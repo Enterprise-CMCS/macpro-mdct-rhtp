@@ -57,7 +57,7 @@ vi.mock("../../storage/reports", () => ({
             type: "accordionGroup",
             accordions: [
               {
-                children: [
+                elements: [
                   {
                     type: "attachmentArea",
                     answer: [
