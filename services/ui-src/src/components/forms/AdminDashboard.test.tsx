@@ -40,9 +40,11 @@ describe("<AdminDashboard />", () => {
   });
   it("AdminDashboard renders", async () => {
     expect(
-      screen.getByRole("heading", { name: "Admin Dashboard" })
+      screen.getByRole("heading", { name: "RHTP Admin Dashboard" })
     ).toBeVisible();
-    expect(screen.getByRole("button", { name: "Instructions" })).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Admin Instructions" })
+    ).toBeVisible();
     expect(screen.getByRole("button", { name: "States select" })).toBeVisible();
     expect(
       screen.getByRole("button", { name: "All Budget Period" })
