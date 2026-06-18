@@ -77,9 +77,11 @@ export const UseOfFundsAttachmentElement = (
         uploadedSubLabel={""}
         multiple={false}
       ></UploadModal>
-      <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
-        Uploaded Attachment
-      </Heading>
+      {files.length > 0 && (
+        <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
+          Uploaded Attachment
+        </Heading>
+      )}
       {uploadListRender(
         reportType,
         state,

@@ -107,10 +107,7 @@ export const InitiativesTable = (
       <Table variant="initiative">
         <Thead>
           <Tr>
-            <Th>
-              Initiative number and name <br />
-              Status
-            </Th>
+            <Th>Initiative</Th>
             <Th>Actions</Th>
           </Tr>
         </Thead>

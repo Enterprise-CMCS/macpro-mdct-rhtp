@@ -17,7 +17,6 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
 import { UploadModal } from "components/modals/UploadModal";
@@ -363,9 +362,9 @@ export const TableCheckpoint = (
         );
 
       const columnActions = "file" in row && row.file.fileId && (
-        <Flex>
+        <Flex gap=".5rem">
           <Button
-            variant="link"
+            variant="outline"
             onClick={() => onEditClick(row.file)}
             aria-label={`Edit file or info for ${row.file.name}`}
             disabled={!canEditAttachment(row.status) || disabled}
@@ -376,8 +375,9 @@ export const TableCheckpoint = (
             variant="link"
             onClick={() => onCommentClick(row.file)}
             aria-label={`Comment on ${row.file.name}`}
+            fontWeight="bold"
           >
-            <Image src={commentIcon} alt="Comment" minWidth="26px" />
+            Status/Comments
           </Button>
           <Button
             variant="unstyled"

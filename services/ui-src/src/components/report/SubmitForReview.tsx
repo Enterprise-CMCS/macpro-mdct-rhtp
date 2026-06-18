@@ -59,14 +59,19 @@ export const SubmitForReview = () => {
     <Stack width={"100%"}>
       {isSubmittedForReview ? (
         <Alert title={"Submitted for Review"} status={AlertTypes.SUCCESS}>
-          Instructions to come
+          Your submission was sent to CMS for preliminary review of the details
+          entered to date. You can still edit the report in preparation for
+          final submission.
         </Alert>
       ) : null}
       <Text fontSize="heading_md" fontWeight="heading_md">
-        Ready for Review?
+        Submit for Review
       </Text>
       <Text fontSize="body_md">
-        [Instructions about what happens during review]
+        Select “Submit for Review” to send a notification to CMS that the report
+        is ready for a preliminary review. States will still have edit
+        functionality to complete the rest of the report until you have selected
+        to fully “Submit” the report below.
       </Text>
       <Button
         variant="outline"
@@ -89,7 +94,8 @@ export const SubmitForReview = () => {
         submitting={isSubmitting}
         content={{
           heading: "Submit for Review",
-          subheading: "{More instructions to come}",
+          subheading:
+            "Add a comment below to detail to the CMS PO what portion of the report is ready for preliminary review. Once you select “Submit for Review” a notification will be sent to CMS PO’s.",
           actionButtonText: "Submit for Review",
           closeButtonText: "Cancel",
         }}

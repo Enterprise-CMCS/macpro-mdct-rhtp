@@ -11,6 +11,7 @@ import {
   TableCheckpointTemplate,
   TextAreaBoxTemplate,
   MaskType,
+  AccordionTemplate,
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
 
@@ -56,7 +57,26 @@ const initiativeHeader: (
 const initiativeInstructions: ParagraphTemplate = {
   type: ElementType.Paragraph,
   id: "initiative-instructions",
-  text: "Use this page to provide information about your initiative and the metrics you use to measure its progress. Then, update any checkpoints for review. Note, only Initiative checkpoints and attachments can be updated in quarterly reporting cycles.",
+  text: "Use this page to provide information about your initiative and the metrics you use to measure its progress. Then, update any checkpoints for review.",
+};
+
+const initiativeAccordion: AccordionTemplate = {
+  type: ElementType.Accordion,
+  id: "initiative-accordion",
+  label: "What is included in Annual Reporting vs Quarterly Reporting?",
+  value:
+    "<b>Annual Reporting Data should include:</b>" +
+    "<ul>" +
+    "  <li>Initiative Progress Narrative</li>" +
+    "  <li>Initiative People Served</li>" +
+    "  <li>Initiative Metrics</li>" +
+    "  <li>Initiative Checkpoints</li>" +
+    "</ul>" +
+    "<b>Quarterly Reporting Data can include:</b>" +
+    "<ul>" +
+    "  <li>Initiative Progress Narrative (Optional)" +
+    "  <li>Initiative Checkpoints</li>" +
+    "</ul>",
 };
 
 const checkpointsHeader: SubHeaderTemplate = {
@@ -71,9 +91,9 @@ const checkpointsInstructions: ParagraphTemplate = {
   text:
     "<p>Checkpoints are grouped into the stages listed below. On this page, you can take the following actions on any checkpoint unless otherwise noted.</p>" +
     "<ul>" +
-    "  <li>Add or remove attachments with supporting documentation</li>" +
-    "  <li>Check if the checkpoint is ready for CMS review</li>" +
-    "  <li>Leave comments for CMS, or respond to comments from them by attachment</li>" +
+    "  <li>Add or remove attachments of evidentiary documentation.</li>" +
+    "  <li>Select the checkbox when the checkpoint is complete and ready for CMS review.</li>" +
+    "  <li>Leave comments for CMS, or respond to comments from them by attachment.</li>" +
     "</ul>",
 };
 
@@ -82,7 +102,7 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   id: "initiative-narrative",
   label: "Narrative",
   helperText:
-    "Provide a narrative description of the initiative’s progress during this reporting period.",
+    "Narrative is optional for quarterly reporting. Limit responses to 2,000 characters, or approximately 250–350 words.",
   required: true,
   answer: narrative,
   quarterly: false,
@@ -93,6 +113,7 @@ const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   id: "initiative-number-of-people-served",
   label: "Number of people served",
   mask: MaskType.CommaSeparated,
+  helperText: "Number of People Served is only reported annually.",
   required: true,
   quarterly: false,
 };
@@ -105,7 +126,7 @@ export const metricTable = (
     id: "metrics-table",
     label: "Metric",
     hintText:
-      "Each initiative should have at least 4 metrics to measure its progress toward initiative goals.",
+      "The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metrics are only reported annually. Contact your Project Officer if the metrics listed are incorrect. Note: Metrics are only reported annually.",
     quarterly: false,
     modal: {
       title: "Metric",
@@ -230,6 +251,7 @@ export const buildInitiativePages = (
         returnToInitiativesDashboard,
         initiativeHeader(title, initiativeNumber),
         initiativeInstructions,
+        initiativeAccordion,
         initiativeNarrative(narrative),
         initiativeNumberOfPeopleServed,
         metricTable(metrics),

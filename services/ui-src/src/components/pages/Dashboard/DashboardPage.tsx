@@ -125,27 +125,23 @@ export const DashboardPage = () => {
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}
         </Heading>
+        <Box marginTop="spacer4">
+          Click the <b>“Start {reportName} Report”</b> button to begin creating
+          your report. Refer to the reference guide "RHTP_State Reporting
+          Expectations_Guide" as needed for additional support. Prior to
+          submitting your report confirm all the information is complete and
+          accurate.
+        </Box>
         <Accordion
           allowToggle={true}
           sx={sx.accordion}
           defaultIndex={[-1]} // sets the accordion to closed by default
         >
-          <AccordionItem label="Instructions" sx={sx.accordionItem}>
+          <AccordionItem
+            label="Understanding report statuses"
+            sx={sx.accordionItem}
+          >
             <Box sx={sx.accordionPanel}>
-              <p>
-                <strong>Creating a New Report</strong>
-              </p>
-              <p>
-                Click the <b>“Start {reportName}”</b> button to begin creating
-                your report. A series of questions will appear to gather the
-                necessary information for your report. Fill out each field
-                accurately to ensure your report is complete. Before submitting,
-                review the information you’ve provided. If everything looks
-                good, confirm your entries and proceed.
-              </p>
-              <p>
-                <strong>Understanding Report Statuses</strong>
-              </p>
               <ul>
                 <li>
                   <strong>Not started:</strong> The report has been created but
@@ -173,13 +169,13 @@ export const DashboardPage = () => {
         <Flex alignItems="flex-end" gap="spacer3">
           <CmsdsDropdownField
             name="budgetPeriodFilter"
-            label="Filter by Budget Period"
+            label="Budget Period"
             value={dropdownValue}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodFilterOptions}
           />
-          <Button onClick={handleFilter} variant="outline">
-            Filter
+          <Button onClick={handleFilter} variant="link" fontWeight="bold">
+            Clear Filter
           </Button>
         </Flex>
         {!isLoading && <DashboardTable reports={filteredReports} />}
@@ -190,8 +186,8 @@ export const DashboardPage = () => {
         )}
         {reports.length === 0 && (
           <Text variant="tableEmpty">
-            Keep track of your {reportName}s, once you start a report you can
-            access it here.
+            Keep track of your {reportName} Reports, once you start a report you
+            can access it here.
           </Text>
         )}
         <Flex justifyContent="center">
