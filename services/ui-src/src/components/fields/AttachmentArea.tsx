@@ -139,8 +139,8 @@ export const AttachmentAreaExport = (element: AttachmentAreaTemplate) => {
     const size = element.answer[0].size;
     return (
       <Stack>
-        <span>{name}</span>
-        <span>{bytesToKiloBytes(size)} KB</span>
+        <Box>{name}</Box>
+        <Box color="gray">{bytesToKiloBytes(size)} KB</Box>
       </Stack>
     );
   } else {
