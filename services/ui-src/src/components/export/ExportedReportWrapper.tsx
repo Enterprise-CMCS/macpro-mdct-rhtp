@@ -17,6 +17,7 @@ export const renderReportDisplay = (
   return elements?.map((element: ReportTableType) => element.response);
 };
 
+//for certain elements i.e. ListInputs and AttachmentArea, we want to have multiple rows to split an array for answers so this function is to capture that
 export const renderExpandedAnswers = (element: PageElement) => {
   if (!("answer" in element) || !element.answer) return element;
 
