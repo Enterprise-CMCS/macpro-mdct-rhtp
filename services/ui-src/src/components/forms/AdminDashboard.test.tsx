@@ -16,6 +16,11 @@ vi.mock("../../utils/api/requestMethods/report", () => ({
   getReportByType: () => mockGetReport(),
 }));
 
+vi.mock("../../utils/api/requestMethods/commentMethods", () => ({
+  getComments: vi.fn().mockResolvedValue([]),
+  createComment: vi.fn().mockResolvedValue({}),
+}));
+
 const mockUseNavigate = vi.fn();
 vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -38,7 +43,7 @@ describe("<AdminDashboard />", () => {
       screen.getByRole("heading", { name: "Admin Dashboard" })
     ).toBeVisible();
     expect(screen.getByRole("button", { name: "Instructions" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "States Filter" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "States select" })).toBeVisible();
     expect(
       screen.getByRole("button", { name: "All Budget Period" })
     ).toBeVisible();
@@ -59,7 +64,7 @@ describe("<AdminDashboard />", () => {
     await waitFor(() => {
       expect(screen.getByText("plan id")).toBeVisible();
     });
-    const stateFilter = screen.getByRole("button", { name: "States Filter" });
+    const stateFilter = screen.getByRole("button", { name: "States select" });
     fireEvent.click(stateFilter);
 
     const search = screen.getByRole("searchbox", {
@@ -136,7 +141,7 @@ describe("<AdminDashboard />", () => {
     expect(mockUseNavigate).toHaveBeenCalled();
   });
 
-  it("Can open and close comment modal", async () => {
+  it("Can open and close comment drawer", async () => {
     const commentStatusButton = screen.getAllByRole("button", {
       name: "Comment/Status",
     })[0];
@@ -144,7 +149,7 @@ describe("<AdminDashboard />", () => {
     expect(
       screen.getByRole("heading", { name: /Add comment to/ })
     ).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    await userEvent.click(screen.getAllByRole("button", { name: "Close" })[0]);
     expect(
       screen.queryByRole("heading", { name: /Add comment to/ })
     ).not.toBeInTheDocument();

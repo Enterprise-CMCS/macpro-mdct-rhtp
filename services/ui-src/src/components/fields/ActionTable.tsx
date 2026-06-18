@@ -1,4 +1,4 @@
-import { Flex, Button, Image } from "@chakra-ui/react";
+import { Flex, Button, Image, Heading, Stack } from "@chakra-ui/react";
 import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
@@ -215,5 +215,38 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         disabled={actionsDisabled}
       />
     </Flex>
+  );
+};
+
+export const ActionTableExport = (element: ActionTableTemplate) => {
+  const showPrevValue = element.answer
+    ?.flat()
+    .filter((item) => item.id === "prevValue")
+    .every((item) => item.value !== "");
+
+  const filteredRows = showPrevValue
+    ? element.rows
+    : element.rows.filter((row) => row.id != "prevValue");
+
+  const headers = filteredRows.map((row) => ({ label: row.header }));
+  const ids = filteredRows.map((row) => row.id);
+
+  const buildRow = (element: ActionAnswerShape, index: number) => {
+    return ids.map((id) => {
+      if (id === "no") return index + 1;
+      const value = element.find((item) => id === item.id)?.value;
+      return !value || value === "" ? "Not applicable" : value;
+    });
+  };
+
+  const rows = element.answer?.map((row, index) => buildRow(row, index)) ?? [];
+
+  return (
+    <Stack width="720px" key={element.id}>
+      <Heading as="h2" className="chakra-heading" fontWeight="bold">
+        {element.label}
+      </Heading>
+      {ResponsiveTable(headers, rows, "pdf")}
+    </Stack>
   );
 };

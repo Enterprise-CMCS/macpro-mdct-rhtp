@@ -127,6 +127,21 @@ export const mockStateUserStore: UserState = {
   setShowLocalLogins: () => {},
 };
 
+export const mockApproverUserStore: UserState = {
+  user: {
+    userRole: UserRoles.APPROVER,
+    email: "stateapprover@test.com",
+    given_name: "Approver",
+    family_name: "User",
+    full_name: "Approver User",
+    state: "MN",
+    userIsAdmin: true,
+  },
+  showLocalLogins: true,
+  setUser: () => {},
+  setShowLocalLogins: () => {},
+};
+
 export const mockHelpDeskUserStore: UserState = {
   user: {
     userRole: UserRoles.HELP_DESK,
@@ -201,6 +216,18 @@ export const mockReportStore: ReportState = {
         type: PageType.Standard,
         title: "mock 2",
         elements: [],
+      },
+      {
+        id: "init-attachment",
+        type: PageType.Standard,
+        title: "initiative attachments",
+        elements: [
+          {
+            id: "init-attach-table",
+            type: ElementType.AttachmentTable,
+            answer: [],
+          },
+        ],
       },
     ],
   },

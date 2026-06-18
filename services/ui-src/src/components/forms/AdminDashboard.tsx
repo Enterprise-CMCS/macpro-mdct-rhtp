@@ -12,26 +12,20 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
-import { Report, ReportType, StateNames } from "@rhtp/shared";
+import {
+  Report,
+  ReportType,
+  StateDropdownOptions,
+  StateNames,
+} from "@rhtp/shared";
 import { PageTemplate, AccordionItem } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
-import { ReportCommentDrawer } from "components/modals/CommentDrawers";
+import { ReportCommentDrawer } from "components/drawers/ReportCommentDrawer";
 import { getStatus } from "utils/other/status";
-
-const buildStateOptions = () => {
-  const stateValues = [];
-  for (const [key, value] of Object.entries(StateNames)) {
-    stateValues.push({
-      label: value,
-      value: key,
-    });
-  }
-  return stateValues;
-};
 
 const budgetPeriodValues = [1, 2, 3, 4, 5];
 const stateAbbr = Object.keys(StateNames);
@@ -51,7 +45,6 @@ export const AdminDashboard = () => {
   const [selectedStates, setSelectedStates] = useState<string[]>(
     searchParams.get("states")?.split(",") ?? []
   );
-  const states = buildStateOptions();
   const [lastSorted, setLastSorted] = useState<{
     sort: string;
     type: SORT_TYPE;
@@ -145,9 +138,10 @@ export const AdminDashboard = () => {
     setCommentDrawerOpen(true);
   };
 
-  const closeCommentsDrawer = () => {
+  const closeCommentsDrawer = (shouldReload?: boolean) => {
     setSelectedReport(undefined);
     setCommentDrawerOpen(false);
+    if (shouldReload) reloadReports(ReportType.RHTP);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -238,7 +232,7 @@ export const AdminDashboard = () => {
             label="State(s)"
             placeholder="Search states"
             countLabel="States"
-            options={states}
+            options={StateDropdownOptions}
             values={selectedStates}
             onChange={(selected) => {
               setSelectedStates(selected);
@@ -306,7 +300,6 @@ export const AdminDashboard = () => {
             onClose: closeCommentsDrawer,
           }}
           selectedReport={selectedReport}
-          reloadReports={reloadReports}
         />
       )}
     </PageTemplate>
