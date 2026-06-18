@@ -359,7 +359,7 @@ export const AttachmentTable = (
         [
           { label: "Attachment name", sortable: true },
           { label: "Initiatives", sortable: true },
-          { label: "Checkpoint", sortable: true },
+          { label: "Stage/Checkpoint", sortable: true },
           { label: "Status", sortable: true },
           { label: "Actions" },
         ],
