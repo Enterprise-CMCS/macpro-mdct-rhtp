@@ -7,7 +7,6 @@ import {
   ChoiceList,
 } from "@cmsgov/design-system";
 import {
-  Box,
   Divider,
   Heading,
   Text,
@@ -24,194 +23,24 @@ import {
   UnorderedList,
   ListItem,
 } from "@chakra-ui/react";
-import { Modal } from "./Modal";
 import {
   InitiativeAnswerProp,
   UploadListProp,
   AttachmentStatus,
-  ReportStatus,
   UserRoles,
   FileStatusOptions,
-  Report,
-  ReportType,
   CommentType,
   Comment,
   isCompleteStatus,
 } from "@rhtp/shared";
-import { acceptReport, releaseReport, useStore } from "utils";
+import { useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import {
   createComment,
   getComments,
 } from "utils/api/requestMethods/commentMethods";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
-import lockIcon from "assets/icons/icon_lock.svg";
-
-const AdminReportStatusOptions = [
-  ReportStatus.SUBMITTED,
-  ReportStatus.ACCEPTED,
-  "Unlock",
-];
-
-export const ReportCommentDrawer = ({
-  modalDisclosure,
-  selectedReport,
-  reloadReports,
-}: ReportCommentProps) => {
-  const { name, status } = selectedReport;
-  const { userIsAdmin } = useStore().user ?? {};
-  // Can only modify dropdown if report is submitted and is admin user
-  const disabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
-  const initialValues: {
-    comment: string;
-    status: string;
-  } = {
-    comment: "",
-    status: status,
-  };
-  const [displayValue, setDisplayValue] = useState(initialValues);
-  const [statusOptions, setStatusOptions] = useState<DropdownOption[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    const statuses = new Set([...AdminReportStatusOptions, status]);
-    const statusOptions = [];
-    for (const status of statuses.values()) {
-      statusOptions.push({
-        label: status,
-        value: status,
-      });
-    }
-    setStatusOptions(statusOptions);
-  }, []);
-
-  const onChange = (
-    event: React.ChangeEvent<HTMLInputElement> | DropdownChangeObject
-  ) => {
-    const { name, value } = event.target;
-    setDisplayValue((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const onSubmit = async () => {
-    setSubmitting(true);
-
-    if (displayValue.status === "Unlock") {
-      await releaseReport(selectedReport);
-      reloadReports(ReportType.RHTP);
-    } else if (
-      displayValue.status === ReportStatus.ACCEPTED &&
-      displayValue.status !== status
-    ) {
-      await acceptReport(selectedReport);
-      reloadReports(ReportType.RHTP);
-    }
-
-    modalDisclosure.onClose();
-    setSubmitting(false);
-  };
-
-  return (
-    <Modal
-      modalDisclosure={modalDisclosure}
-      content={{
-        heading: `Add comment to ${name || "report"}`,
-        actionButtonText: "Save",
-      }}
-      onConfirmHandler={onSubmit}
-      submitting={submitting}
-    >
-      <Dropdown
-        label="Status"
-        name="status"
-        onChange={onChange}
-        options={statusOptions}
-        value={displayValue.status}
-        disabled={disabled}
-      />
-    </Modal>
-  );
-};
-
-interface ReportCommentProps {
-  modalDisclosure: {
-    isOpen: boolean;
-    onClose: () => void;
-  };
-  selectedReport: Report;
-  reloadReports: Function;
-}
-
-const PreviousComments = ({
-  comments,
-  userIsAdmin,
-}: {
-  comments: Comment[];
-  userIsAdmin: boolean;
-}) => {
-  return (
-    <Box marginTop={"spacer2"}>
-      <Heading as={"h3"} fontWeight={"bold"}>
-        Previous Comments
-      </Heading>
-      {comments.map((comment, index) => (
-        <Box
-          marginTop={"spacer4"}
-          key={`previous-comment-${index}`}
-          gap={"spacer1"}
-          display="flex"
-          alignItems="left"
-          flexDirection="column"
-        >
-          <Flex alignItems={"center"} gap={"spacer2"}>
-            <Text fontWeight={"heading_md"}>{comment.author}</Text>
-            <Text fontSize={"heading_md"} color={"gray_dark"}>
-              {new Date(comment.created).toLocaleString()}
-            </Text>
-          </Flex>
-
-          {comment.statusChange && (
-            <Text fontWeight={"body_sm"} color={"gray_dark"}>
-              Status changed to: {comment.statusChange}
-            </Text>
-          )}
-          {userIsAdmin &&
-            (comment.isInternal ? (
-              <Flex alignItems="center" gap="spacer1">
-                <Image src={lockIcon} alt="lock icon" sx={sx.icon} />
-                <Text fontWeight={"body_sm"} color={"gray_dark"}>
-                  CMS Internal
-                </Text>
-              </Flex>
-            ) : (
-              <Text fontWeight={"body_sm"} color={"gray_dark"}>
-                Shared with State
-              </Text>
-            ))}
-          {comment.comment !== "" && (
-            <TextField
-              id={`previous-comment-${index}`}
-              name={`previous-comment-${index}`}
-              label={""}
-              value={comment.comment}
-              disabled={true}
-              multiline
-              style={
-                {
-                  "--text-input__background-color--disabled": comment.isInternal
-                    ? "#e6f9fd"
-                    : "",
-                } as React.CSSProperties
-              }
-            />
-          )}
-        </Box>
-      ))}
-    </Box>
-  );
-};
+import { PreviousComments } from "./PreviousComments";
 
 export const AttachmentCommentDrawer = ({
   modalDisclosure,
@@ -245,7 +74,7 @@ export const AttachmentCommentDrawer = ({
   const initialValues = {
     comment: "",
     status: fileStatus,
-    commentType: "external",
+    commentType: userIsAdmin ? "" : "external",
   };
 
   const noErrorState = {
@@ -257,6 +86,27 @@ export const AttachmentCommentDrawer = ({
 
   const [displayValue, setDisplayValue] = useState(initialValues);
   const [errorMessages, setErrorMessages] = useState(noErrorState);
+
+  const fetchComments = async () => {
+    setCommentsLoading(true);
+    setPastComments([]);
+    try {
+      const comments = await getComments(
+        allFiles[selectedAttachmentIndex].attachment.fileId,
+        report?.state || ""
+      );
+      setPastComments(comments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      setErrorMessages({
+        ...errorMessages,
+        overall:
+          "There was an error fetching comments for this attachment. Please try again.",
+      });
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
 
   useEffect(() => {
     setErrorMessages(noErrorState);
@@ -273,27 +123,6 @@ export const AttachmentCommentDrawer = ({
       );
     }
     setStatusOptions(statusOptions);
-
-    const fetchComments = async () => {
-      setCommentsLoading(true);
-      setPastComments([]);
-      try {
-        const comments = await getComments(
-          allFiles[selectedAttachmentIndex].attachment.fileId,
-          report?.state || ""
-        );
-        setPastComments(comments);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-        setErrorMessages({
-          ...errorMessages,
-          overall:
-            "There was an error fetching comments for this attachment. Please try again.",
-        });
-      } finally {
-        setCommentsLoading(false);
-      }
-    };
 
     if (selectedAttachmentIndex !== -1) {
       fetchComments();
@@ -312,31 +141,42 @@ export const AttachmentCommentDrawer = ({
 
   const onSubmit = async () => {
     setCommentSubmitting(true);
-
-    if (selectedAttachmentIndex === -1 || commentsDisabled) {
-      setCommentSubmitting(false);
-      return modalDisclosure.onClose();
-    }
-
-    const didStatusChange =
-      displayValue.status !== allFiles[selectedAttachmentIndex].status;
-    const commentsEmpty = displayValue.comment.trim() === "";
-    if (commentsEmpty && !commentsOptional) {
-      setErrorMessages({
-        ...errorMessages,
-        comment: "A comment is required.",
-      });
-      setCommentSubmitting(false);
-      return;
-    }
-
-    // Comments are optional for admins
-    if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
-      setCommentSubmitting(false);
-      return modalDisclosure.onClose();
-    }
+    setErrorMessages(noErrorState);
 
     try {
+      if (selectedAttachmentIndex === -1 || commentsDisabled) {
+        setCommentSubmitting(false);
+        return;
+      }
+
+      if (displayValue.commentType === "" && userIsAdmin) {
+        setErrorMessages({
+          ...errorMessages,
+          commentType: "Please select a comment type.",
+        });
+        return;
+      }
+
+      const didStatusChange =
+        displayValue.status !== allFiles[selectedAttachmentIndex].status;
+      const commentsEmpty = displayValue.comment.trim() === "";
+      if (commentsEmpty && !commentsOptional) {
+        setErrorMessages({
+          ...errorMessages,
+          comment: "A comment is required.",
+        });
+        return;
+      }
+
+      // Comments are optional for admins
+      if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
+        setErrorMessages({
+          ...errorMessages,
+          overall: "Must modify Status or provide a Comment to submit.",
+        });
+        return;
+      }
+
       await createComment(
         allFiles[selectedAttachmentIndex].attachment.fileId,
         report?.state || "",
@@ -348,6 +188,20 @@ export const AttachmentCommentDrawer = ({
           ...(didStatusChange && { statusChange: displayValue.status }),
         }
       );
+
+      allFiles[selectedAttachmentIndex] = {
+        ...allFiles[selectedAttachmentIndex],
+        ...(didStatusChange && {
+          status: displayValue.status as AttachmentStatus,
+        }),
+        canDelete: false, // if a comment is added, the file can no longer be deleted
+      };
+      updateElement({ answer: allFiles });
+      fetchComments();
+      setDisplayValue((prev) => ({
+        ...prev,
+        comment: "",
+      }));
     } catch (error) {
       console.error("Error creating comment:", error);
       setErrorMessages({
@@ -355,21 +209,9 @@ export const AttachmentCommentDrawer = ({
         overall:
           "There was an error submitting your comment. Please try again.",
       });
+    } finally {
       setCommentSubmitting(false);
-      return;
     }
-
-    allFiles[selectedAttachmentIndex] = {
-      ...allFiles[selectedAttachmentIndex],
-      ...(didStatusChange && {
-        status: displayValue.status as AttachmentStatus,
-      }),
-      canDelete: false, // if a comment is added, the file can no longer be deleted
-    };
-    updateElement({ answer: allFiles });
-
-    setCommentSubmitting(false);
-    modalDisclosure.onClose();
   };
 
   const userSpecificSubheading = userIsAdmin
@@ -383,7 +225,7 @@ export const AttachmentCommentDrawer = ({
       placement="right"
     >
       <DrawerOverlay />
-      <DrawerContent maxWidth={"50vw"}>
+      <DrawerContent maxWidth={"576px"}>
         <Flex sx={sx.drawerCloseContainer}>
           <Button
             leftIcon={<Image src={closeIcon} alt="Close" />}
@@ -434,6 +276,23 @@ export const AttachmentCommentDrawer = ({
               disabled={statusDisabled}
               errorMessage={errorMessages.status}
             />
+            {userIsAdmin && (
+              <ChoiceList
+                label="External or Internal Comment"
+                hint="Choose whether this comment is hidden from the state or shared."
+                name="commentType"
+                type="radio"
+                onChange={onChange}
+                errorMessage={errorMessages.commentType}
+                choices={[
+                  {
+                    label: "External (Shared with States)",
+                    value: "external",
+                  },
+                  { label: "Internal (CMS Only)", value: "internal" },
+                ]}
+              />
+            )}
             <TextField
               name={"comment"}
               label={
@@ -451,24 +310,6 @@ export const AttachmentCommentDrawer = ({
               rows={3}
               errorMessage={errorMessages.comment}
             />
-            {userIsAdmin && (
-              <ChoiceList
-                label="External or Internal Comment"
-                hint="Choose whether this comment is hidden from the state or shared."
-                name="commentType"
-                type="radio"
-                onChange={onChange}
-                errorMessage={errorMessages.commentType}
-                choices={[
-                  {
-                    label: "External (Shared with States)",
-                    value: "external",
-                    defaultChecked: true,
-                  },
-                  { label: "Internal (CMS Only)", value: "internal" },
-                ]}
-              />
-            )}
           </Flex>
           <Button
             onClick={onSubmit}
@@ -493,9 +334,7 @@ export const AttachmentCommentDrawer = ({
           ) : null}
         </DrawerBody>
         <DrawerFooter>
-          <Button variant="outline" onClick={modalDisclosure.onClose}>
-            Close
-          </Button>
+          <Button onClick={modalDisclosure.onClose}>Close</Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -516,10 +355,8 @@ const sx = {
     fontSize: "body_md",
     fontWeight: "normal",
   },
-  icon: {
-    boxSize: "16px",
-  },
 };
+
 interface Props {
   modalDisclosure: {
     isOpen: boolean;

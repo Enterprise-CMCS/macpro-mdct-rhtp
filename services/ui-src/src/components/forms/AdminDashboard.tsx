@@ -24,7 +24,7 @@ import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
-import { ReportCommentDrawer } from "components/modals/CommentDrawers";
+import { ReportCommentDrawer } from "components/drawers/ReportCommentDrawer";
 import { getStatus } from "utils/other/status";
 
 const budgetPeriodValues = [1, 2, 3, 4, 5];
@@ -138,9 +138,10 @@ export const AdminDashboard = () => {
     setCommentDrawerOpen(true);
   };
 
-  const closeCommentsDrawer = () => {
+  const closeCommentsDrawer = (shouldReload?: boolean) => {
     setSelectedReport(undefined);
     setCommentDrawerOpen(false);
+    if (shouldReload) reloadReports(ReportType.RHTP);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -299,7 +300,6 @@ export const AdminDashboard = () => {
             onClose: closeCommentsDrawer,
           }}
           selectedReport={selectedReport}
-          reloadReports={reloadReports}
         />
       )}
     </PageTemplate>

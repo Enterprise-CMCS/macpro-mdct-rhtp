@@ -16,6 +16,11 @@ vi.mock("../../utils/api/requestMethods/report", () => ({
   getReportByType: () => mockGetReport(),
 }));
 
+vi.mock("../../utils/api/requestMethods/commentMethods", () => ({
+  getComments: vi.fn().mockResolvedValue([]),
+  createComment: vi.fn().mockResolvedValue({}),
+}));
+
 const mockUseNavigate = vi.fn();
 vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -136,7 +141,7 @@ describe("<AdminDashboard />", () => {
     expect(mockUseNavigate).toHaveBeenCalled();
   });
 
-  it("Can open and close comment modal", async () => {
+  it("Can open and close comment drawer", async () => {
     const commentStatusButton = screen.getAllByRole("button", {
       name: "Comment/Status",
     })[0];
@@ -144,7 +149,7 @@ describe("<AdminDashboard />", () => {
     expect(
       screen.getByRole("heading", { name: /Add comment to/ })
     ).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    await userEvent.click(screen.getAllByRole("button", { name: "Close" })[0]);
     expect(
       screen.queryByRole("heading", { name: /Add comment to/ })
     ).not.toBeInTheDocument();

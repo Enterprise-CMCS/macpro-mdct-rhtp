@@ -39,7 +39,7 @@ import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider"
 import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
-import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
+import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDrawer";
 import { Alert } from "components";
 import { ResponsiveTable } from "components/tables/ResponsiveTable";
 
