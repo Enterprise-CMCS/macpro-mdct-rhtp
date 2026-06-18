@@ -267,7 +267,7 @@ describe("<AttachmentTable />", () => {
     await sortResult("Attachment name", [0, 5], ["mock-file", "mock-file-2"]);
     await sortResult("Initiatives", [1, 6], ["#123", "#123"]);
     await sortResult(
-      "Checkpoint",
+      "Stage/Checkpoint",
       [2, 7],
       ["1.2 Launch initiative", "2.1 Continue initiative activities"]
     );

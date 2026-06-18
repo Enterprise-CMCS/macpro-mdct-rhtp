@@ -139,7 +139,7 @@ describe("DashboardPage with state user", () => {
       screen.queryAllByLabelText("Budget Period")[0],
       "Budget Period 1"
     );
-    await userEvent.click(screen.getByText("Filter"));
+    await userEvent.click(screen.getByText("Clear Filter"));
 
     const table = container.querySelector("table")!;
     const columns = [...table.querySelectorAll("tr th")].map(
