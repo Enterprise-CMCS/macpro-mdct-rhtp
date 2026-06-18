@@ -108,4 +108,43 @@ describe("ExportedReportWrapper", () => {
     expect(screen.queryByText("bananah")).not.toBeInTheDocument();
     expect(screen.queryByText("bananya")).not.toBeInTheDocument();
   });
+
+  test("should expand answers in AccordionGroup types", () => {
+    const elements: PageElement[] = [
+      {
+        id: "mock-accordion-group",
+        type: ElementType.AccordionGroup,
+        accordions: [
+          {
+            label: "mock-label",
+            elements: [
+              {
+                type: ElementType.ListInput,
+                id: "mock-links",
+                label: "Mock: Links",
+                helperText: "mock helper text",
+                fieldLabel: "Link",
+                buttonText: "Add link",
+                validation: "link",
+                required: false,
+                answer: ["http//:www.google.com", "http//:www.fake.com"],
+              },
+            ],
+          },
+        ],
+        required: true,
+      },
+    ];
+
+    render(<ExportedReportWrapper section={{ ...section, elements }} />);
+    expect(screen.getAllByRole("table")).toHaveLength(1);
+    expect(screen.getAllByRole("row")).toHaveLength(3);
+
+    expect(screen.getByText("Mock: Links 1")).toBeVisible();
+    expect(screen.getByText("Mock: Links 2")).toBeVisible();
+    expect(screen.getByText("http//:www.google.com")).toBeVisible();
+    expect(screen.getByText("http//:www.fake.com")).toBeVisible();
+
+    screen.debug();
+  });
 });
