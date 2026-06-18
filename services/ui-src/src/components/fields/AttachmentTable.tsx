@@ -1,7 +1,7 @@
 import { Button, Stack, Image, HStack, Text } from "@chakra-ui/react";
 import { ChoiceList, Dropdown } from "@cmsgov/design-system";
 import { UploadModal } from "components/modals/UploadModal";
-import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
+import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDrawer";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useEffect, useState } from "react";
 import {
@@ -25,7 +25,6 @@ import {
   getStageIdByCheckpointId,
 } from "verbiage/checkpoints";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
-import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -259,8 +258,9 @@ export const AttachmentTable = (
             variant="link"
             onClick={() => onCommentClick(row)}
             aria-label={`Comment on ${row.attachment.name}`}
+            fontWeight="bold"
           >
-            <Image src={commentIcon} alt="Comment" minWidth="26px" />
+            Status/Comments
           </Button>
           <Button
             variant="link"

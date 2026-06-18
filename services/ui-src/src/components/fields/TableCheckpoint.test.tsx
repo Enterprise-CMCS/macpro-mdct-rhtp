@@ -20,7 +20,7 @@ import {
 } from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
-import { AttachmentCommentDrawer } from "components/modals/CommentDrawers";
+import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDrawer";
 import { removeFile } from "utils/other/fileUtils";
 
 vi.mock("utils/state/useStore");
@@ -75,7 +75,7 @@ vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
     ]),
 }));
 
-vi.mock("components/modals/CommentDrawers");
+vi.mock("components/drawers/AttachmentCommentDrawer");
 const mockCommentDrawer = vi.mocked(AttachmentCommentDrawer);
 
 const mockTableCheckpointElement: TableCheckpointTemplate = {

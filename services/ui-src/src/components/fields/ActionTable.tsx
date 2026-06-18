@@ -10,7 +10,7 @@ import {
   ElementType,
   isCompleteStatus,
 } from "@rhtp/shared";
-import { useStore } from "utils";
+import { parseHtml, useStore } from "utils";
 import { buildElement } from "utils/state/reportLogic/tableBuilder";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
@@ -180,7 +180,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
       <Label>{pluralLabel}</Label>
-      <Hint id={id}>{hintText}</Hint>
+      <Hint id={id}>{parseHtml(hintText)}</Hint>
       {canAddOrChangeStatus ? (
         <Button
           aria-label={`add ${label}`}

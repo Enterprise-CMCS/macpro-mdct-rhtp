@@ -90,7 +90,7 @@ export type Comment = {
   type: CommentType;
   parentReportId?: string;
   comment?: string;
-  statusChange?: AttachmentStatus;
+  statusChange?: AttachmentStatus | ReportStatus;
 };
 
 export interface Report extends ReportOptions {
