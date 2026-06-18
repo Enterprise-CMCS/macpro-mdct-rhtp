@@ -6,8 +6,6 @@ import {
   RhtpSubType,
 } from "@rhtp/shared";
 
-const ignoreCopy = ["use-of-funds-attachment", "initiative-narrative"];
-
 const copyAnswer = (
   oldElements: PageElement[],
   newElements: PageElement[],
@@ -28,8 +26,8 @@ const copyAnswer = (
         newElement.answer = copyMetricAnswers(
           oldElement.answer as ActionAnswerShape[]
         );
-      } else if (ignoreCopy.includes(newElement.id)) {
-        newElement.answer = typeof newElement.answer == "string" ? "" : [];
+      } else if (newElement.id === "use-of-funds-attachment") {
+        newElement.answer = [];
       } else {
         newElement.answer = oldElement.answer;
       }
