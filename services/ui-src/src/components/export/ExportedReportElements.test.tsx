@@ -1,13 +1,24 @@
 import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { renderElements } from "./ExportedReportElements";
-import { ElementType, PageElement } from "@rhtp/shared";
+import {
+  AttachmentAreaTemplate,
+  ElementType,
+  PageElement,
+  UseOfFundsAttachmentTemplate,
+} from "@rhtp/shared";
 import { mockUseStore } from "utils/testing/setupTest";
 import { useStore } from "utils";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 mockedUseStore.mockReturnValue(mockUseStore);
+
+const mockFile = {
+  name: "mock-file.txt",
+  size: 100,
+  fileId: "mock-file-id",
+};
 
 describe("Test ExportedReportElements", () => {
   test("render SubHeader element", () => {
@@ -37,15 +48,25 @@ describe("Test ExportedReportElements", () => {
     expect(screen.getAllByText("Yes")).toHaveLength(1);
   });
   test("render AttachmentArea element", () => {
-    const element = renderElements({
+    const notAnswered = {
       type: ElementType.AttachmentArea,
       id: "mock-attachment-area",
       label: "",
       required: true,
       uploadedSubLabel: "mock sub label",
-    });
+    } as AttachmentAreaTemplate;
+
+    const element = renderElements(notAnswered);
     render(element);
     expect(screen.getByText("Not answered")).toBeInTheDocument();
+
+    const answeredElement = renderElements({
+      ...notAnswered,
+      answer: [mockFile],
+    });
+    render(answeredElement);
+    expect(screen.getByText("mock-file.txt")).toBeInTheDocument();
+    expect(screen.getByText("1 KB")).toBeInTheDocument();
   });
   test("render ActionTable element", () => {
     const element = renderElements({
@@ -86,5 +107,24 @@ describe("Test ExportedReportElements", () => {
       screen.getByRole("columnheader", { name: "mock header 2" })
     ).toBeVisible();
     expect(screen.getByText("mock value")).toBeVisible();
+  });
+  test("render UseOfFundsAttachment element", () => {
+    const notAnswered = {
+      type: ElementType.UseOfFundsAttachment,
+      id: "mock-attachment-area",
+      label: "",
+      required: true,
+    } as UseOfFundsAttachmentTemplate;
+    const element = renderElements(notAnswered);
+    render(element);
+    expect(screen.getByText("Not answered")).toBeInTheDocument();
+
+    const answeredElement = renderElements({
+      ...notAnswered,
+      answer: [mockFile],
+    });
+    render(answeredElement);
+    expect(screen.getByText("mock-file.txt")).toBeInTheDocument();
+    expect(screen.getByText("1 KB")).toBeInTheDocument();
   });
 });
