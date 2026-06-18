@@ -215,7 +215,7 @@ export const AdminDashboard = () => {
     <PageTemplate type="report" sxOverride={sx.layout}>
       <Stack sx={sx.box} gap="2rem">
         <Heading as="h1" variant="h1">
-          Admin Dashboard
+          RHTP Admin Dashboard
         </Heading>
         <Accordion
           allowToggle={true}
