@@ -32,7 +32,7 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
     {
       type: ElementType.Paragraph,
       id: "review-text",
-      title: "Ready to submit?",
+      title: "Ready to Submit?",
       text: "Double check that everything in your RHTP Report is accurate. To make edits to your report after submitting, contact your CMS RHTP Lead to unlock your report.",
     },
     {

@@ -5,6 +5,7 @@ import {
   FormPageTemplate,
   ListInputTemplate,
   PageType,
+  ParagraphTemplate,
   TextAreaBoxTemplate,
 } from "@rhtp/shared";
 import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
@@ -25,19 +26,26 @@ const commitmentStatusDropdown = (
 const commitmentLinkListInput: ListInputTemplate = {
   type: ElementType.ListInput,
   id: "commitment-links",
-  label: "Supporting Evidence: Links",
-  helperText: "Add links to any supporting evidence materials posted online.",
+  label: "Links",
+  helperText: "Add URL to exact policy.",
   fieldLabel: "Link",
   buttonText: "Add link",
   validation: "link",
   required: false,
 };
 
+const commitmentSupportParagraph: ParagraphTemplate = {
+  type: ElementType.Paragraph,
+  id: "commitment-support-paragraph",
+  title: "Supporting Evidence",
+  text: "States should only submit legislation links and attachments as acceptable evidence for their State policy commitments. CMS will not accept press releases or promotional links/attachments as substantial evidence.",
+};
+
 const commitmentAttachmentArea: AttachmentAreaTemplate = {
   type: ElementType.AttachmentArea,
   id: "commitment-attachments",
-  label: "Supporting Evidence: Attachments",
-  helperText: "Upload files to submit as supporting evidence",
+  label: "Attachments",
+  helperText: "Upload state legislation.",
   uploadedSubLabel:
     "These files have been attached to the state policy commitment above.",
   required: false,
@@ -66,6 +74,7 @@ const buildCommitments = (
       label,
       children: [
         commitmentStatusDropdown(label, status),
+        commitmentSupportParagraph,
         commitmentLinkListInput,
         commitmentAttachmentArea,
         commitmentNotes,
@@ -91,7 +100,7 @@ export const buildStatePolicyCommitments = (
     {
       type: ElementType.Paragraph,
       id: "initiatives-instructions",
-      text: "The commitments listed here are based on those your state submitted to CMS. Expand each one to update its status, evidence, and comments.",
+      text: "The commitments listed here are based on those identified in a State's approved application. Expand each one to update its status, evidence, and comments.",
     },
     {
       type: ElementType.AccordionGroup,

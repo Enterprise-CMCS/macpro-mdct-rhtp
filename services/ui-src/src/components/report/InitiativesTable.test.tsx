@@ -47,7 +47,7 @@ describe("InitiativesTable component", () => {
     test("renders with initiatives", () => {
       expect(
         screen.getByRole("columnheader", {
-          name: "InitiativeStatus",
+          name: "Initiative",
         })
       ).toBeVisible();
       expect(
@@ -106,7 +106,7 @@ describe("InitiativesTable component", () => {
     test("renders with initiatives, cannot add or edit initiatives", () => {
       expect(
         screen.getByRole("columnheader", {
-          name: "InitiativeStatus",
+          name: "Initiative",
         })
       ).toBeVisible();
       expect(
