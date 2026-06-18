@@ -108,7 +108,8 @@ export const InitiativesTable = (
         <Thead>
           <Tr>
             <Th>
-              Initiative number and name <br />
+              Initiative
+              <br />
               Status
             </Th>
             <Th>Actions</Th>
