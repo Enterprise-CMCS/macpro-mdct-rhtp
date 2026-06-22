@@ -62,6 +62,22 @@ export const updateUpload = async (
   await client.send(new UpdateCommand(params));
 };
 
+// export const batchPutUploads = async (uploads: UploadData[]) => {
+//   const BATCH_SIZE = 25;
+//   for (let i = 0; i < comments.length; i += BATCH_SIZE) {
+//     const batch = comments.slice(i, i + BATCH_SIZE);
+//     await client.send(
+//       new BatchWriteCommand({
+//         RequestItems: {
+//           [commentsTableName]: batch.map((comment) => ({
+//             PutRequest: { Item: comment },
+//           })),
+//         },
+//       })
+//     );
+//   }
+// };
+
 export const queryUpload = async (fileId: string, state: string) => {
   const documentParams: QueryCommandInput = {
     TableName: uploadTableName,

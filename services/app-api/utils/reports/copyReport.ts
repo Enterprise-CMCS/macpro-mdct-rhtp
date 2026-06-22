@@ -1,9 +1,11 @@
+import { queryComments } from "../../storage/comments";
 import { getReport as getReportFromDatabase } from "../../storage/reports";
 import {
   ActionAnswerShape,
   PageElement,
   Report,
   RhtpSubType,
+  InitiativeAnswerProp,
 } from "@rhtp/shared";
 
 const copyAnswer = (
@@ -28,6 +30,8 @@ const copyAnswer = (
         );
       } else if (newElement.id === "use-of-funds-attachment") {
         newElement.answer = [];
+      } else if (newElement.id === "initiative-attachments-table") {
+        newElement.answer = oldElement.answer;
       } else {
         newElement.answer = oldElement.answer;
       }
@@ -47,6 +51,10 @@ const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
   });
 };
 
+// export const copyAttachmentTableAnswer = async (oldAnswer: InitiativeAnswerProp[]) => {
+//   return oldAnswer.map()
+// }
+
 export const copyReport = async (newReport: Report) => {
   const { copyFromReportId, pages: newPages, state, type, subType } = newReport;
   const reportToCopy = await getReportFromDatabase(
@@ -55,6 +63,9 @@ export const copyReport = async (newReport: Report) => {
     copyFromReportId!
   );
   if (!reportToCopy) return;
+
+  // const reportComments = await queryComments(copyFromReportId!, true);
+  // return reportComments;
 
   for (const oldPage of reportToCopy.pages) {
     if (oldPage.elements) {

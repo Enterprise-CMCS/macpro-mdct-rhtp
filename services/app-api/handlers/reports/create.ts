@@ -86,7 +86,7 @@ export const createReport = handler(
 
     const report = await buildReport(reportType, state, reportOptions, user);
 
-    await putReport(report);
+    // await putReport(report);
     return ok(report);
   }
 );
