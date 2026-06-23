@@ -75,7 +75,7 @@ const mockStatePolicyCommitments = [
         accordions: [
           {
             label: "State Policy Commitment 1",
-            children: [
+            elements: [
               {
                 type: ElementType.Textbox,
                 id: "state-policy-commitment-1-textbox",
