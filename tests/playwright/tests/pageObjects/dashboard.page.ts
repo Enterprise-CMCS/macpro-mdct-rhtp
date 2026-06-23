@@ -93,6 +93,28 @@ export class DashboardPage extends BasePage {
     await expect(this.page.getByRole("dialog")).toBeVisible();
   }
 
+  async openFirstEditableReport(): Promise<void> {
+    const editButton = this.page
+      .getByRole("button", { name: /^Edit .* report$/i })
+      .first();
+    await Promise.all([
+      this.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?/),
+      editButton.click(),
+    ]);
+    await this.waitForLoadingComplete();
+  }
+
+  async openFirstSubmittedReport(): Promise<void> {
+    const viewButton = this.page
+      .getByRole("button", { name: /^View .* report$/i })
+      .first();
+    await Promise.all([
+      this.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?/),
+      viewButton.click(),
+    ]);
+    await this.waitForLoadingComplete();
+  }
+
   async getDashboardState(): Promise<DashboardState> {
     await this.waitForDashboardReady();
 
