@@ -216,7 +216,7 @@ describe("copyReport util", () => {
       expect.arrayContaining([
         expect.objectContaining({
           label: "State Policy Commitment 1",
-          children: [
+          elements: [
             expect.objectContaining({
               type: ElementType.Textbox,
               id: "state-policy-commitment-1-textbox",
