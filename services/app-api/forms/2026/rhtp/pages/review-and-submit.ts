@@ -60,13 +60,9 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
       type: ElementType.Paragraph,
       id: "submitted-what-explanation",
       title: "What happens now?",
-      text: 'Your dashboard will indicate the status of this report as "Submitted" and and it is now locked from editing.',
-    },
-    {
-      type: ElementType.Paragraph,
-      id: "submitted-what-happens",
-      text: "Email your CMS representative to inform them you submitted the RHTP Report and it is ready for their review.",
-      style: "bold",
+      text:
+        "<p>Your report has been submitted and is now locked from editing.</p></br></br>" +
+        "<p>An automated confirmation email has been sent to you, your CMS Project Officer, and all points of contact listed on your General Information page. No further action is required on your part</p>",
     },
   ],
 };

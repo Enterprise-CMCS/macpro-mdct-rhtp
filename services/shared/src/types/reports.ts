@@ -431,6 +431,7 @@ export interface ActionElement {
   type: ElementType;
   disabled?: boolean;
   mask?: MaskType;
+  hintText?: string;
 }
 
 export interface ActionRowElement extends ActionElement {
