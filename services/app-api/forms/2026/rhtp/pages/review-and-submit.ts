@@ -64,9 +64,9 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
     },
     {
       type: ElementType.Paragraph,
-      weight: "bold",
       id: "submitted-what-happens",
       text: "Email your CMS representative to inform them you submitted the RHTP Report and it is ready for their review.",
+      style: "bold",
     },
   ],
 };

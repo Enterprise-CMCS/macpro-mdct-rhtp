@@ -51,7 +51,7 @@ const paragraphTemplateSchema = object().shape({
   id: string().required(),
   text: string().required(),
   title: string().notRequired(),
-  weight: string().notRequired(),
+  style: string().notRequired(),
 });
 
 const textboxTemplateSchema = object().shape({
