@@ -164,7 +164,7 @@ export enum PageType {
 
 export type AccordionGroupItem = {
   label: string;
-  children: PageElement[];
+  elements: PageElement[];
 };
 
 export enum ElementType {
@@ -389,6 +389,7 @@ export interface AccordionGroupTemplate {
 export type UseOfFundsAttachmentTemplate = {
   type: ElementType.UseOfFundsAttachment;
   id: string;
+  label: string;
   answer?: UploadListProp[];
   required: boolean;
 };

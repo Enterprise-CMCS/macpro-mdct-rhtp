@@ -15,14 +15,14 @@ const copyStatePolicyCommitments = (
   newAccordions: AccordionGroupItem[]
 ) => {
   for (const oldAccordionItem of oldAccordions) {
-    for (const oldChildItem of oldAccordionItem.children) {
+    for (const oldChildItem of oldAccordionItem.elements) {
       if ("answer" in oldChildItem) {
         const newAccordionItem = newAccordions.find(
           (newAccordionItem) =>
             newAccordionItem.label === oldAccordionItem.label
         );
 
-        const newChildItem = newAccordionItem?.children.find(
+        const newChildItem = newAccordionItem?.elements.find(
           (newChildItem) => newChildItem.id === oldChildItem.id
         ) as PageElement;
         if (oldChildItem?.type === newChildItem.type) {

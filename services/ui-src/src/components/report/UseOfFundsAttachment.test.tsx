@@ -37,6 +37,7 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn();
 const mockedElement: UseOfFundsAttachmentTemplate = {
   id: "mock-id",
   type: ElementType.UseOfFundsAttachment,
+  label: "mock label",
   answer: [],
   required: true,
 };
@@ -44,6 +45,7 @@ const mockedElement: UseOfFundsAttachmentTemplate = {
 const mockElementWithAnswer: UseOfFundsAttachmentTemplate = {
   id: "mock-id",
   type: ElementType.UseOfFundsAttachment,
+  label: "mock label",
   answer: [
     {
       name: "mock-file.txt",
