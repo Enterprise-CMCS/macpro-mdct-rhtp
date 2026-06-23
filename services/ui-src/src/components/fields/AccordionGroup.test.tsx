@@ -14,7 +14,7 @@ const mockAccordionGroupElement: AccordionGroupTemplate = {
   accordions: [
     {
       label: "mock-textbox-label",
-      children: [
+      elements: [
         {
           id: "mock-textbox-id",
           type: ElementType.Textbox,

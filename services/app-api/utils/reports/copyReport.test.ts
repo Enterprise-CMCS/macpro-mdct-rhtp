@@ -75,7 +75,7 @@ const mockStatePolicyCommitments = [
         accordions: [
           {
             label: "State Policy Commitment 1",
-            children: [
+            elements: [
               {
                 type: ElementType.Textbox,
                 id: "state-policy-commitment-1-textbox",
@@ -126,6 +126,7 @@ const mockOldReport: Report = {
         {
           id: "use-of-funds-attachment",
           type: ElementType.UseOfFundsAttachment,
+          label: "mock label",
           answer: [
             {
               name: "file-name",
@@ -215,7 +216,7 @@ describe("copyReport util", () => {
       expect.arrayContaining([
         expect.objectContaining({
           label: "State Policy Commitment 1",
-          children: [
+          elements: [
             expect.objectContaining({
               type: ElementType.Textbox,
               id: "state-policy-commitment-1-textbox",

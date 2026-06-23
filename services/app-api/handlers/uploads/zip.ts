@@ -97,7 +97,7 @@ export const zipWorker = async (event: ZipWorkerEvent) => {
   const accordionGroups = flattenElements
     ?.filter((element) => element?.type === ElementType.AccordionGroup)
     .flatMap((group) =>
-      group.accordions.flatMap((accordions) => accordions.children)
+      group.accordions.flatMap((accordions) => accordions.elements)
     )
     .filter((element) => element.type === ElementType.AttachmentArea);
 
