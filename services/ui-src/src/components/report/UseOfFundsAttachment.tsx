@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Image, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import {
   AlertTypes,
   UploadListProp,
@@ -8,7 +8,7 @@ import { PageElementProps } from "./Elements";
 import { Fragment, useState } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-import { useStore } from "utils";
+import { bytesToKiloBytes, useStore } from "utils";
 import { UploadModal } from "components/modals/UploadModal";
 import {
   uploadListRender,
@@ -17,6 +17,7 @@ import {
 } from "utils/other/fileUtils";
 import { Modal } from "components/modals/Modal";
 import { Alert } from "components/alerts/Alert";
+import { notAnsweredText } from "../../constants";
 
 export const UseOfFundsAttachmentElement = (
   props: PageElementProps<UseOfFundsAttachmentTemplate>
@@ -26,7 +27,7 @@ export const UseOfFundsAttachmentElement = (
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const { id, state, type: reportType } = report!;
-  const { answer } = element;
+  const { answer, label } = element;
   const files = answer ?? [];
 
   const saveToReport = (newFiles: UploadListProp[]) => {
@@ -81,7 +82,7 @@ export const UseOfFundsAttachmentElement = (
       ></UploadModal>
       {files.length > 0 && (
         <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
-          Uploaded Attachment
+          {label}
         </Heading>
       )}
       {uploadListRender(
@@ -129,8 +130,18 @@ export const UseOfFundsAttachmentElement = (
 export const UseOfFundsAttachmentElementExport = (
   element: UseOfFundsAttachmentTemplate
 ) => {
-  console.log("element", element);
-  return <div>empty div for now</div>;
+  if (element.answer && element.answer.length > 0) {
+    const name = element.answer[0].name;
+    const size = element.answer[0].size;
+    return (
+      <Stack>
+        <Box>{name}</Box>
+        <Box color="gray">{bytesToKiloBytes(size)} KB</Box>
+      </Stack>
+    );
+  } else {
+    return notAnsweredText;
+  }
 };
 
 const sx = {

@@ -73,7 +73,7 @@ const buildCommitments = (
   for (const { label, status } of commitmentsForState) {
     commitments.push({
       label,
-      children: [
+      elements: [
         commitmentStatusDropdown(label, status),
         commitmentSupportParagraph,
         commitmentLinkListInput,

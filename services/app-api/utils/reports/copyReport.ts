@@ -4,7 +4,32 @@ import {
   PageElement,
   Report,
   RhtpSubType,
+  AccordionGroupItem,
+  AccordionGroupTemplate,
 } from "@rhtp/shared";
+
+const copyStatePolicyCommitments = (
+  oldAccordions: AccordionGroupItem[],
+  newAccordions: AccordionGroupItem[]
+) => {
+  for (const oldAccordionItem of oldAccordions) {
+    for (const oldChildItem of oldAccordionItem.elements) {
+      if ("answer" in oldChildItem) {
+        const newAccordionItem = newAccordions.find(
+          (newAccordionItem) =>
+            newAccordionItem.label === oldAccordionItem.label
+        );
+
+        const newChildItem = newAccordionItem?.elements.find(
+          (newChildItem) => newChildItem.id === oldChildItem.id
+        ) as PageElement;
+        if (oldChildItem?.type === newChildItem.type) {
+          newChildItem.answer = structuredClone(oldChildItem.answer);
+        }
+      }
+    }
+  }
+};
 
 const copyAnswer = (
   oldElements: PageElement[],
@@ -12,6 +37,13 @@ const copyAnswer = (
   newSubType: RhtpSubType
 ) => {
   for (const oldElement of oldElements) {
+    // Copying over State Policy Commitments
+    if ("accordions" in oldElement) {
+      const newElement = newElements.find(
+        (newElement) => newElement.id === oldElement.id
+      ) as AccordionGroupTemplate;
+      copyStatePolicyCommitments(oldElement.accordions, newElement.accordions);
+    }
     if (!("answer" in oldElement)) continue;
 
     const newElement = newElements.find(
