@@ -49,6 +49,17 @@ describe("buildZip util", () => {
                   label: "State Policy Commitment 1 Textbox",
                   type: "textbox",
                 },
+                {
+                  id: "attachment-id",
+                  type: "attachmentArea",
+                  answer: [
+                    {
+                      fileId: "mock-id",
+                      name: "mock-name",
+                      size: 100,
+                    },
+                  ],
+                },
               ],
               label: "State Policy Commitment 1",
             },
