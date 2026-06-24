@@ -85,7 +85,7 @@ const statusVariant = {
 
 const exportVariant = {
   table: {
-    "th, td": {
+    "tr, th, td": {
       borderColor: "gray_lighter",
     },
     td: {

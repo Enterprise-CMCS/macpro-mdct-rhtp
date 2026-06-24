@@ -24,7 +24,7 @@ describe("test state policy commitment functions", () => {
             accordions: expect.arrayContaining([
               expect.objectContaining({
                 // expected accordion fields
-                children: expect.arrayContaining([
+                elements: expect.arrayContaining([
                   expect.objectContaining({
                     type: ElementType.Dropdown,
                     id: "commitment-status",
