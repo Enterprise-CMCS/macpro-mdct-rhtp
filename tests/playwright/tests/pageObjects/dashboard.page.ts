@@ -80,8 +80,11 @@ export class DashboardPage extends BasePage {
   }
 
   async openCreateModal(): Promise<void> {
-    // click() implicitly waits for the element to be visible and actionable
-    await this.getStartButton().click();
+    // Wait for the button to be enabled — canCreateReport is async (set after reports API resolves)
+    const btn = this.getStartButton();
+    await btn.waitFor({ state: "visible" });
+    await expect(btn).toBeEnabled({ timeout: TIMEOUT_UI });
+    await btn.click();
     await expect(this.page.getByRole("dialog")).toBeVisible();
   }
 
@@ -95,7 +98,7 @@ export class DashboardPage extends BasePage {
 
   async openFirstEditableReport(): Promise<void> {
     const editButton = this.page
-      .getByRole("button", { name: /^Edit .* report$/i })
+      .getByRole("button", { name: /^View .* report$/i })
       .first();
     await Promise.all([
       this.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?/),
