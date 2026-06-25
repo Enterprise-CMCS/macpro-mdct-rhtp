@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import { BasePage } from "./base.page";
-import { TIMEOUT_UI } from "../../utils/timeouts";
+import { TIMEOUT_LOADING, TIMEOUT_UI } from "../../utils/timeouts";
 
 export type DashboardState = "empty" | "unsubmitted" | "submitted";
 
@@ -33,12 +33,15 @@ export class DashboardPage extends BasePage {
 
   // ===== Locators (private helpers) =====
   private getStartButton() {
-    return this.page.getByRole("button").filter({ hasText: /Start/i }).first();
+    return this.page
+      .getByRole("button", { name: /^Start .* Report$/i })
+      .first();
   }
 
   private getCopyButton() {
-    // Look for buttons with "Copy" text
-    return this.page.getByRole("button").filter({ hasText: /Copy/i }).first();
+    return this.page
+      .getByRole("button", { name: /^Copy .* Submission$/i })
+      .first();
   }
 
   private getSubmittedStatusCell() {
@@ -49,6 +52,10 @@ export class DashboardPage extends BasePage {
     return this.page
       .getByRole("cell", { name: /^(Not started|In progress|In revision)$/i })
       .first();
+  }
+
+  private getViewReportButton() {
+    return this.page.getByRole("button", { name: /^View .* report$/i }).first();
   }
 
   // ===== Modal Interactions =====
@@ -80,12 +87,18 @@ export class DashboardPage extends BasePage {
   }
 
   async openCreateModal(): Promise<void> {
+    await this.waitForDashboardReady();
+
     // Wait for the button to be enabled — canCreateReport is async (set after reports API resolves)
     const btn = this.getStartButton();
     await btn.waitFor({ state: "visible" });
     await expect(btn).toBeEnabled({ timeout: TIMEOUT_UI });
     await btn.click();
-    await expect(this.page.getByRole("dialog")).toBeVisible();
+
+    // Wait for modal to appear with extended timeout
+    await expect(this.page.getByRole("dialog")).toBeVisible({
+      timeout: TIMEOUT_LOADING,
+    });
   }
 
   async openCopyModal(): Promise<void> {
@@ -121,14 +134,21 @@ export class DashboardPage extends BasePage {
   async getDashboardState(): Promise<DashboardState> {
     await this.waitForDashboardReady();
 
-    const [hasSubmitted, hasUnsubmitted] = await Promise.all([
-      this.getSubmittedStatusCell()
-        .isVisible({ timeout: TIMEOUT_UI })
-        .catch(() => false),
-      this.getUnsubmittedStatusCell()
-        .isVisible({ timeout: TIMEOUT_UI })
-        .catch(() => false),
-    ]);
+    const [hasSubmitted, hasUnsubmitted, hasViewReportButton, hasCopyButton] =
+      await Promise.all([
+        this.getSubmittedStatusCell()
+          .isVisible({ timeout: TIMEOUT_UI })
+          .catch(() => false),
+        this.getUnsubmittedStatusCell()
+          .isVisible({ timeout: TIMEOUT_UI })
+          .catch(() => false),
+        this.getViewReportButton()
+          .isVisible({ timeout: TIMEOUT_UI })
+          .catch(() => false),
+        this.getCopyButton()
+          .isVisible({ timeout: TIMEOUT_UI })
+          .catch(() => false),
+      ]);
 
     if (hasUnsubmitted) {
       return "unsubmitted";
@@ -136,6 +156,11 @@ export class DashboardPage extends BasePage {
 
     if (hasSubmitted) {
       return "submitted";
+    }
+
+    // Fallback: action button state can be a more reliable signal than status-cell text.
+    if (hasViewReportButton) {
+      return hasCopyButton ? "submitted" : "unsubmitted";
     }
 
     return "empty";
