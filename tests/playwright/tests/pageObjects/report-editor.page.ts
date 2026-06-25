@@ -98,4 +98,10 @@ export class ReportEditorPage extends BasePage {
     await field.clear();
     await field.fill(value);
   }
+
+  async fillTextarea(label: string | RegExp, value: string): Promise<void> {
+    // Get textarea by label — use getByLabel which should work for textarea as well
+    const field = this.page.getByLabel(label);
+    await field.fill(value);
+  }
 }
