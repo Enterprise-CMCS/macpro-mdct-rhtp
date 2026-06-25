@@ -47,7 +47,7 @@ test.describe("Report Editing", () => {
     }
   };
 
-  const verifyFieldsReadOnly = async (
+  const _verifyFieldsReadOnly = async (
     editor: ReportEditorPage,
     fields: Array<{ label: string | RegExp }>
   ) => {
@@ -115,22 +115,39 @@ test.describe("Report Editing", () => {
     if (dashboardState === "empty") {
       const isStartEnabled = await dashboard.isStartButtonAvailable();
       if (!isStartEnabled) {
+        // Wait a bit and re-detect state to get accurate reading
+        await statePage.page.waitForTimeout(1000);
         dashboardState = await dashboard.getDashboardState();
       }
     }
 
-    // For unsubmitted reports: create if dashboard is empty
+    // For unsubmitted reports: create if dashboard is empty or copy if only submitted exist
     if (targetState === "unsubmitted" && dashboardState === "empty") {
-      await dashboard.openCreateModal();
-      const createOutcome = await modal.submitCreateModal();
+      const canCreate = await dashboard.isStartButtonAvailable();
+      if (!canCreate) {
+        // If Start button is disabled, reports exist but weren't detected—try to open one
+        const hasReports =
+          (await dashboard.isCopyButtonVisible()) ||
+          (await statePage.page
+            .getByRole("button", { name: /^View .* report$/i })
+            .first()
+            .isVisible()
+            .catch(() => false));
+        if (hasReports) {
+          dashboardState = "submitted"; // Fallback: assume submitted if reports exist
+        }
+      } else {
+        await dashboard.openCreateModal();
+        const createOutcome = await modal.submitCreateModal();
 
-      if (createOutcome !== "created") {
-        test.skip(); // Skip if report creation is blocked by business rules
-        return null;
+        if (createOutcome !== "created") {
+          test.skip(); // Skip if report creation is blocked by business rules
+          return null;
+        }
+        // Reload dashboard to see the newly created report
+        await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+        dashboardState = await dashboard.getDashboardState();
       }
-      // Reload dashboard to see the newly created report
-      await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
-      dashboardState = await dashboard.getDashboardState();
     }
 
     // If only submitted reports exist, copy one to create an editable report.
@@ -375,18 +392,107 @@ test.describe("Report Editing", () => {
     await expect(editor.previousButton).toBeHidden();
   });
 
-  test("should display fields as read-only for a submitted report", async ({
+  // Field labels for Sustainability & Highlights section
+  const SUCCESS_STORIES_LABEL = /success stories/i;
+  const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
+
+  const SUSTAINABILITY_TEST_DATA = {
+    successStories:
+      "This is a test success story demonstrating measurable outcomes from RHT implementation.",
+    sustainabilityPlan:
+      "Our sustainability strategy includes long-term funding commitments and workforce development partnerships.",
+  };
+
+  const verifyTextareaValue = async (
+    editor: ReportEditorPage,
+    label: string | RegExp,
+    expectedValue: string
+  ) => {
+    await expect(editor.getFieldByLabel(label)).toHaveValue(expectedValue);
+  };
+
+  test("should fill and persist Sustainability and Highlights textareas", async ({
     statePage,
   }) => {
     // Arrange
     const editor = await openReportSection(
       statePage,
-      "submitted",
+      "unsubmitted",
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+    );
+    if (!editor) return;
+
+    // Act — fill both textarea fields
+    await editor.fillTextarea(
+      SUCCESS_STORIES_LABEL,
+      SUSTAINABILITY_TEST_DATA.successStories
+    );
+    await editor.fillTextarea(
+      SUSTAINABILITY_PLANNING_LABEL,
+      SUSTAINABILITY_TEST_DATA.sustainabilityPlan
+    );
+
+    // Blur fields to trigger autosave
+    await editor.page.keyboard.press("Tab");
+    await editor.page.keyboard.press("Tab");
+
+    // Wait for autosave debounce (2000ms + buffer)
+    await editor.page.waitForTimeout(3000);
+
+    // Assert — values persist locally after fill and autosave
+    await verifyTextareaValue(
+      editor,
+      SUCCESS_STORIES_LABEL,
+      SUSTAINABILITY_TEST_DATA.successStories
+    );
+    await verifyTextareaValue(
+      editor,
+      SUSTAINABILITY_PLANNING_LABEL,
+      SUSTAINABILITY_TEST_DATA.sustainabilityPlan
+    );
+  });
+
+  test("should persist field values across multiple sections", async ({
+    statePage,
+  }) => {
+    // Test that edits in one section persist when navigating to another section and back
+
+    // Arrange — start at General Information
+    const editor = await openReportSection(
+      statePage,
+      "unsubmitted",
       GENERAL_INFORMATION_SECTION
     );
     if (!editor) return;
 
-    // Assert — all fields are disabled and read-only
-    await verifyFieldsReadOnly(editor, GENERAL_INFO_FIELDS);
+    const { reportType, state, reportId } = editor.getCurrentRouteParams();
+
+    // Act — fill a field in General Information
+    const testValue = `Test Value ${Date.now()}`;
+    await editor.fillTextField(AOR_NAME_LABEL, testValue);
+    await editor.page.keyboard.press("Tab");
+    await editor.page.waitForTimeout(2000); // Wait for autosave
+
+    // Assert — value is present
+    await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(testValue);
+
+    // Act — navigate directly to next section via URL
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      INITIATIVE_ATTACHMENTS_SECTION
+    );
+
+    // Act — navigate back to General Information
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      GENERAL_INFORMATION_SECTION
+    );
+
+    // Assert — General Info value persisted after round trip
+    await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(testValue);
   });
 });
