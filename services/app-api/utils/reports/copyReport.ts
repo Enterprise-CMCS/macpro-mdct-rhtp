@@ -60,6 +60,8 @@ const copyAnswer = (
         );
       } else if (newElement.id === "use-of-funds-attachment") {
         newElement.answer = [];
+      } else if (newElement.id === "initiative-narrative") {
+        newElement.answer = [];
       } else {
         newElement.answer = oldElement.answer;
       }
