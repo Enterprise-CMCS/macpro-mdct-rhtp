@@ -531,6 +531,64 @@
     ]
   },
   {
+    "username": "statedemo7@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo7@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo7"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "RI"
+      }
+    ]
+  },
+  {
+    "username": "statedemo8@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo8@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo8"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "MO"
+      }
+    ]
+  },
+  {
     "username": "projectofficer@test.com",
     "attributes": [
       {
