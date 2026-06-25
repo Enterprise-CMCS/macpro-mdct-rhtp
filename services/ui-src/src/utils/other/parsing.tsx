@@ -13,3 +13,14 @@ export const parseHtml = (html: string) => {
 export const bytesToKiloBytes = (bytes: number) => {
   return Math.ceil(bytes / 1000);
 };
+
+export const optionalTag = (element: { label: string; required: boolean }) => {
+  if (!element.label) return "";
+
+  return (
+    <>
+      {element.label}
+      {!element.required && <span className="optionalText"> (optional)</span>}
+    </>
+  );
+};

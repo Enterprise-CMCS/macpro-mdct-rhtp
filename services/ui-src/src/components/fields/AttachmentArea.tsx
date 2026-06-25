@@ -7,7 +7,7 @@ import { PageElementProps } from "components/report/Elements";
 import { Button, Stack, Image, Text, Box } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
-import { bytesToKiloBytes, useStore } from "utils";
+import { bytesToKiloBytes, optionalTag, useStore } from "utils";
 import {
   downloadFile,
   uploadListRender,
@@ -24,7 +24,7 @@ export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
   const { disabled } = props;
-  const { label, helperText, answer, uploadedSubLabel } = props.element;
+  const { helperText, answer, uploadedSubLabel } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
@@ -67,7 +67,7 @@ export const AttachmentArea = (
 
   return (
     <Stack gap="0">
-      <Label fieldId={id}>{label}</Label>
+      <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
         uploadListRender(
@@ -81,6 +81,7 @@ export const AttachmentArea = (
           disabled
         )}
       <Button
+        mt="spacer2"
         width="fit-content"
         onClick={() => setModalOpen(true)}
         variant="outline"
