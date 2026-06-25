@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
-import { parseHtml } from "utils";
+import { optionalTag, parseHtml } from "utils";
 import { TextAreaBoxTemplate } from "@rhtp/shared";
 import { PageElementProps } from "../report/Elements";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
@@ -36,13 +36,6 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
 
   const parsedHint = textbox.helperText && parseHtml(textbox.helperText);
 
-  const labelText = (
-    <>
-      {textbox.label}
-      {!textbox.required && <span className="optionalText"> (optional)</span>}
-    </>
-  );
-
   if (hideElement) {
     return null;
   }
@@ -51,7 +44,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
     <Box width={"100%"}>
       <CmsdsTextField
         name={textbox.id}
-        label={labelText}
+        label={optionalTag(textbox)}
         hint={parsedHint}
         onChange={onChangeHandler}
         onBlur={onChangeHandler}
