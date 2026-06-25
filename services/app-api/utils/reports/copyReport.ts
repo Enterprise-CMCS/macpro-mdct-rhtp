@@ -5,7 +5,6 @@ import {
   PageElement,
   Report,
   RhtpSubType,
-  InitiativeAnswerProp,
   AccordionGroupItem,
   AccordionGroupTemplate,
   AttachmentTableTemplate,
@@ -184,7 +183,7 @@ export const copyAttachmentsAndTheirComments = async (newReport: Report) => {
     });
 
     const comments = await queryComments(previousUpload.fileId, true);
-    if (comments.length > 0) {
+    if (comments && comments.length > 0) {
       for (const comment of comments) {
         commentsToBatchPut.push({
           ...comment,
@@ -196,20 +195,6 @@ export const copyAttachmentsAndTheirComments = async (newReport: Report) => {
   }
 
   await batchPutUploads(uploadsToBatchPut);
-  await batchPutComments(commentsToBatchPut);
-};
-
-export const copyReportComments = async (newReport: Report) => {
-  const commentsToBatchPut: Comment[] = [];
-  const comments = await queryComments(newReport.copyFromReportId!, true);
-  if (comments.length > 0) {
-    for (const comment of comments) {
-      commentsToBatchPut.push({
-        ...comment,
-        contextId: newReport.id,
-      });
-    }
-  }
   await batchPutComments(commentsToBatchPut);
 };
 
@@ -245,6 +230,5 @@ export const copyReport = async (newReport: Report) => {
     }
   }
 
-  await copyReportComments(newReport);
   await copyAttachmentsAndTheirComments(newReport);
 };

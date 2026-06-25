@@ -144,7 +144,5 @@ describe("ExportedReportWrapper", () => {
     expect(screen.getByText("Mock: Links 2")).toBeVisible();
     expect(screen.getByText("http//:www.google.com")).toBeVisible();
     expect(screen.getByText("http//:www.fake.com")).toBeVisible();
-
-    screen.debug();
   });
 });

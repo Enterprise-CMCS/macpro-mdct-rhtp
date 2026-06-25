@@ -14,9 +14,23 @@ import { validReport } from "../tests/mockReport";
 import { copyReport } from "./copyReport";
 
 const mockGetReport = vi.fn();
+const mockQueryComments = vi.fn();
+const mockBatchComments = vi.fn();
+const mockBatchUploads = vi.fn();
+const mockQueryUpload = vi.fn();
 
 vi.mock("../../storage/reports", () => ({
   getReport: () => mockGetReport(),
+}));
+
+vi.mock("../../storage/comments", () => ({
+  queryComments: () => mockQueryComments(),
+  batchPutComments: () => mockBatchComments(),
+}));
+
+vi.mock("../../storage/upload", () => ({
+  queryUpload: () => mockQueryUpload(),
+  batchPutUploads: () => mockBatchUploads(),
 }));
 
 const mockInitiativeAnswer = "mock text answer";
