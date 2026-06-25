@@ -207,9 +207,6 @@ export const copyReport = async (newReport: Report) => {
   );
   if (!reportToCopy) return;
 
-  // const reportComments = await queryComments(copyFromReportId!, true);
-  // return reportComments;
-
   for (const oldPage of reportToCopy.pages) {
     if (oldPage.elements) {
       let newPage = newPages.find((newPage) => newPage.id === oldPage.id);
