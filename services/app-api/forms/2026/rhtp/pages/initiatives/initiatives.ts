@@ -105,7 +105,7 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
     "Narrative is optional for quarterly reporting. Limit responses to 2,000 characters, or approximately 250–350 words.",
   required: true,
   answer: narrative,
-  quarterly: false,
+  quarterly: true,
 });
 
 const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
