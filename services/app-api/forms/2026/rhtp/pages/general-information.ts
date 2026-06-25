@@ -48,7 +48,7 @@ export const generalInformation: FormPageTemplate = {
     {
       type: ElementType.Textbox,
       id: "poc-noa",
-      label: "Point of Contact (POC) listed in NoA (Optional)",
+      label: "Point of Contact (POC) listed in NoA",
       required: false,
       helperText: "Optionally added and approved by CMS.",
       quarterly: true,
@@ -56,7 +56,7 @@ export const generalInformation: FormPageTemplate = {
     {
       type: ElementType.Textbox,
       id: "poc-email",
-      label: "Point of Contact (POC) email (Optional)",
+      label: "Point of Contact (POC) email",
       required: false,
       helperText:
         "Enter the email address for the Additional Point of Contact listed in the NoA.",

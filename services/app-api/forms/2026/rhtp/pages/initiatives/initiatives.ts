@@ -136,6 +136,8 @@ export const metricTable = (
           type: ElementType.Dropdown,
           label: "Status",
           editOnly: true,
+          hintText:
+            "Setting \“Abandoned\" preserves its historical values for auditing but flags it as abandoned, removing it from the state's current active data entry requirements.,",
           children: [
             { label: "Active", value: "Active" },
             { label: "Abandoned", value: "Abandoned" },
