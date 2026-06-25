@@ -288,7 +288,7 @@ export interface HeaderTemplate extends DisplayElementTemplate {
 export interface ParagraphTemplate extends DisplayElementTemplate {
   type: ElementType.Paragraph;
   title?: string;
-  weight?: string;
+  style?: string;
 }
 
 export interface StatusAlertTemplate extends DisplayElementTemplate {
@@ -432,6 +432,7 @@ export interface ActionElement {
   type: ElementType;
   disabled?: boolean;
   mask?: MaskType;
+  hintText?: string;
 }
 
 export interface ActionRowElement extends ActionElement {

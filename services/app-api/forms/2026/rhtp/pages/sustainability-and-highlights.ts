@@ -29,8 +29,9 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
     {
       id: "success-stories-paragraph",
       type: ElementType.Paragraph,
-      title: "Success Stories: Supporting Evidence (Optional)",
+      title: "Success Stories: Supporting Evidence",
       text: "Upload supporting documentation (e.g., press releases illustrating success stories).",
+      style: "hint",
     },
     {
       type: ElementType.ListInput,
@@ -72,8 +73,9 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
     {
       id: "sustainability-paragraph",
       type: ElementType.Paragraph,
-      title: "Sustainability Planning: Supporting Evidence (Optional)",
+      title: "Sustainability Planning: Supporting Evidence",
       text: "Upload supporting documentation.",
+      style: "hint",
     },
     {
       type: ElementType.ListInput,
