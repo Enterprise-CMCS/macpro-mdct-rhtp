@@ -6,7 +6,6 @@ import {
   RhtpSubType,
   AccordionGroupItem,
   AccordionGroupTemplate,
-  optionalInQuarterly,
 } from "@rhtp/shared";
 
 const copyStatePolicyCommitments = (
@@ -61,8 +60,7 @@ const copyAnswer = (
         );
       } else if (newElement.id === "use-of-funds-attachment") {
         newElement.answer = [];
-      } else if (optionalInQuarterly.includes(newElement.id)) {
-        //only handles items that area strings like textboxes and textarea, expand when that changes
+      } else if (newElement.id === "initiative-narrative") {
         newElement.answer = "";
       } else {
         newElement.answer = oldElement.answer;
