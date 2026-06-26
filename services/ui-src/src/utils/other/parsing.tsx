@@ -1,4 +1,4 @@
-import { RhtpSubType } from "@rhtp/shared";
+import { optionalInQuarterly, RhtpSubType } from "@rhtp/shared";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 
@@ -27,7 +27,7 @@ export const optionalTag = (
     } else {
       //currently only used for Initiative -> Narrative textarea field
       if (
-        element.id === "initiative-narrative" &&
+        optionalInQuarterly.includes(element.id) &&
         subType === RhtpSubType.ANNUAL
       ) {
         return { show: true, text: "Required Annually" };

@@ -71,3 +71,5 @@ export const StateDropdownOptions = Object.entries(StateNames).map(
     value: key,
   })
 );
+
+export const optionalInQuarterly = ["initiative-narrative"];
