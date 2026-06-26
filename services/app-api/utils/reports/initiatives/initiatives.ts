@@ -18,11 +18,13 @@ export const updateInitiativeStatus = (
 
   if (initiativeAbandon) {
     report.pages[initiativeIndex].status = PageStatus.ABANDONED;
-    report.pages[initiativeIndex].elements = report.pages[
-      initiativeIndex
-    ].elements.map((element) => ({
-      ...element,
-      disabled: true,
-    }));
+    if (report.pages[initiativeIndex].elements) {
+      report.pages[initiativeIndex].elements = report.pages[
+        initiativeIndex
+      ].elements.map((element) => ({
+        ...element,
+        disabled: true,
+      }));
+    }
   }
 };
