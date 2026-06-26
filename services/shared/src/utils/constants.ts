@@ -72,4 +72,6 @@ export const StateDropdownOptions = Object.entries(StateNames).map(
   })
 );
 
+//for fields that are required but only when it's an annual report and it needs to mutate to not required in optional.
+//This also clears the answer when copied, assuming it's a string, see reports/copyReport.ts
 export const optionalInQuarterly = ["initiative-narrative"];
