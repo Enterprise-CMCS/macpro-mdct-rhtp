@@ -19,7 +19,7 @@ import s3 from "../../libs/s3-lib";
 const SKIP_COPY_ANSWER_IDS = [
   "use-of-funds-attachment",
   "success-attachments",
-  "commitment-attachments",
+  "sustainability-attachments",
 ];
 
 const copyStatePolicyCommitments = (
