@@ -7,6 +7,13 @@ import {
   StateAbbr,
   RhtpSubType,
   ReportType,
+  AccordionGroupItem,
+  ActionTableTemplate,
+  FormPageTemplate,
+  InitiativePageTemplate,
+  PageStatus,
+  TextboxTemplate,
+  ActionAnswerShape,
 } from "@rhtp/shared";
 
 const pages = rhtpReportTemplate("PA");
@@ -95,3 +102,76 @@ export const invalidPageElementType = {
     },
   ],
 };
+
+export const metricAnswers: ActionAnswerShape[] = [
+  [
+    { id: "status", value: "active" },
+    { id: "metric", value: "hello" },
+    { id: "prevValue", value: "" },
+    { id: "currValue", value: "1000" },
+    { id: "date", value: "2/2/2025" },
+  ],
+];
+
+export const mockAddedInitiatives = [
+  {
+    id: "added-initiative-1",
+    title: "Added Initiative 1",
+    initiativeNumber: "0987",
+    elements: [
+      {
+        type: ElementType.Textbox,
+        id: "mock-added-initiative-element",
+        label: "Added Initiative element",
+        required: true,
+        answer: "mock text answer",
+      } as TextboxTemplate,
+      {
+        id: "metrics-table", // id match for specific logic
+        type: ElementType.ActionTable,
+        label: "Metric table element",
+        required: true,
+        answer: metricAnswers,
+      } as unknown as ActionTableTemplate,
+    ],
+  },
+  {
+    id: "added-initiative-2",
+    title: "Added Initiative 2",
+    initiativeNumber: "1010",
+    status: PageStatus.ABANDONED,
+    elements: [],
+  },
+] as InitiativePageTemplate[];
+
+export const mockStatePolicyCommitments = [
+  {
+    id: "state-policy-commitments",
+    title: "State Policy Commitments",
+    type: PageType.Standard,
+    elements: [
+      {
+        type: ElementType.AccordionGroup,
+        id: "state-policy-commitments-group",
+        accordions: [
+          {
+            label: "State Policy Commitment 1",
+            elements: [
+              {
+                type: ElementType.Textbox,
+                id: "state-policy-commitment-1-textbox",
+                label: "State Policy Commitment 1 Textbox",
+                answer: "State Policy Commitment 1 Answer",
+              },
+              {
+                type: ElementType.AttachmentArea,
+                id: "attachment-id",
+                answer: [{ name: "mock-name", size: 100, fileId: "mock-id" }],
+              },
+            ],
+          },
+        ] as AccordionGroupItem[],
+      },
+    ],
+  },
+] as FormPageTemplate[];
