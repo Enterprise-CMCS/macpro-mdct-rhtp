@@ -11,7 +11,7 @@ import {
   getFileWithSafeName,
   uploadListRender,
 } from "utils/other/fileUtils";
-import { useStore } from "utils";
+import { parseHtml, useStore } from "utils";
 
 interface Props {
   answer: UploadListProp[];
@@ -126,7 +126,7 @@ export const UploadArea = ({
         <>
           <div>
             {subLabel.upload && (
-              <Text sx={sx.uploadedSubLabel}>{subLabel.upload}</Text>
+              <Text mb="spacer2">{parseHtml(subLabel.upload)}</Text>
             )}
             <Text sx={sx.uploadedLabel}>
               Select a {multiple ? "file or files" : "file"} to upload

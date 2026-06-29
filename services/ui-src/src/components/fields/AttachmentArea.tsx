@@ -7,7 +7,7 @@ import { PageElementProps } from "components/report/Elements";
 import { Button, Stack, Image, Text, Box } from "@chakra-ui/react";
 import { UploadModal } from "components/modals/UploadModal";
 import { useState } from "react";
-import { bytesToKiloBytes, optionalTag, useStore } from "utils";
+import { bytesToKiloBytes, optionalTag, parseHtml, useStore } from "utils";
 import {
   downloadFile,
   uploadListRender,
@@ -117,6 +117,9 @@ export const AttachmentArea = (
           commitment
         </Alert>
         <Box mt={"spacer3"} mb={"spacer_half"}>
+          {subLabel.upload && (
+            <Text mb="spacer2">{parseHtml(subLabel?.upload)}</Text>
+          )}
           <Text sx={sx.uploadedLabel}>File</Text>
           <Text sx={sx.uploadedSubLabel}>{subLabel?.uploaded}</Text>
         </Box>

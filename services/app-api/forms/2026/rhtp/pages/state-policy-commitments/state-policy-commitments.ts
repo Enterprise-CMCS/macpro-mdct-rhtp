@@ -79,7 +79,14 @@ const buildCommitments = (
         commitmentStatusDropdown(label, status),
         commitmentSupportParagraph,
         commitmentLinkListInput,
-        commitmentAttachmentArea,
+        {
+          ...commitmentAttachmentArea,
+          subLabel: {
+            upload: `<b>State Policy Commitment:</b> ${label}`,
+            uploaded:
+              "These files have been attached to the state policy commitment above.",
+          },
+        },
         commitmentNotes,
       ],
     });
