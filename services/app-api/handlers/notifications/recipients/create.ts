@@ -1,5 +1,5 @@
 import { handler } from "../../../libs/handler-lib";
-import { forbidden, ok } from "../../../libs/response-lib";
+import { created, forbidden } from "../../../libs/response-lib";
 import { parseState } from "../../../libs/param-lib";
 import { putRecipient } from "../../../storage/notificationRecipients";
 import { randomUUID } from "node:crypto";
@@ -28,6 +28,6 @@ export const createNotificationRecipient = handler(
     };
 
     await putRecipient(recipientBody);
-    return ok(recipientBody);
+    return created(recipientBody);
   }
 );
