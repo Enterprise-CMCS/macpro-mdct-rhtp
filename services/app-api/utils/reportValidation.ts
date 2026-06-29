@@ -296,7 +296,10 @@ const attachmentAreaSchema = object().shape({
   id: string().required(),
   label: string().required(),
   helperText: string().optional(),
-  uploadedSubLabel: string().required(),
+  subLabel: object().shape({
+    upload: string().optional(),
+    uploaded: string().optional(),
+  }),
   required: boolean().required(),
   answer: array().of(
     object().shape({

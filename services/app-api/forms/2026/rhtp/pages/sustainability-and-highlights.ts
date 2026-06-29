@@ -48,7 +48,9 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       id: "success-attachments",
       label: "Attachments",
       helperText: "Upload supporting documentation.",
-      uploadedSubLabel: "Success Stories: Supporting Evidence",
+      subLabel: {
+        uploaded: "Success Stories: Supporting Evidence",
+      },
       required: false,
     },
     {
@@ -92,7 +94,9 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       id: "sustainability-attachments",
       label: "Attachments",
       helperText: "Upload supporting documentation.",
-      uploadedSubLabel: "Sustainability Planning: Supporting Evidence",
+      subLabel: {
+        uploaded: "Sustainability Planning: Supporting Evidence",
+      },
       required: false,
     },
   ],

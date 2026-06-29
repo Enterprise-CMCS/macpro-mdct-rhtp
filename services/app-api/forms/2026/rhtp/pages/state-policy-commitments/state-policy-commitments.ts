@@ -47,8 +47,10 @@ const commitmentAttachmentArea: AttachmentAreaTemplate = {
   id: "commitment-attachments",
   label: "Attachments",
   helperText: "Upload state legislation.",
-  uploadedSubLabel:
-    "These files have been attached to the state policy commitment above.",
+  subLabel: {
+    uploaded:
+      "These files have been attached to the state policy commitment above.",
+  },
   required: false,
 };
 
