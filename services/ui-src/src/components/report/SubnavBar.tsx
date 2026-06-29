@@ -13,7 +13,7 @@ export const SubnavBar = ({ stateName, reportType }: Props) => {
   const { report, lastSavedTime } = useStore();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const saveStatusText = "Last saved " + lastSavedTime;
-  const title = getTitle(reportType);
+  const title = report?.name ?? `${stateName} ${getTitle(reportType)}`;
 
   //different return route if user is an admin
   const returnRoute =
@@ -26,7 +26,7 @@ export const SubnavBar = ({ stateName, reportType }: Props) => {
       <Container sx={sx.subnavContainer}>
         <Flex sx={sx.subnavFlex}>
           <Flex>
-            <Text sx={sx.submissionNameText}>{`${stateName} ${title}`}</Text>
+            <Text sx={sx.submissionNameText}>{title}</Text>
           </Flex>
           <Flex sx={sx.subnavFlexRight}>
             {lastSavedTime && (
@@ -71,7 +71,7 @@ const sx = {
     },
   },
   subnavFlex: {
-    height: "60px",
+    minHeight: "60px",
     justifyContent: "space-between",
     alignItems: "center",
   },
