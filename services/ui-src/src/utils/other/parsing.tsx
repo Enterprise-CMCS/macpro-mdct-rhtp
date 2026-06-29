@@ -29,7 +29,7 @@ export const optionalTag = (element: { label: string; required: boolean }) => {
 export const parseHintText = (
   element: {
     helperText?: string;
-    helperTextLink?: { text: string; label: string };
+    helperTextLink?: { link: string; text: string; label: string };
   },
   setModalComponent: (content: string, header: string) => void
 ) => {
@@ -48,7 +48,7 @@ export const parseHintText = (
               );
             }}
           >
-            {element.helperTextLink?.label}
+            {element.helperTextLink?.link}
           </Button>
         )}
       </span>

@@ -60,9 +60,9 @@ const inputElementSchema = {
   helperText: string().notRequired(),
   helperTextLink: object()
     .shape({
-      link: string().notRequired(),
-      label: string().notRequired(),
-      text: string().notRequired(),
+      link: string(),
+      label: string(),
+      text: string(),
     })
     .notRequired(),
   required: boolean().required(),
