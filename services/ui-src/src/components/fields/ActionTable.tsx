@@ -1,5 +1,4 @@
 import { Flex, Button, Image, Heading, Stack } from "@chakra-ui/react";
-import { Hint, Label } from "@cmsgov/design-system";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useState } from "react";
@@ -179,8 +178,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
-      <Label>{pluralLabel}</Label>
-      <Hint id={id}>{parseHtml(hintText)}</Hint>
+      <Heading as="h2" variant="subHeader">
+        {pluralLabel}
+      </Heading>
+      <p id={id}>{parseHtml(hintText)}</p>
       {canAddOrChangeStatus ? (
         <Button
           aria-label={`add ${label}`}

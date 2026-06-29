@@ -40,6 +40,7 @@ export const buildElement = (
           value={defaultValue}
           errorMessage={errorMessage}
           disabled={element.disabled}
+          hint={element.hintText ?? ""}
         />
       );
     case ElementType.Textbox:

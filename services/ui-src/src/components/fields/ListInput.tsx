@@ -7,6 +7,7 @@ import cancelPrimary from "assets/icons/cancel/icon_cancel_primary.svg";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { ErrorMessages } from "../../constants";
+import { optionalTag } from "utils";
 
 const validateField = (rawValue: string, validation: string | undefined) => {
   let validationError = undefined;
@@ -19,7 +20,7 @@ const validateField = (rawValue: string, validation: string | undefined) => {
 
 export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
   const { updateElement, disabled, element } = props;
-  const { id, label, fieldLabel, helperText, buttonText, answer, validation } =
+  const { id, fieldLabel, helperText, buttonText, answer, validation } =
     element;
   const [displayValue, setDisplayValue] = useState(answer ?? []);
   const [errorMessages, setErrorMessages] = useState([""]);
@@ -67,7 +68,7 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
 
   return (
     <fieldset key="list-input-field">
-      <Label fieldId={id}>{label}</Label>
+      <Label fieldId={id}>{optionalTag(element)}</Label>
       <Hint id={id}>{helperText}</Hint>
       {displayValue.map((field, index) => (
         <HStack
@@ -95,6 +96,7 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
         </HStack>
       ))}
       <Button
+        mt="spacer2"
         variant="outline"
         leftIcon={
           <Image src={disabled ? addGray : addPrimary} alt="Add icon" />

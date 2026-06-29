@@ -98,6 +98,20 @@ export const SubHeaderElement = ({
 export const ParagraphElement = ({
   element,
 }: PageElementProps<ParagraphTemplate>) => {
+  const styleObject = (type: string) => {
+    let styleDefault = { weight: "normal", size: "body_md", color: "base" };
+
+    switch (type) {
+      case "bold":
+        return { ...styleDefault, weight: "bold" };
+      case "hint":
+        return { ...styleDefault, size: "body_sm", color: "gray_dark" };
+    }
+    return styleDefault;
+  };
+
+  const obj = styleObject(element.style ?? "");
+
   return (
     <Stack>
       {element.title && (
@@ -105,7 +119,7 @@ export const ParagraphElement = ({
           {element.title}
         </Text>
       )}
-      <Box fontSize="body_md" fontWeight={element.weight}>
+      <Box fontSize={obj.size} fontWeight={obj.weight} color={obj.color}>
         {parseHtml(element.text)}
       </Box>
     </Stack>

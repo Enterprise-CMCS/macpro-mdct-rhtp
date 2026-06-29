@@ -165,11 +165,18 @@ button {
 
 .ds-c-hint {
   font-size: 14px;
+
+  &#metrics-table {
+    min-width: 80%;
+  }
 }
 
 .ds-c-field {
   margin: 8px 0 0 0;
   font-weight: 100;
+  &.numberField {
+    max-width: 240px;
+  }
 }
 
 .ds-c-fieldset {

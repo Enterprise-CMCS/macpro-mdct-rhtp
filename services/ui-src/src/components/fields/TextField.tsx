@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
-import { parseHtml } from "utils";
+import { optionalTag, parseHtml } from "utils";
 import {
   TextboxTemplate,
   NumberFieldTemplate,
@@ -97,17 +97,16 @@ export const TextField = (
   };
 
   const parsedHint = textbox.helperText && parseHtml(textbox.helperText);
-  const labelText = textbox.label;
 
   if (hideElement) {
     return null;
   }
 
   return (
-    <Box>
+    <Box width="100%">
       <CmsdsTextField
         name={textbox.id}
-        label={labelText || ""}
+        label={optionalTag(textbox)}
         hint={parsedHint}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
@@ -115,6 +114,7 @@ export const TextField = (
         value={displayValue}
         errorMessage={errorMessage}
         disabled={disabled || textbox.disabled}
+        fieldClassName={textbox.type}
       />
     </Box>
   );
