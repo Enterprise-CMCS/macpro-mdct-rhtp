@@ -35,7 +35,7 @@ export const parseHintText = (
 ) => {
   return (
     element.helperText && (
-      <span>
+      <span className="column">
         {parseHtml(element.helperText)}
         {element.helperTextLink && (
           <Button
@@ -47,6 +47,7 @@ export const parseHintText = (
                 element.helperTextLink?.label ?? ""
               );
             }}
+            textAlign="left"
           >
             {element.helperTextLink?.link}
           </Button>
