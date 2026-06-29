@@ -66,17 +66,25 @@ const sx = {
   },
   subnavContainer: {
     maxW: "appMax",
+    padding: ".5rem",
     ".desktop &": {
       paddingX: "spacer4",
     },
+    minHeight: "60px",
   },
   subnavFlex: {
-    minHeight: "60px",
     justifyContent: "space-between",
     alignItems: "center",
+    height: "100%",
   },
   leaveFormLink: {
     marginLeft: "spacer2",
+    ".mobile &": {
+      margin: "0",
+      paddingLeft: "0",
+      textAlign: "right",
+      border: "none",
+    },
   },
   checkIcon: {
     marginRight: "spacer1",
@@ -91,7 +99,6 @@ const sx = {
   saveStatusText: {
     fontSize: "body_sm",
     ".mobile &": {
-      width: "5rem",
       textAlign: "right",
     },
   },
