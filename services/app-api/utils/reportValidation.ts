@@ -54,68 +54,61 @@ const paragraphTemplateSchema = object().shape({
   style: string().notRequired(),
 });
 
-const textboxTemplateSchema = object().shape({
-  type: string().required().matches(new RegExp(ElementType.Textbox)),
+const inputElementSchema = {
   id: string().required(),
   label: string().required(),
   helperText: string().notRequired(),
-  answer: string().notRequired(),
+  helperTextLink: object()
+    .shape({
+      link: string().notRequired(),
+      label: string().notRequired(),
+      text: string().notRequired(),
+    })
+    .notRequired(),
   required: boolean().required(),
-  hideCondition: hideConditionSchema,
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
+};
+
+const textboxTemplateSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.Textbox)),
+  ...inputElementSchema,
+  answer: string().notRequired(),
+  hideCondition: hideConditionSchema,
 });
 
 const listInputTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ListInput)),
-  id: string().required(),
-  label: string().required(),
+  ...inputElementSchema,
   fieldLabel: string().required(),
-  helperText: string().required(),
   buttonText: string().required(),
   answer: array().of(string()).notRequired(),
-  required: boolean().required(),
   validation: string().notRequired(),
 });
 
 const numberFieldTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.NumberField)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   answer: number().notRequired(),
-  required: boolean().required(),
   mask: string().notRequired(),
-  quarterly: boolean().notRequired(),
-  disabled: boolean().notRequired(),
 });
 
 const textAreaTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.TextAreaField)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
-  required: boolean().required(),
-  quarterly: boolean().notRequired(),
-  disabled: boolean().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Date)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().required(),
+  ...inputElementSchema,
   answer: string().notRequired(),
-  required: boolean().required(),
 });
 
 const dropdownTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Dropdown)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   options: array().of(
     object().shape({
       label: string().required(),
@@ -125,7 +118,6 @@ const dropdownTemplateSchema = object().shape({
     })
   ),
   answer: string().notRequired(),
-  required: boolean().required(),
 });
 
 const accordionTemplateSchema = object().shape({
@@ -220,9 +212,7 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
 
 const radioTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Radio)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   choices: array().of(
     object().shape({
       label: string().required(),
@@ -232,16 +222,13 @@ const radioTemplateSchema = object().shape({
     })
   ),
   answer: string().notRequired(),
-  required: boolean().required(),
   clickAction: string().notRequired(),
   hideCondition: hideConditionSchema,
 });
 
 const checkboxTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Checkbox)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   choices: array().of(
     object().shape({
       label: string().required(),
@@ -251,7 +238,6 @@ const checkboxTemplateSchema = object().shape({
     })
   ),
   answer: array().of(string()).notRequired(),
-  required: boolean().required(),
 });
 
 const tableCheckpointTemplateSchema = object().shape({
@@ -293,11 +279,8 @@ const buttonLinkTemplateSchema = object().shape({
 
 const attachmentAreaSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().optional(),
+  ...inputElementSchema,
   uploadedSubLabel: string().required(),
-  required: boolean().required(),
   answer: array().of(
     object().shape({
       name: string()

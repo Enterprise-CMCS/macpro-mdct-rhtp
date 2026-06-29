@@ -1,3 +1,4 @@
+import { Button } from "@chakra-ui/react";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
 
@@ -22,5 +23,35 @@ export const optionalTag = (element: { label: string; required: boolean }) => {
       {element.label}
       {!element.required && <span className="optionalText"> (optional)</span>}
     </>
+  );
+};
+
+export const parseHintText = (
+  element: {
+    helperText?: string;
+    helperTextLink?: { text: string; label: string };
+  },
+  setModalComponent: (content: string, header: string) => void
+) => {
+  return (
+    element.helperText && (
+      <span>
+        {parseHtml(element.helperText)}
+        {element.helperTextLink && (
+          <Button
+            variant="link"
+            fontSize="14px"
+            onClick={() => {
+              setModalComponent(
+                parseHtml(element.helperTextLink?.text ?? ""),
+                element.helperTextLink?.label ?? ""
+              );
+            }}
+          >
+            {element.helperTextLink?.label}
+          </Button>
+        )}
+      </span>
+    )
   );
 };
