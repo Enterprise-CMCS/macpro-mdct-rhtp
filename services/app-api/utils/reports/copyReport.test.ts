@@ -1,14 +1,16 @@
 import {
-  ActionAnswerShape,
   ActionTableTemplate,
   ElementType,
-  InitiativePageTemplate,
   PageStatus,
   PageType,
   Report,
-  TextboxTemplate,
 } from "@rhtp/shared";
-import { validReport } from "../tests/mockReport";
+import {
+  metricAnswers,
+  mockAddedInitiatives,
+  mockStatePolicyCommitments,
+  validReport,
+} from "../tests/mockReport";
 import { copyReport } from "./copyReport";
 
 const mockGetReport = vi.fn();
@@ -19,47 +21,6 @@ vi.mock("../../storage/reports", () => ({
 
 const mockInitiativeAnswer = "mock text answer";
 const metricStartingCurrentValue = "1000";
-
-const metricAnswers: ActionAnswerShape[] = [
-  [
-    { id: "status", value: "active" },
-    { id: "metric", value: "hello" },
-    { id: "prevValue", value: "" },
-    { id: "currValue", value: metricStartingCurrentValue },
-    { id: "date", value: "2/2/2025" },
-  ],
-];
-
-const mockAddedInitiatives = [
-  {
-    id: "added-initiative-1",
-    title: "Added Initiative 1",
-    initiativeNumber: "0987",
-    elements: [
-      {
-        type: ElementType.Textbox,
-        id: "mock-added-initiative-element",
-        label: "Added Initiative element",
-        required: true,
-        answer: mockInitiativeAnswer,
-      } as TextboxTemplate,
-      {
-        id: "metrics-table", // id match for specific logic
-        type: ElementType.ActionTable,
-        label: "Metric table element",
-        required: true,
-        answer: metricAnswers,
-      } as unknown as ActionTableTemplate,
-    ],
-  },
-  {
-    id: "added-initiative-2",
-    title: "Added Initiative 2",
-    initiativeNumber: "1010",
-    status: PageStatus.ABANDONED,
-    elements: [],
-  },
-] as InitiativePageTemplate[];
 
 const mockOldReport: Report = {
   ...validReport,
@@ -97,6 +58,7 @@ const mockOldReport: Report = {
         {
           id: "use-of-funds-attachment",
           type: ElementType.UseOfFundsAttachment,
+          label: "mock label",
           answer: [
             {
               name: "file-name",
@@ -108,6 +70,8 @@ const mockOldReport: Report = {
         },
       ],
     },
+    ...mockAddedInitiatives,
+    ...mockStatePolicyCommitments,
   ],
 };
 
@@ -116,8 +80,6 @@ const mockNewReport: any = structuredClone(mockOldReport);
 mockNewReport.id = "mock-new-report";
 mockNewReport.copyFromReportId = "mock-old-report";
 delete mockNewReport.pages[1].elements[1].answer;
-// add initiative to old report that's not in new report, so we can test it copies
-mockOldReport.pages.push(...mockAddedInitiatives);
 
 describe("copyReport util", () => {
   test("copyReport copies data from old report into new one, including initiative pages and answers", async () => {
@@ -179,5 +141,34 @@ describe("copyReport util", () => {
 
     const existingUseOfFunds = mockNewReport.pages[1].elements[3].answer;
     expect(existingUseOfFunds).toEqual([]);
+
+    // Verify state policy commitments are copied correctly
+    const newPolicyCommitments = mockNewReport.pages[4].elements[0].accordions;
+    expect(newPolicyCommitments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "State Policy Commitment 1",
+          elements: [
+            expect.objectContaining({
+              type: ElementType.Textbox,
+              id: "state-policy-commitment-1-textbox",
+              label: "State Policy Commitment 1 Textbox",
+              answer: "State Policy Commitment 1 Answer",
+            }),
+            {
+              answer: [
+                {
+                  fileId: "mock-id",
+                  name: "mock-name",
+                  size: 100,
+                },
+              ],
+              id: "attachment-id",
+              type: "attachmentArea",
+            },
+          ],
+        }),
+      ])
+    );
   });
 });

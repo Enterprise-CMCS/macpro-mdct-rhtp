@@ -25,9 +25,6 @@ const baseStyles = {
     header: {
       marginBottom: "spacer3",
     },
-    p: {
-      marginBottom: "spacer3",
-    },
     ul: {
       marginBottom: "spacer3",
     },

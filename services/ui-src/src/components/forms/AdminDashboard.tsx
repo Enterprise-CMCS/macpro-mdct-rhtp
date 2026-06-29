@@ -10,6 +10,7 @@ import {
   HStack,
   Image,
   Box,
+  Text,
 } from "@chakra-ui/react";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import {
@@ -240,10 +241,17 @@ export const AdminDashboard = () => {
             </Box>
           </AccordionItem>
         </Accordion>
-        <Heading as="h1" variant="h1">
+        <Box>
+          <Text mb="spacer2">
+            To begin the first annual report for a state, select Start First
+            Annual Report.
+          </Text>
+          <Button variant="outline">Start First Annual Report</Button>
+        </Box>
+        <Heading as="h2" variant="h2">
           State Submissions
         </Heading>
-        <Box marginTop="spacer4">
+        <Box>
           The table below lists RHTP reports for all states. By default, this
           list is automatically filtered to show your assigned states. Selecting
           an option from the State(s) or Budget Period dropdowns will

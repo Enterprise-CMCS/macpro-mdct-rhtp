@@ -39,6 +39,7 @@ const commitmentSupportParagraph: ParagraphTemplate = {
   id: "commitment-support-paragraph",
   title: "Supporting Evidence",
   text: "States should only submit legislation links and attachments as acceptable evidence for their State policy commitments. CMS will not accept press releases or promotional links/attachments as substantial evidence.",
+  style: "hint",
 };
 
 const commitmentAttachmentArea: AttachmentAreaTemplate = {
@@ -72,7 +73,7 @@ const buildCommitments = (
   for (const { label, status } of commitmentsForState) {
     commitments.push({
       label,
-      children: [
+      elements: [
         commitmentStatusDropdown(label, status),
         commitmentSupportParagraph,
         commitmentLinkListInput,

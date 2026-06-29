@@ -8,6 +8,7 @@ import {
 const UseOfFundsAttachmentElement: UseOfFundsAttachmentTemplate = {
   type: ElementType.UseOfFundsAttachment,
   id: "use-of-funds-attachment",
+  label: "Uploaded Attachment",
   required: true,
 };
 
