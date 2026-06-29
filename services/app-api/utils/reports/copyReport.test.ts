@@ -221,8 +221,8 @@ describe("copyReport util", () => {
       ])
     );
 
-    const existingUseOfFunds = mockNewReport.pages[1].elements[3].answer;
-    expect(existingUseOfFunds).toEqual([]);
+    const existingUseOfFunds = mockNewReport.pages[1].elements[3];
+    expect(existingUseOfFunds).not.toHaveProperty("answer");
 
     // Verify state policy commitments are copied correctly
     const newPolicyCommitments = mockNewReport.pages[4].elements[0].accordions;

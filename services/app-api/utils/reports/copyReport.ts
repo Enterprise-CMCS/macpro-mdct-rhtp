@@ -73,7 +73,7 @@ const copyAnswer = (
           oldElement.answer as ActionAnswerShape[]
         );
       } else if (SKIP_COPY_ANSWER_IDS.includes(newElement.id)) {
-        newElement.answer = [];
+        delete newElement.answer;
       } else {
         newElement.answer = oldElement.answer;
       }
