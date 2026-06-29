@@ -50,7 +50,9 @@ describe("SubmissionBar", () => {
       render(<SubmissionBar />);
     });
     test("SubmissionBar renders", () => {
-      expect(screen.getByRole("button", { name: "ZIP Files" })).toBeVisible();
+      expect(
+        screen.getByRole("button", { name: "ZIP Attachment Files" })
+      ).toBeVisible();
       expect(
         screen.getByRole("button", { name: "Submit RHTP Report" })
       ).toBeVisible();
@@ -65,7 +67,9 @@ describe("SubmissionBar", () => {
       });
     });
     test("Click Zip Files", async () => {
-      const zipFilesBtn = screen.getByRole("button", { name: "ZIP Files" });
+      const zipFilesBtn = screen.getByRole("button", {
+        name: "ZIP Attachment Files",
+      });
       await userEvent.click(zipFilesBtn);
       waitFor(() => {
         expect(getZipFile).toHaveBeenCalled();

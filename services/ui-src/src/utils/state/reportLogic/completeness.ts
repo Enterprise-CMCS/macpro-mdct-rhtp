@@ -98,7 +98,7 @@ export const pageIsCompletable = (report: Report, pageId: string) => {
     for (const element of targetPage.elements) {
       if (element.type === ElementType.AccordionGroup) {
         const accordionElements = element.accordions.flatMap(
-          (accordion) => accordion.children
+          (accordion) => accordion.elements
         );
         for (const element of accordionElements) {
           const satisfied = elementSatisfiesRequired(

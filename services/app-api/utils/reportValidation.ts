@@ -51,7 +51,7 @@ const paragraphTemplateSchema = object().shape({
   id: string().required(),
   text: string().required(),
   title: string().notRequired(),
-  weight: string().notRequired(),
+  style: string().notRequired(),
 });
 
 const textboxTemplateSchema = object().shape({
@@ -140,6 +140,7 @@ const UseOfFundsAttachmentSchema = object().shape({
     .required()
     .matches(new RegExp(ElementType.UseOfFundsAttachment)),
   id: string().required(),
+  label: string().required(),
   answer: array()
     .of(
       object().shape({
@@ -274,7 +275,7 @@ const accordionGroupTemplateSchema = object().shape({
     .of(
       object().shape({
         label: string().required(),
-        children: lazy(() => array().of(pageElementSchema).required()),
+        elements: lazy(() => array().of(pageElementSchema).required()),
       })
     )
     .required(),
@@ -312,6 +313,7 @@ const attachmentAreaSchema = object().shape({
 const ActionElementsSchema = {
   id: string().required(),
   type: string().required(),
+  hintText: string().notRequired(),
   disabled: boolean().notRequired(),
   mask: string().notRequired(),
 };

@@ -4,15 +4,16 @@ import { parseFileUploadDownloadParameters } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { getReport } from "../../storage/reports";
-import {
-  AttachmentStatus,
-  ElementType,
-  ReportType,
-  StateAbbr,
-} from "@rhtp/shared";
+import { ReportType, StateAbbr } from "@rhtp/shared";
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 import JSZip from "jszip";
 import { Readable } from "node:stream";
+import {
+  sortElementsForZip,
+  getInitativeFiles,
+  getAccordionFiles,
+  getSustainabilityAndHighlightFiles,
+} from "../../utils/reports/buildZip";
 
 const lambdaClient = new LambdaClient({ region: "us-east-1" });
 
@@ -80,43 +81,39 @@ export const zipWorker = async (event: ZipWorkerEvent) => {
   const { reportType, state, id } = event;
 
   const report = await getReport(reportType, state, id);
-  const flattenElements = report?.pages.flatMap((page) => page.elements);
 
-  const initAttachment = flattenElements?.find(
-    (element) => element?.type === ElementType.AttachmentTable
-  );
-  const initAttachmentFiles =
-    initAttachment?.answer
-      ?.filter(
-        (attachment) =>
-          attachment.status !== AttachmentStatus.ARCHIVED &&
-          attachment.status !== AttachmentStatus.INFORMATIONAL
-      )
-      ?.map((answer) => answer.attachment) ?? [];
+  if (!report) return;
 
-  const accordionGroups = flattenElements
-    ?.filter((element) => element?.type === ElementType.AccordionGroup)
-    .flatMap((group) =>
-      group.accordions.flatMap((accordions) => accordions.children)
-    )
-    .filter((element) => element.type === ElementType.AttachmentArea);
-
-  const accordionFiles =
-    accordionGroups?.flatMap((group) => group.answer) ?? [];
-
-  const files = [...initAttachmentFiles, ...accordionFiles].filter(
-    (file) => file != undefined
-  );
+  const sortedElements = sortElementsForZip(report);
+  const zipFolders = [
+    {
+      name: "Initiatives",
+      files: getInitativeFiles(sortedElements?.initiative),
+    },
+    {
+      name: "State Policy Commitments",
+      files: getAccordionFiles(sortedElements?.accordions ?? []),
+    },
+    {
+      name: "Sustainability and Highlights",
+      files: getSustainabilityAndHighlightFiles(sortedElements?.area ?? []),
+    },
+  ];
 
   const zip = new JSZip();
-  for (const file of files) {
-    const item = await s3.getObject({
-      Bucket: process.env.attachmentsBucketName,
-      Key: `${reportType}/${state}/${id}/${file?.fileId}`,
-    });
-    const bytes = await item.Body?.transformToByteArray();
-    if (bytes && file?.name) {
-      zip.file(`${state}/${report?.subTypeKey}/${file.name}`, bytes);
+  for (const folder of zipFolders) {
+    for (const file of folder.files) {
+      const item = await s3.getObject({
+        Bucket: process.env.attachmentsBucketName,
+        Key: `${reportType}/${state}/${id}/${file?.fileId}`,
+      });
+      const bytes = await item.Body?.transformToByteArray();
+      if (bytes && file?.name) {
+        zip.file(
+          `${state}/${report?.subType.toLowerCase()}/${folder.name}/${file.name}`,
+          bytes
+        );
+      }
     }
   }
 

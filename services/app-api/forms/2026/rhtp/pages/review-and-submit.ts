@@ -32,7 +32,7 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
     {
       type: ElementType.Paragraph,
       id: "review-text",
-      title: "Ready to submit?",
+      title: "Ready to Submit?",
       text: "Double check that everything in your RHTP Report is accurate. To make edits to your report after submitting, contact your CMS RHTP Lead to unlock your report.",
     },
     {
@@ -60,13 +60,9 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
       type: ElementType.Paragraph,
       id: "submitted-what-explanation",
       title: "What happens now?",
-      text: 'Your dashboard will indicate the status of this report as "Submitted" and and it is now locked from editing.',
-    },
-    {
-      type: ElementType.Paragraph,
-      weight: "bold",
-      id: "submitted-what-happens",
-      text: "Email your CMS representative to inform them you submitted the RHTP Report and it is ready for their review.",
+      text:
+        "<p>Your report has been submitted and is now locked from editing.</p></br></br>" +
+        "<p>An automated confirmation email has been sent to you, your CMS Project Officer, and all points of contact listed on your General Information page. No further action is required on your part</p>",
     },
   ],
 };

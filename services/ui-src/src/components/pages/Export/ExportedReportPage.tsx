@@ -125,6 +125,7 @@ export const renderReportSections = (reportPages: ReportPages) => {
       ...element,
       initId: init.id,
     }));
+    init.title = `${(init as ReportPage & { initiativeNumber: string }).initiativeNumber}: ${init.title}`;
   }
 
   sortedReports[1].splice(indexOfInitiative + 1, 0, ...sortedReports[0]);

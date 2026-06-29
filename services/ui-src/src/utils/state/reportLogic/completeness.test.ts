@@ -167,7 +167,7 @@ describe("pageIsCompletable", () => {
               accordions: [
                 {
                   label: "",
-                  children: [
+                  elements: [
                     {
                       id: "good-question",
                       type: ElementType.Textbox,

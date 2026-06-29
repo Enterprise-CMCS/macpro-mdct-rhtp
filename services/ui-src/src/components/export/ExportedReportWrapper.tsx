@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { PageElement, ReportPage } from "@rhtp/shared";
+import { ElementType, PageElement, ReportPage } from "@rhtp/shared";
 import { renderElements, shouldUseTable } from "./ExportedReportElements";
 import { chunkBy } from "utils/other/arrays";
 import { ExportedReportTable, ReportTableType } from "./ExportedReportTable";
@@ -15,6 +15,26 @@ export const renderReportDisplay = (
   elements: ReportTableType[] | undefined
 ) => {
   return elements?.map((element: ReportTableType) => element.response);
+};
+
+//for certain elements i.e. ListInputs and AttachmentArea, we want to have multiple rows to split an array for answers so this function is to capture that
+export const renderExpandedAnswers = (element: PageElement) => {
+  if (!("answer" in element) || !element.answer) return element;
+
+  switch (element.type) {
+    case ElementType.ListInput:
+    case ElementType.AttachmentArea:
+      return element.answer?.map(
+        (item, index) =>
+          ({
+            type: element.type,
+            label: `${element.label}  ${index + 1}`,
+            helperText: element.helperText,
+            answer: [item],
+          }) as any
+      );
+  }
+  return element;
 };
 
 // Render helper text only if it exists and is not a warning.
@@ -54,6 +74,20 @@ export const ExportedReportWrapper = ({ section }: Props) => {
           element,
           ...expandCheckedChildren(checkedChoice?.checkedChildren ?? []),
         ];
+      } else if (element.type === ElementType.AccordionGroup) {
+        const expandedElements: PageElement[] = [];
+        for (const accordion of element.accordions) {
+          expandedElements.push({
+            id: accordion.label,
+            text: accordion.label,
+            type: ElementType.SubHeader,
+          });
+          const childElements = accordion.elements.flatMap((element) =>
+            renderExpandedAnswers(element)
+          );
+          expandedElements.push(...childElements);
+        }
+        return expandedElements;
       } else {
         // All other element types stand on their own.
         return [element];
