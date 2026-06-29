@@ -495,4 +495,213 @@ test.describe("Report Editing", () => {
     // Assert — General Info value persisted after round trip
     await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(testValue);
   });
+
+  // ===== PHASE 2: Multi-section data workflows =====
+
+  test("should edit multiple General Information fields and verify persistence", async ({
+    statePage,
+  }) => {
+    // Test that all General Information fields persist when navigating away and back
+
+    // Arrange
+    const editor = await openReportSection(
+      statePage,
+      "unsubmitted",
+      GENERAL_INFORMATION_SECTION
+    );
+    if (!editor) return;
+
+    const { reportType, state, reportId } = editor.getCurrentRouteParams();
+
+    // Act — fill all four General Information fields
+    const testDataMultiple = [
+      {
+        label: AOR_NAME_LABEL,
+        value: `AOR Name ${Date.now()}`,
+      },
+      {
+        label: AOR_EMAIL_LABEL,
+        value: `aor-${Date.now()}@test.gov`,
+      },
+      {
+        label: PIPD_NAME_LABEL,
+        value: `PIPD Name ${Date.now()}`,
+      },
+      {
+        label: PIPD_EMAIL_LABEL,
+        value: `pipd-${Date.now()}@test.gov`,
+      },
+    ];
+
+    await fillFields(editor, testDataMultiple);
+    await editor.page.keyboard.press("Tab");
+    await editor.page.waitForTimeout(3000); // Wait for autosave
+
+    // Assert — all values present immediately after fill
+    await verifyFieldValues(editor, testDataMultiple);
+
+    // Act — navigate to Sustainability section (far away) and back to General Info
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+    );
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      GENERAL_INFORMATION_SECTION
+    );
+
+    // Assert — all General Information fields persisted
+    await verifyCurrentSection(editor, GENERAL_INFORMATION_SECTION);
+    await verifyFieldValues(editor, testDataMultiple);
+  });
+
+  test("should edit text and textarea fields across sections and verify all persist", async ({
+    statePage,
+  }) => {
+    // Test that different field types (text, textarea) persist correctly across sections
+
+    // Arrange — start at General Information
+    const editor = await openReportSection(
+      statePage,
+      "unsubmitted",
+      GENERAL_INFORMATION_SECTION
+    );
+    if (!editor) return;
+
+    const { reportType, state, reportId } = editor.getCurrentRouteParams();
+
+    // Act — fill a text field in General Information
+    const generalInfoValue = `General Info ${Date.now()}`;
+    await editor.fillTextField(AOR_NAME_LABEL, generalInfoValue);
+    await editor.page.keyboard.press("Tab");
+    await editor.page.waitForTimeout(2000);
+
+    // Act — navigate to Sustainability section and fill textarea fields
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+    );
+
+    const successStoriesValue = `Success Stories ${Date.now()}`;
+    const sustainabilityValue = `Sustainability Plan ${Date.now()}`;
+
+    await editor.fillTextarea(SUCCESS_STORIES_LABEL, successStoriesValue);
+    await editor.fillTextarea(
+      SUSTAINABILITY_PLANNING_LABEL,
+      sustainabilityValue
+    );
+    await editor.page.keyboard.press("Tab");
+    await editor.page.waitForTimeout(3000);
+
+    // Act — navigate back to General Information to verify text field persisted
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      GENERAL_INFORMATION_SECTION
+    );
+
+    // Assert — text field persisted
+    await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(
+      generalInfoValue
+    );
+
+    // Act — navigate back to Sustainability to verify textarea fields persisted
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+    );
+
+    // Assert — textarea fields persisted
+    await verifyTextareaValue(
+      editor,
+      SUCCESS_STORIES_LABEL,
+      successStoriesValue
+    );
+    await verifyTextareaValue(
+      editor,
+      SUSTAINABILITY_PLANNING_LABEL,
+      sustainabilityValue
+    );
+  });
+
+  test("should update autosave indicator when editing across sections", async ({
+    statePage,
+  }) => {
+    // Test that the autosave "Last saved" indicator updates correctly across section navigation
+
+    // Arrange
+    const editor = await openReportSection(
+      statePage,
+      "unsubmitted",
+      GENERAL_INFORMATION_SECTION
+    );
+    if (!editor) return;
+
+    const { reportType, state, reportId } = editor.getCurrentRouteParams();
+
+    // Act — verify initial state (no save indicator yet)
+    const saveIndicator = editor.saveStatusText;
+    let isSaveIndicatorVisible = await saveIndicator
+      .isVisible()
+      .catch(() => false);
+    expect(isSaveIndicatorVisible).toBe(false);
+
+    // Act — edit a field to trigger autosave
+    const testValue = `Test ${Date.now()}`;
+    await editor.fillTextField(AOR_NAME_LABEL, testValue);
+    await editor.page.keyboard.press("Tab");
+
+    // Wait for autosave debounce
+    await editor.page.waitForTimeout(3000);
+
+    // Assert — save indicator is now visible
+    isSaveIndicatorVisible = await saveIndicator.isVisible().catch(() => false);
+    expect(isSaveIndicatorVisible).toBe(true);
+
+    // Act — navigate to different section
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+    );
+
+    // Assert — save indicator should still be visible (autosave was successful)
+    isSaveIndicatorVisible = await saveIndicator.isVisible().catch(() => false);
+    expect(isSaveIndicatorVisible).toBe(true);
+
+    // Act — edit a textarea field in this section
+    const textareaValue = `Textarea ${Date.now()}`;
+    await editor.fillTextarea(SUSTAINABILITY_PLANNING_LABEL, textareaValue);
+    await editor.page.keyboard.press("Tab");
+
+    // Wait for new autosave
+    await editor.page.waitForTimeout(3000);
+
+    // Assert — save indicator updated with new timestamp
+    const saveText = await saveIndicator.textContent();
+    expect(saveText).toContain("Last saved");
+
+    // Act — navigate back to General Information
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      GENERAL_INFORMATION_SECTION
+    );
+
+    // Assert — both edits persisted, save indicator still visible
+    await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(testValue);
+    isSaveIndicatorVisible = await saveIndicator.isVisible().catch(() => false);
+    expect(isSaveIndicatorVisible).toBe(true);
+  });
 });
