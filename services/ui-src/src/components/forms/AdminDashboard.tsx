@@ -59,8 +59,9 @@ export const AdminDashboard = () => {
   const { email: userEmail } = useStore().user ?? {};
 
   const setStatesHandler = (states: string[]) => {
-    localStorage.setItem("states", states.join(","));
-    setSelectedStates(states);
+    const sortedStates = states.toSorted();
+    localStorage.setItem("states", sortedStates.join(","));
+    setSelectedStates(sortedStates);
   };
 
   const reloadReports = async (reportType: string) => {
