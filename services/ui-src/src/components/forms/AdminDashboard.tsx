@@ -1,5 +1,5 @@
 import { JSX, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate } from "react-router";
 import {
   Button,
   Heading,
@@ -21,12 +21,18 @@ import {
 } from "@rhtp/shared";
 import { PageTemplate, AccordionItem } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
-import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
+import {
+  formatMonthDayYear,
+  getReportByType,
+  reportBasePath,
+  useStore,
+} from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
 import { ReportCommentDrawer } from "components/drawers/ReportCommentDrawer";
 import { getStatus } from "utils/other/status";
+import { getAssignedStatesByEmail } from "utils/api/requestMethods/notificationRecipients";
 
 const budgetPeriodValues = [1, 2, 3, 4, 5];
 const stateAbbr = Object.keys(StateNames);
@@ -39,12 +45,9 @@ export const AdminDashboard = () => {
     (string | number | JSX.Element | undefined)[][]
   >([]);
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [budgetValue, setBudgetValue] = useState(
-    searchParams.get("budgetPeriod") || "All"
-  );
+  const [budgetValue, setBudgetValue] = useState("All");
   const [selectedStates, setSelectedStates] = useState<string[]>(
-    searchParams.get("states")?.split(",") ?? []
+    localStorage.getItem("states")?.split(",") ?? []
   );
   const [lastSorted, setLastSorted] = useState<{
     sort: string;
@@ -53,6 +56,12 @@ export const AdminDashboard = () => {
 
   const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report>();
+  const { email: userEmail } = useStore().user ?? {};
+
+  const setStatesHandler = (states: string[]) => {
+    localStorage.setItem("states", states.join(","));
+    setSelectedStates(states);
+  };
 
   const reloadReports = async (reportType: string) => {
     setIsLoading(true);
@@ -64,38 +73,32 @@ export const AdminDashboard = () => {
     setIsLoading(false);
   };
 
-  //when the page is loaded, we load the reports
+  const getAssignedStatesForUser = async () => {
+    const sessionStateFilter = localStorage.getItem("states");
+    if (!userEmail || !!sessionStateFilter) return;
+    setIsLoading(true);
+    const assignedStates = await getAssignedStatesByEmail(userEmail);
+    setStatesHandler(assignedStates);
+    setIsLoading(false);
+  };
+
+  //when the page is loaded, we load the reports and states assigned to the user
   useEffect(() => {
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
+    getAssignedStatesForUser();
   }, []);
 
   useEffect(() => {
-    const savingStates = selectedStates.join(",");
-
-    if (selectedStates.length === 0 && budgetValue === "All") {
-      setSearchParams();
-    } else {
-      setSearchParams({
-        budgetPeriod: budgetValue.toString(),
-        states: savingStates,
-      });
-    }
-  }, [selectedStates, budgetValue]);
-
-  useEffect(() => {
-    const paramBudgetPeriod = searchParams.get("budgetPeriod");
-    const paramStates = searchParams.get("states");
-
     const filterBudgetPeriod =
-      paramBudgetPeriod == null || paramBudgetPeriod == "All"
+      budgetValue == null || budgetValue == "All"
         ? budgetPeriodValues
-        : [parseInt(paramBudgetPeriod)];
+        : [parseInt(budgetValue)];
 
-    const filterStates =
-      paramStates == null || paramStates == ""
-        ? stateAbbr
-        : paramStates.split(",");
+    const sessionStateFilter = localStorage.getItem("states");
+    const filterStates = !sessionStateFilter
+      ? stateAbbr
+      : sessionStateFilter.split(",");
 
     const filtered = reports.filter(
       (report) =>
@@ -104,7 +107,7 @@ export const AdminDashboard = () => {
     );
 
     setSortedReports(filtered);
-  }, [reports, searchParams]);
+  }, [reports, selectedStates, budgetValue]);
 
   //after reports are filtered, we apply the last saved sort
   useEffect(() => {
@@ -116,7 +119,7 @@ export const AdminDashboard = () => {
   };
 
   const clearFilter = () => {
-    setSelectedStates([]);
+    setStatesHandler([]);
     setBudgetValue("All");
     setSortedReports(reports);
   };
@@ -127,11 +130,7 @@ export const AdminDashboard = () => {
 
   const removeTag = (deleteTag: string) => {
     const remainingTags = selectedStates.filter((tag) => tag != deleteTag);
-    setSelectedStates(remainingTags);
-    setSearchParams({
-      budgetPeriod: budgetValue.toString(),
-      states: remainingTags.join(","),
-    });
+    setStatesHandler(remainingTags);
   };
 
   const openCommentsDrawer = (report: Report) => {
@@ -266,9 +265,7 @@ export const AdminDashboard = () => {
             countLabel="States"
             options={StateDropdownOptions}
             values={selectedStates}
-            onChange={(selected) => {
-              setSelectedStates(selected);
-            }}
+            onChange={(selected) => setStatesHandler(selected)}
           />
           <CmsdsDropdownField
             name="budgetPeriodFilter"

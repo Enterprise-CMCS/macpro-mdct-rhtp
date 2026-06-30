@@ -78,6 +78,7 @@ describe("<AdminDashboard />", () => {
     fireEvent.input(search, { target: { value: "Ala" } });
     const checkbox2 = screen.getByRole("checkbox", { name: "Alabama" });
     await userEvent.click(checkbox2);
+    expect(localStorage.getItem("states")).toEqual("NJ,AL");
 
     expect(
       screen.getByRole("button", { name: "Remove New Jersey tag" })

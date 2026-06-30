@@ -4,9 +4,22 @@ import {
   parseReportParameters,
   parseState,
   parseStateAndId,
+  parseEmail,
 } from "../param-lib";
 
 describe("Path parameter parsing", () => {
+  describe("parseEmail", () => {
+    test("should check for email", () => {
+      const event = {
+        ...proxyEvent,
+        pathParameters: { email: "test@email.com" },
+      };
+      const result = parseEmail(event)!;
+      expect(result).toBeDefined();
+      expect(result.email).toBe("test@email.com");
+    });
+  });
+
   describe("parseState", () => {
     test("should validate state", () => {
       const event = {
