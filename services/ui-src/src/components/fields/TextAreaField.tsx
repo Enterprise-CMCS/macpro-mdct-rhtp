@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
-import { optionalTag, parseHtml } from "utils";
+import { optionalTag, parseHintText, useStore } from "utils";
 import { TextAreaBoxTemplate } from "@rhtp/shared";
 import { PageElementProps } from "../report/Elements";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
@@ -9,6 +9,7 @@ import { ErrorMessages } from "../../constants";
 
 export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
   const { element: textbox, updateElement, disabled, subType } = props;
+  const { setModalComponent } = useStore();
   const defaultValue = textbox.answer ?? "";
   const [displayValue, setDisplayValue] = useState(defaultValue);
   const [errorMessage, setErrorMessage] = useState("");
@@ -34,7 +35,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
     updateElement({ answer });
   };
 
-  const parsedHint = textbox.helperText && parseHtml(textbox.helperText);
+  const parsedHint = parseHintText(textbox, setModalComponent);
 
   if (hideElement) {
     return null;
