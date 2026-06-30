@@ -18,6 +18,15 @@ describe("Path parameter parsing", () => {
       expect(result).toBeDefined();
       expect(result.email).toBe("test@email.com");
     });
+
+    test("should return false for missing email", () => {
+      const event = {
+        ...proxyEvent,
+        pathParameters: {},
+      };
+      const result = parseEmail(event);
+      expect(result).toBeUndefined();
+    });
   });
 
   describe("parseState", () => {
