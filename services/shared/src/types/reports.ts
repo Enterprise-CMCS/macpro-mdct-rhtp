@@ -308,6 +308,7 @@ interface InputElementTemplate {
   id: string;
   label: string;
   helperText?: string;
+  helperTextLink?: { link: string; label: string; text: string };
   required: boolean;
   quarterly?: boolean;
   disabled?: boolean;
