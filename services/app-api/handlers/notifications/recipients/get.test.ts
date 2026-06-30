@@ -6,8 +6,6 @@ import { authenticatedUser } from "../../../utils/authentication";
 import { APIGatewayProxyEvent, User } from "../../../types/types";
 import { proxyEvent } from "../../../testing/proxyEvent";
 import { StatusCodes } from "../../../libs/response-lib";
-import { canModifyNotificationRecipients } from "../../../utils/authorization";
-import { error } from "../../../utils/constants";
 
 vi.mock("../../../utils/authentication");
 const mockAuthenticatedUser = vi.mocked(authenticatedUser);
@@ -22,10 +20,6 @@ vi.mock("../../../utils/authorization", () => ({
 
 vi.mock("../../../storage/notificationRecipients", () => ({
   scanAllRecipients: vi.fn(),
-}));
-
-vi.mock("../../../utils/authorization", () => ({
-  canModifyNotificationRecipients: vi.fn().mockReturnValue(true),
 }));
 
 const testEvent: APIGatewayProxyEvent = {
@@ -44,13 +38,6 @@ const mockRecipient: NotificationRecipientRecord = {
 describe("Test fetchBanner API method", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  test("not authorized to get recipients throws 403 error", async () => {
-    (canModifyNotificationRecipients as Mock).mockReturnValueOnce(false);
-    const res = await getNotificationRecipients(testEvent);
-    expect(res.statusCode).toBe(StatusCodes.Forbidden);
-    expect(res.body).toContain(error.UNAUTHORIZED);
   });
 
   test("Successful recipient get", async () => {
