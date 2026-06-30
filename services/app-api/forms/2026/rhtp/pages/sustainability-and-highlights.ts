@@ -96,7 +96,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       label: "Attachments",
       helperText: "Upload supporting documentation.",
       subLabel: {
-        upload: "Sustainability Planning: Supporting Evidence",
+        upload: "<b>Sustainability Planning: Supporting Evidence</b>",
         uploaded: "These files have been uploaded.",
       },
       required: false,
