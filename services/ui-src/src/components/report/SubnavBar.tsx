@@ -2,18 +2,12 @@ import { Link as RouterLink } from "react-router";
 import { Flex, Container, Image, Link, Text } from "@chakra-ui/react";
 import { useStore } from "utils";
 import checkIcon from "assets/icons/check/icon_check_gray.png";
-import { isReportType } from "@rhtp/shared";
 
-const getTitle = (reportType: string) => {
-  if (!isReportType(reportType)) return "";
-  return `${reportType} Report`;
-};
-
-export const SubnavBar = ({ stateName, reportType }: Props) => {
+export const SubnavBar = () => {
   const { report, lastSavedTime } = useStore();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const saveStatusText = "Last saved " + lastSavedTime;
-  const title = report?.name ?? `${stateName} ${getTitle(reportType)}`;
+  const title = report?.name;
 
   //different return route if user is an admin
   const returnRoute =
@@ -53,11 +47,6 @@ export const SubnavBar = ({ stateName, reportType }: Props) => {
     </Flex>
   );
 };
-
-interface Props {
-  stateName: string;
-  reportType: string;
-}
 
 const sx = {
   subnavBar: {
