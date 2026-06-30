@@ -1,3 +1,4 @@
+import { batchPutComments, queryComments } from "../../storage/comments";
 import { getReport as getReportFromDatabase } from "../../storage/reports";
 import {
   ActionAnswerShape,
@@ -6,7 +7,20 @@ import {
   RhtpSubType,
   AccordionGroupItem,
   AccordionGroupTemplate,
+  AttachmentTableTemplate,
+  Comment,
+  ElementType,
 } from "@rhtp/shared";
+import KSUID from "ksuid";
+import { queryUpload, batchPutUploads } from "../../storage/upload";
+import { UploadData } from "../../types/uploads";
+import s3 from "../../libs/s3-lib";
+
+const SKIP_COPY_ANSWER_IDS = [
+  "use-of-funds-attachment",
+  "success-attachments",
+  "sustainability-attachments",
+];
 
 const copyStatePolicyCommitments = (
   oldAccordions: AccordionGroupItem[],
@@ -58,8 +72,8 @@ const copyAnswer = (
         newElement.answer = copyMetricAnswers(
           oldElement.answer as ActionAnswerShape[]
         );
-      } else if (newElement.id === "use-of-funds-attachment") {
-        newElement.answer = [];
+      } else if (SKIP_COPY_ANSWER_IDS.includes(newElement.id)) {
+        delete newElement.answer;
       } else {
         newElement.answer = oldElement.answer;
       }
@@ -77,6 +91,111 @@ const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
     newAnswerRow[indexes[1]].value = "";
     return newAnswerRow;
   });
+};
+
+// Initiative attachments: YES
+// State policy commitment attachments: YES
+// Use of funds attachment: NO
+// Sustainability attachments: NO
+// (subject to change)
+export const copyAttachmentsAndTheirComments = async (newReport: Report) => {
+  const { pages, copyFromReportId, state, type, id } = newReport;
+  const uploadsToCopy = [];
+
+  // Initiative attachments
+  const initiativeAttachmentsPage = pages.find(
+    (page) => page.id === "initiative-attachments"
+  );
+  const initiativeAttachmentsTable = initiativeAttachmentsPage?.elements?.find(
+    (element) => element.id === "initiative-attachments-table"
+  ) as AttachmentTableTemplate;
+
+  if (!initiativeAttachmentsTable?.answer) return;
+
+  if ("answer" in initiativeAttachmentsTable) {
+    for (const answer of initiativeAttachmentsTable.answer) {
+      const newFileId = `${KSUID.randomSync().string}_${answer.attachment.name}`;
+      uploadsToCopy.push({
+        fileId: newFileId,
+        previousReportId: copyFromReportId,
+        previousFileId: answer.attachment.fileId,
+        uploadedState: state,
+      });
+
+      // mutating the answer to new fileId
+      answer.attachment.fileId = newFileId;
+    }
+  }
+
+  // State policy commitment attachments
+  const statePolicyCommitmentsPage = pages.find(
+    (page) => page.id === "state-policy-commitments"
+  );
+  const statePolicyGroup = statePolicyCommitmentsPage?.elements?.find(
+    (element) => element.id === "state-policy-commitments-group"
+  ) as AccordionGroupTemplate;
+  for (const accordion of statePolicyGroup.accordions) {
+    for (const element of accordion.elements) {
+      if (element.type === ElementType.AttachmentArea && "answer" in element) {
+        for (const answer of element.answer!) {
+          const newFileId = `${KSUID.randomSync().string}_${answer.name}`;
+          uploadsToCopy.push({
+            fileId: newFileId,
+            previousReportId: copyFromReportId,
+            previousFileId: answer.fileId,
+            uploadedState: state,
+          });
+
+          // mutating the answer to new fileId
+          answer.fileId = newFileId;
+        }
+      }
+    }
+  }
+
+  const uploadsToBatchPut: UploadData[] = [];
+  const commentsToBatchPut: Comment[] = [];
+
+  // Update uploads in DynamoDB and copy files in S3
+  // and prepare its comments to be copied
+  for (const upload of uploadsToCopy) {
+    const results = await queryUpload(
+      upload.previousFileId,
+      upload.uploadedState
+    );
+    if (!results.Items || results.Items.length === 0) {
+      console.error(
+        `No upload found for fileId: ${upload.previousFileId} and state: ${upload.uploadedState}`
+      );
+      continue;
+    }
+
+    const previousUpload = results.Items[0];
+    uploadsToBatchPut.push({
+      ...previousUpload,
+      ...upload,
+    } as UploadData);
+
+    await s3.copyObject({
+      Bucket: process.env.attachmentsBucketName,
+      CopySource: `${process.env.attachmentsBucketName}/${type}/${state}/${copyFromReportId}/${previousUpload.fileId}`,
+      Key: `${type}/${state}/${id}/${upload.fileId}`,
+    });
+
+    const comments = await queryComments(previousUpload.fileId, true);
+    if (comments && comments.length > 0) {
+      for (const comment of comments) {
+        commentsToBatchPut.push({
+          ...comment,
+          contextId: upload.fileId,
+          parentReportId: id,
+        });
+      }
+    }
+  }
+
+  await batchPutUploads(uploadsToBatchPut);
+  await batchPutComments(commentsToBatchPut);
 };
 
 export const copyReport = async (newReport: Report) => {
@@ -107,4 +226,6 @@ export const copyReport = async (newReport: Report) => {
       copyAnswer(oldPage.elements, newElements, subType);
     }
   }
+
+  await copyAttachmentsAndTheirComments(newReport);
 };

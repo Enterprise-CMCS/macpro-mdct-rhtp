@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
-import { optionalTag, parseHtml } from "utils";
+import { optionalTag, parseHintText, useStore } from "utils";
 import {
   TextboxTemplate,
   NumberFieldTemplate,
@@ -20,6 +20,7 @@ import {
 export const TextField = (
   props: PageElementProps<TextboxTemplate | NumberFieldTemplate>
 ) => {
+  const { setModalComponent } = useStore();
   const { element: textbox, disabled } = props;
   const stringifyAnswer = (newAnswer: typeof textbox.answer) => {
     if (textbox.type === ElementType.NumberField) {
@@ -96,7 +97,7 @@ export const TextField = (
     }
   };
 
-  const parsedHint = textbox.helperText && parseHtml(textbox.helperText);
+  const parsedHint = parseHintText(textbox, setModalComponent);
 
   if (hideElement) {
     return null;

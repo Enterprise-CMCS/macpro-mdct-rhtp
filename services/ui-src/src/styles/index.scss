@@ -218,3 +218,9 @@ button {
   @extend .tech-spec-icon;
   height: 0.9rem;
 }
+
+.column {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+}
