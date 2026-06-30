@@ -65,3 +65,7 @@ export const canReadInternalComments = (user: User) => {
 export const canReadAnyReport = (user: User) => {
   return statelessRoles.includes(user.role);
 };
+
+export const canModifyNotificationRecipients = (user: User) => {
+  return user.role === UserRoles.APPROVER;
+};
