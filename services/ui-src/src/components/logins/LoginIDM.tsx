@@ -7,8 +7,8 @@ export const LoginIDM = () => {
   const navigate = useNavigate();
   const { loginWithIDM } = useContext(UserContext);
 
-  const handleLogin = () => {
-    loginWithIDM();
+  const handleLogin = async () => {
+    await loginWithIDM();
     navigate(getReturnUrl());
   };
 
