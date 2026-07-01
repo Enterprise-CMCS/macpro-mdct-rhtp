@@ -10,7 +10,10 @@ import {
   isCompleteStatus,
 } from "@rhtp/shared";
 import { parseHtml, useStore } from "utils";
-import { buildElement } from "utils/state/reportLogic/tableBuilder";
+import {
+  buildElement,
+  getErrorMessage,
+} from "utils/state/reportLogic/tableBuilder";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { unmaskByType } from "utils/validation/inputValidation";
@@ -29,10 +32,16 @@ const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
 const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
-  onChange: (value: string[], index: number, id: string) => void,
+  onChange: (
+    value: string[],
+    index: number,
+    id: string,
+    type: ElementType
+  ) => void,
   onEdit: (index: number) => void,
   formDisabled?: boolean,
-  canChangeStatus: boolean = false
+  canChangeStatus: boolean = false,
+  errorMessages: string[][] = []
 ) => {
   const formattedRows: (JSX.Element | string | number)[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
@@ -48,8 +57,16 @@ const buildRows = (
           ...column,
           disabled: disabled || column.disabled,
         };
-        const value = buildElement(formattedCol, element?.value!, (value) =>
-          onChange(value, answerRowIndex, column.id)
+
+        const value = buildElement(
+          formattedCol,
+          element?.value!,
+          (value) =>
+            onChange(value, answerRowIndex, column.id, formattedCol.type),
+          "",
+          errorMessages[answerRowIndex][
+            rows.findIndex((row) => row.id === column.id)
+          ]
         );
         rowElement.push(value || "--");
       }
@@ -114,6 +131,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
+  const [errorMessages, setErrorMessages] = useState<string[][]>(
+    answer?.map(() => initial.map(() => "")) ?? []
+  );
+
   const formatAnswers = (
     data: ActionAnswerShape,
     answerType: "modal" | "row"
@@ -135,13 +156,23 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     });
   };
 
-  const onChange = (value: string[], index: number, id: string) => {
+  const onChange = (
+    value: string[],
+    index: number,
+    id: string,
+    type: ElementType
+  ) => {
     const newAnswer = [...(answer ?? [])];
+    const newErrorMessages = [...errorMessages];
     const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
+    const errorMessage = getErrorMessage(type, false, value);
+    newErrorMessages[index][rowIndex] = errorMessage;
+    setErrorMessages(newErrorMessages);
     const formattedValue = formatAnswers(
       [{ id: id, value: value[0] }],
       "row"
     )[0].value;
+
     newAnswer[index][rowIndex].value = formattedValue;
     props.updateElement({ answer: newAnswer });
   };
@@ -159,7 +190,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     onChange,
     onModalEdit,
     disabled || element.disabled,
-    canAddOrChangeStatus
+    canAddOrChangeStatus,
+    errorMessages
   );
 
   const onSave = (data: ActionAnswerShape) => {
