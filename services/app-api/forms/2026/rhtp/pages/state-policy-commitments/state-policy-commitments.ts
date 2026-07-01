@@ -23,6 +23,19 @@ const commitmentStatusDropdown = (
   answer: status,
 });
 
+const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
+  type: ElementType.AttachmentArea,
+  id: "commitment-attachments",
+  label: "Attachments",
+  helperText: "Upload state legislation.",
+  subLabel: {
+    upload: `<b>State Policy Commitment:</b> ${label}`,
+    uploaded:
+      "These files have been attached to the state policy commitment above.",
+  },
+  required: false,
+});
+
 const commitmentLinkListInput: ListInputTemplate = {
   type: ElementType.ListInput,
   id: "commitment-links",
@@ -40,18 +53,6 @@ const commitmentSupportParagraph: ParagraphTemplate = {
   title: "Supporting Evidence",
   text: "States should only submit legislation links and attachments as acceptable evidence for their State policy commitments. CMS will not accept press releases or promotional links/attachments as substantial evidence.",
   style: "hint",
-};
-
-const commitmentAttachmentArea: AttachmentAreaTemplate = {
-  type: ElementType.AttachmentArea,
-  id: "commitment-attachments",
-  label: "Attachments",
-  helperText: "Upload state legislation.",
-  subLabel: {
-    uploaded:
-      "These files have been attached to the state policy commitment above.",
-  },
-  required: false,
 };
 
 const commitmentNotes: TextAreaBoxTemplate = {
@@ -79,14 +80,7 @@ const buildCommitments = (
         commitmentStatusDropdown(label, status),
         commitmentSupportParagraph,
         commitmentLinkListInput,
-        {
-          ...commitmentAttachmentArea,
-          subLabel: {
-            upload: `<b>State Policy Commitment:</b> ${label}`,
-            uploaded:
-              "These files have been attached to the state policy commitment above.",
-          },
-        },
+        commitmentAttachmentArea(label),
         commitmentNotes,
       ],
     });
