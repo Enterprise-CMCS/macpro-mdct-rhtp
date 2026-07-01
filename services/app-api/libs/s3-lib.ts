@@ -1,5 +1,7 @@
 import {
   S3Client,
+  CopyObjectCommand,
+  CopyObjectRequest,
   DeleteObjectRequest,
   DeleteObjectCommand,
   HeadObjectRequest,
@@ -41,5 +43,8 @@ export default {
   },
   putObject: (params: PutObjectRequest) => {
     return client.send(new PutObjectCommand(params));
+  },
+  copyObject: (params: CopyObjectRequest) => {
+    return client.send(new CopyObjectCommand(params));
   },
 };

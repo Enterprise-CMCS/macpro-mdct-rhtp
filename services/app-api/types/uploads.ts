@@ -11,4 +11,6 @@ export interface UploadData {
   uploadedUsername: string;
   fileId: string;
   filesize: number;
+  previousReportId?: string;
+  previousFileId?: string;
 }

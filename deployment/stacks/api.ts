@@ -396,6 +396,30 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "createNotificationRecipient", {
+    entry: "services/app-api/handlers/notifications/recipients/create.ts",
+    handler: "createNotificationRecipient",
+    path: "notifications/recipients/{state}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getNotificationRecipients", {
+    entry: "services/app-api/handlers/notifications/recipients/get.ts",
+    handler: "getNotificationRecipients",
+    path: "notifications/recipients",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "deleteNotificationRecipient", {
+    entry: "services/app-api/handlers/notifications/recipients/delete.ts",
+    handler: "deleteNotificationRecipient",
+    path: "notifications/recipients/{state}/{id}",
+    method: "DELETE",
+    ...commonProps,
+  });
+
   new LambdaDynamoEventSource(scope, "postKafkaData", {
     entry: "services/app-api/handlers/kafka/post/postKafkaData.ts",
     handler: "handler",

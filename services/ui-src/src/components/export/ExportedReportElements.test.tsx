@@ -53,7 +53,7 @@ describe("Test ExportedReportElements", () => {
       id: "mock-attachment-area",
       label: "",
       required: true,
-      uploadedSubLabel: "mock sub label",
+      subLabel: { uploaded: "mock sub label" },
     } as AttachmentAreaTemplate;
 
     const element = renderElements(notAnswered);
