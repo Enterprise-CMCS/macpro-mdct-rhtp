@@ -487,9 +487,10 @@ export const TableCheckpoint = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         uploadAreaHidden={modalMode !== "Upload"}
-        uploadedSubLabel={
-          "These files have been attached to the stage and checkpoint selected above."
-        }
+        subLabel={{
+          uploaded:
+            "These files have been attached to the stage and checkpoint selected above.",
+        }}
         onModalSubmit={onModalSubmit}
       />
       <AttachmentCommentDrawer

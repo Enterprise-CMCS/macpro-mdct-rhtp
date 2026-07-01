@@ -2,18 +2,12 @@ import { Link as RouterLink } from "react-router";
 import { Flex, Container, Image, Link, Text } from "@chakra-ui/react";
 import { useStore } from "utils";
 import checkIcon from "assets/icons/check/icon_check_gray.png";
-import { isReportType } from "@rhtp/shared";
 
-const getTitle = (reportType: string) => {
-  if (!isReportType(reportType)) return "";
-  return `${reportType} Report`;
-};
-
-export const SubnavBar = ({ stateName, reportType }: Props) => {
+export const SubnavBar = () => {
   const { report, lastSavedTime } = useStore();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const saveStatusText = "Last saved " + lastSavedTime;
-  const title = getTitle(reportType);
+  const title = report?.name;
 
   //different return route if user is an admin
   const returnRoute =
@@ -26,7 +20,7 @@ export const SubnavBar = ({ stateName, reportType }: Props) => {
       <Container sx={sx.subnavContainer}>
         <Flex sx={sx.subnavFlex}>
           <Flex>
-            <Text sx={sx.submissionNameText}>{`${stateName} ${title}`}</Text>
+            <Text sx={sx.submissionNameText}>{title}</Text>
           </Flex>
           <Flex sx={sx.subnavFlexRight}>
             {lastSavedTime && (
@@ -54,11 +48,6 @@ export const SubnavBar = ({ stateName, reportType }: Props) => {
   );
 };
 
-interface Props {
-  stateName: string;
-  reportType: string;
-}
-
 const sx = {
   subnavBar: {
     position: "sticky",
@@ -66,17 +55,25 @@ const sx = {
   },
   subnavContainer: {
     maxW: "appMax",
+    padding: ".5rem",
     ".desktop &": {
       paddingX: "spacer4",
     },
+    minHeight: "60px",
   },
   subnavFlex: {
-    height: "60px",
     justifyContent: "space-between",
     alignItems: "center",
+    height: "100%",
   },
   leaveFormLink: {
     marginLeft: "spacer2",
+    ".mobile &": {
+      margin: "0",
+      paddingLeft: "0",
+      textAlign: "right",
+      border: "none",
+    },
   },
   checkIcon: {
     marginRight: "spacer1",
@@ -91,7 +88,6 @@ const sx = {
   saveStatusText: {
     fontSize: "body_sm",
     ".mobile &": {
-      width: "5rem",
       textAlign: "right",
     },
   },

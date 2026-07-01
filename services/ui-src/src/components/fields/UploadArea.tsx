@@ -11,14 +11,14 @@ import {
   getFileWithSafeName,
   uploadListRender,
 } from "utils/other/fileUtils";
-import { useStore } from "utils";
+import { parseHtml, useStore } from "utils";
 
 interface Props {
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
-  uploadedSubLabel: string;
+  subLabel: { upload?: string; uploaded?: string };
   multiple?: boolean;
 }
 
@@ -27,7 +27,7 @@ export const UploadArea = ({
   saveToReport,
   deleteFromReport,
   uploadAreaHidden = false,
-  uploadedSubLabel,
+  subLabel,
   multiple = true,
 }: Props) => {
   const { report } = useStore();
@@ -125,6 +125,9 @@ export const UploadArea = ({
       {!uploadAreaHidden && (
         <>
           <div>
+            {subLabel.upload && (
+              <Text mb="spacer2">{parseHtml(subLabel.upload)}</Text>
+            )}
             <Text sx={sx.uploadedLabel}>
               Select a {multiple ? "file or files" : "file"} to upload
             </Text>
@@ -181,7 +184,9 @@ export const UploadArea = ({
         <Text sx={sx.uploadedLabel}>
           Uploaded {multiple ? "Files" : "File"}
         </Text>
-        <Text sx={sx.uploadedSubLabel}>{uploadedSubLabel}</Text>
+        {subLabel.uploaded && (
+          <Text sx={sx.uploadedSubLabel}>{subLabel.uploaded}</Text>
+        )}
       </div>
       {uploadListRender(
         reportType,
