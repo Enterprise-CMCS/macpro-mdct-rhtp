@@ -44,6 +44,7 @@ export const Page = ({ id, setElements, elements }: Props) => {
 
   const buildElement = (element: PageElement, index: number) => {
     const disabled = !userIsEndUser || isCompleteStatus(report?.status);
+    const subType = report?.subType;
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([
         ...elements.slice(0, index),
@@ -62,7 +63,9 @@ export const Page = ({ id, setElements, elements }: Props) => {
       case ElementType.Textbox:
         return <TextField {...{ updateElement, disabled, element }} />;
       case ElementType.TextAreaField:
-        return <TextAreaField {...{ updateElement, disabled, element }} />;
+        return (
+          <TextAreaField {...{ updateElement, disabled, element, subType }} />
+        );
       case ElementType.NumberField:
         return <TextField {...{ updateElement, disabled, element }} />;
       case ElementType.Date:

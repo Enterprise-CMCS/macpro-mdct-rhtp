@@ -18,6 +18,7 @@ import {
   ButtonLinkTemplate,
   HeaderIcon,
   PageElement,
+  RhtpSubType,
 } from "@rhtp/shared";
 import { AccordionItem } from "components";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
@@ -32,6 +33,7 @@ export type PageElementProps<T extends PageElement = PageElement> = T extends {
       element: T;
       updateElement: (updatedElement: Partial<T>) => void;
       disabled?: boolean;
+      subType?: RhtpSubType;
     }
   : {
       element: T;
