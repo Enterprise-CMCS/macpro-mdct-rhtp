@@ -14,10 +14,6 @@ mockAuthenticatedUser.mockResolvedValue({
   state: "PA",
 } as User);
 
-vi.mock("../../utils/authorization", () => ({
-  isAuthenticated: vi.fn().mockReturnValue(true),
-}));
-
 vi.mock("../../storage/banners", () => ({
   scanAllBanners: vi.fn(),
 }));
