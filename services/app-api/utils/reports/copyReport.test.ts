@@ -14,9 +14,23 @@ import {
 import { copyReport } from "./copyReport";
 
 const mockGetReport = vi.fn();
+const mockQueryComments = vi.fn();
+const mockBatchComments = vi.fn();
+const mockBatchUploads = vi.fn();
+const mockQueryUpload = vi.fn();
 
 vi.mock("../../storage/reports", () => ({
   getReport: () => mockGetReport(),
+}));
+
+vi.mock("../../storage/comments", () => ({
+  queryComments: () => mockQueryComments(),
+  batchPutComments: () => mockBatchComments(),
+}));
+
+vi.mock("../../storage/upload", () => ({
+  queryUpload: () => mockQueryUpload(),
+  batchPutUploads: () => mockBatchUploads(),
 }));
 
 const mockInitiativeAnswer = "mock text answer";
@@ -149,8 +163,8 @@ describe("copyReport util", () => {
       ])
     );
 
-    const existingUseOfFunds = mockNewReport.pages[1].elements[3].answer;
-    expect(existingUseOfFunds).toEqual([]);
+    const existingUseOfFunds = mockNewReport.pages[1].elements[3];
+    expect(existingUseOfFunds).not.toHaveProperty("answer");
 
     // Verify state policy commitments are copied correctly
     const newPolicyCommitments = mockNewReport.pages[4].elements[0].accordions;
