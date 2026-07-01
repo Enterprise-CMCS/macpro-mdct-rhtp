@@ -127,7 +127,7 @@ describe("copyReport util", () => {
     );
 
     //did not copy initiative-narrative text area
-    expect(mockNewReport.pages[1].elements[4].answer).toEqual("");
+    expect(mockNewReport.pages[1].elements[4].answer).toEqual(undefined);
 
     // metrics in added initiative — current values get copied to previous value, then cleared
     const newMetricAnswerRow = mockNewReport.pages[2].elements[1].answer[0];
