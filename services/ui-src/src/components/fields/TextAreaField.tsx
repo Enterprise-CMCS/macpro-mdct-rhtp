@@ -8,8 +8,8 @@ import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { ErrorMessages } from "../../constants";
 
 export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
+  const { element: textbox, updateElement, disabled, subType } = props;
   const { setModalComponent } = useStore();
-  const { element: textbox, updateElement, disabled } = props;
   const defaultValue = textbox.answer ?? "";
   const [displayValue, setDisplayValue] = useState(defaultValue);
   const [errorMessage, setErrorMessage] = useState("");
@@ -45,7 +45,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
     <Box width={"100%"}>
       <CmsdsTextField
         name={textbox.id}
-        label={optionalTag(textbox)}
+        label={optionalTag(textbox, subType)}
         hint={parsedHint}
         onChange={onChangeHandler}
         onBlur={onChangeHandler}

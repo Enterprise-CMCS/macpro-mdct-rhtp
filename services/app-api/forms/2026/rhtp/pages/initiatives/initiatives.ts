@@ -113,7 +113,7 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   },
   required: true,
   answer: narrative,
-  quarterly: false,
+  quarterly: true,
 });
 
 const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
