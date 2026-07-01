@@ -10,6 +10,7 @@ import {
   ReportPageWrapper,
   ComponentInventory,
   NotificationsPage,
+  ExportedZipPage,
 } from "components";
 import { useStore } from "utils";
 import { useEffect } from "react";
@@ -51,6 +52,7 @@ export const AppRoutes = () => {
               )
             }
           />
+          <Route path="/export" element={<ExportedZipPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="*" element={<NotFoundPage />} />
