@@ -172,6 +172,7 @@ const metricVariant = {
       "&:last-of-type": {
         paddingRight: "0.75rem",
       },
+      verticalAlign: "bottom",
     },
   },
 };
