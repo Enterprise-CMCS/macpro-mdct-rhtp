@@ -5,7 +5,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   fetchAuthSession,
   signInWithRedirect,
@@ -39,6 +39,7 @@ const authenticateWithIDM = async () => {
 
 export const UserProvider = ({ children }: Props) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isProduction = window.location.origin.includes(PRODUCTION_HOST_DOMAIN);
   const flags = useFlags();
 
@@ -53,6 +54,7 @@ export const UserProvider = ({ children }: Props) => {
       setUser(undefined);
       await signOut();
       localStorage.clear();
+      navigate("/"); // reset pathname on logout
     } catch (error) {
       console.log(error);
     }
