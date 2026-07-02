@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import {
   act,
   fireEvent,
@@ -10,6 +11,12 @@ import { RouterWrappedComponent } from "utils/testing/mockRouter";
 import { mockReport, mockReport2 } from "utils/testing/mockForm";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
+import { useStore } from "utils";
+import { mockAdminUserStore } from "utils/testing/setupTest";
+
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
+mockedUseStore.mockReturnValue(mockAdminUserStore);
 
 const mockGetReport = vi.fn().mockResolvedValue([mockReport, mockReport2]);
 vi.mock("../../utils/api/requestMethods/report", () => ({
@@ -19,6 +26,10 @@ vi.mock("../../utils/api/requestMethods/report", () => ({
 vi.mock("../../utils/api/requestMethods/commentMethods", () => ({
   getComments: vi.fn().mockResolvedValue([]),
   createComment: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock("../../utils/api/requestMethods/notificationRecipients", () => ({
+  getAssignedStatesByEmail: vi.fn().mockResolvedValue([]),
 }));
 
 const mockUseNavigate = vi.fn();
@@ -78,6 +89,7 @@ describe("<AdminDashboard />", () => {
     fireEvent.input(search, { target: { value: "Ala" } });
     const checkbox2 = screen.getByRole("checkbox", { name: "Alabama" });
     await userEvent.click(checkbox2);
+    expect(localStorage.getItem("states")).toEqual("AL,NJ");
 
     expect(
       screen.getByRole("button", { name: "Remove New Jersey tag" })

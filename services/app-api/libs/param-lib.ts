@@ -15,6 +15,17 @@ export const parseReportType = (event: APIGatewayProxyEvent) => {
   return { reportType };
 };
 
+export const parseEmail = (event: APIGatewayProxyEvent) => {
+  const { email } = event.pathParameters ?? {};
+
+  if (!email) {
+    logger.warn("Missing email in path");
+    return undefined;
+  }
+
+  return { email };
+};
+
 export const parseState = (event: APIGatewayProxyEvent) => {
   const { state } = event.pathParameters ?? {};
 
