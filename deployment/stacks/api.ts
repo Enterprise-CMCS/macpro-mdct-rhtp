@@ -412,6 +412,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "getAssignedStatesByEmail", {
+    entry: "services/app-api/handlers/notifications/recipients/get.ts",
+    handler: "getAssignedStatesByEmail",
+    path: "notifications/recipientByEmail/{email}",
+    method: "GET",
+    ...commonProps,
+  });
+
   new Lambda(scope, "deleteNotificationRecipient", {
     entry: "services/app-api/handlers/notifications/recipients/delete.ts",
     handler: "deleteNotificationRecipient",
