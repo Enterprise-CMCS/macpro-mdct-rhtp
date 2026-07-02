@@ -39,6 +39,13 @@ export const AdminMenu = () => {
         </MenuButton>
       </Box>
       <MenuList sx={sx.menuList}>
+        {userRole === UserRoles.APPROVER && (
+          <Link as={RouterLink} to="/export" variant="unstyled">
+            <MenuItem sx={sx.menuItem}>
+              <MenuOption role="button" text="Export" />
+            </MenuItem>
+          </Link>
+        )}
         <Link as={RouterLink} to="/admin" variant="unstyled">
           <MenuItem sx={sx.menuItem}>
             <MenuOption role="button" text="Banner Editor" />
