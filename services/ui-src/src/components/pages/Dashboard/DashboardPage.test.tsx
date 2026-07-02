@@ -135,11 +135,11 @@ describe("DashboardPage with state user", () => {
       expect(screen.getByText("Mock Report Name")).toBeInTheDocument();
     });
 
+    await userEvent.click(screen.getByText("Clear Filter"));
     await userEvent.selectOptions(
       screen.queryAllByLabelText("Budget Period")[0],
       "Budget Period 1"
     );
-    await userEvent.click(screen.getByText("Clear Filter"));
 
     const table = container.querySelector("table")!;
     const columns = [...table.querySelectorAll("tr th")].map(

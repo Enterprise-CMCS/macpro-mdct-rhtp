@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link as RouterLink, useParams, useSearchParams } from "react-router";
+import { Link as RouterLink, useParams } from "react-router";
 import {
   StateNames,
   isStateAbbr,
@@ -43,14 +43,10 @@ export const DashboardPage = () => {
   const [reports, setReports] = useState<LiteReport[]>([]);
   const [canCreateReport, setCanCreateReport] = useState(false);
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [dropdownValue, setDropdownValue] = useState(
-    searchParams.get("budgetPeriod") || "All"
-  );
+  const [budgetPeriodFilter, setBudgetPeriodFilter] = useState("All");
 
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
   const reportName = getReportName(reportType);
-  const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
   const hasSubmittedReport = reports.some((report) =>
     isCompleteStatus(report.status)
   );
@@ -63,16 +59,16 @@ export const DashboardPage = () => {
   }, [reportType, state]);
 
   useEffect(() => {
-    if (filterBudgetPeriod === "All") {
+    if (budgetPeriodFilter === "All") {
       setFilteredReports(reports);
     } else {
       setFilteredReports(
         reports.filter(
-          (report) => report.budgetPeriod === parseInt(filterBudgetPeriod)
+          (report) => report.budgetPeriod === parseInt(budgetPeriodFilter)
         )
       );
     }
-  }, [reports, filterBudgetPeriod]);
+  }, [reports, budgetPeriodFilter]);
 
   useEffect(() => {
     const noReports = reports.length === 0;
@@ -99,13 +95,11 @@ export const DashboardPage = () => {
   } = useDisclosure();
 
   const handleBudgetPeriodChange = (evt: { target: { value: string } }) => {
-    setDropdownValue(evt.target.value);
+    setBudgetPeriodFilter(evt.target.value);
   };
 
-  const handleFilter = () => {
-    setSearchParams({
-      budgetPeriod: dropdownValue.toString(),
-    });
+  const clearFilter = () => {
+    setBudgetPeriodFilter("All");
   };
 
   return (
@@ -170,11 +164,11 @@ export const DashboardPage = () => {
           <CmsdsDropdownField
             name="budgetPeriodFilter"
             label="Budget Period"
-            value={dropdownValue}
+            value={budgetPeriodFilter}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodFilterOptions}
           />
-          <Button onClick={handleFilter} variant="link" fontWeight="bold">
+          <Button onClick={clearFilter} variant="link" fontWeight="bold">
             Clear Filter
           </Button>
         </Flex>
