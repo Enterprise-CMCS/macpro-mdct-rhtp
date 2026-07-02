@@ -1,6 +1,7 @@
 import {
   createNotificationRecipient,
   deleteNotificationRecipient,
+  getAssignedStatesByEmail,
   getNotificationRecipients,
 } from "./notificationRecipients";
 
@@ -30,6 +31,11 @@ describe("notification recipients api", () => {
 
   test("getNotificationRecipients", async () => {
     await getNotificationRecipients();
+    expect(mockGet).toHaveBeenCalledTimes(1);
+  });
+
+  test("getAssignedStatesByEmail", async () => {
+    await getAssignedStatesByEmail("test@email.com");
     expect(mockGet).toHaveBeenCalledTimes(1);
   });
 

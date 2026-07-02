@@ -4,6 +4,7 @@ import { signIn } from "aws-amplify/auth";
 import { Box, Button, Heading, Input, Stack, Text } from "@chakra-ui/react";
 import { Alert } from "components";
 import { AlertTypes } from "@rhtp/shared";
+import { getReturnUrl } from "utils";
 
 export const LoginCognito = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export const LoginCognito = () => {
     setError(undefined);
     try {
       await signIn({ username, password });
-      navigate(`/`);
+      navigate(getReturnUrl());
     } catch (error) {
       setError(error instanceof Error ? error.message : "");
     }

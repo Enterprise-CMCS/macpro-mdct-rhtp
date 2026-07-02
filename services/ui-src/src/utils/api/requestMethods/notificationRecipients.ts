@@ -33,6 +33,18 @@ export async function getNotificationRecipients() {
   );
 }
 
+export async function getAssignedStatesByEmail(email: string) {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  return await apiLib.get<string[]>(
+    `/notifications/recipientByEmail/${email}`,
+    options
+  );
+}
+
 export async function deleteNotificationRecipient(state: string, id: string) {
   const requestHeaders = await getRequestHeaders();
   const options = {

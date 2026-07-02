@@ -82,6 +82,13 @@ const mockOldReport: Report = {
           ],
           required: true,
         },
+        {
+          id: "initiative-narrative",
+          type: ElementType.TextAreaField,
+          label: "mock text area",
+          required: true,
+          answer: "mock answer for textfield",
+        },
       ],
     },
     ...mockAddedInitiatives,
@@ -118,6 +125,9 @@ describe("copyReport util", () => {
     expect(mockNewReport.pages[2].elements[0].answer).toEqual(
       mockInitiativeAnswer
     );
+
+    //did not copy initiative-narrative text area
+    expect(mockNewReport.pages[1].elements[4].answer).toEqual(undefined);
 
     // metrics in added initiative — current values get copied to previous value, then cleared
     const newMetricAnswerRow = mockNewReport.pages[2].elements[1].answer[0];
