@@ -5,7 +5,7 @@ import { canReleaseReport } from "../../utils/authorization";
 import { error } from "../../utils/constants";
 import { getReport, putReport } from "../../storage/reports";
 import { ReportStatus } from "@rhtp/shared";
-import { sendEmail } from "../../utils/notifications/email";
+import { sendReportStatusChangeEmail } from "../../utils/notifications/email";
 import { logger } from "../../libs/debug-lib";
 
 export const releaseReport = handler(parseReportParameters, async (request) => {
@@ -32,7 +32,7 @@ export const releaseReport = handler(parseReportParameters, async (request) => {
   await putReport(report);
 
   try {
-    await sendEmail(report, user);
+    await sendReportStatusChangeEmail(report, user);
   } catch (error) {
     // log and allow call to succeed even if email fails
     logger.error(error);

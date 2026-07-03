@@ -1,4 +1,4 @@
-import { sendEmail } from "./email";
+import { sendReportStatusChangeEmail } from "./email";
 import sesLib from "../../libs/ses-lib";
 import { validReport } from "../tests/mockReport";
 import { User } from "../../types/types";
@@ -18,13 +18,13 @@ const mockUser = {
   email: "mock@user.com",
 } as User;
 
-describe("sendEmail", () => {
+describe("sendReportStatusChangeEmail", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("should not issue a send email command when no email in report", async () => {
-    await sendEmail(validReport, mockUser);
+    await sendReportStatusChangeEmail(validReport, mockUser);
     expect(sesLib.sendSesEmail).not.toHaveBeenCalled();
     expect(mockSaveNotifications).not.toHaveBeenCalled();
   });
@@ -33,7 +33,7 @@ describe("sendEmail", () => {
     // any type so it doesn't complain about accessing .answer on generic PageElement
     const reportWithEmail: any = structuredClone(validReport);
     reportWithEmail.pages[1].elements[2].answer = "test@email.com";
-    await sendEmail(reportWithEmail, mockUser);
+    await sendReportStatusChangeEmail(reportWithEmail, mockUser);
     expect(sesLib.sendSesEmail).toHaveBeenCalledTimes(1);
     expect(mockSaveNotifications).toHaveBeenCalled();
   });
