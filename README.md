@@ -194,6 +194,7 @@ RHTP pipes updates from the dynamodb tables to BigMac for downstream consumption
 
 - `services/app-api/utils/constants.ts` - Add the table and topic name into the `kafkaTables` (or `reportTables` for new reports) and `kafkaTopics` arrays.
 - `services/topics/config.js` - Declare the new topic name.
+- `deployment/stacks/api.ts` - Add the dynamo table to the Lambda event source for `postKafkaData`
 - Update the [ReportSchema.md](./docs/ReportSchema.md) documentation with the new data fields
 
 ## Architecture
