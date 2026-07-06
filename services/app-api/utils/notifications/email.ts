@@ -142,8 +142,19 @@ export const sendReportCommentEmail = async (report: Report, user: User) => {
     emailTemplate
   );
   if (!isLocalStack()) {
-    const res = await sesLib.sendSesEmail(emailTemplate);
-    await saveNotifications(res, emailTemplate, report, user);
+    try {
+      const res = await sesLib.sendSesEmail(emailTemplate);
+      await saveNotifications(res, emailTemplate, report, user);
+    } catch (error) {
+      logger.warn(
+        "Email failed to send for report: ",
+        report,
+        " and template",
+        emailTemplate,
+        " with error ",
+        error
+      );
+    }
   } else {
     logger.info("Skipping email in dev env");
   }
