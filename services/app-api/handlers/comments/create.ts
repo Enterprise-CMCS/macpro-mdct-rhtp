@@ -7,8 +7,9 @@ import { canWriteComments } from "../../utils/authorization";
 import { logger } from "../../libs/debug-lib";
 import { validateCommentPayload } from "../../utils/reportValidation";
 import { error } from "../../utils/constants";
-import { Comment, CommentType } from "@rhtp/shared";
+import { Comment, CommentType, ReportType } from "@rhtp/shared";
 import { sendReportCommentEmail } from "../../utils/notifications/email";
+import { getReport } from "../../storage/reports";
 
 export const createComment = handler(
   parseCommentPathParams,
@@ -38,9 +39,11 @@ export const createComment = handler(
 
     await putComment(validatedComment);
 
-    if (comment.type === CommentType.REPORT) {
-      // Need to get report here, or some other way to get report name + recipients
-      await sendReportCommentEmail(report, user);
+    if (comment.type === CommentType.REPORT && !comment.isInternal) {
+      const report = await getReport(ReportType.RHTP, state, contextId);
+      if (report) {
+        await sendReportCommentEmail(report, user);
+      }
     }
 
     return created(validatedComment);

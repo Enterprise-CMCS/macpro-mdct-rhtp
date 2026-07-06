@@ -1,9 +1,10 @@
-import { Report, ReportPages, ReportStatus } from "@rhtp/shared";
+import { Report, ReportPages, ReportStatus, UserRoles } from "@rhtp/shared";
 import sesLib from "../../libs/ses-lib";
 import { logger } from "../../libs/debug-lib";
 import { isLocalStack } from "../../libs/localstack";
 import { User } from "../../types/types";
 import { saveNotifications } from "./notifications";
+import { queryRecipientsByState } from "../../storage/notificationRecipients";
 
 const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
 
@@ -41,28 +42,38 @@ If you believe this status change was made in error, or if you have questions re
   },
 });
 
-const getReportStatusChangeRecipients = (pages: ReportPages) => {
-  const generalInformationPage = pages.find(
-    (page) => page.id === "general-information"
-  );
-  const emailFields = generalInformationPage?.elements?.filter(
-    (element) =>
-      element.id.includes("email") &&
-      "answer" in element &&
-      element.answer !== ""
-  );
-  const emails = emailFields?.map((field) =>
-    "answer" in field ? field.answer : undefined
-  ) as string[];
-  return emails || [];
+const getRecipients = async (
+  pages: ReportPages,
+  userRole: UserRoles,
+  state: string
+) => {
+  let recipientEmails: string[] = [];
+  if (userRole !== UserRoles.STATE_USER) {
+    const generalInformationPage = pages.find(
+      (page) => page.id === "general-information"
+    );
+    const emailFields = generalInformationPage?.elements?.filter(
+      (element) =>
+        element.id.includes("email") &&
+        "answer" in element &&
+        element.answer !== ""
+    );
+    recipientEmails = emailFields?.map((field) =>
+      "answer" in field ? field.answer : undefined
+    ) as string[];
+  } else {
+    const assignedUsers = await queryRecipientsByState(state);
+    recipientEmails = assignedUsers?.map((user) => user.email);
+  }
+  return recipientEmails;
 };
 
 export const sendReportStatusChangeEmail = async (
   report: Report,
   user: User
 ) => {
-  const { name, pages, status } = report;
-  const recipients = getReportStatusChangeRecipients(pages);
+  const { name, pages, state, status } = report;
+  const recipients = await getRecipients(pages, user.role, state);
   if (recipients.length === 0) return;
   const emailTemplate = getReportStatusChangeTemplate(name, status, recipients);
   logger.info(
@@ -119,15 +130,9 @@ Update Summary
   },
 });
 
-export const getReportCommentRecipients = (pages: ReportPages) => {
-  // TODO: need to implement proper ticket logic
-  // list will differ based on who makes the comment
-  return [];
-};
-
 export const sendReportCommentEmail = async (report: Report, user: User) => {
-  const { name, pages } = report;
-  const recipients = getReportCommentRecipients(pages);
+  const { name, pages, state } = report;
+  const recipients = await getRecipients(pages, user.role, state);
   if (recipients.length === 0) return;
   const emailTemplate = getReportCommentTemplate(name, recipients);
   logger.info(
