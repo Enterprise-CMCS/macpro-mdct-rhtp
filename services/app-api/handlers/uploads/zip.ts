@@ -97,3 +97,36 @@ export const zipWorker = async (event: ZipWorkerEvent) => {
 
   await zipBuffer(S3ZipKey(reportType, state, id), zip);
 };
+
+export const createZipByIds = handler(
+  parseFileUploadDownloadParameters,
+  async (request) => {
+    const { body, parameters } = request;
+    const { state, reportType, id } = parameters;
+    const { fileIds } = body as any;
+
+    const zip = new JSZip();
+    for (const fileId in fileIds) {
+      const item = await s3.getObject({
+        Bucket: process.env.attachmentsBucketName,
+        Key: `${reportType}/${state}/${id}/${fileId}`,
+      });
+      const bytes = await item.Body?.transformToByteArray();
+      if (bytes) {
+        zip.file(`${state}/"UseOfFunds"/${fileId}`, bytes);
+      }
+    }
+
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+    const key = S3ZipKey(reportType, state, id);
+    await s3.putObject({
+      Bucket: process.env.attachmentsBucketName,
+      Key: key,
+      Body: Readable.from(zipBuffer),
+      ContentLength: zipBuffer.byteLength,
+      ContentType: "application/zip",
+      Tagging: "auto_delete_category=generated_zip",
+    });
+    return ok();
+  }
+);
