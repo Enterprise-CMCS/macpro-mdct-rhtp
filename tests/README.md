@@ -27,11 +27,22 @@ There are four options for running tests locally. You can execute these commands
 
 - Starts the app locally and runs all tests in terminal. Terminates when tests complete.
 
+1. `yarn test:e2e-deploy`
+
+- Starts the app locally and runs only deploy-gate tests in terminal.
+- Excludes tests tagged `@flaky`, `@regression`, and `@a11y`.
+
 2. `yarn test:e2e-ui`
 
 - Starts the app locally
 - Launches Playwright UI
 - Runs all the tests
+
+2. `yarn test:e2e-deploy-ui`
+
+- Starts the app locally
+- Launches Playwright UI
+- Filters to deploy-gate tests only
 
 3. `yarn test:e2e-stable`
 
