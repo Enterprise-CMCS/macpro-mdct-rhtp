@@ -410,9 +410,10 @@ export const AttachmentTable = (
         modalHeading={modalHeading[modalMode]}
         deleteFromReport={removeAttachment}
         uploadAreaHidden={modalMode !== "Upload"}
-        uploadedSubLabel={
-          "These files have been attached to the stage and checkpoint selected above."
-        }
+        subLabel={{
+          uploaded:
+            "These files have been attached to the stage and checkpoint selected above.",
+        }}
       />
       <AttachmentCommentDrawer
         modalDisclosure={{

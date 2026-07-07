@@ -20,6 +20,7 @@ const SKIP_COPY_ANSWER_IDS = [
   "use-of-funds-attachment",
   "success-attachments",
   "sustainability-attachments",
+  "initiative-narrative",
 ];
 
 const copyStatePolicyCommitments = (

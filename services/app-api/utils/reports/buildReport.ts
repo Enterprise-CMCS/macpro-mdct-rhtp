@@ -7,11 +7,14 @@ import {
   RhtpSubType,
   StateAbbr,
   ReportPages,
+  optionalInQuarterly,
 } from "@rhtp/shared";
 import { User } from "../../types/types";
 import { validateReportPayload } from "../reportValidation";
 import { logger } from "../../libs/debug-lib";
 import { copyReport } from "./copyReport";
+
+//there are certain elements that change from being required to optional when going from annual to quarterly
 
 export const makeQuarterlyChanges = (pages: ReportPages) => {
   for (const page of pages) {
@@ -19,6 +22,9 @@ export const makeQuarterlyChanges = (pages: ReportPages) => {
     for (const element of page.elements) {
       if ("quarterly" in element && !element.quarterly) {
         element.disabled = true;
+      }
+      if (optionalInQuarterly.includes(element.id) && "required" in element) {
+        element.required = false;
       }
     }
   }

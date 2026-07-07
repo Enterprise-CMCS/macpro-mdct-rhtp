@@ -120,7 +120,7 @@ describe("buildZip util", () => {
   test("getSustainabilityAndHighlightFiles", () => {
     const attachmentArea: AttachmentAreaTemplate = {
       type: ElementType.AttachmentArea,
-      uploadedSubLabel: "",
+      subLabel: {},
       id: "success-attachments",
       label: "mock area",
       required: false,
