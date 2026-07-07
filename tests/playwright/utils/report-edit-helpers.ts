@@ -243,7 +243,7 @@ const completeSustainabilityForSubmission = async (
 
 const completeUseOfFundsForSubmission = async (
   editor: ReportEditorPage
-): Promise<void> => {
+): Promise<boolean> => {
   const { reportType, state, reportId } = editor.getCurrentRouteParams();
   await editor.navigateToSection(
     reportType,
@@ -256,19 +256,23 @@ const completeUseOfFundsForSubmission = async (
     name: /Add Use of Funds/i,
   });
 
-  if (await addUseOfFundsButton.isEnabled()) {
-    await addUseOfFundsButton.click();
-    const uploadDialog = editor.page.getByRole("dialog");
-    await expect(uploadDialog).toBeVisible();
-
-    await uploadDialog
-      .locator("input[type='file']#file-input")
-      .setInputFiles(USE_OF_FUNDS_FIXTURE_PATH);
-    await expect(uploadDialog.getByText("use-of-funds.csv")).toBeVisible();
-
-    await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
-    await expect(uploadDialog).toBeHidden();
+  if (!(await addUseOfFundsButton.isEnabled())) {
+    return false;
   }
+
+  await addUseOfFundsButton.click();
+  const uploadDialog = editor.page.getByRole("dialog");
+  await expect(uploadDialog).toBeVisible();
+
+  await uploadDialog
+    .locator("input[type='file']#file-input")
+    .setInputFiles(USE_OF_FUNDS_FIXTURE_PATH);
+  await expect(uploadDialog.getByText("use-of-funds.csv")).toBeVisible();
+
+  await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
+  await expect(uploadDialog).toBeHidden();
+
+  return true;
 };
 
 const completeSectionByTitle = async (
@@ -285,8 +289,7 @@ const completeSectionByTitle = async (
   }
 
   if (/^Use of Funds$/i.test(title)) {
-    await completeUseOfFundsForSubmission(editor);
-    return true;
+    return completeUseOfFundsForSubmission(editor);
   }
 
   return false;
@@ -299,6 +302,8 @@ const ensureReportIsSubmittable = async (
   const finalSubmitButton = editor.page.getByRole("button", {
     name: /Submit .* Report/i,
   });
+
+  let previousIncompleteSignature = "";
 
   for (let attempt = 0; attempt < 5; attempt++) {
     await editor.navigateToSection(
@@ -317,6 +322,21 @@ const ensureReportIsSubmittable = async (
     if (incompleteSections.length === 0) {
       break;
     }
+
+    const currentIncompleteSignature = incompleteSections
+      .map((s) => `${s.title}:${s.status}`)
+      .join("|");
+    if (
+      attempt > 0 &&
+      currentIncompleteSignature === previousIncompleteSignature
+    ) {
+      return {
+        submittable: false,
+        reason:
+          "Report completion made no progress between attempts; required sections remain incomplete",
+      };
+    }
+    previousIncompleteSignature = currentIncompleteSignature;
 
     const unhandled: string[] = [];
     for (const section of incompleteSections) {
