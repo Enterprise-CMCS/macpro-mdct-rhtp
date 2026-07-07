@@ -6,3 +6,6 @@ export const TIMEOUT_LOADING = 15000;
 
 /** Waiting for full page navigation */
 export const TIMEOUT_NAVIGATION = 30000;
+
+/** Waiting for autosave indicator to appear after field blur/edit */
+export const TIMEOUT_AUTOSAVE = 10000;

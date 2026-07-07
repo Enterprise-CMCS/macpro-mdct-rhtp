@@ -58,6 +58,28 @@ export class DashboardPage extends BasePage {
     return this.page.getByRole("button", { name: /^View .* report$/i }).first();
   }
 
+  private getReportActionButtonForStatus(statusPattern: RegExp) {
+    const row = this.page
+      .locator("tbody tr")
+      .filter({ has: this.page.getByRole("cell", { name: statusPattern }) })
+      .first();
+    return row.getByRole("button", { name: /^View .* report$/i }).first();
+  }
+
+  private getReportActionButtonsForStatus(statusPattern: RegExp) {
+    const rows = this.page
+      .locator("tbody tr")
+      .filter({ has: this.page.getByRole("cell", { name: statusPattern }) });
+    return rows.getByRole("button", { name: /^View .* report$/i });
+  }
+
+  async getEditableReportCount(): Promise<number> {
+    await this.waitForDashboardReady();
+    return this.getReportActionButtonsForStatus(
+      /^(Not started|In progress|In revision)$/i
+    ).count();
+  }
+
   // ===== Modal Interactions =====
   async isStartButtonAvailable(): Promise<boolean> {
     const btn = this.getStartButton();
@@ -91,7 +113,7 @@ export class DashboardPage extends BasePage {
 
     // Wait for the button to be enabled — canCreateReport is async (set after reports API resolves)
     const btn = this.getStartButton();
-    await btn.waitFor({ state: "visible" });
+    await btn.waitFor({ state: "visible", timeout: TIMEOUT_UI });
     await expect(btn).toBeEnabled({ timeout: TIMEOUT_UI });
     await btn.click();
 
@@ -105,28 +127,57 @@ export class DashboardPage extends BasePage {
     const button = this.getCopyButton();
 
     // Rely on Playwright's built-in actionability checks for visibility/enabled state.
+    await expect(button).toBeVisible({ timeout: TIMEOUT_UI });
+    await expect(button).toBeEnabled({ timeout: TIMEOUT_UI });
     await button.click();
     await expect(this.page.getByRole("dialog")).toBeVisible();
   }
 
-  async openFirstEditableReport(): Promise<void> {
-    const editButton = this.page
+  async openEditableReportByIndex(index = 0): Promise<void> {
+    const editButtons = this.getReportActionButtonsForStatus(
+      /^(Not started|In progress|In revision)$/i
+    );
+    const editableCount = await editButtons.count();
+
+    // Prefer an explicitly editable row; fallback to first visible report action.
+    const editButton =
+      editableCount > 0
+        ? editButtons.nth(Math.min(index, editableCount - 1))
+        : this.getReportActionButtonForStatus(
+            /^(Not started|In progress|In revision)$/i
+          );
+    const fallbackButton = this.page
       .getByRole("button", { name: /^View .* report$/i })
       .first();
+
+    const targetButton = (await editButton.isVisible().catch(() => false))
+      ? editButton
+      : fallbackButton;
+
     await Promise.all([
       this.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?/),
-      editButton.click(),
+      targetButton.click(),
     ]);
     await this.waitForLoadingComplete();
   }
 
+  async openFirstEditableReport(): Promise<void> {
+    await this.openEditableReportByIndex(0);
+  }
+
   async openFirstSubmittedReport(): Promise<void> {
-    const viewButton = this.page
+    const viewButton = this.getReportActionButtonForStatus(/^Submitted$/i);
+    const fallbackButton = this.page
       .getByRole("button", { name: /^View .* report$/i })
       .first();
+
+    const targetButton = (await viewButton.isVisible().catch(() => false))
+      ? viewButton
+      : fallbackButton;
+
     await Promise.all([
       this.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?/),
-      viewButton.click(),
+      targetButton.click(),
     ]);
     await this.waitForLoadingComplete();
   }
@@ -161,6 +212,22 @@ export class DashboardPage extends BasePage {
     // Fallback: action button state can be a more reliable signal than status-cell text.
     if (hasViewReportButton) {
       return hasCopyButton ? "submitted" : "unsubmitted";
+    }
+
+    const firstRowText = await this.page
+      .locator("tbody tr")
+      .first()
+      .textContent()
+      .catch(() => null);
+
+    if (firstRowText) {
+      if (/\b(Not started|In progress|In revision)\b/i.test(firstRowText)) {
+        return "unsubmitted";
+      }
+
+      if (/\bSubmitted\b/i.test(firstRowText)) {
+        return "submitted";
+      }
     }
 
     return "empty";
