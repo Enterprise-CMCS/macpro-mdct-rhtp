@@ -356,6 +356,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "createZipByIds", {
+    entry: "services/app-api/handlers/uploads/zip.ts",
+    handler: "createZipByIds",
+    path: "/reports/{reportType}/{state}/zip",
+    method: "POST",
+    ...commonProps,
+  });
+
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
     handler: "deleteUploadedFile",
