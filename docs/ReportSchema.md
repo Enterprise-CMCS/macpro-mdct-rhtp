@@ -12,6 +12,23 @@ The RHTP report has a Kafka topic that receives messages when the data changes:
 In ephemeral development environments, each topic name is prefixed.
 For example: `--rhtp--my-branch-name--aws.mdct.rhtp.rhtp-reports.v0`
 
+Comments added to the reports or to attached files are sent in a separate topic:
+
+`aws.mdct.rhtp.rhtp-comments.v0`
+
+## Comment data
+
+- `id` (string): A unique id for this comment.
+- `contextId` (string): An id corresponding to either the report or the attachment to which the comment is addressed.
+- `created` (number): Timestamp for comment creation. Milliseconds since epoch.
+- `author` (string): The full name of the commenting user.
+- `authorEmail` (string): The email of the commenting user.
+- `type` (string): The type of comment ("report" or "attachment")
+- `isInternal` (boolean): When true, only admin users can see the comment
+- `comment` (string): Text content of the comment
+- `statusChange` (string): If the commenting user changed the status of the report or attachment, the status it was changed to. For attachments, one of "Pending Review", "Needs Revision", "Locked for Scoring", "Informational", or "Archived". For reports, one of "Not started", "In progress", "Submitted", or "Accepted".
+- `parentReportId` (string): For attachment comments, id of the associated report.
+
 ## Report fields
 
 - `id` (string): A [K-Sortable Unique Identifier](https://github.com/segmentio/ksuid?tab=readme-ov-file#what-is-a-ksuid) for this report.
