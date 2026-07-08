@@ -18,7 +18,7 @@ interface ZipWorkerEvent {
   files: { state: string; reportId: string; fileId: string }[];
 }
 
-export const triggerZipGeneration2 = handler(
+export const triggerZipByFilesGeneration = handler(
   parseReportType,
   async (request) => {
     const { reportType } = request.parameters;
@@ -32,18 +32,17 @@ export const triggerZipGeneration2 = handler(
   }
 );
 
-export const getZipStatus2 = handler(parseReportType, async (request) => {
+export const getZipByFilesStatus = handler(parseReportType, async (request) => {
   const { reportType } = request.parameters;
   const key = S3ZipKey(reportType);
 
   return await getPSURL(key, `attachment; filename=${reportType}.zip`);
 });
 
-export const zipWorker2 = async (event: ZipWorkerEvent) => {
+export const zipByFilesWorker = async (event: ZipWorkerEvent) => {
   const { reportType, files } = event;
 
   const zip = new JSZip();
-
   for (const file of files) {
     const item = await s3.getObject({
       Bucket: process.env.attachmentsBucketName,

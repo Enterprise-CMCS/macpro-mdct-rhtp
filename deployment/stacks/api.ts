@@ -356,37 +356,37 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  const zipWorkerLambda2 = new Lambda(scope, "zipWorker2", {
-    entry: "services/app-api/handlers/uploads/zip2.ts",
-    handler: "zipWorker2",
+  const zipByFilesWorkerLambda = new Lambda(scope, "zipByFilesWorker", {
+    entry: "services/app-api/handlers/uploads/zipByFiles.ts",
+    handler: "zipByFilesWorker",
     memorySize: 10240,
     timeout: Duration.minutes(15),
     ...commonProps,
   });
 
-  new Lambda(scope, "getZipStatus2", {
-    entry: "services/app-api/handlers/uploads/zip2.ts",
-    handler: "getZipStatus2",
+  new Lambda(scope, "getZipByFilesStatus", {
+    entry: "services/app-api/handlers/uploads/zipByFiles.ts",
+    handler: "getZipByFilesStatus",
     path: "/reports/{reportType}/zip",
     method: "GET",
     ...commonProps,
   });
 
-  new Lambda(scope, "triggerZipGeneration2", {
-    entry: "services/app-api/handlers/uploads/zip2.ts",
-    handler: "triggerZipGeneration2",
+  new Lambda(scope, "triggerZipByFilesGeneration", {
+    entry: "services/app-api/handlers/uploads/zipByFiles.ts",
+    handler: "triggerZipByFilesGeneration",
     path: "/reports/{reportType}/zip",
     method: "POST",
     additionalPolicies: [
       new PolicyStatement({
         actions: ["lambda:InvokeFunction"],
-        resources: [zipWorkerLambda2.lambda.functionArn],
+        resources: [zipByFilesWorkerLambda.lambda.functionArn],
       }),
     ],
     ...commonProps,
     environment: {
       ...commonProps.environment,
-      zipWorkerFunctionName: zipWorkerLambda2.lambda.functionName,
+      zipWorkerFunctionName: zipByFilesWorkerLambda.lambda.functionName,
     },
   });
 

@@ -8,8 +8,8 @@ import { SubmitReportModal } from "./SubmitReportModal";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
 import { isCompleteStatus } from "@rhtp/shared";
-import { getZipFile } from "utils/other/fileUtils";
 import { ZipModal } from "./ZipModal";
+import { getZipFile } from "utils/state/reportLogic/reportActions";
 
 export const SubmissionBar = () => {
   const { report, user, setModalComponent, setModalOpen, updateReport } =
@@ -47,7 +47,10 @@ export const SubmissionBar = () => {
     setModalOpen(false);
     setIsZipLoading(true);
     try {
-      await getZipFile(report);
+      await getZipFile(
+        `/reports/${report.type}/${report.state}/${report.id}/files/zip`,
+        {}
+      );
     } catch (error) {
       // TODO: better visual handing of this error for client?
       // or not, because the timeout is 15 minutes

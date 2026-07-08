@@ -17,7 +17,7 @@ import { dropdownEmptyOption } from "../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
 import { ElementType, Report, ReportType, UploadListProp } from "@rhtp/shared";
 import { getReportByType } from "utils";
-import { getZipFile2 } from "utils/other/fileUtils";
+import { getZipFile } from "utils/state/reportLogic/reportActions";
 
 const ExportCard = (title: string, desc: string, onClick: () => void) => {
   return (
@@ -186,7 +186,9 @@ export const ExportedZipPage = () => {
       fileId: file.file?.fileId!,
     }));
 
-    await getZipFile2(ReportType.RHTP, newFiles);
+    await getZipFile<{
+      files: { reportId: string; state: string; fileId: string }[];
+    }>(`/reports/${ReportType.RHTP}/zip`, { files: newFiles });
   };
 
   return (
