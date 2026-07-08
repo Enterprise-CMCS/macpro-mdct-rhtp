@@ -1,6 +1,7 @@
 import {
   ActionTableTemplate,
   ElementType,
+  FormPageTemplate,
   PageStatus,
   PageType,
   Report,
@@ -93,6 +94,17 @@ const mockOldReport: Report = {
     },
     ...mockAddedInitiatives,
     ...mockStatePolicyCommitments,
+    {
+      id: "sustainability-and-highlights",
+      elements: [
+        {
+          id: "mock-sah-input-element",
+          type: ElementType.Textbox,
+          required: true,
+          answer: "mock answer",
+        },
+      ],
+    } as FormPageTemplate,
   ],
 };
 
@@ -101,6 +113,7 @@ const mockNewReport: any = structuredClone(mockOldReport);
 mockNewReport.id = "mock-new-report";
 mockNewReport.copyFromReportId = "mock-old-report";
 delete mockNewReport.pages[1].elements[1].answer;
+delete mockNewReport.pages[5].elements[0].answer; // remove answer from sustainability and highlights element
 
 describe("copyReport util", () => {
   test("copyReport copies data from old report into new one, including initiative pages and answers", async () => {
@@ -193,6 +206,15 @@ describe("copyReport util", () => {
           ],
         }),
       ])
+    );
+
+    // verify sustainability and highlights is skipped and answers are not copied
+    const mockSustainabilityAndHighlightsPage = mockNewReport.pages[5];
+    expect(mockSustainabilityAndHighlightsPage.id).toEqual(
+      "sustainability-and-highlights"
+    );
+    expect(mockSustainabilityAndHighlightsPage.elements[0]).not.toHaveProperty(
+      "answer"
     );
   });
 });

@@ -24,7 +24,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       helperText:
         "Limit responses to 3,000 characters, approximately 400–500 words.",
       required: true,
-      quarterly: false,
+      quarterly: true,
     },
     {
       id: "success-stories-paragraph",
