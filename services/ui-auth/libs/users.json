@@ -676,6 +676,35 @@
     ]
   },
   {
+    "username": "statedemo12@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo12@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo12"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "TX"
+      }
+    ]
+  },
+  {
     "username": "projectofficer@test.com",
     "attributes": [
       {
