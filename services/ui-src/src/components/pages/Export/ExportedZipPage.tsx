@@ -17,6 +17,7 @@ import { dropdownEmptyOption } from "../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
 import { ElementType, Report, ReportType, UploadListProp } from "@rhtp/shared";
 import { getReportByType } from "utils";
+import { getZipFile2 } from "utils/other/fileUtils";
 
 const ExportCard = (title: string, desc: string, onClick: () => void) => {
   return (
@@ -174,7 +175,19 @@ export const ExportedZipPage = () => {
     setModalOpen(true);
   };
 
-  const OnExport = () => {};
+  const OnExport = async () => {
+    const files = reports.filter(
+      (report) => report.file && report.file.fileId != undefined
+    );
+
+    const newFiles = files.map((file) => ({
+      reportId: file.id,
+      state: file.state,
+      fileId: file.file?.fileId!,
+    }));
+
+    await getZipFile2(ReportType.RHTP, newFiles);
+  };
 
   return (
     <PageTemplate>
