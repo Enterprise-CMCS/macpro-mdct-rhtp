@@ -356,12 +356,38 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  new Lambda(scope, "createZipByIds", {
-    entry: "services/app-api/handlers/uploads/zip.ts",
-    handler: "createZipByIds",
-    path: "/reports/{reportType}/{state}/zip",
-    method: "POST",
+  const zipWorkerLambda2 = new Lambda(scope, "zipWorker2", {
+    entry: "services/app-api/handlers/uploads/zip2.ts",
+    handler: "zipWorker2",
+    memorySize: 10240,
+    timeout: Duration.minutes(15),
     ...commonProps,
+  });
+
+  new Lambda(scope, "getZipStatus2", {
+    entry: "services/app-api/handlers/uploads/zip2.ts",
+    handler: "getZipStatus2",
+    path: "/reports/{reportType}/zip",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "triggerZipGeneration2", {
+    entry: "services/app-api/handlers/uploads/zip2.ts",
+    handler: "triggerZipGeneration2",
+    path: "/reports/{reportType}/zip",
+    method: "POST",
+    additionalPolicies: [
+      new PolicyStatement({
+        actions: ["lambda:InvokeFunction"],
+        resources: [zipWorkerLambda2.lambda.functionArn],
+      }),
+    ],
+    ...commonProps,
+    environment: {
+      ...commonProps.environment,
+      zipWorkerFunctionName: zipWorkerLambda2.lambda.functionName,
+    },
   });
 
   new Lambda(scope, "deleteUpload", {

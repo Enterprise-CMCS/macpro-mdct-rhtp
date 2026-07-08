@@ -70,6 +70,35 @@ export const getZipPresignedUrl = async (
   throw new Error("Zip generation timed out");
 };
 
+export const getZipPresignedUrlTest = async (
+  reportType: string,
+  files: { state: string; reportId: string; fileId: string }[]
+) => {
+  const requestHeaders = await getRequestHeaders();
+
+  await apiLib.post<{ status: string }>(`/reports/${reportType}/zip`, {
+    headers: { ...requestHeaders },
+    body: { files },
+  });
+
+  for (let i = 0; i < MAX_POLLS; i++) {
+    await new Promise<void>((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    console.log(`Polling for zip status... (attempt ${i + 1}/${MAX_POLLS})`);
+
+    const freshHeaders = await getRequestHeaders();
+    const result = await apiLib.get<ZipStatusResponse>(
+      `/reports/${reportType}/zip`,
+      { headers: { ...freshHeaders } }
+    );
+
+    if (result.status === "ready" && result.psurl) {
+      return result.psurl;
+    }
+  }
+
+  throw new Error("Zip generation timed out");
+};
+
 export const uploadFileToS3 = async (
   { presignedUploadUrl }: { presignedUploadUrl: string },
   file: File

@@ -12,6 +12,7 @@ import {
   deleteUploadedFile,
   getFileDownloadUrl,
   getZipPresignedUrl,
+  getZipPresignedUrlTest,
 } from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
@@ -76,6 +77,18 @@ export const getZipFile = async (report: Report) => {
   const { state, id, type } = report;
 
   const fileLink = await getZipPresignedUrl(type, state, id);
+  const sanitizeLink = DOMPurify.sanitize(fileLink);
+
+  const link = document.createElement("a");
+  link.href = sanitizeLink;
+  link.click();
+};
+
+export const getZipFile2 = async (
+  type: string,
+  files: { state: string; reportId: string; fileId: string }[]
+) => {
+  const fileLink = await getZipPresignedUrlTest(type, files);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
 
   const link = document.createElement("a");
