@@ -393,6 +393,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "createComment",
     path: "comments/{state}/{contextId}",
     method: "POST",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 

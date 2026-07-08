@@ -35,9 +35,12 @@ export const queryRecipientsByState = async (
 ): Promise<NotificationRecipientRecord[]> => {
   const params: QueryCommandInput = {
     TableName: notificationRecipientsTable,
-    KeyConditionExpression: "state = :state",
+    KeyConditionExpression: "#state = :state",
     ExpressionAttributeValues: {
       ":state": state,
+    },
+    ExpressionAttributeNames: {
+      "#state": "state",
     },
   };
 
