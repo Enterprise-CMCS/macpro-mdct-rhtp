@@ -312,6 +312,7 @@ interface InputElementTemplate {
   required: boolean;
   quarterly?: boolean;
   disabled?: boolean;
+  editByRole?: string[];
 }
 
 export interface CheckboxTemplate extends InputElementTemplate {

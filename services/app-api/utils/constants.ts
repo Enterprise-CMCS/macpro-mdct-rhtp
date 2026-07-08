@@ -94,6 +94,12 @@ export const reportTables: { [key in ReportType]: string } = {
   RHTP: process.env.RhtpReportsTable!,
 };
 
-export const tableTopics: { [key in ReportType]: string } = {
+export const kafkaTables: { [key: string]: string } = {
+  ...reportTables,
+  RHTP_COMMENTS: process.env.CommentsTable!,
+};
+
+export const kafkaTopics: { [key in string]: string } = {
   RHTP: "rhtp-reports",
+  RHTP_COMMENTS: "rhtp-comments",
 };

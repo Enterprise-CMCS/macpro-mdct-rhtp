@@ -12,16 +12,23 @@ import {
   Box,
   Text,
 } from "@chakra-ui/react";
-import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import {
+  Dropdown as CmsdsDropdownField,
+  Dropdown,
+} from "@cmsgov/design-system";
+import {
+  AlertTypes,
+  dropdownEmptyOption,
   Report,
   ReportType,
   StateDropdownOptions,
   StateNames,
+  UserRoles,
 } from "@rhtp/shared";
-import { PageTemplate, AccordionItem } from "components";
+import { PageTemplate, AccordionItem, Modal, Alert } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import {
+  createReport,
   formatMonthDayYear,
   getReportByType,
   reportBasePath,
@@ -33,6 +40,80 @@ import { budgetPeriodFilterOptions } from "./../../constants";
 import { ReportCommentDrawer } from "components/drawers/ReportCommentDrawer";
 import { getStatus } from "utils/other/status";
 import { getAssignedStatesByEmail } from "utils/api/requestMethods/notificationRecipients";
+import { DropdownOptions } from "types";
+import { useFlags } from "launchdarkly-react-client-sdk";
+
+const AdminCreateReportModal = ({
+  modalDisclosure,
+  reports,
+  reloadReports,
+}: any) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [errorAlert, setErrorAlert] = useState();
+  const [selectedState, setSelectedState] = useState(dropdownEmptyOption.value);
+  const [dropdownOptions, setDropdownOptions] =
+    useState<DropdownOptions[]>(StateDropdownOptions);
+
+  const onClose = () => {
+    setErrorAlert(undefined);
+    setSelectedState(dropdownEmptyOption.value);
+    modalDisclosure.onClose();
+  };
+
+  const onSubmit = async () => {
+    setSubmitting(true);
+
+    try {
+      await createReport(ReportType.RHTP, selectedState);
+      await reloadReports(ReportType.RHTP);
+      onClose();
+    } catch (error: any) {
+      const errorMessage =
+        error.message?.split(" - ").at(-1) || "Unknown error";
+      setErrorAlert(errorMessage);
+    }
+
+    setSubmitting(false);
+  };
+
+  useEffect(() => {
+    const statesAlreadyCreated = reports.map((report: Report) => report.state);
+    const options = StateDropdownOptions.filter(
+      ({ value }) => !statesAlreadyCreated.includes(value)
+    );
+    setDropdownOptions([dropdownEmptyOption, ...options]);
+  }, [modalDisclosure.isOpen]);
+
+  return (
+    <Modal
+      modalDisclosure={{
+        isOpen: modalDisclosure.isOpen,
+        onClose: onClose,
+      }}
+      content={{
+        heading: "Start First Annual Report",
+        subheading:
+          "This will start the first annual report for the state selected below.",
+        actionButtonText: "Start",
+      }}
+      onConfirmHandler={onSubmit}
+      submitting={submitting}
+    >
+      {errorAlert !== undefined && (
+        <Alert status={AlertTypes.ERROR} title="Failed to create report">
+          {errorAlert}
+        </Alert>
+      )}
+      <Dropdown
+        label="State"
+        name="State"
+        onChange={(event) => setSelectedState(event.target.value)}
+        options={dropdownOptions}
+        value={selectedState}
+      />
+    </Modal>
+  );
+};
 
 const budgetPeriodValues = [1, 2, 3, 4, 5];
 const stateAbbr = Object.keys(StateNames);
@@ -56,7 +137,13 @@ export const AdminDashboard = () => {
 
   const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report>();
-  const { email: userEmail } = useStore().user ?? {};
+  const [createReportModalOpen, setCreateReportModalOpen] = useState(false);
+  const { email: userEmail, userRole } = useStore().user ?? {};
+  const flags = useFlags();
+  const userCanStartReport =
+    [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER].includes(
+      userRole as UserRoles
+    ) && flags?.adminCanEditReport;
 
   const setStatesHandler = (states: string[]) => {
     const sortedStates = states.toSorted();
@@ -241,13 +328,20 @@ export const AdminDashboard = () => {
             </Box>
           </AccordionItem>
         </Accordion>
-        <Box>
-          <Text mb="spacer2">
-            To begin the first annual report for a state, select Start First
-            Annual Report.
-          </Text>
-          <Button variant="outline">Start First Annual Report</Button>
-        </Box>
+        {userCanStartReport && (
+          <Box>
+            <Text mb="spacer2">
+              To begin the first annual report for a state, select Start First
+              Annual Report.
+            </Text>
+            <Button
+              variant="outline"
+              onClick={() => setCreateReportModalOpen(true)}
+            >
+              Start First Annual Report
+            </Button>
+          </Box>
+        )}
         <Heading as="h2" variant="h2">
           State Submissions
         </Heading>
@@ -329,6 +423,14 @@ export const AdminDashboard = () => {
           selectedReport={selectedReport}
         />
       )}
+      <AdminCreateReportModal
+        modalDisclosure={{
+          isOpen: createReportModalOpen,
+          onClose: () => setCreateReportModalOpen(false),
+        }}
+        reports={reports}
+        reloadReports={reloadReports}
+      />
     </PageTemplate>
   );
 };

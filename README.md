@@ -190,10 +190,12 @@ If you have a PR that needs Product/Design input, the easiest way to get it to t
 
 ## BigMac Kafka Integration
 
-RHTP pipes updates from the report object tables to BigMac for downstream consumption. To add a topic for a new report type, update the following locations:
+RHTP pipes updates from the dynamodb tables to BigMac for downstream consumption. To add a topic, update the following locations:
 
-- `services/app-api/utils/constants.ts` - Add the table and topic name into the `reportTables` and `tableTopics` arrays.
+- `services/app-api/utils/constants.ts` - Add the table and topic name into the `kafkaTables` (or `reportTables` for new reports) and `kafkaTopics` arrays.
 - `services/topics/config.js` - Declare the new topic name.
+- `deployment/stacks/api.ts` - Add the dynamo table to the Lambda event source for `postKafkaData`
+- Update the [ReportSchema.md](./docs/ReportSchema.md) documentation with the new data fields
 
 ## Architecture
 

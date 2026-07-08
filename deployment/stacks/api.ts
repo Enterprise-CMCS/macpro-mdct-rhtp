@@ -385,6 +385,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "createComment",
     path: "comments/{state}/{contextId}",
     method: "POST",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
@@ -442,7 +443,9 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       topicNamespace: isDev ? `--${project}--${stage}--` : "",
       ...commonProps.environment,
     },
-    tables: tables.filter((table) => ["RhtpReports"].includes(table.node.id)),
+    tables: tables.filter((table) =>
+      ["RhtpReports", "Comments"].includes(table.node.id)
+    ),
   });
 
   if (!isLocalStack) {
