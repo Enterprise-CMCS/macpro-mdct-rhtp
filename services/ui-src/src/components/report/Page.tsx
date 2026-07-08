@@ -39,11 +39,15 @@ interface Props {
 }
 
 export const Page = ({ id, setElements, elements }: Props) => {
-  const { userIsEndUser } = useStore().user || {};
+  const { userIsEndUser, userRole } = useStore().user || {};
   const { report } = useStore();
 
   const buildElement = (element: PageElement, index: number) => {
-    const disabled = !userIsEndUser || isCompleteStatus(report?.status);
+    const roleCanEdit =
+      "editByRole" in element
+        ? element.editByRole!.includes(userRole!)
+        : userIsEndUser;
+    const disabled = !roleCanEdit || isCompleteStatus(report?.status);
     const subType = report?.subType;
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([

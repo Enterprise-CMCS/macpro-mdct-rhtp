@@ -68,6 +68,7 @@ const inputElementSchema = {
   required: boolean().required(),
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
+  editByRole: array().of(string()).notRequired(),
 };
 
 const textboxTemplateSchema = object().shape({

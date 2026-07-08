@@ -43,6 +43,11 @@ export const STATE_POLICY_COMMITMENT_NAMES = [
   "F.1. Telehealth License/Registration Process (including special licenses)",
 ];
 
+export const cmsEvaluationStatusDefault = {
+  label: "Not yet evaluated",
+  value: "Not yet evaluated",
+};
+
 export const getDropdownOptions = (label: string) => {
   switch (label) {
     case "B.3. SNAP Food Restriction Waiver Policy":
