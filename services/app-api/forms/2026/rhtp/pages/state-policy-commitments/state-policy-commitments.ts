@@ -7,9 +7,10 @@ import {
   PageType,
   ParagraphTemplate,
   TextAreaBoxTemplate,
+  UserRoles,
 } from "@rhtp/shared";
 import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
-import { getDropdownOptions } from "./constants";
+import { cmsEvaluationStatusDefault, getDropdownOptions } from "./constants";
 
 const commitmentStatusDropdown = (
   label: string,
@@ -35,6 +36,22 @@ const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
   },
   required: false,
 });
+const cmsStatusEvaluation = (label: string): DropdownTemplate => {
+  const dropdownOptions = [
+    cmsEvaluationStatusDefault,
+    ...getDropdownOptions(label),
+  ];
+
+  return {
+    type: ElementType.Dropdown,
+    id: "cms-status-evaluation",
+    label: "CMS Status Evaluation",
+    options: dropdownOptions,
+    required: true,
+    answer: cmsEvaluationStatusDefault.value,
+    editByRole: [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER],
+  };
+};
 
 const commitmentLinkListInput: ListInputTemplate = {
   type: ElementType.ListInput,
@@ -78,6 +95,7 @@ const buildCommitments = (
       label,
       elements: [
         commitmentStatusDropdown(label, status),
+        cmsStatusEvaluation(label),
         commitmentSupportParagraph,
         commitmentLinkListInput,
         commitmentAttachmentArea(label),
