@@ -98,11 +98,11 @@ const AdminCreateReportModal = ({
       onConfirmHandler={onSubmit}
       submitting={submitting}
     >
-      {errorAlert !== undefined ? (
+      {errorAlert !== undefined && (
         <Alert status={AlertTypes.ERROR} title="Failed to create report">
           {errorAlert}
         </Alert>
-      ) : null}
+      )}
       <Dropdown
         label="State"
         name="State"
@@ -327,7 +327,7 @@ export const AdminDashboard = () => {
             </Box>
           </AccordionItem>
         </Accordion>
-        {userCanStartReport ? (
+        {userCanStartReport && (
           <Box>
             <Text mb="spacer2">
               To begin the first annual report for a state, select Start First
@@ -340,7 +340,7 @@ export const AdminDashboard = () => {
               Start First Annual Report
             </Button>
           </Box>
-        ) : null}
+        )}
         <Heading as="h2" variant="h2">
           State Submissions
         </Heading>
