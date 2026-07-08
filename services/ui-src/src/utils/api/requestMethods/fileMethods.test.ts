@@ -71,7 +71,7 @@ describe("Test fileApi functions", () => {
       status: "ready",
     };
     (apiLib.get as Mock).mockReturnValue(mockUrl);
-    const result = await getZipPresignedUrl("RHTP", "PA", "mock-id");
+    const result = await getZipPresignedUrl("RHTP/PA/mock-id", {});
     expect(result).toBe(mockUrl.psurl);
   });
 });

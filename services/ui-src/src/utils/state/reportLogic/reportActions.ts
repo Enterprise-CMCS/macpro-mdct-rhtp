@@ -6,6 +6,8 @@ import { PageStatus, ParentPageTemplate, Report } from "@rhtp/shared";
 import { ReportState } from "types";
 import { putReport } from "utils/api/requestMethods/report";
 import { getLocalHourMinuteTime } from "utils";
+import { getZipPresignedUrl } from "utils/api/requestMethods/fileMethods";
+import DOMPurify from "dompurify";
 
 export const buildState = (
   report: Report | undefined,
@@ -166,4 +168,13 @@ export const setAnswerInElement = <T>(
     (element.answer as T) = getAnswer(element.answer as T);
   }
   setAnswers(page, pageId);
+};
+
+export const getZipFile = async <T>(path: string, body: T) => {
+  const fileLink = await getZipPresignedUrl(path, body);
+  const sanitizeLink = DOMPurify.sanitize(fileLink);
+
+  const link = document.createElement("a");
+  link.href = sanitizeLink;
+  link.click();
 };

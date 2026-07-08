@@ -11,18 +11,11 @@ import {
 import {
   deleteUploadedFile,
   getFileDownloadUrl,
-  getZipPresignedUrl,
-  getZipPresignedUrlTest,
 } from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
-import {
-  ReportType,
-  UploadListProp,
-  AttachmentStatus,
-  Report,
-} from "@rhtp/shared";
+import { ReportType, UploadListProp, AttachmentStatus } from "@rhtp/shared";
 
 export const acceptedFileTypes = [
   ".bmp",
@@ -71,29 +64,6 @@ export const downloadFile = async (
   const fileLink = await getFileDownloadUrl(reportType, state, id, file.fileId);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
   window.open(sanitizeLink);
-};
-
-export const getZipFile = async (report: Report) => {
-  const { state, id, type } = report;
-
-  const fileLink = await getZipPresignedUrl(type, state, id);
-  const sanitizeLink = DOMPurify.sanitize(fileLink);
-
-  const link = document.createElement("a");
-  link.href = sanitizeLink;
-  link.click();
-};
-
-export const getZipFile2 = async (
-  type: string,
-  files: { state: string; reportId: string; fileId: string }[]
-) => {
-  const fileLink = await getZipPresignedUrlTest(type, files);
-  const sanitizeLink = DOMPurify.sanitize(fileLink);
-
-  const link = document.createElement("a");
-  link.href = sanitizeLink;
-  link.click();
 };
 
 export const canEditAttachment = (status: AttachmentStatus): boolean => {

@@ -40,45 +40,12 @@ interface ZipStatusResponse {
 const POLL_INTERVAL_MS = 3000;
 const MAX_POLLS = 300; // 15 minutes at 3-second intervals
 
-export const getZipPresignedUrl = async (
-  reportType: string,
-  state: string,
-  id: string
-) => {
+export const getZipPresignedUrl = async <T>(path: string, body: T) => {
   const requestHeaders = await getRequestHeaders();
 
-  await apiLib.post<{ status: string }>(
-    `/reports/${reportType}/${state}/${id}/files/zip`,
-    { headers: { ...requestHeaders }, body: {} }
-  );
-
-  for (let i = 0; i < MAX_POLLS; i++) {
-    await new Promise<void>((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-    console.log(`Polling for zip status... (attempt ${i + 1}/${MAX_POLLS})`);
-
-    const freshHeaders = await getRequestHeaders();
-    const result = await apiLib.get<ZipStatusResponse>(
-      `/reports/${reportType}/${state}/${id}/files/zip`,
-      { headers: { ...freshHeaders } }
-    );
-
-    if (result.status === "ready" && result.psurl) {
-      return result.psurl;
-    }
-  }
-
-  throw new Error("Zip generation timed out");
-};
-
-export const getZipPresignedUrlTest = async (
-  reportType: string,
-  files: { state: string; reportId: string; fileId: string }[]
-) => {
-  const requestHeaders = await getRequestHeaders();
-
-  await apiLib.post<{ status: string }>(`/reports/${reportType}/zip`, {
+  await apiLib.post<{ status: string }>(path, {
     headers: { ...requestHeaders },
-    body: { files },
+    body: body,
   });
 
   for (let i = 0; i < MAX_POLLS; i++) {
@@ -86,10 +53,9 @@ export const getZipPresignedUrlTest = async (
     console.log(`Polling for zip status... (attempt ${i + 1}/${MAX_POLLS})`);
 
     const freshHeaders = await getRequestHeaders();
-    const result = await apiLib.get<ZipStatusResponse>(
-      `/reports/${reportType}/zip`,
-      { headers: { ...freshHeaders } }
-    );
+    const result = await apiLib.get<ZipStatusResponse>(path, {
+      headers: { ...freshHeaders },
+    });
 
     if (result.status === "ready" && result.psurl) {
       return result.psurl;
