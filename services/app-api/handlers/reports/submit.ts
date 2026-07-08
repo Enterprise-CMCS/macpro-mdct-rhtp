@@ -7,7 +7,7 @@ import { Report, ReportStatus } from "@rhtp/shared";
 import { canWriteState } from "../../utils/authorization";
 import { error } from "../../utils/constants";
 import { validateReportPayload } from "../../utils/reportValidation";
-import { sendEmail } from "../../utils/notifications/email";
+import { sendReportStatusChangeEmail } from "../../utils/notifications/email";
 
 export const submitReport = handler(parseReportParameters, async (request) => {
   const { reportType, state, id } = request.parameters;
@@ -59,7 +59,7 @@ export const submitReport = handler(parseReportParameters, async (request) => {
   await putReport(validatedPayload);
 
   try {
-    await sendEmail(report, user);
+    await sendReportStatusChangeEmail(report, user);
   } catch (error) {
     // log and allow call to succeed even if email fails
     logger.error(error);
