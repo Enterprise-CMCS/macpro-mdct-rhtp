@@ -56,6 +56,7 @@ const AdminCreateReportModal = ({
 
   const onClose = () => {
     setErrorAlert(undefined);
+    setSelectedState(dropdownEmptyOption.value);
     modalDisclosure.onClose();
   };
 
