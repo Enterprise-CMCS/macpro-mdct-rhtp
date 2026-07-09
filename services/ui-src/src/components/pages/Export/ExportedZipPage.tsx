@@ -51,8 +51,6 @@ export const ExportedZipPage = () => {
 
   const [selectedState, setSelectedState] = useState<string>();
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
-  const [stateOptions, setStateOptions] = useState<DropdownOptions[]>([]);
-  const [reportOptions, setReportOptions] = useState<DropdownOptions[]>([]);
 
   const buildReportOptions = () => {
     const subType = Object.entries(RhtpSubTypeMap)
