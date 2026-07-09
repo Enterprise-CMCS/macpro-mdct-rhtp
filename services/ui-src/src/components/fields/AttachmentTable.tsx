@@ -11,6 +11,7 @@ import {
   AlertTypes,
   InitiativeAnswerProp,
   AttachmentStatus,
+  PageStatus,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import {
@@ -157,31 +158,31 @@ export const AttachmentTable = (
     onClose();
   };
 
+  const getInitiativeOptions = (selectedFile?: InitiativeAnswerProp) => {
+    return initiatives.map(({ id, initiativeNumber, status, title }) => {
+      const isAbandoned = status === PageStatus.ABANDONED;
+      const isChecked = selectedFile?.initiatives?.includes(id);
+      return {
+        label: `${initiativeNumber}: ${title}${isAbandoned ? " (abandoned)" : ""}`,
+        value: id,
+        checked: !!isChecked,
+        disabled: isAbandoned,
+      };
+    });
+  };
+
   const onAddClick = () => {
     setModalMode("Upload");
     setModalOpen(true);
     setCheckpoint("");
     setUploadedFiles([]);
-    setInitiativeOptions(
-      initiatives.map((initiative) => ({
-        label: `${initiative.initiativeNumber}: ${initiative.title}`,
-        value: initiative.id,
-        checked: false,
-      }))
-    );
+    setInitiativeOptions(getInitiativeOptions());
   };
 
   const setCurrentValues = (selectedFile: InitiativeAnswerProp) => {
     setCheckpoint(selectedFile.checkpoint ?? "");
     setUploadedFiles([selectedFile.attachment]);
-
-    const initiativeOptions = initiatives.map((initiative) => ({
-      label: `${initiative.initiativeNumber}: ${initiative.title}`,
-      value: initiative.id,
-      checked: selectedFile.initiatives.includes(initiative.id),
-    }));
-
-    setInitiativeOptions(initiativeOptions);
+    setInitiativeOptions(getInitiativeOptions(selectedFile));
   };
 
   const onEditClick = (selectedFile: InitiativeAnswerProp) => {
@@ -259,6 +260,7 @@ export const AttachmentTable = (
             onClick={() => onCommentClick(row)}
             aria-label={`Comment on ${row.attachment.name}`}
             fontWeight="bold"
+            disabled={disabled}
           >
             Status/Comments
           </Button>
