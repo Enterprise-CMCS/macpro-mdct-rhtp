@@ -54,7 +54,9 @@ export const parseHintText = (
   },
   setModalComponent: (content: string, header: string) => void
 ) => {
-  const { link, label, text } = element.helperTextLink!;
+  const link = element.helperTextLink?.link;
+  const label = element.helperTextLink?.label;
+  const text = element.helperTextLink?.label;
 
   return (
     element.helperText && (
