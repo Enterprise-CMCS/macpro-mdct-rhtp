@@ -2,7 +2,7 @@ import s3 from "../../libs/s3-lib";
 import { handler } from "../../libs/handler-lib";
 import { parseReportType } from "../../libs/param-lib";
 import { ok } from "../../libs/response-lib";
-import { ReportType, StateAbbr } from "@rhtp/shared";
+import { ReportType } from "@rhtp/shared";
 import JSZip from "jszip";
 import { getPSURL, zipBuffer, runZipWorker } from "../../utils/zips/polling";
 import { LambdaClient } from "@aws-sdk/client-lambda";
@@ -13,8 +13,6 @@ const S3ZipKey = (reportType: string) => `zips/${reportType}.zip`;
 
 interface ZipWorkerEvent {
   reportType: ReportType;
-  state: StateAbbr;
-  id: string;
   files: { state: string; reportId: string; fileId: string }[];
 }
 
