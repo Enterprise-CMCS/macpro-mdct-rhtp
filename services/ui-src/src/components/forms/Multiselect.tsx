@@ -2,15 +2,17 @@ import { Box, Checkbox, Image } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import arrowIcon from "assets/icons/arrows/icon_arrow_up_black.svg";
 import { InlineError } from "@cmsgov/design-system";
+import { DropdownOptions } from "types";
 
 interface Prop {
   label: string;
   values: string[];
-  options: { label: string; value: string }[];
+  options: DropdownOptions[];
   placeholder: string;
   countLabel: string;
   onChange: (item: string[]) => void;
   errorMessage?: string;
+  disabled?: boolean;
 }
 
 export const MultiSelect = ({
@@ -21,15 +23,28 @@ export const MultiSelect = ({
   placeholder,
   onChange,
   errorMessage,
+  disabled,
 }: Prop) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
+  const [defaultValue, setDefaultValue] = useState<DropdownOptions[]>(options);
   const [filteredValues, setFilteredValues] =
-    useState<{ label: string; value: string }[]>(options);
+    useState<DropdownOptions[]>(options);
 
   const onClick = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    setDefaultValue(options);
+    setFilteredValues(options);
+  }, [options]);
+
+  useEffect(() => {
+    if (search === "" || !search) {
+      setFilteredValues(options);
+    }
+  }, [search]);
 
   useEffect(() => {
     const clickOutOfBounds = (e: PointerEvent) => {
@@ -38,7 +53,6 @@ export const MultiSelect = ({
 
       if (multiselect && !multiselect.contains(target)) {
         setSearch("");
-        setFilteredValues(options);
         setIsOpen(false);
       }
     };
@@ -69,9 +83,9 @@ export const MultiSelect = ({
     setSearch(searchValue);
 
     if (searchValue === undefined || searchValue === "")
-      setFilteredValues(options);
+      setFilteredValues(defaultValue);
     else {
-      const displayValues = options.filter((value) =>
+      const displayValues = defaultValue.filter((value) =>
         value.label.toLowerCase().startsWith(searchValue)
       );
       setFilteredValues(displayValues);
@@ -87,6 +101,7 @@ export const MultiSelect = ({
         onChange={onSearch}
         value={search}
         aria-label={`Search ${countLabel} by name`}
+        disabled={disabled}
       />
     ) : (
       <input
@@ -96,6 +111,7 @@ export const MultiSelect = ({
         onClick={onClick}
         value={`${countLabel} (${values.length})`}
         aria-label={`${countLabel} select`}
+        disabled={disabled}
       />
     );
   };
@@ -171,6 +187,10 @@ const sx = {
         border: "2px solid black",
         borderRadius: "3px",
         padding: "8px",
+        "&:disabled": {
+          backgroundColor: "gray_lighter",
+          borderColor: "gray_light",
+        },
       },
       img: {
         position: "absolute",

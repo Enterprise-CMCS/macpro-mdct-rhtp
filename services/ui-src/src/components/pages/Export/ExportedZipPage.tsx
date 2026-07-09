@@ -13,11 +13,22 @@ import { Dropdown } from "@cmsgov/design-system";
 import { PageTemplate } from "components/layout/PageTemplate";
 import { Modal } from "components/modals/Modal";
 import { useEffect, useState } from "react";
-import { dropdownEmptyOption } from "../../../../../shared/src/utils/constants";
+import {
+  dropdownEmptyOption,
+  StateNames,
+} from "../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
 import { ElementType, Report, ReportType, UploadListProp } from "@rhtp/shared";
 import { getReportByType } from "utils";
 import { getZipFile } from "utils/state/reportLogic/reportActions";
+import { DropdownOptions } from "types";
+
+type ZipMetadata = {
+  name: string;
+  id: string;
+  state: string;
+  file?: UploadListProp;
+};
 
 const ExportCard = (title: string, desc: string, onClick: () => void) => {
   return (
@@ -58,48 +69,42 @@ const buildReportList = (reports: Report[]) => {
 
 export const ExportedZipPage = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+  const [emptyReport, isEmptyReport] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<{
     heading: string;
-    subHeading?: string;
+    subheading?: string;
     actionButtonText: string;
     closeButtonText?: string;
   }>({ heading: "", actionButtonText: "Export", closeButtonText: "Cancel" });
   const [view, setView] = useState<"STATE" | "REPORTS" | undefined>();
-  const [reports, setReports] = useState<
-    { name: string; id: string; state: string; file?: UploadListProp }[]
-  >([]);
+  const [reports, setReports] = useState<ZipMetadata[]>([]);
 
   const [selectedState, setSelectedState] = useState<string>("");
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
+  const [stateOptions, setStateOptions] = useState<DropdownOptions[]>([]);
+  const [reportOptions, setReportOptions] = useState<DropdownOptions[]>([]);
 
-  const [stateOptions, setStateOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [reportOptions, setReportOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const buildReportOptions = (reports: ZipMetadata[]) => {
+    const filtered = reports.filter((report) => report.file);
+
+    isEmptyReport(filtered.length === 0);
+    if (filtered.length === 0) return [];
+
+    return [
+      { label: "All", value: "all" },
+      ...filtered.map((report) => ({ label: report.name, value: report.id })),
+    ];
+  };
 
   useEffect(() => {
     const reloadReports = async (reportType: string) => {
       setIsLoading(true);
       const result = await getReportByType(reportType);
-
       const list = buildReportList(result);
       setReports(list);
-
-      setStateOptions([
-        dropdownEmptyOption,
-        ...result.map((report) => ({
-          label: report.state,
-          value: report.state,
-        })),
-      ]);
-
-      setReportOptions([
-        { label: "All", value: "all" },
-        ...result.map((report) => ({ label: report.name, value: report.id })),
-      ]);
+      setReportOptions(buildReportOptions(list));
       setIsLoading(false);
     };
     reloadReports(ReportType.RHTP);
@@ -109,75 +114,79 @@ export const ExportedZipPage = () => {
     setStateOptions([
       dropdownEmptyOption,
       ...reports.map((report) => ({
-        label: report.state,
+        label: StateNames[report.state as keyof typeof StateNames],
         value: report.state,
       })),
     ]);
-
-    setReportOptions([
-      { label: "All", value: "all" },
-      ...reports.map((report) => ({ label: report.name, value: report.id })),
-    ]);
-  }, []);
+    setReportOptions(buildReportOptions(reports));
+    setSelectedState("");
+    setSelectedReports([]);
+  }, [modalOpen]);
 
   const onStateChange = (evt: { target: { value: string } }) => {
     const newState = evt.target.value;
+
     setSelectedState(newState);
-    setReportOptions([
-      { label: "All", value: "all" },
-      ...reports
-        .filter((report) => report.state === newState)
-        .map((option) => ({ label: option.name, value: option.id })),
-    ]);
+    setSelectedReports([]);
+
+    const filteredReports = reports.filter(
+      (report) => report.state === newState
+    );
+
+    //if no state is selected,, display all reports
+    setReportOptions(
+      buildReportOptions(newState === "" ? reports : filteredReports)
+    );
   };
 
   const onReportChange = (selected: string[]) => {
-    if (!selectedReports.includes("all")) {
-      if (selected.includes("all")) {
-        setSelectedReports(reportOptions.map((option) => option.value));
-        return;
-      }
+    if (!selectedReports.includes("all") && selected.includes("all")) {
+      //if user selected all and it previously wasn't selected, set all checkboxes to selected
+      setSelectedReports(reportOptions.map((option) => option.value));
+    } else if (selectedReports.includes("all") && !selected.includes("all")) {
+      //if all was selected and now is deselected, remove all checkboxes
+      setSelectedReports([]);
+    } else if (
+      selected.length === reportOptions.length - 1 &&
+      !selected.includes("all")
+    ) {
+      //if user selects all the selections, auto select all
+      setSelectedReports(["all", ...selected]);
+    } else if (selected.length < reportOptions.length + 1) {
+      //if user deselects a state and all is selected, it will be remove
+      setSelectedReports(selected.filter((selection) => selection !== "all"));
     } else {
-      if (!selected.includes("all")) {
-        setSelectedReports([]);
-        return;
-      } else {
-        if (selected.length < reportOptions.length + 1) {
-          setSelectedReports(
-            selected.filter((selection) => selection !== "all")
-          );
-          return;
-        }
-      }
+      setSelectedReports(selected);
     }
-    setSelectedReports(selected);
   };
 
-  const export1 = () => {
-    setModalData({
-      ...modalData,
-      heading: "Use of Funds: By Reports (includes All States)",
-      subHeading:
-        "Report includes all states. Select one or many reports to include in the download.",
-    });
-    setView("REPORTS");
-    setModalOpen(true);
-  };
-
-  const export2 = () => {
-    setModalData({
-      ...modalData,
-      heading: "Use of Funds: By State and Report(s) Export",
-      subHeading:
-        "Select one State and one or many reports to include in the download.",
-    });
-    setView("STATE");
+  const setExportData = (view: "STATE" | "REPORTS") => {
+    switch (view) {
+      case "REPORTS":
+        setModalData({
+          ...modalData,
+          heading: "Use of Funds: By Reports (includes All States)",
+          subheading:
+            "Report includes all states. Select one or many reports to include in the download.",
+        });
+        break;
+      case "STATE":
+        setModalData({
+          ...modalData,
+          heading: "Use of Funds: By State and Report(s) Export",
+          subheading:
+            "Select one State and one or many reports to include in the download.",
+        });
+        break;
+    }
+    setView(view);
     setModalOpen(true);
   };
 
   const OnExport = async () => {
-    const files = reports.filter(
-      (report) => report.file && report.file.fileId != undefined
+    setIsExporting(true);
+    const files = reports.filter((report) =>
+      selectedReports.includes(report.id)
     );
 
     const newFiles = files.map((file) => ({
@@ -189,6 +198,8 @@ export const ExportedZipPage = () => {
     await getZipFile<{
       files: { reportId: string; state: string; fileId: string }[];
     }>(`/reports/${ReportType.RHTP}/zip`, { files: newFiles });
+    setIsExporting(false);
+    setModalOpen(false);
   };
 
   return (
@@ -211,12 +222,12 @@ export const ExportedZipPage = () => {
           {ExportCard(
             "Use of Funds: By Reports (includes All States)",
             "{Details about what is included in the export}",
-            export1
+            () => setExportData("REPORTS")
           )}
           {ExportCard(
             "Use of Funds: By State and Report(s)",
             "{Details about what is included in the export}",
-            export2
+            () => setExportData("STATE")
           )}
         </Flex>
       )}
@@ -229,6 +240,8 @@ export const ExportedZipPage = () => {
         }}
         content={modalData}
         onConfirmHandler={OnExport}
+        submitting={isExporting}
+        disableConfirm={emptyReport}
       >
         <Stack gap="1.5rem" sx={sx.override}>
           {view === "STATE" && (
@@ -247,7 +260,13 @@ export const ExportedZipPage = () => {
             values={selectedReports}
             placeholder={"- Select an option -"}
             countLabel={"Reports"}
+            disabled={emptyReport}
           ></MultiSelect>
+          {emptyReport && (
+            <Text color="error">
+              {`No use of funds found in ${StateNames[selectedState as keyof typeof StateNames]} reports`}
+            </Text>
+          )}
         </Stack>
       </Modal>
     </PageTemplate>
