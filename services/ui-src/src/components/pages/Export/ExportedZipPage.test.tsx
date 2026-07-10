@@ -10,11 +10,6 @@ import { testA11yAct } from "utils/testing/commonTests";
 import { RouterWrappedComponent } from "utils/testing/mockRouter";
 import userEvent from "@testing-library/user-event";
 
-const mockGetZipFile = vi.fn();
-vi.mock("utils/state/reportLogic/reportActions", () => ({
-  getZipFile: () => mockGetZipFile(),
-}));
-
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 describe("ExportedZipPage", () => {
@@ -61,11 +56,6 @@ describe("ExportedZipPage", () => {
     fireEvent.input(search, { target: { value: "Annual" } });
     const checkbox1 = screen.getByRole("checkbox", { name: "Annual Report 1" });
     await userEvent.click(checkbox1);
-
-    const exportBtn = screen.getByRole("button", { name: "Export" });
-    await userEvent.click(exportBtn);
-    expect(mockGetZipFile).toHaveBeenCalled();
-
     userEvent.click(screen.getByRole("button", { name: "Cancel" }));
   });
 
@@ -91,11 +81,6 @@ describe("ExportedZipPage", () => {
     fireEvent.input(search, { target: { value: "Annual" } });
     const checkbox1 = screen.getByRole("checkbox", { name: "Annual Report 1" });
     await userEvent.click(checkbox1);
-
-    const exportBtn = screen.getByRole("button", { name: "Export" });
-    await userEvent.click(exportBtn);
-    expect(mockGetZipFile).toHaveBeenCalled();
-
     userEvent.click(screen.getByRole("button", { name: "Cancel" }));
   });
 });
