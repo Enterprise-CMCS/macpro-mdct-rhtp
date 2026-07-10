@@ -13,6 +13,8 @@ import {
   TableCheckpointTemplate,
   UploadListProp,
   AlertTypes,
+  InitiativePageTemplate,
+  PageStatus,
 } from "@rhtp/shared";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -145,13 +147,17 @@ const getFilesFromTable = (tables: TableShape[], checkpoint: string) => {
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
 ) => {
-  const { disabled } = props;
+  const { disabled: formDisabled } = props;
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<UploadListProp[]>([]);
   const { pageId } = useParams();
   const { report, setAnswers } = useStore();
+  const initiative = report?.pages.find(
+    (page) => page.id === pageId
+  ) as InitiativePageTemplate;
+  const disabled = formDisabled || initiative?.status === PageStatus.ABANDONED;
   const { id, state, type: reportType } = report!;
   const { autosave } = useContext(ReportAutosaveContext);
   //if there is answer on load, we need to build the shape from the checkpoints data
@@ -376,6 +382,7 @@ export const TableCheckpoint = (
             onClick={() => onCommentClick(row.file)}
             aria-label={`Comment on ${row.file.name}`}
             fontWeight="bold"
+            disabled={disabled}
           >
             Status/Comments
           </Button>

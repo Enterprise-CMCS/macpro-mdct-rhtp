@@ -10,6 +10,7 @@ import {
   AttachmentTableTemplate,
   Comment,
   ElementType,
+  PageStatus,
 } from "@rhtp/shared";
 import KSUID from "ksuid";
 import { queryUpload, batchPutUploads } from "../../storage/upload";
@@ -49,7 +50,8 @@ const copyStatePolicyCommitments = (
 const copyAnswer = (
   oldElements: PageElement[],
   newElements: PageElement[],
-  newSubType: RhtpSubType
+  newSubType: RhtpSubType,
+  status?: PageStatus
 ) => {
   for (const oldElement of oldElements) {
     // Copying over State Policy Commitments
@@ -59,11 +61,21 @@ const copyAnswer = (
       ) as AccordionGroupTemplate;
       copyStatePolicyCommitments(oldElement.accordions, newElement.accordions);
     }
-    if (!("answer" in oldElement)) continue;
 
     const newElement = newElements.find(
       (newElement) => newElement.id === oldElement.id
     );
+    // when copying, don't use pre-filled answers
+    if (newElement && "answer" in newElement) {
+      delete newElement.answer;
+    }
+    // disable all elements in an abandoned page
+    if (status === PageStatus.ABANDONED) {
+      (newElement as any).disabled = true;
+    }
+    if (!("answer" in oldElement)) {
+      continue;
+    }
     if (newElement?.type === oldElement.type) {
       //special copy of metrics table when it's a new annual report
       if (
@@ -225,7 +237,7 @@ export const copyReport = async (newReport: Report) => {
         newPage.status = oldPage.status;
       }
 
-      copyAnswer(oldPage.elements, newElements, subType);
+      copyAnswer(oldPage.elements, newElements, subType, newPage?.status);
     }
   }
 
