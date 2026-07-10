@@ -8,41 +8,7 @@ import {
 import { ExportedZipPage } from "./ExportedZipPage";
 import { testA11yAct } from "utils/testing/commonTests";
 import { RouterWrappedComponent } from "utils/testing/mockRouter";
-import { mockReport, mockReport2 } from "utils/testing/mockForm";
 import userEvent from "@testing-library/user-event";
-import { ElementType, PageType } from "@rhtp/shared";
-
-const useOfFunds = [
-  {
-    id: "use-of-funds",
-    type: PageType.Standard,
-    title: "Use Of Funds",
-    elements: [
-      {
-        id: "use of funds attachment",
-        type: ElementType.UseOfFundsAttachment,
-        label: "",
-        required: false,
-        answer: [
-          {
-            name: "file",
-            size: 0,
-            fileId: "mock-file-id",
-          },
-        ],
-      },
-    ],
-  },
-];
-
-const mockGetReport = vi.fn().mockResolvedValue([
-  { ...mockReport, pages: useOfFunds },
-  { ...mockReport2, pages: useOfFunds },
-]);
-vi.mock("utils", async (importOriginal) => ({
-  ...(await importOriginal()),
-  getReportByType: () => mockGetReport(),
-}));
 
 const mockGetZipFile = vi.fn();
 vi.mock("utils/state/reportLogic/reportActions", () => ({
@@ -92,8 +58,8 @@ describe("ExportedZipPage", () => {
       name: "Search Reports by name",
     });
 
-    fireEvent.input(search, { target: { value: "plan" } });
-    const checkbox1 = screen.getByRole("checkbox", { name: "plan id" });
+    fireEvent.input(search, { target: { value: "Annual" } });
+    const checkbox1 = screen.getByRole("checkbox", { name: "Annual Report 1" });
     await userEvent.click(checkbox1);
 
     const exportBtn = screen.getByRole("button", { name: "Export" });
@@ -122,8 +88,8 @@ describe("ExportedZipPage", () => {
       name: "Search Reports by name",
     });
 
-    fireEvent.input(search, { target: { value: "plan" } });
-    const checkbox1 = screen.getByRole("checkbox", { name: "plan id" });
+    fireEvent.input(search, { target: { value: "Annual" } });
+    const checkbox1 = screen.getByRole("checkbox", { name: "Annual Report 1" });
     await userEvent.click(checkbox1);
 
     const exportBtn = screen.getByRole("button", { name: "Export" });

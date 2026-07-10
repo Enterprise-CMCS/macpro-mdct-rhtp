@@ -5,7 +5,6 @@ import {
   Flex,
   Heading,
   HStack,
-  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -18,17 +17,8 @@ import {
   StateNames,
 } from "../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
-import { ElementType, Report, ReportType, UploadListProp } from "@rhtp/shared";
-import { getReportByType } from "utils";
+import { RhtpSubTypeMap } from "@rhtp/shared";
 import { getZipFile } from "utils/state/reportLogic/reportActions";
-import { DropdownOptions } from "types";
-
-type ZipMetadata = {
-  name: string;
-  id: string;
-  state: string;
-  file?: UploadListProp;
-};
 
 const ExportCard = (title: string, desc: string, onClick: () => void) => {
   return (
@@ -49,28 +39,8 @@ const ExportCard = (title: string, desc: string, onClick: () => void) => {
   );
 };
 
-const buildReportList = (reports: Report[]) => {
-  return reports.map((report) => {
-    const useOfFunds = report.pages.find((page) => page.id === "use-of-funds");
-    const attachments =
-      useOfFunds?.elements
-        ?.filter((element) => element.type === ElementType.UseOfFundsAttachment)
-        .flatMap((attachment) => attachment.answer)
-        .filter(Boolean) ?? [];
-
-    return {
-      id: report.id,
-      name: report.name,
-      state: report.state,
-      file: attachments[0],
-    };
-  });
-};
-
 export const ExportedZipPage = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
-  const [emptyReport, isEmptyReport] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<{
     heading: string;
@@ -79,46 +49,29 @@ export const ExportedZipPage = () => {
     closeButtonText?: string;
   }>({ heading: "", actionButtonText: "Export", closeButtonText: "Cancel" });
   const [view, setView] = useState<"STATE" | "REPORTS" | undefined>();
-  const [reports, setReports] = useState<ZipMetadata[]>([]);
 
-  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedState, setSelectedState] = useState<string>();
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
-  const [stateOptions, setStateOptions] = useState<DropdownOptions[]>([]);
-  const [reportOptions, setReportOptions] = useState<DropdownOptions[]>([]);
 
-  const buildReportOptions = (reports: ZipMetadata[]) => {
-    const filtered = reports.filter((report) => report.file);
+  const buildReportOptions = () => {
+    const subType = Object.entries(RhtpSubTypeMap)
+      .filter((item) => item[1].openDate < Date.now())
+      .map((item) => ({ label: item[1].name, value: item[0] }));
 
-    isEmptyReport(filtered.length === 0);
-    if (filtered.length === 0) return [];
-
-    return [
-      { label: "All", value: "all" },
-      ...filtered.map((report) => ({ label: report.name, value: report.id })),
-    ];
+    return [{ label: "All", value: "all" }, ...subType];
   };
 
-  useEffect(() => {
-    const reloadReports = async (reportType: string) => {
-      setIsLoading(true);
-      const result = await getReportByType(reportType);
-      const list = buildReportList(result);
-      setReports(list);
-      setReportOptions(buildReportOptions(list));
-      setIsLoading(false);
-    };
-    reloadReports(ReportType.RHTP);
-  }, []);
+  //using all states of now until we get a report lite route
+  const stateOptions = [
+    dropdownEmptyOption,
+    ...Object.entries(StateNames).map((state) => ({
+      label: state[1],
+      value: state[0],
+    })),
+  ];
+  const reportOptions = buildReportOptions();
 
   useEffect(() => {
-    setStateOptions([
-      dropdownEmptyOption,
-      ...reports.map((report) => ({
-        label: StateNames[report.state as keyof typeof StateNames],
-        value: report.state,
-      })),
-    ]);
-    setReportOptions(buildReportOptions(reports));
     setSelectedState("");
     setSelectedReports([]);
   }, [modalOpen]);
@@ -128,15 +81,6 @@ export const ExportedZipPage = () => {
 
     setSelectedState(newState);
     setSelectedReports([]);
-
-    const filteredReports = reports.filter(
-      (report) => report.state === newState
-    );
-
-    //if no state is selected,, display all reports
-    setReportOptions(
-      buildReportOptions(newState === "" ? reports : filteredReports)
-    );
   };
 
   const onReportChange = (selected: string[]) => {
@@ -185,39 +129,23 @@ export const ExportedZipPage = () => {
 
   const OnExport = async () => {
     setIsExporting(true);
-    const files = reports.filter((report) =>
-      selectedReports.includes(report.id)
-    );
 
-    const newFiles = files.map((file) => ({
-      reportId: file.id,
-      state: file.state,
-      fileId: file.file?.fileId!,
-      name: file.file?.name!,
-    }));
+    /////////////////////////
+    //add export code here
+    const body = [{}];
+    const path = "";
+    type zipType = {};
 
-    await getZipFile<{
-      files: {
-        reportId: string;
-        state: string;
-        fileId: string;
-        name: string;
-      }[];
-    }>(`/reports/${ReportType.RHTP}/zip`, { files: newFiles });
+    await getZipFile<zipType[]>(path, body);
+
+    /////////////////////////
+
     setIsExporting(false);
     setModalOpen(false);
   };
 
-  const errorMsg = (view: string) => {
-    const msg =
-      view === "STATE"
-        ? "No reports found for selected state"
-        : "No reports found";
-    return emptyReport ? msg : "";
-  };
-
   const isReportSelectDisabled = () => {
-    return (view === "STATE" && selectedState === "") || emptyReport;
+    return view === "STATE" && selectedState === "";
   };
 
   return (
@@ -231,24 +159,18 @@ export const ExportedZipPage = () => {
           details and context to help the user complete this page.
         </Text>
       </Box>
-      {isLoading ? (
-        <Flex justify="center">
-          <Spinner size="md" />
-        </Flex>
-      ) : (
-        <Flex flexDirection="column" gap="spacer4">
-          {ExportCard(
-            "Use of Funds: By Reports (includes All States)",
-            "{Details about what is included in the export}",
-            () => setExportData("REPORTS")
-          )}
-          {ExportCard(
-            "Use of Funds: By State and Report(s)",
-            "{Details about what is included in the export}",
-            () => setExportData("STATE")
-          )}
-        </Flex>
-      )}
+      <Flex flexDirection="column" gap="spacer4">
+        {ExportCard(
+          "Use of Funds: By Reports (includes All States)",
+          "{Details about what is included in the export}",
+          () => setExportData("REPORTS")
+        )}
+        {ExportCard(
+          "Use of Funds: By State and Report(s)",
+          "{Details about what is included in the export}",
+          () => setExportData("STATE")
+        )}
+      </Flex>
       <Modal
         modalDisclosure={{
           isOpen: modalOpen,
@@ -259,7 +181,7 @@ export const ExportedZipPage = () => {
         content={modalData}
         onConfirmHandler={OnExport}
         submitting={isExporting}
-        disableConfirm={emptyReport}
+        disableConfirm={isReportSelectDisabled()}
       >
         <Stack gap="1.5rem" sx={sx.override}>
           {view === "STATE" && (
@@ -279,7 +201,6 @@ export const ExportedZipPage = () => {
             placeholder={"- Select an option -"}
             countLabel={"Reports"}
             disabled={isReportSelectDisabled()}
-            errorMessage={errorMsg(view!)}
           ></MultiSelect>
         </Stack>
       </Modal>

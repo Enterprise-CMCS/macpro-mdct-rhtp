@@ -356,40 +356,6 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
-  const zipByFilesWorkerLambda = new Lambda(scope, "zipByFilesWorker", {
-    entry: "services/app-api/handlers/uploads/zipByFiles.ts",
-    handler: "zipByFilesWorker",
-    memorySize: 10240,
-    timeout: Duration.minutes(15),
-    ...commonProps,
-  });
-
-  new Lambda(scope, "getZipByFilesStatus", {
-    entry: "services/app-api/handlers/uploads/zipByFiles.ts",
-    handler: "getZipByFilesStatus",
-    path: "/reports/{reportType}/zip",
-    method: "GET",
-    ...commonProps,
-  });
-
-  new Lambda(scope, "triggerZipByFilesGeneration", {
-    entry: "services/app-api/handlers/uploads/zipByFiles.ts",
-    handler: "triggerZipByFilesGeneration",
-    path: "/reports/{reportType}/zip",
-    method: "POST",
-    additionalPolicies: [
-      new PolicyStatement({
-        actions: ["lambda:InvokeFunction"],
-        resources: [zipByFilesWorkerLambda.lambda.functionArn],
-      }),
-    ],
-    ...commonProps,
-    environment: {
-      ...commonProps.environment,
-      zipWorkerFunctionName: zipByFilesWorkerLambda.lambda.functionName,
-    },
-  });
-
   new Lambda(scope, "deleteUpload", {
     entry: "services/app-api/handlers/uploads/delete.ts",
     handler: "deleteUploadedFile",
