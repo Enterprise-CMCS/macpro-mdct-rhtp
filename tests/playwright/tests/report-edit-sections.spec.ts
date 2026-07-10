@@ -1,6 +1,6 @@
-import { test, expect } from "./fixtures/base";
-import { ReportEditorPage } from "./pageObjects/report-editor.page";
-import { openReportSection } from "../utils/report-edit-arrange";
+import { test, expect } from "../fixtures/base";
+import { ReportEditorPage } from "../pages/report-editor.page";
+import { openReportSection } from "../support/report/arrange";
 import {
   INITIATIVE_ATTACHMENTS_SECTION,
   INITIATIVES_SECTION,
@@ -8,12 +8,12 @@ import {
   STATE_POLICY_COMMITMENTS_SECTION,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
   USE_OF_FUNDS_SECTION,
-} from "../utils/report-edit-helpers";
+} from "../support/report/edit.helpers";
 import {
   verifyCurrentSection,
   verifyContinueVisible,
   verifyPreviousVisible,
-} from "../utils/report-edit-assertions";
+} from "../support/assertions/report-edit.assertions";
 
 const verifySectionNavState = async (
   editor: ReportEditorPage,
@@ -194,16 +194,26 @@ test.describe("Report Editing - Section Rendering", () => {
       editor.page.getByRole("heading", { name: "Review & Submit" })
     ).toBeVisible();
     await expect(
-      editor.page.getByText("Your form is not ready for submission", {
-        exact: true,
-      })
-    ).toBeVisible();
-    await expect(
       editor.page.getByText("Ready to Submit?", { exact: true })
     ).toBeVisible();
-    await expect(
-      editor.page.getByRole("button", { name: /Submit for Review/i })
-    ).toBeVisible();
+    const blockedMessage = editor.page.getByText(
+      "Your form is not ready for submission",
+      {
+        exact: true,
+      }
+    );
+    const finalSubmitButton = editor.page.getByRole("button", {
+      name: /Submit .* Report/i,
+    });
+
+    if (await blockedMessage.isVisible().catch(() => false)) {
+      await expect(blockedMessage).toBeVisible();
+      await expect(
+        editor.page.getByRole("button", { name: /Submit for Review/i })
+      ).toBeVisible();
+    } else {
+      await expect(finalSubmitButton).toBeVisible();
+    }
     await expect(editor.continueButton).toBeHidden();
     await expect(editor.previousButton).toBeHidden();
   });

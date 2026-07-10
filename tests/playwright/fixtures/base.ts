@@ -1,7 +1,7 @@
 import { test as base, BrowserContext } from "@playwright/test";
-import { adminAuthPath, stateUserAuthPath } from "../../utils/consts";
-import { AdminPage } from "../pageObjects/admin.page";
-import { StatePage } from "../pageObjects/state.page";
+import { adminAuthPath, stateUserAuthPath } from "../support/shared/consts";
+import { AdminPage } from "../pages/admin.page";
+import { StatePage } from "../pages/state.page";
 
 type CustomFixtures = {
   stateContext: BrowserContext;

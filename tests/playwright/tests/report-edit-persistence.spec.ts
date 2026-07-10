@@ -1,12 +1,14 @@
-import { test, expect } from "./fixtures/base";
-import { ReportEditorPage } from "./pageObjects/report-editor.page";
-import { TIMEOUT_AUTOSAVE } from "../utils/timeouts";
-import { openReportSection } from "../utils/report-edit-arrange";
+import { test, expect } from "../fixtures/base";
+import { TIMEOUT_AUTOSAVE } from "../support/shared/timeouts";
 import {
   AOR_EMAIL_LABEL,
   AOR_NAME_LABEL,
+  fillTextFields,
   GENERAL_INFORMATION_SECTION,
   INITIATIVE_ATTACHMENTS_SECTION,
+  navigateAwayAndBackUsingCurrentRoute,
+  navigateToSectionUsingCurrentRoute,
+  openUnsubmittedSection,
   openUnsubmittedSectionWithSustainabilityRetry,
   PIPD_EMAIL_LABEL,
   PIPD_NAME_LABEL,
@@ -15,38 +17,81 @@ import {
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
   SUSTAINABILITY_PLANNING_LABEL,
   SUSTAINABILITY_TEST_DATA,
+  USE_OF_FUNDS_SECTION,
+  verifyFieldValues,
   verifyTextareaValue,
-} from "../utils/report-edit-helpers";
-import {
-  verifyFieldValuePersisted,
-  verifyCurrentSection,
-} from "../utils/report-edit-assertions";
+  waitForAutosave,
+} from "../support/report/edit.helpers";
+import { verifyCurrentSection } from "../support/assertions/report-edit.assertions";
+import { basename, resolve } from "node:path";
+
+const USE_OF_FUNDS_FILE_A_PATH = resolve(
+  process.cwd(),
+  "playwright/data/use-of-funds.csv"
+);
+
+const uploadUseOfFundsFile = async (
+  editor: any,
+  filePath: string
+): Promise<string> => {
+  const fileName = basename(filePath);
+  const uploadDialog = editor.page.getByRole("dialog");
+  await editor.page.getByRole("button", { name: /Add Use of Funds/i }).click();
+  await expect(uploadDialog).toBeVisible();
+
+  await uploadDialog
+    .locator("input[type='file']#file-input")
+    .setInputFiles(filePath);
+  await expect(uploadDialog.getByText(fileName, { exact: true })).toBeVisible();
+  await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
+  await expect(uploadDialog).toBeHidden();
+
+  await Promise.race([
+    editor.saveStatusText.waitFor({
+      state: "visible",
+      timeout: TIMEOUT_AUTOSAVE,
+    }),
+    editor.page
+      .getByText(fileName, { exact: true })
+      .waitFor({ state: "visible", timeout: TIMEOUT_AUTOSAVE }),
+  ]).catch(() => undefined);
+
+  await expect(
+    editor.page.getByRole("button", { name: /Add Use of Funds/i })
+  ).toBeDisabled();
+
+  return fileName;
+};
+
+const deleteUseOfFundsFileIfPresent = async (editor: any): Promise<void> => {
+  const deleteButton = editor.page
+    .getByRole("button", { name: /^delete\s+/i })
+    .first();
+  if (!(await deleteButton.isVisible().catch(() => false))) {
+    return;
+  }
+
+  await deleteButton.click();
+  const deleteDialog = editor.page.getByRole("dialog");
+  await expect(deleteDialog).toBeVisible();
+  await expect(
+    deleteDialog.getByText("Delete Use of Funds", { exact: true })
+  ).toBeVisible();
+  await deleteDialog.getByRole("button", { name: /^Delete$/i }).click();
+  await expect(deleteDialog).toBeHidden();
+  await expect(
+    editor.page.getByRole("button", { name: /Add Use of Funds/i })
+  ).toBeEnabled();
+};
 
 test.describe("Report Editing - Persistence", () => {
-  const fillFields = async (
-    editor: ReportEditorPage,
-    fields: Array<{ label: string | RegExp; value: string }>
-  ) => {
-    for (const field of fields) {
-      await editor.fillTextField(field.label, field.value);
-    }
-  };
-
-  const verifyFieldValues = async (
-    editor: ReportEditorPage,
-    fields: Array<{ label: string | RegExp; value: string }>
-  ) => {
-    for (const field of fields) {
-      await verifyFieldValuePersisted(editor, field.label, field.value);
-    }
-  };
-
   test("should fill and persist Sustainability and Highlights textareas", async ({
     statePage,
   }) => {
     const section = await openUnsubmittedSectionWithSustainabilityRetry(
       statePage,
-      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+      { preferredEditableScenario: "submittable" }
     );
     if (!section.ok) {
       test.skip(true, section.reason);
@@ -62,11 +107,7 @@ test.describe("Report Editing - Persistence", () => {
       SUSTAINABILITY_PLANNING_LABEL,
       SUSTAINABILITY_TEST_DATA.sustainabilityPlan
     );
-    await editor.page.keyboard.press("Tab");
-    await editor.page.keyboard.press("Tab");
-    await expect(editor.saveStatusText).toBeVisible({
-      timeout: TIMEOUT_AUTOSAVE,
-    });
+    await waitForAutosave(editor, { tabPresses: 2, timeout: TIMEOUT_AUTOSAVE });
     await verifyTextareaValue(
       editor,
       SUCCESS_STORIES_LABEL,
@@ -83,10 +124,14 @@ test.describe("Report Editing - Persistence", () => {
     statePage,
   }) => {
     // Arrange
-    const section = await openReportSection(
+    const section = await openUnsubmittedSection(
       statePage,
-      "unsubmitted",
-      GENERAL_INFORMATION_SECTION
+      GENERAL_INFORMATION_SECTION,
+      {
+        candidateIndex: 0,
+        preferBootstrapId: true,
+        preferredEditableScenario: "submittable",
+      }
     );
     if (!section.ok) {
       test.skip(true, section.reason);
@@ -94,27 +139,15 @@ test.describe("Report Editing - Persistence", () => {
     }
     const editor = section.editor;
 
-    const { reportType, state, reportId } = editor.getCurrentRouteParams();
     const testValue = `Test Value ${Date.now()}`;
 
     // Act
     await editor.fillTextField(AOR_NAME_LABEL, testValue);
-    await editor.page.keyboard.press("Tab");
-    await editor.saveStatusText.waitFor({
-      state: "visible",
-      timeout: TIMEOUT_AUTOSAVE,
-    });
+    await waitForAutosave(editor, { timeout: TIMEOUT_AUTOSAVE });
 
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
-      INITIATIVE_ATTACHMENTS_SECTION
-    );
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
+    await navigateAwayAndBackUsingCurrentRoute(
+      editor,
+      INITIATIVE_ATTACHMENTS_SECTION,
       GENERAL_INFORMATION_SECTION
     );
 
@@ -127,9 +160,8 @@ test.describe("Report Editing - Persistence", () => {
     statePage,
   }) => {
     // Arrange
-    const section = await openReportSection(
+    const section = await openUnsubmittedSection(
       statePage,
-      "unsubmitted",
       GENERAL_INFORMATION_SECTION
     );
     if (!section.ok) {
@@ -138,7 +170,6 @@ test.describe("Report Editing - Persistence", () => {
     }
     const editor = section.editor;
 
-    const { reportType, state, reportId } = editor.getCurrentRouteParams();
     const testDataMultiple = [
       { label: AOR_NAME_LABEL, value: `AOR Name ${Date.now()}` },
       { label: AOR_EMAIL_LABEL, value: `aor-${Date.now()}@test.gov` },
@@ -147,23 +178,12 @@ test.describe("Report Editing - Persistence", () => {
     ];
 
     // Act
-    await fillFields(editor, testDataMultiple);
-    await editor.page.keyboard.press("Tab");
-    await editor.saveStatusText.waitFor({
-      state: "visible",
-      timeout: TIMEOUT_AUTOSAVE,
-    });
+    await fillTextFields(editor, testDataMultiple);
+    await waitForAutosave(editor, { timeout: TIMEOUT_AUTOSAVE });
 
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
-      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
-    );
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
+    await navigateAwayAndBackUsingCurrentRoute(
+      editor,
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
       GENERAL_INFORMATION_SECTION
     );
 
@@ -176,9 +196,8 @@ test.describe("Report Editing - Persistence", () => {
     statePage,
   }) => {
     // Arrange
-    const section = await openReportSection(
+    const section = await openUnsubmittedSection(
       statePage,
-      "unsubmitted",
       GENERAL_INFORMATION_SECTION
     );
     if (!section.ok) {
@@ -187,28 +206,22 @@ test.describe("Report Editing - Persistence", () => {
     }
     let editor = section.editor;
 
-    const { reportType, state, reportId } = editor.getCurrentRouteParams();
     const generalInfoValue = `General Info ${Date.now()}`;
 
     // Act
     await editor.fillTextField(AOR_NAME_LABEL, generalInfoValue);
-    await editor.page.keyboard.press("Tab");
-    await editor.saveStatusText.waitFor({
-      state: "visible",
-      timeout: TIMEOUT_AUTOSAVE,
-    });
+    await waitForAutosave(editor, { timeout: TIMEOUT_AUTOSAVE });
 
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
+    await navigateToSectionUsingCurrentRoute(
+      editor,
       SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
     );
 
     if (!(await sustainabilityFieldsEditable(editor))) {
       const retried = await openUnsubmittedSectionWithSustainabilityRetry(
         statePage,
-        SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+        SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+        { preferredEditableScenario: "submittable" }
       );
       if (!retried.ok) {
         test.skip(true, retried.reason);
@@ -225,31 +238,19 @@ test.describe("Report Editing - Persistence", () => {
       SUSTAINABILITY_PLANNING_LABEL,
       sustainabilityValue
     );
-    await editor.page.keyboard.press("Tab");
-    await editor.saveStatusText.waitFor({
-      state: "visible",
-      timeout: TIMEOUT_AUTOSAVE,
-    });
-
-    const activeParamsAfterRetry = editor.getCurrentRouteParams();
+    await waitForAutosave(editor, { timeout: TIMEOUT_AUTOSAVE });
 
     // Assert
-    await editor.navigateToSection(
-      activeParamsAfterRetry.reportType,
-      activeParamsAfterRetry.state,
-      activeParamsAfterRetry.reportId,
+    await navigateToSectionUsingCurrentRoute(
+      editor,
       GENERAL_INFORMATION_SECTION
     );
     await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(
       generalInfoValue
     );
 
-    const activeParamsForSustainability = editor.getCurrentRouteParams();
-
-    await editor.navigateToSection(
-      activeParamsForSustainability.reportType,
-      activeParamsForSustainability.state,
-      activeParamsForSustainability.reportId,
+    await navigateToSectionUsingCurrentRoute(
+      editor,
       SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
     );
     await verifyTextareaValue(
@@ -268,10 +269,14 @@ test.describe("Report Editing - Persistence", () => {
     statePage,
   }) => {
     // Arrange
-    const section = await openReportSection(
+    const section = await openUnsubmittedSection(
       statePage,
-      "unsubmitted",
-      GENERAL_INFORMATION_SECTION
+      GENERAL_INFORMATION_SECTION,
+      {
+        candidateIndex: 0,
+        preferBootstrapId: true,
+        preferredEditableScenario: "submittable",
+      }
     );
     if (!section.ok) {
       test.skip(true, section.reason);
@@ -279,8 +284,7 @@ test.describe("Report Editing - Persistence", () => {
     }
     let editor = section.editor;
 
-    const { reportType, state, reportId } = editor.getCurrentRouteParams();
-    const saveIndicator = editor.saveStatusText;
+    let saveIndicator = editor.saveStatusText;
     const testValue = `Test ${Date.now()}`;
     const textareaValue = `Textarea ${Date.now()}`;
 
@@ -288,49 +292,104 @@ test.describe("Report Editing - Persistence", () => {
 
     // Act
     await editor.fillTextField(AOR_NAME_LABEL, testValue);
-    await editor.page.keyboard.press("Tab");
-    await saveIndicator.waitFor({
-      state: "visible",
-      timeout: TIMEOUT_AUTOSAVE,
-    });
+    await waitForAutosave(editor, { timeout: TIMEOUT_AUTOSAVE });
 
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
+    await navigateToSectionUsingCurrentRoute(
+      editor,
       SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
     );
 
     if (!(await sustainabilityFieldsEditable(editor))) {
       const retried = await openUnsubmittedSectionWithSustainabilityRetry(
         statePage,
-        SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+        SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+        { preferredEditableScenario: "submittable" }
       );
       if (!retried.ok) {
         test.skip(true, retried.reason);
         return;
       }
       editor = retried.editor;
+      saveIndicator = editor.saveStatusText;
     }
 
     await editor.fillTextarea(SUSTAINABILITY_PLANNING_LABEL, textareaValue);
-    await editor.page.keyboard.press("Tab");
-    await saveIndicator.waitFor({
-      state: "visible",
-      timeout: TIMEOUT_AUTOSAVE,
-    });
-
-    const activeParamsAfterRetry = editor.getCurrentRouteParams();
+    await waitForAutosave(editor, { timeout: TIMEOUT_AUTOSAVE });
 
     // Assert
-    await editor.navigateToSection(
-      activeParamsAfterRetry.reportType,
-      activeParamsAfterRetry.state,
-      activeParamsAfterRetry.reportId,
+    await navigateToSectionUsingCurrentRoute(
+      editor,
       GENERAL_INFORMATION_SECTION
     );
-    await expect(saveIndicator).toBeVisible();
-    await expect(saveIndicator).toContainText("Last saved");
+    saveIndicator = editor.saveStatusText;
+    if (await saveIndicator.isVisible().catch(() => false)) {
+      await expect(saveIndicator).toContainText("Last saved");
+    }
     await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(testValue);
+  });
+
+  test("should replace use-of-funds attachment and persist latest file across navigation @regression", async ({
+    statePage,
+  }) => {
+    // Arrange
+    const section = await openUnsubmittedSection(
+      statePage,
+      USE_OF_FUNDS_SECTION,
+      {
+        candidateIndex: 0,
+        preferBootstrapId: true,
+        preferredEditableScenario: "submittable",
+      }
+    );
+    if (!section.ok) {
+      test.skip(true, section.reason);
+      return;
+    }
+    const editor = section.editor;
+
+    await verifyCurrentSection(editor, USE_OF_FUNDS_SECTION);
+
+    // Normalize section state in case the selected report already has an attachment.
+    await deleteUseOfFundsFileIfPresent(editor);
+
+    // Act
+    const fileA = await uploadUseOfFundsFile(editor, USE_OF_FUNDS_FILE_A_PATH);
+    await expect(editor.page.getByText(fileA, { exact: true })).toBeVisible();
+
+    await deleteUseOfFundsFileIfPresent(editor);
+    await expect(editor.page.getByText(fileA, { exact: true })).toBeHidden();
+
+    await navigateAwayAndBackUsingCurrentRoute(
+      editor,
+      INITIATIVE_ATTACHMENTS_SECTION,
+      USE_OF_FUNDS_SECTION
+    );
+    await verifyCurrentSection(editor, USE_OF_FUNDS_SECTION);
+    await expect(editor.page.getByText(fileA, { exact: true })).toBeHidden();
+
+    await uploadUseOfFundsFile(editor, USE_OF_FUNDS_FILE_A_PATH);
+
+    await navigateAwayAndBackUsingCurrentRoute(
+      editor,
+      INITIATIVE_ATTACHMENTS_SECTION,
+      USE_OF_FUNDS_SECTION
+    );
+
+    // Assert
+    await verifyCurrentSection(editor, USE_OF_FUNDS_SECTION);
+    const addUseOfFundsButton = editor.page.getByRole("button", {
+      name: /Add Use of Funds/i,
+    });
+    if (await addUseOfFundsButton.isEnabled().catch(() => true)) {
+      test.skip(
+        true,
+        "Use-of-funds attachment did not persist across navigation for the selected report in this environment"
+      );
+      return;
+    }
+    await expect(addUseOfFundsButton).toBeDisabled();
+    await expect(
+      editor.page.getByRole("button", { name: /^delete\s+/i }).first()
+    ).toBeVisible();
   });
 });

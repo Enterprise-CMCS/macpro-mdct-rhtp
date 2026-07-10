@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import { BasePage } from "./base.page";
-import { TIMEOUT_LOADING, TIMEOUT_UI } from "../../utils/timeouts";
+import { TIMEOUT_LOADING, TIMEOUT_UI } from "../support/shared/timeouts";
 
 export class ReportModalPage extends BasePage {
   constructor(page: Page) {

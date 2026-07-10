@@ -1,6 +1,6 @@
 import { Page, Locator } from "@playwright/test";
 import { BasePage } from "./base.page";
-import { TIMEOUT_LOADING } from "../../utils/timeouts";
+import { TIMEOUT_LOADING } from "../support/shared/timeouts";
 
 export class ReportEditorPage extends BasePage {
   constructor(page: Page) {
