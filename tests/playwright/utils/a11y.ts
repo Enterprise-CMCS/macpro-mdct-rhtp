@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, Page } from "@playwright/test";
-import { a11yTags, a11yViewports } from "../shared/consts";
+import { a11yTags, a11yViewports } from "./consts";
 
 export async function checkPageAccessibility(page: Page) {
   const axeBuilder = new AxeBuilder({ page }).withTags(a11yTags);

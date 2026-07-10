@@ -1,30 +1,23 @@
-import { test, expect } from "../fixtures/base";
-import { StatePage } from "../pages/state.page";
-import { TIMEOUT_LOADING } from "../support/shared/timeouts";
+import { test, expect } from "./fixtures/base";
+import { StatePage } from "./pageObjects/state.page";
+import { TIMEOUT_LOADING } from "../utils/timeouts";
+import { openReportSection } from "../utils/report-edit-arrange";
 import {
   GENERAL_INFORMATION_SECTION,
   GENERAL_INFO_FIELDS,
-  openSubmittedSection,
-  openUnsubmittedSection,
-  openUnsubmittedSectionWithSustainabilityRetry,
   prepareReportForSubmission,
   REVIEW_SUBMIT_SECTION,
-  SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-} from "../support/report/edit.helpers";
+} from "../utils/report-edit-helpers";
 import {
   verifyFieldIsReadOnly,
   verifyCurrentSection,
-} from "../support/assertions/report-edit.assertions";
+} from "../utils/report-edit-assertions";
 
 const arrangeReviewSubmitSection = async (statePage: StatePage) => {
-  const section = await openUnsubmittedSection(
+  const section = await openReportSection(
     statePage,
-    REVIEW_SUBMIT_SECTION,
-    {
-      candidateIndex: 0,
-      preferBootstrapId: true,
-      preferredEditableScenario: "blocked",
-    }
+    "unsubmitted",
+    REVIEW_SUBMIT_SECTION
   );
   if (!section.ok) {
     test.skip(true, section.reason);
@@ -53,8 +46,9 @@ test.describe("Report Editing - Submit and Readonly", () => {
   test("should render submitted reports as read-only in general information", async ({
     statePage,
   }) => {
-    const section = await openSubmittedSection(
+    const section = await openReportSection(
       statePage,
+      "submitted",
       GENERAL_INFORMATION_SECTION
     );
     if (!section.ok) {
@@ -79,27 +73,17 @@ test.describe("Report Editing - Submit and Readonly", () => {
     const { submitButton, blockedMessage, editor } = context;
 
     await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
-
-    if (!(await blockedMessage.isVisible().catch(() => false))) {
-      test.skip(
-        true,
-        "Unable to reproduce blocked submission state with available unsubmitted report"
-      );
-      return;
-    }
-
-    await expect(submitButton).toBeVisible();
-    const submitWasEnabled = await submitButton.isEnabled();
-
-    if (submitWasEnabled) {
-      await submitButton.click();
-    }
-
-    await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
     await expect(blockedMessage).toBeVisible();
-    if (!submitWasEnabled) {
+    await expect(submitButton).toBeVisible();
+
+    if (await submitButton.isEnabled()) {
+      await submitButton.click();
+      await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
+    } else {
       await expect(submitButton).toBeDisabled();
     }
+
+    await expect(blockedMessage).toBeVisible();
     await expect(
       editor.page.getByRole("heading", { name: /Successfully Submitted/i })
     ).toBeHidden();
@@ -108,52 +92,22 @@ test.describe("Report Editing - Submit and Readonly", () => {
   test("should submit a report when submission criteria are met", async ({
     statePage,
   }) => {
-    const section = await openUnsubmittedSection(
+    const section = await openReportSection(
       statePage,
-      REVIEW_SUBMIT_SECTION,
-      {
-        candidateIndex: 0,
-        preferBootstrapId: true,
-        preferredEditableScenario: "submittable",
-      }
+      "unsubmitted",
+      REVIEW_SUBMIT_SECTION
     );
     if (!section.ok) {
       test.skip(true, section.reason);
       return;
     }
-    let editor = section.editor;
-
-    let prepResult = await prepareReportForSubmission(editor);
-    if (
-      !prepResult.submittable &&
-      /Sustainability and Highlights/i.test(prepResult.reason ?? "")
-    ) {
-      const retried = await openUnsubmittedSectionWithSustainabilityRetry(
-        statePage,
-        SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-        { preferredEditableScenario: "submittable" }
-      );
-      if (!retried.ok) {
-        test.skip(true, retried.reason);
-        return;
-      }
-
-      editor = retried.editor;
-      prepResult = await prepareReportForSubmission(editor);
-    }
-
-    if (!prepResult.submittable) {
-      test.skip(
-        true,
-        `Report was not submittable after preparation: ${prepResult.reason ?? "unknown reason"}`
-      );
-      return;
-    }
+    const editor = section.editor;
 
     const finalSubmitButton = editor.page.getByRole("button", {
       name: /Submit .* Report/i,
     });
 
+    const prepResult = await prepareReportForSubmission(editor);
     const { reportType, state, reportId } = editor.getCurrentRouteParams();
     await editor.navigateToSection(
       reportType,
@@ -163,6 +117,14 @@ test.describe("Report Editing - Submit and Readonly", () => {
     );
     await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
     await expect(finalSubmitButton).toBeVisible();
+
+    if (!prepResult.submittable) {
+      console.warn(
+        `Skipping final submission test: ${prepResult.reason ?? "report not submittable"}`
+      );
+      test.skip(true, prepResult.reason ?? "report not submittable");
+      return;
+    }
 
     await expect(finalSubmitButton).toBeEnabled({ timeout: TIMEOUT_LOADING });
 

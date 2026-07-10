@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test";
-import { cognitoIdentityRoute } from "../shared/consts";
+import { cognitoIdentityRoute } from "./consts";
 
 /**
  * Authenticate using UI login

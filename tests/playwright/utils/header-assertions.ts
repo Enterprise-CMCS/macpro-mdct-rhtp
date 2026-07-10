@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { HeaderPage } from "../../pages/header.page";
+import { HeaderPage } from "../tests/pageObjects/header.page";
 
 /**
  * Verify that header is visible and all controls are rendered

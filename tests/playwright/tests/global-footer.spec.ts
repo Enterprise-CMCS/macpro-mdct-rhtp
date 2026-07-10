@@ -1,10 +1,10 @@
-import { test } from "../fixtures/base";
-import { FooterPage } from "../pages/footer.page";
+import { test } from "./fixtures/base";
+import { FooterPage } from "./pageObjects/footer.page";
 import {
   verifyFooterVisible,
   verifyFooterHidden,
   verifyFooterNavigation,
-} from "../support/assertions/footer.assertions";
+} from "../utils/footer-assertions";
 
 test.describe("global footer", () => {
   test.describe("authenticated state user", () => {
