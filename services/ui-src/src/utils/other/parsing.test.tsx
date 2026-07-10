@@ -22,7 +22,6 @@ describe("utils/parsing", () => {
       const element = optionalTag({
         label: "mock label",
         required: false,
-        id: "mock-id",
       });
       render(element);
       expect(screen.getByText("mock label")).toBeInTheDocument();
@@ -32,11 +31,10 @@ describe("utils/parsing", () => {
       const element = optionalTag({
         label: "mock label",
         required: true,
-        id: "initiative-narrative",
       });
       render(element);
       expect(screen.getByText("mock label")).toBeInTheDocument();
-      expect(screen.getByText("(Required Annually)")).toBeInTheDocument();
+      expect(screen.getByText("Required")).toBeInTheDocument();
     });
   });
 });

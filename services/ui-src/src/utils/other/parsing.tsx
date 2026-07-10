@@ -15,11 +15,7 @@ export const bytesToKiloBytes = (bytes: number) => {
   return Math.ceil(bytes / 1000);
 };
 
-export const optionalTag = (element: {
-  label: string;
-  required: boolean;
-  id: string;
-}) => {
+export const optionalTag = (element: { label: string; required: boolean }) => {
   return (
     <>
       {element.label}
