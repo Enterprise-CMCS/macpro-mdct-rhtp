@@ -230,34 +230,19 @@ const waitForReportsApiReady = async (
   apiBase: string,
   stateToken: string
 ): Promise<boolean> => {
-  const url = `${apiBase}/reports/${reportType}/${stateAbbreviation}`;
-
   for (let attempt = 1; attempt <= REPORTS_API_READY_RETRIES; attempt++) {
     try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: { "x-api-key": stateToken },
-      });
-
-      // Treat any non-5xx response as "API is ready".
-      // 4xx (e.g. 403 Forbidden) means the server is responding normally;
-      // only 5xx indicates the API is not yet available (cold start, deploy lag, etc.).
-      if (response.status < 500) {
-        return true;
-      }
-
-      console.warn(
-        `Report bootstrap: reports API not ready (attempt ${attempt}/${REPORTS_API_READY_RETRIES}) - GET ${url} failed (${response.status})`
-      );
+      await getReportsForConfiguredState(apiBase, stateToken);
+      return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(
         `Report bootstrap: reports API not ready (attempt ${attempt}/${REPORTS_API_READY_RETRIES}) - ${message}`
       );
-    }
 
-    if (attempt < REPORTS_API_READY_RETRIES) {
-      await delay(REPORTS_API_READY_DELAY_MS);
+      if (attempt < REPORTS_API_READY_RETRIES) {
+        await delay(REPORTS_API_READY_DELAY_MS);
+      }
     }
   }
 
@@ -458,20 +443,7 @@ const bootstrapReportStates =
       );
     }
 
-    let reports: LiteReport[];
-    try {
-      reports = await getReportsForConfiguredState(apiBase, stateToken);
-    } catch (error) {
-      // A 4xx error (e.g. 403 Forbidden) means the API is up but the test
-      // user isn't authorized to list reports. Soft-fail so the tests can
-      // still run; they will find or create reports via the UI instead.
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn(
-        `Report bootstrap skipped: unable to list reports - ${message}`
-      );
-      writeBootstrapState({});
-      return { finalEditable: false, finalSubmitted: false };
-    }
+    let reports = await getReportsForConfiguredState(apiBase, stateToken);
     let releasedSubmittedEditableId: string | undefined;
     let createdEditableReportId: string | undefined;
 
