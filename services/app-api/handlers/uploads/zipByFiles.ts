@@ -13,7 +13,7 @@ const S3ZipKey = (reportType: string) => `zips/${reportType}.zip`;
 
 interface ZipWorkerEvent {
   reportType: ReportType;
-  files: { state: string; reportId: string; fileId: string }[];
+  files: { state: string; reportId: string; fileId: string; name: string }[];
 }
 
 export const triggerZipByFilesGeneration = handler(
@@ -48,7 +48,7 @@ export const zipByFilesWorker = async (event: ZipWorkerEvent) => {
     });
     const bytes = await item.Body?.transformToByteArray();
     if (bytes) {
-      zip.file(`${file.state}/${file.fileId}`, bytes);
+      zip.file(`${file.state}/${file.name}`, bytes);
     }
   }
 

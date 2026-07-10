@@ -193,10 +193,16 @@ export const ExportedZipPage = () => {
       reportId: file.id,
       state: file.state,
       fileId: file.file?.fileId!,
+      name: file.file?.name!,
     }));
 
     await getZipFile<{
-      files: { reportId: string; state: string; fileId: string }[];
+      files: {
+        reportId: string;
+        state: string;
+        fileId: string;
+        name: string;
+      }[];
     }>(`/reports/${ReportType.RHTP}/zip`, { files: newFiles });
     setIsExporting(false);
     setModalOpen(false);
