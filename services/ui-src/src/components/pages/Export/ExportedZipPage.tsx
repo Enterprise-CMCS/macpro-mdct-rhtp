@@ -14,7 +14,7 @@ import { Modal } from "components/modals/Modal";
 import { useEffect, useState } from "react";
 import {
   dropdownEmptyOption,
-  StateNames,
+  StateDropdownOptions,
 } from "../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
 import { RhtpSubTypeMap } from "@rhtp/shared";
@@ -62,13 +62,7 @@ export const ExportedZipPage = () => {
   };
 
   //using all states of now until we get a report lite route
-  const stateOptions = [
-    dropdownEmptyOption,
-    ...Object.entries(StateNames).map((state) => ({
-      label: state[1],
-      value: state[0],
-    })),
-  ];
+  const stateOptions = [dropdownEmptyOption, ...StateDropdownOptions];
   const reportOptions = buildReportOptions();
 
   useEffect(() => {
