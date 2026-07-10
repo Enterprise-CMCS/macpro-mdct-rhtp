@@ -44,6 +44,13 @@ vi.mock("utils", async (importOriginal) => ({
   getReportByType: () => mockGetReport(),
 }));
 
+const mockGetZipFile = vi.fn();
+vi.mock("utils/state/reportLogic/reportActions", () => ({
+  getZipFile: () => mockGetZipFile(),
+}));
+
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
 describe("ExportedZipPage", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -69,7 +76,7 @@ describe("ExportedZipPage", () => {
     ).toBeVisible();
   });
 
-  test("Modal By Reports open and closes", async () => {
+  test("Modal By Reports user interactions", async () => {
     const exportBtns = screen.getAllByRole("button", { name: "Export" });
     await userEvent.click(exportBtns[0]);
     expect(
@@ -78,13 +85,25 @@ describe("ExportedZipPage", () => {
       )
     ).toBeVisible();
 
-    const dropdown = screen.getByRole("button", { name: "Reports select" });
-    fireEvent.input(dropdown, { target: { value: "plan id" } });
+    const reportFilter = screen.getByRole("button", { name: "Reports select" });
+    fireEvent.click(reportFilter);
+
+    const search = screen.getByRole("searchbox", {
+      name: "Search Reports by name",
+    });
+
+    fireEvent.input(search, { target: { value: "plan" } });
+    const checkbox1 = screen.getByRole("checkbox", { name: "plan id" });
+    await userEvent.click(checkbox1);
+
+    const exportBtn = screen.getByRole("button", { name: "Export" });
+    await userEvent.click(exportBtn);
+    expect(mockGetZipFile).toHaveBeenCalled();
 
     userEvent.click(screen.getByRole("button", { name: "Cancel" }));
   });
 
-  test("Modal By Reports exist", async () => {
+  test("Modal By Reports and State user interactions", async () => {
     const exportBtns = screen.getAllByRole("button", { name: "Export" });
     await userEvent.click(exportBtns[1]);
     expect(
@@ -92,9 +111,25 @@ describe("ExportedZipPage", () => {
         "Select one State and one or many reports to include in the download."
       )
     ).toBeVisible();
-    expect(
-      screen.getByRole("button", { name: "Reports select" })
-    ).toBeVisible();
+
+    const dropdown = screen.getAllByLabelText("State")[0];
+    await userEvent.selectOptions(dropdown, "NJ");
+
+    const reportFilter = screen.getByRole("button", { name: "Reports select" });
+    fireEvent.click(reportFilter);
+
+    const search = screen.getByRole("searchbox", {
+      name: "Search Reports by name",
+    });
+
+    fireEvent.input(search, { target: { value: "plan" } });
+    const checkbox1 = screen.getByRole("checkbox", { name: "plan id" });
+    await userEvent.click(checkbox1);
+
+    const exportBtn = screen.getByRole("button", { name: "Export" });
+    await userEvent.click(exportBtn);
+    expect(mockGetZipFile).toHaveBeenCalled();
+
     userEvent.click(screen.getByRole("button", { name: "Cancel" }));
   });
 });
