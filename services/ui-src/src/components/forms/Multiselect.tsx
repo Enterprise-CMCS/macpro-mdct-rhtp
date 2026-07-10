@@ -41,6 +41,7 @@ export const MultiSelect = ({
 
       if (multiselect && !multiselect.contains(target)) {
         setSearch("");
+        setFilteredValues(options);
         setIsOpen(false);
       }
     };
