@@ -18,10 +18,10 @@ import s3 from "../../libs/s3-lib";
 
 const SKIP_COPY_ANSWER_IDS = [
   "use-of-funds-attachment",
-  "success-attachments",
-  "sustainability-attachments",
   "initiative-narrative",
 ];
+
+const SKIP_COPY_PAGE_IDS = ["sustainability-and-highlights"];
 
 const copyStatePolicyCommitments = (
   oldAccordions: AccordionGroupItem[],
@@ -209,6 +209,7 @@ export const copyReport = async (newReport: Report) => {
   if (!reportToCopy) return;
 
   for (const oldPage of reportToCopy.pages) {
+    if (SKIP_COPY_PAGE_IDS.includes(oldPage.id)) continue;
     if (oldPage.elements) {
       let newPage = newPages.find((newPage) => newPage.id === oldPage.id);
       // ensure initiatives not in base template get copied
