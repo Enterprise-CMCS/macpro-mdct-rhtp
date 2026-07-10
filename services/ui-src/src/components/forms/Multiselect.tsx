@@ -92,6 +92,10 @@ export const MultiSelect = ({
     }
   };
 
+  const counter = () => {
+    return values.filter((value) => value !== "all").length;
+  };
+
   const field = () => {
     return isOpen ? (
       <input
@@ -109,7 +113,7 @@ export const MultiSelect = ({
         name="multi-select"
         type="button"
         onClick={onClick}
-        value={`${countLabel} (${values.length})`}
+        value={`${countLabel} (${counter()})`}
         aria-label={`${countLabel} select`}
         disabled={disabled}
       />
