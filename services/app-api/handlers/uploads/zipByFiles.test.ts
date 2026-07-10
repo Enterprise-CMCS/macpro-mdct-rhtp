@@ -99,7 +99,14 @@ describe("Test zip methods", () => {
     test("uploads zip to S3", async () => {
       await zipByFilesWorker({
         reportType: ReportType.RHTP,
-        files: [{ state: "PA", reportId: "mock-id", fileId: "file-id" }],
+        files: [
+          {
+            state: "PA",
+            reportId: "mock-id",
+            fileId: "file-id",
+            name: "file-name",
+          },
+        ],
       });
       expect(vi.mocked(s3.putObject)).toHaveBeenCalledOnce();
     });
