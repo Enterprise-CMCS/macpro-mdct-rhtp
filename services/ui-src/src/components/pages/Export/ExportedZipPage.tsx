@@ -202,6 +202,14 @@ export const ExportedZipPage = () => {
     setModalOpen(false);
   };
 
+  const errorMsg = (view: string) => {
+    const state =
+      view === "State"
+        ? `${StateNames[selectedState as keyof typeof StateNames]} `
+        : "";
+    return `No use of funds found in ${state}reports`;
+  };
+
   return (
     <PageTemplate>
       <Box>
@@ -262,11 +270,7 @@ export const ExportedZipPage = () => {
             countLabel={"Reports"}
             disabled={emptyReport}
           ></MultiSelect>
-          {emptyReport && (
-            <Text color="error">
-              {`No use of funds found in ${StateNames[selectedState as keyof typeof StateNames]} reports`}
-            </Text>
-          )}
+          {emptyReport && <Text color="error">{errorMsg(view!)}</Text>}
         </Stack>
       </Modal>
     </PageTemplate>
