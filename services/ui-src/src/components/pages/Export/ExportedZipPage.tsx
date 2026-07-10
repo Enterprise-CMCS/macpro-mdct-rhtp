@@ -18,7 +18,6 @@ import {
 } from "../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
 import { RhtpSubTypeMap } from "@rhtp/shared";
-import { getZipFile } from "utils/state/reportLogic/reportActions";
 
 const ExportCard = (title: string, desc: string, onClick: () => void) => {
   return (
@@ -121,17 +120,11 @@ export const ExportedZipPage = () => {
     setModalOpen(true);
   };
 
-  const OnExport = async () => {
+  const onExport = async () => {
     setIsExporting(true);
 
     /////////////////////////
     //add export code here
-    const body = [{}];
-    const path = "";
-    type zipType = {};
-
-    await getZipFile<zipType[]>(path, body);
-
     /////////////////////////
 
     setIsExporting(false);
@@ -145,7 +138,7 @@ export const ExportedZipPage = () => {
   return (
     <PageTemplate>
       <Box>
-        <Heading as="h1" id="Exporteader" variant="h1" tabIndex={-1}>
+        <Heading as="h1" variant="h1" tabIndex={-1}>
           Export RHTP Files and Data
         </Heading>
         <Text>
@@ -173,7 +166,7 @@ export const ExportedZipPage = () => {
           },
         }}
         content={modalData}
-        onConfirmHandler={OnExport}
+        onConfirmHandler={onExport}
         submitting={isExporting}
         disableConfirm={isReportSelectDisabled()}
       >
