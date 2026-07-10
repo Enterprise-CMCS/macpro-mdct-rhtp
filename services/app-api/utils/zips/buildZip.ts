@@ -5,11 +5,22 @@ import {
   ElementType,
   AttachmentAreaTemplate,
   Report,
+  PageElement,
+  ReportType,
+  StateAbbr,
 } from "@rhtp/shared";
+import s3Lib from "../../libs/s3-lib";
+import JSZip from "jszip";
 
-export const sortElementsForZip = (report: Report) => {
-  //sort relevant elements into an object to organize better
-  return report?.pages
+export const formatS3ReportZipKey = (
+  reportType: ReportType,
+  state: StateAbbr,
+  id: string
+) => `zips/${reportType}/${state}/${id}.zip`;
+
+// sort relevant elements into an object to organize better
+export const sortElementsForZip = (report: Report) =>
+  report?.pages
     .flatMap((page) => page.elements)
     .reduce(
       (
@@ -31,38 +42,61 @@ export const sortElementsForZip = (report: Report) => {
       },
       { initiative: {}, accordions: [], area: [] }
     );
-};
 
-export const getInitativeFiles = (element: AttachmentTableTemplate) => {
-  //status of files to not add in the zip
-  const ignoreStatus = [
-    AttachmentStatus.ARCHIVED,
-    AttachmentStatus.INFORMATIONAL,
-  ];
-  return (
-    element.answer
-      ?.filter((attachment) => !ignoreStatus.includes(attachment.status))
-      ?.map((answer) => answer.attachment) ?? []
-  );
-};
+// exclude initiative files with these statuses from the zip
+const ignoreStatus = [
+  AttachmentStatus.ARCHIVED,
+  AttachmentStatus.INFORMATIONAL,
+];
+export const getInitiativeFiles = (element: AttachmentTableTemplate) =>
+  element.answer
+    ?.filter(({ status }) => !ignoreStatus.includes(status))
+    .map(({ attachment }) => attachment) ?? [];
 
 export const getAccordionFiles = (elements: AccordionGroupTemplate[]) => {
-  const accordionGroups = elements
-    .flatMap((group) =>
-      group.accordions.flatMap((accordions) => accordions.elements)
-    )
-    .filter((element) => element.type === ElementType.AttachmentArea)
-    .filter((element) => "answer" in element);
-  return accordionGroups.flatMap((group) => group.answer) ?? [];
+  const elementList = elements.flatMap((group) =>
+    group.accordions.flatMap((accordions) => accordions.elements)
+  ) as PageElement[];
+  return getAttachmentAreaFiles(elementList);
 };
 
-export const getSustainabilityAndHighlightFiles = (
-  elements: AttachmentAreaTemplate[]
-) => {
-  const attachAreaIds = ["success-attachments", "sustainability-attachments"];
-  return elements
-    .filter(
-      (element) => attachAreaIds.includes(element.id) && "answer" in element
-    )
-    .flatMap((element) => element.answer);
+export const getAttachmentAreaFiles = (elements: PageElement[]) =>
+  elements
+    .filter((element) => element.type === ElementType.AttachmentArea)
+    .filter((element) => "answer" in element)
+    .flatMap((group) => group.answer);
+
+export const addReportFilesToZip = async (report: Report, zip: JSZip) => {
+  const { id, type: reportType, state } = report;
+  const sortedElements = sortElementsForZip(report);
+  const zipFolders = [
+    {
+      name: "Initiatives",
+      files: getInitiativeFiles(sortedElements?.initiative),
+    },
+    {
+      name: "State Policy Commitments",
+      files: getAccordionFiles(sortedElements?.accordions),
+    },
+    {
+      name: "Sustainability and Highlights",
+      files: getAttachmentAreaFiles(sortedElements?.area),
+    },
+  ];
+
+  for (const folder of zipFolders) {
+    for (const file of folder.files) {
+      const item = await s3Lib.getObject({
+        Bucket: process.env.attachmentsBucketName,
+        Key: `${reportType}/${state}/${id}/${file?.fileId}`,
+      });
+      const bytes = await item.Body?.transformToByteArray();
+      if (bytes && file?.name) {
+        zip.file(
+          `${state}/${report?.subType.toLowerCase()}/${folder.name}/${file.name}`,
+          bytes
+        );
+      }
+    }
+  }
 };
