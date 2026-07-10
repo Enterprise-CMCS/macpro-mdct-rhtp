@@ -24,6 +24,8 @@ import { useParams, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { AddEditInitiativeModal } from "components/modals/AddEditInitiativeModal";
+import { elementSatisfiesRequired } from "utils/state/reportLogic/completeness";
+import { TableStatusIcon } from "components/tables/TableStatusIcon";
 
 export const InitiativesTable = (
   props: PageElementProps<InitiativesTableTemplate>
@@ -57,6 +59,22 @@ export const InitiativesTable = (
 
   const navigate = useNavigate();
 
+  const getStatus = (initiative: InitiativePageTemplate) => {
+    const elements = initiative.elements.filter(
+      (element) => "required" in element && element.required
+    );
+    const statuses = elements.map((element) =>
+      elementSatisfiesRequired(element, elements)
+    );
+    return statuses.every(Boolean);
+  };
+
+  const getMinimumRequirement = (initiative: InitiativePageTemplate) => {
+    return getStatus(initiative)
+      ? "Minimum requirements met"
+      : "Minimum requirements not met";
+  };
+
   // Build Rows
   const rows = initiatives.map(
     (initiative: InitiativePageTemplate, index: number) => {
@@ -68,8 +86,17 @@ export const InitiativesTable = (
       return (
         <Tr key={index}>
           <Td>
+            <TableStatusIcon
+              tableStatus={
+                getStatus(initiative)
+                  ? PageStatus.COMPLETE
+                  : PageStatus.NOT_STARTED
+              }
+            />
+          </Td>
+          <Td>
             <Text fontWeight="bold">{displayName}</Text>
-            <Text>{`Status: ${initiative.status || "Not started"}`}</Text>
+            <Text>{`Status: ${getMinimumRequirement(initiative)}`}</Text>
           </Td>
           <Td>
             {userIsAdmin && initiative.status !== PageStatus.ABANDONED && (
@@ -107,6 +134,7 @@ export const InitiativesTable = (
       <Table variant="initiative">
         <Thead>
           <Tr>
+            <Th>Status</Th>
             <Th>Initiative</Th>
             <Th>Actions</Th>
           </Tr>
