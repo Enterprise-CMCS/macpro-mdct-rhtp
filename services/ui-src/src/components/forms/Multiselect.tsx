@@ -2,15 +2,17 @@ import { Box, Checkbox, Image } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import arrowIcon from "assets/icons/arrows/icon_arrow_up_black.svg";
 import { InlineError } from "@cmsgov/design-system";
+import { DropdownOptions } from "types";
 
 interface Prop {
   label: string;
   values: string[];
-  options: { label: string; value: string }[];
+  options: DropdownOptions[];
   placeholder: string;
   countLabel: string;
   onChange: (item: string[]) => void;
   errorMessage?: string;
+  disabled?: boolean;
 }
 
 export const MultiSelect = ({
@@ -21,11 +23,12 @@ export const MultiSelect = ({
   placeholder,
   onChange,
   errorMessage,
+  disabled,
 }: Prop) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [filteredValues, setFilteredValues] =
-    useState<{ label: string; value: string }[]>(options);
+    useState<DropdownOptions[]>(options);
 
   const onClick = () => {
     setIsOpen(!isOpen);
@@ -78,6 +81,10 @@ export const MultiSelect = ({
     }
   };
 
+  const counter = () => {
+    return values.filter((value) => value !== "all").length;
+  };
+
   const field = () => {
     return isOpen ? (
       <input
@@ -87,6 +94,7 @@ export const MultiSelect = ({
         onChange={onSearch}
         value={search}
         aria-label={`Search ${countLabel} by name`}
+        disabled={disabled}
       />
     ) : (
       <input
@@ -94,8 +102,9 @@ export const MultiSelect = ({
         name="multi-select"
         type="button"
         onClick={onClick}
-        value={`${countLabel} (${values.length})`}
+        value={`${countLabel} (${counter()})`}
         aria-label={`${countLabel} select`}
+        disabled={disabled}
       />
     );
   };
@@ -171,6 +180,10 @@ const sx = {
         border: "2px solid black",
         borderRadius: "3px",
         padding: "8px",
+        "&:disabled": {
+          backgroundColor: "gray_lighter",
+          borderColor: "gray_light",
+        },
       },
       img: {
         position: "absolute",

@@ -54,23 +54,24 @@ export const parseHintText = (
   },
   setModalComponent: (content: string, header: string) => void
 ) => {
+  const link = element.helperTextLink?.link;
+  const label = element.helperTextLink?.label;
+  const text = element.helperTextLink?.text;
+
   return (
     element.helperText && (
       <span className="column">
         {parseHtml(element.helperText)}
-        {element.helperTextLink && (
+        {link && (
           <Button
             variant="link"
             fontSize="14px"
             onClick={() => {
-              setModalComponent(
-                parseHtml(element.helperTextLink?.text ?? ""),
-                element.helperTextLink?.label ?? ""
-              );
+              setModalComponent(parseHtml(text ?? ""), label ?? "");
             }}
             textAlign="left"
           >
-            {element.helperTextLink?.link}
+            {link}
           </Button>
         )}
       </span>
