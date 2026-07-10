@@ -8,47 +8,9 @@ import {
 import { ExportedZipPage } from "./ExportedZipPage";
 import { testA11yAct } from "utils/testing/commonTests";
 import { RouterWrappedComponent } from "utils/testing/mockRouter";
-<<<<<<< HEAD
 import userEvent from "@testing-library/user-event";
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
-=======
-import { mockReport, mockReport2 } from "utils/testing/mockForm";
-import userEvent from "@testing-library/user-event";
-import { ElementType, PageType } from "@rhtp/shared";
-
-const useOfFunds = [
-  {
-    id: "use-of-funds",
-    type: PageType.Standard,
-    title: "Use Of Funds",
-    elements: [
-      {
-        id: "use of funds attachment",
-        type: ElementType.UseOfFundsAttachment,
-        label: "",
-        required: false,
-        answer: [
-          {
-            name: "file",
-            size: 0,
-            fileId: "mock-file-id",
-          },
-        ],
-      },
-    ],
-  },
-];
-
-const mockGetReport = vi.fn().mockResolvedValue([
-  { ...mockReport, pages: useOfFunds },
-  { ...mockReport2, pages: useOfFunds },
-]);
-vi.mock("utils", async (importOriginal) => ({
-  ...(await importOriginal()),
-  getReportByType: () => mockGetReport(),
-}));
->>>>>>> 47068f1 (Create ExportedZipPage.test.tsx)
 
 describe("ExportedZipPage", () => {
   beforeEach(async () => {
@@ -75,11 +37,7 @@ describe("ExportedZipPage", () => {
     ).toBeVisible();
   });
 
-<<<<<<< HEAD
   test("Modal By Reports user interactions", async () => {
-=======
-  test("Modal By Reports open and closes", async () => {
->>>>>>> 47068f1 (Create ExportedZipPage.test.tsx)
     const exportBtns = screen.getAllByRole("button", { name: "Export" });
     await userEvent.click(exportBtns[0]);
     expect(
@@ -88,7 +46,6 @@ describe("ExportedZipPage", () => {
       )
     ).toBeVisible();
 
-<<<<<<< HEAD
     const reportFilter = screen.getByRole("button", { name: "Reports select" });
     fireEvent.click(reportFilter);
 
@@ -103,15 +60,6 @@ describe("ExportedZipPage", () => {
   });
 
   test("Modal By Reports and State user interactions", async () => {
-=======
-    const dropdown = screen.getByRole("button", { name: "Reports select" });
-    fireEvent.input(dropdown, { target: { value: "plan id" } });
-
-    userEvent.click(screen.getByRole("button", { name: "Cancel" }));
-  });
-
-  test("Modal By Reports exist", async () => {
->>>>>>> 47068f1 (Create ExportedZipPage.test.tsx)
     const exportBtns = screen.getAllByRole("button", { name: "Export" });
     await userEvent.click(exportBtns[1]);
     expect(
@@ -119,7 +67,6 @@ describe("ExportedZipPage", () => {
         "Select one State and one or many reports to include in the download."
       )
     ).toBeVisible();
-<<<<<<< HEAD
 
     const dropdown = screen.getAllByLabelText("State")[0];
     await userEvent.selectOptions(dropdown, "NJ");
@@ -134,11 +81,6 @@ describe("ExportedZipPage", () => {
     fireEvent.input(search, { target: { value: "Annual" } });
     const checkbox1 = screen.getByRole("checkbox", { name: "Annual Report 1" });
     await userEvent.click(checkbox1);
-=======
-    expect(
-      screen.getByRole("button", { name: "Reports select" })
-    ).toBeVisible();
->>>>>>> 47068f1 (Create ExportedZipPage.test.tsx)
     userEvent.click(screen.getByRole("button", { name: "Cancel" }));
   });
 });
