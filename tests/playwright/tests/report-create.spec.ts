@@ -1,18 +1,16 @@
-import { test, expect } from "./fixtures/base";
-import { DashboardPage, DashboardState } from "./pageObjects/dashboard.page";
-import { ReportModalPage } from "./pageObjects/report-modal.page";
-import { reportType, stateAbbreviation } from "../utils/consts";
+import { test, expect } from "../fixtures/base";
+import { DashboardPage } from "../pages/dashboard.page";
+import { ReportModalPage } from "../pages/report-modal.page";
+import { reportType, stateAbbreviation } from "../support/shared/consts";
+import {
+  ensureStableEmptyCreateScenario,
+  ensureSubmittedCopyScenario,
+  readCreateBootstrapState,
+  requireBootstrapScenarioId,
+} from "../support/report/create.scenarios";
 
 test.describe("Report Creation", () => {
-  const REPORT_TYPE = reportType;
-  const STATE = stateAbbreviation;
-
-  const navigateAndGetState = async (
-    dashboard: DashboardPage
-  ): Promise<DashboardState> => {
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
-    return dashboard.getDashboardState();
-  };
+  const bootstrapState = readCreateBootstrapState();
 
   test("should allow creating a new report when no reports exist on the dashboard", async ({
     statePage,
@@ -21,17 +19,11 @@ test.describe("Report Creation", () => {
     const dashboard = new DashboardPage(statePage.page);
     const modal = new ReportModalPage(statePage.page);
 
-    // Act - Navigate to dashboard and detect state
-    const dashboardState = await navigateAndGetState(dashboard);
-
-    if (dashboardState !== "empty") {
-      test.skip();
+    const emptyScenario = await ensureStableEmptyCreateScenario(dashboard);
+    if (!emptyScenario.ok) {
+      test.skip(true, emptyScenario.reason);
       return;
     }
-
-    // Assert empty dashboard state
-    expect(await dashboard.isStartButtonAvailable()).toBe(true);
-    expect(await dashboard.isCopyButtonVisible()).toBe(false);
 
     // Act - Create a report
     await dashboard.openCreateModal();
@@ -44,16 +36,18 @@ test.describe("Report Creation", () => {
   test("should disable new report creation and copying when an unsubmitted report is present", async ({
     statePage,
   }) => {
-    // Arrange
-    const dashboard = new DashboardPage(statePage.page);
-
-    // Act - Navigate to dashboard and detect state
-    const dashboardState = await navigateAndGetState(dashboard);
-
-    if (dashboardState !== "unsubmitted") {
-      test.skip();
+    const unsubmittedScenario = requireBootstrapScenarioId(
+      bootstrapState?.createScenarioUnsubmittedReportId,
+      "Bootstrap did not provide unsubmitted create scenario id"
+    );
+    if (!unsubmittedScenario.ok) {
+      test.skip(true, unsubmittedScenario.reason);
       return;
     }
+
+    // Arrange
+    const dashboard = new DashboardPage(statePage.page);
+    await dashboard.navigateToDashboard(reportType, stateAbbreviation);
 
     // Assert blocking behavior
     expect(await dashboard.isStartButtonAvailable()).toBe(false);
@@ -63,21 +57,24 @@ test.describe("Report Creation", () => {
   test("should allow copying a submitted report for a future reporting cycle", async ({
     statePage,
   }) => {
+    const submittedScenario = requireBootstrapScenarioId(
+      bootstrapState?.createScenarioSubmittedReportId,
+      "Bootstrap did not provide submitted create scenario id"
+    );
+    if (!submittedScenario.ok) {
+      test.skip(true, submittedScenario.reason);
+      return;
+    }
+
     // Arrange
     const dashboard = new DashboardPage(statePage.page);
     const modal = new ReportModalPage(statePage.page);
 
-    // Act - Navigate to dashboard and detect state
-    const dashboardState = await navigateAndGetState(dashboard);
-
-    if (dashboardState !== "submitted") {
-      test.skip();
+    const copyScenario = await ensureSubmittedCopyScenario(dashboard);
+    if (!copyScenario.ok) {
+      test.skip(true, copyScenario.reason);
       return;
     }
-
-    // Assert submitted dashboard state — button relabels to "Copy", "Start" variant should not be visible
-    expect(await dashboard.isCopyButtonAvailable()).toBe(true);
-    expect(await dashboard.isStartButtonVisible()).toBe(false);
 
     // Act - Open and submit copy modal
     await dashboard.openCopyModal();

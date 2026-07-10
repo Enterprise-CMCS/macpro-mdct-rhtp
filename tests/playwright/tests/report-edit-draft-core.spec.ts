@@ -1,17 +1,17 @@
-import { test, expect } from "./fixtures/base";
-import { TIMEOUT_AUTOSAVE } from "../utils/timeouts";
-import { openReportSection } from "../utils/report-edit-arrange";
+import { test, expect } from "../fixtures/base";
+import { TIMEOUT_AUTOSAVE } from "../support/shared/timeouts";
+import { openReportSection } from "../support/report/arrange";
 import {
   AOR_NAME_LABEL,
   GENERAL_INFORMATION_SECTION,
   GENERAL_INFO_FIELDS,
-} from "../utils/report-edit-helpers";
+} from "../support/report/edit.helpers";
 import {
   verifyFieldIsEditable,
   verifyFieldValuePersisted,
   verifyCurrentSection,
   verifyContinueVisible,
-} from "../utils/report-edit-assertions";
+} from "../support/assertions/report-edit.assertions";
 
 test.describe("Report Editing - Draft Core", () => {
   test("should allow a state user to edit text fields on an unsubmitted report", async ({

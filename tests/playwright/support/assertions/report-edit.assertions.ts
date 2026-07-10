@@ -1,5 +1,5 @@
 import { expect, Locator } from "@playwright/test";
-import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
+import { ReportEditorPage } from "../../pages/report-editor.page";
 
 const verifyButtonVisibleAndEnabled = async (
   button: Locator
