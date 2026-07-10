@@ -2,12 +2,14 @@ import { Flex, Button, Image, Heading, Stack } from "@chakra-ui/react";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useState } from "react";
+import { useParams } from "react-router";
 import {
   ActionTableTemplate,
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-  isCompleteStatus,
+  InitiativePageTemplate,
+  PageStatus,
 } from "@rhtp/shared";
 import { parseHtml, useStore } from "utils";
 import {
@@ -73,7 +75,11 @@ const buildRows = (
     });
     if (canChangeStatus) {
       rowElement.push(
-        <Button variant="link" onClick={() => onEdit(answerRowIndex)}>
+        <Button
+          variant="link"
+          onClick={() => onEdit(answerRowIndex)}
+          disabled={formDisabled}
+        >
           Edit/Abandon
         </Button>
       );
@@ -108,7 +114,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
-  const actionsDisabled = isCompleteStatus(report?.status);
+  const { pageId } = useParams();
+  const initiative = report?.pages.find(
+    (page) => page.id === pageId
+  ) as InitiativePageTemplate;
+  const actionsDisabled =
+    disabled || element.disabled || initiative?.status === PageStatus.ABANDONED;
   const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
@@ -189,7 +200,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     answer ?? [],
     onChange,
     onModalEdit,
-    disabled || element.disabled,
+    actionsDisabled,
     canAddOrChangeStatus,
     errorMessages
   );
