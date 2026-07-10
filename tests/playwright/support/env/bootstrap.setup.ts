@@ -79,8 +79,56 @@ const parseJsonBody = async (response: Response) => {
   }
 };
 
+type DecodedTokenSummary = {
+  sub?: string;
+  role?: string;
+  state?: string;
+  exp?: number;
+};
+
+type ReportsApiProbeResult =
+  | { ok: true }
+  | {
+      ok: false;
+      status?: number;
+      message: string;
+      tokenSummary?: DecodedTokenSummary;
+    };
+
 const delay = async (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const decodeTokenSummary = (
+  token: string | undefined
+): DecodedTokenSummary | undefined => {
+  if (!token) {
+    return undefined;
+  }
+
+  const payloadSegment = token.split(".")[1];
+  if (!payloadSegment) {
+    return undefined;
+  }
+
+  try {
+    const payload = JSON.parse(
+      Buffer.from(payloadSegment, "base64url").toString("utf8")
+    ) as Record<string, unknown>;
+
+    return {
+      ...(typeof payload.sub === "string" ? { sub: payload.sub } : {}),
+      ...(typeof payload["custom:cms_roles"] === "string"
+        ? { role: String(payload["custom:cms_roles"]).split(",")[0] }
+        : {}),
+      ...(typeof payload["custom:cms_state"] === "string"
+        ? { state: payload["custom:cms_state"] }
+        : {}),
+      ...(typeof payload.exp === "number" ? { exp: payload.exp } : {}),
+    };
+  } catch {
+    return undefined;
+  }
+};
 
 const getLocalstackApiUrl = async (): Promise<string | undefined> => {
   const project = process.env.PROJECT || "rhtp";
@@ -217,6 +265,24 @@ const writeBootstrapState = (state: ReportBootstrapState): void => {
   writeFileSync(BOOTSTRAP_STATE_PATH, JSON.stringify(state, null, 2), "utf8");
 };
 
+const assertTokenLooksUsable = (
+  token: string | undefined,
+  expectedLabel: string
+): void => {
+  if (!token) {
+    throw new Error(
+      `Report bootstrap hard-gate failed: missing ${expectedLabel} token`
+    );
+  }
+
+  const summary = decodeTokenSummary(token);
+  if (!summary) {
+    throw new Error(
+      `Report bootstrap hard-gate failed: unable to decode ${expectedLabel} token`
+    );
+  }
+};
+
 const getReportsForConfiguredState = async (
   apiBase: string,
   stateToken: string
@@ -226,16 +292,30 @@ const getReportsForConfiguredState = async (
   return sortNewestFirst(Array.isArray(reports) ? reports : []);
 };
 
-const waitForReportsApiReady = async (
+const probeReportsApiReady = async (
   apiBase: string,
   stateToken: string
-): Promise<boolean> => {
+): Promise<ReportsApiProbeResult> => {
+  const tokenSummary = decodeTokenSummary(stateToken);
+
   for (let attempt = 1; attempt <= REPORTS_API_READY_RETRIES; attempt++) {
     try {
       await getReportsForConfiguredState(apiBase, stateToken);
-      return true;
+      return { ok: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      const statusMatch = /failed \((\d+)\)/.exec(message);
+      const status = statusMatch ? Number(statusMatch[1]) : undefined;
+
+      if (status === 401 || status === 403) {
+        return {
+          ok: false,
+          status,
+          message,
+          tokenSummary,
+        };
+      }
+
       console.warn(
         `Report bootstrap: reports API not ready (attempt ${attempt}/${REPORTS_API_READY_RETRIES}) - ${message}`
       );
@@ -246,7 +326,11 @@ const waitForReportsApiReady = async (
     }
   }
 
-  return false;
+  return {
+    ok: false,
+    message: "reports API never became ready",
+    tokenSummary,
+  };
 };
 
 const tryCreateEditableReport = async (
@@ -435,11 +519,23 @@ const bootstrapReportStates =
       );
     }
 
+    assertTokenLooksUsable(stateToken, "state user");
+    assertTokenLooksUsable(adminToken, "admin user");
+
     const apiBase = normalizeApiBase(apiUrl);
-    const ready = await waitForReportsApiReady(apiBase, stateToken);
-    if (!ready) {
+    const readiness = await probeReportsApiReady(apiBase, stateToken);
+    if (!readiness.ok) {
+      if (readiness.status === 401 || readiness.status === 403) {
+        throw new Error(
+          `Report bootstrap auth failed: GET ${apiBase}/reports/${reportType}/${stateAbbreviation} returned ${readiness.status}. ` +
+            `Decoded state token summary: ${JSON.stringify(
+              readiness.tokenSummary ?? {}
+            )}`
+        );
+      }
+
       throw new Error(
-        "Report bootstrap hard-gate failed: reports API never became ready"
+        `Report bootstrap hard-gate failed: ${readiness.message}`
       );
     }
 
