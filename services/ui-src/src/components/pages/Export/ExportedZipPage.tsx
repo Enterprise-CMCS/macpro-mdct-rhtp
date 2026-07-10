@@ -209,11 +209,15 @@ export const ExportedZipPage = () => {
   };
 
   const errorMsg = (view: string) => {
-    const state =
-      view === "State"
-        ? `${StateNames[selectedState as keyof typeof StateNames]} `
-        : "";
-    return `No use of funds found in ${state}reports`;
+    const msg =
+      view === "STATE"
+        ? "No reports found for selected state"
+        : "No reports found";
+    return emptyReport ? msg : "";
+  };
+
+  const isReportSelectDisabled = () => {
+    return (view === "STATE" && selectedState === "") || emptyReport;
   };
 
   return (
@@ -274,9 +278,9 @@ export const ExportedZipPage = () => {
             values={selectedReports}
             placeholder={"- Select an option -"}
             countLabel={"Reports"}
-            disabled={emptyReport}
+            disabled={isReportSelectDisabled()}
+            errorMessage={errorMsg(view!)}
           ></MultiSelect>
-          {emptyReport && <Text color="error">{errorMsg(view!)}</Text>}
         </Stack>
       </Modal>
     </PageTemplate>
