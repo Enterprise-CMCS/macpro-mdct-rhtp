@@ -56,7 +56,7 @@ export const parseHintText = (
 ) => {
   const link = element.helperTextLink?.link;
   const label = element.helperTextLink?.label;
-  const text = element.helperTextLink?.label;
+  const text = element.helperTextLink?.text;
 
   return (
     element.helperText && (

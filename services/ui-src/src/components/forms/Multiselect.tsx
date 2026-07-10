@@ -27,24 +27,12 @@ export const MultiSelect = ({
 }: Prop) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
-  const [defaultValue, setDefaultValue] = useState<DropdownOptions[]>(options);
   const [filteredValues, setFilteredValues] =
     useState<DropdownOptions[]>(options);
 
   const onClick = () => {
     setIsOpen(!isOpen);
   };
-
-  useEffect(() => {
-    setDefaultValue(options);
-    setFilteredValues(options);
-  }, [options]);
-
-  useEffect(() => {
-    if (search === "" || !search) {
-      setFilteredValues(options);
-    }
-  }, [search]);
 
   useEffect(() => {
     const clickOutOfBounds = (e: PointerEvent) => {
@@ -83,9 +71,9 @@ export const MultiSelect = ({
     setSearch(searchValue);
 
     if (searchValue === undefined || searchValue === "")
-      setFilteredValues(defaultValue);
+      setFilteredValues(options);
     else {
-      const displayValues = defaultValue.filter((value) =>
+      const displayValues = options.filter((value) =>
         value.label.toLowerCase().startsWith(searchValue)
       );
       setFilteredValues(displayValues);
