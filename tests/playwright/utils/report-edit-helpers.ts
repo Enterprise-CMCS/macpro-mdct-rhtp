@@ -1,16 +1,18 @@
 import { expect } from "@playwright/test";
 import { resolve } from "node:path";
-import { DashboardPage } from "../../pages/dashboard.page";
-import { ReportEditorPage } from "../../pages/report-editor.page";
-import { reportType, stateAbbreviation } from "../shared/consts";
-import { openReportSection, type OpenReportSectionResult } from "./arrange";
-import { TIMEOUT_AUTOSAVE } from "../shared/timeouts";
+import { DashboardPage } from "../tests/pageObjects/dashboard.page";
+import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
+import { reportType, stateAbbreviation } from "./consts";
+import {
+  openReportSection,
+  type OpenReportSectionResult,
+} from "./report-edit-arrange";
+import { TIMEOUT_AUTOSAVE } from "./timeouts";
+
+const REPORT_TYPE = reportType;
+const STATE = stateAbbreviation;
 
 export type ReportEditLabel = string | RegExp;
-export type LabeledFieldValue = {
-  label: ReportEditLabel;
-  value: string;
-};
 
 export type GeneralInfoField = {
   label: ReportEditLabel;
@@ -28,7 +30,7 @@ export const REVIEW_SUBMIT_SECTION = "review-submit";
 
 const USE_OF_FUNDS_FIXTURE_PATH = resolve(
   process.cwd(),
-  "playwright/data/use-of-funds.csv"
+  "playwright/fixtures/use-of-funds.csv"
 );
 
 export const AOR_NAME_LABEL =
@@ -71,104 +73,6 @@ export const verifyTextareaValue = async (
   await expect(editor.getFieldByLabel(label)).toHaveValue(expectedValue);
 };
 
-export const fillTextFields = async (
-  editor: ReportEditorPage,
-  fields: LabeledFieldValue[]
-): Promise<void> => {
-  for (const field of fields) {
-    await editor.fillTextField(field.label, field.value);
-  }
-};
-
-export const verifyFieldValues = async (
-  editor: ReportEditorPage,
-  fields: LabeledFieldValue[]
-): Promise<void> => {
-  for (const field of fields) {
-    await expect(editor.getFieldByLabel(field.label)).toHaveValue(field.value);
-  }
-};
-
-export const waitForAutosave = async (
-  editor: ReportEditorPage,
-  options?: { tabPresses?: number; timeout?: number }
-): Promise<void> => {
-  const tabPresses = options?.tabPresses ?? 1;
-  for (let i = 0; i < tabPresses; i++) {
-    await editor.page.keyboard.press("Tab");
-  }
-
-  await expect(editor.saveStatusText).toBeVisible({
-    timeout: options?.timeout ?? TIMEOUT_AUTOSAVE,
-  });
-};
-
-export const navigateToSectionUsingCurrentRoute = async (
-  editor: ReportEditorPage,
-  sectionId: string
-): Promise<void> => {
-  const {
-    reportType: activeReportType,
-    state: activeState,
-    reportId: activeReportId,
-  } = editor.getCurrentRouteParams();
-  await editor.navigateToSection(
-    activeReportType,
-    activeState,
-    activeReportId,
-    sectionId
-  );
-};
-
-export const navigateAwayAndBackUsingCurrentRoute = async (
-  editor: ReportEditorPage,
-  awaySectionId: string,
-  returnSectionId: string
-): Promise<void> => {
-  await navigateToSectionUsingCurrentRoute(editor, awaySectionId);
-  await navigateToSectionUsingCurrentRoute(editor, returnSectionId);
-};
-
-export const openUnsubmittedSection = async (
-  statePage: any,
-  sectionId: string,
-  options?: {
-    candidateIndex?: number;
-    preferBootstrapId?: boolean;
-    preferredEditableScenario?: "blocked" | "submittable";
-  }
-): Promise<OpenReportSectionResult> => {
-  return openReportSection(
-    statePage,
-    "unsubmitted",
-    sectionId,
-    options?.candidateIndex ?? 0,
-    {
-      preferBootstrapId: options?.preferBootstrapId,
-      preferredEditableScenario: options?.preferredEditableScenario,
-    }
-  );
-};
-
-export const openSubmittedSection = async (
-  statePage: any,
-  sectionId: string,
-  options?: {
-    candidateIndex?: number;
-    preferBootstrapId?: boolean;
-  }
-): Promise<OpenReportSectionResult> => {
-  return openReportSection(
-    statePage,
-    "submitted",
-    sectionId,
-    options?.candidateIndex ?? 0,
-    {
-      preferBootstrapId: options?.preferBootstrapId,
-    }
-  );
-};
-
 export const sustainabilityFieldsEditable = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
@@ -188,36 +92,14 @@ export const sustainabilityFieldsEditable = async (
 
 export const openUnsubmittedSectionWithSustainabilityRetry = async (
   statePage: any,
-  sectionId: string,
-  options?: { preferredEditableScenario?: "blocked" | "submittable" }
+  sectionId: string
 ): Promise<OpenReportSectionResult> => {
   const dashboard = new DashboardPage(statePage.page);
-
-  const preferredBootstrapCandidate = await openReportSection(
-    statePage,
-    "unsubmitted",
-    sectionId,
-    0,
-    {
-      preferBootstrapId: true,
-      ...(options?.preferredEditableScenario
-        ? { preferredEditableScenario: options.preferredEditableScenario }
-        : {}),
-    }
-  );
-
-  if (
-    preferredBootstrapCandidate.ok &&
-    (await sustainabilityFieldsEditable(preferredBootstrapCandidate.editor))
-  ) {
-    return preferredBootstrapCandidate;
-  }
-
-  await dashboard.navigateToDashboard(reportType, stateAbbreviation);
+  await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
   const editableCount = await dashboard.getEditableReportCount();
   const maxAttempts = Math.min(Math.max(editableCount, 2), 3);
 
-  let sawReadOnlySustainability = preferredBootstrapCandidate.ok;
+  let sawReadOnlySustainability = false;
   let lastFailureReason = NO_EDITABLE_REPORT_REASON;
 
   const openCandidate = async (
@@ -340,17 +222,7 @@ const completeSustainabilityForSubmission = async (
   );
 
   if (!(await sustainabilityFieldsEditable(editor))) {
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
-      REVIEW_SUBMIT_SECTION
-    );
-    const incompleteSections = await getIncompleteReviewSections(editor);
-    const sustainabilityStillIncomplete = incompleteSections.some((section) =>
-      /^Sustainability and Highlights$/i.test(section.title)
-    );
-    return !sustainabilityStillIncomplete;
+    return false;
   }
 
   await editor.fillTextarea(
@@ -385,17 +257,7 @@ const completeUseOfFundsForSubmission = async (
   });
 
   if (!(await addUseOfFundsButton.isEnabled())) {
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
-      REVIEW_SUBMIT_SECTION
-    );
-    const incompleteSections = await getIncompleteReviewSections(editor);
-    const useOfFundsStillIncomplete = incompleteSections.some((section) =>
-      /^Use of Funds$/i.test(section.title)
-    );
-    return !useOfFundsStillIncomplete;
+    return false;
   }
 
   await addUseOfFundsButton.click();
@@ -410,30 +272,7 @@ const completeUseOfFundsForSubmission = async (
   await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
   await expect(uploadDialog).toBeHidden();
 
-  // Upload completion does not always surface the generic autosave banner;
-  // accept either autosave text or file visibility before validating section status.
-  await Promise.race([
-    editor.saveStatusText.waitFor({
-      state: "visible",
-      timeout: TIMEOUT_AUTOSAVE,
-    }),
-    editor.page
-      .getByText("use-of-funds.csv", { exact: false })
-      .first()
-      .waitFor({ state: "visible", timeout: TIMEOUT_AUTOSAVE }),
-  ]).catch(() => undefined);
-
-  await editor.navigateToSection(
-    reportType,
-    state,
-    reportId,
-    REVIEW_SUBMIT_SECTION
-  );
-  const incompleteSections = await getIncompleteReviewSections(editor);
-  const useOfFundsStillIncomplete = incompleteSections.some((section) =>
-    /^Use of Funds$/i.test(section.title)
-  );
-  return !useOfFundsStillIncomplete;
+  return true;
 };
 
 const completeSectionByTitle = async (
@@ -493,9 +332,8 @@ const ensureReportIsSubmittable = async (
     ) {
       return {
         submittable: false,
-        reason: `Report completion made no progress between attempts; required sections remain incomplete: ${incompleteSections
-          .map((s) => `${s.title} (${s.status})`)
-          .join(", ")}`,
+        reason:
+          "Report completion made no progress between attempts; required sections remain incomplete",
       };
     }
     previousIncompleteSignature = currentIncompleteSignature;
@@ -531,30 +369,6 @@ const ensureReportIsSubmittable = async (
 export const prepareReportForSubmission = async (
   editor: ReportEditorPage
 ): Promise<{ submittable: boolean; reason?: string }> => {
-  const {
-    reportType: activeReportType,
-    state: activeState,
-    reportId: activeReportId,
-  } = editor.getCurrentRouteParams();
-  await editor.navigateToSection(
-    activeReportType,
-    activeState,
-    activeReportId,
-    GENERAL_INFORMATION_SECTION
-  );
-
-  const generalInfoEditable = await editor
-    .getFieldByLabel(AOR_NAME_LABEL)
-    .isEnabled()
-    .catch(() => false);
-  if (!generalInfoEditable) {
-    return {
-      submittable: false,
-      reason:
-        "General Information fields are read-only for the available report",
-    };
-  }
-
   await completeGeneralInformationForSubmission(editor);
   const sustainabilityCompleted =
     await completeSustainabilityForSubmission(editor);

@@ -1,5 +1,5 @@
-import { test, expect } from "../fixtures/base";
-import { checkAccessibilityAcrossViewports } from "../support/a11y/checks";
+import { test, expect } from "./fixtures/base";
+import { checkAccessibilityAcrossViewports } from "../utils/a11y";
 
 test.describe("state user home page", () => {
   test.beforeEach(async ({ statePage }) => {

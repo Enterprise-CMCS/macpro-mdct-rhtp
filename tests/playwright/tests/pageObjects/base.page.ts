@@ -1,8 +1,5 @@
 import { Page } from "@playwright/test";
-import {
-  TIMEOUT_LOADING,
-  TIMEOUT_NAVIGATION,
-} from "../support/shared/timeouts";
+import { TIMEOUT_LOADING, TIMEOUT_NAVIGATION } from "../../utils/timeouts";
 
 export class BasePage {
   readonly page: Page;

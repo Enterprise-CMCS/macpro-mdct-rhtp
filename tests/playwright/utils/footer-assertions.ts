@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { FooterPage } from "../../pages/footer.page";
+import { FooterPage } from "../tests/pageObjects/footer.page";
 
 /**
  * Verify that footer is visible and all elements are rendered

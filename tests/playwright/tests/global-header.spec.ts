@@ -1,12 +1,12 @@
-import { test } from "../fixtures/base";
-import { HeaderPage } from "../pages/header.page";
+import { test } from "./fixtures/base";
+import { HeaderPage } from "./pageObjects/header.page";
 import {
   verifyHeaderVisible,
   verifyHeaderHidden,
   verifyMenuItemsVisible,
   verifyLogoutCompleted,
   verifyHeaderNavigation,
-} from "../support/assertions/header.assertions";
+} from "../utils/header-assertions";
 
 test.describe("global header", () => {
   test.describe("authenticated state user", () => {
