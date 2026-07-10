@@ -1,4 +1,3 @@
-import { RhtpSubType } from "@rhtp/shared";
 import { render, screen } from "@testing-library/react";
 import { parseHtml, optionalTag } from "utils";
 
@@ -30,10 +29,11 @@ describe("utils/parsing", () => {
       expect(screen.getByText("(optional)")).toBeInTheDocument();
     });
     test("required annual elements should have (Required Annually) appended to the label", () => {
-      const element = optionalTag(
-        { label: "mock label", required: true, id: "initiative-narrative" },
-        RhtpSubType.ANNUAL
-      );
+      const element = optionalTag({
+        label: "mock label",
+        required: true,
+        id: "initiative-narrative",
+      });
       render(element);
       expect(screen.getByText("mock label")).toBeInTheDocument();
       expect(screen.getByText("(Required Annually)")).toBeInTheDocument();

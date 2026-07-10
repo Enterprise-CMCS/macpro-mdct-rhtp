@@ -1,4 +1,3 @@
-import { optionalInQuarterly, RhtpSubType } from "@rhtp/shared";
 import { Button } from "@chakra-ui/react";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
@@ -16,33 +15,19 @@ export const bytesToKiloBytes = (bytes: number) => {
   return Math.ceil(bytes / 1000);
 };
 
-export const optionalTag = (
-  element: { label: string; required: boolean; id: string },
-  subType?: RhtpSubType
-) => {
-  if (!element.label) return "";
-
-  const setTag = () => {
-    if (!element.required) {
-      return { show: true, text: "optional" };
-    } else {
-      //currently only used for Initiative -> Narrative textarea field
-      if (
-        optionalInQuarterly.includes(element.id) &&
-        subType === RhtpSubType.ANNUAL
-      ) {
-        return { show: true, text: "Required Annually" };
-      }
-    }
-    return { show: false, text: "" };
-  };
-
-  const tag = setTag();
-
+export const optionalTag = (element: {
+  label: string;
+  required: boolean;
+  id: string;
+}) => {
   return (
     <>
       {element.label}
-      {tag.show && <span className="optionalText"> ({tag.text})</span>}
+      {element.required ? (
+        <span className="requiredText">Required</span>
+      ) : (
+        <span className="optionalText"> (optional)</span>
+      )}
     </>
   );
 };
