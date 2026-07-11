@@ -24,6 +24,19 @@ const commitmentStatusDropdown = (
   answer: status,
 });
 
+const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
+  type: ElementType.AttachmentArea,
+  id: "commitment-attachments",
+  label: "Attachments",
+  helperText: "Upload state legislation.",
+  subLabel: {
+    upload: `<b>State Policy Commitment:</b> ${label}`,
+    uploaded:
+      "These files have been attached to the state policy commitment above.",
+  },
+  required: false,
+});
+
 const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   const dropdownOptions = [
     cmsEvaluationStatusDefault,
@@ -60,18 +73,6 @@ const commitmentSupportParagraph: ParagraphTemplate = {
   style: "hint",
 };
 
-const commitmentAttachmentArea: AttachmentAreaTemplate = {
-  type: ElementType.AttachmentArea,
-  id: "commitment-attachments",
-  label: "Attachments",
-  helperText: "Upload state legislation.",
-  subLabel: {
-    uploaded:
-      "These files have been attached to the state policy commitment above.",
-  },
-  required: false,
-};
-
 const commitmentNotes: TextAreaBoxTemplate = {
   id: "commitment-notes",
   type: ElementType.TextAreaField,
@@ -98,14 +99,7 @@ const buildCommitments = (
         cmsStatusEvaluation(label),
         commitmentSupportParagraph,
         commitmentLinkListInput,
-        {
-          ...commitmentAttachmentArea,
-          subLabel: {
-            upload: `<b>State Policy Commitment:</b> ${label}`,
-            uploaded:
-              "These files have been attached to the state policy commitment above.",
-          },
-        },
+        commitmentAttachmentArea(label),
         commitmentNotes,
       ],
     });

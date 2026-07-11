@@ -48,6 +48,7 @@ export { HelpPage } from "./pages/HelpPage/HelpPage";
 export { NotFoundPage } from "./pages/NotFound/NotFoundPage";
 export { NotificationsPage } from "./pages/Notifications/NotificationsPage";
 export { ProfilePage } from "./pages/Profile/ProfilePage";
+export { ExportedZipPage } from "./pages/Export/ExportedZipPage";
 // report
 export { StatusAlert } from "./report/StatusAlert";
 export { Page } from "./report/Page";
