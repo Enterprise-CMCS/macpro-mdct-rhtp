@@ -29,8 +29,7 @@ test.describe("Report Creation", () => {
       return;
     }
 
-    // Assert empty dashboard state
-    expect(await dashboard.isStartButtonAvailable()).toBe(true);
+    // Assert empty dashboard state (Start readiness is covered by openCreateModal's built-in waiting)
     expect(await dashboard.isCopyButtonVisible()).toBe(false);
 
     // Act - Create a report
