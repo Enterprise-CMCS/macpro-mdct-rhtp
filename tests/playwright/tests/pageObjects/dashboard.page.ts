@@ -182,9 +182,7 @@ export class DashboardPage extends BasePage {
     await this.waitForLoadingComplete();
   }
 
-  async getDashboardState(): Promise<DashboardState> {
-    await this.waitForDashboardReady();
-
+  private async getDashboardStateSnapshot(): Promise<DashboardState> {
     const [hasSubmitted, hasUnsubmitted, hasViewReportButton, hasCopyButton] =
       await Promise.all([
         this.getSubmittedStatusCell()
@@ -205,7 +203,7 @@ export class DashboardPage extends BasePage {
       return "unsubmitted";
     }
 
-    if (hasSubmitted) {
+    if (hasSubmitted || hasCopyButton) {
       return "submitted";
     }
 
@@ -227,6 +225,25 @@ export class DashboardPage extends BasePage {
 
       if (/\bSubmitted\b/i.test(firstRowText)) {
         return "submitted";
+      }
+    }
+
+    return "empty";
+  }
+
+  async getDashboardState(): Promise<DashboardState> {
+    await this.waitForDashboardReady();
+
+    // Avoid transient "empty" while async report data is still settling.
+    const settleAttempts = 5;
+    for (let attempt = 0; attempt < settleAttempts; attempt++) {
+      const snapshot = await this.getDashboardStateSnapshot();
+      if (snapshot !== "empty") {
+        return snapshot;
+      }
+
+      if (attempt < settleAttempts - 1) {
+        await this.page.waitForTimeout(200);
       }
     }
 
