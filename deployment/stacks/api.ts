@@ -61,7 +61,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   );
 
   // The cms.hhs.gov sender identity requires manual verification and
-  // approvals, so only the main, val, and production stages may send email.
+  // approvals, so only the dev, val, and production stages may send email.
   // The identity and configuration set are account-level singletons managed
   // by the prerequisites stack (deployment/prerequisites-additional.ts).
   const sesPolicy = isDev
