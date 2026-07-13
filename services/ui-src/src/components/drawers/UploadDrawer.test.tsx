@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { UploadModal } from "./UploadModal";
+import { UploadDrawer } from "./UploadDrawer";
 import userEvent from "@testing-library/user-event";
 import { Dropdown } from "@cmsgov/design-system";
 
@@ -35,7 +35,7 @@ vi.mock("utils", async (importOriginal) => ({
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 
 const modalComponent = (
-  <UploadModal
+  <UploadDrawer
     modalDisclosure={{
       isOpen: true,
       onClose: mockCloseHandler,

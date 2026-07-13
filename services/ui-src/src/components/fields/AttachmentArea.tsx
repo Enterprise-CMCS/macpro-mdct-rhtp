@@ -5,7 +5,7 @@ import {
 } from "@rhtp/shared";
 import { PageElementProps } from "components/report/Elements";
 import { Button, Stack, Image, Text, Box } from "@chakra-ui/react";
-import { UploadModal } from "components/modals/UploadModal";
+import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useState } from "react";
 import { bytesToKiloBytes, optionalTag, parseHtml, useStore } from "utils";
 import {
@@ -90,7 +90,7 @@ export const AttachmentArea = (
       >
         Upload Attachments
       </Button>
-      <UploadModal
+      <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: onModalClose,

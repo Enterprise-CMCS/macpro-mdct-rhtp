@@ -1,10 +1,10 @@
 import { Stack } from "@chakra-ui/react";
-import { Modal } from "components";
 import { UploadArea } from "components/fields/UploadArea";
 import { JSX } from "react";
 import { UploadListProp } from "@rhtp/shared";
+import { Drawer } from "components";
 
-export const UploadModal = ({
+export const UploadDrawer = ({
   modalDisclosure,
   hint,
   selections,
@@ -19,7 +19,7 @@ export const UploadModal = ({
   multiple = true,
 }: Props) => {
   return (
-    <Modal
+    <Drawer
       modalDisclosure={modalDisclosure}
       onConfirmHandler={onModalSubmit}
       content={{
@@ -40,7 +40,7 @@ export const UploadModal = ({
           multiple={multiple}
         />
       </Stack>
-    </Modal>
+    </Drawer>
   );
 };
 
