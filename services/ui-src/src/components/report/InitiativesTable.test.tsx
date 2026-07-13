@@ -38,6 +38,7 @@ describe("InitiativesTable component", () => {
               id: "mock-initiative-1",
               title: "Mock Initiative",
               initiativeNumber: "123",
+              elements: [],
             },
           ],
         },
@@ -56,7 +57,7 @@ describe("InitiativesTable component", () => {
       ).toBeVisible();
       expect(
         screen.getByRole("cell", {
-          name: "123: Mock Initiative Status: Not started",
+          name: "123: Mock Initiative Status: Minimum requirements met",
         })
       ).toBeVisible();
       expect(
@@ -96,6 +97,7 @@ describe("InitiativesTable component", () => {
               id: "mock-initiative-1",
               title: "Mock Initiative",
               initiativeNumber: "123",
+              elements: [{ type: ElementType.Textbox, required: true }],
             },
           ],
         },
@@ -115,7 +117,7 @@ describe("InitiativesTable component", () => {
       ).toBeVisible();
       expect(
         screen.getByRole("cell", {
-          name: "123: Mock Initiative Status: Not started",
+          name: "123: Mock Initiative Status: Minimum requirements not met",
         })
       ).toBeVisible();
       expect(
