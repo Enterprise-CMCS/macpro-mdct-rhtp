@@ -5,6 +5,7 @@ import {
   AttachmentTableTemplate,
   ElementType,
   Report,
+  ReportType,
 } from "@rhtp/shared";
 import {
   validReport,
@@ -13,9 +14,10 @@ import {
 } from "../tests/mockReport";
 import {
   sortElementsForZip,
-  getInitativeFiles,
+  getInitiativeFiles,
+  getAttachmentAreaFiles,
   getAccordionFiles,
-  getSustainabilityAndHighlightFiles,
+  formatS3ReportZipKey,
 } from "./buildZip";
 
 const mockOldReport: Report = {
@@ -32,6 +34,10 @@ const mockOldReport: Report = {
 };
 
 describe("buildZip util", () => {
+  test("formatS3ReportZipKey", () => {
+    const zipKey = formatS3ReportZipKey(ReportType.RHTP, "AL", "report-123");
+    expect(zipKey).toEqual("zips/RHTP/AL/report-123.zip");
+  });
   test("sortElementsForZip", () => {
     const sort = sortElementsForZip(mockOldReport);
     expect(sort).toStrictEqual({
@@ -69,7 +75,7 @@ describe("buildZip util", () => {
       area: [],
     });
   });
-  test("getInitativeFiles", () => {
+  test("getInitiativeFiles", () => {
     const initiative: AttachmentTableTemplate = {
       type: ElementType.AttachmentTable,
       id: "mock-initiative",
@@ -96,7 +102,7 @@ describe("buildZip util", () => {
         },
       ],
     };
-    const files = getInitativeFiles(initiative);
+    const files = getInitiativeFiles(initiative);
     expect(files).toStrictEqual([
       {
         fileId: "id",
@@ -117,7 +123,7 @@ describe("buildZip util", () => {
       },
     ]);
   });
-  test("getSustainabilityAndHighlightFiles", () => {
+  test("getAttachmentAreaFiles", () => {
     const attachmentArea: AttachmentAreaTemplate = {
       type: ElementType.AttachmentArea,
       subLabel: {},
@@ -133,7 +139,7 @@ describe("buildZip util", () => {
       ],
     };
 
-    const files = getSustainabilityAndHighlightFiles([attachmentArea]);
+    const files = getAttachmentAreaFiles([attachmentArea]);
     expect(files).toStrictEqual([
       {
         name: "mock-file",

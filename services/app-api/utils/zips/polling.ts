@@ -4,8 +4,16 @@ import { fixLocalstackUrl } from "../../libs/localstack";
 import JSZip from "jszip";
 import { Readable } from "node:stream";
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+import { ReportType, StateAbbr } from "@rhtp/shared";
+import { getReport } from "../../storage/reports";
+import { formatS3ReportZipKey } from "./buildZip";
 
-export const getPSURL = async (key: string, content: string) => {
+export const getPSURL = async (
+  reportType: ReportType,
+  state: StateAbbr,
+  id: string
+) => {
+  const key = formatS3ReportZipKey(reportType, state, id);
   const exists = await s3
     .headObject({ Bucket: process.env.attachmentsBucketName, Key: key })
     .then(() => true)
@@ -15,10 +23,11 @@ export const getPSURL = async (key: string, content: string) => {
     return ok({ status: "pending" });
   }
 
+  const report = await getReport(reportType, state, id);
   let psurl = await s3.getSignedDownloadUrl({
     Bucket: process.env.attachmentsBucketName,
     Key: key,
-    ResponseContentDisposition: content,
+    ResponseContentDisposition: `attachment; filename=RHTP_${state}_${report?.subTypeKey}.zip`,
   });
   psurl = fixLocalstackUrl(psurl);
 
@@ -37,16 +46,17 @@ export const zipBuffer = async (key: string, zip: JSZip) => {
   });
 };
 
-export const runZipWorker = async (
+export const startZipWorker = async (
   lambdaClient: LambdaClient,
-  key: string,
-  payload: any
+  reportType: ReportType,
+  state: StateAbbr,
+  id: string
 ) => {
   //remove previous zip file
   await s3
     .deleteObject({
       Bucket: process.env.attachmentsBucketName,
-      Key: key,
+      Key: formatS3ReportZipKey(reportType, state, id),
     })
     .catch(() => {});
 
@@ -54,7 +64,7 @@ export const runZipWorker = async (
     new InvokeCommand({
       FunctionName: process.env.zipWorkerFunctionName,
       InvocationType: "Event",
-      Payload: JSON.stringify(payload),
+      Payload: JSON.stringify({ reportType, state, id }),
     })
   );
 };
