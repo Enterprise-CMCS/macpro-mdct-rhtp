@@ -2,10 +2,10 @@
 // This file is managed by macpro-mdct-core so if you'd like to change it let's do it there
 import "source-map-support/register.js";
 import {
+  App,
   aws_apigateway as apigateway,
   aws_ec2 as ec2,
   aws_iam as iam,
-  App,
   DefaultStackSynthesizer,
   Stack,
   Tags,
