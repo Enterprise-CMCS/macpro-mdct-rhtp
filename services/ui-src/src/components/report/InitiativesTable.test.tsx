@@ -17,6 +17,7 @@ const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 const mockTemplate: InitiativesTableTemplate = {
   type: ElementType.InitiativesTable,
   id: "mock-table-id",
+  required: false,
 };
 
 const mockInitiativeTableComponent = (

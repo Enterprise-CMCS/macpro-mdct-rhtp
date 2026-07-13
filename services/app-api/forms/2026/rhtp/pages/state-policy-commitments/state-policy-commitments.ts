@@ -20,7 +20,7 @@ const commitmentStatusDropdown = (
   id: "commitment-status",
   label: "Current Status",
   options: getDropdownOptions(label),
-  required: true,
+  required: false,
   answer: status,
 });
 
