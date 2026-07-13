@@ -60,19 +60,28 @@ export const InitiativesTable = (
   const navigate = useNavigate();
 
   const getStatus = (initiative: InitiativePageTemplate) => {
+    if (initiative.status === "Abandoned") return undefined;
+
     const elements = initiative.elements.filter(
       (element) => "required" in element && element.required
     );
     const statuses = elements.map((element) =>
       elementSatisfiesRequired(element, elements)
     );
-    return statuses.every(Boolean);
+    return statuses.every(Boolean)
+      ? PageStatus.COMPLETE
+      : PageStatus.NOT_STARTED;
   };
 
   const getMinimumRequirement = (initiative: InitiativePageTemplate) => {
-    return getStatus(initiative)
-      ? "Minimum requirements met"
-      : "Minimum requirements not met";
+    switch (getStatus(initiative)) {
+      case PageStatus.COMPLETE:
+        return "Minimum requirements met";
+      case PageStatus.NOT_STARTED:
+        return "Minimum requirements not met";
+      default:
+        return initiative.status;
+    }
   };
 
   // Build Rows
@@ -86,13 +95,7 @@ export const InitiativesTable = (
       return (
         <Tr key={index}>
           <Td>
-            <TableStatusIcon
-              tableStatus={
-                getStatus(initiative)
-                  ? PageStatus.COMPLETE
-                  : PageStatus.NOT_STARTED
-              }
-            />
+            <TableStatusIcon tableStatus={getStatus(initiative)} />
           </Td>
           <Td>
             <Text fontWeight="bold">{displayName}</Text>
