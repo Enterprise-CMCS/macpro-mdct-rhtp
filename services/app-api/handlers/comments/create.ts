@@ -42,7 +42,12 @@ export const createComment = handler(
     if (comment.type === CommentType.REPORT && !comment.isInternal) {
       const report = await getReport(ReportType.RHTP, state, contextId);
       if (report) {
-        await sendReportCommentEmail(report, user);
+        try {
+          await sendReportCommentEmail(report, user);
+        } catch (error) {
+          // log and allow call to succeed even if email fails
+          logger.error(error);
+        }
       }
     }
 

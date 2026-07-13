@@ -5,8 +5,6 @@ import {
   aws_wafv2 as wafv2,
   aws_s3 as s3,
   aws_ec2 as ec2,
-  aws_ses as ses,
-  aws_sns as sns,
   aws_iam as iam,
   Aws,
   CfnOutput,
@@ -62,63 +60,24 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     }
   );
 
-  // sending emails requires manual steps and approvals, so we only do them in dev, val, prod
-  let sesPolicy = new iam.PolicyStatement({
-    effect: iam.Effect.DENY,
-    actions: ["ses:SendEmail", "ses:SendRawEmail"],
-    resources: ["*"],
-  });
-  if (!isDev) {
-    const topic = new sns.Topic(scope, `${project}-${stage}-failedEmailTopic`);
-    new sns.Subscription(scope, `${project}-${stage}-email-subscription`, {
-      topic: sns.Topic.fromTopicArn(
-        scope,
-        `${project}-${stage}-failed-email-topic`,
-        topic.topicArn
-      ),
-      endpoint: "mdct-integrations@coforma.io",
-      protocol: sns.SubscriptionProtocol.EMAIL,
-    });
-
-    const configSet = new ses.ConfigurationSet(
-      scope,
-      `${project}-${stage}-email-configuration-set`,
-      {
-        sendingEnabled: true,
-        configurationSetName: `${project}-${stage}-email-configuration-set`,
-        reputationMetrics: true,
-      }
-    );
-
-    configSet.addEventDestination("sns", {
-      destination: ses.EventDestination.snsTopic(topic),
-      configurationSetEventDestinationName: `${project}-${stage}-email-topic`,
-      enabled: true,
-      events: [
-        ses.EmailSendingEvent.REJECT,
-        ses.EmailSendingEvent.BOUNCE,
-        ses.EmailSendingEvent.COMPLAINT,
-      ],
-    });
-
-    const senderIdentity = new ses.EmailIdentity(
-      scope,
-      "SenderDomainIdentity",
-      {
-        identity: ses.Identity.domain("cms.hhs.gov"),
-        configurationSet: configSet,
-      }
-    );
-
-    sesPolicy = new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ["ses:SendEmail", "ses:SendRawEmail"],
-      resources: [
-        senderIdentity.emailIdentityArn,
-        `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:configuration-set/${configSet.configurationSetName}`,
-      ],
-    });
-  }
+  // The cms.hhs.gov sender identity requires manual verification and
+  // approvals, so only the main, val, and production stages may send email.
+  // The identity and configuration set are account-level singletons managed
+  // by the prerequisites stack (deployment/prerequisites-additional.ts).
+  const sesPolicy = isDev
+    ? new iam.PolicyStatement({
+        effect: iam.Effect.DENY,
+        actions: ["ses:SendEmail", "ses:SendRawEmail"],
+        resources: ["*"],
+      })
+    : new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["ses:SendEmail", "ses:SendRawEmail"],
+        resources: [
+          `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:identity/cms.hhs.gov`,
+          `arn:aws:ses:${Aws.REGION}:${Aws.ACCOUNT_ID}:configuration-set/${project}-email-configuration-set`,
+        ],
+      });
 
   const logGroup = new logs.LogGroup(scope, "ApiAccessLogs", {
     removalPolicy: isDev ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN,

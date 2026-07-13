@@ -118,4 +118,24 @@ describe("Test createComment API method", () => {
     expect(mockGetReport).toHaveBeenCalled();
     expect(mockSendEmail).toHaveBeenCalled();
   });
+
+  test("Report Comment Create succeeds even when the email fails", async () => {
+    const mockReportCommentEvent: APIGatewayProxyEvent = {
+      ...testEvent,
+      body: JSON.stringify({
+        type: CommentType.REPORT,
+        comment: mockComment.comment,
+        parentReportId: mockComment.parentReportId,
+        isInternal: mockComment.isInternal,
+      }),
+    };
+    (putComment as Mock).mockResolvedValueOnce({});
+    mockGetReport.mockResolvedValue({
+      ...validReport,
+      state: "PA",
+    });
+    mockSendEmail.mockRejectedValueOnce(new Error("ses failure"));
+    const res = await createComment(mockReportCommentEvent);
+    expect(res.statusCode).toBe(StatusCodes.Created);
+  });
 });

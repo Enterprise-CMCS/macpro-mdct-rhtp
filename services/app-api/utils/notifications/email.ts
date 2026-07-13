@@ -8,6 +8,8 @@ import { queryRecipientsByState } from "../../storage/notificationRecipients";
 
 const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const getReportStatusChangeTemplate = (
   reportName: string,
   status: ReportStatus,
@@ -47,25 +49,25 @@ const getRecipients = async (
   userRole: UserRoles,
   state: string
 ) => {
-  let recipientEmails: string[] = [];
+  let recipientEmails: string[];
   if (userRole !== UserRoles.STATE_USER) {
     const generalInformationPage = pages.find(
       (page) => page.id === "general-information"
     );
-    const emailFields = generalInformationPage?.elements?.filter(
-      (element) =>
-        element.id.includes("email") &&
-        "answer" in element &&
-        element.answer !== ""
-    );
-    recipientEmails = emailFields?.map((field) =>
-      "answer" in field ? field.answer : undefined
-    ) as string[];
+    recipientEmails = (generalInformationPage?.elements ?? [])
+      .filter((element) => element.id.includes("email"))
+      .map((element) => ("answer" in element ? element.answer : undefined))
+      .filter(
+        (answer): answer is string =>
+          typeof answer === "string" && EMAIL_PATTERN.test(answer)
+      );
   } else {
     const assignedUsers = await queryRecipientsByState(state);
-    recipientEmails = assignedUsers?.map((user) => user.email);
+    recipientEmails = assignedUsers
+      .map((user) => user.email)
+      .filter((email) => EMAIL_PATTERN.test(email));
   }
-  return recipientEmails;
+  return [...new Set(recipientEmails)];
 };
 
 export const sendReportStatusChangeEmail = async (
@@ -99,7 +101,7 @@ const getReportCommentTemplate = (
     ToAddresses: recipients,
   },
   Message: {
-    Subject: { Data: `Subject: RHTP: New comment on ${reportName}` },
+    Subject: { Data: `RHTP: New comment on ${reportName}` },
     Body: {
       Text: {
         Data: `
@@ -115,7 +117,7 @@ Update Summary
 
     Please follow the steps below to navigate to the comment within the portal:
 
-    1. Log in to the [MDCT Portal](https://mdctrhtp.cms.gov)
+    1. Log in to the MDCT Portal: https://mdctrhtp.cms.gov
     2. Find ${reportName}
     3. Select Status/Comments.
 
@@ -142,19 +144,8 @@ export const sendReportCommentEmail = async (report: Report, user: User) => {
     emailTemplate
   );
   if (!isLocalStack()) {
-    try {
-      const res = await sesLib.sendSesEmail(emailTemplate);
-      await saveNotifications(res, emailTemplate, report, user);
-    } catch (error) {
-      logger.warn(
-        "Email failed to send for report: ",
-        report,
-        " and template",
-        emailTemplate,
-        " with error ",
-        error
-      );
-    }
+    const res = await sesLib.sendSesEmail(emailTemplate);
+    await saveNotifications(res, emailTemplate, report, user);
   } else {
     logger.info("Skipping email in dev env");
   }
