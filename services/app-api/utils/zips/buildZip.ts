@@ -113,7 +113,7 @@ export const addUseOfFundsFilesToZip = async (
     id: string;
     state: StateAbbr;
     subType: string;
-    file: UploadListProp | undefined;
+    file: UploadListProp;
   }[] = [];
   const getUseOfFundsFiles = (report: Report) => {
     const useOfFundsPage = report?.pages.find(
@@ -123,7 +123,7 @@ export const addUseOfFundsFilesToZip = async (
       useOfFundsPage?.elements
         ?.filter((element) => element.type === ElementType.UseOfFundsAttachment)
         .flatMap((attachment) => attachment.answer)
-        .filter(Boolean) ?? [];
+        .filter((answer) => !!answer) ?? [];
 
     useOfFundsFiles.push({
       id: report.id,
@@ -158,7 +158,6 @@ export const addUseOfFundsFilesToZip = async (
   }
   for (const useOfFundsFile of useOfFundsFiles) {
     const { id, file, state, subType } = useOfFundsFile;
-    if (!file?.fileId || !file?.name) continue;
     const item = await s3Lib.getObject({
       Bucket: process.env.attachmentsBucketName,
       Key: `${UseOfFundsReportType}/${state}/${id}/${file.fileId}`,
