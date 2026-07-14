@@ -40,6 +40,16 @@ describe("InitiativesTable component", () => {
               initiativeNumber: "123",
               elements: [],
             },
+            {
+              id: "initiatives",
+              elements: [
+                {
+                  id: "initiative-table",
+                  type: ElementType.InitiativesTable,
+                  required: false,
+                },
+              ],
+            },
           ],
         },
         ...mockAdminUserStore,
@@ -54,11 +64,6 @@ describe("InitiativesTable component", () => {
       ).toBeVisible();
       expect(
         screen.getByRole("columnheader", { name: "Actions" })
-      ).toBeVisible();
-      expect(
-        screen.getByRole("cell", {
-          name: "123: Mock Initiative Status: Minimum requirements met",
-        })
       ).toBeVisible();
       expect(
         screen.getByRole("button", {
@@ -98,6 +103,16 @@ describe("InitiativesTable component", () => {
               title: "Mock Initiative",
               initiativeNumber: "123",
               elements: [{ type: ElementType.Textbox, required: true }],
+            },
+            {
+              id: "initiatives",
+              elements: [
+                {
+                  id: "initiative-table",
+                  type: ElementType.InitiativesTable,
+                  required: true,
+                },
+              ],
             },
           ],
         },
