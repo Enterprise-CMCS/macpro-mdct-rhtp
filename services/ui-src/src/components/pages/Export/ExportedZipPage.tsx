@@ -17,7 +17,8 @@ import {
   StateDropdownOptions,
 } from "../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
-import { RhtpSubTypeMap } from "@rhtp/shared";
+import { RhtpSubTypeMap, ZipRequestTypes } from "@rhtp/shared";
+import { getZipFile } from "utils/other/fileUtils";
 
 const ExportCard = (title: string, desc: string, onClick: () => void) => {
   return (
@@ -54,7 +55,7 @@ export const ExportedZipPage = () => {
 
   const buildReportOptions = () => {
     const subType = Object.entries(RhtpSubTypeMap)
-      .filter((item) => item[1].openDate < Date.now())
+      // .filter((item) => item[1].openDate < Date.now())
       .map((item) => ({ label: item[1].name, value: item[0] }));
 
     return [{ label: "All", value: "all" }, ...subType];
@@ -123,9 +124,13 @@ export const ExportedZipPage = () => {
   const onExport = async () => {
     setIsExporting(true);
 
-    /////////////////////////
-    //add export code here
-    /////////////////////////
+    const reports = selectedReports.filter((report) => report !== "all");
+    const body = {
+      type: ZipRequestTypes.USE_OF_FUNDS,
+      state: selectedState,
+      reportSubTypeKeys: reports,
+    };
+    await getZipFile(body);
 
     setIsExporting(false);
     setModalOpen(false);
@@ -133,6 +138,10 @@ export const ExportedZipPage = () => {
 
   const isReportSelectDisabled = () => {
     return view === "STATE" && selectedState === "";
+  };
+
+  const isExportSubmitDisabled = () => {
+    return isReportSelectDisabled() || selectedReports.length === 0;
   };
 
   return (
@@ -168,7 +177,7 @@ export const ExportedZipPage = () => {
         content={modalData}
         onConfirmHandler={onExport}
         submitting={isExporting}
-        disableConfirm={isReportSelectDisabled()}
+        disableConfirm={isExportSubmitDisabled()}
       >
         <Stack gap="1.5rem" sx={sx.override}>
           {view === "STATE" && (

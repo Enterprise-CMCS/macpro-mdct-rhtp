@@ -67,13 +67,13 @@ describe("<AccordionGroup />", () => {
     const accordionBtn = screen.getByRole("button", {
       name: "mock-textbox-label",
     });
-    userEvent.click(accordionBtn);
-    await waitFor(() => {
+    await userEvent.click(accordionBtn);
+    waitFor(() => {
       expect(screen.getByRole("textbox", { name: "mock textbox" }));
     });
-    userEvent.click(accordionBtn);
+    await userEvent.click(accordionBtn);
 
-    await waitFor(() => {
+    waitFor(() => {
       expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
     });
   });

@@ -20,7 +20,7 @@ import {
   ReportType,
   UploadListProp,
   AttachmentStatus,
-  Report,
+  ZipRequestBody,
 } from "@rhtp/shared";
 
 export const acceptedFileTypes = [
@@ -72,10 +72,8 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
-export const getZipFile = async (report: Report) => {
-  const { state, id, type } = report;
-
-  const fileLink = await getZipPresignedUrl(type, state, id);
+export const getZipFile = async (body: ZipRequestBody) => {
+  const fileLink = await getZipPresignedUrl(body);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
 
   const link = document.createElement("a");

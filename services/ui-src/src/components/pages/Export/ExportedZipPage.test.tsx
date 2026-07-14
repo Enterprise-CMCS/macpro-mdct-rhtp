@@ -9,8 +9,13 @@ import { ExportedZipPage } from "./ExportedZipPage";
 import { testA11yAct } from "utils/testing/commonTests";
 import { RouterWrappedComponent } from "utils/testing/mockRouter";
 import userEvent from "@testing-library/user-event";
+import { getZipFile } from "utils/other/fileUtils";
+import { ZipRequestTypes } from "@rhtp/shared";
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
+vi.mock("utils/other/fileUtils");
+const mockGetZipFile = vi.mocked(getZipFile);
 
 describe("ExportedZipPage", () => {
   beforeEach(async () => {
@@ -56,7 +61,12 @@ describe("ExportedZipPage", () => {
     fireEvent.input(search, { target: { value: "Annual" } });
     const checkbox1 = screen.getByRole("checkbox", { name: "Annual Report 1" });
     await userEvent.click(checkbox1);
-    userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await userEvent.click(screen.getByRole("button", { name: "Export" }));
+    expect(mockGetZipFile).toHaveBeenCalledWith({
+      type: ZipRequestTypes.USE_OF_FUNDS,
+      state: "",
+      reportSubTypeKeys: ["A1"],
+    });
   });
 
   test("Modal By Reports and State user interactions", async () => {
@@ -81,7 +91,12 @@ describe("ExportedZipPage", () => {
     fireEvent.input(search, { target: { value: "Annual" } });
     const checkbox1 = screen.getByRole("checkbox", { name: "Annual Report 1" });
     await userEvent.click(checkbox1);
-    userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await userEvent.click(screen.getByRole("button", { name: "Export" }));
+    expect(mockGetZipFile).toHaveBeenCalledWith({
+      type: ZipRequestTypes.USE_OF_FUNDS,
+      state: "NJ",
+      reportSubTypeKeys: ["A1"],
+    });
   });
 });
 
