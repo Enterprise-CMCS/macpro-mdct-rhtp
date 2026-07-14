@@ -158,6 +158,7 @@ export const addUseOfFundsFilesToZip = async (
   }
   for (const useOfFundsFile of useOfFundsFiles) {
     const { id, file, state, subType } = useOfFundsFile;
+    if (!file?.fileId || !file?.name) continue;
     const item = await s3Lib.getObject({
       Bucket: process.env.attachmentsBucketName,
       Key: `${UseOfFundsReportType}/${state}/${id}/${file.fileId}`,
