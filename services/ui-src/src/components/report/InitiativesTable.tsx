@@ -1,4 +1,5 @@
 import {
+  ElementType,
   InitiativePageTemplate,
   InitiativesTableTemplate,
   isCompleteStatus,
@@ -39,8 +40,17 @@ export const InitiativesTable = (
     InitiativePageTemplate | undefined
   >(undefined);
   const [initiatives, setInitiatives] = useState<any[]>([]);
+  const [showStatus, setShowStatus] = useState<boolean>(false);
 
   useEffect(() => {
+    const table = report?.pages
+      .find((page) => page.id === "initiatives")
+      ?.elements?.find(
+        (element) => element.type === ElementType.InitiativesTable
+      ) ?? { required: false };
+
+    setShowStatus(table.required);
+
     const initiatives = (report?.pages.filter(
       (page) => "initiativeNumber" in page
     ) || []) as InitiativePageTemplate[];
@@ -94,12 +104,16 @@ export const InitiativesTable = (
           : `Edit`;
       return (
         <Tr key={index}>
-          <Td>
-            <TableStatusIcon tableStatus={getStatus(initiative)} />
-          </Td>
+          {showStatus && (
+            <Td>
+              <TableStatusIcon tableStatus={getStatus(initiative)} />
+            </Td>
+          )}
           <Td>
             <Text fontWeight="bold">{displayName}</Text>
-            <Text>{`Status: ${getMinimumRequirement(initiative)}`}</Text>
+            {showStatus && (
+              <Text>{`Status: ${getMinimumRequirement(initiative)}`}</Text>
+            )}
           </Td>
           <Td>
             {userIsAdmin && initiative.status !== PageStatus.ABANDONED && (
@@ -137,7 +151,7 @@ export const InitiativesTable = (
       <Table variant="initiative">
         <Thead>
           <Tr>
-            <Th>Status</Th>
+            {showStatus && <Th>Status</Th>}
             <Th>Initiative</Th>
             <Th>Actions</Th>
           </Tr>
