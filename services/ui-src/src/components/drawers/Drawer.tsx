@@ -12,6 +12,7 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerOverlay,
+  Divider,
 } from "@chakra-ui/react";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
 import { useBreakpoint } from "utils";
@@ -36,32 +37,33 @@ export const Drawer = ({
     >
       <DrawerOverlay />
       <DrawerContent maxWidth={"576px"}>
-        <DrawerHeader>
-          <Heading as="h1" sx={sx.modalHeaderText}>
-            {content.heading}
-          </Heading>
-        </DrawerHeader>
-        {content.subheading && (
-          <Box sx={sx.subheading}>{content.subheading}</Box>
-        )}
-        <Flex sx={sx.modalCloseContainer}>
+        <Flex sx={sx.headerContainer}>
+          <DrawerHeader sx={sx.modalHeaderText}>
+            <Heading as="h1">
+              {content.heading} asd asd asd sad asd asdasa dsad
+            </Heading>
+          </DrawerHeader>
+          {content.subheading && (
+            <Box sx={sx.subheading}>{content.subheading}</Box>
+          )}
           <Button
             leftIcon={<Image src={closeIcon} alt="Close" />}
             variant="link"
             onClick={modalDisclosure.onClose}
             fontWeight="bold"
+            sx={sx.close}
           >
             Close
           </Button>
         </Flex>
         <DrawerBody>{children}</DrawerBody>
+        <Divider></Divider>
         <DrawerFooter>
           {formId && (
             <Button
               sx={sx.action}
               form={formId}
               type="submit"
-              data-testid="modal-submit-button"
               disabled={disableConfirm || submitting}
             >
               {submitting ? <Spinner size="md" /> : content.actionButtonText}
@@ -71,7 +73,6 @@ export const Drawer = ({
             <Button
               sx={sx.action}
               onClick={() => onConfirmHandler()}
-              data-testid="modal-submit-button"
               disabled={disableConfirm || submitting}
             >
               {submitting ? <Spinner size="md" /> : content.actionButtonText}
@@ -79,7 +80,6 @@ export const Drawer = ({
           )}
           {content.closeButtonText && (
             <Button
-              sx={sx.close}
               variant="link"
               onClick={modalDisclosure.onClose}
               fontWeight="bold"
@@ -112,13 +112,19 @@ interface Props {
 }
 
 const sx = {
-  modalHeaderText: {
-    fontSize: "heading_2xl",
-    fontWeight: "heading_2xl",
+  headerContainer: {
+    position: "relative",
+    justifyContent: "space-between",
+    padding: "24px 24px 0 24px",
   },
-  modalCloseContainer: {
-    position: "absolute",
-    right: "spacer4",
+  modalHeaderText: {
+    flexBasis: "100%",
+    padding: "0 16px 0 0",
+    h1: {
+      fontSize: "heading_2xl",
+      fontWeight: "heading_2xl",
+      paddingRight: "12px",
+    },
   },
   subheading: {
     paddingBottom: "spacer3",
@@ -135,10 +141,16 @@ const sx = {
     },
   },
   close: {
-    padding: "0 spacer2",
-    ".mobile &": {
-      fontSize: "body_sm",
-      marginRight: "0",
+    position: "relative",
+    display: "flex",
+    alignItems: "flex-start",
+    width: "78px",
+    span: {
+      display: "flex",
+      alignItems: "flex-start",
+      width: "12px",
+      height: "100%",
+      padding: "6px 0 0 0 ",
     },
   },
 };

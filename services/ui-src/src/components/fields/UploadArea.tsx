@@ -11,15 +11,16 @@ import {
   getFileWithSafeName,
   uploadListRender,
 } from "utils/other/fileUtils";
-import { parseHtml, useStore } from "utils";
+import { useStore } from "utils";
+import { Alert } from "@cmsgov/design-system";
 
 interface Props {
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
-  subLabel: { upload?: string; uploaded?: string };
   multiple?: boolean;
+  disabled?: boolean;
 }
 
 export const UploadArea = ({
@@ -27,8 +28,8 @@ export const UploadArea = ({
   saveToReport,
   deleteFromReport,
   uploadAreaHidden = false,
-  subLabel,
   multiple = true,
+  disabled,
 }: Props) => {
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
@@ -46,8 +47,10 @@ export const UploadArea = ({
     }
   }, [filesToUpload]);
 
-  const hideUploadArea = () => {
-    return !multiple && (answer.length > 0 || filesToUpload.length > 0);
+  const disableUploadArea = () => {
+    return (
+      (!multiple && (answer.length > 0 || filesToUpload.length > 0)) || disabled
+    );
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -86,7 +89,7 @@ export const UploadArea = ({
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    if (hideUploadArea()) return;
+    if (disableUploadArea()) return;
 
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
@@ -125,23 +128,20 @@ export const UploadArea = ({
       {!uploadAreaHidden && (
         <>
           <div>
-            {subLabel.upload && (
-              <Text mb="spacer2">{parseHtml(subLabel.upload)}</Text>
-            )}
             <Text sx={sx.uploadedLabel}>
               Select a {multiple ? "file or files" : "file"} to upload
             </Text>
-            <Text sx={sx.uploadedSubLabel}>
-              Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
-            </Text>
           </div>
+          <Alert hideIcon variation="warn">
+            ALERT
+          </Alert>
           <Box
             sx={sx.uploadBox}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             width="100%"
             aria-label="file drop area"
-            className={hideUploadArea() ? "disabled" : ""}
+            className={disableUploadArea() ? "disabled" : ""}
           >
             <span>
               Drag {multiple ? "files" : "file"} here or
@@ -153,7 +153,7 @@ export const UploadArea = ({
                   multiple={multiple}
                   accept={acceptedFileTypes.join(",")}
                   onChange={onFileChange}
-                  disabled={hideUploadArea()}
+                  disabled={disableUploadArea()}
                 />
               </label>
             </span>
@@ -167,35 +167,23 @@ export const UploadArea = ({
               ))}
             </Box>
           )}
-
-          <Text sx={sx.uploadedLabel}>
-            Selected {multiple ? "Files" : "File"}
-          </Text>
+        </>
+      )}
+      {answer.length > 0 && (
+        <>
+          <div>
+            <Text sx={sx.uploadedLabel}>Upload Status</Text>
+          </div>
           {uploadListRender(
             reportType,
             state,
             id,
-            filesToUpload ?? [],
-            deleteFromReport
+            answer ?? [],
+            deleteFromReport,
+            downloadFile,
+            uploadAreaHidden
           )}
         </>
-      )}
-      <div>
-        <Text sx={sx.uploadedLabel}>
-          Uploaded {multiple ? "Files" : "File"}
-        </Text>
-        {subLabel.uploaded && (
-          <Text sx={sx.uploadedSubLabel}>{subLabel.uploaded}</Text>
-        )}
-      </div>
-      {uploadListRender(
-        reportType,
-        state,
-        id,
-        answer ?? [],
-        deleteFromReport,
-        downloadFile,
-        uploadAreaHidden
       )}
     </VStack>
   );
@@ -206,6 +194,10 @@ const sx = {
     h2: {
       margin: "1.5rem 0",
       fontWeight: "700",
+    },
+
+    ".ds-c-alert": {
+      width: "100%",
     },
   },
 
@@ -218,10 +210,6 @@ const sx = {
     marginBottom: ".50rem",
     fontWeight: "600",
     color: "error",
-  },
-
-  uploadedSubLabel: {
-    fontSize: "14px",
   },
 
   uploadBox: {

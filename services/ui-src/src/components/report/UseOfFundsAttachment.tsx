@@ -75,9 +75,6 @@ export const UseOfFundsAttachmentElement = (
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
-        subLabel={{
-          uploaded: "This file has been uploaded to the use of funds page.",
-        }}
         multiple={false}
       ></UploadDrawer>
       {files.length > 0 && (

@@ -58,7 +58,6 @@ const modalComponent = (
     saveToReport={mockSaveToReport}
     deleteFromReport={mockDeleteFromReport}
     modalHeading={"Upload Attachments"}
-    subLabel={{ uploaded: "mock sub label" }}
   />
 );
 

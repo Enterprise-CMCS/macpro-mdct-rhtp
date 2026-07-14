@@ -4,10 +4,10 @@ import {
   UploadListProp,
 } from "@rhtp/shared";
 import { PageElementProps } from "components/report/Elements";
-import { Button, Stack, Image, Text, Box } from "@chakra-ui/react";
+import { Button, Stack, Image, Box } from "@chakra-ui/react";
 import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useState } from "react";
-import { bytesToKiloBytes, optionalTag, parseHtml, useStore } from "utils";
+import { bytesToKiloBytes, optionalTag, useStore } from "utils";
 import {
   downloadFile,
   uploadListRender,
@@ -24,7 +24,7 @@ export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
   const { disabled } = props;
-  const { helperText, answer, subLabel } = props.element;
+  const { helperText, answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
@@ -98,7 +98,6 @@ export const AttachmentArea = (
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
-        subLabel={subLabel}
       />
       {/** delete file modal */}
       <Modal
@@ -116,13 +115,6 @@ export const AttachmentArea = (
           Deleting this attachment will remove it from the state policy
           commitment
         </Alert>
-        <Box mt={"spacer3"} mb={"spacer_half"}>
-          {subLabel.upload && (
-            <Text mb="spacer2">{parseHtml(subLabel?.upload)}</Text>
-          )}
-          <Text sx={sx.uploadedLabel}>File</Text>
-          <Text sx={sx.uploadedSubLabel}>{subLabel?.uploaded}</Text>
-        </Box>
         {uploadListRender(
           reportType,
           state,
@@ -150,16 +142,4 @@ export const AttachmentAreaExport = (element: AttachmentAreaTemplate) => {
   } else {
     return notAnsweredText;
   }
-};
-
-const sx = {
-  uploadedLabel: {
-    marginBottom: ".50rem",
-    fontWeight: "600",
-  },
-  uploadedSubLabel: {
-    fontSize: "body_sm",
-    fontWeight: "body_sm",
-    color: "gray_dark",
-  },
 };

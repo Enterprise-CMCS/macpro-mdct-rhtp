@@ -15,8 +15,8 @@ export const UploadDrawer = ({
   onModalSubmit = modalDisclosure.onClose,
   actionButtonText = "Done",
   uploadAreaHidden = false,
-  subLabel,
   multiple = true,
+  disabled,
 }: Props) => {
   return (
     <Drawer
@@ -36,8 +36,8 @@ export const UploadDrawer = ({
           saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
           uploadAreaHidden={uploadAreaHidden}
-          subLabel={subLabel}
           multiple={multiple}
+          disabled={disabled}
         />
       </Stack>
     </Drawer>
@@ -58,6 +58,6 @@ interface Props {
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
-  subLabel: { upload?: string; uploaded?: string };
   multiple?: boolean;
+  disabled?: boolean;
 }
