@@ -55,7 +55,7 @@ export const ExportedZipPage = () => {
 
   const buildReportOptions = () => {
     const subType = Object.entries(RhtpSubTypeMap)
-      // .filter((item) => item[1].openDate < Date.now())
+      .filter((item) => item[1].openDate < Date.now())
       .map((item) => ({ label: item[1].name, value: item[0] }));
 
     return [{ label: "All", value: "all" }, ...subType];
