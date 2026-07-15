@@ -88,6 +88,9 @@ export const ExportedReportWrapper = ({ section }: Props) => {
           expandedElements.push(...childElements);
         }
         return expandedElements;
+      } else if (element.type === ElementType.AttachmentArea) {
+        //expand attachments that are outside an accordion
+        return renderExpandedAnswers(element);
       } else {
         // All other element types stand on their own.
         return [element];
