@@ -64,7 +64,6 @@ export function deployFrontend(props: DeployFrontendProps) {
       ],
       destinationBucket: uiBucket,
       distribution,
-      distributionPaths: ["/*"],
       prune: true,
       exclude: ["index.html"],
       cacheControl: [
@@ -82,10 +81,11 @@ export function deployFrontend(props: DeployFrontendProps) {
     ],
     destinationBucket: uiBucket,
     distribution,
-    distributionPaths: ["/index.html"],
+    distributionPaths: ["/", "/index.html", "/env-config.js"],
     prune: false,
     cacheControl: [
-      s3_deployment.CacheControl.noCache(),
+      s3_deployment.CacheControl.noStore(),
+      s3_deployment.CacheControl.maxAge(Duration.seconds(0)),
       s3_deployment.CacheControl.mustRevalidate(),
     ],
   });
@@ -116,6 +116,7 @@ export function deployFrontend(props: DeployFrontendProps) {
   );
 
   deployTimeConfig.node.addDependency(deployWebsite);
+  deployIndex.node.addDependency(deployTimeConfig);
 
   if (isDev) {
     const denyLogs = new iam.PolicyStatement({
