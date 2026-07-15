@@ -46,7 +46,13 @@ export const createComment = handler(
           await sendReportCommentEmail(report, user);
         } catch (error) {
           // log and allow call to succeed even if email fails
-          logger.error(error);
+          logger.error("Failed to send report comment email", {
+            error,
+            contextId,
+            state,
+            reportType: ReportType.RHTP,
+            userEmail: user.email,
+          });
         }
       }
     }
