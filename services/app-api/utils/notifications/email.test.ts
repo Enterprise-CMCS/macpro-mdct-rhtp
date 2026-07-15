@@ -73,14 +73,6 @@ describe("email utils", () => {
       expect(mockSaveNotifications).toHaveBeenCalled();
     });
 
-    test("should not issue a send email command when answers are not valid email addresses", async () => {
-      const reportWithEmail: any = structuredClone(validReport);
-      reportWithEmail.pages[1].elements[2].answer = "not-an-email";
-      await sendReportStatusChangeEmail(reportWithEmail, mockAdminUser);
-      expect(sesLib.sendSesEmail).not.toHaveBeenCalled();
-      expect(mockSaveNotifications).not.toHaveBeenCalled();
-    });
-
     test("should dedupe repeated email answers", async () => {
       const reportWithEmail: any = structuredClone(validReport);
       const emailElements = reportWithEmail.pages

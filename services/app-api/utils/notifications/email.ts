@@ -8,8 +8,6 @@ import { queryRecipientsByState } from "../../storage/notificationRecipients";
 
 const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const getReportStatusChangeTemplate = (
   reportName: string,
   status: ReportStatus,
@@ -57,15 +55,10 @@ const getRecipients = async (
     recipientEmails = (generalInformationPage?.elements ?? [])
       .filter((element) => element.id.includes("email"))
       .map((element) => ("answer" in element ? element.answer : undefined))
-      .filter(
-        (answer): answer is string =>
-          typeof answer === "string" && EMAIL_PATTERN.test(answer)
-      );
+      .filter((answer): answer is string => typeof answer === "string");
   } else {
     const assignedUsers = await queryRecipientsByState(state);
-    recipientEmails = assignedUsers
-      .map((user) => user.email)
-      .filter((email) => EMAIL_PATTERN.test(email));
+    recipientEmails = assignedUsers.map((user) => user.email);
   }
   return [...new Set(recipientEmails)];
 };
