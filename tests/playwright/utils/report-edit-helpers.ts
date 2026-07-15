@@ -31,9 +31,9 @@ export const SUSTAINABILITY_AND_HIGHLIGHTS_SECTION =
   "sustainability-and-highlights";
 export const REVIEW_SUBMIT_SECTION = "review-submit";
 
-const USE_OF_FUNDS_FIXTURE_PATH = resolve(
+export const USE_OF_FUNDS_FIXTURE_PATH = resolve(
   process.cwd(),
-  "playwright/fixtures/use-of-funds.csv"
+  "playwright/data/use-of-funds.csv"
 );
 
 export const AOR_NAME_LABEL =

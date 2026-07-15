@@ -2,18 +2,14 @@ import { test, expect, type Page } from "./fixtures/base";
 import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange";
 import {
   GENERAL_INFORMATION_SECTION,
+  USE_OF_FUNDS_FIXTURE_PATH,
   USE_OF_FUNDS_SECTION,
 } from "../utils/report-edit-helpers";
 import { verifyCurrentSection } from "../utils/report-edit-assertions";
 import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "../utils/timeouts";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-
-const USE_OF_FUNDS_FIXTURE_PATH = resolve(
-  process.cwd(),
-  "playwright/fixtures/use-of-funds.csv"
-);
+import { join } from "node:path";
 
 const escapeRegExp = (value: string) =>
   value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);

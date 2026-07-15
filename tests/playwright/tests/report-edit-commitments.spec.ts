@@ -4,16 +4,12 @@ import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange
 import {
   GENERAL_INFORMATION_SECTION,
   STATE_POLICY_COMMITMENTS_SECTION,
+  USE_OF_FUNDS_FIXTURE_PATH,
 } from "../utils/report-edit-helpers";
 import { verifyCurrentSection } from "../utils/report-edit-assertions";
 import { getFirstVisible } from "../utils/locators";
 import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "../utils/timeouts";
-import { resolve } from "node:path";
-
-const ATTACHMENT_FIXTURE_PATH = resolve(
-  process.cwd(),
-  "playwright/fixtures/use-of-funds.csv"
-);
+const ATTACHMENT_FIXTURE_PATH = USE_OF_FUNDS_FIXTURE_PATH;
 
 const openFirstCommitmentAccordion = async (
   editor: ReportEditorPage
