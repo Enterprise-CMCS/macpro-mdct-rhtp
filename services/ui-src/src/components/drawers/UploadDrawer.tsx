@@ -1,7 +1,7 @@
 import { Stack } from "@chakra-ui/react";
 import { UploadArea } from "components/fields/UploadArea";
 import { JSX } from "react";
-import { UploadListProp } from "@rhtp/shared";
+import { AlertTypes, UploadListProp } from "@rhtp/shared";
 import { Drawer } from "components";
 
 export const UploadDrawer = ({
@@ -17,6 +17,7 @@ export const UploadDrawer = ({
   uploadAreaHidden = false,
   multiple = true,
   disabled,
+  notification,
 }: Props) => {
   return (
     <Drawer
@@ -38,6 +39,7 @@ export const UploadDrawer = ({
           uploadAreaHidden={uploadAreaHidden}
           multiple={multiple}
           disabled={disabled}
+          notification={notification}
         />
       </Stack>
     </Drawer>
@@ -60,4 +62,5 @@ interface Props {
   uploadAreaHidden?: boolean;
   multiple?: boolean;
   disabled?: boolean;
+  notification?: { type: AlertTypes; text: string };
 }

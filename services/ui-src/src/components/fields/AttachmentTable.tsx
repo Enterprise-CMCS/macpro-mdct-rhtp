@@ -214,7 +214,9 @@ export const AttachmentTable = (
     return initiativeOptions.every((option) => option.checked != true);
   };
 
-  const getCheckpointDisplayName = (answer: InitiativeAnswerProp) => {
+  const getCheckpointDisplayName = (
+    answer: { checkpoint: string } | InitiativeAnswerProp
+  ) => {
     const checkpoint = checkpointList.find(
       ({ id }) => id === answer.checkpoint
     );
@@ -343,6 +345,24 @@ export const AttachmentTable = (
     setTableRows(rows(filteredValues.flat()));
   };
 
+  const getNotification = () => {
+    const checkedInit = initiativeOptions
+      .filter((opt) => opt.checked)
+      .map((opt) => opt.label.split(":")[0])
+      .join(", ");
+    const check = getCheckpointDisplayName({ checkpoint: checkpoint });
+
+    return !checkpoint
+      ? {
+          type: AlertTypes.WARNING,
+          text: "Select initiative and checkpoint to enable upload.",
+        }
+      : {
+          type: AlertTypes.INFO,
+          text: `Attaching to: Initiatives(s): ${checkedInit}; ${check}`,
+        };
+  };
+
   return (
     <Stack width="100%" gap="1.5rem">
       <Button
@@ -413,6 +433,7 @@ export const AttachmentTable = (
         deleteFromReport={removeAttachment}
         uploadAreaHidden={modalMode !== "Upload"}
         disabled={!checkpoint}
+        notification={getNotification()}
       />
       <AttachmentCommentDrawer
         modalDisclosure={{

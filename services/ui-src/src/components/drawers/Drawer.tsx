@@ -39,9 +39,7 @@ export const Drawer = ({
       <DrawerContent maxWidth={"576px"}>
         <Flex sx={sx.headerContainer}>
           <DrawerHeader sx={sx.modalHeaderText}>
-            <Heading as="h1">
-              {content.heading} asd asd asd sad asd asdasa dsad
-            </Heading>
+            <Heading as="h1">{content.heading}</Heading>
           </DrawerHeader>
           {content.subheading && (
             <Box sx={sx.subheading}>{content.subheading}</Box>

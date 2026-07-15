@@ -14,6 +14,7 @@ import {
   getZipPresignedUrl,
 } from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import successIcon from "assets/icons/status/icon_status_check.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes } from "./parsing";
 import {
@@ -112,7 +113,10 @@ export const uploadListRender = (
   reportType: ReportType,
   state: string,
   id: string,
-  files: File[] | UploadListProp[],
+  files:
+    | File[]
+    | UploadListProp[]
+    | { name: string; size: number; fileId: string; message?: string }[],
   onRemove: Function,
   onClick?: Function,
   removeIconHidden: boolean = false,
@@ -137,6 +141,12 @@ export const uploadListRender = (
                   </Button>
                 )}
                 <span>{bytesToKiloBytes(file.size)} KB</span>
+                {"message" in file && file.message && (
+                  <span className="successMsg">
+                    <Image src={successIcon} />
+                    Uploaded to: {file.message}
+                  </span>
+                )}
               </VStack>
               <Button
                 variant="unstyled"
