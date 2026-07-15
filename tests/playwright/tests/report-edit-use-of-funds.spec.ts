@@ -1,4 +1,4 @@
-import { test, expect, Page } from "./fixtures/base";
+import { test, expect, type Page } from "./fixtures/base";
 import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange";
 import {
   GENERAL_INFORMATION_SECTION,

@@ -1,5 +1,4 @@
-import { test, expect, Locator } from "./fixtures/base";
-import type { Page } from "@playwright/test";
+import { test, expect, Locator, type Page } from "./fixtures/base";
 import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange";
 import { INITIATIVE_ATTACHMENTS_SECTION } from "../utils/report-edit-helpers";
 import { verifyCurrentSection } from "../utils/report-edit-assertions";
