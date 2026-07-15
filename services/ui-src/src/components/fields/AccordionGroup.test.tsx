@@ -51,13 +51,13 @@ describe("<AccordionGroup />", () => {
     const expandAllBtn = screen.getByRole("button", { name: "Expand all" });
     const collapseAllBtn = screen.getByRole("button", { name: "Collapse all" });
     expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
-    userEvent.click(expandAllBtn);
+    await userEvent.click(expandAllBtn);
     await waitFor(() => {
       expect(
         screen.getByRole("textbox", { name: "mock textbox" })
       ).toBeVisible();
     });
-    userEvent.click(collapseAllBtn);
+    await userEvent.click(collapseAllBtn);
     await waitFor(() => {
       expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
     });
@@ -67,11 +67,13 @@ describe("<AccordionGroup />", () => {
     const accordionBtn = screen.getByRole("button", {
       name: "mock-textbox-label",
     });
-    userEvent.click(accordionBtn);
+    await userEvent.click(accordionBtn);
     await waitFor(() => {
-      expect(screen.getByRole("textbox", { name: "mock textbox" }));
+      expect(
+        screen.getByRole("textbox", { name: "mock textbox" })
+      ).toBeVisible();
     });
-    userEvent.click(accordionBtn);
+    await userEvent.click(accordionBtn);
 
     await waitFor(() => {
       expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
