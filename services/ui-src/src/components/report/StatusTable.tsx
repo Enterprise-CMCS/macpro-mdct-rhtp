@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import {
   Button,
-  Image,
   Table,
   Tbody,
   Td,
@@ -11,7 +10,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useStore } from "utils";
-import editIconPrimary from "assets/icons/edit/icon_edit_primary.svg";
 import { TableStatusIcon } from "components/tables/TableStatusIcon";
 import { submittableMetricsSelector } from "utils/state/selectors";
 
@@ -45,7 +43,7 @@ export const StatusTableElement = () => {
         <Td>
           <Button
             variant="outline"
-            leftIcon={<Image src={editIconPrimary} />}
+            width="100%"
             onClick={() => handleEditClick(section.id)}
           >
             Edit

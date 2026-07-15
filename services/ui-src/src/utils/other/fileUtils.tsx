@@ -119,7 +119,7 @@ export const uploadListRender = (
   disabled?: boolean
 ) => {
   return (
-    <List variant="upload">
+    <List variant="upload" mb="spacer3">
       {files?.map((file, fileIdx) => (
         <ListItem key={`${file.name}.${fileIdx}`}>
           <VStack width="100%">

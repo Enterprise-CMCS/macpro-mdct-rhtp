@@ -106,8 +106,7 @@ export const UseOfFundsAttachmentElement = (
         }}
       >
         <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from the state policy
-          commitment
+          Deleting this attachment will remove it from the Use of Funds page.
         </Alert>
         <Box mt={"spacer3"} mb={"spacer_half"}>
           <Text sx={sx.uploadedLabel}>File</Text>

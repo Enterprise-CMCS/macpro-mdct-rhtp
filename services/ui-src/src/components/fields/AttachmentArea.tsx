@@ -66,7 +66,7 @@ export const AttachmentArea = (
   };
 
   return (
-    <Stack gap="0">
+    <Stack gap="0" width="100%">
       <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
@@ -113,8 +113,7 @@ export const AttachmentArea = (
         }}
       >
         <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from the state policy
-          commitment
+          Deleting this attachment will remove it from the page below
         </Alert>
         <Box mt={"spacer3"} mb={"spacer_half"}>
           {subLabel.upload && (
