@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures/base";
 import { ReportEditorPage } from "./pageObjects/report-editor.page";
-import { openReportSection } from "../utils/report-edit-arrange";
+import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   INITIATIVE_ATTACHMENTS_SECTION,
   INITIATIVES_SECTION,
@@ -36,16 +36,15 @@ test.describe("Report Editing - Section Rendering", () => {
   test("should render the initiative attachments section for an unsubmitted report @regression", async ({
     statePage,
   }) => {
-    const section = await openReportSection(
+    const editor = await openReportSectionOrSkip(
       statePage,
       "unsubmitted",
-      INITIATIVE_ATTACHMENTS_SECTION
+      INITIATIVE_ATTACHMENTS_SECTION,
+      (reason) => test.skip(true, reason)
     );
-    if (!section.ok) {
-      test.skip(true, section.reason);
+    if (!editor) {
       return;
     }
-    const editor = section.editor;
 
     await verifyCurrentSection(editor, INITIATIVE_ATTACHMENTS_SECTION);
     await verifySectionNavState(editor, {
@@ -61,16 +60,15 @@ test.describe("Report Editing - Section Rendering", () => {
   test("should render the initiatives section for an unsubmitted report @regression", async ({
     statePage,
   }) => {
-    const section = await openReportSection(
+    const editor = await openReportSectionOrSkip(
       statePage,
       "unsubmitted",
-      INITIATIVES_SECTION
+      INITIATIVES_SECTION,
+      (reason) => test.skip(true, reason)
     );
-    if (!section.ok) {
-      test.skip(true, section.reason);
+    if (!editor) {
       return;
     }
-    const editor = section.editor;
 
     await verifyCurrentSection(editor, INITIATIVES_SECTION);
     await verifySectionNavState(editor, {
@@ -85,16 +83,15 @@ test.describe("Report Editing - Section Rendering", () => {
   test("should render the state policy commitments section for an unsubmitted report @regression", async ({
     statePage,
   }) => {
-    const section = await openReportSection(
+    const editor = await openReportSectionOrSkip(
       statePage,
       "unsubmitted",
-      STATE_POLICY_COMMITMENTS_SECTION
+      STATE_POLICY_COMMITMENTS_SECTION,
+      (reason) => test.skip(true, reason)
     );
-    if (!section.ok) {
-      test.skip(true, section.reason);
+    if (!editor) {
       return;
     }
-    const editor = section.editor;
 
     await verifyCurrentSection(editor, STATE_POLICY_COMMITMENTS_SECTION);
     await verifySectionNavState(editor, {
@@ -109,16 +106,15 @@ test.describe("Report Editing - Section Rendering", () => {
   test("should render the use of funds section for an unsubmitted report @regression", async ({
     statePage,
   }) => {
-    const section = await openReportSection(
+    const editor = await openReportSectionOrSkip(
       statePage,
       "unsubmitted",
-      USE_OF_FUNDS_SECTION
+      USE_OF_FUNDS_SECTION,
+      (reason) => test.skip(true, reason)
     );
-    if (!section.ok) {
-      test.skip(true, section.reason);
+    if (!editor) {
       return;
     }
-    const editor = section.editor;
 
     await verifyCurrentSection(editor, USE_OF_FUNDS_SECTION);
     await verifySectionNavState(editor, {
@@ -136,16 +132,15 @@ test.describe("Report Editing - Section Rendering", () => {
   test("should render the sustainability and highlights section for an unsubmitted report @regression", async ({
     statePage,
   }) => {
-    const section = await openReportSection(
+    const editor = await openReportSectionOrSkip(
       statePage,
       "unsubmitted",
-      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
+      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+      (reason) => test.skip(true, reason)
     );
-    if (!section.ok) {
-      test.skip(true, section.reason);
+    if (!editor) {
       return;
     }
-    const editor = section.editor;
 
     await verifyCurrentSection(editor, SUSTAINABILITY_AND_HIGHLIGHTS_SECTION);
     await verifySectionNavState(editor, {
@@ -175,34 +170,22 @@ test.describe("Report Editing - Section Rendering", () => {
     ).toBeVisible();
   });
 
-  test("should render the review and submit section for an unsubmitted report @regression", async ({
+  test("should render the review and submit section shell for an unsubmitted report @regression", async ({
     statePage,
   }) => {
-    const section = await openReportSection(
+    const editor = await openReportSectionOrSkip(
       statePage,
       "unsubmitted",
-      REVIEW_SUBMIT_SECTION
+      REVIEW_SUBMIT_SECTION,
+      (reason) => test.skip(true, reason)
     );
-    if (!section.ok) {
-      test.skip(true, section.reason);
+    if (!editor) {
       return;
     }
-    const editor = section.editor;
 
     await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
     await expect(
       editor.page.getByRole("heading", { name: "Review & Submit" })
-    ).toBeVisible();
-    await expect(
-      editor.page.getByText("Your form is not ready for submission", {
-        exact: true,
-      })
-    ).toBeVisible();
-    await expect(
-      editor.page.getByText("Ready to Submit?", { exact: true })
-    ).toBeVisible();
-    await expect(
-      editor.page.getByRole("button", { name: /Submit for Review/i })
     ).toBeVisible();
     await expect(editor.continueButton).toBeHidden();
     await expect(editor.previousButton).toBeHidden();

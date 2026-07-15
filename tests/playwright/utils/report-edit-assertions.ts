@@ -29,13 +29,6 @@ export async function verifyFieldIsReadOnly(
 }
 
 /**
- * Verify the autosave "Last saved" indicator is visible in the SubnavBar.
- */
-export async function verifyAutosaved(editor: ReportEditorPage): Promise<void> {
-  await expect(editor.saveStatusText).toBeVisible();
-}
-
-/**
  * Verify that a field's current value matches the expected value.
  * Use after navigating back to the page to confirm persistence.
  */
