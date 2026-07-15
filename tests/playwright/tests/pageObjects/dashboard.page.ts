@@ -44,6 +44,10 @@ export class DashboardPage extends BasePage {
       .first();
   }
 
+  private getDevToolsToggleButton() {
+    return this.page.getByRole("button", { name: /Dev Tools/i }).first();
+  }
+
   private getSubmittedStatusCell() {
     return this.page.getByRole("cell", { name: /^Submitted$/i }).first();
   }
@@ -133,6 +137,114 @@ export class DashboardPage extends BasePage {
     await expect(this.page.getByRole("dialog")).toBeVisible();
   }
 
+  async setDevToolsDateToLatestOpenDate(): Promise<boolean> {
+    await this.waitForDashboardReady();
+
+    const roleToggle = this.getDevToolsToggleButton();
+    const textToggle = this.page
+      .locator("button:has-text('Dev Tools')")
+      .first();
+    const toggleButton =
+      (await roleToggle.isVisible().catch(() => false)) ||
+      !(await textToggle.isVisible().catch(() => false))
+        ? roleToggle
+        : textToggle;
+
+    const devToolsVisible = await toggleButton.isVisible().catch(() => false);
+    if (!devToolsVisible) {
+      return false;
+    }
+
+    const roleSelect = this.page
+      .getByRole("combobox", { name: /select an open date/i })
+      .first();
+    const cssSelect = this.page
+      .locator("select[aria-label='select an open date']")
+      .first();
+    const dateSelect = (await roleSelect.count()) > 0 ? roleSelect : cssSelect;
+
+    const selectVisible = await dateSelect.isVisible().catch(() => false);
+    if (!selectVisible) {
+      await toggleButton.click();
+      await expect(dateSelect)
+        .toBeVisible({ timeout: TIMEOUT_UI })
+        .catch(() => {});
+    }
+
+    const options = dateSelect.locator("option");
+    const optionCount = await options.count();
+    if (optionCount < 1) {
+      return false;
+    }
+
+    let latestOptionValue: string | undefined;
+    for (let idx = optionCount - 1; idx >= 0; idx--) {
+      const value = await options.nth(idx).getAttribute("value");
+      if (value && value.trim().length > 0) {
+        latestOptionValue = value;
+        break;
+      }
+    }
+
+    if (!latestOptionValue) {
+      return false;
+    }
+
+    await dateSelect.selectOption(latestOptionValue);
+    await expect(dateSelect)
+      .toHaveValue(latestOptionValue, {
+        timeout: TIMEOUT_UI,
+      })
+      .catch(() => {});
+
+    // Wait for DevTools state to reflect a concrete date value before retrying.
+    const devDateLabel = this.page.getByText(/Current Dev Date:/i).first();
+    await expect(devDateLabel)
+      .toContainText(/\d{1,2}\/\d{1,2}\/\d{4}/, { timeout: TIMEOUT_UI })
+      .catch(() => {});
+
+    return true;
+  }
+
+  async deleteAllReportsViaDevTools(state: string): Promise<boolean> {
+    await this.waitForDashboardReady();
+
+    const roleToggle = this.getDevToolsToggleButton();
+    const textToggle = this.page
+      .locator("button:has-text('Dev Tools')")
+      .first();
+    const toggleButton =
+      (await roleToggle.isVisible().catch(() => false)) ||
+      !(await textToggle.isVisible().catch(() => false))
+        ? roleToggle
+        : textToggle;
+
+    if (!(await toggleButton.isVisible().catch(() => false))) {
+      return false;
+    }
+
+    const deleteAllButton = this.page
+      .getByRole("button", {
+        name: new RegExp(`Delete All .* Reports For ${state}`, "i"),
+      })
+      .first();
+
+    if (!(await deleteAllButton.isVisible().catch(() => false))) {
+      await toggleButton.click();
+      await expect(deleteAllButton)
+        .toBeVisible({ timeout: TIMEOUT_UI })
+        .catch(() => {});
+    }
+
+    if (!(await deleteAllButton.isVisible().catch(() => false))) {
+      return false;
+    }
+
+    await deleteAllButton.click();
+    await this.waitForLoadingComplete();
+    return true;
+  }
+
   async openEditableReportByIndex(index = 0): Promise<void> {
     const editButtons = this.getReportActionButtonsForStatus(
       /^(Not started|In progress|In revision)$/i
@@ -159,10 +271,6 @@ export class DashboardPage extends BasePage {
       targetButton.click(),
     ]);
     await this.waitForLoadingComplete();
-  }
-
-  async openFirstEditableReport(): Promise<void> {
-    await this.openEditableReportByIndex(0);
   }
 
   async openFirstSubmittedReport(): Promise<void> {
@@ -212,11 +320,11 @@ export class DashboardPage extends BasePage {
       return hasCopyButton ? "submitted" : "unsubmitted";
     }
 
-    const firstRowText = await this.page
-      .locator("tbody tr")
-      .first()
-      .textContent()
-      .catch(() => null);
+    const firstRow = this.page.locator("tbody tr").first();
+    const hasFirstRow = (await firstRow.count().catch(() => 0)) > 0;
+    const firstRowText = hasFirstRow
+      ? await firstRow.textContent().catch(() => null)
+      : null;
 
     if (firstRowText) {
       if (/\b(Not started|In progress|In revision)\b/i.test(firstRowText)) {
@@ -237,31 +345,29 @@ export class DashboardPage extends BasePage {
     // Avoid transient "empty" while async report data is still settling.
     const settleAttempts = 5;
     for (let attempt = 0; attempt < settleAttempts; attempt++) {
+      if (this.page.isClosed()) {
+        throw new Error(
+          "Dashboard page closed before state settled (likely app/webServer restart during test)."
+        );
+      }
+
       const snapshot = await this.getDashboardStateSnapshot();
       if (snapshot !== "empty") {
         return snapshot;
       }
 
       if (attempt < settleAttempts - 1) {
-        await this.page.waitForTimeout(200);
+        // Prefer signal-based waits over fixed sleeps to reduce flake.
+        await Promise.race([
+          this.page
+            .locator("tbody tr")
+            .first()
+            .waitFor({ state: "visible", timeout: 1500 }),
+          this.page.waitForLoadState("networkidle", { timeout: 1500 }),
+        ]).catch(() => {});
       }
     }
 
     return "empty";
-  }
-
-  /**
-   * Check if there are any submitted reports on the dashboard.
-   * Looks for "Submitted" status text in the table.
-   */
-  async hasSubmittedReports(): Promise<boolean> {
-    return (await this.getDashboardState()) === "submitted";
-  }
-
-  /**
-   * Check if there are any unsubmitted (in progress or not started) reports.
-   */
-  async hasUnsubmittedReports(): Promise<boolean> {
-    return (await this.getDashboardState()) === "unsubmitted";
   }
 }
