@@ -2,12 +2,13 @@ import { expect } from "@playwright/test";
 import { resolve } from "node:path";
 import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
+import type { StatePage } from "../tests/pageObjects/state.page";
 import { reportType, stateAbbreviation } from "./consts";
 import {
   openReportSection,
   type OpenReportSectionResult,
 } from "./report-edit-arrange";
-import { TIMEOUT_AUTOSAVE } from "./timeouts";
+import { TIMEOUT_AUTOSAVE, TIMEOUT_LOADING } from "./timeouts";
 
 const REPORT_TYPE = reportType;
 const STATE = stateAbbreviation;
@@ -18,6 +19,8 @@ export type GeneralInfoField = {
   label: ReportEditLabel;
   value: string;
 };
+
+export type GeneralInfoFillMode = "overwrite" | "fill-empty";
 
 export const GENERAL_INFORMATION_SECTION = "general-information";
 export const INITIATIVE_ATTACHMENTS_SECTION = "initiative-attachments";
@@ -48,6 +51,8 @@ export const GENERAL_INFO_FIELDS: GeneralInfoField[] = [
   { label: PIPD_EMAIL_LABEL, value: "pipd@test.gov" },
 ];
 
+export const createUniqueAorValue = (): string => `AOR ${Date.now()}`;
+
 export const SUCCESS_STORIES_LABEL = /success stories/i;
 export const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
 
@@ -64,6 +69,11 @@ const SUSTAINABILITY_READ_ONLY_REASON =
   "Sustainability fields are read-only on available unsubmitted reports";
 const NO_EDITABLE_REPORT_REASON =
   "No editable report candidates were available";
+
+type AutosaveRefreshOptions = {
+  timeoutMs?: number;
+  fallbackSectionId?: string;
+};
 
 export const verifyTextareaValue = async (
   editor: ReportEditorPage,
@@ -91,7 +101,7 @@ export const sustainabilityFieldsEditable = async (
 };
 
 export const openUnsubmittedSectionWithSustainabilityRetry = async (
-  statePage: any,
+  statePage: StatePage,
   sectionId: string
 ): Promise<OpenReportSectionResult> => {
   const dashboard = new DashboardPage(statePage.page);
@@ -162,12 +172,62 @@ export const openUnsubmittedSectionWithSustainabilityRetry = async (
   return { ok: false, reason: lastFailureReason };
 };
 
-const fillGeneralInformationFields = async (
-  editor: ReportEditorPage
+export const editGeneralInformationFields = async (
+  editor: ReportEditorPage,
+  fields: GeneralInfoField[],
+  mode: GeneralInfoFillMode = "overwrite"
 ): Promise<void> => {
-  for (const field of GENERAL_INFO_FIELDS) {
+  for (const field of fields) {
+    if (mode === "fill-empty") {
+      const input = editor.getFieldByLabel(field.label);
+      const currentValue = await input.inputValue().catch(() => "");
+      if (currentValue.trim().length > 0) {
+        continue;
+      }
+    }
+
     await editor.fillTextField(field.label, field.value);
   }
+};
+
+export const waitForAutosaveWithSectionRefresh = async (
+  editor: ReportEditorPage,
+  sectionId: string,
+  options: AutosaveRefreshOptions = {}
+): Promise<boolean> => {
+  const timeoutMs = options.timeoutMs ?? TIMEOUT_AUTOSAVE;
+  const fallbackSectionId =
+    options.fallbackSectionId ?? INITIATIVE_ATTACHMENTS_SECTION;
+
+  const autosaveVisible = await editor.saveStatusText
+    .isVisible({ timeout: timeoutMs })
+    .catch(() => false);
+
+  if (autosaveVisible) {
+    return true;
+  }
+
+  const { reportType, state, reportId } = editor.getCurrentRouteParams();
+  if (fallbackSectionId !== sectionId) {
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      fallbackSectionId
+    );
+  }
+  await editor.navigateToSection(reportType, state, reportId, sectionId);
+
+  return editor.saveStatusText
+    .isVisible({ timeout: timeoutMs })
+    .catch(() => false);
+};
+
+export const waitForAutosaveIndicator = async (
+  editor: ReportEditorPage,
+  timeoutMs = TIMEOUT_AUTOSAVE
+): Promise<void> => {
+  await expect(editor.saveStatusText).toBeVisible({ timeout: timeoutMs });
 };
 
 const getIncompleteReviewSections = async (
@@ -185,7 +245,10 @@ const getIncompleteReviewSections = async (
     )?.trim();
 
     if (!title || !statusText) continue;
-    if (!/complete/i.test(statusText)) {
+    // Section is complete if status contains "complete" or appears to be done
+    const isComplete =
+      /complete|done|✓/i.test(statusText) || statusText.length === 0;
+    if (!isComplete) {
       incomplete.push({ title, status: statusText });
     }
   }
@@ -203,11 +266,8 @@ const completeGeneralInformationForSubmission = async (
     reportId,
     GENERAL_INFORMATION_SECTION
   );
-  await fillGeneralInformationFields(editor);
+  await editGeneralInformationFields(editor, GENERAL_INFO_FIELDS, "fill-empty");
   await editor.page.keyboard.press("Tab");
-  await expect(editor.saveStatusText).toBeVisible({
-    timeout: TIMEOUT_AUTOSAVE,
-  });
 };
 
 const completeSustainabilityForSubmission = async (
@@ -234,9 +294,6 @@ const completeSustainabilityForSubmission = async (
     `Sustainability plan for submission ${Date.now()}`
   );
   await editor.page.keyboard.press("Tab");
-  await expect(editor.saveStatusText).toBeVisible({
-    timeout: TIMEOUT_AUTOSAVE,
-  });
 
   return true;
 };
@@ -302,22 +359,53 @@ const ensureReportIsSubmittable = async (
   const finalSubmitButton = editor.page.getByRole("button", {
     name: /Submit .* Report/i,
   });
+  const submitForReviewButton = editor.page.getByRole("button", {
+    name: /^Submit for Review$/i,
+  });
+
+  const waitForFinalSubmitEnabled = async (): Promise<boolean> => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const enabled = await finalSubmitButton
+        .isEnabled({ timeout: TIMEOUT_LOADING * 2 })
+        .catch(() => false);
+      if (enabled) {
+        return true;
+      }
+
+      if (attempt < 2) {
+        await editor.navigateToSection(
+          reportType,
+          state,
+          reportId,
+          REVIEW_SUBMIT_SECTION
+        );
+        await expect(finalSubmitButton).toBeVisible();
+      }
+    }
+
+    return false;
+  };
 
   let previousIncompleteSignature = "";
 
-  for (let attempt = 0; attempt < 5; attempt++) {
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
-      REVIEW_SUBMIT_SECTION
-    );
-    await expect(finalSubmitButton).toBeVisible();
+  // Navigate to review section and wait for button
+  await editor.navigateToSection(
+    reportType,
+    state,
+    reportId,
+    REVIEW_SUBMIT_SECTION
+  );
+  await expect(finalSubmitButton).toBeVisible();
 
-    if (await finalSubmitButton.isEnabled()) {
-      return { submittable: true };
-    }
+  // Require enabled state to avoid false positives from visible-but-disabled buttons.
+  const isEnabled = await waitForFinalSubmitEnabled();
 
+  if (isEnabled) {
+    return { submittable: true };
+  }
+
+  // If button not clickable, check for incomplete sections
+  for (let attempt = 0; attempt < 3; attempt++) {
     const incompleteSections = await getIncompleteReviewSections(editor);
     if (incompleteSections.length === 0) {
       break;
@@ -355,6 +443,36 @@ const ensureReportIsSubmittable = async (
   }
 
   const remaining = await getIncompleteReviewSections(editor);
+  if (remaining.length === 0) {
+    const finalEnabled = await waitForFinalSubmitEnabled();
+
+    if (finalEnabled) {
+      return { submittable: true };
+    }
+
+    const reviewVisible = await submitForReviewButton
+      .isVisible()
+      .catch(() => false);
+    const reviewEnabled = reviewVisible
+      ? await submitForReviewButton.isEnabled().catch(() => false)
+      : false;
+
+    if (reviewEnabled) {
+      await submitForReviewButton.click();
+
+      const enabledAfterReview = await waitForFinalSubmitEnabled();
+      if (enabledAfterReview) {
+        return { submittable: true };
+      }
+    }
+
+    return {
+      submittable: false,
+      reason:
+        "Report reached Review & Submit but final submit remains disabled after Submit for Review",
+    };
+  }
+
   return {
     submittable: false,
     reason:
