@@ -9,3 +9,6 @@ export const TIMEOUT_NAVIGATION = 30000;
 
 /** Waiting for autosave indicator to appear after field blur/edit */
 export const TIMEOUT_AUTOSAVE = 10000;
+
+/** Guardrail timeout for opening report sections via dashboard/modals/navigation */
+export const TIMEOUT_OPEN_REPORT_SECTION = 90000;
