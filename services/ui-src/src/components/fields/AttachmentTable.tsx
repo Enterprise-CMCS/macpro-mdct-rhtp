@@ -352,7 +352,7 @@ export const AttachmentTable = (
       .join(", ");
     const check = getCheckpointDisplayName({ checkpoint: checkpoint });
 
-    return !checkpoint
+    const instruction = !checkpoint
       ? {
           type: AlertTypes.WARNING,
           text: "Select initiative and checkpoint to enable upload.",
@@ -361,6 +361,11 @@ export const AttachmentTable = (
           type: AlertTypes.INFO,
           text: `Attaching to: Initiatives(s): ${checkedInit}; ${check}`,
         };
+
+    return {
+      instruction: instruction,
+      success: `Uploaded to: Initiatives(s): ${checkedInit}; ${check}`,
+    };
   };
 
   return (
@@ -401,7 +406,7 @@ export const AttachmentTable = (
         }}
         answer={uploadedFiles}
         selections={
-          <Stack gap="1.5rem" marginTop="1.5rem">
+          <Stack gap="1.5rem">
             {modalMode === "Delete" ? (
               <Alert status={AlertTypes.WARNING} title="Warning">
                 Deleting this attachment will remove it from all initiatives,

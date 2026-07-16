@@ -57,6 +57,7 @@ const paragraphTemplateSchema = object().shape({
 const inputElementSchema = {
   id: string().required(),
   label: string().required(),
+  subLabel: string().notRequired(),
   helperText: string().notRequired(),
   helperTextLink: object()
     .shape({

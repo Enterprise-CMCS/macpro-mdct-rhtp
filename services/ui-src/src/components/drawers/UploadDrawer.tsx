@@ -62,5 +62,8 @@ interface Props {
   uploadAreaHidden?: boolean;
   multiple?: boolean;
   disabled?: boolean;
-  notification?: { type: AlertTypes; text: string };
+  notification?: {
+    instruction: { type: AlertTypes; text: string };
+    success: string;
+  };
 }

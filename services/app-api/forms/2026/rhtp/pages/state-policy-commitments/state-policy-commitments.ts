@@ -24,10 +24,11 @@ const commitmentStatusDropdown = (
   answer: status,
 });
 
-const commitmentAttachmentArea = (): AttachmentAreaTemplate => ({
+const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
   type: ElementType.AttachmentArea,
   id: "commitment-attachments",
   label: "Attachments",
+  subLabel: `<b>State Policy Commitment:</b> ${label}`,
   helperText: "Upload state legislation.",
   required: false,
 });
@@ -93,7 +94,7 @@ const buildCommitments = (
         cmsStatusEvaluation(label),
         commitmentSupportParagraph,
         commitmentLinkListInput,
-        commitmentAttachmentArea(),
+        commitmentAttachmentArea(label),
         commitmentNotes,
       ],
     });

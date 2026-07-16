@@ -15,7 +15,7 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import closeIcon from "assets/icons/close/icon_close_primary.svg";
-import { useBreakpoint } from "utils";
+import { parseHtml, useBreakpoint } from "utils";
 
 export const Drawer = ({
   modalDisclosure,
@@ -36,14 +36,11 @@ export const Drawer = ({
       size={isMobile ? "sm" : "md"}
     >
       <DrawerOverlay />
-      <DrawerContent maxWidth={"576px"}>
+      <DrawerContent maxWidth={"576px"} sx={sx.modalContent}>
         <Flex sx={sx.headerContainer}>
           <DrawerHeader sx={sx.modalHeaderText}>
             <Heading as="h1">{content.heading}</Heading>
           </DrawerHeader>
-          {content.subheading && (
-            <Box sx={sx.subheading}>{content.subheading}</Box>
-          )}
           <Button
             leftIcon={<Image src={closeIcon} alt="Close" />}
             variant="link"
@@ -54,9 +51,14 @@ export const Drawer = ({
             Close
           </Button>
         </Flex>
-        <DrawerBody>{children}</DrawerBody>
+        <DrawerBody sx={sx.modalBody}>
+          {content.subheading && (
+            <Box sx={sx.subheading}>{parseHtml(content.subheading)}</Box>
+          )}
+          {children}
+        </DrawerBody>
         <Divider></Divider>
-        <DrawerFooter>
+        <DrawerFooter paddingX="0">
           {formId && (
             <Button
               sx={sx.action}
@@ -110,10 +112,14 @@ interface Props {
 }
 
 const sx = {
+  modalContent: {
+    padding: "24px 56px",
+  },
   headerContainer: {
     position: "relative",
     justifyContent: "space-between",
-    padding: "24px 24px 0 24px",
+    // padding: "24px 56px",
+    padding: "0",
   },
   modalHeaderText: {
     flexBasis: "100%",
@@ -123,6 +129,10 @@ const sx = {
       fontWeight: "heading_2xl",
       paddingRight: "12px",
     },
+  },
+  modalBody: {
+    padding: "24px 0 0 0",
+    overflow: "visible",
   },
   subheading: {
     paddingBottom: "spacer3",

@@ -22,7 +22,10 @@ interface Props {
   uploadAreaHidden?: boolean;
   multiple?: boolean;
   disabled?: boolean;
-  notification?: { type: AlertTypes; text: string };
+  notification?: {
+    instruction: { type: AlertTypes; text: string };
+    success: string;
+  };
 }
 
 export const UploadArea = ({
@@ -49,12 +52,13 @@ export const UploadArea = ({
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
         await onUploadFiles().then((response) => {
-          setUploadSuccess(
-            response.map((file) => ({
+          setUploadSuccess([
+            ...uploadSuccess,
+            ...response.map((file) => ({
               fileId: file.fileId,
-              message: "upload file is successful",
-            }))
-          );
+              message: notification?.success ?? "",
+            })),
+          ]);
           setFilesToUpload([]);
           saveToReport(response);
           //add uploaded to message here
@@ -180,9 +184,13 @@ export const UploadArea = ({
               ))}
             </Box>
           )}
-          {notification && (
-            <Alert status={notification.type} title={""} showIcon={false}>
-              {notification.text}
+          {notification?.instruction && (
+            <Alert
+              status={notification.instruction.type}
+              title={""}
+              showIcon={false}
+            >
+              {notification.instruction.text}
             </Alert>
           )}
           <Box

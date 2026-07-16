@@ -24,7 +24,7 @@ export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
   const { disabled } = props;
-  const { helperText, answer } = props.element;
+  const { helperText, answer, subLabel } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
@@ -95,6 +95,7 @@ export const AttachmentArea = (
           isOpen: isModalOpen,
           onClose: onModalClose,
         }}
+        hint={subLabel}
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
