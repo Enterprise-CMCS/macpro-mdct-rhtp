@@ -85,7 +85,7 @@ describe("<RadioField />", () => {
     const firstRadio = screen.getByLabelText("Choice 2");
     await userEvent.click(firstRadio);
     expect(updateSpy).toHaveBeenCalledWith({ answer: "B" });
-    expect(screen.getByLabelText("mock-text-box")).toBeInTheDocument();
+    expect(screen.getByLabelText("mock-text-boxRequired")).toBeInTheDocument();
   });
 
   testA11y(RadioFieldComponent);

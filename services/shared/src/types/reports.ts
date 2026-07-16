@@ -69,6 +69,7 @@ export enum AlertTypes {
 }
 
 export enum PageStatus {
+  OPTIONAL = "Optional",
   NOT_STARTED = "Not started",
   IN_PROGRESS = "In progress",
   ABANDONED = "Abandoned",
@@ -257,6 +258,9 @@ export type DividerTemplate = {
 export type InitiativesTableTemplate = {
   id: string;
   type: ElementType.InitiativesTable;
+  required: boolean;
+  quarterly?: boolean;
+  disabled?: boolean;
 };
 
 export type StatusTableTemplate = {

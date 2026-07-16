@@ -86,6 +86,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       buttonText: "Add link",
       validation: "link",
       required: false,
+      quarterly: false,
     },
     {
       type: ElementType.AttachmentArea,
@@ -94,6 +95,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       subLabel: "<b>Sustainability Planning: Supporting Evidence</b>",
       helperText: "Upload supporting documentation.",
       required: false,
+      quarterly: false,
     },
   ],
 };

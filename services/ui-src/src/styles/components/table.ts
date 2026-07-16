@@ -183,6 +183,9 @@ const initiativeVariant = {
       "&:last-of-type": {
         textAlign: "right",
       },
+      "&:first-of-type": {
+        minWidth: "56px",
+      },
     },
     td: {
       "&:last-of-type": {
@@ -195,6 +198,9 @@ const initiativeVariant = {
       },
       ".chakra-button": {
         padding: "0 1rem",
+      },
+      img: {
+        width: "24px",
       },
     },
   },

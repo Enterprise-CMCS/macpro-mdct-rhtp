@@ -20,7 +20,7 @@ const commitmentStatusDropdown = (
   id: "commitment-status",
   label: "Current Status",
   options: getDropdownOptions(label),
-  required: true,
+  required: false,
   answer: status,
 });
 
@@ -43,7 +43,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
     id: "cms-status-evaluation",
     label: "CMS Status Evaluation",
     options: dropdownOptions,
-    required: true,
+    required: false,
     answer: cmsEvaluationStatusDefault.value,
     editByRole: [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER],
   };
@@ -124,7 +124,7 @@ export const buildStatePolicyCommitments = (
       type: ElementType.AccordionGroup,
       id: "state-policy-commitments-group",
       accordions: [...buildCommitments(state)],
-      required: true,
+      required: false,
     },
   ],
 });

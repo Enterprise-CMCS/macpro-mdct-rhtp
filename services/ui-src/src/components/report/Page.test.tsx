@@ -150,6 +150,7 @@ const elements: PageElement[] = [
   {
     type: ElementType.InitiativesTable,
     id: "",
+    required: false,
   },
   {
     type: ElementType.AttachmentArea,
