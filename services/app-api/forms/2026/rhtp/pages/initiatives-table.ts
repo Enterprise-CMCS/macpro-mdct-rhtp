@@ -19,6 +19,8 @@ export const initiativesTable: FormPageTemplate = {
     {
       type: ElementType.InitiativesTable,
       id: "initiatives-table",
+      required: true,
+      quarterly: false,
     },
   ],
 };

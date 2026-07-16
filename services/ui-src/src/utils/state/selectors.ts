@@ -1,5 +1,6 @@
 import {
   BannerArea,
+  FormPageTemplate,
   isCompleteStatus,
   PageStatus,
   ParentPageTemplate,
@@ -19,6 +20,16 @@ export const currentPageSelector = (state: ReportState) => {
   return currentPage;
 };
 
+/**
+ * @param section Check the elements in the page for a required key. If key exist and is true, return true.
+ * @returns boolean
+ */
+export const checkIfStatusIsRequired = (section: FormPageTemplate) => {
+  return section.elements.some(
+    (element) => "required" in element && element.required
+  );
+};
+
 export const submittableMetricsSelector = (state: ReportState) => {
   const { report, pageMap } = state;
   if (!report || !pageMap) {
@@ -30,13 +41,17 @@ export const submittableMetricsSelector = (state: ReportState) => {
   const sections = childPages.slice(0, -1).map((id) => {
     const pageIdx = pageMap.get(id);
     if (!pageIdx) return null;
-    const section = report.pages[pageIdx] as ParentPageTemplate;
+
+    const section = report.pages[pageIdx] as FormPageTemplate;
+
     const displayStatus = inferredReportStatus(report, section.id);
     let submittable = displayStatus === PageStatus.COMPLETE;
 
     return {
       section: section,
-      displayStatus: displayStatus,
+      displayStatus: !checkIfStatusIsRequired(section)
+        ? PageStatus.OPTIONAL
+        : displayStatus,
       submittable: submittable,
     };
   });
