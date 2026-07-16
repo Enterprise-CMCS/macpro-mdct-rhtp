@@ -18,14 +18,13 @@ import {
   downloadFile,
   removeFile,
   canEditAttachment,
-  canDeleteAttachment,
 } from "utils/other/fileUtils";
 import {
   checkpointAttachableOptions,
   checkpointList,
   getStageIdByCheckpointId,
 } from "verbiage/checkpoints";
-import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Alert } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -53,18 +52,14 @@ export const AttachmentTable = (
     (string | JSX.Element | undefined)[][]
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
-  const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
-    "Upload"
-  );
+  const [modalMode, setModalMode] = useState<"Upload" | "Manage">("Upload");
   const actionButtonText = {
     Upload: "Done",
-    Edit: "Save",
-    Delete: "Delete",
+    Manage: "Save changes",
   };
   const modalHeading = {
     Upload: "Upload Initiative Attachments",
-    Edit: "Edit Attachment",
-    Delete: "Delete Attachment",
+    Manage: "Manage Attachment",
   };
 
   if (!state || !id || !reportType) {
@@ -125,7 +120,7 @@ export const AttachmentTable = (
   };
 
   const onModalSubmit = () => {
-    if (modalMode === "Delete") {
+    if (modalMode === "Manage") {
       removeAttachment(uploadedFiles[0]);
       return onClose();
     }
@@ -185,8 +180,8 @@ export const AttachmentTable = (
     setInitiativeOptions(getInitiativeOptions(selectedFile));
   };
 
-  const onEditClick = (selectedFile: InitiativeAnswerProp) => {
-    setModalMode("Edit");
+  const onManagedClick = (selectedFile: InitiativeAnswerProp) => {
+    setModalMode("Manage");
     setModalOpen(true);
 
     setCurrentValues(selectedFile);
@@ -194,13 +189,6 @@ export const AttachmentTable = (
 
   const onCommentClick = (selectedFile: InitiativeAnswerProp) => {
     setCommentsOpen(true);
-    setCurrentValues(selectedFile);
-  };
-
-  const onDeleteClick = (selectedFile: InitiativeAnswerProp) => {
-    setModalMode("Delete");
-    setModalOpen(true);
-
     setCurrentValues(selectedFile);
   };
 
@@ -251,11 +239,11 @@ export const AttachmentTable = (
         <HStack>
           <Button
             variant="outline"
-            onClick={() => onEditClick(row)}
+            onClick={() => onManagedClick(row)}
             aria-label={`Edit file or info for ${row.attachment.name}`}
             disabled={!canEditAttachment(row.status) || disabled}
           >
-            Edit
+            Manage
           </Button>
           <Button
             variant="link"
@@ -264,17 +252,7 @@ export const AttachmentTable = (
             fontWeight="bold"
             disabled={disabled}
           >
-            Status/Comments
-          </Button>
-          <Button
-            variant="link"
-            onClick={() => onDeleteClick(row)}
-            aria-label={`Delete ${row.attachment.name}`}
-            disabled={
-              !canDeleteAttachment(row.status, row.canDelete) || disabled
-            }
-          >
-            <Image src={cancelIcon} alt="Remove" minWidth="24px" />
+            <Image src={commentIcon} alt="Remove" minWidth="24px" />
           </Button>
         </HStack>
       );
@@ -407,7 +385,7 @@ export const AttachmentTable = (
         answer={uploadedFiles}
         selections={
           <Stack gap="1.5rem">
-            {modalMode === "Delete" ? (
+            {modalMode === "Manage" ? (
               <Alert status={AlertTypes.WARNING} title="Warning">
                 Deleting this attachment will remove it from all initiatives,
                 stages, and checkpoints below.
@@ -419,7 +397,7 @@ export const AttachmentTable = (
               type={"checkbox"}
               label={"Which initiative does this attachment apply to?"}
               onChange={onChoiceChangeHandler}
-              disabled={modalMode === "Delete" || disabled}
+              disabled={modalMode === "Manage" || disabled}
             />
             <Dropdown
               name={"checkpoint"}
@@ -427,7 +405,7 @@ export const AttachmentTable = (
               options={checkpointAttachableOptions}
               value={checkpoint}
               onChange={(event) => setCheckpoint(event.target.value)}
-              disabled={modalMode === "Delete" || isStageEnabled()}
+              disabled={modalMode === "Manage" || isStageEnabled()}
             />
           </Stack>
         }

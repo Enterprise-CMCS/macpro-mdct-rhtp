@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   TextField,
-  Dropdown,
   DropdownChangeObject,
-  DropdownOption,
   ChoiceList,
 } from "@cmsgov/design-system";
 import {
@@ -20,15 +18,10 @@ import {
   Button,
   Image,
   Flex,
-  UnorderedList,
-  ListItem,
 } from "@chakra-ui/react";
 import {
   InitiativeAnswerProp,
   UploadListProp,
-  AttachmentStatus,
-  UserRoles,
-  FileStatusOptions,
   CommentType,
   Comment,
   isCompleteStatus,
@@ -48,12 +41,9 @@ export const AttachmentCommentDrawer = ({
   updateElement,
   allFiles,
 }: Props) => {
-  const { userIsAdmin, userIsEndUser, userRole } = useStore().user ?? {};
-  const isStateUser = userRole === UserRoles.STATE_USER;
+  const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const { report } = useStore();
   const [pastComments, setPastComments] = useState<Comment[]>([]);
-  const [statusOptions, setStatusOptions] =
-    useState<DropdownOption[]>(FileStatusOptions);
   const [commentSubmitting, setCommentSubmitting] = useState<boolean>(false);
   const [commentsLoading, setCommentsLoading] = useState<boolean>(false);
   const adminCommentsEnabled = useFlags()?.adminCommentsEnabled;
@@ -66,20 +56,14 @@ export const AttachmentCommentDrawer = ({
   const selectedAttachmentIndex = allFiles.findIndex(
     (file) => file.attachment.fileId === selectedFile?.fileId
   );
-  const fileStatus = allFiles[selectedAttachmentIndex]?.status || "";
-  const statusDisabled =
-    commentsDisabled ||
-    (isStateUser && fileStatus === AttachmentStatus.LOCKED_FOR_SCORING);
 
   const initialValues = {
     comment: "",
-    status: fileStatus,
     commentType: userIsAdmin ? "" : "external",
   };
 
   const noErrorState = {
     comment: "",
-    status: "",
     overall: "",
     commentType: "",
   };
@@ -111,18 +95,6 @@ export const AttachmentCommentDrawer = ({
   useEffect(() => {
     setErrorMessages(noErrorState);
     setDisplayValue(initialValues);
-
-    let statusOptions = structuredClone(FileStatusOptions);
-    // state users cannot change status to Locked For Scoring or Needs Revision, but those options should still show up if it's the existing status
-    if (isStateUser) {
-      statusOptions = statusOptions.filter(
-        (status) =>
-          (status.value !== AttachmentStatus.LOCKED_FOR_SCORING &&
-            status.value !== AttachmentStatus.NEEDS_REVISION) ||
-          status.value === fileStatus
-      );
-    }
-    setStatusOptions(statusOptions);
 
     if (selectedAttachmentIndex !== -1) {
       fetchComments();
@@ -157,8 +129,6 @@ export const AttachmentCommentDrawer = ({
         return;
       }
 
-      const didStatusChange =
-        displayValue.status !== allFiles[selectedAttachmentIndex].status;
       const commentsEmpty = displayValue.comment.trim() === "";
       if (commentsEmpty && !commentsOptional) {
         setErrorMessages({
@@ -169,7 +139,7 @@ export const AttachmentCommentDrawer = ({
       }
 
       // Comments are optional for admins
-      if ((!didStatusChange || !commentsOptional) && commentsEmpty) {
+      if (!commentsOptional && commentsEmpty) {
         setErrorMessages({
           ...errorMessages,
           overall: "Must modify Status or provide a Comment to submit.",
@@ -185,15 +155,11 @@ export const AttachmentCommentDrawer = ({
           type: CommentType.ATTACHMENT,
           parentReportId: report?.id,
           isInternal: displayValue.commentType === "internal",
-          ...(didStatusChange && { statusChange: displayValue.status }),
         }
       );
 
       allFiles[selectedAttachmentIndex] = {
         ...allFiles[selectedAttachmentIndex],
-        ...(didStatusChange && {
-          status: displayValue.status as AttachmentStatus,
-        }),
         canDelete: false, // if a comment is added, the file can no longer be deleted
       };
       updateElement({ answer: allFiles });
@@ -213,10 +179,6 @@ export const AttachmentCommentDrawer = ({
       setCommentSubmitting(false);
     }
   };
-
-  const userSpecificSubheading = userIsAdmin
-    ? "Use the fields below to manage the attachment status and leave comments for the state."
-    : "Use the fields below to manage the attachment status and leave comments for your CMS Project Officer.";
 
   return (
     <Drawer
@@ -246,19 +208,9 @@ export const AttachmentCommentDrawer = ({
         <DrawerBody>
           <Flex direction="column" gap="spacer4" marginBottom="spacer4">
             <Text sx={sx.drawerSubheading}>
-              {userSpecificSubheading} Certain statuses restrict the ability to
-              modify or remove files:
+              Use the field below to leave comments for your CMS Project
+              Officer.
             </Text>
-            <UnorderedList sx={sx.drawerSubheading}>
-              <ListItem>
-                <b>Needs Revision, Informational, Archived:</b> The attachment
-                will no longer be able to be deleted.
-              </ListItem>
-              <ListItem>
-                <b>Locked for Scoring:</b> The attachment is locked and cannot
-                be edited or deleted.
-              </ListItem>
-            </UnorderedList>
             <Text fontSize="body_lg" fontWeight="body_lg">
               <b>Attachment:</b> {fileName}
             </Text>
@@ -267,15 +219,6 @@ export const AttachmentCommentDrawer = ({
                 {errorMessages.overall}
               </Text>
             )}
-            <Dropdown
-              label="Status"
-              name="status"
-              onChange={onChange}
-              options={statusOptions}
-              value={displayValue.status}
-              disabled={statusDisabled}
-              errorMessage={errorMessages.status}
-            />
             {userIsAdmin && (
               <ChoiceList
                 label="External or Internal Comment"
