@@ -76,7 +76,7 @@ export const AttachmentArea = (
   };
 
   return (
-    <Stack gap="0">
+    <Stack gap="0" width="100%" maxWidth="450px">
       <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
