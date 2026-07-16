@@ -57,7 +57,7 @@ export const Drawer = ({
           )}
           {children}
         </DrawerBody>
-        <Divider></Divider>
+        <Divider padding="16px 0"></Divider>
         <DrawerFooter paddingX="0">
           {formId && (
             <Button
@@ -114,11 +114,11 @@ interface Props {
 const sx = {
   modalContent: {
     padding: "24px 56px",
+    overflow: "scroll",
   },
   headerContainer: {
     position: "relative",
     justifyContent: "space-between",
-    // padding: "24px 56px",
     padding: "0",
   },
   modalHeaderText: {

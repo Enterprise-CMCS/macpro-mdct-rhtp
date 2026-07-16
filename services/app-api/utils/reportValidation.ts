@@ -282,6 +282,7 @@ const buttonLinkTemplateSchema = object().shape({
 const attachmentAreaSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
   ...inputElementSchema,
+  message: string().notRequired(),
   answer: array().of(
     object().shape({
       name: string()

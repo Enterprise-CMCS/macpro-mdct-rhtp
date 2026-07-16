@@ -29,6 +29,7 @@ const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
   id: "commitment-attachments",
   label: "Attachments",
   subLabel: `<b>State Policy Commitment:</b> ${label}`,
+  message: label,
   helperText: "Upload state legislation.",
   required: false,
 });

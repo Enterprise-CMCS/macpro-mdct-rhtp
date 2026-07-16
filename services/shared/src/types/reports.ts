@@ -381,6 +381,7 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  message?: string;
   answer?: UploadListProp[];
 }
 

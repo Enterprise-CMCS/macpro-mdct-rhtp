@@ -28,6 +28,7 @@ export const AttachmentArea = (
     helperText,
     answer,
     subLabel,
+    message,
     disabled: elementDisabled,
   } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
@@ -108,6 +109,7 @@ export const AttachmentArea = (
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
+        notification={{ success: message! }}
       />
       {/** delete file modal */}
       <Modal

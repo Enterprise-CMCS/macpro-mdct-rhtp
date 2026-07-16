@@ -63,7 +63,7 @@ interface Props {
   multiple?: boolean;
   disabled?: boolean;
   notification?: {
-    instruction: { type: AlertTypes; text: string };
-    success: string;
+    instruction?: { type: AlertTypes; text: string };
+    success?: string;
   };
 }

@@ -16,7 +16,7 @@ import {
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import DOMPurify from "dompurify";
-import { bytesToKiloBytes } from "./parsing";
+import { bytesToKiloBytes, parseHtml } from "./parsing";
 import {
   ReportType,
   UploadListProp,
@@ -144,7 +144,7 @@ export const uploadListRender = (
                 {"message" in file && file.message && (
                   <span className="successMsg">
                     <Image src={successIcon} />
-                    Uploaded to: {file.message}
+                    Uploaded to: {parseHtml(file.message)}
                   </span>
                 )}
               </VStack>

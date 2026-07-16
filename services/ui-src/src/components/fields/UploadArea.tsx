@@ -23,8 +23,8 @@ interface Props {
   multiple?: boolean;
   disabled?: boolean;
   notification?: {
-    instruction: { type: AlertTypes; text: string };
-    success: string;
+    instruction?: { type: AlertTypes; text: string };
+    success?: string;
   };
 }
 
@@ -61,7 +61,6 @@ export const UploadArea = ({
           ]);
           setFilesToUpload([]);
           saveToReport(response);
-          //add uploaded to message here
         });
       fetchData();
     }
@@ -233,15 +232,16 @@ export const UploadArea = ({
               filesToUpload ?? [],
               deleteFromReport
             )}
-          {uploadListRender(
-            reportType,
-            state,
-            id,
-            modifiedAnswer(answer ?? []),
-            deleteFromReport,
-            downloadFile,
-            uploadAreaHidden
-          )}
+          {answer.length > 0 &&
+            uploadListRender(
+              reportType,
+              state,
+              id,
+              modifiedAnswer(answer ?? []),
+              deleteFromReport,
+              downloadFile,
+              uploadAreaHidden
+            )}
         </>
       )}
     </VStack>

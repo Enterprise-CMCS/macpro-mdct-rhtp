@@ -76,6 +76,7 @@ export const UseOfFundsAttachmentElement = (
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
         multiple={false}
+        notification={{ success: "Use of Funds" }}
       ></UploadDrawer>
       {files.length > 0 && (
         <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">

@@ -33,6 +33,7 @@ import {
 import {
   checkpointAttachableOptions,
   checkpointList,
+  getCheckpointLabel,
   getStageIdByCheckpointId,
   stageList,
 } from "verbiage/checkpoints";
@@ -494,6 +495,7 @@ export const TableCheckpoint = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         uploadAreaHidden={modalMode !== "Upload"}
+        notification={{ success: getCheckpointLabel(checkpoint) }}
         onModalSubmit={onModalSubmit}
       />
       <AttachmentCommentDrawer
