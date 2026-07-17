@@ -42,7 +42,7 @@
     "@aws-sdk/client-support": "~3.1032.0",
     "aws-cdk-lib": "~2.250.0",
     "constructs": "~10.5.0",
-    "jsdom": "^28.0.0",
+    "jsdom": "^29.1.1",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {

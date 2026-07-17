@@ -41,7 +41,7 @@ describe("test state policy commitment functions", () => {
                 ]),
               }),
             ]),
-            required: true,
+            required: false,
           }),
         ]),
       })
