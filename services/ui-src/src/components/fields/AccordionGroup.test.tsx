@@ -70,12 +70,12 @@ describe("<AccordionGroup />", () => {
     });
     await userEvent.click(accordionBtn);
     waitFor(() => {
-      expect(screen.getByRole("textbox", { name: "mock textbox" }));
+      expect(screen.getByRole("textbox", { name: "mock textboxRequired" }));
     });
     await userEvent.click(accordionBtn);
 
     waitFor(() => {
-      expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
+      expect(screen.queryByLabelText("mock textboxRequired")).not.toBeVisible();
     });
   });
   testA11y(AccordionGroupComponent);
