@@ -57,7 +57,6 @@ const paragraphTemplateSchema = object().shape({
 const inputElementSchema = {
   id: string().required(),
   label: string().required(),
-  subLabel: string().notRequired(),
   helperText: string().notRequired(),
   helperTextLink: object()
     .shape({
@@ -282,6 +281,7 @@ const buttonLinkTemplateSchema = object().shape({
 const attachmentAreaSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
   ...inputElementSchema,
+  subLabel: string().notRequired(),
   message: string().notRequired(),
   answer: array().of(
     object().shape({

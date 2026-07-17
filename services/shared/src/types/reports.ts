@@ -311,7 +311,6 @@ interface InputElementTemplate {
   type: ElementType;
   id: string;
   label: string;
-  subLabel?: string;
   helperText?: string;
   helperTextLink?: { link: string; label: string; text: string };
   required: boolean;
@@ -381,6 +380,7 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
+  subLabel?: string;
   message?: string;
   answer?: UploadListProp[];
 }
