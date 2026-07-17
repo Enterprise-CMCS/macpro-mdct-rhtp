@@ -342,7 +342,7 @@ export const AttachmentTable = (
 
     return {
       instruction: instruction,
-      success: `Uploaded to: Initiatives(s): ${checkedInit}; ${check}`,
+      success: `Initiatives(s): ${checkedInit}; ${check}`,
     };
   };
 
