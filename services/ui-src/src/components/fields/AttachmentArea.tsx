@@ -124,8 +124,7 @@ export const AttachmentArea = (
         }}
       >
         <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from the state policy
-          commitment
+          Deleting this attachment will remove it from the page below
         </Alert>
         {uploadListRender(
           reportType,
