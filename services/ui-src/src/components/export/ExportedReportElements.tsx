@@ -30,7 +30,6 @@ const renderElementList = [
   ElementType.SubHeader,
   ElementType.Paragraph,
   ElementType.TableCheckpoint,
-  ElementType.AttachmentArea,
   ElementType.ActionTable,
 ];
 

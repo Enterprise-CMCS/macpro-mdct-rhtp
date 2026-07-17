@@ -352,6 +352,9 @@ const actionTableSchema = object().shape({
 const initiativesTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.InitiativesTable)),
   id: string().required(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
+  required: boolean().required(),
 });
 
 const attachmentTableSchema = object().shape({

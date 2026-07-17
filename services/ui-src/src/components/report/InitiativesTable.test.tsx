@@ -17,6 +17,7 @@ const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 const mockTemplate: InitiativesTableTemplate = {
   type: ElementType.InitiativesTable,
   id: "mock-table-id",
+  required: false,
 };
 
 const mockInitiativeTableComponent = (
@@ -37,6 +38,17 @@ describe("InitiativesTable component", () => {
               id: "mock-initiative-1",
               title: "Mock Initiative",
               initiativeNumber: "123",
+              elements: [],
+            },
+            {
+              id: "initiatives",
+              elements: [
+                {
+                  id: "initiative-table",
+                  type: ElementType.InitiativesTable,
+                  required: false,
+                },
+              ],
             },
           ],
         },
@@ -52,11 +64,6 @@ describe("InitiativesTable component", () => {
       ).toBeVisible();
       expect(
         screen.getByRole("columnheader", { name: "Actions" })
-      ).toBeVisible();
-      expect(
-        screen.getByRole("cell", {
-          name: "123: Mock Initiative Status: Not started",
-        })
       ).toBeVisible();
       expect(
         screen.getByRole("button", {
@@ -95,6 +102,17 @@ describe("InitiativesTable component", () => {
               id: "mock-initiative-1",
               title: "Mock Initiative",
               initiativeNumber: "123",
+              elements: [{ type: ElementType.Textbox, required: true }],
+            },
+            {
+              id: "initiatives",
+              elements: [
+                {
+                  id: "initiative-table",
+                  type: ElementType.InitiativesTable,
+                  required: true,
+                },
+              ],
             },
           ],
         },
@@ -114,7 +132,7 @@ describe("InitiativesTable component", () => {
       ).toBeVisible();
       expect(
         screen.getByRole("cell", {
-          name: "123: Mock Initiative Status: Not started",
+          name: "123: Mock Initiative Status: Minimum requirements not met",
         })
       ).toBeVisible();
       expect(

@@ -50,16 +50,17 @@ describe("<AccordionGroup />", () => {
 
     const expandAllBtn = screen.getByRole("button", { name: "Expand all" });
     const collapseAllBtn = screen.getByRole("button", { name: "Collapse all" });
-    expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
+    expect(screen.queryByLabelText("mock textboxRequired")).not.toBeVisible();
     userEvent.click(expandAllBtn);
+
     await waitFor(() => {
       expect(
-        screen.getByRole("textbox", { name: "mock textbox" })
+        screen.queryByRole("textbox", { name: "mock textboxRequired" })
       ).toBeVisible();
     });
     userEvent.click(collapseAllBtn);
     await waitFor(() => {
-      expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
+      expect(screen.queryByLabelText("mock textboxRequired")).not.toBeVisible();
     });
   });
   test("accordions toggle open and close", async () => {
@@ -69,12 +70,12 @@ describe("<AccordionGroup />", () => {
     });
     userEvent.click(accordionBtn);
     await waitFor(() => {
-      expect(screen.getByRole("textbox", { name: "mock textbox" }));
+      expect(screen.getByRole("textbox", { name: "mock textboxRequired" }));
     });
     userEvent.click(accordionBtn);
 
     await waitFor(() => {
-      expect(screen.queryByLabelText("mock textbox")).not.toBeVisible();
+      expect(screen.queryByLabelText("mock textboxRequired")).not.toBeVisible();
     });
   });
   testA11y(AccordionGroupComponent);

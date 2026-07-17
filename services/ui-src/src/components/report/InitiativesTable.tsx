@@ -1,4 +1,5 @@
 import {
+  ElementType,
   InitiativePageTemplate,
   InitiativesTableTemplate,
   isCompleteStatus,
@@ -24,6 +25,8 @@ import { useParams, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import { AddEditInitiativeModal } from "components/modals/AddEditInitiativeModal";
+import { elementSatisfiesRequired } from "utils/state/reportLogic/completeness";
+import { TableStatusIcon } from "components/tables/TableStatusIcon";
 
 export const InitiativesTable = (
   props: PageElementProps<InitiativesTableTemplate>
@@ -37,8 +40,17 @@ export const InitiativesTable = (
     InitiativePageTemplate | undefined
   >(undefined);
   const [initiatives, setInitiatives] = useState<any[]>([]);
+  const [showStatus, setShowStatus] = useState<boolean>(false);
 
   useEffect(() => {
+    const table = report?.pages
+      .find((page) => page.id === "initiatives")
+      ?.elements?.find(
+        (element) => element.type === ElementType.InitiativesTable
+      ) ?? { required: false };
+
+    setShowStatus(table.required);
+
     const initiatives = (report?.pages.filter(
       (page) => "initiativeNumber" in page
     ) || []) as InitiativePageTemplate[];
@@ -57,6 +69,31 @@ export const InitiativesTable = (
 
   const navigate = useNavigate();
 
+  const getStatus = (initiative: InitiativePageTemplate) => {
+    if (initiative.status === "Abandoned") return undefined;
+
+    const elements = initiative.elements.filter(
+      (element) => "required" in element && element.required
+    );
+    const statuses = elements.map((element) =>
+      elementSatisfiesRequired(element, elements)
+    );
+    return statuses.every(Boolean)
+      ? PageStatus.COMPLETE
+      : PageStatus.NOT_STARTED;
+  };
+
+  const getMinimumRequirement = (initiative: InitiativePageTemplate) => {
+    switch (getStatus(initiative)) {
+      case PageStatus.COMPLETE:
+        return "Minimum requirements met";
+      case PageStatus.NOT_STARTED:
+        return "Minimum requirements not met";
+      default:
+        return initiative.status;
+    }
+  };
+
   // Build Rows
   const rows = initiatives.map(
     (initiative: InitiativePageTemplate, index: number) => {
@@ -67,9 +104,16 @@ export const InitiativesTable = (
           : `Edit`;
       return (
         <Tr key={index}>
+          {showStatus && (
+            <Td>
+              <TableStatusIcon tableStatus={getStatus(initiative)} />
+            </Td>
+          )}
           <Td>
             <Text fontWeight="bold">{displayName}</Text>
-            <Text>{`Status: ${initiative.status || "Not started"}`}</Text>
+            {showStatus && (
+              <Text>{`Status: ${getMinimumRequirement(initiative)}`}</Text>
+            )}
           </Td>
           <Td>
             {userIsAdmin && initiative.status !== PageStatus.ABANDONED && (
@@ -107,6 +151,7 @@ export const InitiativesTable = (
       <Table variant="initiative">
         <Thead>
           <Tr>
+            {showStatus && <Th>Status</Th>}
             <Th>Initiative</Th>
             <Th>Actions</Th>
           </Tr>

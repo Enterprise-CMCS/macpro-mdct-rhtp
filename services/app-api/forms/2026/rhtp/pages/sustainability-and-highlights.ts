@@ -89,6 +89,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       buttonText: "Add link",
       validation: "link",
       required: false,
+      quarterly: false,
     },
     {
       type: ElementType.AttachmentArea,
@@ -100,6 +101,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
         uploaded: "These files have been uploaded.",
       },
       required: false,
+      quarterly: false,
     },
   ],
 };

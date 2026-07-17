@@ -24,7 +24,12 @@ export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
   const { disabled } = props;
-  const { helperText, answer, subLabel } = props.element;
+  const {
+    helperText,
+    answer,
+    subLabel,
+    disabled: elementDisabled,
+  } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
@@ -65,8 +70,12 @@ export const AttachmentArea = (
     updateElement({ answer: [...files, ...newFiles] });
   };
 
+  const isDisabled = () => {
+    return disabled || elementDisabled;
+  };
+
   return (
-    <Stack gap="0">
+    <Stack gap="0" width="100%">
       <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
@@ -78,15 +87,15 @@ export const AttachmentArea = (
           onDeleteModalOpen,
           downloadFile,
           false,
-          disabled
+          isDisabled()
         )}
       <Button
         mt="spacer2"
         width="fit-content"
         onClick={() => setModalOpen(true)}
         variant="outline"
-        leftIcon={<Image src={disabled ? addGray : addIconPrimary} />}
-        disabled={disabled}
+        leftIcon={<Image src={isDisabled() ? addGray : addIconPrimary} />}
+        disabled={isDisabled()}
       >
         Upload Attachments
       </Button>
@@ -113,8 +122,7 @@ export const AttachmentArea = (
         }}
       >
         <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from the state policy
-          commitment
+          Deleting this attachment will remove it from the page below
         </Alert>
         <Box mt={"spacer3"} mb={"spacer_half"}>
           {subLabel.upload && (

@@ -11,7 +11,7 @@ import {
   InitiativePageTemplate,
   PageStatus,
 } from "@rhtp/shared";
-import { parseHtml, useStore } from "utils";
+import { optionalTag, parseHtml, useStore } from "utils";
 import {
   buildElement,
   getErrorMessage,
@@ -222,7 +222,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
       <Heading as="h2" variant="subHeader">
-        {pluralLabel}
+        {optionalTag({ label: pluralLabel, required: element.required })}
       </Heading>
       <p id={id}>{parseHtml(hintText)}</p>
       {canAddOrChangeStatus ? (

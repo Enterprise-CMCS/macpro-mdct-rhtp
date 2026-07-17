@@ -373,6 +373,7 @@ export const AdminDashboard = () => {
             onClick={clearFilter}
             variant="link"
             height="40px"
+            fontWeight="bold"
             aria-label="Clear All Filters"
           >
             Clear Filters
