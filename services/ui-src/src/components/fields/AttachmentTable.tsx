@@ -25,10 +25,10 @@ import {
   getStageIdByCheckpointId,
 } from "verbiage/checkpoints";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
-import { Alert } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
+import { ManageDrawer } from "components/drawers/ManageDrawer";
 
 export const AttachmentTable = (
   props: PageElementProps<AttachmentTableTemplate>
@@ -38,6 +38,7 @@ export const AttachmentTable = (
   const displayValue = structuredClone(answer) ?? [];
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
+  const [isManageOpen, setManageOpen] = useState<boolean>(false);
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
 
@@ -52,15 +53,6 @@ export const AttachmentTable = (
     (string | JSX.Element | undefined)[][]
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<UploadListProp[]>([]);
-  const [modalMode, setModalMode] = useState<"Upload" | "Manage">("Upload");
-  const actionButtonText = {
-    Upload: "Done",
-    Manage: "Save changes",
-  };
-  const modalHeading = {
-    Upload: "Upload Initiative Attachments",
-    Manage: "Manage Attachment",
-  };
 
   if (!state || !id || !reportType) {
     console.error("Can't retrieve uploads with missing state, id or type");
@@ -120,11 +112,6 @@ export const AttachmentTable = (
   };
 
   const onModalSubmit = () => {
-    if (modalMode === "Manage") {
-      removeAttachment(uploadedFiles[0]);
-      return onClose();
-    }
-
     const formattedUploadsToSave = uploadedFiles.map((upload) => ({
       attachment: upload,
       initiatives: initiativeOptions
@@ -167,7 +154,6 @@ export const AttachmentTable = (
   };
 
   const onAddClick = () => {
-    setModalMode("Upload");
     setModalOpen(true);
     setCheckpoint("");
     setUploadedFiles([]);
@@ -181,9 +167,7 @@ export const AttachmentTable = (
   };
 
   const onManagedClick = (selectedFile: InitiativeAnswerProp) => {
-    setModalMode("Manage");
-    setModalOpen(true);
-
+    setManageOpen(true);
     setCurrentValues(selectedFile);
   };
 
@@ -346,6 +330,29 @@ export const AttachmentTable = (
     };
   };
 
+  const selections = () => {
+    return (
+      <Stack gap="1.5rem">
+        <ChoiceList
+          choices={initiativeOptions}
+          name={"initiative-choice-list"}
+          type={"checkbox"}
+          label={"Which initiative does this attachment apply to?"}
+          onChange={onChoiceChangeHandler}
+          disabled={disabled}
+        />
+        <Dropdown
+          name={"checkpoint"}
+          label={"Which stage/checkpoint does this attachment apply to?"}
+          options={checkpointAttachableOptions}
+          value={checkpoint}
+          onChange={(event) => setCheckpoint(event.target.value)}
+          disabled={isStageEnabled()}
+        />
+      </Stack>
+    );
+  };
+
   return (
     <Stack width="100%" gap="1.5rem">
       <Button
@@ -383,41 +390,24 @@ export const AttachmentTable = (
           onClose: onClose,
         }}
         answer={uploadedFiles}
-        selections={
-          <Stack gap="1.5rem">
-            {modalMode === "Manage" ? (
-              <Alert status={AlertTypes.WARNING} title="Warning">
-                Deleting this attachment will remove it from all initiatives,
-                stages, and checkpoints below.
-              </Alert>
-            ) : null}
-            <ChoiceList
-              choices={initiativeOptions}
-              name={"initiative-choice-list"}
-              type={"checkbox"}
-              label={"Which initiative does this attachment apply to?"}
-              onChange={onChoiceChangeHandler}
-              disabled={modalMode === "Manage" || disabled}
-            />
-            <Dropdown
-              name={"checkpoint"}
-              label={"Which stage/checkpoint does this attachment apply to?"}
-              options={checkpointAttachableOptions}
-              value={checkpoint}
-              onChange={(event) => setCheckpoint(event.target.value)}
-              disabled={modalMode === "Manage" || isStageEnabled()}
-            />
-          </Stack>
-        }
+        selections={selections()}
         saveToReport={saveToReport}
         onModalSubmit={onModalSubmit}
-        actionButtonText={actionButtonText[modalMode]}
-        modalHeading={modalHeading[modalMode]}
+        actionButtonText={"Done"}
+        modalHeading="Upload Initiative Attachments"
         deleteFromReport={removeAttachment}
-        uploadAreaHidden={modalMode !== "Upload"}
         disabled={!checkpoint}
         notification={getNotification()}
       />
+      <ManageDrawer
+        modalDisclosure={{
+          isOpen: isManageOpen,
+          onClose: () => {
+            setManageOpen(false);
+          },
+        }}
+        content={selections()}
+      ></ManageDrawer>
       <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,

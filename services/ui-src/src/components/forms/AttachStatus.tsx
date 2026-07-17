@@ -1,4 +1,4 @@
-import { Box, Heading, ListItem, UnorderedList } from "@chakra-ui/react";
+import { Heading, ListItem, Stack, UnorderedList } from "@chakra-ui/react";
 import {
   Dropdown,
   DropdownChangeObject,
@@ -49,8 +49,8 @@ export const AttachStatus = ({ files, selectedFile }: Props) => {
   };
 
   return (
-    <Box>
-      <Heading variant="h1">Status</Heading>
+    <Stack gap="1.5rem">
+      <Heading variant="h2">Status</Heading>
       <UnorderedList>
         <ListItem>
           <b>Needs Revision, Informational, Archived:</b> The attachment will no
@@ -62,7 +62,7 @@ export const AttachStatus = ({ files, selectedFile }: Props) => {
         </ListItem>
       </UnorderedList>
       <Dropdown
-        label="Status"
+        label="Status (Optional)"
         name="status"
         onChange={onChange}
         options={statusOptions}
@@ -70,6 +70,6 @@ export const AttachStatus = ({ files, selectedFile }: Props) => {
         disabled={statusDisabled}
         errorMessage={errorMessages.status}
       />
-    </Box>
+    </Stack>
   );
 };

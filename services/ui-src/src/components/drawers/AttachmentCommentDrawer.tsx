@@ -4,21 +4,7 @@ import {
   DropdownChangeObject,
   ChoiceList,
 } from "@cmsgov/design-system";
-import {
-  Divider,
-  Heading,
-  Text,
-  Spinner,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-  Button,
-  Image,
-  Flex,
-} from "@chakra-ui/react";
+import { Divider, Text, Spinner, Button, Flex } from "@chakra-ui/react";
 import {
   InitiativeAnswerProp,
   UploadListProp,
@@ -32,8 +18,8 @@ import {
   createComment,
   getComments,
 } from "utils/api/requestMethods/commentMethods";
-import closeIcon from "assets/icons/close/icon_close_primary.svg";
 import { PreviousComments } from "./PreviousComments";
+import { Drawer } from "./Drawer";
 
 export const AttachmentCommentDrawer = ({
   modalDisclosure,
@@ -188,104 +174,79 @@ export const AttachmentCommentDrawer = ({
 
   return (
     <Drawer
-      isOpen={modalDisclosure.isOpen}
-      onClose={modalDisclosure.onClose}
-      placement="right"
+      modalDisclosure={modalDisclosure}
+      onConfirmHandler={modalDisclosure.onClose}
+      content={{
+        heading: "Add comment to attachment",
+        actionButtonText: "Close",
+        closeButtonText: undefined,
+      }}
     >
-      <DrawerOverlay />
-      <DrawerContent maxWidth={"576px"}>
-        <Flex sx={sx.drawerCloseContainer}>
-          <Button
-            leftIcon={<Image src={closeIcon} alt="Close" />}
-            variant="link"
-            onClick={modalDisclosure.onClose}
-            fontWeight="bold"
-          >
-            Close
-          </Button>
+      <Flex direction="column" gap="spacer4" marginBottom="spacer4">
+        <Text sx={sx.drawerSubheading}>
+          Use the field below to leave comments for your CMS Project Officer.
+        </Text>
+        <Text fontSize="body_lg" fontWeight="body_lg">
+          <b>Attachment:</b> {fileName}
+        </Text>
+        {errorMessages.overall && (
+          <Text fontSize="body_md" color="red">
+            {errorMessages.overall}
+          </Text>
+        )}
+        {userIsAdmin && (
+          <ChoiceList
+            label="External or Internal Comment"
+            hint="Choose whether this comment is hidden from the state or shared."
+            name="commentType"
+            type="radio"
+            onChange={onChange}
+            errorMessage={errorMessages.commentType}
+            choices={[
+              {
+                label: "External (Shared with States)",
+                value: "external",
+              },
+              { label: "Internal (CMS Only)", value: "internal" },
+            ]}
+          />
+        )}
+        <TextField
+          name={"comment"}
+          label={
+            <>
+              Comment
+              {commentsOptional && (
+                <span className="optionalText"> (optional)</span>
+              )}
+            </>
+          }
+          onChange={onChange}
+          value={displayValue.comment}
+          disabled={commentsDisabled}
+          multiline
+          rows={3}
+          errorMessage={errorMessages.comment}
+        />
+      </Flex>
+      <Button
+        onClick={onSubmit}
+        isDisabled={commentsDisabled}
+        isLoading={commentSubmitting}
+        variant="outline"
+      >
+        Add comment
+      </Button>
+      <Divider marginTop={"spacer3"} borderColor={"black"} />
+      {commentsLoading ? (
+        <Flex gap="spacer2" alignItems="center" marginTop="spacer4">
+          <Spinner size="md" />
+          <Text>Comments loading...</Text>
         </Flex>
-        <DrawerHeader>
-          <Flex direction="column" gap="spacer3">
-            <Heading as="h1" sx={sx.drawerHeaderText}>
-              Add comment to attachment
-            </Heading>
-          </Flex>
-        </DrawerHeader>
-        <DrawerBody>
-          <Flex direction="column" gap="spacer4" marginBottom="spacer4">
-            <Text sx={sx.drawerSubheading}>
-              Use the field below to leave comments for your CMS Project
-              Officer.
-            </Text>
-            <Text fontSize="body_lg" fontWeight="body_lg">
-              <b>Attachment:</b> {fileName}
-            </Text>
-            {errorMessages.overall && (
-              <Text fontSize="body_md" color="red">
-                {errorMessages.overall}
-              </Text>
-            )}
-            {userIsAdmin && (
-              <ChoiceList
-                label="External or Internal Comment"
-                hint="Choose whether this comment is hidden from the state or shared."
-                name="commentType"
-                type="radio"
-                onChange={onChange}
-                errorMessage={errorMessages.commentType}
-                choices={[
-                  {
-                    label: "External (Shared with States)",
-                    value: "external",
-                  },
-                  { label: "Internal (CMS Only)", value: "internal" },
-                ]}
-              />
-            )}
-            <TextField
-              name={"comment"}
-              label={
-                <>
-                  Comment
-                  {commentsOptional && (
-                    <span className="optionalText"> (optional)</span>
-                  )}
-                </>
-              }
-              onChange={onChange}
-              value={displayValue.comment}
-              disabled={commentsDisabled}
-              multiline
-              rows={3}
-              errorMessage={errorMessages.comment}
-            />
-          </Flex>
-          <Button
-            onClick={onSubmit}
-            isDisabled={commentsDisabled}
-            isLoading={commentSubmitting}
-            variant="outline"
-          >
-            Add comment
-          </Button>
-          <Divider marginTop={"spacer3"} borderColor={"black"} />
-          {commentsLoading ? (
-            <Flex gap="spacer2" alignItems="center" marginTop="spacer4">
-              <Spinner size="md" />
-              <Text>Comments loading...</Text>
-            </Flex>
-          ) : null}
-          {pastComments.length > 0 ? (
-            <PreviousComments
-              comments={pastComments}
-              userIsAdmin={userIsAdmin!}
-            />
-          ) : null}
-        </DrawerBody>
-        <DrawerFooter>
-          <Button onClick={modalDisclosure.onClose}>Close</Button>
-        </DrawerFooter>
-      </DrawerContent>
+      ) : null}
+      {pastComments.length > 0 ? (
+        <PreviousComments comments={pastComments} userIsAdmin={userIsAdmin!} />
+      ) : null}
     </Drawer>
   );
 };
