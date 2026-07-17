@@ -50,6 +50,23 @@ export class ReportEditorPage extends BasePage {
     await this.waitForLoadingComplete();
   }
 
+  async navigateToSectionAndBack(
+    reportType: string,
+    state: string,
+    reportId: string,
+    toSectionId: string,
+    fromSectionId: string
+  ): Promise<void> {
+    await this.navigateToSection(reportType, state, reportId, toSectionId);
+    await this.waitForLoadingComplete();
+
+    if (fromSectionId === toSectionId) {
+      return;
+    }
+    await this.navigateToSection(reportType, state, reportId, fromSectionId);
+    await this.waitForLoadingComplete();
+  }
+
   private async clickSectionNavButton(button: Locator): Promise<void> {
     const fromSection = this.getCurrentSectionId();
     await Promise.all([
@@ -74,7 +91,7 @@ export class ReportEditorPage extends BasePage {
 
   // ===== Locators =====
 
-  getFieldByLabel(label: string | RegExp): Locator {
+  getTextField(label: string | RegExp): Locator {
     return this.page.getByLabel(label);
   }
 
@@ -94,13 +111,6 @@ export class ReportEditorPage extends BasePage {
   // ===== Actions =====
 
   async fillTextField(label: string | RegExp, value: string): Promise<void> {
-    const field = this.getFieldByLabel(label);
-    await field.clear();
-    await field.fill(value);
-  }
-
-  async fillTextarea(label: string | RegExp, value: string): Promise<void> {
-    // Get textarea by label — use getByLabel which should work for textarea as well
     const field = this.page.getByLabel(label);
     await field.fill(value);
   }

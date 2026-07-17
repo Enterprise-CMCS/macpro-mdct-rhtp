@@ -15,7 +15,7 @@ export async function verifyFieldIsEditable(
   editor: ReportEditorPage,
   label: string | RegExp
 ): Promise<void> {
-  await expect(editor.getFieldByLabel(label)).not.toBeDisabled();
+  await expect(editor.getTextField(label)).not.toBeDisabled();
 }
 
 /**
@@ -25,19 +25,19 @@ export async function verifyFieldIsReadOnly(
   editor: ReportEditorPage,
   label: string | RegExp
 ): Promise<void> {
-  await expect(editor.getFieldByLabel(label)).toBeDisabled();
+  await expect(editor.getTextField(label)).toBeDisabled();
 }
 
 /**
  * Verify that a field's current value matches the expected value.
  * Use after navigating back to the page to confirm persistence.
  */
-export async function verifyFieldValuePersisted(
+export async function verifyFieldValue(
   editor: ReportEditorPage,
   label: string | RegExp,
   expectedValue: string
 ): Promise<void> {
-  await expect(editor.getFieldByLabel(label)).toHaveValue(expectedValue);
+  await expect(editor.getTextField(label)).toHaveValue(expectedValue);
 }
 
 /**

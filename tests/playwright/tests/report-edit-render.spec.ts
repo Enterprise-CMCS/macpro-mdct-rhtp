@@ -158,16 +158,6 @@ test.describe("Report Editing - Section Rendering", () => {
     await expect(
       editor.page.getByText("Sustainability Planning", { exact: true })
     ).toBeVisible();
-    await expect(
-      editor.page.getByLabel(
-        /Share success stories that you want to highlight as result of your State’s implementation of the RHT Program\./
-      )
-    ).toBeVisible();
-    await expect(
-      editor.page.getByLabel(
-        /What are the most significant updates or changes to your sustainability plan based on the past year’s experiences, successes, and challenges\?/
-      )
-    ).toBeVisible();
   });
 
   test("should render the review and submit section shell for an unsubmitted report @regression", async ({

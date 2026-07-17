@@ -58,9 +58,11 @@ export const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
 
 export const SUSTAINABILITY_TEST_DATA = {
   successStories:
-    "This is a test success story demonstrating measurable outcomes from RHT implementation.",
+    "This is a test success story demonstrating measurable outcomes from RHT implementation." +
+    ` Timestamp: ${Date.now()}`,
   sustainabilityPlan:
-    "Our sustainability strategy includes long-term funding commitments and workforce development partnerships.",
+    "Our sustainability strategy includes long-term funding commitments and workforce development partnerships." +
+    ` Timestamp: ${Date.now()}`,
 };
 
 const SUSTAINABILITY_RETRY_INTERRUPTED_REASON =
@@ -75,24 +77,16 @@ type AutosaveRefreshOptions = {
   fallbackSectionId?: string;
 };
 
-export const verifyTextareaValue = async (
-  editor: ReportEditorPage,
-  label: ReportEditLabel,
-  expectedValue: string
-): Promise<void> => {
-  await expect(editor.getFieldByLabel(label)).toHaveValue(expectedValue);
-};
-
 export const sustainabilityFieldsEditable = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
   const [successEnabled, planningEnabled] = await Promise.all([
     editor
-      .getFieldByLabel(SUCCESS_STORIES_LABEL)
+      .getTextField(SUCCESS_STORIES_LABEL)
       .isEnabled()
       .catch(() => false),
     editor
-      .getFieldByLabel(SUSTAINABILITY_PLANNING_LABEL)
+      .getTextField(SUSTAINABILITY_PLANNING_LABEL)
       .isEnabled()
       .catch(() => false),
   ]);
@@ -179,7 +173,7 @@ export const editGeneralInformationFields = async (
 ): Promise<void> => {
   for (const field of fields) {
     if (mode === "fill-empty") {
-      const input = editor.getFieldByLabel(field.label);
+      const input = editor.getTextField(field.label);
       const currentValue = await input.inputValue().catch(() => "");
       if (currentValue.trim().length > 0) {
         continue;
@@ -223,11 +217,12 @@ export const waitForAutosaveWithSectionRefresh = async (
     .catch(() => false);
 };
 
-export const waitForAutosaveIndicator = async (
-  editor: ReportEditorPage,
-  timeoutMs = TIMEOUT_AUTOSAVE
+export const confirmAutosaveIndicatorIsVisible = async (
+  editor: ReportEditorPage
 ): Promise<void> => {
-  await expect(editor.saveStatusText).toBeVisible({ timeout: timeoutMs });
+  await expect(editor.saveStatusText).toBeVisible({
+    timeout: TIMEOUT_AUTOSAVE,
+  });
 };
 
 const getIncompleteReviewSections = async (
@@ -285,11 +280,11 @@ const completeSustainabilityForSubmission = async (
     return false;
   }
 
-  await editor.fillTextarea(
+  await editor.fillTextField(
     SUCCESS_STORIES_LABEL,
     `Success story for submission ${Date.now()}`
   );
-  await editor.fillTextarea(
+  await editor.fillTextField(
     SUSTAINABILITY_PLANNING_LABEL,
     `Sustainability plan for submission ${Date.now()}`
   );
