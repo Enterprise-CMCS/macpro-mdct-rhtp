@@ -26,8 +26,7 @@ export const UploadDrawer = ({
       content={{
         heading: modalHeading,
         subheading: hint,
-        actionButtonText: actionButtonText,
-        closeButtonText: undefined,
+        solidButtonText: actionButtonText,
       }}
     >
       <Stack gap="1.5rem">

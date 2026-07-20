@@ -4,48 +4,32 @@ import {
   DropdownChangeObject,
   DropdownOption,
 } from "@cmsgov/design-system";
-import {
-  AttachmentStatus,
-  FileStatusOptions,
-  InitiativeAnswerProp,
-  UploadListProp,
-  UserRoles,
-} from "@rhtp/shared";
+import { AttachmentStatus, FileStatusOptions, UserRoles } from "@rhtp/shared";
 import { useState } from "react";
-import { useStore } from "utils";
+import { optionalTag, useStore } from "utils";
 
 interface Props {
-  files: InitiativeAnswerProp[];
-  selectedFile: UploadListProp | undefined;
+  status: AttachmentStatus;
+  onChange: (status: AttachmentStatus) => void;
 }
 
-const noErrorState = {
-  comment: "",
-  status: "",
-  overall: "",
-  commentType: "",
-};
-
-export const AttachStatus = ({ files, selectedFile }: Props) => {
+export const StatusDropdown = ({ status, onChange }: Props) => {
   const { userRole } = useStore().user ?? {};
   const isStateUser = userRole === UserRoles.STATE_USER;
   const [statusOptions, _setStatusOptions] =
     useState<DropdownOption[]>(FileStatusOptions);
-  const [errorMessages, _setErrorMessages] = useState(noErrorState);
 
-  const selectedAttachmentIndex = files.findIndex(
-    (file) => file.attachment.fileId === selectedFile?.fileId
-  );
-  const fileStatus = files[selectedAttachmentIndex]?.status || "";
-
-  const [displayValue, _setDisplayValue] = useState(fileStatus);
   const statusDisabled =
-    isStateUser && fileStatus === AttachmentStatus.LOCKED_FOR_SCORING;
+    isStateUser && status === AttachmentStatus.LOCKED_FOR_SCORING;
 
-  const onChange = (
+  const [displayValue, setDisplayValue] = useState(status);
+
+  const setDropdownValue = (
     event: React.ChangeEvent<HTMLInputElement> | DropdownChangeObject
   ) => {
-    console.log(event);
+    const newStatus = event.target.value as AttachmentStatus;
+    setDisplayValue(newStatus);
+    onChange(newStatus);
   };
 
   return (
@@ -62,13 +46,12 @@ export const AttachStatus = ({ files, selectedFile }: Props) => {
         </ListItem>
       </UnorderedList>
       <Dropdown
-        label="Status (Optional)"
+        label={optionalTag({ label: "Status", required: false })}
         name="status"
-        onChange={onChange}
+        onChange={setDropdownValue}
         options={statusOptions}
         value={displayValue}
         disabled={statusDisabled}
-        errorMessage={errorMessages.status}
       />
     </Stack>
   );

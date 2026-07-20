@@ -178,8 +178,7 @@ export const AttachmentCommentDrawer = ({
       onConfirmHandler={modalDisclosure.onClose}
       content={{
         heading: "Add comment to attachment",
-        actionButtonText: "Close",
-        closeButtonText: undefined,
+        solidButtonText: "Close",
       }}
     >
       <Flex direction="column" gap="spacer4" marginBottom="spacer4">

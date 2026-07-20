@@ -6,29 +6,66 @@ import {
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
-import { JSX } from "react";
-import { AlertTypes } from "@rhtp/shared";
+import { useState } from "react";
+import {
+  AlertTypes,
+  AttachmentStatus,
+  InitiativeAnswerProp,
+  UploadListProp,
+} from "@rhtp/shared";
 import { Alert, Drawer } from "components";
-import { AttachStatus } from "components/forms/AttachStatus";
+import { StatusDropdown } from "components/fields/attachments/StatusDropdown";
+import { StageCheckpointDropdown } from "components/fields/attachments/StageCheckpointDropdown";
 
 export const ManageDrawer = ({
   modalDisclosure,
-  content,
-  onModalSubmit = modalDisclosure.onClose,
+  answer,
+  files,
+  onModalDelete,
+  updateElement,
 }: Props) => {
+  if (!answer) return;
+  const [status, setStatus] = useState<AttachmentStatus>(answer.status);
+  const [initiatives, setInitiatives] = useState<string[]>([]);
+  const [checkpoint, setCheckpoint] = useState<string>("");
+
+  const onSubmit = async () => {
+    const index = files.findIndex(
+      (file) => file.attachment.fileId === answer.fileId
+    );
+    if (index !== -1) {
+      files[index].initiatives = initiatives;
+      files[index].checkpoint = checkpoint;
+      files[index].status = status;
+      await updateElement({ answer: files });
+      modalDisclosure.onClose();
+    }
+  };
+
+  const onDropdownHandler = (initiatives: string[], checkpoint?: string) => {
+    setInitiatives(initiatives);
+    setCheckpoint(checkpoint ?? "");
+  };
+
   return (
     <Drawer
       modalDisclosure={modalDisclosure}
-      onConfirmHandler={onModalSubmit}
+      onConfirmHandler={onSubmit}
+      onOutlineHandler={onModalDelete}
       content={{
         heading: "Manage Attachment",
-        actionButtonText: "Save changes",
-        closeButtonText: undefined,
+        outlineButtonText: "Delete attachment",
+        solidButtonText: "Save changes",
       }}
     >
       <Stack gap="1.5rem">
-        <Text>Attachment: {}</Text>
-        <AttachStatus files={[]} selectedFile={undefined}></AttachStatus>
+        <Text>
+          <b>Attachment:</b> {answer.name}
+        </Text>
+        <StatusDropdown
+          status={answer.status}
+          onChange={(status) => setStatus(status)}
+        ></StatusDropdown>
         <Divider></Divider>
         <Heading variant="h2">Adjust initiatives and stage/checkpoint</Heading>
         <UnorderedList>
@@ -43,7 +80,7 @@ export const ManageDrawer = ({
             upload your new document as a fresh attachment.
           </ListItem>
         </UnorderedList>
-        {content}
+        <StageCheckpointDropdown onDropdownHandler={onDropdownHandler} />
         <Heading variant="h2">Delete attachment</Heading>
         <Alert status={AlertTypes.WARNING} title="Warning">
           Deleting this attachment will remove it from all initiatives, stages,
@@ -59,6 +96,8 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
   };
-  content?: JSX.Element;
-  onModalSubmit?: () => void;
+  onModalDelete?: () => void;
+  answer: UploadListProp & { status: AttachmentStatus };
+  updateElement: Function;
+  files: InitiativeAnswerProp[];
 }
