@@ -23,6 +23,7 @@ export { RhtpIntroductionCard } from "./cards/RhtpIntroductionCard";
 export { ExportedReportBanner } from "./export/ExportedReportBanner";
 export { ExportedReportWrapper } from "./export/ExportedReportWrapper";
 // fields
+export { CharacterCounter } from "./fields/CharacterCounter";
 export { DateField } from "./fields/DateField";
 export { DropdownField } from "./fields/DropdownField";
 export { RadioField } from "./fields/RadioField";

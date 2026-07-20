@@ -25,6 +25,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
         "Limit responses to 3,000 characters, approximately 400–500 words.",
       required: true,
       quarterly: true,
+      charLimit: 3000,
     },
     {
       id: "success-stories-paragraph",
@@ -72,6 +73,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
         "Limit responses to 3,000 characters, approximately 400–500 words.",
       required: true,
       quarterly: false,
+      charLimit: 3000,
     },
     {
       id: "sustainability-paragraph",
