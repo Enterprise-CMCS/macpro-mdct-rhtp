@@ -26,7 +26,7 @@ vi.mock("../../libs/s3-lib", () => ({
 
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
-  body: `{"fileId":"mock-id"}`,
+  body: `{"uploadedFileName":"mock-id","uploadedFileType":"image/png"}`,
   pathParameters: {
     state: "PA",
     reportType: "RHTP",
@@ -50,6 +50,15 @@ describe("Test createUpload API method", () => {
       pathParameters: {},
     } as APIGatewayProxyEvent;
     const res = await createUpload(badTestEvent);
+    expect(res.statusCode).toBe(StatusCodes.BadRequest);
+  });
+  test("returns bad request for disallowed file type", async () => {
+    const badFileTypeEvent = {
+      ...testEvent,
+      body: `{"uploadedFileName":"mock-id","uploadedFileType":"image/svg"}`,
+    };
+    (updateUpload as Mock).mockResolvedValueOnce(mockUploadRespond);
+    const res = await createUpload(badFileTypeEvent);
     expect(res.statusCode).toBe(StatusCodes.BadRequest);
   });
   test("successful create upload ps url", async () => {
