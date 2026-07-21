@@ -20,10 +20,19 @@ const commitmentStatusDropdown = (
   id: "commitment-status",
   label: "Current Status",
   options: getDropdownOptions(label),
-  required: true,
+  required: false,
   answer: status,
 });
 
+const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
+  type: ElementType.AttachmentArea,
+  id: "commitment-attachments",
+  label: "Attachments",
+  subLabel: `<b>State Policy Commitment:</b> ${label}`,
+  message: label,
+  helperText: "Upload state legislation.",
+  required: false,
+});
 const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   const dropdownOptions = [
     cmsEvaluationStatusDefault,
@@ -35,7 +44,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
     id: "cms-status-evaluation",
     label: "CMS Status Evaluation",
     options: dropdownOptions,
-    required: true,
+    required: false,
     answer: cmsEvaluationStatusDefault.value,
     editByRole: [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER],
   };
@@ -58,18 +67,6 @@ const commitmentSupportParagraph: ParagraphTemplate = {
   title: "Supporting Evidence",
   text: "States should only submit legislation links and attachments as acceptable evidence for their State policy commitments. CMS will not accept press releases or promotional links/attachments as substantial evidence.",
   style: "hint",
-};
-
-const commitmentAttachmentArea: AttachmentAreaTemplate = {
-  type: ElementType.AttachmentArea,
-  id: "commitment-attachments",
-  label: "Attachments",
-  helperText: "Upload state legislation.",
-  subLabel: {
-    uploaded:
-      "These files have been attached to the state policy commitment above.",
-  },
-  required: false,
 };
 
 const commitmentNotes: TextAreaBoxTemplate = {
@@ -98,14 +95,7 @@ const buildCommitments = (
         cmsStatusEvaluation(label),
         commitmentSupportParagraph,
         commitmentLinkListInput,
-        {
-          ...commitmentAttachmentArea,
-          subLabel: {
-            upload: `<b>State Policy Commitment:</b> ${label}`,
-            uploaded:
-              "These files have been attached to the state policy commitment above.",
-          },
-        },
+        commitmentAttachmentArea(label),
         commitmentNotes,
       ],
     });
@@ -135,7 +125,7 @@ export const buildStatePolicyCommitments = (
       type: ElementType.AccordionGroup,
       id: "state-policy-commitments-group",
       accordions: [...buildCommitments(state)],
-      required: true,
+      required: false,
     },
   ],
 });

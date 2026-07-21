@@ -6,9 +6,10 @@ import { TextAreaBoxTemplate } from "@rhtp/shared";
 import { PageElementProps } from "../report/Elements";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 import { ErrorMessages } from "../../constants";
+import { CharacterCounter } from "components";
 
 export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
-  const { element: textbox, updateElement, disabled, subType } = props;
+  const { element: textbox, updateElement, disabled } = props;
   const { setModalComponent } = useStore();
   const defaultValue = textbox.answer ?? "";
   const [displayValue, setDisplayValue] = useState(defaultValue);
@@ -24,7 +25,11 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
   const onChangeHandler = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value;
+    let value = event.target.value;
+    if (textbox.charLimit && value.length >= textbox.charLimit) {
+      // Limit reached. Do not save any more characters. Allow pasting large text but truncate.
+      value = value.substring(0, textbox.charLimit);
+    }
     setDisplayValue(value);
     if (!value && textbox.required) {
       setErrorMessage(ErrorMessages.requiredResponse);
@@ -45,7 +50,7 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
     <Box width={"100%"}>
       <CmsdsTextField
         name={textbox.id}
-        label={optionalTag(textbox, subType)}
+        label={optionalTag(textbox)}
         hint={parsedHint}
         onChange={onChangeHandler}
         onBlur={onChangeHandler}
@@ -55,6 +60,13 @@ export const TextAreaField = (props: PageElementProps<TextAreaBoxTemplate>) => {
         rows={3}
         disabled={disabled || textbox.disabled}
       />
+      {textbox.charLimit && (
+        <CharacterCounter
+          id={`${textbox.id}-counter`}
+          input={displayValue ?? ""}
+          maxLength={textbox.charLimit}
+        />
+      )}
     </Box>
   );
 };

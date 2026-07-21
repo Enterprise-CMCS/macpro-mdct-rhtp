@@ -36,6 +36,24 @@ export interface UpdateInitiativeOptions {
   initiativeAbandon: boolean;
 }
 
+export interface ZipRequestBody {
+  type: ZipRequestTypes;
+  report?: ZipRequestReportDetails; // REPORT type
+  state?: string; // USE_OF_FUNDS type
+  reportSubTypeKeys?: string[]; // USE_OF_FUNDS type
+}
+
+export enum ZipRequestTypes {
+  REPORT = "REPORT",
+  USE_OF_FUNDS = "USE_OF_FUNDS",
+}
+
+export interface ZipRequestReportDetails {
+  state: StateAbbr;
+  reportType: ReportType;
+  id: string;
+}
+
 export interface ReportOptions {
   name: string;
   subType: RhtpSubType;
@@ -69,6 +87,7 @@ export enum AlertTypes {
 }
 
 export enum PageStatus {
+  OPTIONAL = "Optional",
   NOT_STARTED = "Not started",
   IN_PROGRESS = "In progress",
   ABANDONED = "Abandoned",
@@ -257,6 +276,9 @@ export type DividerTemplate = {
 export type InitiativesTableTemplate = {
   id: string;
   type: ElementType.InitiativesTable;
+  required: boolean;
+  quarterly?: boolean;
+  disabled?: boolean;
 };
 
 export type StatusTableTemplate = {
@@ -359,6 +381,7 @@ export interface TextAreaBoxTemplate extends InputElementTemplate {
   type: ElementType.TextAreaField;
   answer?: string;
   hideCondition?: HideCondition;
+  charLimit?: number;
 }
 
 export interface TextboxTemplate extends InputElementTemplate {
@@ -376,10 +399,8 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  subLabel: {
-    upload?: string;
-    uploaded?: string;
-  };
+  subLabel?: string;
+  message?: string;
   answer?: UploadListProp[];
 }
 

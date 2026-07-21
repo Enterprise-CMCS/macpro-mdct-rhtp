@@ -24,7 +24,8 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       helperText:
         "Limit responses to 3,000 characters, approximately 400–500 words.",
       required: true,
-      quarterly: false,
+      quarterly: true,
+      charLimit: 3000,
     },
     {
       id: "success-stories-paragraph",
@@ -47,11 +48,9 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       type: ElementType.AttachmentArea,
       id: "success-attachments",
       label: "Attachments",
+      subLabel: "<b>Success Stories: Supporting Evidence</b>",
+      message: "Success Stories",
       helperText: "Upload supporting documentation.",
-      subLabel: {
-        upload: "<b>Success Stories: Supporting Evidence</b>",
-        uploaded: "These files have been uploaded.",
-      },
       required: false,
     },
     {
@@ -72,6 +71,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
         "Limit responses to 3,000 characters, approximately 400–500 words.",
       required: true,
       quarterly: false,
+      charLimit: 3000,
     },
     {
       id: "sustainability-paragraph",
@@ -89,17 +89,17 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       buttonText: "Add link",
       validation: "link",
       required: false,
+      quarterly: false,
     },
     {
       type: ElementType.AttachmentArea,
       id: "sustainability-attachments",
       label: "Attachments",
+      subLabel: "<b>Sustainability Planning: Supporting Evidence</b>",
+      message: "Sustainability Planning",
       helperText: "Upload supporting documentation.",
-      subLabel: {
-        upload: "<b>Sustainability Planning: Supporting Evidence</b>",
-        uploaded: "These files have been uploaded.",
-      },
       required: false,
+      quarterly: false,
     },
   ],
 };

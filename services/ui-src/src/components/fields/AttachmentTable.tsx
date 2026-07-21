@@ -1,6 +1,6 @@
 import { Button, Stack, Image, HStack, Text } from "@chakra-ui/react";
 import { ChoiceList, Dropdown } from "@cmsgov/design-system";
-import { UploadModal } from "components/modals/UploadModal";
+import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDrawer";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import {
   AlertTypes,
   InitiativeAnswerProp,
   AttachmentStatus,
+  PageStatus,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import {
@@ -157,31 +158,31 @@ export const AttachmentTable = (
     onClose();
   };
 
+  const getInitiativeOptions = (selectedFile?: InitiativeAnswerProp) => {
+    return initiatives.map(({ id, initiativeNumber, status, title }) => {
+      const isAbandoned = status === PageStatus.ABANDONED;
+      const isChecked = selectedFile?.initiatives?.includes(id);
+      return {
+        label: `${initiativeNumber}: ${title}${isAbandoned ? " (abandoned)" : ""}`,
+        value: id,
+        checked: !!isChecked,
+        disabled: isAbandoned,
+      };
+    });
+  };
+
   const onAddClick = () => {
     setModalMode("Upload");
     setModalOpen(true);
     setCheckpoint("");
     setUploadedFiles([]);
-    setInitiativeOptions(
-      initiatives.map((initiative) => ({
-        label: `${initiative.initiativeNumber}: ${initiative.title}`,
-        value: initiative.id,
-        checked: false,
-      }))
-    );
+    setInitiativeOptions(getInitiativeOptions());
   };
 
   const setCurrentValues = (selectedFile: InitiativeAnswerProp) => {
     setCheckpoint(selectedFile.checkpoint ?? "");
     setUploadedFiles([selectedFile.attachment]);
-
-    const initiativeOptions = initiatives.map((initiative) => ({
-      label: `${initiative.initiativeNumber}: ${initiative.title}`,
-      value: initiative.id,
-      checked: selectedFile.initiatives.includes(initiative.id),
-    }));
-
-    setInitiativeOptions(initiativeOptions);
+    setInitiativeOptions(getInitiativeOptions(selectedFile));
   };
 
   const onEditClick = (selectedFile: InitiativeAnswerProp) => {
@@ -213,7 +214,9 @@ export const AttachmentTable = (
     return initiativeOptions.every((option) => option.checked != true);
   };
 
-  const getCheckpointDisplayName = (answer: InitiativeAnswerProp) => {
+  const getCheckpointDisplayName = (
+    answer: { checkpoint: string } | InitiativeAnswerProp
+  ) => {
     const checkpoint = checkpointList.find(
       ({ id }) => id === answer.checkpoint
     );
@@ -259,6 +262,7 @@ export const AttachmentTable = (
             onClick={() => onCommentClick(row)}
             aria-label={`Comment on ${row.attachment.name}`}
             fontWeight="bold"
+            disabled={disabled}
           >
             Status/Comments
           </Button>
@@ -341,6 +345,29 @@ export const AttachmentTable = (
     setTableRows(rows(filteredValues.flat()));
   };
 
+  const getNotification = () => {
+    const checkedInit = initiativeOptions
+      .filter((opt) => opt.checked)
+      .map((opt) => opt.label.split(":")[0])
+      .join(", ");
+    const check = getCheckpointDisplayName({ checkpoint: checkpoint });
+
+    const instruction = !checkpoint
+      ? {
+          type: AlertTypes.WARNING,
+          text: "Select initiative and checkpoint to enable upload.",
+        }
+      : {
+          type: AlertTypes.INFO,
+          text: `Attaching to: Initiatives(s): ${checkedInit}; ${check}`,
+        };
+
+    return {
+      instruction: instruction,
+      success: `Initiatives(s): ${checkedInit}; ${check}`,
+    };
+  };
+
   return (
     <Stack width="100%" gap="1.5rem">
       <Button
@@ -372,14 +399,14 @@ export const AttachmentTable = (
           No attachments found. Select “Add Attachment” to get started.
         </Text>
       )}
-      <UploadModal
+      <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: onClose,
         }}
         answer={uploadedFiles}
         selections={
-          <Stack gap="1.5rem" marginTop="1.5rem">
+          <Stack gap="1.5rem">
             {modalMode === "Delete" ? (
               <Alert status={AlertTypes.WARNING} title="Warning">
                 Deleting this attachment will remove it from all initiatives,
@@ -410,10 +437,8 @@ export const AttachmentTable = (
         modalHeading={modalHeading[modalMode]}
         deleteFromReport={removeAttachment}
         uploadAreaHidden={modalMode !== "Upload"}
-        subLabel={{
-          uploaded:
-            "These files have been attached to the stage and checkpoint selected above.",
-        }}
+        disabled={!checkpoint}
+        notification={getNotification()}
       />
       <AttachmentCommentDrawer
         modalDisclosure={{

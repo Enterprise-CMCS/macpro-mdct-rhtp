@@ -150,15 +150,13 @@ const elements: PageElement[] = [
   {
     type: ElementType.InitiativesTable,
     id: "",
+    required: false,
   },
   {
     type: ElementType.AttachmentArea,
     id: "",
     label: "Attachment area label",
     required: true,
-    subLabel: {
-      uploaded: "mock sub label",
-    },
   },
   {
     type: ElementType.ListInput,

@@ -22,6 +22,7 @@ export const makeQuarterlyChanges = (pages: ReportPages) => {
     for (const element of page.elements) {
       if ("quarterly" in element && !element.quarterly) {
         element.disabled = true;
+        element.required = false;
       }
       if (optionalInQuarterly.includes(element.id) && "required" in element) {
         element.required = false;

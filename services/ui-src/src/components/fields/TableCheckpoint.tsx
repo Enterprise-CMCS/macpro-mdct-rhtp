@@ -13,13 +13,15 @@ import {
   TableCheckpointTemplate,
   UploadListProp,
   AlertTypes,
+  InitiativePageTemplate,
+  PageStatus,
 } from "@rhtp/shared";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
-import { UploadModal } from "components/modals/UploadModal";
+import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
@@ -31,6 +33,7 @@ import {
 import {
   checkpointAttachableOptions,
   checkpointList,
+  getCheckpointLabel,
   getStageIdByCheckpointId,
   stageList,
 } from "verbiage/checkpoints";
@@ -145,13 +148,17 @@ const getFilesFromTable = (tables: TableShape[], checkpoint: string) => {
 export const TableCheckpoint = (
   props: PageElementProps<TableCheckpointTemplate>
 ) => {
-  const { disabled } = props;
+  const { disabled: formDisabled } = props;
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<UploadListProp[]>([]);
   const { pageId } = useParams();
   const { report, setAnswers } = useStore();
+  const initiative = report?.pages.find(
+    (page) => page.id === pageId
+  ) as InitiativePageTemplate;
+  const disabled = formDisabled || initiative?.status === PageStatus.ABANDONED;
   const { id, state, type: reportType } = report!;
   const { autosave } = useContext(ReportAutosaveContext);
   //if there is answer on load, we need to build the shape from the checkpoints data
@@ -376,6 +383,7 @@ export const TableCheckpoint = (
             onClick={() => onCommentClick(row.file)}
             aria-label={`Comment on ${row.file.name}`}
             fontWeight="bold"
+            disabled={disabled}
           >
             Status/Comments
           </Button>
@@ -458,7 +466,7 @@ export const TableCheckpoint = (
           )}
         </Stack>
       ))}
-      <UploadModal
+      <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: () => setModalOpen(false),
@@ -487,10 +495,7 @@ export const TableCheckpoint = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         uploadAreaHidden={modalMode !== "Upload"}
-        subLabel={{
-          uploaded:
-            "These files have been attached to the stage and checkpoint selected above.",
-        }}
+        notification={{ success: getCheckpointLabel(checkpoint) }}
         onModalSubmit={onModalSubmit}
       />
       <AttachmentCommentDrawer

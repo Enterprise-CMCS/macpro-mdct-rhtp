@@ -1,5 +1,6 @@
 import { getRequestHeaders } from "utils/api/requestMethods/getRequestHeaders";
 import { apiLib } from "../apiLib";
+import { ZipRequestBody } from "@rhtp/shared";
 
 interface PathURL {
   psurl: string;
@@ -40,16 +41,15 @@ interface ZipStatusResponse {
 const POLL_INTERVAL_MS = 3000;
 const MAX_POLLS = 300; // 15 minutes at 3-second intervals
 
-export const getZipPresignedUrl = async (
-  reportType: string,
-  state: string,
-  id: string
-) => {
+export const getZipPresignedUrl = async (body: ZipRequestBody) => {
   const requestHeaders = await getRequestHeaders();
 
-  await apiLib.post<{ status: string }>(
-    `/reports/${reportType}/${state}/${id}/files/zip`,
-    { headers: { ...requestHeaders }, body: {} }
+  const { zipId } = await apiLib.post<{ status: string; zipId: string }>(
+    `/zips`,
+    {
+      headers: { ...requestHeaders },
+      body,
+    }
   );
 
   for (let i = 0; i < MAX_POLLS; i++) {
@@ -57,10 +57,9 @@ export const getZipPresignedUrl = async (
     console.log(`Polling for zip status... (attempt ${i + 1}/${MAX_POLLS})`);
 
     const freshHeaders = await getRequestHeaders();
-    const result = await apiLib.get<ZipStatusResponse>(
-      `/reports/${reportType}/${state}/${id}/files/zip`,
-      { headers: { ...freshHeaders } }
-    );
+    const result = await apiLib.get<ZipStatusResponse>(`/zips/${zipId}`, {
+      headers: { ...freshHeaders },
+    });
 
     if (result.status === "ready" && result.psurl) {
       return result.psurl;

@@ -168,7 +168,12 @@ export const DashboardPage = () => {
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodFilterOptions}
           />
-          <Button onClick={clearFilter} variant="link" fontWeight="bold">
+          <Button
+            onClick={clearFilter}
+            variant="link"
+            fontWeight="bold"
+            height="40px"
+          >
             Clear Filter
           </Button>
         </Flex>

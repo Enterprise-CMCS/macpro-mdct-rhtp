@@ -14,13 +14,14 @@ import {
   getZipPresignedUrl,
 } from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import successIcon from "assets/icons/status/icon_status_check.svg";
 import DOMPurify from "dompurify";
-import { bytesToKiloBytes } from "./parsing";
+import { bytesToKiloBytes, parseHtml } from "./parsing";
 import {
   ReportType,
   UploadListProp,
   AttachmentStatus,
-  Report,
+  ZipRequestBody,
 } from "@rhtp/shared";
 
 export const acceptedFileTypes = [
@@ -72,10 +73,8 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
-export const getZipFile = async (report: Report) => {
-  const { state, id, type } = report;
-
-  const fileLink = await getZipPresignedUrl(type, state, id);
+export const getZipFile = async (body: ZipRequestBody) => {
+  const fileLink = await getZipPresignedUrl(body);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
 
   const link = document.createElement("a");
@@ -112,14 +111,17 @@ export const uploadListRender = (
   reportType: ReportType,
   state: string,
   id: string,
-  files: File[] | UploadListProp[],
+  files:
+    | File[]
+    | UploadListProp[]
+    | { name: string; size: number; fileId: string; message?: string }[],
   onRemove: Function,
   onClick?: Function,
   removeIconHidden: boolean = false,
   disabled?: boolean
 ) => {
   return (
-    <List variant="upload">
+    <List variant="upload" mb="spacer3">
       {files?.map((file, fileIdx) => (
         <ListItem key={`${file.name}.${fileIdx}`}>
           <VStack width="100%">
@@ -137,6 +139,12 @@ export const uploadListRender = (
                   </Button>
                 )}
                 <span>{bytesToKiloBytes(file.size)} KB</span>
+                {"message" in file && file.message && (
+                  <span className="successMsg">
+                    <Image src={successIcon} />
+                    Uploaded to: {parseHtml(file.message)}
+                  </span>
+                )}
               </VStack>
               <Button
                 variant="unstyled"

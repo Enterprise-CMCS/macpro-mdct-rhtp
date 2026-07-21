@@ -77,6 +77,24 @@ describe("<TextField />", () => {
     expect(updateSpy).toHaveBeenCalledWith({ answer: 24 });
   });
 
+  test("TextField should render error on load for invalid email", async () => {
+    const mockedEmailField = {
+      ...mockedTextboxElement,
+      id: "mock-email-field",
+      answer: "not-an-email",
+    };
+    render(<TextFieldWrapper template={mockedEmailField} />);
+    expect(
+      screen.getByText("Response must be a valid email address")
+    ).toBeVisible();
+    const textField = screen.getByRole("textbox");
+    await userEvent.clear(textField);
+    await userEvent.type(textField, "test@email.com");
+    expect(
+      screen.queryByText("Response must be a valid email address")
+    ).not.toBeInTheDocument();
+  });
+
   test("NumberField should render its initial value", () => {
     render(
       <TextFieldWrapper template={{ ...mockedNumberField, answer: 123 }} />

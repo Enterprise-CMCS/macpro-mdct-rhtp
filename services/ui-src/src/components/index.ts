@@ -19,10 +19,13 @@ export { HelpCard } from "./cards/HelpCard";
 export { ReportIntroCard } from "./cards/ReportIntroCard";
 export { ReportIntroCardActions } from "./cards/ReportIntroCardActions";
 export { RhtpIntroductionCard } from "./cards/RhtpIntroductionCard";
+//drawer
+export { Drawer } from "./drawers/Drawer";
 // export
 export { ExportedReportBanner } from "./export/ExportedReportBanner";
 export { ExportedReportWrapper } from "./export/ExportedReportWrapper";
 // fields
+export { CharacterCounter } from "./fields/CharacterCounter";
 export { DateField } from "./fields/DateField";
 export { DropdownField } from "./fields/DropdownField";
 export { RadioField } from "./fields/RadioField";
@@ -48,6 +51,7 @@ export { HelpPage } from "./pages/HelpPage/HelpPage";
 export { NotFoundPage } from "./pages/NotFound/NotFoundPage";
 export { NotificationsPage } from "./pages/Notifications/NotificationsPage";
 export { ProfilePage } from "./pages/Profile/ProfilePage";
+export { ExportedZipPage } from "./pages/Export/ExportedZipPage";
 // report
 export { StatusAlert } from "./report/StatusAlert";
 export { Page } from "./report/Page";

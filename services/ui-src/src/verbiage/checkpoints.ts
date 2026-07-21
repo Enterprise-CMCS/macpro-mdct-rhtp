@@ -166,3 +166,13 @@ export const getStageIdByCheckpointId = (checkpoint: string) =>
   stageList.find((stage) =>
     stage.checkpoints.find(({ id }) => id === checkpoint)
   )?.id;
+
+export const getCheckpointLabel = (checkpoint: string) => {
+  const foundCheckpoint = stageList
+    .flatMap((list) => list.checkpoints)
+    .find((a_checkpoint) => a_checkpoint.id === checkpoint);
+
+  if (!foundCheckpoint) return undefined;
+
+  return `${foundCheckpoint.checkpointNumber} ${foundCheckpoint.label}`;
+};

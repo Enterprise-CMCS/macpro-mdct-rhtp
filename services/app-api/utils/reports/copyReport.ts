@@ -10,6 +10,7 @@ import {
   AttachmentTableTemplate,
   Comment,
   ElementType,
+  PageStatus,
 } from "@rhtp/shared";
 import KSUID from "ksuid";
 import { queryUpload, batchPutUploads } from "../../storage/upload";
@@ -18,10 +19,10 @@ import s3 from "../../libs/s3-lib";
 
 const SKIP_COPY_ANSWER_IDS = [
   "use-of-funds-attachment",
-  "success-attachments",
-  "sustainability-attachments",
   "initiative-narrative",
 ];
+
+const SKIP_COPY_PAGE_IDS = ["sustainability-and-highlights"];
 
 const copyStatePolicyCommitments = (
   oldAccordions: AccordionGroupItem[],
@@ -49,7 +50,8 @@ const copyStatePolicyCommitments = (
 const copyAnswer = (
   oldElements: PageElement[],
   newElements: PageElement[],
-  newSubType: RhtpSubType
+  newSubType: RhtpSubType,
+  status?: PageStatus
 ) => {
   for (const oldElement of oldElements) {
     // Copying over State Policy Commitments
@@ -59,11 +61,21 @@ const copyAnswer = (
       ) as AccordionGroupTemplate;
       copyStatePolicyCommitments(oldElement.accordions, newElement.accordions);
     }
-    if (!("answer" in oldElement)) continue;
 
     const newElement = newElements.find(
       (newElement) => newElement.id === oldElement.id
     );
+    // when copying, don't use pre-filled answers
+    if (newElement && "answer" in newElement) {
+      delete newElement.answer;
+    }
+    // disable all elements in an abandoned page
+    if (status === PageStatus.ABANDONED) {
+      (newElement as any).disabled = true;
+    }
+    if (!("answer" in oldElement)) {
+      continue;
+    }
     if (newElement?.type === oldElement.type) {
       //special copy of metrics table when it's a new annual report
       if (
@@ -209,6 +221,7 @@ export const copyReport = async (newReport: Report) => {
   if (!reportToCopy) return;
 
   for (const oldPage of reportToCopy.pages) {
+    if (SKIP_COPY_PAGE_IDS.includes(oldPage.id)) continue;
     if (oldPage.elements) {
       let newPage = newPages.find((newPage) => newPage.id === oldPage.id);
       // ensure initiatives not in base template get copied
@@ -224,7 +237,7 @@ export const copyReport = async (newReport: Report) => {
         newPage.status = oldPage.status;
       }
 
-      copyAnswer(oldPage.elements, newElements, subType);
+      copyAnswer(oldPage.elements, newElements, subType, newPage?.status);
     }
   }
 

@@ -118,6 +118,12 @@ const AdminCreateReportModal = ({
 const budgetPeriodValues = [1, 2, 3, 4, 5];
 const stateAbbr = Object.keys(StateNames);
 
+const getSavedStateFilter = () => {
+  const savedFilter = localStorage.getItem("states");
+  if (!savedFilter) return [];
+  return savedFilter.split(",");
+};
+
 export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [reports, setReports] = useState<Report[]>([]);
@@ -128,7 +134,7 @@ export const AdminDashboard = () => {
   const navigate = useNavigate();
   const [budgetValue, setBudgetValue] = useState("All");
   const [selectedStates, setSelectedStates] = useState<string[]>(
-    localStorage.getItem("states")?.split(",") ?? []
+    getSavedStateFilter()
   );
   const [lastSorted, setLastSorted] = useState<{
     sort: string;
@@ -163,7 +169,7 @@ export const AdminDashboard = () => {
 
   const getAssignedStatesForUser = async () => {
     const sessionStateFilter = localStorage.getItem("states");
-    if (!userEmail || !!sessionStateFilter) return;
+    if (!userEmail || sessionStateFilter !== null) return;
     setIsLoading(true);
     const assignedStates = await getAssignedStatesByEmail(userEmail);
     setStatesHandler(assignedStates);
@@ -373,6 +379,7 @@ export const AdminDashboard = () => {
             onClick={clearFilter}
             variant="link"
             height="40px"
+            fontWeight="bold"
             aria-label="Clear All Filters"
           >
             Clear Filters

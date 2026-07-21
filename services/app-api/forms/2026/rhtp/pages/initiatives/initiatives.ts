@@ -114,6 +114,7 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   required: true,
   answer: narrative,
   quarterly: true,
+  charLimit: 2000,
 });
 
 const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
@@ -148,7 +149,7 @@ export const metricTable = (
     label: "Metric",
     hintText:
       "The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metrics are only reported annually. Contact your Project Officer if the metrics listed are incorrect. Note: Metrics are only reported annually.",
-    quarterly: false,
+    quarterly: true,
     modal: {
       title: "Metric",
       elements: [

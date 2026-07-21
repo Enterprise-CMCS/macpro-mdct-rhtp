@@ -137,6 +137,12 @@ export const AttachmentCommentDrawer = ({
       ...prev,
       [name]: value,
     }));
+    if (value) {
+      setErrorMessages({
+        ...errorMessages,
+        [name]: "",
+      });
+    }
   };
 
   const onSubmit = async () => {

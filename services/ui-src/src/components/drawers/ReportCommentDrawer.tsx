@@ -121,6 +121,12 @@ export const ReportCommentDrawer = ({
       ...prev,
       [name]: value,
     }));
+    if (value) {
+      setErrorMessages({
+        ...errorMessages,
+        [name]: "",
+      });
+    }
   };
 
   const onSubmit = async () => {
