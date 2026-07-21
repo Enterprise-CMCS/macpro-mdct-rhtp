@@ -333,7 +333,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "triggerZipGeneration", {
     entry: "services/app-api/handlers/uploads/zip.ts",
     handler: "triggerZipGeneration",
-    path: "/reports/{reportType}/{state}/{id}/files/zip",
+    path: "/zips",
     method: "POST",
     additionalPolicies: [
       new PolicyStatement({
@@ -351,7 +351,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "getZipStatus", {
     entry: "services/app-api/handlers/uploads/zip.ts",
     handler: "getZipStatus",
-    path: "/reports/{reportType}/{state}/{id}/files/zip",
+    path: "/zips/{id}",
     method: "GET",
     ...commonProps,
   });

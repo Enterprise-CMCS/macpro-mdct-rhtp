@@ -10,6 +10,8 @@ import {
   PutObjectCommand,
   GetObjectRequest,
   GetObjectCommand,
+  GetObjectTaggingRequest,
+  GetObjectTaggingCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { logger } from "./debug-lib";
@@ -40,6 +42,9 @@ export default {
   },
   getObject: (params: GetObjectRequest) => {
     return client.send(new GetObjectCommand(params));
+  },
+  getObjectTagging: (params: GetObjectTaggingRequest) => {
+    return client.send(new GetObjectTaggingCommand(params));
   },
   putObject: (params: PutObjectRequest) => {
     return client.send(new PutObjectCommand(params));

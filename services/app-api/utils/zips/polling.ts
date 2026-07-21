@@ -4,16 +4,25 @@ import { fixLocalstackUrl } from "../../libs/localstack";
 import JSZip from "jszip";
 import { Readable } from "node:stream";
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
-import { ReportType, StateAbbr } from "@rhtp/shared";
-import { getReport } from "../../storage/reports";
-import { formatS3ReportZipKey } from "./buildZip";
+import { StateAbbr, ZipRequestBody, ZipRequestTypes } from "@rhtp/shared";
+import KSUID from "ksuid";
+import { formatS3ZipKey } from "./buildZip";
 
-export const getPSURL = async (
-  reportType: ReportType,
-  state: StateAbbr,
-  id: string
-) => {
-  const key = formatS3ReportZipKey(reportType, state, id);
+const lambdaClient = new LambdaClient({ region: "us-east-1" });
+
+const getFileName = async (key: string) => {
+  const { TagSet } = await s3.getObjectTagging({
+    Bucket: process.env.attachmentsBucketName,
+    Key: key,
+  });
+  if (!TagSet) return "RHTP.zip";
+  const state = TagSet.find((tag) => tag.Key === "state")?.Value as StateAbbr;
+  const subTypeKeys = TagSet.find((tag) => tag.Key === "subTypeKeys")?.Value;
+  return `RHTP_${state ?? "ALL_STATES"}_${subTypeKeys}.zip`;
+};
+
+export const getPSURL = async (zipId: string) => {
+  const key = formatS3ZipKey(zipId);
   const exists = await s3
     .headObject({ Bucket: process.env.attachmentsBucketName, Key: key })
     .then(() => true)
@@ -23,48 +32,48 @@ export const getPSURL = async (
     return ok({ status: "pending" });
   }
 
-  const report = await getReport(reportType, state, id);
+  const fileName = await getFileName(key);
   let psurl = await s3.getSignedDownloadUrl({
     Bucket: process.env.attachmentsBucketName,
     Key: key,
-    ResponseContentDisposition: `attachment; filename=RHTP_${state}_${report?.subTypeKey}.zip`,
+    ResponseContentDisposition: `attachment; filename=${fileName}`,
   });
   psurl = fixLocalstackUrl(psurl);
 
   return ok({ status: "ready", psurl });
 };
 
-export const zipBuffer = async (key: string, zip: JSZip) => {
+export const zipBuffer = async (zipId: string, tags: string, zip: JSZip) => {
   const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
   await s3.putObject({
     Bucket: process.env.attachmentsBucketName,
-    Key: key,
+    Key: formatS3ZipKey(zipId),
     Body: Readable.from(zipBuffer),
     ContentLength: zipBuffer.byteLength,
     ContentType: "application/zip",
-    Tagging: "auto_delete_category=generated_zip",
+    Tagging: `auto_delete_category=generated_zip&${tags}`,
   });
 };
 
-export const startZipWorker = async (
-  lambdaClient: LambdaClient,
-  reportType: ReportType,
-  state: StateAbbr,
-  id: string
-) => {
-  //remove previous zip file
-  await s3
-    .deleteObject({
-      Bucket: process.env.attachmentsBucketName,
-      Key: formatS3ReportZipKey(reportType, state, id),
-    })
-    .catch(() => {});
-
+export const startZipWorker = async (body: ZipRequestBody) => {
+  const { type } = body;
+  const zipId = KSUID.randomSync().string;
+  let payload: any = { type, zipId };
+  if (type === ZipRequestTypes.REPORT && body.report) {
+    const { reportType, state, id } = body.report;
+    payload = { ...payload, reportType, state, id };
+  } else if (type === ZipRequestTypes.USE_OF_FUNDS) {
+    const { state, reportSubTypeKeys } = body;
+    payload = { ...payload, state, reportSubTypeKeys };
+  } else {
+    throw new Error("Type not recognized");
+  }
   await lambdaClient.send(
     new InvokeCommand({
       FunctionName: process.env.zipWorkerFunctionName,
       InvocationType: "Event",
-      Payload: JSON.stringify({ reportType, state, id }),
+      Payload: JSON.stringify(payload),
     })
   );
+  return zipId;
 };

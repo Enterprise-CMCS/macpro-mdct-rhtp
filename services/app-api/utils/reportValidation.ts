@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/no-thenable
 import {
   array,
   boolean,
@@ -20,6 +21,8 @@ import {
   UpdateInitiativeOptions,
   RhtpSubType,
   Comment,
+  ZipRequestTypes,
+  ZipRequestBody,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -509,6 +512,47 @@ export const isUpdateInitiativeBody = (
     .noUnknown();
 
   return updateInitiativeSchema.isValidSync(obj, {
+    stripUnknown: false,
+    strict: true,
+  });
+};
+
+export const isZipRequestBody = (
+  obj: object | undefined
+): obj is ZipRequestBody => {
+  const zipRequestBody = object()
+    .shape({
+      type: mixed<ZipRequestTypes>()
+        .oneOf(Object.values(ZipRequestTypes))
+        .required(),
+      report: object()
+        .shape({
+          state: string().required(),
+          id: string().required(),
+          reportType: mixed<ReportType>()
+            .oneOf(Object.values(ReportType))
+            .required(),
+        })
+        .when("type", {
+          is: ZipRequestTypes.REPORT,
+          then: (schema) =>
+            schema.required("Report information required for REPORT zip"),
+          otherwise: (schema) => schema.notRequired(),
+        }),
+      state: string().notRequired(),
+      reportSubTypeKeys: array()
+        .of(string().required())
+        .when("type", {
+          is: ZipRequestTypes.USE_OF_FUNDS,
+          then: (schema) =>
+            schema.required("Report sub types required for USE_OF_FUNDS zip"),
+          otherwise: (schema) => schema.notRequired(),
+        }),
+    })
+    .required()
+    .noUnknown();
+
+  return zipRequestBody.isValidSync(obj, {
     stripUnknown: false,
     strict: true,
   });
