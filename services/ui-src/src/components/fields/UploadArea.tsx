@@ -1,12 +1,11 @@
 import { Box, Heading, Text, VStack, Image } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { AlertTypes, UploadListProp } from "@rhtp/shared";
+import { acceptedFileTypes, AlertTypes, UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
 } from "utils/api/requestMethods/fileMethods";
 import {
-  acceptedFileTypes,
   downloadFile,
   getFileWithSafeName,
   uploadListRender,
@@ -135,10 +134,23 @@ export const UploadArea = ({
     for (var i = 0; i < files.length; i++) {
       const displayName = files[i].name;
       const file = getFileWithSafeName(files[i]);
-      const { presignedUploadUrl, fileId } =
-        await recordFileInDatabaseAndGetUploadUrl(reportType, state, id, file);
-      savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
-      await uploadFileToS3({ presignedUploadUrl }, file);
+      try {
+        const { presignedUploadUrl, fileId } =
+          await recordFileInDatabaseAndGetUploadUrl(
+            reportType,
+            state,
+            id,
+            file
+          );
+        savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
+        await uploadFileToS3({ presignedUploadUrl }, file);
+      } catch (error) {
+        console.error("File upload error", error);
+        setUploadErrors((prevErrors) => [
+          ...(prevErrors ?? []),
+          `File ${file.name} failed to upload`,
+        ]);
+      }
     }
     return savedFiles;
   };

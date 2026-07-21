@@ -11,9 +11,9 @@ export const createUpload = handler(
   parseFileUploadDownloadParameters,
   async (request) => {
     const { user, body } = request;
+    const { state, reportType, id: reportId } = request.parameters;
     // Format Info
     const { uploadedFileName, uploadedFileSize } = body as UploadFileData;
-    const { state, reportType, id: reportId } = request.parameters;
 
     const username = user.email ?? "";
     const fileId = `${KSUID.randomSync().string}_${uploadedFileName}`;
