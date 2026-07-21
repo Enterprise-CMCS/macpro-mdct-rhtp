@@ -49,7 +49,6 @@ export const EXTENSION_MIME_MAP: Record<string, string[]> = {
   ".odt": [ZIP_CONTAINER, "application/vnd.oasis.opendocument.text"],
   ".ods": [ZIP_CONTAINER, "application/vnd.oasis.opendocument.spreadsheet"],
   ".odp": [ZIP_CONTAINER, "application/vnd.oasis.opendocument.presentation"],
-  ".jar": [ZIP_CONTAINER, "application/java-archive"],
   ".msg": ["application/vnd.ms-outlook"],
   ".rtf": ["application/rtf"],
 };

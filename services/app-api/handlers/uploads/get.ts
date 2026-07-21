@@ -14,23 +14,19 @@ export const getUploadsByFileId = handler(
   parseUploadParameters,
   async (request) => {
     const { state, reportType, id, fileId } = request.parameters;
-    console.log("getUploadsByFileId", request.parameters);
 
     const results = await queryUpload(fileId, state);
     if (!results.Items || results.Items.length === 0) {
       return forbidden(error.UNAUTHORIZED);
     }
     const document = results.Items[0];
-    console.log("document", document);
     const extension =
       getExtension(document.filename) ?? getExtension(document.fileId);
     if (!extension || !isAllowedFileExtension(extension)) {
       return forbidden(error.UNAUTHORIZED);
     }
-    console.log("extension", extension);
 
     const objectKey = `${reportType}/${state}/${id}/${document.fileId}`;
-    console.log("objectKey", objectKey);
     let fileHeader: Uint8Array;
     try {
       const object = await s3.getObject({
@@ -39,7 +35,6 @@ export const getUploadsByFileId = handler(
         Range: FILE_HEADER_BYTE_RANGE,
       });
       fileHeader = await object.Body!.transformToByteArray();
-      console.log("fileHeader", fileHeader);
     } catch {
       return forbidden(error.UNAUTHORIZED);
     }
@@ -48,7 +43,6 @@ export const getUploadsByFileId = handler(
       fileHeader,
       extension
     );
-    console.log("isValidContent", isValidContent);
     if (!isValidContent) {
       return forbidden(error.UNAUTHORIZED);
     }

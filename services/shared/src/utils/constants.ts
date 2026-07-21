@@ -75,7 +75,6 @@ export const acceptedFileTypes = [
   ".bmp",
   ".txt",
   ".csv",
-  ".jar",
   ".odt",
   ".ods",
   ".odp",
