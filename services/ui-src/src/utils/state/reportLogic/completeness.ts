@@ -9,6 +9,7 @@ import {
   Report,
 } from "@rhtp/shared";
 import { isFormPageTemplate, assertExhaustive } from "types";
+import { isEmail } from "utils/validation/inputValidation";
 
 /**
  * Calculate the status of any page, including calculated values.
@@ -174,6 +175,9 @@ export const elementSatisfiesRequired = (
   }
   if (element.type == ElementType.UseOfFundsAttachment) {
     return element.answer.length > 0;
+  }
+  if (element.id.includes("email") && typeof element.answer === "string") {
+    return isEmail(element.answer);
   }
 
   return true;

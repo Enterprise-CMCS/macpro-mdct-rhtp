@@ -7,7 +7,7 @@ import {
   deleteUploadedFile,
   getZipPresignedUrl,
 } from "./fileMethods";
-import { ReportType } from "@rhtp/shared";
+import { ReportType, StateAbbr, ZipRequestTypes } from "@rhtp/shared";
 
 vi.mock("../apiLib", () => ({
   apiLib: {
@@ -71,7 +71,15 @@ describe("Test fileApi functions", () => {
       status: "ready",
     };
     (apiLib.get as Mock).mockReturnValue(mockUrl);
-    const result = await getZipPresignedUrl("RHTP", "PA", "mock-id");
+    const requestBody = {
+      type: ZipRequestTypes.REPORT,
+      report: {
+        reportType: ReportType.RHTP,
+        state: "PA" as StateAbbr,
+        id: "mock-id",
+      },
+    };
+    const result = await getZipPresignedUrl(requestBody);
     expect(result).toBe(mockUrl.psurl);
   });
 });

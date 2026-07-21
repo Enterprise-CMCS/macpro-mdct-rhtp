@@ -1,6 +1,6 @@
-import { Box, Text, VStack } from "@chakra-ui/react";
+import { Box, Heading, Text, VStack, Image } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { acceptedFileTypes, UploadListProp } from "@rhtp/shared";
+import { acceptedFileTypes, AlertTypes, UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
   uploadFileToS3,
@@ -10,15 +10,21 @@ import {
   getFileWithSafeName,
   uploadListRender,
 } from "utils/other/fileUtils";
-import { parseHtml, useStore } from "utils";
+import { useStore } from "utils";
+import { Alert } from "components/alerts/Alert";
+import alert from "assets/icons/status/icon_status_alert.svg";
 
 interface Props {
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
-  subLabel: { upload?: string; uploaded?: string };
   multiple?: boolean;
+  disabled?: boolean;
+  notification?: {
+    instruction?: { type: AlertTypes; text: string };
+    success?: string;
+  };
 }
 
 export const UploadArea = ({
@@ -26,18 +32,32 @@ export const UploadArea = ({
   saveToReport,
   deleteFromReport,
   uploadAreaHidden = false,
-  subLabel,
   multiple = true,
+  disabled,
+  notification,
 }: Props) => {
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
+  const [uploadSuccess, setUploadSuccess] = useState<
+    {
+      fileId: string;
+      message: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
         await onUploadFiles().then((response) => {
+          setUploadSuccess([
+            ...uploadSuccess,
+            ...response.map((file) => ({
+              fileId: file.fileId,
+              message: notification?.success ?? "",
+            })),
+          ]);
           setFilesToUpload([]);
           saveToReport(response);
         });
@@ -45,8 +65,10 @@ export const UploadArea = ({
     }
   }, [filesToUpload]);
 
-  const hideUploadArea = () => {
-    return !multiple && (answer.length > 0 || filesToUpload.length > 0);
+  const disableUploadArea = () => {
+    return (
+      (!multiple && (answer.length > 0 || filesToUpload.length > 0)) || disabled
+    );
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -80,12 +102,13 @@ export const UploadArea = ({
     });
 
     const prevFiles = filesToUpload ?? [];
+
     setFilesToUpload([...prevFiles, ...filteredFiles]);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    if (hideUploadArea()) return;
+    if (disableUploadArea()) return;
 
     const files = [...event.dataTransfer.items]
       .map((item) => item.getAsFile())
@@ -132,28 +155,62 @@ export const UploadArea = ({
     return savedFiles;
   };
 
+  const modifiedAnswer = (answer: UploadListProp[]) => {
+    return answer.map((item) => ({
+      ...item,
+      message: uploadSuccess.find((success) => success.fileId === item.fileId)
+        ?.message,
+    }));
+  };
+
+  const displayUploadStatus = () => {
+    return filesToUpload.length > 0 || answer.length > 0;
+  };
+
   return (
     <VStack sx={sx.container} gap="1rem" alignItems="flex-start">
       {!uploadAreaHidden && (
         <>
           <div>
-            {subLabel.upload && (
-              <Text mb="spacer2">{parseHtml(subLabel.upload)}</Text>
-            )}
-            <Text sx={sx.uploadedLabel}>
+            <Text sx={sx.uploadedLabel} marginBottom="-1rem">
               Select a {multiple ? "file or files" : "file"} to upload
             </Text>
-            <Text sx={sx.uploadedSubLabel}>
-              Supported formats: JPEG, PNG, PDF, CSV, Word, PPT
-            </Text>
           </div>
+          {uploadErrors.length > 0 && (
+            <Box>
+              {uploadErrors.map((error, index) => (
+                <Text
+                  sx={sx.uploadErrorLabel}
+                  key={`upload-error-${index}`}
+                  display="flex"
+                >
+                  <Image
+                    src={alert}
+                    alt={"error"}
+                    marginRight="0.5rem"
+                    width="16px"
+                  />
+                  {error}
+                </Text>
+              ))}
+            </Box>
+          )}
+          {notification?.instruction && (
+            <Alert
+              status={notification.instruction.type}
+              title={""}
+              showIcon={false}
+            >
+              {notification.instruction.text}
+            </Alert>
+          )}
           <Box
             sx={sx.uploadBox}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             width="100%"
             aria-label="file drop area"
-            className={hideUploadArea() ? "disabled" : ""}
+            className={disableUploadArea() ? "disabled" : ""}
           >
             <span>
               Drag {multiple ? "files" : "file"} here or
@@ -165,49 +222,39 @@ export const UploadArea = ({
                   multiple={multiple}
                   accept={acceptedFileTypes.join(",")}
                   onChange={onFileChange}
-                  disabled={hideUploadArea()}
+                  disabled={disableUploadArea()}
                 />
               </label>
             </span>
           </Box>
-          {uploadErrors.length > 0 && (
-            <Box>
-              {uploadErrors.map((error, index) => (
-                <Text sx={sx.uploadErrorLabel} key={`upload-error-${index}`}>
-                  {error}
-                </Text>
-              ))}
-            </Box>
-          )}
-
-          <Text sx={sx.uploadedLabel}>
-            Selected {multiple ? "Files" : "File"}
-          </Text>
-          {uploadListRender(
-            reportType,
-            state,
-            id,
-            filesToUpload ?? [],
-            deleteFromReport
-          )}
         </>
       )}
-      <div>
-        <Text sx={sx.uploadedLabel}>
-          Uploaded {multiple ? "Files" : "File"}
-        </Text>
-        {subLabel.uploaded && (
-          <Text sx={sx.uploadedSubLabel}>{subLabel.uploaded}</Text>
-        )}
-      </div>
-      {uploadListRender(
-        reportType,
-        state,
-        id,
-        answer ?? [],
-        deleteFromReport,
-        downloadFile,
-        uploadAreaHidden
+      {displayUploadStatus() && (
+        <>
+          <div>
+            <Heading as="h2" variant="h3">
+              Upload Status
+            </Heading>
+          </div>
+          {filesToUpload.length > 0 &&
+            uploadListRender(
+              reportType,
+              state,
+              id,
+              filesToUpload ?? [],
+              deleteFromReport
+            )}
+          {answer.length > 0 &&
+            uploadListRender(
+              reportType,
+              state,
+              id,
+              modifiedAnswer(answer ?? []),
+              deleteFromReport,
+              downloadFile,
+              uploadAreaHidden
+            )}
+        </>
       )}
     </VStack>
   );
@@ -219,21 +266,20 @@ const sx = {
       margin: "1.5rem 0",
       fontWeight: "700",
     },
+
+    ".ds-c-alert": {
+      width: "100%",
+    },
   },
 
   uploadedLabel: {
-    marginBottom: ".50rem",
     fontWeight: "600",
   },
 
   uploadErrorLabel: {
-    marginBottom: ".50rem",
-    fontWeight: "600",
     color: "error",
-  },
-
-  uploadedSubLabel: {
     fontSize: "14px",
+    marginY: "0.25rem",
   },
 
   uploadBox: {

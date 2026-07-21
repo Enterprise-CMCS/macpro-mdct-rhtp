@@ -4,44 +4,119 @@ import {
   AttachmentStatus,
   AttachmentTableTemplate,
   ElementType,
+  FormPageTemplate,
   Report,
-  ReportType,
+  UseOfFundsAttachmentTemplate,
 } from "@rhtp/shared";
-import {
-  validReport,
-  mockAddedInitiatives,
-  mockStatePolicyCommitments,
-} from "../tests/mockReport";
+import { validReport, mockStatePolicyCommitments } from "../tests/mockReport";
 import {
   sortElementsForZip,
   getInitiativeFiles,
   getAttachmentAreaFiles,
   getAccordionFiles,
-  formatS3ReportZipKey,
+  formatS3ZipKey,
+  addReportFilesToZip,
+  addUseOfFundsFilesToZip,
 } from "./buildZip";
+import JSZip from "jszip";
+import s3Lib from "../../libs/s3-lib";
+import {
+  getReport,
+  queryReportsByType,
+  queryReportsForState,
+} from "../../storage/reports";
 
-const mockOldReport: Report = {
+vi.mock("../../libs/s3-lib", () => ({
+  default: {
+    getObject: vi.fn().mockResolvedValue({
+      Body: {
+        transformToByteArray: vi.fn().mockReturnValue("bytes"),
+      },
+    }),
+  },
+}));
+
+const mockUseOfFundsReport: Report = {
   ...validReport,
-  id: "mock-old-report",
+  id: "mock-completed-report",
   pages: [
     {
       id: "root",
       childPageIds: ["mock-page-1"],
     },
-    ...mockAddedInitiatives,
+    {
+      id: "use-of-funds",
+      elements: [
+        {
+          type: ElementType.UseOfFundsAttachment,
+          answer: [
+            {
+              name: "use-of-funds-file",
+              fileId: "use-of-funds-file",
+            },
+          ],
+        } as UseOfFundsAttachmentTemplate,
+      ],
+    } as FormPageTemplate,
+  ],
+};
+
+vi.mock("../../storage/reports");
+const mockGetReport = vi
+  .mocked(getReport)
+  .mockResolvedValue(mockUseOfFundsReport);
+const mockQueryByType = vi
+  .mocked(queryReportsByType)
+  .mockResolvedValue([mockUseOfFundsReport]);
+const mockQueryByState = vi
+  .mocked(queryReportsForState)
+  .mockResolvedValue([mockUseOfFundsReport]);
+
+const mockReport: Report = {
+  ...validReport,
+  id: "mock-report",
+  pages: [
+    {
+      id: "root",
+      childPageIds: ["mock-page-1"],
+    },
+    {
+      id: "mock-attachment-table-page",
+      elements: [
+        {
+          type: ElementType.AttachmentTable,
+          answer: [{ attachment: { name: "mock-name" } }],
+        } as AttachmentTableTemplate,
+      ],
+    } as FormPageTemplate,
+    {
+      id: "mock-attachment-area-page",
+      elements: [
+        {
+          type: ElementType.AttachmentArea,
+          answer: [{ name: "mock-name" }],
+        } as AttachmentAreaTemplate,
+      ],
+    } as FormPageTemplate,
     ...mockStatePolicyCommitments,
   ],
 };
 
 describe("buildZip util", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   test("formatS3ReportZipKey", () => {
-    const zipKey = formatS3ReportZipKey(ReportType.RHTP, "AL", "report-123");
-    expect(zipKey).toEqual("zips/RHTP/AL/report-123.zip");
+    const zipId = formatS3ZipKey("report-123");
+    expect(zipId).toEqual("zips/report-123.zip");
   });
   test("sortElementsForZip", () => {
-    const sort = sortElementsForZip(mockOldReport);
+    const sort = sortElementsForZip(mockReport);
     expect(sort).toStrictEqual({
-      initiative: {},
+      initiative: {
+        type: ElementType.AttachmentTable,
+        answer: [{ attachment: { name: "mock-name" } }],
+      },
       accordions: [
         {
           type: "accordionGroup",
@@ -72,7 +147,12 @@ describe("buildZip util", () => {
           ],
         },
       ],
-      area: [],
+      area: [
+        {
+          type: ElementType.AttachmentArea,
+          answer: [{ name: "mock-name" }],
+        },
+      ],
     });
   });
   test("getInitiativeFiles", () => {
@@ -126,7 +206,6 @@ describe("buildZip util", () => {
   test("getAttachmentAreaFiles", () => {
     const attachmentArea: AttachmentAreaTemplate = {
       type: ElementType.AttachmentArea,
-      subLabel: {},
       id: "success-attachments",
       label: "mock area",
       required: false,
@@ -147,5 +226,28 @@ describe("buildZip util", () => {
         fileId: "mock-id",
       },
     ]);
+  });
+
+  test("addReportFilesToZip", async () => {
+    const mockZip = new JSZip();
+    await addReportFilesToZip(mockReport, mockZip);
+    expect(s3Lib.getObject).toHaveBeenCalled();
+    expect(mockZip.files).toBeDefined();
+  });
+
+  test("addUseOfFundsFilesToZip without state", async () => {
+    const mockZip = new JSZip();
+    await addUseOfFundsFilesToZip(["A1"], mockZip);
+    expect(mockZip.files).toBeDefined();
+    expect(mockQueryByType).toHaveBeenCalled();
+  });
+
+  test("addUseOfFundsFilesToZip with state", async () => {
+    const mockZip = new JSZip();
+    await addUseOfFundsFilesToZip(["A1"], mockZip, "NJ");
+    expect(mockGetReport).toHaveBeenCalled();
+    expect(mockQueryByState).toHaveBeenCalled();
+    expect(mockQueryByType).not.toHaveBeenCalled();
+    expect(mockZip.files).toBeDefined();
   });
 });

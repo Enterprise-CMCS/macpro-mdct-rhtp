@@ -5,6 +5,7 @@ import {
   parseState,
   parseStateAndId,
   parseEmail,
+  parseZipIdParameters,
 } from "../param-lib";
 
 describe("Path parameter parsing", () => {
@@ -149,6 +150,27 @@ describe("Path parameter parsing", () => {
         pathParameters: { reportType: "RHTP", state: "CO" },
       };
       const result = parseReportParameters(event);
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe("parseZipIdParameters", () => {
+    test("should validate zip id exists", () => {
+      const event = {
+        ...proxyEvent,
+        pathParameters: { id: "foo" },
+      };
+      const result = parseZipIdParameters(event)!;
+      expect(result).toBeDefined();
+      expect(result.id).toBe("foo");
+    });
+
+    test("should return false for missing report ID", () => {
+      const event = {
+        ...proxyEvent,
+        pathParameters: {},
+      };
+      const result = parseZipIdParameters(event);
       expect(result).toBeUndefined();
     });
   });

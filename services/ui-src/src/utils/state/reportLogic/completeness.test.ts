@@ -308,4 +308,22 @@ describe("elementSatisfiesRequired", () => {
     } as UseOfFundsAttachmentTemplate;
     expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
   });
+
+  test("handles invalid email field", () => {
+    const element = {
+      type: ElementType.Textbox,
+      id: "test-email-field",
+      required: true,
+    } as TextboxTemplate;
+    const invalidEmail = {
+      ...element,
+      answer: "not-a-valid-email",
+    };
+    const validEmail = {
+      ...element,
+      answer: "test@email.com",
+    };
+    expect(elementSatisfiesRequired(invalidEmail, [invalidEmail])).toBeFalsy();
+    expect(elementSatisfiesRequired(validEmail, [validEmail])).toBeTruthy();
+  });
 });

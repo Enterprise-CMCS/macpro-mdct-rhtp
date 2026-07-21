@@ -1,10 +1,10 @@
 import { Stack } from "@chakra-ui/react";
-import { Modal } from "components";
 import { UploadArea } from "components/fields/UploadArea";
 import { JSX } from "react";
-import { UploadListProp } from "@rhtp/shared";
+import { AlertTypes, UploadListProp } from "@rhtp/shared";
+import { Drawer } from "components";
 
-export const UploadModal = ({
+export const UploadDrawer = ({
   modalDisclosure,
   hint,
   selections,
@@ -15,11 +15,12 @@ export const UploadModal = ({
   onModalSubmit = modalDisclosure.onClose,
   actionButtonText = "Done",
   uploadAreaHidden = false,
-  subLabel,
   multiple = true,
+  disabled,
+  notification,
 }: Props) => {
   return (
-    <Modal
+    <Drawer
       modalDisclosure={modalDisclosure}
       onConfirmHandler={onModalSubmit}
       content={{
@@ -36,11 +37,12 @@ export const UploadModal = ({
           saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
           uploadAreaHidden={uploadAreaHidden}
-          subLabel={subLabel}
           multiple={multiple}
+          disabled={disabled}
+          notification={notification}
         />
       </Stack>
-    </Modal>
+    </Drawer>
   );
 };
 
@@ -58,6 +60,10 @@ interface Props {
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
-  subLabel: { upload?: string; uploaded?: string };
   multiple?: boolean;
+  disabled?: boolean;
+  notification?: {
+    instruction?: { type: AlertTypes; text: string };
+    success?: string;
+  };
 }
