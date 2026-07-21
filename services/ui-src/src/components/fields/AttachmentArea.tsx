@@ -4,10 +4,10 @@ import {
   UploadListProp,
 } from "@rhtp/shared";
 import { PageElementProps } from "components/report/Elements";
-import { Button, Stack, Image, Text, Box } from "@chakra-ui/react";
-import { UploadModal } from "components/modals/UploadModal";
+import { Button, Stack, Image, Box } from "@chakra-ui/react";
+import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useState } from "react";
-import { bytesToKiloBytes, optionalTag, parseHtml, useStore } from "utils";
+import { bytesToKiloBytes, optionalTag, useStore } from "utils";
 import {
   downloadFile,
   uploadListRender,
@@ -28,6 +28,7 @@ export const AttachmentArea = (
     helperText,
     answer,
     subLabel,
+    message,
     disabled: elementDisabled,
   } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
@@ -75,7 +76,7 @@ export const AttachmentArea = (
   };
 
   return (
-    <Stack gap="0" width="100%">
+    <Stack gap="0" width="100%" maxWidth="450px">
       <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
@@ -99,15 +100,16 @@ export const AttachmentArea = (
       >
         Upload Attachments
       </Button>
-      <UploadModal
+      <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: onModalClose,
         }}
+        hint={subLabel}
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
-        subLabel={subLabel}
+        notification={{ success: message! }}
       />
       {/** delete file modal */}
       <Modal
@@ -124,13 +126,6 @@ export const AttachmentArea = (
         <Alert status={AlertTypes.WARNING} title="Warning">
           Deleting this attachment will remove it from the page below
         </Alert>
-        <Box mt={"spacer3"} mb={"spacer_half"}>
-          {subLabel.upload && (
-            <Text mb="spacer2">{parseHtml(subLabel?.upload)}</Text>
-          )}
-          <Text sx={sx.uploadedLabel}>File</Text>
-          <Text sx={sx.uploadedSubLabel}>{subLabel?.uploaded}</Text>
-        </Box>
         {uploadListRender(
           reportType,
           state,
@@ -158,16 +153,4 @@ export const AttachmentAreaExport = (element: AttachmentAreaTemplate) => {
   } else {
     return notAnsweredText;
   }
-};
-
-const sx = {
-  uploadedLabel: {
-    marginBottom: ".50rem",
-    fontWeight: "600",
-  },
-  uploadedSubLabel: {
-    fontSize: "body_sm",
-    fontWeight: "body_sm",
-    color: "gray_dark",
-  },
 };

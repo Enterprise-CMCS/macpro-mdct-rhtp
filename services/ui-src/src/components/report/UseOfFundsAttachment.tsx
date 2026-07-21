@@ -9,7 +9,7 @@ import { Fragment, useState } from "react";
 import addIcon from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { bytesToKiloBytes, useStore } from "utils";
-import { UploadModal } from "components/modals/UploadModal";
+import { UploadDrawer } from "components/drawers/UploadDrawer";
 import {
   uploadListRender,
   downloadFile,
@@ -64,7 +64,7 @@ export const UseOfFundsAttachmentElement = (
       >
         Add Use of Funds
       </Button>
-      <UploadModal
+      <UploadDrawer
         modalDisclosure={{
           isOpen: modalOpen,
           onClose: () => {
@@ -75,11 +75,9 @@ export const UseOfFundsAttachmentElement = (
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
-        subLabel={{
-          uploaded: "This file has been uploaded to the use of funds page.",
-        }}
         multiple={false}
-      ></UploadModal>
+        notification={{ success: "Use of Funds" }}
+      ></UploadDrawer>
       {files.length > 0 && (
         <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
           {label}

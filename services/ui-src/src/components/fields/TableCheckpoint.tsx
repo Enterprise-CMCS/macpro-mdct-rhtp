@@ -21,7 +21,7 @@ import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { Dropdown, Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
-import { UploadModal } from "components/modals/UploadModal";
+import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
@@ -33,6 +33,7 @@ import {
 import {
   checkpointAttachableOptions,
   checkpointList,
+  getCheckpointLabel,
   getStageIdByCheckpointId,
   stageList,
 } from "verbiage/checkpoints";
@@ -465,7 +466,7 @@ export const TableCheckpoint = (
           )}
         </Stack>
       ))}
-      <UploadModal
+      <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: () => setModalOpen(false),
@@ -494,10 +495,7 @@ export const TableCheckpoint = (
         actionButtonText={actionButtonText[modalMode]}
         modalHeading={modalHeading[modalMode]}
         uploadAreaHidden={modalMode !== "Upload"}
-        subLabel={{
-          uploaded:
-            "These files have been attached to the stage and checkpoint selected above.",
-        }}
+        notification={{ success: getCheckpointLabel(checkpoint) }}
         onModalSubmit={onModalSubmit}
       />
       <AttachmentCommentDrawer

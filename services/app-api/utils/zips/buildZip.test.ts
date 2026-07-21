@@ -126,7 +126,6 @@ describe("buildZip util", () => {
   test("getAttachmentAreaFiles", () => {
     const attachmentArea: AttachmentAreaTemplate = {
       type: ElementType.AttachmentArea,
-      subLabel: {},
       id: "success-attachments",
       label: "mock area",
       required: false,

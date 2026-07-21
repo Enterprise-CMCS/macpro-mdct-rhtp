@@ -232,3 +232,13 @@ button {
   flex-flow: column;
   align-items: flex-start;
 }
+
+.successMsg {
+  display: flex;
+  img {
+    margin-right: 8px;
+    width: 20px;
+  }
+  font-size: 14px;
+  color: var(--chakra-colors-success_darker);
+}

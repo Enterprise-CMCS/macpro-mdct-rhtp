@@ -47,11 +47,9 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       type: ElementType.AttachmentArea,
       id: "success-attachments",
       label: "Attachments",
+      subLabel: "<b>Success Stories: Supporting Evidence</b>",
+      message: "Success Stories",
       helperText: "Upload supporting documentation.",
-      subLabel: {
-        upload: "<b>Success Stories: Supporting Evidence</b>",
-        uploaded: "These files have been uploaded.",
-      },
       required: false,
     },
     {
@@ -95,11 +93,9 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       type: ElementType.AttachmentArea,
       id: "sustainability-attachments",
       label: "Attachments",
+      subLabel: "<b>Sustainability Planning: Supporting Evidence</b>",
+      message: "Sustainability Planning",
       helperText: "Upload supporting documentation.",
-      subLabel: {
-        upload: "<b>Sustainability Planning: Supporting Evidence</b>",
-        uploaded: "These files have been uploaded.",
-      },
       required: false,
       quarterly: false,
     },
