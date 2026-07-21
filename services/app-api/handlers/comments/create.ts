@@ -7,8 +7,17 @@ import { canWriteComments } from "../../utils/authorization";
 import { logger } from "../../libs/debug-lib";
 import { validateCommentPayload } from "../../utils/reportValidation";
 import { error } from "../../utils/constants";
-import { Comment, CommentType, ReportType } from "@rhtp/shared";
-import { sendReportCommentEmail } from "../../utils/notifications/email";
+import {
+  AttachmentStatus,
+  Comment,
+  CommentType,
+  ReportType,
+} from "@rhtp/shared";
+import {
+  sendAttachmentCommentEmail,
+  sendAttachmentStatusChangeEmail,
+  sendReportCommentEmail,
+} from "../../utils/notifications/email";
 import { getReport } from "../../storage/reports";
 
 export const createComment = handler(
@@ -39,10 +48,48 @@ export const createComment = handler(
 
     await putComment(validatedComment);
 
-    if (comment.type === CommentType.REPORT && !comment.isInternal) {
+    if (
+      comment.type === CommentType.REPORT &&
+      !comment.isInternal &&
+      comment.comment
+    ) {
       const report = await getReport(ReportType.RHTP, state, contextId);
       if (report) {
         await sendReportCommentEmail(report, user);
+      }
+    }
+
+    // New external comment on an attachment
+    if (
+      comment.type === CommentType.ATTACHMENT &&
+      !comment.isInternal &&
+      comment.parentReportId &&
+      comment.comment
+    ) {
+      const report = await getReport(
+        ReportType.RHTP,
+        state,
+        comment.parentReportId
+      );
+      if (report) {
+        await sendAttachmentCommentEmail(report, user, comment);
+      }
+    }
+
+    // Email-triggering status change on an attachment
+    if (
+      comment.type === CommentType.ATTACHMENT &&
+      comment.parentReportId &&
+      (comment.statusChange === AttachmentStatus.LOCKED_FOR_SCORING ||
+        comment.statusChange === AttachmentStatus.NEEDS_REVISION)
+    ) {
+      const report = await getReport(
+        ReportType.RHTP,
+        state,
+        comment.parentReportId
+      );
+      if (report) {
+        await sendAttachmentStatusChangeEmail(report, user, comment);
       }
     }
 
