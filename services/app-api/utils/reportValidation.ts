@@ -21,6 +21,8 @@ import {
   UpdateInitiativeOptions,
   RhtpSubType,
   Comment,
+  getExtension,
+  isAllowedFileExtension,
   ZipRequestTypes,
   ZipRequestBody,
 } from "@rhtp/shared";
@@ -132,26 +134,43 @@ const accordionTemplateSchema = object().shape({
   value: string().required(),
 });
 
+const hasAllowedFileExtension = (value?: string) => {
+  const ext = getExtension(value ?? "");
+  return !!ext && isAllowedFileExtension(ext);
+};
+
+export const uploadListPropSchema = object().shape({
+  name: string()
+    .transform((value) => (value === "" ? undefined : value))
+    .default("Uploaded File")
+    .required()
+    .test(
+      "allowed-extension",
+      "Unsupported file type",
+      hasAllowedFileExtension
+    ),
+  size: number().required(),
+  fileId: string()
+    .required()
+    .test("allowed-extension", "Unsupported file type", hasAllowedFileExtension)
+    .test(
+      "matches-name-extension",
+      "fileId extension must match name extension",
+      function (fileId) {
+        const nameExt = getExtension(this.parent.name ?? "");
+        const fileIdExt = getExtension(fileId ?? "");
+        return !!nameExt && nameExt === fileIdExt;
+      }
+    ),
+});
+
 const UseOfFundsAttachmentSchema = object().shape({
   type: string()
     .required()
     .matches(new RegExp(ElementType.UseOfFundsAttachment)),
   id: string().required(),
   label: string().required(),
-  answer: array()
-    .of(
-      object().shape({
-        name: string()
-          .transform((value) => (value === "" ? undefined : value))
-          .default("Uploaded File")
-          .required(),
-        size: number().required(),
-        fileId: string().required(),
-      })
-    )
-    .min(0)
-    .max(1)
-    .notRequired(),
+  answer: array().of(uploadListPropSchema).min(0).max(1).notRequired(),
   required: boolean().required(),
 });
 
@@ -285,18 +304,9 @@ const buttonLinkTemplateSchema = object().shape({
 const attachmentAreaSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
   ...inputElementSchema,
+  answer: array().of(uploadListPropSchema),
   subLabel: string().notRequired(),
   message: string().notRequired(),
-  answer: array().of(
-    object().shape({
-      name: string()
-        .transform((value) => (value === "" ? undefined : value))
-        .default("Uploaded File")
-        .required(),
-      size: number().required(),
-      fileId: string().required(),
-    })
-  ),
 });
 
 const ActionElementsSchema = {
@@ -365,14 +375,7 @@ const attachmentTableSchema = object().shape({
   answer: array()
     .of(
       object().shape({
-        attachment: object().shape({
-          name: string()
-            .transform((value) => (value === "" ? undefined : value))
-            .default("Uploaded File")
-            .required(),
-          size: number().required(),
-          fileId: string().required(),
-        }),
+        attachment: uploadListPropSchema,
         initiatives: array().of(string().notRequired()).required(),
         stage: string().notRequired(),
         checkpoint: string().notRequired(),

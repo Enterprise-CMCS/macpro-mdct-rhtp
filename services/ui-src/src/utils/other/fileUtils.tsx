@@ -24,34 +24,6 @@ import {
   ZipRequestBody,
 } from "@rhtp/shared";
 
-export const acceptedFileTypes = [
-  ".bmp",
-  ".txt",
-  ".csv",
-  ".jar",
-  ".odt",
-  ".ods",
-  ".odp",
-  ".msg",
-  ".potx",
-  ".pptx",
-  ".ppt",
-  ".rtf",
-  ".tif",
-  ".gif",
-  ".jpeg",
-  ".png",
-  ".docm",
-  ".docx",
-  ".doc",
-  ".pdf",
-  ".jpg",
-  ".xlsx",
-  ".xltx",
-  ".xls",
-  ".xml",
-];
-
 const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
 
 export const getFileWithSafeName = (file: File) => {
