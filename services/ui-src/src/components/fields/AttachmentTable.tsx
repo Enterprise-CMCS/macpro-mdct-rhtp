@@ -60,9 +60,9 @@ export const AttachmentTable = (
   const saveToReport = (uploads: UploadListProp[]) => {
     const formattedUploads = uploads.map((upload) => ({
       attachment: upload,
-      initiatives: [],
-      stage: "",
-      checkpoint: "",
+      initiatives: initiativeOptions,
+      stage: getStageIdByCheckpointId(checkpoint),
+      checkpoint: checkpoint,
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
       canDelete: true,
@@ -85,33 +85,6 @@ export const AttachmentTable = (
     );
     props.updateElement({ answer: newAnswerValue });
     removeFile(reportType, state, id, file);
-  };
-
-  const onModalSubmit = () => {
-    const formattedUploadsToSave = uploadedFiles.map((upload) => ({
-      attachment: upload,
-      initiatives: initiativeOptions,
-      stage: getStageIdByCheckpointId(checkpoint),
-      checkpoint,
-      status: AttachmentStatus.PENDING_REVIEW,
-    }));
-
-    const newValues = displayValue.map((item) => {
-      const updatedItem = formattedUploadsToSave.find(
-        (upload) => upload.attachment.fileId === item.attachment.fileId
-      );
-      if (updatedItem) {
-        return {
-          ...item,
-          ...updatedItem,
-        };
-      } else {
-        return item;
-      }
-    });
-
-    props.updateElement({ answer: newValues });
-    onClose();
   };
 
   const onAddClick = () => {
@@ -144,6 +117,8 @@ export const AttachmentTable = (
   const onClose = () => {
     setModalOpen(false);
     setUploadedFiles([]);
+    setInitiativeOptions([]);
+    setCheckpoint("");
   };
 
   const getCheckpointDisplayName = (
@@ -269,8 +244,13 @@ export const AttachmentTable = (
 
   const getNotification = () => {
     const checkedInit = initiativeOptions
-      .map((opt) => initiatives.find((initative) => initative.id === opt)?.id)
+      .map(
+        (opt) =>
+          initiatives.find((initative) => initative.id === opt)
+            ?.initiativeNumber
+      )
       .join(", ");
+
     const check = getCheckpointDisplayName({ checkpoint: checkpoint });
 
     const instruction = !checkpoint
@@ -339,7 +319,6 @@ export const AttachmentTable = (
           />
         }
         saveToReport={saveToReport}
-        onModalSubmit={onModalSubmit}
         actionButtonText={"Done"}
         modalHeading="Upload Initiative Attachments"
         deleteFromReport={removeAttachment}

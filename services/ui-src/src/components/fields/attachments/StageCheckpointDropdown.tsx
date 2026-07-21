@@ -22,6 +22,8 @@ export const StageCheckpointDropdown = ({
 }: Props) => {
   const { report } = useStore();
 
+  const [checkpointValue, setCheckpointValue] = useState<string>("");
+
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
   ) || []) as InitiativePageTemplate[];
@@ -59,6 +61,10 @@ export const StageCheckpointDropdown = ({
     if (choices.every((choice) => !choice.checked)) {
       setCheckpoint("");
     }
+    onDropdownHandler(
+      initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
+      checkpointValue
+    );
   };
 
   const isStageEnabled = () => {
@@ -69,6 +75,7 @@ export const StageCheckpointDropdown = ({
     event: React.ChangeEvent<HTMLInputElement> | DropdownChangeObject
   ) => {
     const newCheckpoint = event.target.value;
+    setCheckpointValue(newCheckpoint);
     onDropdownHandler(
       initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
       newCheckpoint

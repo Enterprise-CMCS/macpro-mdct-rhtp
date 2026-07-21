@@ -14,7 +14,6 @@ export const UploadDrawer = ({
   modalHeading = "Upload Attachments",
   onModalSubmit = modalDisclosure.onClose,
   actionButtonText = "Done",
-  uploadAreaHidden = false,
   multiple = true,
   disabled,
   notification,
@@ -35,7 +34,6 @@ export const UploadDrawer = ({
           answer={answer}
           saveToReport={saveToReport}
           deleteFromReport={deleteFromReport}
-          uploadAreaHidden={uploadAreaHidden}
           multiple={multiple}
           disabled={disabled}
           notification={notification}
@@ -58,7 +56,6 @@ interface Props {
   actionButtonText?: string;
   saveToReport: (uploads: UploadListProp[]) => void;
   deleteFromReport: (file: UploadListProp) => void;
-  uploadAreaHidden?: boolean;
   multiple?: boolean;
   disabled?: boolean;
   notification?: {
