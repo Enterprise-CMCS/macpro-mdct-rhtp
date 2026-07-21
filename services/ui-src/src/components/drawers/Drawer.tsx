@@ -25,6 +25,7 @@ export const Drawer = ({
   submitting,
   children,
   disableConfirm,
+  disableOutline,
 }: Props) => {
   const { isMobile } = useBreakpoint();
 
@@ -77,6 +78,7 @@ export const Drawer = ({
               variant="outline"
               onClick={() => onOutlineHandler()}
               fontWeight="bold"
+              disabled={disableOutline}
             >
               {content.outlineButtonText}
             </Button>
@@ -102,6 +104,7 @@ interface Props {
   onConfirmHandler?: () => void;
   submitting?: boolean;
   disableConfirm?: boolean;
+  disableOutline?: boolean;
   children?: ReactNode;
 }
 

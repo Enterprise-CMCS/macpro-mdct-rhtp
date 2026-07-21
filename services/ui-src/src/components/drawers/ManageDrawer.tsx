@@ -16,6 +16,7 @@ import {
 import { Alert, Drawer } from "components";
 import { StatusDropdown } from "components/fields/attachments/StatusDropdown";
 import { StageCheckpointDropdown } from "components/fields/attachments/StageCheckpointDropdown";
+import { canDeleteAttachment, canEditAttachment } from "utils/other/fileUtils";
 
 export const ManageDrawer = ({
   modalDisclosure,
@@ -24,22 +25,24 @@ export const ManageDrawer = ({
   onModalDelete,
   updateElement,
 }: Props) => {
-  if (!answer) return;
-  const [status, setStatus] = useState<AttachmentStatus>(answer.status);
-  const [initiatives, setInitiatives] = useState<string[]>([]);
-  const [checkpoint, setCheckpoint] = useState<string>("");
+  const file = files.find((file) => file.attachment.fileId === answer.fileId);
+
+  if (!answer || !file) return;
+
+  const [status, setStatus] = useState<AttachmentStatus>(file.status);
+  const [initiatives, setInitiatives] = useState<string[]>(file.initiatives);
+  const [checkpoint, setCheckpoint] = useState<string>(file.checkpoint ?? "");
 
   const onSubmit = async () => {
-    const index = files.findIndex(
-      (file) => file.attachment.fileId === answer.fileId
-    );
-    if (index !== -1) {
-      files[index].initiatives = initiatives;
-      files[index].checkpoint = checkpoint;
-      files[index].status = status;
-      await updateElement({ answer: files });
-      modalDisclosure.onClose();
-    }
+    file.initiatives = initiatives;
+    file.checkpoint = checkpoint;
+    file.status = status;
+    await updateElement({ answer: files });
+    modalDisclosure.onClose();
+  };
+
+  const isFilled = () => {
+    return initiatives.length > 0 && checkpoint;
   };
 
   const onDropdownHandler = (initiatives: string[], checkpoint?: string) => {
@@ -57,17 +60,26 @@ export const ManageDrawer = ({
         outlineButtonText: "Delete attachment",
         solidButtonText: "Save changes",
       }}
+      disableConfirm={!isFilled()}
+      disableOutline={
+        canDeleteAttachment(file.status, true) ||
+        !canEditAttachment(file.status)
+      }
     >
       <Stack gap="1.5rem">
         <Text>
           <b>Attachment:</b> {answer.name}
         </Text>
         <StatusDropdown
-          status={answer.status}
+          status={file.status}
           onChange={(status) => setStatus(status)}
         ></StatusDropdown>
         <Divider></Divider>
         <Heading variant="h2">Adjust initiatives and stage/checkpoint</Heading>
+        <Text>
+          <b>Important:</b> If you edit the checkpoint, that change will update
+          the file's checkpoint across all linked initiatives.
+        </Text>
         <UnorderedList>
           <ListItem>
             Why can't I replace files? Federal record-keeping mandates require
@@ -80,12 +92,24 @@ export const ManageDrawer = ({
             upload your new document as a fresh attachment.
           </ListItem>
         </UnorderedList>
-        <StageCheckpointDropdown onDropdownHandler={onDropdownHandler} />
+        <StageCheckpointDropdown
+          answer={file}
+          onDropdownHandler={onDropdownHandler}
+          disabled={!canEditAttachment(file.status)}
+          isError={!isFilled()}
+        />
         <Heading variant="h2">Delete attachment</Heading>
-        <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from all initiatives, stages,
-          and checkpoints below.
-        </Alert>
+        {canEditAttachment(file.status) ? (
+          <Alert status={AlertTypes.WARNING} title="Warning">
+            Deleting this attachment will remove it from all initiatives,
+            stages, and checkpoints below.
+          </Alert>
+        ) : (
+          <Text>
+            Attachment is in a status that cannot longer be deleted due to
+            record keeping requirements.
+          </Text>
+        )}
       </Stack>
     </Drawer>
   );
@@ -97,7 +121,7 @@ interface Props {
     onClose: () => void;
   };
   onModalDelete?: () => void;
-  answer: UploadListProp & { status: AttachmentStatus };
+  answer: UploadListProp;
   updateElement: Function;
   files: InitiativeAnswerProp[];
 }

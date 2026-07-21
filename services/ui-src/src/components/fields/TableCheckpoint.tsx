@@ -12,26 +12,23 @@ import {
   InitiativeAnswerProp,
   TableCheckpointTemplate,
   UploadListProp,
-  AlertTypes,
   InitiativePageTemplate,
   PageStatus,
 } from "@rhtp/shared";
-import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-import { Dropdown, Label } from "@cmsgov/design-system";
+import commentIcon from "assets/icons/comment/icon_comment.svg";
+import { Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
 import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useParams } from "react-router";
 import { useStore } from "utils";
 import {
-  canDeleteAttachment,
   canEditAttachment,
   downloadFile,
   removeFile,
 } from "utils/other/fileUtils";
 import {
-  checkpointAttachableOptions,
   checkpointList,
   getCheckpointLabel,
   getStageIdByCheckpointId,
@@ -42,8 +39,9 @@ import { PageElementProps } from "components/report/Elements";
 import { setAnswerInElement } from "utils/state/reportLogic/reportActions";
 import { attachmentTableId } from "../../constants";
 import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDrawer";
-import { Alert } from "components";
 import { ResponsiveTable } from "components/tables/ResponsiveTable";
+import { ManageDrawer } from "components/drawers/ManageDrawer";
+import { StageCheckpointDropdown } from "./attachments/StageCheckpointDropdown";
 
 type TableShape = {
   stage: number;
@@ -152,6 +150,7 @@ export const TableCheckpoint = (
   const { answer } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
+  const [isManageOpen, setManageOpen] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<UploadListProp[]>([]);
   const { pageId } = useParams();
   const { report, setAnswers } = useStore();
@@ -169,22 +168,8 @@ export const TableCheckpoint = (
       checked: false,
     }));
   const [tables, setTables] = useState<TableShape[]>([]);
-  const [checkpoint, setCheckpoint] = useState("");
+  const [checkpoint, _setCheckpoint] = useState("");
   const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
-
-  const [modalMode, setModalMode] = useState<"Upload" | "Edit" | "Delete">(
-    "Upload"
-  );
-  const actionButtonText = {
-    Upload: "Done",
-    Delete: "Delete",
-    Edit: "Edit",
-  };
-  const modalHeading = {
-    Upload: "Upload Initiative Attachments",
-    Delete: "Delete Attachment",
-    Edit: "Edit Attachment",
-  };
 
   if (!state || !id || !reportType || !pageId) {
     console.error(
@@ -192,15 +177,6 @@ export const TableCheckpoint = (
     );
     return;
   }
-
-  //This populates the uploaded area of the uploads modal when the dropdown selection has changed
-  useEffect(() => {
-    if (modalMode === "Upload") {
-      setSelectedFiles(getFilesFromTable(tables, checkpoint));
-    } else if (modalMode === "Delete") {
-      setSelectedFiles(selectedFiles ?? []);
-    }
-  }, [checkpoint]);
 
   //Updates when the report has been updated, so when a file has been added or removed from the table
   //when isCommentsOpen is closed, we want to reload the report to update the status in the table
@@ -251,31 +227,12 @@ export const TableCheckpoint = (
   };
 
   const onAddClick = () => {
-    setCheckpoint("");
-    setModalMode("Upload");
     setModalOpen(true);
   };
 
-  const onEditClick = (selectedFiles: UploadListProp) => {
-    setModalMode("Edit");
-    setModalOpen(true);
+  const onManageClick = (selectedFiles: UploadListProp) => {
+    setManageOpen(true);
     setSelectedFiles([selectedFiles]);
-
-    const fullSelectedFile = attachments.find(
-      ({ attachment }) => attachment.fileId === selectedFiles.fileId
-    );
-    setCheckpoint(fullSelectedFile?.checkpoint ?? "");
-  };
-
-  const onDeleteClick = (selectedFiles: UploadListProp) => {
-    setModalMode("Delete");
-    setModalOpen(true);
-    setSelectedFiles([selectedFiles]);
-
-    const fullSelectedFile = attachments.find(
-      ({ attachment }) => attachment.fileId === selectedFiles.fileId
-    );
-    setCheckpoint(fullSelectedFile?.checkpoint ?? "");
   };
 
   const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
@@ -311,21 +268,17 @@ export const TableCheckpoint = (
   };
 
   const onModalSubmit = () => {
-    if (modalMode === "Delete") {
-      deleteFromReport(selectedFiles[0]!);
-    } else if (modalMode === "Edit") {
-      //the type of element being passed in determines whether it's an add or remove
-      const generateAnswer = (answer: InitiativeAnswerProp[]) => {
-        const selectedIndex = answer.findIndex(
-          (file) => file.attachment.fileId === selectedFiles[0].fileId
-        );
-        const newAnswers = [...answer];
-        newAnswers[selectedIndex].stage = getStageIdByCheckpointId(checkpoint);
-        newAnswers[selectedIndex].checkpoint = checkpoint;
-        return newAnswers;
-      };
-      writeToAttachmentsTable(generateAnswer);
-    }
+    //the type of element being passed in determines whether it's an add or remove
+    const generateAnswer = (answer: InitiativeAnswerProp[]) => {
+      const selectedIndex = answer.findIndex(
+        (file) => file.attachment.fileId === selectedFiles[0].fileId
+      );
+      const newAnswers = [...answer];
+      newAnswers[selectedIndex].stage = getStageIdByCheckpointId(checkpoint);
+      newAnswers[selectedIndex].checkpoint = checkpoint;
+      return newAnswers;
+    };
+    writeToAttachmentsTable(generateAnswer);
     setModalOpen(false);
   };
 
@@ -372,11 +325,11 @@ export const TableCheckpoint = (
         <Flex gap=".5rem">
           <Button
             variant="outline"
-            onClick={() => onEditClick(row.file)}
+            onClick={() => onManageClick(row.file)}
             aria-label={`Edit file or info for ${row.file.name}`}
             disabled={!canEditAttachment(row.status) || disabled}
           >
-            Edit
+            Manage
           </Button>
           <Button
             variant="link"
@@ -385,19 +338,7 @@ export const TableCheckpoint = (
             fontWeight="bold"
             disabled={disabled}
           >
-            Status/Comments
-          </Button>
-          <Button
-            variant="unstyled"
-            onClick={() => {
-              onDeleteClick(row.file);
-            }}
-            aria-label={`Remove ${row.file.name} from checkpoint ${row.label}`}
-            disabled={
-              !canDeleteAttachment(row.status, row.canDelete) || disabled
-            }
-          >
-            <Image src={cancelIcon} alt="Remove" />
+            <Image src={commentIcon} alt="Remove" minWidth="24px" />
           </Button>
         </Flex>
       );
@@ -472,31 +413,31 @@ export const TableCheckpoint = (
           onClose: () => setModalOpen(false),
         }}
         answer={selectedFiles}
-        selections={
-          <>
-            {modalMode === "Delete" ? (
-              <Alert status={AlertTypes.WARNING} title="Warning">
-                Deleting attachment will remove it from all initiatives, stages
-                and checkpoints below.
-              </Alert>
-            ) : null}
-            <Dropdown
-              name={"checkpoint"}
-              label={"Which stage/checkpoint does this attachment apply to?"}
-              options={checkpointAttachableOptions}
-              value={checkpoint}
-              onChange={(event) => setCheckpoint(event.target.value)}
-              disabled={modalMode === "Delete"}
-            />
-          </>
-        }
+        selections={<StageCheckpointDropdown onDropdownHandler={() => {}} />}
         saveToReport={handleFileAddDelete}
         deleteFromReport={deleteFromReport}
-        actionButtonText={actionButtonText[modalMode]}
-        modalHeading={modalHeading[modalMode]}
+        actionButtonText={"Done"}
+        modalHeading={"Upload Initiative Attachments"}
         notification={{ success: getCheckpointLabel(checkpoint) }}
         onModalSubmit={onModalSubmit}
       />
+      {selectedFiles[0] && (
+        <ManageDrawer
+          modalDisclosure={{
+            isOpen: isManageOpen,
+            onClose: () => {
+              setManageOpen(false);
+            },
+          }}
+          onModalDelete={() => {
+            deleteFromReport(selectedFiles[0]);
+            setManageOpen(false);
+          }}
+          answer={selectedFiles[0]}
+          files={attachments}
+          updateElement={props.updateElement}
+        ></ManageDrawer>
+      )}
       <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,

@@ -83,9 +83,7 @@ export const getZipFile = async (body: ZipRequestBody) => {
 };
 
 export const canEditAttachment = (status: AttachmentStatus): boolean => {
-  if (status === AttachmentStatus.LOCKED_FOR_SCORING) return false;
-
-  return true;
+  return status !== AttachmentStatus.LOCKED_FOR_SCORING;
 };
 
 export const canDeleteAttachment = (

@@ -10,19 +10,19 @@ import { useStore } from "utils";
 import { checkpointAttachableOptions } from "verbiage/checkpoints";
 
 interface Props {
-  answer?: { stage: string[]; checkpoint: string };
+  answer?: { initiatives: string[]; checkpoint?: string };
   disabled?: boolean;
   onDropdownHandler: (initatives: string[], checkpoint: string) => void;
+  isError?: boolean;
 }
 
 export const StageCheckpointDropdown = ({
   answer,
   disabled,
   onDropdownHandler,
+  isError,
 }: Props) => {
   const { report } = useStore();
-
-  const [checkpointValue, setCheckpointValue] = useState<string>("");
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -31,7 +31,8 @@ export const StageCheckpointDropdown = ({
   const getInitiativeOptions = () => {
     return initiatives.map(({ id, initiativeNumber, status, title }) => {
       const isAbandoned = status === PageStatus.ABANDONED;
-      const isChecked = answer?.stage.includes(id);
+      const isChecked = answer?.initiatives.includes(id);
+
       return {
         label: `${initiativeNumber}: ${title}${isAbandoned ? " (abandoned)" : ""}`,
         value: id,
@@ -44,7 +45,7 @@ export const StageCheckpointDropdown = ({
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >(getInitiativeOptions());
-  const [checkpoint, setCheckpoint] = useState(answer?.checkpoint);
+  const [checkpoint, setCheckpoint] = useState(answer?.checkpoint ?? "");
 
   const onChoiceChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -63,7 +64,7 @@ export const StageCheckpointDropdown = ({
     }
     onDropdownHandler(
       initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
-      checkpointValue
+      checkpoint
     );
   };
 
@@ -75,7 +76,7 @@ export const StageCheckpointDropdown = ({
     event: React.ChangeEvent<HTMLInputElement> | DropdownChangeObject
   ) => {
     const newCheckpoint = event.target.value;
-    setCheckpointValue(newCheckpoint);
+    setCheckpoint(newCheckpoint);
     onDropdownHandler(
       initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
       newCheckpoint
@@ -91,6 +92,7 @@ export const StageCheckpointDropdown = ({
         label={"Which initiative does this attachment apply to?"}
         onChange={onChoiceChangeHandler}
         disabled={disabled}
+        errorMessage={isError ? "At least one initiative must be selected" : ""}
       />
       <Dropdown
         name={"checkpoint"}
@@ -98,7 +100,7 @@ export const StageCheckpointDropdown = ({
         options={checkpointAttachableOptions}
         value={checkpoint}
         onChange={onCheckpointHandler}
-        disabled={isStageEnabled()}
+        disabled={isStageEnabled() || disabled}
       />
     </Stack>
   );

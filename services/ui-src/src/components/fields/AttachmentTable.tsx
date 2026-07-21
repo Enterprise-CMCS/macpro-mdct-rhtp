@@ -12,11 +12,7 @@ import {
   AttachmentStatus,
 } from "@rhtp/shared";
 import { useStore } from "utils";
-import {
-  downloadFile,
-  removeFile,
-  canEditAttachment,
-} from "utils/other/fileUtils";
+import { downloadFile, removeFile } from "utils/other/fileUtils";
 import { checkpointList, getStageIdByCheckpointId } from "verbiage/checkpoints";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
@@ -160,7 +156,7 @@ export const AttachmentTable = (
             variant="outline"
             onClick={() => onManagedClick(row)}
             aria-label={`Edit file or info for ${row.attachment.name}`}
-            disabled={!canEditAttachment(row.status) || disabled}
+            disabled={disabled}
           >
             Manage
           </Button>
@@ -269,13 +265,6 @@ export const AttachmentTable = (
     };
   };
 
-  const getFileStatus = (file: UploadListProp) => {
-    const data = displayValue.find(
-      (item) => item.attachment.fileId === file.fileId
-    );
-    return data ? data.status : AttachmentStatus.PENDING_REVIEW;
-  };
-
   return (
     <Stack width="100%" gap="1.5rem">
       <Button
@@ -337,10 +326,7 @@ export const AttachmentTable = (
             removeAttachment(uploadedFiles[0]);
             setManageOpen(false);
           }}
-          answer={{
-            ...uploadedFiles[0],
-            status: getFileStatus(uploadedFiles[0]),
-          }}
+          answer={uploadedFiles[0]}
           files={displayValue}
           updateElement={props.updateElement}
         ></ManageDrawer>

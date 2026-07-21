@@ -1,9 +1,11 @@
-import { Heading, ListItem, Stack, UnorderedList } from "@chakra-ui/react";
 import {
-  Dropdown,
-  DropdownChangeObject,
-  DropdownOption,
-} from "@cmsgov/design-system";
+  Heading,
+  ListItem,
+  Stack,
+  UnorderedList,
+  Text,
+} from "@chakra-ui/react";
+import { Dropdown, DropdownChangeObject } from "@cmsgov/design-system";
 import { AttachmentStatus, FileStatusOptions, UserRoles } from "@rhtp/shared";
 import { useState } from "react";
 import { optionalTag, useStore } from "utils";
@@ -13,11 +15,24 @@ interface Props {
   onChange: (status: AttachmentStatus) => void;
 }
 
+const buildStatusOptions = (isStateUser: boolean, currentStatus: string) => {
+  let statusOptions = structuredClone(FileStatusOptions);
+  // state users cannot change status to Locked For Scoring or Needs Revision, but those options should still show up if it's the existing status
+  if (isStateUser) {
+    statusOptions = statusOptions.filter(
+      (status) =>
+        (status.value !== AttachmentStatus.LOCKED_FOR_SCORING &&
+          status.value !== AttachmentStatus.NEEDS_REVISION) ||
+        status.value === currentStatus
+    );
+  }
+  return statusOptions;
+};
+
 export const StatusDropdown = ({ status, onChange }: Props) => {
   const { userRole } = useStore().user ?? {};
   const isStateUser = userRole === UserRoles.STATE_USER;
-  const [statusOptions, _setStatusOptions] =
-    useState<DropdownOption[]>(FileStatusOptions);
+  const statusOptions = buildStatusOptions(isStateUser, status);
 
   const statusDisabled =
     isStateUser && status === AttachmentStatus.LOCKED_FOR_SCORING;
@@ -35,6 +50,10 @@ export const StatusDropdown = ({ status, onChange }: Props) => {
   return (
     <Stack gap="1.5rem">
       <Heading variant="h2">Status</Heading>
+      <Text>
+        Use the field below to manage the attachment status. Certain statuses
+        restrict the ability to modify or remove files:
+      </Text>
       <UnorderedList>
         <ListItem>
           <b>Needs Revision, Informational, Archived:</b> The attachment will no
