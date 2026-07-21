@@ -102,6 +102,7 @@ const textAreaTemplateSchema = object().shape({
   ...inputElementSchema,
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
+  charLimit: number().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({

@@ -381,6 +381,7 @@ export interface TextAreaBoxTemplate extends InputElementTemplate {
   type: ElementType.TextAreaField;
   answer?: string;
   hideCondition?: HideCondition;
+  charLimit?: number;
 }
 
 export interface TextboxTemplate extends InputElementTemplate {
