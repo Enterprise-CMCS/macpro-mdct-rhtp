@@ -89,10 +89,12 @@ export const queryReportsForState = async (
 export const queryReportsByType = async (reportType: ReportType) => {
   const pages = paginateScan(
     { client: dynamoClient },
-    { TableName: reportTables[reportType] }
+    {
+      TableName: reportTables[reportType],
+    }
   );
   const items = await collectPageItems(pages);
-  return items as LiteReport[];
+  return items as Report[];
 };
 
 export const updateField = async (

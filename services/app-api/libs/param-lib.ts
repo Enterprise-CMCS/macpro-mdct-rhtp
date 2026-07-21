@@ -160,6 +160,17 @@ export const parseFileUploadDownloadParameters = (
   return { state, reportType, id };
 };
 
+export const parseZipIdParameters = (event: APIGatewayProxyEvent) => {
+  const { id } = event.pathParameters ?? {};
+
+  if (!id) {
+    logger.warn("Missing file ID in path");
+    return undefined;
+  }
+
+  return { id };
+};
+
 export const parseCommentPathParams = (event: APIGatewayProxyEvent) => {
   const { contextId, state } = event.pathParameters ?? {};
   if (!contextId) {

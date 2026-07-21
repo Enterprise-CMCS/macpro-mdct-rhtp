@@ -40,6 +40,14 @@ export const TextField = (
   const hideElement = useElementIsHidden(textbox.hideCondition);
 
   useEffect(() => {
+    const isEmailField = textbox.id.includes("email");
+    const defaultValueString = stringifyInput(displayValue);
+    if (isEmailField && defaultValueString && !isEmail(defaultValueString)) {
+      setErrorMessage(ErrorMessages.mustBeAnEmail);
+    }
+  }, []);
+
+  useEffect(() => {
     /*
      * We need to listen for answer updates.
      * But we don't want to overwrite input contents while the user is typing.
@@ -80,7 +88,7 @@ export const TextField = (
       updateElement({ answer: rawValue });
       if (!rawValue && textbox.required) {
         setErrorMessage(ErrorMessages.requiredResponse);
-      } else if (textbox.label.includes("email") && !isEmail(rawValue)) {
+      } else if (textbox.id.includes("email") && !isEmail(rawValue)) {
         setErrorMessage(ErrorMessages.mustBeAnEmail);
       } else {
         setErrorMessage("");

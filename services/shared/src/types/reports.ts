@@ -36,6 +36,24 @@ export interface UpdateInitiativeOptions {
   initiativeAbandon: boolean;
 }
 
+export interface ZipRequestBody {
+  type: ZipRequestTypes;
+  report?: ZipRequestReportDetails; // REPORT type
+  state?: string; // USE_OF_FUNDS type
+  reportSubTypeKeys?: string[]; // USE_OF_FUNDS type
+}
+
+export enum ZipRequestTypes {
+  REPORT = "REPORT",
+  USE_OF_FUNDS = "USE_OF_FUNDS",
+}
+
+export interface ZipRequestReportDetails {
+  state: StateAbbr;
+  reportType: ReportType;
+  id: string;
+}
+
 export interface ReportOptions {
   name: string;
   subType: RhtpSubType;

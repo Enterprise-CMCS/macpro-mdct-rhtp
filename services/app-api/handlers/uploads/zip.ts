@@ -1,47 +1,64 @@
 import { handler } from "../../libs/handler-lib";
-import { parseFileUploadDownloadParameters } from "../../libs/param-lib";
-import { ok } from "../../libs/response-lib";
+import { emptyParser, parseZipIdParameters } from "../../libs/param-lib";
+import { badRequest, ok } from "../../libs/response-lib";
 import { getReport } from "../../storage/reports";
-import { ReportType, StateAbbr } from "@rhtp/shared";
-import { LambdaClient } from "@aws-sdk/client-lambda";
+import { ReportType, StateAbbr, ZipRequestTypes } from "@rhtp/shared";
 import JSZip from "jszip";
 import {
   addReportFilesToZip,
-  formatS3ReportZipKey,
+  addUseOfFundsFilesToZip,
 } from "../../utils/zips/buildZip";
 import { getPSURL, zipBuffer, startZipWorker } from "../../utils/zips/polling";
+import { isZipRequestBody } from "../../utils/reportValidation";
 
-const lambdaClient = new LambdaClient({ region: "us-east-1" });
-
-interface ZipWorkerEvent {
+export interface ZipReportWorkerEvent {
+  type: ZipRequestTypes.REPORT;
+  zipId: string;
   reportType: ReportType;
   state: StateAbbr;
   id: string;
 }
 
-export const triggerZipGeneration = handler(
-  parseFileUploadDownloadParameters,
-  async (request) => {
-    const { state, reportType, id } = request.parameters;
-    await startZipWorker(lambdaClient, reportType, state, id);
-    return ok({ status: "pending" });
+export interface ZipUseOfFundsWorkerEvent {
+  type: ZipRequestTypes.USE_OF_FUNDS;
+  zipId: string;
+  state?: StateAbbr;
+  reportSubTypeKeys: string[];
+}
+
+export const triggerZipGeneration = handler(emptyParser, async (request) => {
+  const { body } = request;
+  if (!isZipRequestBody(body)) {
+    return badRequest("Invalid request");
   }
-);
+  const zipId = await startZipWorker(body);
+  return ok({ status: "pending", zipId });
+});
 
-export const getZipStatus = handler(
-  parseFileUploadDownloadParameters,
-  async (request) => {
-    const { state, reportType, id } = request.parameters;
-    return await getPSURL(reportType, state, id);
-  }
-);
+export const getZipStatus = handler(parseZipIdParameters, async (request) => {
+  const { id } = request.parameters;
+  return await getPSURL(id);
+});
 
-export const zipWorker = async (event: ZipWorkerEvent) => {
-  const { reportType, state, id } = event;
-  const report = await getReport(reportType, state, id);
-  if (!report) return;
-
+export const zipWorker = async (
+  event: ZipReportWorkerEvent | ZipUseOfFundsWorkerEvent
+) => {
   const zip = new JSZip();
-  await addReportFilesToZip(report, zip);
-  await zipBuffer(formatS3ReportZipKey(reportType, state, id), zip);
+  const { type, zipId } = event;
+  let tags = `type=${type}`;
+  if (type === ZipRequestTypes.REPORT) {
+    const { reportType, state, id } = event;
+    const report = await getReport(reportType, state, id);
+    if (!report) return;
+
+    await addReportFilesToZip(report, zip);
+    tags = `${tags}&reportType=${reportType}&state=${state}&id=${id}&subTypeKeys=${report.subTypeKey}`;
+  } else if (type === ZipRequestTypes.USE_OF_FUNDS) {
+    const { reportSubTypeKeys, state } = event;
+    await addUseOfFundsFilesToZip(reportSubTypeKeys, zip, state);
+    tags = `${tags}&subTypeKeys=${reportSubTypeKeys.join("-")}${state ? `&state=${state}` : ""}`;
+  } else {
+    return badRequest(`Unidentified type. Cannot proceed. Event: ${event}`);
+  }
+  await zipBuffer(zipId, tags, zip);
 };
