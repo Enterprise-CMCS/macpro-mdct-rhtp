@@ -138,11 +138,15 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
     userPoolClient.node.defaultChild as cognito.CfnUserPoolClient
   ).addPropertyOverride("ExplicitAuthFlows", ["ADMIN_NO_SRP_AUTH"]);
 
+  const defaultUserPoolDomainPrefix = `${project}-${stage}-login-user-pool-client`
+    .replaceAll("amazon", "amzn")
+    .replaceAll("cognito", "cog")
+    .replaceAll("aws", "aw");
+
   const userPoolDomain = new cognito.UserPoolDomain(scope, "UserPoolDomain", {
     userPool,
     cognitoDomain: {
-      domainPrefix:
-        userPoolDomainPrefix ?? `${project}-${stage}-login-user-pool-client`,
+      domainPrefix: userPoolDomainPrefix ?? defaultUserPoolDomainPrefix,
     },
   });
 
