@@ -23,11 +23,7 @@ import { useContext, useEffect, useState } from "react";
 import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useParams } from "react-router";
 import { useStore } from "utils";
-import {
-  canEditAttachment,
-  downloadFile,
-  removeFile,
-} from "utils/other/fileUtils";
+import { downloadFile, removeFile } from "utils/other/fileUtils";
 import {
   checkpointList,
   getCheckpointLabel,
@@ -188,7 +184,6 @@ export const TableCheckpoint = (
   };
 
   const onDrawerClick = (type: string, selectedFile: UploadListProp) => {
-    console.log("on drawer click", type);
     switch (type) {
       case "MANAGE":
         setManageOpen(true);
@@ -312,7 +307,6 @@ export const TableCheckpoint = (
             variant="outline"
             onClick={() => onDrawerClick("MANAGE", row.file)}
             aria-label={`Manage file or info for ${row.file.name}`}
-            disabled={!canEditAttachment(row.status) || disabled}
           >
             Manage
           </Button>
@@ -361,20 +355,6 @@ export const TableCheckpoint = (
 
   return (
     <Stack gap="1.25rem" width="100%">
-      <ManageDrawer
-        modalDisclosure={{
-          isOpen: isManageOpen,
-          onClose: onClose,
-        }}
-        onModalDelete={() => {
-          deleteFromReport(selectedFiles[0]);
-          setManageOpen(false);
-        }}
-        answer={selectedFiles[0]}
-        files={attachments}
-        updateElement={props.updateElement}
-        onSubmitOverride={OnManageSubmit}
-      ></ManageDrawer>
       {buildTables(files).map((table, tableIndex) => (
         <Stack key={`checkpoint-${tableIndex}`} gap="1.25rem">
           <Label>{`Stage ${table.stage}: ${table.label}`}</Label>
@@ -425,6 +405,20 @@ export const TableCheckpoint = (
         modalHeading={"Upload Initiative Attachments"}
         notification={{ success: getCheckpointLabel(checkpoint) }}
       />
+      <ManageDrawer
+        modalDisclosure={{
+          isOpen: isManageOpen,
+          onClose: onClose,
+        }}
+        onModalDelete={() => {
+          deleteFromReport(selectedFiles[0]);
+          setManageOpen(false);
+        }}
+        answer={selectedFiles[0]}
+        files={attachments}
+        updateElement={props.updateElement}
+        onSubmitOverride={OnManageSubmit}
+      ></ManageDrawer>
       <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,

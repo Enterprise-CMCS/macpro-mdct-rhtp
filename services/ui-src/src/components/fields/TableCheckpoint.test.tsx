@@ -190,16 +190,13 @@ describe("<TableCheckpoint />", () => {
     const manageBtn = screen.getByRole("button", {
       name: "Manage file or info for orange.png",
     });
-
     await userEvent.click(manageBtn);
     await waitFor(() => {
-      expect(screen.queryByText("Manage Attachment")).toBeVisible();
+      expect(screen.getByText("Manage Attachment")).toBeVisible();
     });
-
     const deleteButton = screen.getByRole("button", {
       name: "Delete attachment",
     });
-
     expect(deleteButton).toBeDisabled();
   });
   test("delete disabled when file has canDelete set to true", async () => {
@@ -207,22 +204,28 @@ describe("<TableCheckpoint />", () => {
     lockedFileReport.report.pages[1].elements![0].answer[0].canDelete = false;
     mockedUseStore.mockReturnValue(lockedFileReport);
     render(TableCheckpointComponent);
+    const manageBtn = screen.getByRole("button", {
+      name: "Manage file or info for orange.png",
+    });
+    await userEvent.click(manageBtn);
+    await waitFor(() => {
+      expect(screen.getByText("Manage Attachment")).toBeVisible();
+    });
     const deleteButton = screen.getByRole("button", {
-      name: "Remove orange.png from checkpoint Launch initiative",
+      name: "Delete attachment",
     });
     expect(deleteButton).toBeDisabled();
   });
   test("delete file", async () => {
     render(TableCheckpointComponent);
+    const manageBtn = screen.getByRole("button", {
+      name: "Manage file or info for orange.png",
+    });
+    await userEvent.click(manageBtn);
     const deleteButton = screen.getByRole("button", {
-      name: "Remove orange.png from checkpoint Launch initiative",
+      name: "Delete attachment",
     });
     await userEvent.click(deleteButton);
-    await waitFor(() => {
-      expect(screen.getByText("Delete Attachment")).toBeVisible();
-    });
-    const confirmDeleteBtn = screen.getByRole("button", { name: "Delete" });
-    await userEvent.click(confirmDeleteBtn);
     expect(mockGetAnswer).toHaveBeenCalled();
     expect(vi.mocked(removeFile)).toHaveBeenCalled();
     expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
@@ -230,16 +233,16 @@ describe("<TableCheckpoint />", () => {
   test("edit file", async () => {
     render(TableCheckpointComponent);
     const editButton = screen.getByRole("button", {
-      name: "Edit file or info for orange.png",
+      name: "Manage file or info for orange.png",
     });
     await userEvent.click(editButton);
     await waitFor(() => {
-      expect(screen.getByText("Edit Attachment")).toBeVisible();
+      expect(screen.getByText("Manage Attachment")).toBeVisible();
     });
-    const confirmEditBtn = screen.getByRole("button", { name: "Edit" });
+    const confirmEditBtn = screen.getByRole("button", { name: "Save changes" });
     await userEvent.click(confirmEditBtn);
     expect(mockGetAnswer).toHaveBeenCalled();
-    expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
+    expect(screen.queryByText("Save change")).not.toBeInTheDocument();
   });
   testA11y(TableCheckpointComponent);
 });
