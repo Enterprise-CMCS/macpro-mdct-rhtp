@@ -52,7 +52,9 @@ export const StatusDropdown = ({ status, onChange }: Props) => {
       <Heading variant="h2">Status</Heading>
       <Text>
         Use the field below to manage the attachment status. Certain statuses
-        restrict the ability to modify or remove files:
+        restrict the ability to modify or remove files. View “Understanding
+        initiatives status” instructions on previous page for more detailed
+        definitions:
       </Text>
       <UnorderedList>
         <ListItem>
