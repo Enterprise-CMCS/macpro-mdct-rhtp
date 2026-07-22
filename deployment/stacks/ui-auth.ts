@@ -139,6 +139,7 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
   ).addPropertyOverride("ExplicitAuthFlows", ["ADMIN_NO_SRP_AUTH"]);
 
   const defaultUserPoolDomainPrefix = `${project}-${stage}-login-user-pool-client`
+    .toLowerCase()
     .replaceAll("amazon", "amzn")
     .replaceAll("cognito", "cog")
     .replaceAll("aws", "aw");
