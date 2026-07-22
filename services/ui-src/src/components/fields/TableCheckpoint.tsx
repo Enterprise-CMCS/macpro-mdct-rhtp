@@ -14,7 +14,6 @@ import {
   UploadListProp,
   InitiativePageTemplate,
   PageStatus,
-  TableCheckpointShape,
 } from "@rhtp/shared";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
@@ -94,7 +93,6 @@ const buildRows = (
 };
 
 const buildTables = (answers: InitiativeAnswerProp[]) => {
-  console.log("answers", answers);
   return stageList.map((list) => {
     const { stage, label, checkpoints } = list;
     const values = checkpoints.map((checkpoint) => {
@@ -115,16 +113,6 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
     const rows = buildRows(values);
     return { stage, label, checkpoints, rows };
   });
-};
-
-const getFilesFromTable = (
-  tables: TableCheckpointShape[],
-  checkpoint: string
-) => {
-  return tables
-    .flatMap((tables) => tables.rows)
-    .filter((row) => row.id === checkpoint && row.file.fileId)
-    .map((filter) => filter.file);
 };
 
 export const TableCheckpoint = (
@@ -151,9 +139,9 @@ export const TableCheckpoint = (
       id: checkpoint.id,
       checked: false,
     }));
-  const [tables, setTables] = useState<TableCheckpointShape[]>([]);
   const [checkpoint, setCheckpoint] = useState("");
   const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
+  const [files, setFiles] = useState<InitiativeAnswerProp[]>([]);
 
   if (!state || !id || !reportType || !pageId) {
     console.error(
@@ -163,7 +151,6 @@ export const TableCheckpoint = (
   }
 
   //Updates when the report has been updated, so when a file has been added or removed from the table
-  //when isCommentsOpen is closed, we want to reload the report to update the status in the table
   useEffect(() => {
     const attachments = report?.pages
       .flatMap((page) => page.elements)
@@ -172,14 +159,9 @@ export const TableCheckpoint = (
     const files =
       attachments?.filter((data) => data.initiatives.includes(pageId)) ?? [];
 
-    const newTables = buildTables(files);
+    setFiles(files);
     setAttachments(attachments || []);
-    setTables(newTables);
-
-    //setSelectedFiles shouldn't update when the comment modal is opened
-    if (!isCommentsOpen)
-      setSelectedFiles(getFilesFromTable(newTables, checkpoint));
-  }, [isCommentsOpen, report]);
+  }, [report]);
 
   const onCheckboxHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
@@ -271,16 +253,14 @@ export const TableCheckpoint = (
     writeToAttachmentsTable(generateAnswer);
   };
 
-  const OnManageSubmit = () => {
+  const OnManageSubmit = (updatedFile: InitiativeAnswerProp) => {
     //the type of element being passed in determines whether it's an add or remove
     const generateAnswer = (answer: InitiativeAnswerProp[]) => {
-      console.log("answer", answer);
       const selectedIndex = answer.findIndex(
         (file) => file.attachment.fileId === selectedFiles[0].fileId
       );
       const newAnswers = [...answer];
-      // newAnswers[selectedIndex].stage = getStageIdByCheckpointId(checkpoint);
-      newAnswers[selectedIndex].checkpoint = checkpoint;
+      newAnswers[selectedIndex] = updatedFile;
       return newAnswers;
     };
     writeToAttachmentsTable(generateAnswer);
@@ -307,7 +287,6 @@ export const TableCheckpoint = (
             }
             onChange={() => onCheckboxHandler(row.id)}
             disabled={disabled}
-            sx={sx.checkbox}
           />
         ) : (
           ""
@@ -381,7 +360,7 @@ export const TableCheckpoint = (
 
   return (
     <Stack gap="1.25rem" width="100%">
-      {tables.map((table, tableIndex) => (
+      {buildTables(files).map((table, tableIndex) => (
         <Stack key={`checkpoint-${tableIndex}`} gap="1.25rem">
           <Label>{`Stage ${table.stage}: ${table.label}`}</Label>
           <Button
@@ -456,17 +435,6 @@ export const TableCheckpoint = (
       />
     </Stack>
   );
-};
-
-const sx = {
-  checkbox: {
-    marginBlock: "0",
-    span: {
-      width: "24px",
-      height: "24px",
-      border: "2px solid black",
-    },
-  },
 };
 
 export const TableCheckpointExport = (

@@ -37,12 +37,13 @@ export const ManageDrawer = ({
   const [checkpoint, setCheckpoint] = useState<string>(file.checkpoint ?? "");
 
   const onSubmit = async () => {
+    file.initiatives = initiatives;
+    file.checkpoint = checkpoint;
+    file.status = status;
+
     if (onSubmitOverride) {
       await onSubmitOverride(file);
     } else {
-      file.initiatives = initiatives;
-      file.checkpoint = checkpoint;
-      file.status = status;
       await updateElement({ answer: files });
     }
     modalDisclosure.onClose();
