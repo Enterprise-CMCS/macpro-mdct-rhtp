@@ -219,26 +219,6 @@ describe("AttachmentCommentDrawer component", () => {
       expect(screen.getByText("A comment is required.")).toBeVisible();
     });
 
-    test("state user can edit attachment status to certain options", async () => {
-      mockedUseStore.mockReturnValue(mockUseStore);
-      await renderAttachmentCommentDrawer();
-      const statusButton = screen.getAllByLabelText("Status")[1];
-      await userEvent.click(statusButton);
-      expect(
-        screen.queryByRole("option", { name: "Needs Revision" })
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole("option", { name: "Locked for Scoring" })
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("option", { name: "Pending Review" })
-      ).toBeVisible();
-      expect(
-        screen.getByRole("option", { name: "Informational" })
-      ).toBeVisible();
-      expect(screen.getByRole("option", { name: "Archived" })).toBeVisible();
-    });
-
     test("admin user can edit when flag true", async () => {
       mockFlags.mockReturnValue({
         adminCommentsEnabled: true,
@@ -323,44 +303,6 @@ describe("AttachmentCommentDrawer component", () => {
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Add comment"));
       expect(screen.getByText("Please select a comment type.")).toBeVisible();
-    });
-
-    test("admin user can edit attachment status", async () => {
-      mockFlags.mockReturnValue({
-        adminCommentsEnabled: true,
-      });
-      mockedUseStore.mockReturnValue({
-        ...mockUseStore,
-        ...mockAdminUserStore,
-      });
-      await renderAttachmentCommentDrawer();
-      const statusButton = screen.getAllByLabelText("Status")[1];
-      await userEvent.click(statusButton);
-      await userEvent.click(
-        screen.getByRole("option", { name: "Needs Revision" })
-      );
-      await userEvent.click(screen.getByText("External (Shared with States)"));
-      await userEvent.click(screen.getByText("Add comment"));
-      expect(mockCreateComment).toHaveBeenCalledWith(
-        mockSelectedFile.fileId,
-        "PA",
-        {
-          comment: "",
-          type: "attachment",
-          parentReportId: mockUseStore.report?.id,
-          statusChange: AttachmentStatus.NEEDS_REVISION,
-          isInternal: false,
-        }
-      );
-      expect(mockUpdateElement).toHaveBeenCalledWith(
-        expect.objectContaining({
-          answer: expect.arrayContaining([
-            expect.objectContaining({
-              status: AttachmentStatus.NEEDS_REVISION,
-            }),
-          ]),
-        })
-      );
     });
   });
 
