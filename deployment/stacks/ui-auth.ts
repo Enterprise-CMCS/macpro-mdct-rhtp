@@ -140,9 +140,23 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
 
   const defaultUserPoolDomainPrefix = `${project}-${stage}-login-user-pool-client`
     .toLowerCase()
-    .replaceAll("amazon", "amzn")
-    .replaceAll("cognito", "cog")
-    .replaceAll("aws", "aw");
+    .split("-")
+    .map((segment) => {
+      if (segment === "amazon") {
+        return "amzn";
+      }
+
+      if (segment === "cognito") {
+        return "cog";
+      }
+
+      if (segment === "aws") {
+        return "aw";
+      }
+
+      return segment;
+    })
+    .join("-");
 
   const userPoolDomain = new cognito.UserPoolDomain(scope, "UserPoolDomain", {
     userPool,
