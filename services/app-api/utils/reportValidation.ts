@@ -373,7 +373,6 @@ const attachmentTableSchema = object().shape({
           fileId: string().required(),
         }),
         initiatives: array().of(string().notRequired()).required(),
-        stage: string().notRequired(),
         checkpoint: string().notRequired(),
         status: string().required(),
         canDelete: boolean().notRequired(),

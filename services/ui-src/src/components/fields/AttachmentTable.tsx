@@ -13,7 +13,7 @@ import {
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/fileUtils";
-import { checkpointList, getStageIdByCheckpointId } from "verbiage/checkpoints";
+import { checkpointList } from "verbiage/checkpoints";
 import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
@@ -57,7 +57,6 @@ export const AttachmentTable = (
     const formattedUploads = uploads.map((upload) => ({
       attachment: upload,
       initiatives: initiativeOptions,
-      stage: getStageIdByCheckpointId(checkpoint),
       checkpoint: checkpoint,
       status: AttachmentStatus.PENDING_REVIEW,
       comments: [],
@@ -83,23 +82,23 @@ export const AttachmentTable = (
     removeFile(reportType, state, id, file);
   };
 
-  const onAddClick = () => {
-    setModalOpen(true);
-    setUploadedFiles([]);
-  };
-
-  const setCurrentValues = (selectedFile: InitiativeAnswerProp) => {
+  const onDrawerClick = (type: string, selectedFile: InitiativeAnswerProp) => {
+    switch (type) {
+      case "MANAGE":
+        setManageOpen(true);
+        break;
+      case "COMMENT":
+        setCommentsOpen(true);
+        break;
+      default:
+        onClose();
+    }
     setUploadedFiles([selectedFile.attachment]);
   };
 
-  const onManagedClick = (selectedFile: InitiativeAnswerProp) => {
-    setManageOpen(true);
-    setCurrentValues(selectedFile);
-  };
-
-  const onCommentClick = (selectedFile: InitiativeAnswerProp) => {
-    setCommentsOpen(true);
-    setCurrentValues(selectedFile);
+  const onAddClick = () => {
+    setModalOpen(true);
+    setUploadedFiles([]);
   };
 
   const setInitativeAndCheckpoint = (
@@ -154,7 +153,7 @@ export const AttachmentTable = (
         <HStack>
           <Button
             variant="outline"
-            onClick={() => onManagedClick(row)}
+            onClick={() => onDrawerClick("MANAGE", row)}
             aria-label={`Edit file or info for ${row.attachment.name}`}
             disabled={disabled}
           >
@@ -162,7 +161,7 @@ export const AttachmentTable = (
           </Button>
           <Button
             variant="link"
-            onClick={() => onCommentClick(row)}
+            onClick={() => onDrawerClick("COMMENT", row)}
             aria-label={`Comment on ${row.attachment.name}`}
             fontWeight="bold"
             disabled={disabled}
@@ -216,26 +215,7 @@ export const AttachmentTable = (
     };
 
     const sortedValues = runSort(displayValue);
-    const filteredValues = sortedValues.reduce(
-      (prev: InitiativeAnswerProp[][], curr) => {
-        if (
-          curr.initiatives.length === 0 &&
-          (curr.stage == "" || curr.stage == undefined)
-        )
-          prev[0].push(curr);
-        else if (
-          curr.initiatives.length > 0 &&
-          (curr.stage == "" || curr.stage == undefined)
-        )
-          prev[1].push(curr);
-        else prev[2].push(curr);
-
-        return prev;
-      },
-      [[], [], []]
-    );
-
-    setTableRows(rows(filteredValues.flat()));
+    setTableRows(rows(sortedValues));
   };
 
   const getNotification = () => {
@@ -314,23 +294,21 @@ export const AttachmentTable = (
         disabled={!checkpoint}
         notification={getNotification()}
       />
-      {uploadedFiles[0] && (
-        <ManageDrawer
-          modalDisclosure={{
-            isOpen: isManageOpen,
-            onClose: () => {
-              setManageOpen(false);
-            },
-          }}
-          onModalDelete={() => {
-            removeAttachment(uploadedFiles[0]);
+      <ManageDrawer
+        modalDisclosure={{
+          isOpen: isManageOpen,
+          onClose: () => {
             setManageOpen(false);
-          }}
-          answer={uploadedFiles[0]}
-          files={displayValue}
-          updateElement={props.updateElement}
-        ></ManageDrawer>
-      )}
+          },
+        }}
+        onModalDelete={() => {
+          removeAttachment(uploadedFiles[0]);
+          setManageOpen(false);
+        }}
+        answer={uploadedFiles[0]}
+        files={displayValue}
+        updateElement={props.updateElement}
+      ></ManageDrawer>
       <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,

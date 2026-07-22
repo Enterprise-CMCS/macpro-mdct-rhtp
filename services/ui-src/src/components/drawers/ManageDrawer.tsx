@@ -23,21 +23,28 @@ export const ManageDrawer = ({
   answer,
   files,
   onModalDelete,
+  onSubmitOverride,
   updateElement,
 }: Props) => {
+  if (!answer) return;
+
   const file = files.find((file) => file.attachment.fileId === answer.fileId);
 
-  if (!answer || !file) return;
+  if (!file) return;
 
   const [status, setStatus] = useState<AttachmentStatus>(file.status);
   const [initiatives, setInitiatives] = useState<string[]>(file.initiatives);
   const [checkpoint, setCheckpoint] = useState<string>(file.checkpoint ?? "");
 
   const onSubmit = async () => {
-    file.initiatives = initiatives;
-    file.checkpoint = checkpoint;
-    file.status = status;
-    await updateElement({ answer: files });
+    if (onSubmitOverride) {
+      await onSubmitOverride(file);
+    } else {
+      file.initiatives = initiatives;
+      file.checkpoint = checkpoint;
+      file.status = status;
+      await updateElement({ answer: files });
+    }
     modalDisclosure.onClose();
   };
 
@@ -62,7 +69,7 @@ export const ManageDrawer = ({
       }}
       disableConfirm={!isFilled()}
       disableOutline={
-        canDeleteAttachment(file.status, true) ||
+        !canDeleteAttachment(file.status, true) &&
         !canEditAttachment(file.status)
       }
     >
@@ -123,5 +130,6 @@ interface Props {
   onModalDelete?: () => void;
   answer: UploadListProp;
   updateElement: Function;
+  onSubmitOverride?: Function;
   files: InitiativeAnswerProp[];
 }

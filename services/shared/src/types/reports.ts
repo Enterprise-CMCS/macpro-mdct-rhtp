@@ -36,6 +36,25 @@ export interface UpdateInitiativeOptions {
   initiativeAbandon: boolean;
 }
 
+export type TableCheckpointShape = {
+  stage: number;
+  label: string;
+  checkpoints: {
+    id: string;
+    checkpointNumber: string;
+    label: string;
+    attachable: boolean;
+  }[];
+  rows: {
+    id: string;
+    stageNo: string;
+    label: string;
+    file: UploadListProp;
+    status: AttachmentStatus;
+    canDelete: boolean;
+  }[];
+};
+
 export interface ZipRequestBody {
   type: ZipRequestTypes;
   report?: ZipRequestReportDetails; // REPORT type
@@ -436,7 +455,6 @@ export const FileStatusOptions = Object.values(AttachmentStatus).map(
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
-  stage?: string;
   checkpoint?: string;
   status: AttachmentStatus;
   canDelete: boolean;

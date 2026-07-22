@@ -14,6 +14,7 @@ interface Props {
   disabled?: boolean;
   onDropdownHandler: (initatives: string[], checkpoint: string) => void;
   isError?: boolean;
+  hideInitiative?: boolean;
 }
 
 export const StageCheckpointDropdown = ({
@@ -21,6 +22,7 @@ export const StageCheckpointDropdown = ({
   disabled,
   onDropdownHandler,
   isError,
+  hideInitiative,
 }: Props) => {
   const { report } = useStore();
 
@@ -85,15 +87,19 @@ export const StageCheckpointDropdown = ({
 
   return (
     <Stack gap="1.5rem">
-      <ChoiceList
-        choices={initiativeOptions}
-        name={"initiative-choice-list"}
-        type={"checkbox"}
-        label={"Which initiative does this attachment apply to?"}
-        onChange={onChoiceChangeHandler}
-        disabled={disabled}
-        errorMessage={isError ? "At least one initiative must be selected" : ""}
-      />
+      {!hideInitiative && (
+        <ChoiceList
+          choices={initiativeOptions}
+          name={"initiative-choice-list"}
+          type={"checkbox"}
+          label={"Which initiative does this attachment apply to?"}
+          onChange={onChoiceChangeHandler}
+          disabled={disabled}
+          errorMessage={
+            isError ? "At least one initiative must be selected" : ""
+          }
+        />
+      )}
       <Dropdown
         name={"checkpoint"}
         label={"Which stage/checkpoint does this attachment apply to?"}

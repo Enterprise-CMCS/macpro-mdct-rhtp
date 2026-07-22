@@ -90,9 +90,7 @@ export const canDeleteAttachment = (
   status: AttachmentStatus,
   canDelete: boolean
 ): boolean => {
-  if (status === AttachmentStatus.PENDING_REVIEW && canDelete) return true;
-
-  return false;
+  return status === AttachmentStatus.PENDING_REVIEW && canDelete;
 };
 
 export const removeFile = async (

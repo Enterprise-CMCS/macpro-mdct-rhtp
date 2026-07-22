@@ -14,6 +14,7 @@ import {
   UploadListProp,
   InitiativePageTemplate,
   PageStatus,
+  TableCheckpointShape,
 } from "@rhtp/shared";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
@@ -42,25 +43,6 @@ import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDra
 import { ResponsiveTable } from "components/tables/ResponsiveTable";
 import { ManageDrawer } from "components/drawers/ManageDrawer";
 import { StageCheckpointDropdown } from "./attachments/StageCheckpointDropdown";
-
-type TableShape = {
-  stage: number;
-  label: string;
-  checkpoints: {
-    id: string;
-    checkpointNumber: string;
-    label: string;
-    attachable: boolean;
-  }[];
-  rows: {
-    id: string;
-    stageNo: string;
-    label: string;
-    file: UploadListProp;
-    status: AttachmentStatus;
-    canDelete: boolean;
-  }[];
-};
 
 /** Formatting the the data from the elements into renderable rows for the table */
 const buildRows = (
@@ -112,13 +94,12 @@ const buildRows = (
 };
 
 const buildTables = (answers: InitiativeAnswerProp[]) => {
+  console.log("answers", answers);
   return stageList.map((list) => {
-    const { stage, label, checkpoints, id } = list;
+    const { stage, label, checkpoints } = list;
     const values = checkpoints.map((checkpoint) => {
       const files = answers
-        .filter(
-          (answer) => answer.stage === id && answer.checkpoint === checkpoint.id
-        )
+        .filter((answer) => answer.checkpoint === checkpoint.id)
         .map((upload) => ({
           file: upload.attachment,
           status: upload.status,
@@ -136,7 +117,10 @@ const buildTables = (answers: InitiativeAnswerProp[]) => {
   });
 };
 
-const getFilesFromTable = (tables: TableShape[], checkpoint: string) => {
+const getFilesFromTable = (
+  tables: TableCheckpointShape[],
+  checkpoint: string
+) => {
   return tables
     .flatMap((tables) => tables.rows)
     .filter((row) => row.id === checkpoint && row.file.fileId)
@@ -167,8 +151,8 @@ export const TableCheckpoint = (
       id: checkpoint.id,
       checked: false,
     }));
-  const [tables, setTables] = useState<TableShape[]>([]);
-  const [checkpoint, _setCheckpoint] = useState("");
+  const [tables, setTables] = useState<TableCheckpointShape[]>([]);
+  const [checkpoint, setCheckpoint] = useState("");
   const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
 
   if (!state || !id || !reportType || !pageId) {
@@ -221,22 +205,42 @@ export const TableCheckpoint = (
     removeFile(reportType, state, id, file);
   };
 
-  const onCommentClick = (file: UploadListProp) => {
-    setSelectedFiles([file]);
-    setCommentsOpen(true);
-  };
-
-  const onAddClick = () => {
-    setModalOpen(true);
-  };
-
-  const onManageClick = (selectedFiles: UploadListProp) => {
-    setManageOpen(true);
-    setSelectedFiles([selectedFiles]);
+  const onDrawerClick = (type: string, selectedFile: UploadListProp) => {
+    switch (type) {
+      case "MANAGE":
+        setManageOpen(true);
+        break;
+      case "COMMENT":
+        setCommentsOpen(true);
+        break;
+      default:
+        onClose();
+    }
+    setSelectedFiles([selectedFile]);
   };
 
   const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
     writeToAttachmentsTable(() => data.answer);
+  };
+
+  const checkpointDropdownHandler = (
+    _initative: string[],
+    checkpoint: string
+  ) => {
+    setCheckpoint(checkpoint);
+    setSelectedFiles(
+      attachments
+        .filter((attachment) => attachment.checkpoint === checkpoint)
+        .map((attachment) => attachment.attachment)
+    );
+  };
+
+  const onClose = () => {
+    setModalOpen(false);
+    setManageOpen(false);
+    setCommentsOpen(false);
+    setSelectedFiles([]);
+    setCheckpoint("");
   };
 
   const writeToAttachmentsTable = (generateAnswer: (answer: any) => any) => {
@@ -267,19 +271,20 @@ export const TableCheckpoint = (
     writeToAttachmentsTable(generateAnswer);
   };
 
-  const onModalSubmit = () => {
+  const OnManageSubmit = () => {
     //the type of element being passed in determines whether it's an add or remove
     const generateAnswer = (answer: InitiativeAnswerProp[]) => {
+      console.log("answer", answer);
       const selectedIndex = answer.findIndex(
         (file) => file.attachment.fileId === selectedFiles[0].fileId
       );
       const newAnswers = [...answer];
-      newAnswers[selectedIndex].stage = getStageIdByCheckpointId(checkpoint);
+      // newAnswers[selectedIndex].stage = getStageIdByCheckpointId(checkpoint);
       newAnswers[selectedIndex].checkpoint = checkpoint;
       return newAnswers;
     };
     writeToAttachmentsTable(generateAnswer);
-    setModalOpen(false);
+    onClose();
   };
 
   const getRows = (
@@ -325,7 +330,7 @@ export const TableCheckpoint = (
         <Flex gap=".5rem">
           <Button
             variant="outline"
-            onClick={() => onManageClick(row.file)}
+            onClick={() => onDrawerClick("MANAGE", row.file)}
             aria-label={`Edit file or info for ${row.file.name}`}
             disabled={!canEditAttachment(row.status) || disabled}
           >
@@ -333,7 +338,7 @@ export const TableCheckpoint = (
           </Button>
           <Button
             variant="link"
-            onClick={() => onCommentClick(row.file)}
+            onClick={() => onDrawerClick("COMMENT", row.file)}
             aria-label={`Comment on ${row.file.name}`}
             fontWeight="bold"
             disabled={disabled}
@@ -353,15 +358,6 @@ export const TableCheckpoint = (
       ];
     });
   };
-
-  const header = [
-    { label: "#" },
-    { label: "Checkpoint" },
-    { label: "Ready for CMS Review" },
-    { label: "Attachments" },
-    { label: "Status" },
-    { label: "Actions" },
-  ];
 
   //This generates the zebra styling for the table rows when multiple files are tied to a shared checkpoint
   const buildStyle = (
@@ -393,13 +389,22 @@ export const TableCheckpoint = (
             variant="outline"
             alignSelf="flex-start"
             leftIcon={<Image src={disabled ? addGray : addIconPrimary} />}
-            onClick={onAddClick}
+            onClick={() => {
+              setModalOpen(true);
+            }}
             disabled={disabled}
           >
             Upload attachments
           </Button>
           {ResponsiveTable(
-            header,
+            [
+              { label: "#" },
+              { label: "Checkpoint" },
+              { label: "Ready for CMS Review" },
+              { label: "Attachments" },
+              { label: "Status" },
+              { label: "Actions" },
+            ],
             getRows(table.rows),
             "metric",
             () => {},
@@ -410,40 +415,40 @@ export const TableCheckpoint = (
       <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,
-          onClose: () => setModalOpen(false),
+          onClose: onClose,
         }}
         answer={selectedFiles}
-        selections={<StageCheckpointDropdown onDropdownHandler={() => {}} />}
+        selections={
+          <StageCheckpointDropdown
+            onDropdownHandler={checkpointDropdownHandler}
+            answer={{ initiatives: [pageId] }}
+            hideInitiative={true}
+          />
+        }
         saveToReport={handleFileAddDelete}
         deleteFromReport={deleteFromReport}
         actionButtonText={"Done"}
         modalHeading={"Upload Initiative Attachments"}
         notification={{ success: getCheckpointLabel(checkpoint) }}
-        onModalSubmit={onModalSubmit}
       />
-      {selectedFiles[0] && (
-        <ManageDrawer
-          modalDisclosure={{
-            isOpen: isManageOpen,
-            onClose: () => {
-              setManageOpen(false);
-            },
-          }}
-          onModalDelete={() => {
-            deleteFromReport(selectedFiles[0]);
-            setManageOpen(false);
-          }}
-          answer={selectedFiles[0]}
-          files={attachments}
-          updateElement={props.updateElement}
-        ></ManageDrawer>
-      )}
+      <ManageDrawer
+        modalDisclosure={{
+          isOpen: isManageOpen,
+          onClose: onClose,
+        }}
+        onModalDelete={() => {
+          deleteFromReport(selectedFiles[0]);
+          setManageOpen(false);
+        }}
+        answer={selectedFiles[0]}
+        files={attachments}
+        updateElement={props.updateElement}
+        onSubmitOverride={OnManageSubmit}
+      ></ManageDrawer>
       <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,
-          onClose: () => {
-            setCommentsOpen(false);
-          },
+          onClose: onClose,
         }}
         updateElement={handleCommentSave}
         selectedFile={selectedFiles[0]}

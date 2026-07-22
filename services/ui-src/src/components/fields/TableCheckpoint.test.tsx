@@ -119,7 +119,6 @@ const mockReport = {
                 initiatives: ["mock-init-1"],
                 checkpoint: "project-prop-2",
                 attachment: mockFiles,
-                stage: "stage-1",
                 status: AttachmentStatus.PENDING_REVIEW,
                 canDelete: true,
               },
