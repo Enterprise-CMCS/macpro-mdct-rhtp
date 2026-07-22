@@ -154,7 +154,7 @@ export const AttachmentTable = (
           <Button
             variant="outline"
             onClick={() => onDrawerClick("MANAGE", row)}
-            aria-label={`Edit file or info for ${row.attachment.name}`}
+            aria-label={`Manage file or info for ${row.attachment.name}`}
             disabled={disabled}
           >
             Manage

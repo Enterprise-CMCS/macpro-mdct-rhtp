@@ -52,6 +52,8 @@ vi.mock("utils/state/reportLogic/reportActions", () => ({
         getAnswer([
           {
             initiatives: ["mock-init-1"],
+            checkpoint: "planning-1",
+            status: AttachmentStatus.PENDING_REVIEW,
             attachment: mockFiles,
           },
         ]);
@@ -185,9 +187,19 @@ describe("<TableCheckpoint />", () => {
       AttachmentStatus.LOCKED_FOR_SCORING;
     mockedUseStore.mockReturnValue(lockedFileReport);
     render(TableCheckpointComponent);
-    const deleteButton = screen.getByRole("button", {
-      name: "Remove orange.png from checkpoint Launch initiative",
+    const manageBtn = screen.getByRole("button", {
+      name: "Manage file or info for orange.png",
     });
+
+    await userEvent.click(manageBtn);
+    await waitFor(() => {
+      expect(screen.queryByText("Manage Attachment")).toBeVisible();
+    });
+
+    const deleteButton = screen.getByRole("button", {
+      name: "Delete attachment",
+    });
+
     expect(deleteButton).toBeDisabled();
   });
   test("delete disabled when file has canDelete set to true", async () => {

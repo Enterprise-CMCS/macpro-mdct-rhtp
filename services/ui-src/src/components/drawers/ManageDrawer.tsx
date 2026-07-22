@@ -69,10 +69,7 @@ export const ManageDrawer = ({
         solidButtonText: "Save changes",
       }}
       disableConfirm={!isFilled()}
-      disableOutline={
-        !canDeleteAttachment(file.status, true) &&
-        !canEditAttachment(file.status)
-      }
+      disableOutline={!canDeleteAttachment(file.status, file.canDelete)}
     >
       <Stack gap="1.5rem">
         <Text>

@@ -188,6 +188,7 @@ export const TableCheckpoint = (
   };
 
   const onDrawerClick = (type: string, selectedFile: UploadListProp) => {
+    console.log("on drawer click", type);
     switch (type) {
       case "MANAGE":
         setManageOpen(true);
@@ -310,7 +311,7 @@ export const TableCheckpoint = (
           <Button
             variant="outline"
             onClick={() => onDrawerClick("MANAGE", row.file)}
-            aria-label={`Edit file or info for ${row.file.name}`}
+            aria-label={`Manage file or info for ${row.file.name}`}
             disabled={!canEditAttachment(row.status) || disabled}
           >
             Manage
@@ -360,6 +361,20 @@ export const TableCheckpoint = (
 
   return (
     <Stack gap="1.25rem" width="100%">
+      <ManageDrawer
+        modalDisclosure={{
+          isOpen: isManageOpen,
+          onClose: onClose,
+        }}
+        onModalDelete={() => {
+          deleteFromReport(selectedFiles[0]);
+          setManageOpen(false);
+        }}
+        answer={selectedFiles[0]}
+        files={attachments}
+        updateElement={props.updateElement}
+        onSubmitOverride={OnManageSubmit}
+      ></ManageDrawer>
       {buildTables(files).map((table, tableIndex) => (
         <Stack key={`checkpoint-${tableIndex}`} gap="1.25rem">
           <Label>{`Stage ${table.stage}: ${table.label}`}</Label>
@@ -410,20 +425,6 @@ export const TableCheckpoint = (
         modalHeading={"Upload Initiative Attachments"}
         notification={{ success: getCheckpointLabel(checkpoint) }}
       />
-      <ManageDrawer
-        modalDisclosure={{
-          isOpen: isManageOpen,
-          onClose: onClose,
-        }}
-        onModalDelete={() => {
-          deleteFromReport(selectedFiles[0]);
-          setManageOpen(false);
-        }}
-        answer={selectedFiles[0]}
-        files={attachments}
-        updateElement={props.updateElement}
-        onSubmitOverride={OnManageSubmit}
-      ></ManageDrawer>
       <AttachmentCommentDrawer
         modalDisclosure={{
           isOpen: isCommentsOpen,
