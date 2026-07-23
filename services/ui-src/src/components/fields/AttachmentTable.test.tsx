@@ -36,6 +36,11 @@ vi.mock("utils/other/fileUtils", async (importOriginal) => ({
   removeFile: vi.fn(),
 }));
 
+vi.mock("utils/api/requestMethods/commentMethods", () => ({
+  getComments: vi.fn().mockReturnValue([]),
+  createComment: () => {},
+}));
+
 const mockAttachmentAreaElementEmpty: AttachmentTableTemplate = {
   id: "mock-attachment-area-id",
   type: ElementType.AttachmentTable,
@@ -190,6 +195,22 @@ describe("<AttachmentTable />", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
     expect(mockUpdateElement).toHaveBeenCalled();
+  });
+
+  it("Mock open and close of comment drawer", async () => {
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+    const commentBtn = screen.getByRole("button", {
+      name: "Comment on mock-file",
+    });
+    await userEvent.click(commentBtn);
+    expect(screen.getByText("Add comment to attachment")).toBeInTheDocument();
+    const closeBtn = screen.getAllByRole("button", {
+      name: "Close",
+    });
+    await userEvent.click(closeBtn[0]);
+    expect(
+      screen.queryByText("Add comment to attachment")
+    ).not.toBeInTheDocument();
   });
 
   it("Verify that editing sets the status to Pending", async () => {
