@@ -115,7 +115,6 @@ export const uploadListRender = (
   onClick?: Function,
   disabled?: boolean
 ) => {
-  console.log(files);
   return (
     <List variant="upload" mb="spacer3">
       {files?.map((file, fileIdx) => (

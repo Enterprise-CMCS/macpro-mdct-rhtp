@@ -164,7 +164,7 @@ export const TableCheckpoint = (
           .map((attachment) => attachment.attachment)
       );
     }
-  }, [report]);
+  }, [report, isManageOpen]);
 
   const onCheckboxHandler = (id: string) => {
     const newValue = [...initialDisplayValue];
