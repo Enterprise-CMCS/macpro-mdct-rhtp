@@ -6,7 +6,7 @@ import {
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertTypes,
   AttachmentStatus,
@@ -28,13 +28,29 @@ export const ManageDrawer = ({
 }: Props) => {
   if (!answer) return;
 
-  const file = files.find((file) => file.attachment.fileId === answer.fileId);
+  const [status, setStatus] = useState<AttachmentStatus>(
+    AttachmentStatus.PENDING_REVIEW
+  );
+  const [initiatives, setInitiatives] = useState<string[]>([]);
+  const [checkpoint, setCheckpoint] = useState<string>("");
+  const [file, setFile] = useState<InitiativeAnswerProp>({
+    initiatives: [],
+    checkpoint: "",
+    status: AttachmentStatus.PENDING_REVIEW,
+    attachment: { name: "", size: 0, fileId: "" },
+    canDelete: true,
+  });
 
-  if (!file) return;
+  useEffect(() => {
+    const file = files.find((file) => file.attachment.fileId === answer.fileId);
 
-  const [status, setStatus] = useState<AttachmentStatus>(file.status);
-  const [initiatives, setInitiatives] = useState<string[]>(file.initiatives);
-  const [checkpoint, setCheckpoint] = useState<string>(file.checkpoint ?? "");
+    if (file) {
+      setStatus(file.status);
+      setInitiatives(file.initiatives);
+      setCheckpoint(file.checkpoint ?? "");
+      setFile(file);
+    }
+  }, [modalDisclosure.isOpen]);
 
   const onSubmit = async () => {
     file.initiatives = initiatives;
@@ -69,7 +85,7 @@ export const ManageDrawer = ({
         solidButtonText: "Save changes",
       }}
       disableConfirm={!isFilled()}
-      disableOutline={!canDeleteAttachment(file.status, file.canDelete)}
+      disableOutline={!canDeleteAttachment(status, file.canDelete)}
     >
       <Stack gap="1.5rem">
         <Text>
@@ -101,7 +117,7 @@ export const ManageDrawer = ({
           answer={file}
           onDropdownHandler={onDropdownHandler}
           disabled={!canEditAttachment(file.status)}
-          isError={!isFilled()}
+          errorCheck={true}
         />
         <Heading variant="h2">Delete attachment</Heading>
         {canEditAttachment(file.status) ? (
