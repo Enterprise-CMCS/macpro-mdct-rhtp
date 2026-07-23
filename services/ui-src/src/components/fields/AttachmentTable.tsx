@@ -229,15 +229,16 @@ export const AttachmentTable = (
 
     const check = getCheckpointDisplayName({ checkpoint: checkpoint });
 
-    const instruction = !checkpoint
-      ? {
-          type: AlertTypes.WARNING,
-          text: "Select initiative and checkpoint to enable upload.",
-        }
-      : {
-          type: AlertTypes.INFO,
-          text: `Attaching to: Initiatives(s): ${checkedInit}; ${check}`,
-        };
+    const instruction =
+      initiativeOptions.length === 0 || !checkpoint
+        ? {
+            type: AlertTypes.WARNING,
+            text: "Select initiative and checkpoint to enable upload.",
+          }
+        : {
+            type: AlertTypes.INFO,
+            text: `Attaching to: Initiatives(s): ${checkedInit}; ${check}`,
+          };
 
     return {
       instruction: instruction,
