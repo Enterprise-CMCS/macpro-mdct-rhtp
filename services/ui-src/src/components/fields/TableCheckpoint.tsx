@@ -197,6 +197,10 @@ export const TableCheckpoint = (
     setSelectedFiles([selectedFile]);
   };
 
+  const handleManageSave = (updatedFiles: InitiativeAnswerProp[]) => {
+    writeToAttachmentsTable(() => updatedFiles);
+  };
+
   const handleCommentSave = (data: { answer: InitiativeAnswerProp[] }) => {
     writeToAttachmentsTable(() => data.answer);
   };
@@ -247,20 +251,6 @@ export const TableCheckpoint = (
       }
     };
     writeToAttachmentsTable(generateAnswer);
-  };
-
-  const OnManageSubmit = (updatedFile: InitiativeAnswerProp) => {
-    //the type of element being passed in determines whether it's an add or remove
-    const generateAnswer = (answer: InitiativeAnswerProp[]) => {
-      const selectedIndex = answer.findIndex(
-        (file) => file.attachment.fileId === selectedFiles[0].fileId
-      );
-      const newAnswers = [...answer];
-      newAnswers[selectedIndex] = updatedFile;
-      return newAnswers;
-    };
-    writeToAttachmentsTable(generateAnswer);
-    onClose();
   };
 
   const getRows = (
@@ -416,8 +406,7 @@ export const TableCheckpoint = (
         }}
         answer={selectedFiles[0]}
         files={attachments}
-        updateElement={props.updateElement}
-        onSubmitOverride={OnManageSubmit}
+        onSubmit={handleManageSave}
       ></ManageDrawer>
       <AttachmentCommentDrawer
         modalDisclosure={{

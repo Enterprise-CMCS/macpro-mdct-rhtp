@@ -23,8 +23,7 @@ export const ManageDrawer = ({
   answer,
   files,
   onModalDelete,
-  onSubmitOverride,
-  updateElement,
+  onSubmit,
 }: Props) => {
   if (!answer) return;
 
@@ -52,7 +51,7 @@ export const ManageDrawer = ({
     }
   }, [modalDisclosure.isOpen]);
 
-  const onSubmit = async () => {
+  const onConfirmHandler = async () => {
     file.initiatives = initiatives;
     file.checkpoint = checkpoint;
     file.status = status;
@@ -62,10 +61,8 @@ export const ManageDrawer = ({
     );
     files[fileIndex] = file;
 
-    if (onSubmitOverride) {
-      await onSubmitOverride(file);
-    } else {
-      await updateElement({ answer: files });
+    if (onSubmit) {
+      await onSubmit(files);
     }
     modalDisclosure.onClose();
   };
@@ -82,7 +79,7 @@ export const ManageDrawer = ({
   return (
     <Drawer
       modalDisclosure={modalDisclosure}
-      onConfirmHandler={onSubmit}
+      onConfirmHandler={onConfirmHandler}
       onOutlineHandler={onModalDelete}
       content={{
         heading: "Manage Attachment",
@@ -148,7 +145,6 @@ interface Props {
   };
   onModalDelete?: () => void;
   answer: UploadListProp;
-  updateElement: Function;
-  onSubmitOverride?: Function;
+  onSubmit?: Function;
   files: InitiativeAnswerProp[];
 }

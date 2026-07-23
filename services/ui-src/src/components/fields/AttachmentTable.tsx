@@ -308,7 +308,9 @@ export const AttachmentTable = (
         }}
         answer={uploadedFiles[0]}
         files={displayValue}
-        updateElement={props.updateElement}
+        onSubmit={(files: InitiativeAnswerProp[]) => {
+          props.updateElement({ answer: files });
+        }}
       ></ManageDrawer>
       <AttachmentCommentDrawer
         modalDisclosure={{
