@@ -12,7 +12,7 @@ import { checkpointAttachableOptions } from "verbiage/checkpoints";
 interface Props {
   answer?: { initiatives: string[]; checkpoint?: string };
   disabled?: boolean;
-  onDropdownHandler: (initatives: string[], checkpoint: string) => void;
+  onDropdownHandler: (initiatives: string[], checkpoint: string) => void;
   errorCheck?: boolean;
   hideInitiative?: boolean;
 }

@@ -157,6 +157,13 @@ export const TableCheckpoint = (
 
     setFiles(files);
     setAttachments(attachments || []);
+    if (isModalOpen && attachments) {
+      setSelectedFiles(
+        attachments
+          .filter((attachment) => attachment.checkpoint === checkpoint)
+          .map((attachment) => attachment.attachment)
+      );
+    }
   }, [report]);
 
   const onCheckboxHandler = (id: string) => {
@@ -206,7 +213,7 @@ export const TableCheckpoint = (
   };
 
   const checkpointDropdownHandler = (
-    _initative: string[],
+    _initiatives: string[],
     checkpoint: string
   ) => {
     setCheckpoint(checkpoint);
@@ -390,7 +397,6 @@ export const TableCheckpoint = (
           />
         }
         saveToReport={handleFileAddDelete}
-        deleteFromReport={deleteFromReport}
         actionButtonText={"Done"}
         modalHeading={"Upload Initiative Attachments"}
         notification={{ success: getCheckpointLabel(checkpoint) }}

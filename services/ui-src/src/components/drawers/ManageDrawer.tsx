@@ -52,14 +52,17 @@ export const ManageDrawer = ({
   }, [modalDisclosure.isOpen]);
 
   const onConfirmHandler = async () => {
-    file.initiatives = initiatives;
-    file.checkpoint = checkpoint;
-    file.status = status;
+    const newFile = {
+      ...file,
+      initiatives: initiatives,
+      checkpoint: checkpoint,
+      status: status,
+    };
 
     const fileIndex = files.findIndex(
-      (file) => file.attachment.fileId === file.attachment.fileId
+      (file) => file.attachment.fileId === newFile.attachment.fileId
     );
-    files[fileIndex] = file;
+    files[fileIndex] = newFile;
 
     if (onSubmit) {
       await onSubmit(files);
@@ -122,10 +125,10 @@ export const ManageDrawer = ({
           errorCheck={true}
         />
         <Heading variant="h2">Delete attachment</Heading>
-        {canEditAttachment(file.status) ? (
+        {canDeleteAttachment(file.status, file.canDelete) ? (
           <Alert status={AlertTypes.WARNING} title="Warning">
             Deleting this attachment will remove it from all initiatives,
-            stages, and checkpoints below.
+            stages, and checkpoints above.
           </Alert>
         ) : (
           <Text>

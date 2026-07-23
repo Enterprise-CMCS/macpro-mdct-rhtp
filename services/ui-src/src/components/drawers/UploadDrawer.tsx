@@ -55,7 +55,7 @@ interface Props {
   onModalSubmit?: () => void;
   actionButtonText?: string;
   saveToReport: (uploads: UploadListProp[]) => void;
-  deleteFromReport: (file: UploadListProp) => void;
+  deleteFromReport?: (file: UploadListProp) => void;
   multiple?: boolean;
   disabled?: boolean;
   notification?: {

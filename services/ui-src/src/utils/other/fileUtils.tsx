@@ -111,11 +111,11 @@ export const uploadListRender = (
     | File[]
     | UploadListProp[]
     | { name: string; size: number; fileId: string; message?: string }[],
-  onRemove: Function,
+  onRemove?: Function,
   onClick?: Function,
-  removeIconHidden: boolean = false,
   disabled?: boolean
 ) => {
+  console.log(files);
   return (
     <List variant="upload" mb="spacer3">
       {files?.map((file, fileIdx) => (
@@ -142,14 +142,15 @@ export const uploadListRender = (
                   </span>
                 )}
               </VStack>
-              <Button
-                variant="unstyled"
-                aria-label={`delete ${file.name}`}
-                onClick={() => onRemove(file)}
-                rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
-                hidden={removeIconHidden}
-                disabled={disabled}
-              />
+              {onRemove && (
+                <Button
+                  variant="unstyled"
+                  aria-label={`delete ${file.name}`}
+                  onClick={() => onRemove(file)}
+                  rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                  disabled={disabled}
+                />
+              )}
             </HStack>
             {!onClick && (
               <Progress className="progress" size="lg" isIndeterminate />

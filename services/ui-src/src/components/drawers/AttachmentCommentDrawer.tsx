@@ -37,7 +37,6 @@ export const AttachmentCommentDrawer = ({
     userIsEndUser || (userIsAdmin && adminCommentsEnabled);
   const commentsDisabled =
     isCompleteStatus(report?.status) || !userCanAddComment;
-  const commentsOptional = userIsAdmin;
   const fileName = selectedFile?.name || "attachment";
   const selectedAttachmentIndex = allFiles.findIndex(
     (file) => file.attachment.fileId === selectedFile?.fileId
@@ -122,7 +121,7 @@ export const AttachmentCommentDrawer = ({
       }
 
       const commentsEmpty = displayValue.comment.trim() === "";
-      if (commentsEmpty && !commentsOptional) {
+      if (commentsEmpty) {
         setErrorMessages({
           ...errorMessages,
           comment: "A comment is required.",
@@ -131,7 +130,7 @@ export const AttachmentCommentDrawer = ({
       }
 
       // Comments are optional for admins
-      if (!commentsOptional && commentsEmpty) {
+      if (commentsEmpty) {
         setErrorMessages({
           ...errorMessages,
           overall: "Must modify Status or provide a Comment to submit.",
@@ -182,9 +181,11 @@ export const AttachmentCommentDrawer = ({
       }}
     >
       <Flex direction="column" gap="spacer4" marginBottom="spacer4">
-        <Text sx={sx.drawerSubheading}>
-          Use the field below to leave comments for your CMS Project Officer.
-        </Text>
+        {!userIsAdmin && (
+          <Text sx={sx.drawerSubheading}>
+            Use the field below to leave comments for your CMS Project Officer.
+          </Text>
+        )}
         <Text fontSize="body_lg" fontWeight="body_lg">
           <b>Attachment:</b> {fileName}
         </Text>
@@ -212,14 +213,7 @@ export const AttachmentCommentDrawer = ({
         )}
         <TextField
           name={"comment"}
-          label={
-            <>
-              Comment
-              {commentsOptional && (
-                <span className="optionalText"> (optional)</span>
-              )}
-            </>
-          }
+          label={"Comment"}
           onChange={onChange}
           value={displayValue.comment}
           disabled={commentsDisabled}
