@@ -271,7 +271,7 @@ describe("AttachmentCommentDrawer component", () => {
       });
       await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", {
-        name: "Comment(optional)",
+        name: "Comment",
       });
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Internal (CMS Only)"));
@@ -298,7 +298,7 @@ describe("AttachmentCommentDrawer component", () => {
       });
       await renderAttachmentCommentDrawer();
       const commentInput = screen.getByRole("textbox", {
-        name: "Comment(optional)",
+        name: "Comment",
       });
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Add comment"));
