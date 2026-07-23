@@ -291,7 +291,7 @@ export const AttachmentTable = (
         actionButtonText={"Done"}
         modalHeading="Upload Initiative Attachments"
         deleteFromReport={removeAttachment}
-        disabled={!checkpoint}
+        disabled={initiativeOptions.length === 0 || !checkpoint}
         notification={getNotification()}
       />
       <ManageDrawer

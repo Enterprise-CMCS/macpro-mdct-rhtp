@@ -57,6 +57,11 @@ export const ManageDrawer = ({
     file.checkpoint = checkpoint;
     file.status = status;
 
+    const fileIndex = files.findIndex(
+      (file) => file.attachment.fileId === file.attachment.fileId
+    );
+    files[fileIndex] = file;
+
     if (onSubmitOverride) {
       await onSubmitOverride(file);
     } else {
