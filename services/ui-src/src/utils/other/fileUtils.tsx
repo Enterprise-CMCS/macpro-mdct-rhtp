@@ -55,18 +55,14 @@ export const getZipFile = async (body: ZipRequestBody) => {
 };
 
 export const canEditAttachment = (status: AttachmentStatus): boolean => {
-  if (status === AttachmentStatus.LOCKED_FOR_SCORING) return false;
-
-  return true;
+  return status !== AttachmentStatus.LOCKED_FOR_SCORING;
 };
 
 export const canDeleteAttachment = (
   status: AttachmentStatus,
   canDelete: boolean
 ): boolean => {
-  if (status === AttachmentStatus.PENDING_REVIEW && canDelete) return true;
-
-  return false;
+  return status === AttachmentStatus.PENDING_REVIEW && canDelete;
 };
 
 export const removeFile = async (
@@ -87,9 +83,8 @@ export const uploadListRender = (
     | File[]
     | UploadListProp[]
     | { name: string; size: number; fileId: string; message?: string }[],
-  onRemove: Function,
+  onRemove?: Function,
   onClick?: Function,
-  removeIconHidden: boolean = false,
   disabled?: boolean
 ) => {
   return (
@@ -118,14 +113,15 @@ export const uploadListRender = (
                   </span>
                 )}
               </VStack>
-              <Button
-                variant="unstyled"
-                aria-label={`delete ${file.name}`}
-                onClick={() => onRemove(file)}
-                rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
-                hidden={removeIconHidden}
-                disabled={disabled}
-              />
+              {onRemove && (
+                <Button
+                  variant="unstyled"
+                  aria-label={`delete ${file.name}`}
+                  onClick={() => onRemove(file)}
+                  rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                  disabled={disabled}
+                />
+              )}
             </HStack>
             {!onClick && (
               <Progress className="progress" size="lg" isIndeterminate />

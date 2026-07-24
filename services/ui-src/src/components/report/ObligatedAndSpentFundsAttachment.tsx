@@ -115,9 +115,8 @@ export const ObligatedAndSpentFundsAttachmentElement = (
           state,
           id,
           files,
-          onRemove,
-          downloadFile,
-          true // hide remove icon in delete modal
+          undefined,
+          downloadFile
         )}
       </Modal>
     </Fragment>

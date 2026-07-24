@@ -437,7 +437,6 @@ export const FileStatusOptions = Object.values(AttachmentStatus).map(
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
-  stage?: string;
   checkpoint?: string;
   status: AttachmentStatus;
   canDelete: boolean;
