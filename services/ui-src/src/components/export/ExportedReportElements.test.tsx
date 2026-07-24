@@ -5,7 +5,7 @@ import {
   AttachmentAreaTemplate,
   ElementType,
   PageElement,
-  UseOfFundsAttachmentTemplate,
+  ObligatedAndSpentFundsAttachmentTemplate,
 } from "@rhtp/shared";
 import { mockUseStore } from "utils/testing/setupTest";
 import { useStore } from "utils";
@@ -107,13 +107,13 @@ describe("Test ExportedReportElements", () => {
     ).toBeVisible();
     expect(screen.getByText("mock value")).toBeVisible();
   });
-  test("render UseOfFundsAttachment element", () => {
+  test("render ObligatedAndSpentFundsAttachment element", () => {
     const notAnswered = {
-      type: ElementType.UseOfFundsAttachment,
+      type: ElementType.ObligatedAndSpentFundsAttachment,
       id: "mock-attachment-area",
       label: "",
       required: true,
-    } as UseOfFundsAttachmentTemplate;
+    } as ObligatedAndSpentFundsAttachmentTemplate;
     const element = renderElements(notAnswered);
     render(element);
     expect(screen.getByText("Not answered")).toBeInTheDocument();

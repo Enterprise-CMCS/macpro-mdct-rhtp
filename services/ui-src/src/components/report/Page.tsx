@@ -28,7 +28,7 @@ import {
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
-import { UseOfFundsAttachmentElement } from "./UseOfFundsAttachment";
+import { ObligatedAndSpentFundsAttachmentElement } from "./ObligatedAndSpentFundsAttachment";
 import { AttachmentArea } from "components/fields/AttachmentArea";
 import { SubmitForReview } from "./SubmitForReview";
 
@@ -96,9 +96,9 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <ListInput {...{ updateElement, disabled, element }} />;
       case ElementType.TableCheckpoint:
         return <TableCheckpoint {...{ updateElement, disabled, element }} />;
-      case ElementType.UseOfFundsAttachment:
+      case ElementType.ObligatedAndSpentFundsAttachment:
         return (
-          <UseOfFundsAttachmentElement
+          <ObligatedAndSpentFundsAttachmentElement
             {...{ updateElement, disabled, element }}
           />
         );

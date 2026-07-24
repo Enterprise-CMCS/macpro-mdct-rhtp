@@ -6,7 +6,7 @@ import {
   ElementType,
   FormPageTemplate,
   Report,
-  UseOfFundsAttachmentTemplate,
+  ObligatedAndSpentFundsAttachmentTemplate,
 } from "@rhtp/shared";
 import { validReport, mockStatePolicyCommitments } from "../tests/mockReport";
 import {
@@ -16,7 +16,7 @@ import {
   getAccordionFiles,
   formatS3ZipKey,
   addReportFilesToZip,
-  addUseOfFundsFilesToZip,
+  addObligatedAndSpentFundsFilesToZip,
 } from "./buildZip";
 import JSZip from "jszip";
 import s3Lib from "../../libs/s3-lib";
@@ -36,7 +36,7 @@ vi.mock("../../libs/s3-lib", () => ({
   },
 }));
 
-const mockUseOfFundsReport: Report = {
+const mockObligatedAndSpentFundsReport: Report = {
   ...validReport,
   id: "mock-completed-report",
   pages: [
@@ -45,17 +45,17 @@ const mockUseOfFundsReport: Report = {
       childPageIds: ["mock-page-1"],
     },
     {
-      id: "use-of-funds",
+      id: "obligated-and-spent-funds",
       elements: [
         {
-          type: ElementType.UseOfFundsAttachment,
+          type: ElementType.ObligatedAndSpentFundsAttachment,
           answer: [
             {
-              name: "use-of-funds-file",
-              fileId: "use-of-funds-file",
+              name: "obligated-and-spent-funds-file",
+              fileId: "obligated-and-spent-funds-file",
             },
           ],
-        } as UseOfFundsAttachmentTemplate,
+        } as ObligatedAndSpentFundsAttachmentTemplate,
       ],
     } as FormPageTemplate,
   ],
@@ -64,13 +64,13 @@ const mockUseOfFundsReport: Report = {
 vi.mock("../../storage/reports");
 const mockGetReport = vi
   .mocked(getReport)
-  .mockResolvedValue(mockUseOfFundsReport);
+  .mockResolvedValue(mockObligatedAndSpentFundsReport);
 const mockQueryByType = vi
   .mocked(queryReportsByType)
-  .mockResolvedValue([mockUseOfFundsReport]);
+  .mockResolvedValue([mockObligatedAndSpentFundsReport]);
 const mockQueryByState = vi
   .mocked(queryReportsForState)
-  .mockResolvedValue([mockUseOfFundsReport]);
+  .mockResolvedValue([mockObligatedAndSpentFundsReport]);
 
 const mockReport: Report = {
   ...validReport,
@@ -235,16 +235,16 @@ describe("buildZip util", () => {
     expect(mockZip.files).toBeDefined();
   });
 
-  test("addUseOfFundsFilesToZip without state", async () => {
+  test("addObligatedAndSpentFundsFilesToZip without state", async () => {
     const mockZip = new JSZip();
-    await addUseOfFundsFilesToZip(["A1"], mockZip);
+    await addObligatedAndSpentFundsFilesToZip(["A1"], mockZip);
     expect(mockZip.files).toBeDefined();
     expect(mockQueryByType).toHaveBeenCalled();
   });
 
-  test("addUseOfFundsFilesToZip with state", async () => {
+  test("addObligatedAndSpentFundsFilesToZip with state", async () => {
     const mockZip = new JSZip();
-    await addUseOfFundsFilesToZip(["A1"], mockZip, "NJ");
+    await addObligatedAndSpentFundsFilesToZip(["A1"], mockZip, "NJ");
     expect(mockGetReport).toHaveBeenCalled();
     expect(mockQueryByState).toHaveBeenCalled();
     expect(mockQueryByType).not.toHaveBeenCalled();

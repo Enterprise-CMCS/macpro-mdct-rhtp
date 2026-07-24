@@ -5,7 +5,7 @@ import {
   TableCheckpointTemplate,
 } from "@rhtp/shared";
 import { notAnsweredText } from "../../constants";
-import { UseOfFundsAttachmentElementExport } from "components/report/UseOfFundsAttachment";
+import { ObligatedAndSpentFundsAttachmentElementExport } from "components/report/ObligatedAndSpentFundsAttachment";
 import { ActionTableExport } from "components/fields/ActionTable";
 import { TableCheckpointExport } from "components/fields/TableCheckpoint";
 import { parseHtml } from "utils";
@@ -19,7 +19,7 @@ const tableElementList = [
   ElementType.Radio,
   ElementType.TextAreaField,
   ElementType.NumberField,
-  ElementType.UseOfFundsAttachment,
+  ElementType.ObligatedAndSpentFundsAttachment,
   ElementType.Dropdown,
   ElementType.ListInput,
   ElementType.AttachmentArea,
@@ -56,8 +56,8 @@ export const renderElements = (element: PageElement) => {
       return TableCheckpointExport(
         element as TableCheckpointTemplate & { initId: string }
       );
-    case ElementType.UseOfFundsAttachment:
-      return UseOfFundsAttachmentElementExport(element);
+    case ElementType.ObligatedAndSpentFundsAttachment:
+      return ObligatedAndSpentFundsAttachmentElementExport(element);
     case ElementType.AttachmentArea:
       return AttachmentAreaExport(element);
     case ElementType.ActionTable:

@@ -8,7 +8,7 @@ import {
   RadioTemplate,
   Report,
   TextboxTemplate,
-  UseOfFundsAttachmentTemplate,
+  ObligatedAndSpentFundsAttachmentTemplate,
 } from "@rhtp/shared";
 import {
   elementSatisfiesRequired,
@@ -299,13 +299,13 @@ describe("elementSatisfiesRequired", () => {
     expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
   });
 
-  test("handles UseOfFundsAttachment", () => {
+  test("handles ObligatedAndSpentFundsAttachment", () => {
     const element = {
-      type: ElementType.UseOfFundsAttachment,
-      id: "use-of-funds",
+      type: ElementType.ObligatedAndSpentFundsAttachment,
+      id: "obligated-and-spent-funds",
       answer: [{ name: "mock-file-name", size: 100, fileId: "mock-id" }],
       required: true,
-    } as UseOfFundsAttachmentTemplate;
+    } as ObligatedAndSpentFundsAttachmentTemplate;
     expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
   });
 
