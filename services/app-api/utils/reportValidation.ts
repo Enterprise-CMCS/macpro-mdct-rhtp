@@ -164,10 +164,10 @@ export const uploadListPropSchema = object().shape({
     ),
 });
 
-const UseOfFundsAttachmentSchema = object().shape({
+const ObligatedAndSpentFundsAttachmentSchema = object().shape({
   type: string()
     .required()
-    .matches(new RegExp(ElementType.UseOfFundsAttachment)),
+    .matches(new RegExp(ElementType.ObligatedAndSpentFundsAttachment)),
   id: string().required(),
   label: string().required(),
   answer: array().of(uploadListPropSchema).min(0).max(1).notRequired(),
@@ -215,8 +215,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
       return tableCheckpointTemplateSchema;
-    case ElementType.UseOfFundsAttachment:
-      return UseOfFundsAttachmentSchema;
+    case ElementType.ObligatedAndSpentFundsAttachment:
+      return ObligatedAndSpentFundsAttachmentSchema;
     case ElementType.InitiativesTable:
       return initiativesTableSchema;
     case ElementType.AttachmentArea:
@@ -547,9 +547,11 @@ export const isZipRequestBody = (
       reportSubTypeKeys: array()
         .of(string().required())
         .when("type", {
-          is: ZipRequestTypes.USE_OF_FUNDS,
+          is: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
           then: (schema) =>
-            schema.required("Report sub types required for USE_OF_FUNDS zip"),
+            schema.required(
+              "Report sub types required for OBLIGATED_AND_SPENT_FUNDS zip"
+            ),
           otherwise: (schema) => schema.notRequired(),
         }),
     })

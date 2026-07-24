@@ -103,7 +103,8 @@ export const ExportedZipPage = () => {
       case "REPORTS":
         setModalData({
           ...modalData,
-          heading: "Use of Funds: By Reports (includes All States)",
+          heading:
+            "Obligated and Spent Funds: By Reports (includes All States)",
           subheading:
             "Report includes all states. Select one or many reports to include in the download.",
         });
@@ -111,7 +112,7 @@ export const ExportedZipPage = () => {
       case "STATE":
         setModalData({
           ...modalData,
-          heading: "Use of Funds: By State and Report(s) Export",
+          heading: "Obligated and Spent Funds: By State and Report(s) Export",
           subheading:
             "Select one State and one or many reports to include in the download.",
         });
@@ -126,7 +127,7 @@ export const ExportedZipPage = () => {
 
     const reports = selectedReports.filter((report) => report !== "all");
     const body = {
-      type: ZipRequestTypes.USE_OF_FUNDS,
+      type: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
       state: selectedState,
       reportSubTypeKeys: reports,
     };
@@ -157,12 +158,12 @@ export const ExportedZipPage = () => {
       </Box>
       <Flex flexDirection="column" gap="spacer4">
         {ExportCard(
-          "Use of Funds: By Reports (includes All States)",
+          "Obligated and Spent Funds: By Reports (includes All States)",
           "{Details about what is included in the export}",
           () => setExportData("REPORTS")
         )}
         {ExportCard(
-          "Use of Funds: By State and Report(s)",
+          "Obligated and Spent Funds: By State and Report(s)",
           "{Details about what is included in the export}",
           () => setExportData("STATE")
         )}

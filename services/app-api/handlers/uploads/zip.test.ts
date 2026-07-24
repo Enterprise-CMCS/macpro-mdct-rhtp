@@ -6,7 +6,7 @@ import {
   getZipStatus,
   zipWorker,
   ZipReportWorkerEvent,
-  ZipUseOfFundsWorkerEvent,
+  ZipObligatedAndSpentFundsWorkerEvent,
 } from "./zip";
 import { authenticatedUser } from "../../utils/authentication";
 import { ReportType, UserRoles, ZipRequestTypes } from "@rhtp/shared";
@@ -14,7 +14,7 @@ import { getPSURL, zipBuffer } from "../../utils/zips/polling";
 import { getReport } from "../../storage/reports";
 import {
   addReportFilesToZip,
-  addUseOfFundsFilesToZip,
+  addObligatedAndSpentFundsFilesToZip,
 } from "../../utils/zips/buildZip";
 
 vi.mock("../../utils/authentication");
@@ -32,7 +32,7 @@ vi.mock("../../utils/zips/polling", () => ({
 
 vi.mock("../../utils/zips/buildZip", () => ({
   addReportFilesToZip: vi.fn(),
-  addUseOfFundsFilesToZip: vi.fn(),
+  addObligatedAndSpentFundsFilesToZip: vi.fn(),
 }));
 
 vi.mock("../../storage/reports", () => ({
@@ -92,10 +92,10 @@ const mockTriggerReportZipEvent: APIGatewayProxyEvent = {
   headers: { "cognito-identity-id": "test" },
 };
 
-const mockTriggerUseOfFundsZipEvent: APIGatewayProxyEvent = {
+const mockTriggerObligatedAndSpentFundsZipEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
   body: JSON.stringify({
-    type: ZipRequestTypes.USE_OF_FUNDS,
+    type: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
     state: "PA",
     reportSubTypeKeys: ["A1", "Q1"],
   }),
@@ -117,12 +117,13 @@ const mockZipWorkerReportEvent: ZipReportWorkerEvent = {
   id: "report-id-123",
 };
 
-const mockZipWorkerUseOfFundsEvent: ZipUseOfFundsWorkerEvent = {
-  type: ZipRequestTypes.USE_OF_FUNDS,
-  zipId: "zip-id-123",
-  state: "PA",
-  reportSubTypeKeys: ["A1", "Q1"],
-};
+const mockZipWorkerObligatedAndSpentFundsEvent: ZipObligatedAndSpentFundsWorkerEvent =
+  {
+    type: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
+    zipId: "zip-id-123",
+    state: "PA",
+    reportSubTypeKeys: ["A1", "Q1"],
+  };
 
 describe("Test zip methods", () => {
   beforeEach(() => {
@@ -150,8 +151,10 @@ describe("Test zip methods", () => {
       );
     });
 
-    test("returns proper response for use of funds event with state", async () => {
-      const res = await triggerZipGeneration(mockTriggerUseOfFundsZipEvent);
+    test("returns proper response for obligated and spent funds event with state", async () => {
+      const res = await triggerZipGeneration(
+        mockTriggerObligatedAndSpentFundsZipEvent
+      );
       expect(res.statusCode).toBe(StatusCodes.Ok);
       expect(res.body).toEqual(
         JSON.stringify({
@@ -202,10 +205,12 @@ describe("Test zip methods", () => {
       expect(vi.mocked(zipBuffer)).toHaveBeenCalledOnce();
     });
 
-    test("use of funds worker event", async () => {
-      await zipWorker(mockZipWorkerUseOfFundsEvent);
+    test("obligated and spent funds worker event", async () => {
+      await zipWorker(mockZipWorkerObligatedAndSpentFundsEvent);
       expect(vi.mocked(getReport)).not.toHaveBeenCalled();
-      expect(vi.mocked(addUseOfFundsFilesToZip)).toHaveBeenCalledOnce();
+      expect(
+        vi.mocked(addObligatedAndSpentFundsFilesToZip)
+      ).toHaveBeenCalledOnce();
       expect(vi.mocked(zipBuffer)).toHaveBeenCalledOnce();
     });
 
@@ -215,7 +220,9 @@ describe("Test zip methods", () => {
       } as any;
       const result = await zipWorker(invalidTypeEvent);
       expect(vi.mocked(addReportFilesToZip)).not.toHaveBeenCalled();
-      expect(vi.mocked(addUseOfFundsFilesToZip)).not.toHaveBeenCalled();
+      expect(
+        vi.mocked(addObligatedAndSpentFundsFilesToZip)
+      ).not.toHaveBeenCalled();
       expect(vi.mocked(zipBuffer)).not.toHaveBeenCalled();
       expect(result?.statusCode).toBe(StatusCodes.BadRequest);
     });

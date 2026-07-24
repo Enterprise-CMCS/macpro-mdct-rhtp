@@ -2,7 +2,7 @@ import { Box, Button, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import {
   AlertTypes,
   UploadListProp,
-  UseOfFundsAttachmentTemplate,
+  ObligatedAndSpentFundsAttachmentTemplate,
 } from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState } from "react";
@@ -19,8 +19,8 @@ import { Modal } from "components/modals/Modal";
 import { Alert } from "components/alerts/Alert";
 import { notAnsweredText } from "../../constants";
 
-export const UseOfFundsAttachmentElement = (
-  props: PageElementProps<UseOfFundsAttachmentTemplate>
+export const ObligatedAndSpentFundsAttachmentElement = (
+  props: PageElementProps<ObligatedAndSpentFundsAttachmentTemplate>
 ) => {
   const { disabled, element, updateElement } = props;
   const { report } = useStore();
@@ -62,7 +62,7 @@ export const UseOfFundsAttachmentElement = (
         disabled={isDisabled()}
         leftIcon={<Image src={isDisabled() ? addGray : addIcon} />}
       >
-        Add Use of Funds
+        Add Obligated and Spent Funds
       </Button>
       <UploadDrawer
         modalDisclosure={{
@@ -71,12 +71,12 @@ export const UseOfFundsAttachmentElement = (
             setModalOpen(false);
           },
         }}
-        modalHeading={"Add Use of Funds"}
+        modalHeading={"Add Obligated and Spent Funds"}
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
         multiple={false}
-        notification={{ success: "Use of Funds" }}
+        notification={{ success: "Obligated and Spent Funds" }}
       ></UploadDrawer>
       {files.length > 0 && (
         <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
@@ -99,12 +99,13 @@ export const UseOfFundsAttachmentElement = (
         }}
         onConfirmHandler={onRemove}
         content={{
-          heading: "Delete Use of Funds",
+          heading: "Delete Obligated and Spent Funds",
           actionButtonText: "Delete",
         }}
       >
         <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from the Use of Funds page.
+          Deleting this attachment will remove it from the Obligated and Spent
+          Funds page.
         </Alert>
         <Box mt={"spacer3"} mb={"spacer_half"}>
           <Text sx={sx.uploadedLabel}>File</Text>
@@ -123,9 +124,9 @@ export const UseOfFundsAttachmentElement = (
   );
 };
 
-// The pdf rendering of UseOfFundsAttachmentElement component
-export const UseOfFundsAttachmentElementExport = (
-  element: UseOfFundsAttachmentTemplate
+// The pdf rendering of ObligatedAndSpentFundsAttachmentElement component
+export const ObligatedAndSpentFundsAttachmentElementExport = (
+  element: ObligatedAndSpentFundsAttachmentTemplate
 ) => {
   if (element.answer && element.answer.length > 0) {
     const name = element.answer[0].name;

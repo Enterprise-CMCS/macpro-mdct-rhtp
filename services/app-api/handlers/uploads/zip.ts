@@ -6,7 +6,7 @@ import { ReportType, StateAbbr, ZipRequestTypes } from "@rhtp/shared";
 import JSZip from "jszip";
 import {
   addReportFilesToZip,
-  addUseOfFundsFilesToZip,
+  addObligatedAndSpentFundsFilesToZip,
 } from "../../utils/zips/buildZip";
 import { getPSURL, zipBuffer, startZipWorker } from "../../utils/zips/polling";
 import { isZipRequestBody } from "../../utils/reportValidation";
@@ -19,8 +19,8 @@ export interface ZipReportWorkerEvent {
   id: string;
 }
 
-export interface ZipUseOfFundsWorkerEvent {
-  type: ZipRequestTypes.USE_OF_FUNDS;
+export interface ZipObligatedAndSpentFundsWorkerEvent {
+  type: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS;
   zipId: string;
   state?: StateAbbr;
   reportSubTypeKeys: string[];
@@ -41,7 +41,7 @@ export const getZipStatus = handler(parseZipIdParameters, async (request) => {
 });
 
 export const zipWorker = async (
-  event: ZipReportWorkerEvent | ZipUseOfFundsWorkerEvent
+  event: ZipReportWorkerEvent | ZipObligatedAndSpentFundsWorkerEvent
 ) => {
   const zip = new JSZip();
   const { type, zipId } = event;
@@ -53,9 +53,9 @@ export const zipWorker = async (
 
     await addReportFilesToZip(report, zip);
     tags = `${tags}&reportType=${reportType}&state=${state}&id=${id}&subTypeKeys=${report.subTypeKey}`;
-  } else if (type === ZipRequestTypes.USE_OF_FUNDS) {
+  } else if (type === ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS) {
     const { reportSubTypeKeys, state } = event;
-    await addUseOfFundsFilesToZip(reportSubTypeKeys, zip, state);
+    await addObligatedAndSpentFundsFilesToZip(reportSubTypeKeys, zip, state);
     tags = `${tags}&subTypeKeys=${reportSubTypeKeys.join("-")}${state ? `&state=${state}` : ""}`;
   } else {
     return badRequest(`Unidentified type. Cannot proceed. Event: ${event}`);

@@ -71,8 +71,8 @@ const mockOldReport: Report = {
           answer: metricAnswers,
         } as unknown as ActionTableTemplate,
         {
-          id: "use-of-funds-attachment",
-          type: ElementType.UseOfFundsAttachment,
+          id: "obligated-and-spent-funds-attachment",
+          type: ElementType.ObligatedAndSpentFundsAttachment,
           label: "mock label",
           answer: [
             {
@@ -176,8 +176,8 @@ describe("copyReport util", () => {
       ])
     );
 
-    const existingUseOfFunds = mockNewReport.pages[1].elements[3];
-    expect(existingUseOfFunds).not.toHaveProperty("answer");
+    const existingObligatedAndSpentFunds = mockNewReport.pages[1].elements[3];
+    expect(existingObligatedAndSpentFunds).not.toHaveProperty("answer");
 
     // Verify state policy commitments are copied correctly
     const newPolicyCommitments = mockNewReport.pages[4].elements[0].accordions;

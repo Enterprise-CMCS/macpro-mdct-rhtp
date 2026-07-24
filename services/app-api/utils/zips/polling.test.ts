@@ -29,8 +29,8 @@ const mockReportZipBody = {
   },
 };
 
-const mockUseOfFundsZipBody = {
-  type: ZipRequestTypes.USE_OF_FUNDS,
+const mockObligatedAndSpentFundsZipBody = {
+  type: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
   reportSubTypeKeys: ["A1"],
 };
 
@@ -102,8 +102,8 @@ describe("polling utils", () => {
       expect(result).toBeTypeOf("string");
     });
 
-    test("startZipWorker works for use of funds type", async () => {
-      const result = await startZipWorker(mockUseOfFundsZipBody);
+    test("startZipWorker works for obligated and spent funds type", async () => {
+      const result = await startZipWorker(mockObligatedAndSpentFundsZipBody);
       expect(mockInvoke).toHaveBeenCalled();
       expect(result).toBeTypeOf("string");
     });
