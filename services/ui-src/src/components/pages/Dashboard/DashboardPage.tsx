@@ -111,7 +111,7 @@ export const DashboardPage = () => {
         reports={reports}
       />
       <Link as={RouterLink} to="/" variant="return">
-        <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
+        <Image src={arrowLeftIcon} className="icon" />
         Return home
       </Link>
       {banner ? <Banner {...banner} key={banner.key} /> : null}
