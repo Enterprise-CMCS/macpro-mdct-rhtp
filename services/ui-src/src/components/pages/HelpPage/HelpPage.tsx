@@ -3,10 +3,9 @@ import { HelpCard, PageTemplate } from "components";
 import { HELP_DESK_EMAIL_ADDRESS } from "../../../constants";
 import { useBreakpoint } from "utils";
 
-const rhtpDemoEmailAddress = "RHTPQuality@cms.hhs.gov";
-
 export const HelpPage = () => {
   const { isDesktop } = useBreakpoint();
+  const helpfile = "RHTP_State Reporting Expectations_Guide V7_6.12.26.pdf";
   return (
     <PageTemplate>
       <Box>
@@ -31,9 +30,14 @@ export const HelpPage = () => {
         <HelpCard icon="spreadsheet">
           <Text sx={sx.bodyText}>For questions about the online form:</Text>
           <Text sx={sx.emailText}>
-            Email {!isDesktop && <br />}
-            <Link href={`mailto:${rhtpDemoEmailAddress}`} target="_blank">
-              {rhtpDemoEmailAddress}
+            Contact your Project Officer or refer to the{" "}
+            <Link
+              href={`${window.location.origin}/${helpfile}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              fontWeight="bold"
+            >
+              State Reporting Guide
             </Link>
           </Text>
         </HelpCard>
