@@ -1,4 +1,5 @@
 import { test, expect } from "./fixtures/base";
+import { ReportEditorPage } from "./pageObjects/report-editor.page";
 import { StatePage } from "./pageObjects/state.page";
 import { TIMEOUT_LOADING } from "../utils/timeouts";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
@@ -7,80 +8,28 @@ import {
   createUniqueAorValue,
   GENERAL_INFORMATION_SECTION,
   GENERAL_INFO_FIELDS,
-  prepareReportForSubmission,
   REVIEW_SUBMIT_SECTION,
   waitForAutosaveWithSectionRefresh,
-} from "../utils/report-edit-helpers";
+} from "../utils/report-edit-shared-helpers";
+import {
+  prepareAndSubmitReport,
+  prepareReportForSubmissionWithTimeout,
+  submitPreparedReport,
+} from "../utils/report-edit-submission-helpers";
 import {
   verifyFieldIsReadOnly,
   verifyCurrentSection,
 } from "../utils/report-edit-assertions";
 
-const isEnvironmentInterruptionError = (error: unknown): boolean => {
-  const message = error instanceof Error ? error.message : String(error);
-  return /Target page, context or browser has been closed/i.test(message);
-};
+const ensureGeneralInfoReadyForEdit = async (
+  editor: ReportEditorPage
+): Promise<void> => {
+  const aorField = editor.getTextField(AOR_NAME_LABEL);
 
-type SubmissionPreparationResult = {
-  submittable: boolean;
-  reason?: string;
-};
-
-const prepareForSubmissionWithTimeout = async (
-  editor: Parameters<typeof prepareReportForSubmission>[0],
-  timeoutMs = 45000
-): Promise<SubmissionPreparationResult> => {
-  const timeoutResult: SubmissionPreparationResult = {
-    submittable: false,
-    reason: "Submission preparation timed out in deployed environment",
-  };
-
-  return Promise.race([
-    prepareReportForSubmission(editor),
-    new Promise<SubmissionPreparationResult>((resolve) => {
-      setTimeout(() => resolve(timeoutResult), timeoutMs);
-    }),
-  ]);
-};
-
-const submitPreparedReport = async (
-  editor: Parameters<typeof prepareReportForSubmission>[0],
-  prepResult: SubmissionPreparationResult
-): Promise<{ submitted: boolean; reason?: string }> => {
-  const { reportType, state, reportId } = editor.getCurrentRouteParams();
-  await editor.navigateToSection(
-    reportType,
-    state,
-    reportId,
-    REVIEW_SUBMIT_SECTION
-  );
-  await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
-
-  const finalSubmitButton = editor.page.getByRole("button", {
-    name: /Submit .* Report/i,
-  });
-  await expect(finalSubmitButton).toBeVisible();
-
-  if (!prepResult.submittable) {
-    return {
-      submitted: false,
-      reason: prepResult.reason ?? "report not submittable",
-    };
-  }
-
-  await expect(finalSubmitButton).toBeEnabled({ timeout: TIMEOUT_LOADING });
-  await finalSubmitButton.click();
-
-  const confirmModal = editor.page.getByRole("dialog");
-  await expect(confirmModal).toBeVisible({ timeout: TIMEOUT_LOADING });
-  await confirmModal.getByRole("button", { name: /Submit .* Report/i }).click();
-
-  await expect(
-    editor.page.getByRole("heading", { name: /Successfully Submitted/i })
-  ).toBeVisible({ timeout: TIMEOUT_LOADING });
-  await expect(finalSubmitButton).toBeHidden();
-
-  return { submitted: true };
+  await expect(aorField).toBeVisible({ timeout: TIMEOUT_LOADING });
+  await expect(aorField).toBeEnabled({ timeout: TIMEOUT_LOADING });
+  await aorField.click({ timeout: TIMEOUT_LOADING });
+  await expect(aorField).toBeFocused();
 };
 
 const arrangeReviewSubmitSection = async (statePage: StatePage) => {
@@ -199,20 +148,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
       return;
     }
 
-    let prepResult;
-    try {
-      prepResult = await prepareForSubmissionWithTimeout(editor);
-    } catch (error) {
-      if (isEnvironmentInterruptionError(error)) {
-        test.skip(
-          true,
-          "Submission preparation interrupted by deployed environment page closure"
-        );
-        return;
-      }
-      throw error;
-    }
-    const submitOutcome = await submitPreparedReport(editor, prepResult);
+    const submitOutcome = await prepareAndSubmitReport(editor);
     if (!submitOutcome.submitted) {
       console.warn(
         `Skipping final submission test: ${submitOutcome.reason ?? "report not submittable"}`
@@ -239,6 +175,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
 
     const aorValue = createUniqueAorValue();
     await verifyCurrentSection(editor, GENERAL_INFORMATION_SECTION);
+    await ensureGeneralInfoReadyForEdit(editor);
     await editor.fillTextField(AOR_NAME_LABEL, aorValue);
     await editor.page.keyboard.press("Tab");
     await waitForAutosaveWithSectionRefresh(
@@ -249,19 +186,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
       }
     );
 
-    let prepResult;
-    try {
-      prepResult = await prepareForSubmissionWithTimeout(editor);
-    } catch (error) {
-      if (isEnvironmentInterruptionError(error)) {
-        test.skip(
-          true,
-          "Submission preparation interrupted by deployed environment page closure"
-        );
-        return;
-      }
-      throw error;
-    }
+    const prepResult = await prepareReportForSubmissionWithTimeout(editor);
     const submitOutcome = await submitPreparedReport(editor, prepResult);
     if (!submitOutcome.submitted) {
       test.skip(true, submitOutcome.reason ?? "report not submittable");

@@ -67,6 +67,17 @@ export class ReportEditorPage extends BasePage {
     await this.waitForLoadingComplete();
   }
 
+  async reloadAndReturnToSection(
+    reportType: string,
+    state: string,
+    reportId: string,
+    sectionId: string
+  ): Promise<void> {
+    await this.page.reload({ waitUntil: "domcontentloaded" });
+    await this.waitForLoadingComplete();
+    await this.navigateToSection(reportType, state, reportId, sectionId);
+  }
+
   private async clickSectionNavButton(button: Locator): Promise<void> {
     const fromSection = this.getCurrentSectionId();
     await Promise.all([
@@ -112,6 +123,7 @@ export class ReportEditorPage extends BasePage {
 
   async fillTextField(label: string | RegExp, value: string): Promise<void> {
     const field = this.page.getByLabel(label);
+    await field.waitFor({ state: "visible", timeout: TIMEOUT_LOADING });
     await field.fill(value);
   }
 }
