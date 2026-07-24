@@ -128,16 +128,6 @@ export const TableCheckpoint = (
   const disabled = formDisabled || initiative?.status === PageStatus.ABANDONED;
   const { id, state, type: reportType } = report!;
   const { autosave } = useContext(ReportAutosaveContext);
-  //if there is answer on load, we need to build the shape from the checkpoints data
-  const initialDisplayValue =
-    answer ??
-    checkpointList.map((checkpoint) => ({
-      id: checkpoint.id,
-      checked: false,
-    }));
-  const [checkpoint, setCheckpoint] = useState("");
-  const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
-  const [files, setFiles] = useState<InitiativeAnswerProp[]>([]);
 
   if (!state || !id || !reportType || !pageId) {
     console.error(
@@ -145,6 +135,19 @@ export const TableCheckpoint = (
     );
     return;
   }
+  //if there is answer on load, we need to build the shape from the checkpoints data
+  const initialDisplayValue =
+    answer ??
+    checkpointList.map((checkpoint) => ({
+      id: checkpoint.id,
+      checked: false,
+    }));
+  const [initiativeOptions, setInitiativeOptions] = useState<string[]>([
+    pageId,
+  ]);
+  const [checkpoint, setCheckpoint] = useState("");
+  const [attachments, setAttachments] = useState<InitiativeAnswerProp[]>([]);
+  const [files, setFiles] = useState<InitiativeAnswerProp[]>([]);
 
   //Updates when the report has been updated, so when a file has been added or removed from the table
   useEffect(() => {
@@ -157,13 +160,6 @@ export const TableCheckpoint = (
 
     setFiles(files);
     setAttachments(attachments || []);
-    if (isModalOpen && attachments) {
-      setSelectedFiles(
-        attachments
-          .filter((attachment) => attachment.checkpoint === checkpoint)
-          .map((attachment) => attachment.attachment)
-      );
-    }
   }, [report, isManageOpen]);
 
   const onCheckboxHandler = (id: string) => {
@@ -175,7 +171,7 @@ export const TableCheckpoint = (
 
   const formatUploads = (uploads: UploadListProp[]) => {
     return uploads.map((file) => ({
-      initiatives: [pageId],
+      initiatives: initiativeOptions,
       stage: getStageIdByCheckpointId(checkpoint),
       checkpoint,
       comments: [],
@@ -188,6 +184,7 @@ export const TableCheckpoint = (
   const deleteFromReport = (file: UploadListProp) => {
     handleFileAddDelete(file.fileId);
     removeFile(reportType, state, id, file);
+    onClose();
   };
 
   const onDrawerClick = (type: string, selectedFile: UploadListProp) => {
@@ -213,15 +210,11 @@ export const TableCheckpoint = (
   };
 
   const checkpointDropdownHandler = (
-    _initiatives: string[],
+    initiatives: string[],
     checkpoint: string
   ) => {
+    setInitiativeOptions(initiatives);
     setCheckpoint(checkpoint);
-    setSelectedFiles(
-      attachments
-        .filter((attachment) => attachment.checkpoint === checkpoint)
-        .map((attachment) => attachment.attachment)
-    );
   };
 
   const onClose = () => {
@@ -393,13 +386,13 @@ export const TableCheckpoint = (
           <StageCheckpointDropdown
             onDropdownHandler={checkpointDropdownHandler}
             answer={{ initiatives: [pageId] }}
-            hideInitiative={true}
           />
         }
         saveToReport={handleFileAddDelete}
         actionButtonText={"Done"}
         modalHeading={"Upload Initiative Attachments"}
         notification={{ success: getCheckpointLabel(checkpoint) }}
+        disabled={!checkpoint}
       />
       <ManageDrawer
         modalDisclosure={{
@@ -408,7 +401,6 @@ export const TableCheckpoint = (
         }}
         onModalDelete={() => {
           deleteFromReport(selectedFiles[0]);
-          setManageOpen(false);
         }}
         answer={selectedFiles[0]}
         files={attachments}

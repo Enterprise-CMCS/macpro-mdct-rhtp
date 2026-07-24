@@ -129,15 +129,6 @@ export const AttachmentCommentDrawer = ({
         return;
       }
 
-      // Comments are optional for admins
-      if (commentsEmpty) {
-        setErrorMessages({
-          ...errorMessages,
-          overall: "Must modify Status or provide a Comment to submit.",
-        });
-        return;
-      }
-
       await createComment(
         allFiles[selectedAttachmentIndex].attachment.fileId,
         report?.state || "",

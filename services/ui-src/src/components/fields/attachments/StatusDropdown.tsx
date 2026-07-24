@@ -66,6 +66,10 @@ export const StatusDropdown = ({ status, onChange }: Props) => {
           edited or deleted.
         </ListItem>
       </UnorderedList>
+      <Text>
+        <b>Current status: </b>
+        {status}
+      </Text>
       <Dropdown
         label={optionalTag({ label: "Status", required: false })}
         name="status"
