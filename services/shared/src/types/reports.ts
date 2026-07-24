@@ -317,6 +317,7 @@ export interface StatusAlertTemplate extends DisplayElementTemplate {
   type: ElementType.StatusAlert;
   title: string;
   status: AlertTypes;
+  for?: string;
 }
 
 export interface SubHeaderTemplate extends DisplayElementTemplate {

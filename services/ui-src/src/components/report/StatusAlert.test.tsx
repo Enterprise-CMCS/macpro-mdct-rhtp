@@ -5,7 +5,6 @@ import { StatusAlert } from "./StatusAlert";
 import { AlertTypes, ElementType, StatusAlertTemplate } from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
-import userEvent from "@testing-library/user-event";
 
 vi.mock("utils/state/reportLogic/completeness", () => ({
   inferredReportStatus: vi.fn().mockReturnValue("Complete"),
@@ -17,7 +16,16 @@ vi.mock("utils/state/useStore", () => ({
     .mockImplementation(
       (selector?: (state: typeof mockUseStore) => unknown) => {
         if (selector) {
-          return false;
+          return {
+            submittable: false,
+            elements: [
+              {
+                id: "mock-accordion-group",
+                type: ElementType.AccordionGroup,
+                accordions: [{ id: "mock id" }],
+              },
+            ],
+          };
         }
         return { ...mockUseStore, currentPageId: "mock-id" };
       }
@@ -44,12 +52,13 @@ const mockStatusAlert: StatusAlertTemplate = {
   status: AlertTypes.ERROR,
 };
 
-const mockStatusLink: StatusAlertTemplate = {
-  id: "mock-alert-id",
+const mockStatusForAlert: StatusAlertTemplate = {
+  id: "mock-conditional-alert-id",
   type: ElementType.StatusAlert,
   title: "mock alert",
-  text: "mock text {ReturnButton}",
-  status: AlertTypes.ERROR,
+  text: "mock text",
+  status: AlertTypes.INFO,
+  for: "mock-accordion-group",
 };
 
 const statusAlertComponent = (
@@ -63,14 +72,10 @@ describe("<StatusAlert />", () => {
       expect(screen.getByText("mock alert")).toBeVisible();
       expect(screen.getByText("mock text")).toBeVisible();
     });
-
-    test("StatusAlert with link is clickable", async () => {
-      render(<StatusAlert element={mockStatusLink}></StatusAlert>);
-
-      expect(screen.getByText("mock alert")).toBeVisible();
-      const link = screen.getByText("Click here");
-
-      await userEvent.click(link);
+    test("Conditional status alert for accordion groups. Should er", () => {
+      render(<StatusAlert element={mockStatusForAlert}></StatusAlert>);
+      expect(screen.queryByText("mock alert")).not.toBeInTheDocument();
+      expect(screen.queryByText("mock text")).not.toBeInTheDocument();
     });
 
     test("Review & Submit banner", () => {

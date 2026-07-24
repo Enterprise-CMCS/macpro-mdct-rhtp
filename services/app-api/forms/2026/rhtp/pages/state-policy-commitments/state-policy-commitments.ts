@@ -1,4 +1,5 @@
 import {
+  AlertTypes,
   AttachmentAreaTemplate,
   DropdownTemplate,
   ElementType,
@@ -126,6 +127,14 @@ export const buildStatePolicyCommitments = (
       id: "state-policy-commitments-group",
       accordions: [...buildCommitments(state)],
       required: false,
+    },
+    {
+      type: ElementType.StatusAlert,
+      id: "state-policy-empty-alert",
+      status: AlertTypes.INFO,
+      title: "No State Policy Commitments Found",
+      text: "No state policy commitments are on file for your state. If you believe this is an error, please contact your CMS Project Officer.",
+      for: "state-policy-commitments-group",
     },
   ],
 });
