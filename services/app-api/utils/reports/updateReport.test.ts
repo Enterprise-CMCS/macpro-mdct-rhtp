@@ -96,6 +96,50 @@ const mockReport: Report = {
           required: true,
           answer: "mock answer for textfield",
         },
+        {
+          id: "mock-dropdown-element",
+          type: ElementType.Dropdown,
+          options: [
+            {
+              label: "My single option",
+              value: "single",
+              checkedChildren: [
+                {
+                  id: "nested-dropdown-input-element",
+                  type: ElementType.Textbox,
+                  label: "Input element",
+                  required: true,
+                  answer: "nested mock answer",
+                },
+              ],
+            },
+          ],
+          label: "Input element",
+          required: true,
+          answer: "mock answer",
+        },
+        {
+          id: "mock-radio-element",
+          type: ElementType.Radio,
+          choices: [
+            {
+              label: "My single option",
+              value: "single",
+              checkedChildren: [
+                {
+                  id: "nested-radio-input-element",
+                  type: ElementType.Textbox,
+                  label: "Input element",
+                  required: true,
+                  answer: "nested mock answer",
+                },
+              ],
+            },
+          ],
+          label: "Input element",
+          required: true,
+          answer: "mock answer",
+        },
       ],
     },
     ...mockAddedInitiatives,
@@ -119,6 +163,10 @@ const mockReportRequest: any = structuredClone(mockReport);
 mockReportRequest.id = "mock-new-report";
 mockReportRequest.copyFromReportId = "mock-old-report";
 mockReportRequest.pages[1].elements[1].answer = "New answer";
+mockReportRequest.pages[1].elements[5].options[0].checkedChildren[0].answer =
+  "New answer"; // dropdown child
+mockReportRequest.pages[1].elements[6].choices[0].checkedChildren[0].answer =
+  "New answer"; // radio child
 mockReportRequest.pages[4].elements[0].accordions[0].elements[0].answer =
   "New answer 2";
 mockReportRequest.pages[1].elements[1].label = "HIJACKED"; // This should be prevented
@@ -137,6 +185,16 @@ describe("updateReport util", () => {
 
     // added initiative answers copy
     expect(result.pages[2].elements[0].answer).toEqual(mockInitiativeAnswer);
+
+    // nested checked choices transfer
+    expect(
+      mockReportRequest.pages[1].elements[5].options[0].checkedChildren[0]
+        .answer
+    ).toEqual("New answer");
+    expect(
+      mockReportRequest.pages[1].elements[5].options[0].checkedChildren[0]
+        .answer
+    ).toEqual("New answer");
 
     // Verify state policy commitments are copied correctly
     const newPolicyCommitments = result.pages[4].elements[0].accordions[0];
