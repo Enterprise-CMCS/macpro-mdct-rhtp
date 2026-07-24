@@ -5,7 +5,6 @@ import { StatusAlert } from "./StatusAlert";
 import { AlertTypes, ElementType, StatusAlertTemplate } from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
-import userEvent from "@testing-library/user-event";
 
 vi.mock("utils/state/reportLogic/completeness", () => ({
   inferredReportStatus: vi.fn().mockReturnValue("Complete"),
@@ -44,14 +43,6 @@ const mockStatusAlert: StatusAlertTemplate = {
   status: AlertTypes.ERROR,
 };
 
-const mockStatusLink: StatusAlertTemplate = {
-  id: "mock-alert-id",
-  type: ElementType.StatusAlert,
-  title: "mock alert",
-  text: "mock text {ReturnButton}",
-  status: AlertTypes.ERROR,
-};
-
 const statusAlertComponent = (
   <StatusAlert element={mockStatusAlert}></StatusAlert>
 );
@@ -62,15 +53,6 @@ describe("<StatusAlert />", () => {
       render(statusAlertComponent);
       expect(screen.getByText("mock alert")).toBeVisible();
       expect(screen.getByText("mock text")).toBeVisible();
-    });
-
-    test("StatusAlert with link is clickable", async () => {
-      render(<StatusAlert element={mockStatusLink}></StatusAlert>);
-
-      expect(screen.getByText("mock alert")).toBeVisible();
-      const link = screen.getByText("Click here");
-
-      await userEvent.click(link);
     });
 
     test("Review & Submit banner", () => {

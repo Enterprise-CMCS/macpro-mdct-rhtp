@@ -24,6 +24,7 @@ export const StatusAlert = (props: PageElementProps<StatusAlertTemplate>) => {
     return <></>;
   }
 
+  //by default alerts are active unless they are tied to an element on the page
   const isAlertActive = (watchId: string) => {
     const element = currentPage?.elements?.find(
       (element) => element.id === watchId
