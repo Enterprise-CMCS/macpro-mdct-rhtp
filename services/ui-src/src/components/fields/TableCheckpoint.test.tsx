@@ -263,7 +263,22 @@ describe("TableCheckpoint upload modal", () => {
       ).toBeVisible();
     });
   });
-  test("drag and dropping a file", () => {
+  test("drag and dropping a file", async () => {
+    await waitFor(() => {
+      expect(screen.getByText("Upload Initiative Attachments")).toBeVisible();
+    });
+
+    const checkbox = screen.getByRole("checkbox", { name: "123: Init Title" });
+    fireEvent.change(checkbox, { target: { value: "123" } });
+
+    const dropdown = screen.getAllByLabelText(
+      "Which stage/checkpoint does this attachment apply to?"
+    )[0];
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
+
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
       dataTransfer: { items: [{ getAsFile: () => mockPng }] },

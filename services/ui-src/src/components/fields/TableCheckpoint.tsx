@@ -170,6 +170,8 @@ export const TableCheckpoint = (
   };
 
   const formatUploads = (uploads: UploadListProp[]) => {
+    setSelectedFiles(uploads);
+
     return uploads.map((file) => ({
       initiatives: initiativeOptions,
       stage: getStageIdByCheckpointId(checkpoint),
@@ -184,7 +186,6 @@ export const TableCheckpoint = (
   const deleteFromReport = (file: UploadListProp) => {
     handleFileAddDelete(file.fileId);
     removeFile(reportType, state, id, file);
-    onClose();
   };
 
   const onDrawerClick = (type: string, selectedFile: UploadListProp) => {
@@ -389,6 +390,7 @@ export const TableCheckpoint = (
           />
         }
         saveToReport={handleFileAddDelete}
+        deleteFromReport={deleteFromReport}
         actionButtonText={"Done"}
         modalHeading={"Upload Initiative Attachments"}
         notification={{ success: getCheckpointLabel(checkpoint) }}
@@ -401,6 +403,7 @@ export const TableCheckpoint = (
         }}
         onModalDelete={() => {
           deleteFromReport(selectedFiles[0]);
+          onClose();
         }}
         answer={selectedFiles[0]}
         files={attachments}
