@@ -63,7 +63,7 @@ export default defineConfig({
           "bash -c 'source ~/.nvm/nvm.sh && nvm use && cd ../ && ./run local'",
         url: process.env.BASE_URL || "http://localhost:3000",
         timeout: 4 * 60 * 1000, // 4 minutes
-        reuseExistingServer: false,
+        reuseExistingServer: true,
         stdout: "pipe",
       },
 });

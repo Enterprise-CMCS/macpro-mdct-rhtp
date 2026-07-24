@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test";
+import { expect, type Page, type Route } from "@playwright/test";
 import { cognitoIdentityRoute } from "./consts";
 
 /**
@@ -49,7 +49,7 @@ export async function interceptAndStoreIdentityRequest(
     resolveCredentialsCaptured = resolve;
   });
 
-  const routeHandler = async (route: any) => {
+  const routeHandler = async (route: Route) => {
     const request = route.request();
 
     try {
@@ -185,8 +185,16 @@ export async function extractAndStoreEnvironmentConfig(
   await page.goto("/");
 
   const config = await page.evaluate(() => {
-    if ((window as any)._env_) {
-      const env = (window as any)._env_;
+    type RuntimeEnv = {
+      API_URL?: string;
+      COGNITO_USER_POOL_ID?: string;
+      COGNITO_USER_POOL_CLIENT_ID?: string;
+      COGNITO_IDENTITY_POOL_ID?: string;
+      COGNITO_REGION?: string;
+    };
+
+    const env = (window as Window & { _env_?: RuntimeEnv })._env_;
+    if (env) {
       return {
         API_URL: env.API_URL,
         COGNITO_USER_POOL_ID: env.COGNITO_USER_POOL_ID,
