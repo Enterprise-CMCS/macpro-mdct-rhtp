@@ -52,6 +52,8 @@ vi.mock("utils/state/reportLogic/reportActions", () => ({
         getAnswer([
           {
             initiatives: ["mock-init-1"],
+            checkpoint: "planning-1",
+            status: AttachmentStatus.PENDING_REVIEW,
             attachment: mockFiles,
           },
         ]);
@@ -119,7 +121,6 @@ const mockReport = {
                 initiatives: ["mock-init-1"],
                 checkpoint: "project-prop-2",
                 attachment: mockFiles,
-                stage: "stage-1",
                 status: AttachmentStatus.PENDING_REVIEW,
                 canDelete: true,
               },
@@ -186,8 +187,15 @@ describe("<TableCheckpoint />", () => {
       AttachmentStatus.LOCKED_FOR_SCORING;
     mockedUseStore.mockReturnValue(lockedFileReport);
     render(TableCheckpointComponent);
+    const manageBtn = screen.getByRole("button", {
+      name: "Manage file or info for orange.png",
+    });
+    await userEvent.click(manageBtn);
+    await waitFor(() => {
+      expect(screen.getByText("Manage Attachment")).toBeVisible();
+    });
     const deleteButton = screen.getByRole("button", {
-      name: "Remove orange.png from checkpoint Launch initiative",
+      name: "Delete attachment",
     });
     expect(deleteButton).toBeDisabled();
   });
@@ -196,22 +204,28 @@ describe("<TableCheckpoint />", () => {
     lockedFileReport.report.pages[1].elements![0].answer[0].canDelete = false;
     mockedUseStore.mockReturnValue(lockedFileReport);
     render(TableCheckpointComponent);
+    const manageBtn = screen.getByRole("button", {
+      name: "Manage file or info for orange.png",
+    });
+    await userEvent.click(manageBtn);
+    await waitFor(() => {
+      expect(screen.getByText("Manage Attachment")).toBeVisible();
+    });
     const deleteButton = screen.getByRole("button", {
-      name: "Remove orange.png from checkpoint Launch initiative",
+      name: "Delete attachment",
     });
     expect(deleteButton).toBeDisabled();
   });
   test("delete file", async () => {
     render(TableCheckpointComponent);
+    const manageBtn = screen.getByRole("button", {
+      name: "Manage file or info for orange.png",
+    });
+    await userEvent.click(manageBtn);
     const deleteButton = screen.getByRole("button", {
-      name: "Remove orange.png from checkpoint Launch initiative",
+      name: "Delete attachment",
     });
     await userEvent.click(deleteButton);
-    await waitFor(() => {
-      expect(screen.getByText("Delete Attachment")).toBeVisible();
-    });
-    const confirmDeleteBtn = screen.getByRole("button", { name: "Delete" });
-    await userEvent.click(confirmDeleteBtn);
     expect(mockGetAnswer).toHaveBeenCalled();
     expect(vi.mocked(removeFile)).toHaveBeenCalled();
     expect(screen.queryByText("Delete Attachment")).not.toBeInTheDocument();
@@ -219,16 +233,16 @@ describe("<TableCheckpoint />", () => {
   test("edit file", async () => {
     render(TableCheckpointComponent);
     const editButton = screen.getByRole("button", {
-      name: "Edit file or info for orange.png",
+      name: "Manage file or info for orange.png",
     });
     await userEvent.click(editButton);
     await waitFor(() => {
-      expect(screen.getByText("Edit Attachment")).toBeVisible();
+      expect(screen.getByText("Manage Attachment")).toBeVisible();
     });
-    const confirmEditBtn = screen.getByRole("button", { name: "Edit" });
+    const confirmEditBtn = screen.getByRole("button", { name: "Save changes" });
     await userEvent.click(confirmEditBtn);
     expect(mockGetAnswer).toHaveBeenCalled();
-    expect(screen.queryByText("Edit Attachment")).not.toBeInTheDocument();
+    expect(screen.queryByText("Save change")).not.toBeInTheDocument();
   });
   testA11y(TableCheckpointComponent);
 });
@@ -249,7 +263,22 @@ describe("TableCheckpoint upload modal", () => {
       ).toBeVisible();
     });
   });
-  test("drag and dropping a file", () => {
+  test("drag and dropping a file", async () => {
+    await waitFor(() => {
+      expect(screen.getByText("Upload Initiative Attachments")).toBeVisible();
+    });
+
+    const checkbox = screen.getByRole("checkbox", { name: "123: Init Title" });
+    fireEvent.change(checkbox, { target: { value: "123" } });
+
+    const dropdown = screen.getAllByLabelText(
+      "Which stage/checkpoint does this attachment apply to?"
+    )[0];
+    await userEvent.selectOptions(
+      dropdown,
+      "2.2 Achieve at least one milestone"
+    );
+
     const dropArea = screen.getByLabelText("file drop area");
     fireEvent.drop(dropArea, {
       dataTransfer: { items: [{ getAsFile: () => mockPng }] },
