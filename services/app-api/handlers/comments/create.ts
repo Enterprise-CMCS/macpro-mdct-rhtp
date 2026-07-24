@@ -7,9 +7,8 @@ import { canWriteComments } from "../../utils/authorization";
 import { logger } from "../../libs/debug-lib";
 import { validateCommentPayload } from "../../utils/reportValidation";
 import { error } from "../../utils/constants";
-import { Comment, CommentType, ReportType } from "@rhtp/shared";
-import { sendReportCommentEmail } from "../../utils/notifications/email";
-import { getReport } from "../../storage/reports";
+import { Comment } from "@rhtp/shared";
+import { sendEmail } from "../../utils/notifications/email";
 
 export const createComment = handler(
   parseCommentPathParams,
@@ -38,14 +37,7 @@ export const createComment = handler(
     }
 
     await putComment(validatedComment);
-
-    if (comment.type === CommentType.REPORT && !comment.isInternal) {
-      const report = await getReport(ReportType.RHTP, state, contextId);
-      if (report) {
-        await sendReportCommentEmail(report, user);
-      }
-    }
-
+    await sendEmail({ comment, state, user });
     return created(validatedComment);
   }
 );

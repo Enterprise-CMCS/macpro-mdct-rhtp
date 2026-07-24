@@ -6,6 +6,7 @@ import { StatusCodes } from "../../libs/response-lib";
 import { proxyEvent } from "../../testing/proxyEvent";
 import { ReportStatus, UserRoles } from "@rhtp/shared";
 import { authenticatedUser } from "../../utils/authentication";
+import { sendEmail } from "../../utils/notifications/email";
 
 vi.mock("../../utils/authentication");
 vi.mocked(authenticatedUser).mockReturnValue({
@@ -76,5 +77,6 @@ describe("Test releaseReport handler", () => {
     const res = await releaseReport(testEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Ok);
+    expect(sendEmail).toHaveBeenCalled();
   });
 });

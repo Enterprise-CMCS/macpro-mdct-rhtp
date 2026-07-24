@@ -1,140 +1,146 @@
-import { Report, ReportPages, ReportStatus, UserRoles } from "@rhtp/shared";
+import {
+  AttachmentStatus,
+  Comment,
+  CommentType,
+  ReportPages,
+  ReportType,
+  StateAbbr,
+  UserRoles,
+} from "@rhtp/shared";
 import sesLib from "../../libs/ses-lib";
 import { logger } from "../../libs/debug-lib";
 import { isLocalStack } from "../../libs/localstack";
 import { User } from "../../types/types";
 import { saveNotifications } from "./notifications";
 import { queryRecipientsByState } from "../../storage/notificationRecipients";
+import { getEmailTemplate } from "./emailTemplates";
+import { queryUpload } from "../../storage/upload";
+import { getReport } from "../../storage/reports";
 
-const FROM_ADDRESS = "MDCT_NoReply@cms.hhs.gov";
-
-const getReportStatusChangeTemplate = (
-  reportName: string,
-  status: ReportStatus,
-  recipients: string[]
-) => ({
-  Source: FROM_ADDRESS,
-  Destination: {
-    ToAddresses: recipients,
-  },
-  Message: {
-    Subject: { Data: `MDCT RHTP Status Update for: ${reportName}` },
-    Body: {
-      Text: {
-        Data: `Dear User,
-
-This is an automated notification to inform you that there has been a change in the status of a report within the Rural Health Transformation Program (RHTP) platform on MDCT.
-
-Please find the details of the update below:
-
-Update Summary
-
-    Report Name: ${reportName}
-
-    New Status: ${status}
-
-    Date of Change: ${new Date().toDateString()}
-
-If you believe this status change was made in error, or if you have questions regarding the requirements for this new status, please contact your system administrator or reach out to the RHTP support desk.
-`,
-      },
-    },
-  },
-});
+export enum EMAIL_TRIGGERS {
+  REPORT_COMMENT = "REPORT_COMMENT",
+  REPORT_STATUS_CHANGE = "REPORT_STATUS_CHANGE",
+  ATTACHMENT_COMMENT = "ATTACHMENT_COMMENT",
+  ATTACHMENT_STATUS_CHANGE_LOCKED = "ATTACHMENT_STATUS_CHANGE_LOCKED",
+  ATTACHMENT_STATUS_CHANGE_NEEDS_REVISION = "ATTACHMENT_STATUS_CHANGE_NEEDS_REVISION",
+}
 
 const getRecipients = async (
   pages: ReportPages,
   userRole: UserRoles,
   state: string
 ) => {
-  let recipientEmails: string[] = [];
+  let recipientEmails: string[];
   if (userRole !== UserRoles.STATE_USER) {
     const generalInformationPage = pages.find(
       (page) => page.id === "general-information"
     );
-    const emailFields = generalInformationPage?.elements?.filter(
-      (element) =>
-        element.id.includes("email") &&
-        "answer" in element &&
-        element.answer !== ""
-    );
-    recipientEmails = emailFields?.map((field) =>
-      "answer" in field ? field.answer : undefined
-    ) as string[];
+    recipientEmails = (generalInformationPage?.elements ?? [])
+      .filter((element) => element.id.includes("email"))
+      .map((element) => ("answer" in element ? element.answer : undefined))
+      .filter((answer) => typeof answer === "string")
+      .filter((answer) => answer !== "");
   } else {
     const assignedUsers = await queryRecipientsByState(state);
-    recipientEmails = assignedUsers?.map((user) => user.email);
+    recipientEmails = assignedUsers.map((user) => user.email);
   }
-  return recipientEmails;
+  return [...new Set(recipientEmails)];
 };
 
-export const sendReportStatusChangeEmail = async (
-  report: Report,
-  user: User
-) => {
-  const { name, pages, state, status } = report;
+export const sendEmail = async ({
+  state,
+  user,
+  comment,
+  reportId: reportIdProp,
+}: {
+  state: StateAbbr;
+  user: User;
+  comment?: Comment;
+  reportId?: string;
+}) => {
+  let reportId: string | undefined;
+  let uploadId: string | undefined;
+  let attachmentName: string | undefined;
+  let emailTrigger: EMAIL_TRIGGERS | undefined;
+
+  // New external comment on a report
+  if (
+    comment &&
+    comment.type === CommentType.REPORT &&
+    !comment.isInternal &&
+    comment.comment
+  ) {
+    emailTrigger = EMAIL_TRIGGERS.REPORT_COMMENT;
+    reportId = comment.contextId;
+  }
+
+  // New external comment on an attachment
+  if (
+    comment &&
+    comment.type === CommentType.ATTACHMENT &&
+    !comment.isInternal &&
+    comment.parentReportId &&
+    comment.comment
+  ) {
+    emailTrigger = EMAIL_TRIGGERS.ATTACHMENT_COMMENT;
+    reportId = comment.parentReportId;
+    uploadId = comment.contextId;
+  }
+
+  // Email-triggering status change on an attachment
+  if (
+    comment &&
+    comment.type === CommentType.ATTACHMENT &&
+    comment.parentReportId &&
+    (comment.statusChange === AttachmentStatus.LOCKED_FOR_SCORING ||
+      comment.statusChange === AttachmentStatus.NEEDS_REVISION)
+  ) {
+    if (comment.statusChange === AttachmentStatus.LOCKED_FOR_SCORING) {
+      emailTrigger = EMAIL_TRIGGERS.ATTACHMENT_STATUS_CHANGE_LOCKED;
+    } else {
+      emailTrigger = EMAIL_TRIGGERS.ATTACHMENT_STATUS_CHANGE_NEEDS_REVISION;
+    }
+    reportId = comment.parentReportId;
+    uploadId = comment.contextId;
+  }
+
+  // Email-triggering status change on a report
+  if (!comment && reportIdProp) {
+    emailTrigger = EMAIL_TRIGGERS.REPORT_STATUS_CHANGE;
+    reportId = reportIdProp;
+  }
+
+  if (!emailTrigger) return;
+
+  // If it's an attachment update, get the upload
+  if (uploadId) {
+    const results = await queryUpload(uploadId, state);
+    if (!results.Items || results.Items.length === 0) {
+      logger.error("Could not find matching file.");
+      return;
+    }
+    const document = results.Items[0];
+    attachmentName = document.filename;
+  }
+
+  // get the report
+  if (!reportId) return;
+  const report = await getReport(ReportType.RHTP, state, reportId);
+  if (!report) return;
+
+  // get recipients
+  const { name: reportName, pages, status } = report;
   const recipients = await getRecipients(pages, user.role, state);
   if (recipients.length === 0) return;
-  const emailTemplate = getReportStatusChangeTemplate(name, status, recipients);
-  logger.info(
-    "Sending email to: ",
+  // get template based on trigger case
+  const emailTemplate = getEmailTemplate(emailTrigger, {
+    reportName,
     recipients,
-    "with content: ",
-    emailTemplate
-  );
-  if (!isLocalStack()) {
-    const res = await sesLib.sendSesEmail(emailTemplate);
-    await saveNotifications(res, emailTemplate, report, user);
-  } else {
-    logger.info("Skipping email in dev env");
-  }
-};
+    status,
+    attachmentName,
+  });
 
-const getReportCommentTemplate = (
-  reportName: string,
-  recipients: string[]
-) => ({
-  Source: FROM_ADDRESS,
-  Destination: {
-    ToAddresses: recipients,
-  },
-  Message: {
-    Subject: { Data: `Subject: RHTP: New comment on ${reportName}` },
-    Body: {
-      Text: {
-        Data: `
-This is an automated notification that a comment has been added to a report within the MDCT Rural Health Transformation Program (RHTP) platform.
-
-Update Summary
-
-    Report Name: ${reportName}
-
-    Activity: New report comment added
-
-    Date of Change: ${new Date().toDateString()}
-
-    Please follow the steps below to navigate to the comment within the portal:
-
-    1. Log in to the [MDCT Portal](https://mdctrhtp.cms.gov)
-    2. Find ${reportName}
-    3. Select Status/Comments.
-
-    If you believe this notification was sent in error, or if you have questions, please reach out to the RHTP support desk.
-
-    Sincerely,
-
-    The RHTP Team
-`,
-      },
-    },
-  },
-});
-
-export const sendReportCommentEmail = async (report: Report, user: User) => {
-  const { name, pages, state } = report;
-  const recipients = await getRecipients(pages, user.role, state);
-  if (recipients.length === 0) return;
-  const emailTemplate = getReportCommentTemplate(name, recipients);
+  // send email
   logger.info(
     "Sending email to: ",
     recipients,
