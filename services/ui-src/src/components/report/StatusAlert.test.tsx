@@ -16,7 +16,16 @@ vi.mock("utils/state/useStore", () => ({
     .mockImplementation(
       (selector?: (state: typeof mockUseStore) => unknown) => {
         if (selector) {
-          return false;
+          return {
+            submittable: false,
+            elements: [
+              {
+                id: "mock-accordion-group",
+                type: ElementType.AccordionGroup,
+                accordions: [{ id: "mock id" }],
+              },
+            ],
+          };
         }
         return { ...mockUseStore, currentPageId: "mock-id" };
       }
@@ -43,6 +52,15 @@ const mockStatusAlert: StatusAlertTemplate = {
   status: AlertTypes.ERROR,
 };
 
+const mockStatusForAlert: StatusAlertTemplate = {
+  id: "mock-conditional-alert-id",
+  type: ElementType.StatusAlert,
+  title: "mock alert",
+  text: "mock text",
+  status: AlertTypes.INFO,
+  for: "mock-accordion-group",
+};
+
 const statusAlertComponent = (
   <StatusAlert element={mockStatusAlert}></StatusAlert>
 );
@@ -53,6 +71,11 @@ describe("<StatusAlert />", () => {
       render(statusAlertComponent);
       expect(screen.getByText("mock alert")).toBeVisible();
       expect(screen.getByText("mock text")).toBeVisible();
+    });
+    test("Conditional status alert for accordion groups. Should er", () => {
+      render(<StatusAlert element={mockStatusForAlert}></StatusAlert>);
+      expect(screen.queryByText("mock alert")).not.toBeInTheDocument();
+      expect(screen.queryByText("mock text")).not.toBeInTheDocument();
     });
 
     test("Review & Submit banner", () => {
