@@ -1,5 +1,10 @@
-import { Button } from "@chakra-ui/react";
-import { ActionTableTemplate } from "@rhtp/shared";
+import { Button, Text } from "@chakra-ui/react";
+import {
+  ActionTableTemplate,
+  FormPageTemplate,
+  PageElement,
+  ParentPageTemplate,
+} from "@rhtp/shared";
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { useContext } from "react";
 import { useStore } from "utils";
@@ -15,6 +20,9 @@ const getAnswerByType = (type: string, id?: string) => {
       return id?.includes("email") ? "mock@email.com" : "mock text input";
     case "textAreaField":
       return "mock text area field";
+    case "useOfFundsAttachment":
+      //To Do: Not sure if I can just inject a file from code, seems like a bad idea
+      return [];
   }
   return console.error("can't find type " + type + ", " + id);
 };
@@ -38,13 +46,32 @@ const fillActionTable = (element: ActionTableTemplate) => {
 };
 
 export const DevReportTools = () => {
-  const { setAnswers } = useStore();
+  const { setAnswers, report } = useStore();
   const currentPage = useStore(currentPageSelector);
   const { autosave } = useContext(ReportAutosaveContext);
 
-  const fillPageElements = () => {
-    const elements = currentPage?.elements;
-    const newElements = elements?.map((element) => {
+  const fillInitiative = () => {
+    if (currentPage?.id === "initiatives") {
+      const initiatives = report?.pages.filter(
+        (page) => "initiativeNumber" in page
+      );
+      if (!initiatives) return;
+      for (const page of initiatives) {
+        const newElements = fillPageElements(page.elements);
+        setAnswers(
+          {
+            ...page,
+            elements: newElements,
+          },
+          page.id
+        );
+      }
+      autosave();
+    }
+  };
+
+  const fillPageElements = (elements: PageElement[]) => {
+    return elements?.map((element) => {
       if (!("required" in element) || !element.required) {
         return element;
       }
@@ -56,16 +83,31 @@ export const DevReportTools = () => {
           answer: getAnswerByType(element.type, element.id),
         };
     });
+  };
 
-    setAnswers({ ...currentPage, elements: newElements });
+  const fillCurrentPageAndSave = (
+    currentPage: ParentPageTemplate | FormPageTemplate
+  ) => {
+    if (!currentPage || !currentPage.elements) return;
+
+    setAnswers({
+      ...currentPage,
+      elements: fillPageElements(currentPage.elements),
+    });
     autosave();
   };
 
   return (
     <>
-      Report Tools
-      <Button variant="primary" onClick={fillPageElements}>
+      <Text fontWeight="bold">Report Tools</Text>
+      <Button
+        variant="primary"
+        onClick={() => fillCurrentPageAndSave(currentPage!)}
+      >
         Fill Page
+      </Button>
+      <Button variant="primary" onClick={() => fillInitiative()}>
+        Fill Initiative Page
       </Button>
     </>
   );
