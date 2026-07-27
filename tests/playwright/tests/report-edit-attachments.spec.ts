@@ -2,12 +2,12 @@ import { test, expect, Locator, type Page } from "./fixtures/base";
 import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange";
 import {
   INITIATIVE_ATTACHMENTS_SECTION,
-  USE_OF_FUNDS_FIXTURE_PATH,
+  OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
 } from "../utils/report-edit-helpers";
 import { verifyCurrentSection } from "../utils/report-edit-assertions";
 import { getFirstVisible } from "../utils/locators";
 import { TIMEOUT_UI } from "../utils/timeouts";
-const ATTACHMENT_FIXTURE_PATH = USE_OF_FUNDS_FIXTURE_PATH;
+const ATTACHMENT_FIXTURE_PATH = OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH;
 
 const getAttachmentsTable = (page: Page): Locator =>
   page.getByRole("table").first();
@@ -48,7 +48,9 @@ test.describe("Report Editing - Initiative Attachments", () => {
     const table = getAttachmentsTable(editor.page);
     await expect(table).toBeVisible();
 
-    const existingFileRef = table.getByText(/use-of-funds\.csv/i).first();
+    const existingFileRef = table
+      .getByText(/obligated-and-spent-funds\.csv/i)
+      .first();
     const hadExistingRef = await existingFileRef.isVisible().catch(() => false);
 
     const addAttachmentButton = getAddAttachmentButton(editor.page);
@@ -79,7 +81,9 @@ test.describe("Report Editing - Initiative Attachments", () => {
     await expect(dialog).toBeHidden();
 
     // We upload a known fixture; seeing it in the table confirms add/upload worked.
-    await expect(table.getByText(/use-of-funds\.csv/i).first()).toBeVisible();
+    await expect(
+      table.getByText(/obligated-and-spent-funds\.csv/i).first()
+    ).toBeVisible();
 
     if (!hadExistingRef) {
       await expect(table.getByText(/pending review/i).first()).toBeVisible();

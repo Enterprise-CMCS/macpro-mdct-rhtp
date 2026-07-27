@@ -17,14 +17,14 @@ export const GENERAL_INFORMATION_SECTION = "general-information";
 export const INITIATIVE_ATTACHMENTS_SECTION = "initiative-attachments";
 export const INITIATIVES_SECTION = "initiatives";
 export const STATE_POLICY_COMMITMENTS_SECTION = "state-policy-commitments";
-export const USE_OF_FUNDS_SECTION = "use-of-funds";
+export const OBLIGATED_AND_SPENT_FUNDS_SECTION = "obligated-and-spent-funds";
 export const SUSTAINABILITY_AND_HIGHLIGHTS_SECTION =
   "sustainability-and-highlights";
 export const REVIEW_SUBMIT_SECTION = "review-submit";
 
-export const USE_OF_FUNDS_FIXTURE_PATH = resolve(
+export const OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH = resolve(
   process.cwd(),
-  "playwright/data/use-of-funds.csv"
+  "playwright/data/obligated-and-spent-funds.csv"
 );
 
 export const AOR_NAME_LABEL =
