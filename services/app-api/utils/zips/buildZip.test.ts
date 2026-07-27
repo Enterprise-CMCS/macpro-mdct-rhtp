@@ -20,11 +20,7 @@ import {
 } from "./buildZip";
 import JSZip from "jszip";
 import s3Lib from "../../libs/s3-lib";
-import {
-  getReport,
-  queryReportsByType,
-  queryReportsForState,
-} from "../../storage/reports";
+import { scanAndCompileReports } from "../../storage/reports";
 
 vi.mock("../../libs/s3-lib", () => ({
   default: {
@@ -62,14 +58,8 @@ const mockUseOfFundsReport: Report = {
 };
 
 vi.mock("../../storage/reports");
-const mockGetReport = vi
-  .mocked(getReport)
-  .mockResolvedValue(mockUseOfFundsReport);
 const mockQueryByType = vi
-  .mocked(queryReportsByType)
-  .mockResolvedValue([mockUseOfFundsReport]);
-const mockQueryByState = vi
-  .mocked(queryReportsForState)
+  .mocked(scanAndCompileReports)
   .mockResolvedValue([mockUseOfFundsReport]);
 
 const mockReport: Report = {
@@ -245,9 +235,7 @@ describe("buildZip util", () => {
   test("addUseOfFundsFilesToZip with state", async () => {
     const mockZip = new JSZip();
     await addUseOfFundsFilesToZip(["A1"], mockZip, "NJ");
-    expect(mockGetReport).toHaveBeenCalled();
-    expect(mockQueryByState).toHaveBeenCalled();
-    expect(mockQueryByType).not.toHaveBeenCalled();
+    expect(mockQueryByType).toHaveBeenCalled();
     expect(mockZip.files).toBeDefined();
   });
 });

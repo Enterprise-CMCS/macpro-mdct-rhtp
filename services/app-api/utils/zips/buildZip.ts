@@ -12,11 +12,7 @@ import {
 } from "@rhtp/shared";
 import s3Lib from "../../libs/s3-lib";
 import JSZip from "jszip";
-import {
-  getReport,
-  queryReportsByType,
-  queryReportsForState,
-} from "../../storage/reports";
+import { scanAndCompileReports } from "../../storage/reports";
 
 export const formatS3ZipKey = (zipId: string) => `zips/${zipId}.zip`;
 
@@ -132,30 +128,13 @@ export const addUseOfFundsFilesToZip = async (
       file: attachments[0],
     });
   };
-  if (state) {
-    const stateReports = await queryReportsForState(
-      UseOfFundsReportType,
-      state
-    );
-    const stateAndSubTypeReports = stateReports.filter((report) =>
-      reportSubTypeKeys.includes(report.subTypeKey)
-    );
-    for (const report of stateAndSubTypeReports) {
-      const { type, state, id } = report;
-      const result = await getReport(type, state, id);
-      if (!result) continue;
-      getUseOfFundsFiles(result);
-    }
-  } else {
-    // already has pages
-    const allReports = await queryReportsByType(UseOfFundsReportType);
-    const subTypeReports = allReports.filter((report) =>
-      reportSubTypeKeys.includes(report.subTypeKey)
-    );
-    for (const report of subTypeReports) {
-      getUseOfFundsFiles(report);
-    }
+
+  const filteredReports = await scanAndCompileReports(reportSubTypeKeys, state);
+
+  for (const report of filteredReports) {
+    getUseOfFundsFiles(report);
   }
+
   for (const useOfFundsFile of useOfFundsFiles) {
     const { id, file, state, subType } = useOfFundsFile;
     if (!file?.fileId || !file?.name) continue;

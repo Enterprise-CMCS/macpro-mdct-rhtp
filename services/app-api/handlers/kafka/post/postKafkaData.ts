@@ -4,7 +4,7 @@ import KafkaSourceLib from "../../../utils/kafka/kafka-source-lib";
 const topicPrefix = "aws.mdct.rhtp";
 const version = "v0";
 const tables = [
-  { sourceName: kafkaTables.RHTP, topicName: kafkaTopics.RHTP },
+  // { sourceName: kafkaTables.RHTP, topicName: kafkaTopics.RHTP }, TODO: Resolve new format with dataconnect
   {
     sourceName: kafkaTables.RHTP_COMMENTS,
     topicName: kafkaTopics.RHTP_COMMENTS,

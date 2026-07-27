@@ -444,7 +444,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       ...commonProps.environment,
     },
     tables: tables.filter((table) =>
-      ["RhtpReports", "Comments"].includes(table.node.id)
+      ["Reports", "Comments"].includes(table.node.id)
     ),
   });
 

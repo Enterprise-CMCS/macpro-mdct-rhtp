@@ -1,5 +1,5 @@
 process.env.BannersTable = "local-banners";
-process.env.RhtpReportsTable = "local-rhtp-reports";
+process.env.ReportsTable = "local-reports";
 process.env.CommentsTable = "local-comments";
 process.env.NotificationsTable = "local-notifications";
 process.env.NotificationRecipientsTable = "local-notifications-recipients";
