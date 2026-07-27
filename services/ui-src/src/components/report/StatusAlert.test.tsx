@@ -72,7 +72,7 @@ describe("<StatusAlert />", () => {
       expect(screen.getByText("mock alert")).toBeVisible();
       expect(screen.getByText("mock text")).toBeVisible();
     });
-    test("Conditional status alert for accordion groups. Should er", () => {
+    test("Conditional status alert for accordion groups. Should not show status when condition is met.", () => {
       render(<StatusAlert element={mockStatusForAlert}></StatusAlert>);
       expect(screen.queryByText("mock alert")).not.toBeInTheDocument();
       expect(screen.queryByText("mock text")).not.toBeInTheDocument();
