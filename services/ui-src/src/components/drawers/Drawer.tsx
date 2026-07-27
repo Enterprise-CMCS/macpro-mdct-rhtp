@@ -20,11 +20,12 @@ import { parseHtml, useBreakpoint } from "utils";
 export const Drawer = ({
   modalDisclosure,
   content,
+  onOutlineHandler,
   onConfirmHandler,
   submitting,
-  formId,
   children,
   disableConfirm,
+  disableOutline,
 }: Props) => {
   const { isMobile } = useBreakpoint();
 
@@ -58,33 +59,28 @@ export const Drawer = ({
           {children}
         </DrawerBody>
         <Divider padding="16px 0"></Divider>
-        <DrawerFooter paddingX="0">
-          {formId && (
-            <Button
-              sx={sx.action}
-              form={formId}
-              type="submit"
-              disabled={disableConfirm || submitting}
-            >
-              {submitting ? <Spinner size="md" /> : content.actionButtonText}
-            </Button>
-          )}
+        <DrawerFooter
+          paddingX="0"
+          justifyContent="space-between"
+          flexDirection="row-reverse"
+        >
           {onConfirmHandler && (
             <Button
               sx={sx.action}
               onClick={() => onConfirmHandler()}
               disabled={disableConfirm || submitting}
             >
-              {submitting ? <Spinner size="md" /> : content.actionButtonText}
+              {submitting ? <Spinner size="md" /> : content.solidButtonText}
             </Button>
           )}
-          {content.closeButtonText && (
+          {onOutlineHandler && (
             <Button
-              variant="link"
-              onClick={modalDisclosure.onClose}
+              variant="outline"
+              onClick={() => onOutlineHandler()}
               fontWeight="bold"
+              disabled={disableOutline}
             >
-              {content.closeButtonText}
+              {content.outlineButtonText}
             </Button>
           )}
         </DrawerFooter>
@@ -101,13 +97,14 @@ interface Props {
   content: {
     heading: string;
     subheading?: string;
-    actionButtonText: string | ReactNode;
-    closeButtonText?: string;
+    solidButtonText: string | ReactNode;
+    outlineButtonText?: string;
   };
+  onOutlineHandler?: () => void;
   onConfirmHandler?: () => void;
   submitting?: boolean;
   disableConfirm?: boolean;
-  formId?: string;
+  disableOutline?: boolean;
   children?: ReactNode;
 }
 

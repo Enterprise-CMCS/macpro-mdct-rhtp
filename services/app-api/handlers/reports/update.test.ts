@@ -28,9 +28,11 @@ vi.mock("../../utils/authorization", () => ({
 
 vi.mock("../../storage/reports", () => ({
   putReport: () => vi.fn(),
+  getReport: vi.fn().mockReturnValue(validReport),
 }));
-
-const report = JSON.stringify(validReport);
+const modifiedReport: any = structuredClone(validReport);
+modifiedReport.pages[1].elements[1].answer = "New answer";
+const report = JSON.stringify(modifiedReport);
 
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,

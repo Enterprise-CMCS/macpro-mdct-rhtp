@@ -76,7 +76,7 @@ export const AttachmentArea = (
   };
 
   return (
-    <Stack gap="0" width="100%" maxWidth="450px">
+    <Stack width="100%" maxWidth="450px">
       <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
@@ -87,7 +87,6 @@ export const AttachmentArea = (
           files,
           onDeleteModalOpen,
           downloadFile,
-          false,
           isDisabled()
         )}
       <Button
@@ -123,18 +122,19 @@ export const AttachmentArea = (
           actionButtonText: "Delete",
         }}
       >
-        <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from the page below
-        </Alert>
-        {uploadListRender(
-          reportType,
-          state,
-          id,
-          selectedFile ? [selectedFile] : [],
-          onRemove,
-          downloadFile,
-          true // hide remove icon in delete modal
-        )}
+        <Stack spacing="spacer4" padding="0">
+          <Alert status={AlertTypes.WARNING} title="Warning">
+            Deleting this attachment will remove it from the page below
+          </Alert>
+          {uploadListRender(
+            reportType,
+            state,
+            id,
+            selectedFile ? [selectedFile] : [],
+            undefined,
+            downloadFile
+          )}
+        </Stack>
       </Modal>
     </Stack>
   );

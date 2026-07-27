@@ -21,6 +21,8 @@ import {
   UpdateInitiativeOptions,
   RhtpSubType,
   Comment,
+  getExtension,
+  isAllowedFileExtension,
   ZipRequestTypes,
   ZipRequestBody,
 } from "@rhtp/shared";
@@ -102,6 +104,7 @@ const textAreaTemplateSchema = object().shape({
   ...inputElementSchema,
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
+  charLimit: number().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({
@@ -131,26 +134,43 @@ const accordionTemplateSchema = object().shape({
   value: string().required(),
 });
 
-const UseOfFundsAttachmentSchema = object().shape({
+const hasAllowedFileExtension = (value?: string) => {
+  const ext = getExtension(value ?? "");
+  return !!ext && isAllowedFileExtension(ext);
+};
+
+export const uploadListPropSchema = object().shape({
+  name: string()
+    .transform((value) => (value === "" ? undefined : value))
+    .default("Uploaded File")
+    .required()
+    .test(
+      "allowed-extension",
+      "Unsupported file type",
+      hasAllowedFileExtension
+    ),
+  size: number().required(),
+  fileId: string()
+    .required()
+    .test("allowed-extension", "Unsupported file type", hasAllowedFileExtension)
+    .test(
+      "matches-name-extension",
+      "fileId extension must match name extension",
+      function (fileId) {
+        const nameExt = getExtension(this.parent.name ?? "");
+        const fileIdExt = getExtension(fileId ?? "");
+        return !!nameExt && nameExt === fileIdExt;
+      }
+    ),
+});
+
+const ObligatedAndSpentFundsAttachmentSchema = object().shape({
   type: string()
     .required()
-    .matches(new RegExp(ElementType.UseOfFundsAttachment)),
+    .matches(new RegExp(ElementType.ObligatedAndSpentFundsAttachment)),
   id: string().required(),
   label: string().required(),
-  answer: array()
-    .of(
-      object().shape({
-        name: string()
-          .transform((value) => (value === "" ? undefined : value))
-          .default("Uploaded File")
-          .required(),
-        size: number().required(),
-        fileId: string().required(),
-      })
-    )
-    .min(0)
-    .max(1)
-    .notRequired(),
+  answer: array().of(uploadListPropSchema).min(0).max(1).notRequired(),
   required: boolean().required(),
 });
 
@@ -195,8 +215,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
       return tableCheckpointTemplateSchema;
-    case ElementType.UseOfFundsAttachment:
-      return UseOfFundsAttachmentSchema;
+    case ElementType.ObligatedAndSpentFundsAttachment:
+      return ObligatedAndSpentFundsAttachmentSchema;
     case ElementType.InitiativesTable:
       return initiativesTableSchema;
     case ElementType.AttachmentArea:
@@ -284,18 +304,9 @@ const buttonLinkTemplateSchema = object().shape({
 const attachmentAreaSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
   ...inputElementSchema,
+  answer: array().of(uploadListPropSchema),
   subLabel: string().notRequired(),
   message: string().notRequired(),
-  answer: array().of(
-    object().shape({
-      name: string()
-        .transform((value) => (value === "" ? undefined : value))
-        .default("Uploaded File")
-        .required(),
-      size: number().required(),
-      fileId: string().required(),
-    })
-  ),
 });
 
 const ActionElementsSchema = {
@@ -364,16 +375,8 @@ const attachmentTableSchema = object().shape({
   answer: array()
     .of(
       object().shape({
-        attachment: object().shape({
-          name: string()
-            .transform((value) => (value === "" ? undefined : value))
-            .default("Uploaded File")
-            .required(),
-          size: number().required(),
-          fileId: string().required(),
-        }),
+        attachment: uploadListPropSchema,
         initiatives: array().of(string().notRequired()).required(),
-        stage: string().notRequired(),
         checkpoint: string().notRequired(),
         status: string().required(),
         canDelete: boolean().notRequired(),
@@ -543,9 +546,11 @@ export const isZipRequestBody = (
       reportSubTypeKeys: array()
         .of(string().required())
         .when("type", {
-          is: ZipRequestTypes.USE_OF_FUNDS,
+          is: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
           then: (schema) =>
-            schema.required("Report sub types required for USE_OF_FUNDS zip"),
+            schema.required(
+              "Report sub types required for OBLIGATED_AND_SPENT_FUNDS zip"
+            ),
           otherwise: (schema) => schema.notRequired(),
         }),
     })

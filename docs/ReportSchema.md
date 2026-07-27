@@ -148,7 +148,7 @@ Here is the complete list of element types, roughly categorized:
   - `initiativesTable`: Table for displaying all initiatives with links to their individual pages.
   - `tableCheckpoint`: Table for displaying initiative checkpoints.
   - `accordionGroup`: Accordions containing input elements.
-  - `UseOfFundsAttachment`: Upload area for uploading a use of fund file.
+  - `ObligatedAndSpentFundsAttachment`: Upload area for uploading a obligated and spent funds file.
   - `attachmentTable`: Table for displaying uploaded files.
   - `actionTable`: Table for displaying inputs as row elements.
 

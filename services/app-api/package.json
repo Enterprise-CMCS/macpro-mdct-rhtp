@@ -16,6 +16,7 @@
     "@launchdarkly/node-server-sdk": "^9.10.4",
     "@rhtp/shared": "workspace:*",
     "dompurify": "^3.4.11",
+    "file-type": "^22.0.1",
     "jsdom": "^26.0.0",
     "jszip": "3.10.1",
     "jwt-decode": "3.1.2",

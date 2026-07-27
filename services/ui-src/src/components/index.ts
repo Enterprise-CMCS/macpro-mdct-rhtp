@@ -6,6 +6,7 @@ export { Banner } from "./alerts/Banner";
 // app
 export { App } from "./app/App";
 export { Error } from "./app/Error";
+//attachments
 // layout
 export { HomePage } from "./layout/HomePage";
 export { Header } from "./layout/Header";
@@ -25,6 +26,7 @@ export { Drawer } from "./drawers/Drawer";
 export { ExportedReportBanner } from "./export/ExportedReportBanner";
 export { ExportedReportWrapper } from "./export/ExportedReportWrapper";
 // fields
+export { CharacterCounter } from "./fields/CharacterCounter";
 export { DateField } from "./fields/DateField";
 export { DropdownField } from "./fields/DropdownField";
 export { RadioField } from "./fields/RadioField";

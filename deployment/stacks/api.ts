@@ -49,6 +49,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     launchDarklyLocalFlags = '{"local": false, "flags": {}}',
   } = props;
 
+  const isProduction = stage === "production";
+
   const service = "app-api";
 
   const kafkaSecurityGroup = new ec2.SecurityGroup(
@@ -93,7 +95,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     configSet.addEventDestination("sns", {
       destination: ses.EventDestination.snsTopic(topic),
       configurationSetEventDestinationName: `${project}-${stage}-email-topic`,
-      enabled: true,
+      enabled: isProduction, // only send alerts to sns in prod
       events: [
         ses.EmailSendingEvent.REJECT,
         ses.EmailSendingEvent.BOUNCE,
@@ -254,7 +256,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
   //paths made only for dev tool, not to be used on real data
-  if (stage !== "production") {
+  if (!isProduction) {
     new Lambda(scope, "deleteReport", {
       entry: "services/app-api/handlers/reports/delete.ts",
       handler: "deleteReport",

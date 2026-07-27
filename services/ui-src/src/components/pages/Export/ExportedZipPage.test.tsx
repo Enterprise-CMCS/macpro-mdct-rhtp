@@ -35,10 +35,12 @@ describe("ExportedZipPage", () => {
   test("ExportedZipPage renders", async () => {
     expect(screen.getByText("Export RHTP Files and Data")).toBeVisible();
     expect(
-      screen.getByText("Use of Funds: By Reports (includes All States)")
+      screen.getByText(
+        "Obligated and Spent Funds: By Reports (includes All States)"
+      )
     ).toBeVisible();
     expect(
-      screen.getByText("Use of Funds: By State and Report(s)")
+      screen.getByText("Obligated and Spent Funds: By State and Report(s)")
     ).toBeVisible();
   });
 
@@ -63,7 +65,7 @@ describe("ExportedZipPage", () => {
     await userEvent.click(checkbox1);
     await userEvent.click(screen.getByRole("button", { name: "Export" }));
     expect(mockGetZipFile).toHaveBeenCalledWith({
-      type: ZipRequestTypes.USE_OF_FUNDS,
+      type: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
       state: "",
       reportSubTypeKeys: ["A1"],
     });
@@ -93,7 +95,7 @@ describe("ExportedZipPage", () => {
     await userEvent.click(checkbox1);
     await userEvent.click(screen.getByRole("button", { name: "Export" }));
     expect(mockGetZipFile).toHaveBeenCalledWith({
-      type: ZipRequestTypes.USE_OF_FUNDS,
+      type: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
       state: "NJ",
       reportSubTypeKeys: ["A1"],
     });
