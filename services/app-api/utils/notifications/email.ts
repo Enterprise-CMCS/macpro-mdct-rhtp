@@ -90,7 +90,7 @@ export const sendEmail = async ({
   // Email-triggering status change on an attachment
   if (
     comment &&
-    comment.type === CommentType.ATTACHMENT &&
+    comment.type === CommentType.ATTACHMENT_STATUS &&
     comment.parentReportId &&
     (comment.statusChange === AttachmentStatus.LOCKED_FOR_SCORING ||
       comment.statusChange === AttachmentStatus.NEEDS_REVISION)

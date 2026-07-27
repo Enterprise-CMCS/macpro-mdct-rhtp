@@ -25,6 +25,7 @@ import {
   isAllowedFileExtension,
   ZipRequestTypes,
   ZipRequestBody,
+  CommentType,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -570,7 +571,7 @@ const commentSchema = object().shape({
   author: string().required(),
   authorEmail: string().required(),
   isInternal: boolean().required(),
-  type: string().required(),
+  type: mixed<CommentType>().oneOf(Object.values(CommentType)).required(),
   comment: string().notRequired(),
   statusChange: string().notRequired(),
   parentReportId: string().notRequired(),

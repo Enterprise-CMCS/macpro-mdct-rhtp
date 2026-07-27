@@ -4,7 +4,12 @@ import { proxyEvent } from "../../testing/proxyEvent";
 import { APIGatewayProxyEvent, User } from "../../types/types";
 import { createComment } from "./create";
 import { authenticatedUser } from "../../utils/authentication";
-import { UserRoles, Comment, CommentType } from "@rhtp/shared";
+import {
+  UserRoles,
+  Comment,
+  CommentType,
+  AttachmentStatus,
+} from "@rhtp/shared";
 import { putComment } from "../../storage/comments";
 import { canWriteComments } from "../../utils/authorization";
 import { sendEmail } from "../../utils/notifications/email";
@@ -22,9 +27,8 @@ mockAuthenticatedUser.mockReturnValue({
   email: "mockuser@example.com",
 } as User);
 
-vi.mock("../../storage/comments", () => ({
-  putComment: vi.fn(),
-}));
+vi.mock("../../storage/comments");
+const mockPutComment = vi.mocked(putComment);
 
 vi.mock("../../utils/notifications/email");
 const mockSendEmail = vi.mocked(sendEmail);
@@ -76,8 +80,21 @@ describe("Test createComment API method", () => {
     expect(response.statusCode).toBe(StatusCodes.Forbidden);
   });
 
-  test("Successful Comment Create", async () => {
-    (putComment as Mock).mockResolvedValueOnce(mockComment);
+  test("invalid payload throws 400", async () => {
+    const mockInvalidBodyEvent: APIGatewayProxyEvent = {
+      ...testEvent,
+      // missing required fields
+      body: JSON.stringify({
+        type: CommentType.REPORT,
+      }),
+    };
+    const res = await createComment(mockInvalidBodyEvent);
+    expect(res.statusCode).toBe(StatusCodes.BadRequest);
+    expect(mockPutComment).not.toHaveBeenCalled();
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  test("Successful attachment Comment Create", async () => {
     const res = await createComment(testEvent);
     expect(res.statusCode).toBe(StatusCodes.Created);
     expect(JSON.parse(res.body as string)).toEqual({
@@ -85,6 +102,8 @@ describe("Test createComment API method", () => {
       created: expect.any(Number),
       id: expect.any(String),
     });
+    expect(mockPutComment).toHaveBeenCalled();
+    expect(mockSendEmail).toHaveBeenCalled();
   });
 
   test("Successful Report Comment Create triggers email", async () => {
@@ -97,7 +116,6 @@ describe("Test createComment API method", () => {
         isInternal: mockComment.isInternal,
       }),
     };
-    (putComment as Mock).mockResolvedValueOnce({});
     const res = await createComment(mockReportCommentEvent);
     expect(res.statusCode).toBe(StatusCodes.Created);
     expect(JSON.parse(res.body as string)).toEqual({
@@ -106,6 +124,31 @@ describe("Test createComment API method", () => {
       created: expect.any(Number),
       id: expect.any(String),
     });
+    expect(mockPutComment).toHaveBeenCalled();
+    expect(mockSendEmail).toHaveBeenCalled();
+  });
+
+  test("Successful attachment status update triggers email but not putComment", async () => {
+    const mockAttachmentStatusEvent: APIGatewayProxyEvent = {
+      ...testEvent,
+      body: JSON.stringify({
+        type: CommentType.ATTACHMENT_STATUS,
+        statusChange: AttachmentStatus.NEEDS_REVISION,
+        isInternal: false,
+        parentReportId: mockComment.parentReportId,
+      }),
+    };
+    const res = await createComment(mockAttachmentStatusEvent);
+    expect(res.statusCode).toBe(StatusCodes.Created);
+    expect(JSON.parse(res.body as string)).toEqual({
+      ...mockComment,
+      comment: undefined,
+      statusChange: AttachmentStatus.NEEDS_REVISION,
+      type: CommentType.ATTACHMENT_STATUS,
+      created: expect.any(Number),
+      id: expect.any(String),
+    });
+    expect(mockPutComment).not.toHaveBeenCalled();
     expect(mockSendEmail).toHaveBeenCalled();
   });
 });

@@ -243,6 +243,7 @@ describe("email utils", () => {
       const mockAttachmentStatusChange = {
         ...mockAttachmentComment,
         comment: undefined,
+        type: CommentType.ATTACHMENT_STATUS,
         statusChange: AttachmentStatus.LOCKED_FOR_SCORING,
       };
       await sendEmail({
@@ -267,6 +268,7 @@ describe("email utils", () => {
       ]);
       const mockAttachmentStatusChange = {
         ...mockAttachmentComment,
+        type: CommentType.ATTACHMENT_STATUS,
         comment: undefined,
         statusChange: AttachmentStatus.NEEDS_REVISION,
       };
@@ -292,6 +294,7 @@ describe("email utils", () => {
       ]);
       const mockAttachmentStatusChange = {
         ...mockAttachmentComment,
+        type: CommentType.ATTACHMENT_STATUS,
         comment: undefined,
         statusChange: AttachmentStatus.INFORMATIONAL,
       };

@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import {
   AlertTypes,
   AttachmentStatus,
+  CommentType,
   InitiativeAnswerProp,
   UploadListProp,
 } from "@rhtp/shared";
@@ -17,6 +18,8 @@ import { Alert, Drawer } from "components";
 import { StatusDropdown } from "components/fields/attachments/StatusDropdown";
 import { StageCheckpointDropdown } from "components/fields/attachments/StageCheckpointDropdown";
 import { canDeleteAttachment, canEditAttachment } from "utils/other/fileUtils";
+import { createComment } from "utils/api/requestMethods/commentMethods";
+import { useStore } from "utils";
 
 export const ManageDrawer = ({
   modalDisclosure,
@@ -25,13 +28,12 @@ export const ManageDrawer = ({
   onModalDelete,
   onSubmit,
 }: Props) => {
-  if (!answer) return;
-
   const [status, setStatus] = useState<AttachmentStatus>(
     AttachmentStatus.PENDING_REVIEW
   );
   const [initiatives, setInitiatives] = useState<string[]>([]);
   const [checkpoint, setCheckpoint] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
   const [file, setFile] = useState<InitiativeAnswerProp>({
     initiatives: [],
     checkpoint: "",
@@ -39,9 +41,12 @@ export const ManageDrawer = ({
     attachment: { name: "", size: 0, fileId: "" },
     canDelete: true,
   });
+  const { report } = useStore();
 
   useEffect(() => {
-    const file = files.find((file) => file.attachment.fileId === answer.fileId);
+    const file = files.find(
+      (file) => file.attachment.fileId === answer?.fileId
+    );
 
     if (file) {
       setStatus(file.status);
@@ -52,6 +57,7 @@ export const ManageDrawer = ({
   }, [modalDisclosure.isOpen]);
 
   const onConfirmHandler = async () => {
+    setSubmitting(true);
     const newFile = {
       ...file,
       initiatives: initiatives,
@@ -67,7 +73,20 @@ export const ManageDrawer = ({
     if (onSubmit) {
       await onSubmit(files);
     }
+    // notify users if attachment is marked as one of the following statuses
+    if (
+      status === AttachmentStatus.LOCKED_FOR_SCORING ||
+      status === AttachmentStatus.NEEDS_REVISION
+    ) {
+      await createComment(newFile.attachment.fileId, report?.state || "", {
+        type: CommentType.ATTACHMENT_STATUS,
+        parentReportId: report?.id,
+        isInternal: false,
+        statusChange: status,
+      });
+    }
     modalDisclosure.onClose();
+    setSubmitting(false);
   };
 
   const isFilled = () => {
@@ -79,11 +98,14 @@ export const ManageDrawer = ({
     setCheckpoint(checkpoint ?? "");
   };
 
+  if (!answer) return;
+
   return (
     <Drawer
       modalDisclosure={modalDisclosure}
       onConfirmHandler={onConfirmHandler}
       onOutlineHandler={onModalDelete}
+      submitting={submitting}
       content={{
         heading: "Manage Attachment",
         outlineButtonText: "Delete attachment",
