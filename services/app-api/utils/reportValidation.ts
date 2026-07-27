@@ -414,6 +414,7 @@ const statusAlertSchema = object().shape({
   title: string().required(),
   text: string().required(),
   status: string().required(),
+  for: string().notRequired(),
 });
 
 const formPageTemplateSchema = object().shape({
