@@ -100,7 +100,7 @@ const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
     const indexes = ["prevValue", "currValue"].map((key) =>
       oldAnswerRow.findIndex((row) => row.id === key)
     );
-    newAnswerRow[indexes[0]].value = oldAnswerRow[indexes[1]].value;
+    newAnswerRow[indexes[0]].value = oldAnswerRow[indexes[1]].value ?? "";
     newAnswerRow[indexes[1]].value = "";
     return newAnswerRow;
   });
