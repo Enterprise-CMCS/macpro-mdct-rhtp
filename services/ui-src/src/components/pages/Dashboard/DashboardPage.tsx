@@ -32,7 +32,7 @@ import { useStore } from "utils";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
-import { DevTools } from "components/devTools/DevTools";
+import { DevTools, ToolType } from "components/devTools/DevTools";
 import { activeBannerSelector } from "utils/state/selectors";
 import { budgetPeriodFilterOptions } from "./../../../constants";
 
@@ -109,6 +109,7 @@ export const DashboardPage = () => {
         state={state}
         reloadReports={reloadReports}
         reports={reports}
+        type={ToolType.DASHBOARD}
       />
       <Link as={RouterLink} to="/" variant="return">
         <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />

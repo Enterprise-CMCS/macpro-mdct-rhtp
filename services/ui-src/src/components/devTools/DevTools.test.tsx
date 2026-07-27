@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { DevTools } from "./DevTools";
+import { DevTools, ToolType } from "./DevTools";
 import { ReportStatus, ReportType, RhtpSubType } from "@rhtp/shared";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import userEvent from "@testing-library/user-event";
@@ -50,6 +50,7 @@ describe("Test DevTools component", () => {
             budgetPeriod: 0,
           },
         ]}
+        type={ToolType.DASHBOARD}
       />
     );
   });

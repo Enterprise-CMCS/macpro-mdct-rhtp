@@ -20,6 +20,7 @@ import { isReviewSubmitPage } from "types";
 import { isCompleteStatus, PageElement } from "@rhtp/shared";
 import { ReportAutosaveContext } from "./ReportAutosaveProvider";
 import { SubmissionBar } from "./SubmissionBar";
+import { DevTools, ToolType } from "components/devTools/DevTools";
 
 export const ReportPageWrapper = () => {
   const {
@@ -87,6 +88,13 @@ export const ReportPageWrapper = () => {
   return (
     <>
       <HStack position="relative" spacing="0" height="100%">
+        <DevTools
+          reportType={reportType}
+          state={state}
+          reloadReports={undefined}
+          reports={[]}
+          type={ToolType.REPORT}
+        ></DevTools>
         <Box sx={sx.sidebarContainer}>{currentPage.sidebar && <Sidebar />}</Box>
         <VStack
           height="100%"
