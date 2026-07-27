@@ -279,18 +279,15 @@ export const TableCheckpoint = (
           ""
         );
 
-      const columnFile =
-        "file" in row ? (
-          <Button
-            aria-label={`Download ${row.file.name}`}
-            variant="link"
-            onClick={() => downloadFile(reportType, state, id, row.file)}
-          >
-            {row.file.name}
-          </Button>
-        ) : (
-          "Not applicable"
-        );
+      const columnFile = row.file?.name && (
+        <Button
+          aria-label={`Download ${row.file.name}`}
+          variant="link"
+          onClick={() => downloadFile(reportType, state, id, row.file)}
+        >
+          {row.file.name}
+        </Button>
+      );
 
       const columnActions = "file" in row && row.file.fileId && (
         <Flex gap=".5rem">
@@ -317,7 +314,7 @@ export const TableCheckpoint = (
         row.stageNo,
         row.label,
         columnCheckbox,
-        columnFile,
+        row.file ? columnFile : "Not applicable",
         row.status,
         columnActions,
       ];

@@ -15,8 +15,8 @@ import {
   INITIATIVES_SECTION,
   REVIEW_SUBMIT_SECTION,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-  USE_OF_FUNDS_FIXTURE_PATH,
-  USE_OF_FUNDS_SECTION,
+  OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
+  OBLIGATED_AND_SPENT_FUNDS_SECTION,
 } from "./report-edit-shared-helpers";
 import { TIMEOUT_LOADING, TIMEOUT_UI } from "./timeouts";
 
@@ -324,7 +324,7 @@ const completeInitiativesForSubmission = async (
   return true;
 };
 
-const completeUseOfFundsForSubmission = async (
+const completeObligatedAndSpentFundsForSubmission = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
   const { reportType, state, reportId } = editor.getCurrentRouteParams();
@@ -332,25 +332,27 @@ const completeUseOfFundsForSubmission = async (
     reportType,
     state,
     reportId,
-    USE_OF_FUNDS_SECTION
+    OBLIGATED_AND_SPENT_FUNDS_SECTION
   );
 
-  const addUseOfFundsButton = editor.page.getByRole("button", {
-    name: /Add Use of Funds/i,
+  const addObligatedAndSpentFundsButton = editor.page.getByRole("button", {
+    name: /Add Obligated and Spent Funds/i,
   });
 
-  if (!(await addUseOfFundsButton.isEnabled())) {
+  if (!(await addObligatedAndSpentFundsButton.isEnabled())) {
     return false;
   }
 
-  await addUseOfFundsButton.click();
+  await addObligatedAndSpentFundsButton.click();
   const uploadDialog = editor.page.getByRole("dialog");
   await expect(uploadDialog).toBeVisible();
 
   await uploadDialog
     .locator("input[type='file']#file-input")
-    .setInputFiles(USE_OF_FUNDS_FIXTURE_PATH);
-  await expect(uploadDialog.getByText("use-of-funds.csv")).toBeVisible();
+    .setInputFiles(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH);
+  await expect(
+    uploadDialog.getByText("obligated-and-spent-funds.csv")
+  ).toBeVisible();
 
   await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
   await expect(uploadDialog).toBeHidden();
@@ -375,8 +377,8 @@ const completeSectionByTitle = async (
     return completeInitiativesForSubmission(editor);
   }
 
-  if (/^Use of Funds$/i.test(title)) {
-    return completeUseOfFundsForSubmission(editor);
+  if (/^Obligated and Spent Funds$/i.test(title)) {
+    return completeObligatedAndSpentFundsForSubmission(editor);
   }
 
   return false;
@@ -523,7 +525,7 @@ export const prepareReportForSubmission = async (
       reason: "Sustainability fields are read-only for the available report",
     };
   }
-  await completeUseOfFundsForSubmission(editor);
+  await completeObligatedAndSpentFundsForSubmission(editor);
   return ensureReportIsSubmittable(editor);
 };
 

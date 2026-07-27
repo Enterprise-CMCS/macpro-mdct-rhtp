@@ -7,7 +7,7 @@ import {
   REVIEW_SUBMIT_SECTION,
   STATE_POLICY_COMMITMENTS_SECTION,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-  USE_OF_FUNDS_SECTION,
+  OBLIGATED_AND_SPENT_FUNDS_SECTION,
 } from "../utils/report-edit-helpers";
 import {
   verifyCurrentSection,
@@ -103,29 +103,31 @@ test.describe("Report Editing - Section Rendering", () => {
     ).toBeVisible();
   });
 
-  test("should render the use of funds section for an unsubmitted report @regression", async ({
+  test("should render the obligated and spent funds section for an unsubmitted report @regression", async ({
     statePage,
   }) => {
     const editor = await openReportSectionOrSkip(
       statePage,
       "unsubmitted",
-      USE_OF_FUNDS_SECTION,
+      OBLIGATED_AND_SPENT_FUNDS_SECTION,
       (reason) => test.skip(true, reason)
     );
     if (!editor) {
       return;
     }
 
-    await verifyCurrentSection(editor, USE_OF_FUNDS_SECTION);
+    await verifyCurrentSection(editor, OBLIGATED_AND_SPENT_FUNDS_SECTION);
     await verifySectionNavState(editor, {
       hasPrevious: true,
       hasContinue: true,
     });
     await expect(
-      editor.page.getByRole("heading", { name: "Use of Funds" })
+      editor.page.getByRole("heading", { name: "Obligated and Spent Funds" })
     ).toBeVisible();
     await expect(
-      editor.page.getByRole("button", { name: /Add Use of Funds/i })
+      editor.page.getByRole("button", {
+        name: /Add Obligated and Spent Funds/i,
+      })
     ).toBeVisible();
   });
 
