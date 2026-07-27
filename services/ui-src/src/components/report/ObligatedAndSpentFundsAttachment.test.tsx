@@ -1,9 +1,12 @@
 import { render, screen, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ElementType, UseOfFundsAttachmentTemplate } from "@rhtp/shared";
+import {
+  ElementType,
+  ObligatedAndSpentFundsAttachmentTemplate,
+} from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
 import { useState } from "react";
-import { UseOfFundsAttachmentElement } from "./UseOfFundsAttachment";
+import { ObligatedAndSpentFundsAttachmentElement } from "./ObligatedAndSpentFundsAttachment";
 
 vi.mock("utils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -34,17 +37,17 @@ vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-const mockedElement: UseOfFundsAttachmentTemplate = {
+const mockedElement: ObligatedAndSpentFundsAttachmentTemplate = {
   id: "mock-id",
-  type: ElementType.UseOfFundsAttachment,
+  type: ElementType.ObligatedAndSpentFundsAttachment,
   label: "mock label",
   answer: [],
   required: true,
 };
 
-const mockElementWithAnswer: UseOfFundsAttachmentTemplate = {
+const mockElementWithAnswer: ObligatedAndSpentFundsAttachmentTemplate = {
   id: "mock-id",
-  type: ElementType.UseOfFundsAttachment,
+  type: ElementType.ObligatedAndSpentFundsAttachment,
   label: "mock label",
   answer: [
     {
@@ -58,10 +61,10 @@ const mockElementWithAnswer: UseOfFundsAttachmentTemplate = {
 
 const updateSpy = vi.fn();
 
-const UseOfFundsAttachmentWrapper = ({
+const ObligatedAndSpentFundsAttachmentWrapper = ({
   template,
 }: {
-  template: UseOfFundsAttachmentTemplate;
+  template: ObligatedAndSpentFundsAttachmentTemplate;
 }) => {
   const [element, setElement] = useState(template);
   const onChange = (updatedElement: Partial<typeof element>) => {
@@ -69,28 +72,35 @@ const UseOfFundsAttachmentWrapper = ({
     setElement({ ...element, ...updatedElement });
   };
   return (
-    <UseOfFundsAttachmentElement element={element} updateElement={onChange} />
+    <ObligatedAndSpentFundsAttachmentElement
+      element={element}
+      updateElement={onChange}
+    />
   );
 };
 
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 
-describe("<UseOfFundsAttachmentElement />", () => {
-  describe("Test UseOfFundsAttachmentElement component", () => {
+describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
+  describe("Test ObligatedAndSpentFundsAttachmentElement component", () => {
     beforeEach(() => {
       vi.clearAllMocks();
     });
 
-    test("UseOfFundsAttachmentElement is visible", () => {
-      render(<UseOfFundsAttachmentWrapper template={mockedElement} />);
-      expect(screen.getByText("Add Use of Funds")).toBeVisible();
+    test("ObligatedAndSpentFundsAttachmentElement is visible", () => {
+      render(
+        <ObligatedAndSpentFundsAttachmentWrapper template={mockedElement} />
+      );
+      expect(screen.getByText("Add Obligated and Spent Funds")).toBeVisible();
     });
 
-    test("Upload a file for use of funds", async () => {
-      render(<UseOfFundsAttachmentWrapper template={mockedElement} />);
+    test("Upload a file for obligated and spent funds", async () => {
+      render(
+        <ObligatedAndSpentFundsAttachmentWrapper template={mockedElement} />
+      );
 
       const addButton = screen.getByRole("button", {
-        name: "Add Use of Funds",
+        name: "Add Obligated and Spent Funds",
       });
       await userEvent.click(addButton);
       expect(screen.getByText("Select a file to upload")).toBeVisible();
@@ -106,25 +116,37 @@ describe("<UseOfFundsAttachmentElement />", () => {
       await userEvent.click(closeButton);
     });
 
-    test("Upload button is disable when 1 use of fund is uploaded", () => {
-      render(<UseOfFundsAttachmentWrapper template={mockElementWithAnswer} />);
+    test("Upload button is disable when 1 obligated and spent funds is uploaded", () => {
+      render(
+        <ObligatedAndSpentFundsAttachmentWrapper
+          template={mockElementWithAnswer}
+        />
+      );
       const addButton = screen.getByRole("button", {
-        name: "Add Use of Funds",
+        name: "Add Obligated and Spent Funds",
       });
       expect(addButton).toBeDisabled();
     });
 
-    test("Able to delete use of funds", async () => {
-      render(<UseOfFundsAttachmentWrapper template={mockElementWithAnswer} />);
+    test("Able to delete obligated and spent funds", async () => {
+      render(
+        <ObligatedAndSpentFundsAttachmentWrapper
+          template={mockElementWithAnswer}
+        />
+      );
       const deleteButton = screen.getByRole("button", {
         name: "delete mock-file.txt",
       });
       await userEvent.click(deleteButton);
-      expect(screen.getByText("Delete Use of Funds")).toBeVisible();
+      expect(
+        screen.getByText("Delete Obligated and Spent Funds")
+      ).toBeVisible();
       await userEvent.click(screen.getByRole("button", { name: "Delete" }));
       expect(updateSpy).toHaveBeenCalled();
     });
   });
 
-  testA11y(<UseOfFundsAttachmentWrapper template={mockedElement} />);
+  testA11y(
+    <ObligatedAndSpentFundsAttachmentWrapper template={mockedElement} />
+  );
 });

@@ -18,7 +18,7 @@ import { UploadData } from "../../types/uploads";
 import s3 from "../../libs/s3-lib";
 
 const SKIP_COPY_ANSWER_IDS = [
-  "use-of-funds-attachment",
+  "obligated-and-spent-funds-attachment",
   "initiative-narrative",
 ];
 
@@ -108,7 +108,7 @@ const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
 
 // Initiative attachments: YES
 // State policy commitment attachments: YES
-// Use of funds attachment: NO
+// Obligated and spent funds attachment: NO
 // Sustainability attachments: NO
 // (subject to change)
 export const copyAttachmentsAndTheirComments = async (newReport: Report) => {

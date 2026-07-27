@@ -26,14 +26,14 @@ export const GENERAL_INFORMATION_SECTION = "general-information";
 export const INITIATIVE_ATTACHMENTS_SECTION = "initiative-attachments";
 export const INITIATIVES_SECTION = "initiatives";
 export const STATE_POLICY_COMMITMENTS_SECTION = "state-policy-commitments";
-export const USE_OF_FUNDS_SECTION = "use-of-funds";
+export const OBLIGATED_AND_SPENT_FUNDS_SECTION = "obligated-and-spent-funds";
 export const SUSTAINABILITY_AND_HIGHLIGHTS_SECTION =
   "sustainability-and-highlights";
 export const REVIEW_SUBMIT_SECTION = "review-submit";
 
-export const USE_OF_FUNDS_FIXTURE_PATH = resolve(
+export const OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH = resolve(
   process.cwd(),
-  "playwright/data/use-of-funds.csv"
+  "playwright/data/obligated-and-spent-funds.csv"
 );
 
 export const AOR_NAME_LABEL =
@@ -293,7 +293,7 @@ const completeSustainabilityForSubmission = async (
   return true;
 };
 
-const completeUseOfFundsForSubmission = async (
+const completeObligatedAndSpentFundsForSubmission = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
   const { reportType, state, reportId } = editor.getCurrentRouteParams();
@@ -301,25 +301,27 @@ const completeUseOfFundsForSubmission = async (
     reportType,
     state,
     reportId,
-    USE_OF_FUNDS_SECTION
+    OBLIGATED_AND_SPENT_FUNDS_SECTION
   );
 
-  const addUseOfFundsButton = editor.page.getByRole("button", {
-    name: /Add Use of Funds/i,
+  const addObligatedAndSpentFundsButton = editor.page.getByRole("button", {
+    name: /Add Obligated and Spent Funds/i,
   });
 
-  if (!(await addUseOfFundsButton.isEnabled())) {
+  if (!(await addObligatedAndSpentFundsButton.isEnabled())) {
     return false;
   }
 
-  await addUseOfFundsButton.click();
+  await addObligatedAndSpentFundsButton.click();
   const uploadDialog = editor.page.getByRole("dialog");
   await expect(uploadDialog).toBeVisible();
 
   await uploadDialog
     .locator("input[type='file']#file-input")
-    .setInputFiles(USE_OF_FUNDS_FIXTURE_PATH);
-  await expect(uploadDialog.getByText("use-of-funds.csv")).toBeVisible();
+    .setInputFiles(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH);
+  await expect(
+    uploadDialog.getByText("obligated-and-spent-funds.csv")
+  ).toBeVisible();
 
   await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
   await expect(uploadDialog).toBeHidden();
@@ -340,8 +342,8 @@ const completeSectionByTitle = async (
     return completeSustainabilityForSubmission(editor);
   }
 
-  if (/^Use of Funds$/i.test(title)) {
-    return completeUseOfFundsForSubmission(editor);
+  if (/^Obligated and Spent Funds$/i.test(title)) {
+    return completeObligatedAndSpentFundsForSubmission(editor);
   }
 
   return false;
@@ -491,6 +493,6 @@ export const prepareReportForSubmission = async (
       reason: "Sustainability fields are read-only for the available report",
     };
   }
-  await completeUseOfFundsForSubmission(editor);
+  await completeObligatedAndSpentFundsForSubmission(editor);
   return ensureReportIsSubmittable(editor);
 };

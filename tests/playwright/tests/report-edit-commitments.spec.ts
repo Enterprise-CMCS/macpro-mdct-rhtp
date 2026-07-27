@@ -4,12 +4,12 @@ import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange
 import {
   GENERAL_INFORMATION_SECTION,
   STATE_POLICY_COMMITMENTS_SECTION,
-  USE_OF_FUNDS_FIXTURE_PATH,
+  OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
 } from "../utils/report-edit-helpers";
 import { verifyCurrentSection } from "../utils/report-edit-assertions";
 import { getFirstVisible } from "../utils/locators";
 import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "../utils/timeouts";
-const ATTACHMENT_FIXTURE_PATH = USE_OF_FUNDS_FIXTURE_PATH;
+const ATTACHMENT_FIXTURE_PATH = OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH;
 
 const openFirstCommitmentAccordion = async (
   editor: ReportEditorPage
@@ -169,7 +169,7 @@ test.describe("Report Editing - State Policy Commitments", () => {
     );
     await expect(editor.page.getByText(linkValue).first()).toBeVisible();
     await expect(
-      editor.page.getByText(/use-of-funds\.csv/i).first()
+      editor.page.getByText(/obligated-and-spent-funds\.csv/i).first()
     ).toBeVisible();
   });
 });
