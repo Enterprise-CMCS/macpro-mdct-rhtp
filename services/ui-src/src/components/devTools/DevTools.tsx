@@ -31,7 +31,7 @@ export const DevTools = ({
   const [showOptions, setShowOptions] = useState<boolean>();
 
   return (
-    <Box sx={sx.container}>
+    <Box sx={sx.container} top={type === ToolType.DASHBOARD ? "96px" : "156px"}>
       <Button sx={sx.primaryBtn} onClick={() => setShowOptions(!showOptions)}>
         <Text transform="rotate(-90deg)" color="white">
           Dev Tools
@@ -56,13 +56,11 @@ export const DevTools = ({
 
 const sx = {
   container: {
-    position: "absolute",
+    position: "fixed",
     display: "flex",
-    top: "96px",
     right: "0",
     zIndex: "999",
     alignItems: "flex-start",
-    height: "404px",
   },
   menuBox: {
     background: "white",
@@ -72,6 +70,7 @@ const sx = {
     padding: "12px",
     borderRadius: "0px 0px 0px 12px",
     boxShadow: "0px 3px 9px rgba(0, 0, 0, 0.1)",
+    minHeight: "110px",
   },
   primaryBtn: {
     width: "40px",

@@ -8,7 +8,10 @@ import {
 import { ReportAutosaveContext } from "components/report/ReportAutosaveProvider";
 import { useContext } from "react";
 import { useStore } from "utils";
-import { currentPageSelector } from "utils/state/selectors";
+import {
+  currentPageSelector,
+  submittableMetricsSelector,
+} from "utils/state/selectors";
 
 const getAnswerByType = (type: string, id?: string) => {
   switch (type) {
@@ -24,7 +27,7 @@ const getAnswerByType = (type: string, id?: string) => {
       //To Do: Not sure if I can just inject a file from code, seems like a bad idea
       return [];
   }
-  return console.error("can't find type " + type + ", " + id);
+  return console.error("Type ignored: " + type + ". Element id: " + id);
 };
 
 const fillActionTable = (element: ActionTableTemplate) => {
@@ -45,44 +48,46 @@ const fillActionTable = (element: ActionTableTemplate) => {
   );
 };
 
+const fillPageElements = (elements: PageElement[]) => {
+  return elements?.map((element) => {
+    if (!("required" in element) || !element.required) {
+      return element;
+    }
+    if (element.type === "actionTable")
+      return { ...element, answer: fillActionTable(element) };
+    else
+      return {
+        ...element,
+        answer: getAnswerByType(element.type, element.id),
+      };
+  });
+};
+
 export const DevReportTools = () => {
   const { setAnswers, report } = useStore();
   const currentPage = useStore(currentPageSelector);
   const { autosave } = useContext(ReportAutosaveContext);
+  const submittableMetrics = useStore(submittableMetricsSelector);
+
+  const optionalPages = submittableMetrics?.sections
+    .filter((section) => section?.displayStatus === "Optional")
+    .map((page) => page?.section.id);
 
   const fillInitiative = () => {
-    if (currentPage?.id === "initiatives") {
-      const initiatives = report?.pages.filter(
-        (page) => "initiativeNumber" in page
+    const initiatives = report?.pages.filter(
+      (page) => "initiativeNumber" in page
+    );
+    if (!initiatives) return;
+    for (const page of initiatives) {
+      const newElements = fillPageElements(page.elements);
+      setAnswers(
+        {
+          ...page,
+          elements: newElements,
+        },
+        page.id
       );
-      if (!initiatives) return;
-      for (const page of initiatives) {
-        const newElements = fillPageElements(page.elements);
-        setAnswers(
-          {
-            ...page,
-            elements: newElements,
-          },
-          page.id
-        );
-      }
-      autosave();
     }
-  };
-
-  const fillPageElements = (elements: PageElement[]) => {
-    return elements?.map((element) => {
-      if (!("required" in element) || !element.required) {
-        return element;
-      }
-      if (element.type === "actionTable")
-        return { ...element, answer: fillActionTable(element) };
-      else
-        return {
-          ...element,
-          answer: getAnswerByType(element.type, element.id),
-        };
-    });
   };
 
   const fillCurrentPageAndSave = (
@@ -90,25 +95,37 @@ export const DevReportTools = () => {
   ) => {
     if (!currentPage || !currentPage.elements) return;
 
-    setAnswers({
-      ...currentPage,
-      elements: fillPageElements(currentPage.elements),
-    });
+    if (currentPage?.id === "initiatives") {
+      fillInitiative();
+    } else {
+      setAnswers({
+        ...currentPage,
+        elements: fillPageElements(currentPage.elements),
+      });
+    }
+
     autosave();
   };
 
   return (
     <>
-      <Text fontWeight="bold">Report Tools</Text>
-      <Button
-        variant="primary"
-        onClick={() => fillCurrentPageAndSave(currentPage!)}
-      >
-        Fill Page
-      </Button>
-      <Button variant="primary" onClick={() => fillInitiative()}>
-        Fill Initiative Page
-      </Button>
+      <Text fontWeight="bold">{currentPage?.title} Tools</Text>
+      {optionalPages?.includes(currentPage?.id) ? (
+        <Text>No actions avaliable for this page.</Text>
+      ) : (
+        <>
+          <Text>
+            Clicking the Auto Fill button will fill only the required fields in{" "}
+            {currentPage?.title} page and trigger autosave.
+          </Text>
+          <Button
+            variant="primary"
+            onClick={() => fillCurrentPageAndSave(currentPage!)}
+          >
+            Auto Fill
+          </Button>
+        </>
+      )}
     </>
   );
 };
