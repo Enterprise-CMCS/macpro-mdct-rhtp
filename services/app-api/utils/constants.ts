@@ -91,13 +91,3 @@ export const error = {
 };
 
 export const reportTable = process.env.ReportsTable!;
-
-export const kafkaTables: { [key: string]: string } = {
-  RHTP: reportTable,
-  RHTP_COMMENTS: process.env.CommentsTable!,
-};
-
-export const kafkaTopics: { [key in string]: string } = {
-  RHTP: "rhtp-reports",
-  RHTP_COMMENTS: "rhtp-comments",
-};
