@@ -1,9 +1,10 @@
-import { Button, Text } from "@chakra-ui/react";
+import { Button, Checkbox, Divider, Stack, Text } from "@chakra-ui/react";
 import {
   ActionTableTemplate,
   ElementType,
   FormPageTemplate,
   PageElement,
+  PageStatus,
   ParentPageTemplate,
   UploadListProp,
 } from "@rhtp/shared";
@@ -22,6 +23,17 @@ export const DevReportTools = () => {
   const { autosave } = useContext(ReportAutosaveContext);
   const submittableMetrics = useStore(submittableMetricsSelector);
   const [files, setFiles] = useState<UploadListProp[]>([]);
+
+  const getFillabelInitiatives = () => {
+    return report?.pages.filter(
+      (page) =>
+        "initiativeNumber" in page && page.status !== PageStatus.ABANDONED
+    );
+  };
+
+  const [checkedInitiatives, setCheckedInitiatives] = useState<string[]>(
+    getFillabelInitiatives()?.map((initiative) => initiative.id) ?? []
+  );
 
   const optionalPages = submittableMetrics?.sections
     .filter((section) => section?.displayStatus === "Optional")
@@ -76,13 +88,25 @@ export const DevReportTools = () => {
     });
   };
 
+  const onChecked = (selection: string) => {
+    let newSelection = [...checkedInitiatives];
+    if (newSelection.includes(selection)) {
+      setCheckedInitiatives(
+        newSelection.filter((selected) => selected != selection)
+      );
+    } else {
+      setCheckedInitiatives([...newSelection, selection]);
+    }
+  };
+
   const fillInitiative = () => {
-    const initiatives = report?.pages.filter(
-      (page) => "initiativeNumber" in page
-    );
+    const initiatives = getFillabelInitiatives();
     if (!initiatives) return;
-    for (const page of initiatives) {
-      const newElements = fillPageElements(page.elements);
+    const selectedInitiatives = initiatives.filter((initiative) =>
+      checkedInitiatives.includes(initiative.id)
+    );
+    for (const page of selectedInitiatives) {
+      const newElements = fillPageElements(page.elements!);
       setAnswers(
         {
           ...page,
@@ -94,7 +118,8 @@ export const DevReportTools = () => {
   };
 
   const fillCurrentPageAndSave = (
-    currentPage: ParentPageTemplate | FormPageTemplate
+    currentPage: ParentPageTemplate | FormPageTemplate,
+    triggerSave: boolean = true
   ) => {
     if (!currentPage || !currentPage.elements) return;
 
@@ -109,7 +134,9 @@ export const DevReportTools = () => {
         currentPage.id
       );
     }
-    autosave();
+    if (triggerSave) {
+      autosave();
+    }
   };
 
   const OnUploadComplete = (files: UploadListProp[]) => {
@@ -126,8 +153,9 @@ export const DevReportTools = () => {
 
     if (requiredPages) {
       for (const page of requiredPages) {
-        fillCurrentPageAndSave(page);
+        fillCurrentPageAndSave(page, false);
       }
+      autosave();
     }
   };
 
@@ -135,18 +163,20 @@ export const DevReportTools = () => {
     switch (id) {
       case "review-submit":
         return (
-          <>
+          <Stack sx={sx.container} gap="1.25rem">
             <Text>Quick fill all required pages in the report.</Text>
             <Text>
-              1. First add a file here to be uploaded to Obligated and Spent
-              funds
+              <b>1.</b> First add a file here to be uploaded to Obligated and
+              Spent funds
             </Text>
             <UploadArea
               answer={files}
               saveToReport={OnUploadComplete}
             ></UploadArea>
+            <Divider></Divider>
             <Text>
-              2. Click Fill Report button and wait for autosave to finish.
+              <b>2.</b> Click Fill Report button and wait for autosave to
+              finish.
             </Text>
             <Text>
               <b>Last Saved:</b> {lastSavedTime}
@@ -155,10 +185,46 @@ export const DevReportTools = () => {
               variant="primary"
               onClick={() => fillReport()}
               disabled={files.length === 0}
+              padding={"10px"}
             >
               Fill Report
             </Button>
-          </>
+          </Stack>
+        );
+      case "obligated-and-spent-funds":
+        return (
+          <Text>
+            No quick actions avaliable for this page. You have to upload the
+            file like the user would.
+          </Text>
+        );
+      case "initiatives":
+        return (
+          <Stack sx={sx.container}>
+            <Text>
+              Clicking the Auto Fill button will fill all the required fields in
+              the checked Initiatives. Abandon initiatives will be ignored.
+            </Text>
+            {getFillabelInitiatives()?.map((initiative) => (
+              <Checkbox
+                key={initiative.id}
+                onChange={() => onChecked(initiative.id)}
+                isChecked={checkedInitiatives.includes(initiative.id)}
+                checked={checkedInitiatives.includes(initiative.id)}
+                margin="0"
+              >
+                {initiative.title}
+              </Checkbox>
+            ))}
+            <Button
+              variant="primary"
+              onClick={() => fillCurrentPageAndSave(currentPage!)}
+              padding="10px"
+              marginTop="0.75rem"
+            >
+              Auto Fill Page
+            </Button>
+          </Stack>
         );
     }
     return (
@@ -187,4 +253,15 @@ export const DevReportTools = () => {
       )}
     </>
   );
+};
+
+const sx = {
+  container: {
+    ".chakra-checkbox__control": {
+      border: "1px solid black",
+    },
+    ".chakra-heading": {
+      margin: "0",
+    },
+  },
 };

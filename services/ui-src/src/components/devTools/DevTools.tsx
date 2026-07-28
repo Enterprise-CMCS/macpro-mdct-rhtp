@@ -73,7 +73,8 @@ const sx = {
     boxShadow: "0px 3px 9px rgba(0, 0, 0, 0.1)",
     minHeight: "110px",
     maxHeight: "500px",
-    overflowY: "scroll",
+    overflowY: "auto",
+    overflowX: "hidden",
   },
   primaryBtn: {
     width: "40px",
