@@ -1,10 +1,17 @@
 import { kafkaTables, kafkaTopics } from "../../../utils/constants";
-import KafkaSourceLib from "../../../utils/kafka/kafka-source-lib";
+import KafkaSourceLib, {
+  SourceTopicMapping,
+} from "../../../utils/kafka/kafka-source-lib";
+import { transformReport } from "./transforms";
 
 const topicPrefix = "aws.mdct.rhtp";
 const version = "v0";
-const tables = [
-  // { sourceName: kafkaTables.RHTP, topicName: kafkaTopics.RHTP }, TODO: Resolve new format with dataconnect
+const tables: SourceTopicMapping[] = [
+  {
+    sourceName: kafkaTables.RHTP,
+    topicName: kafkaTopics.RHTP,
+    transform: transformReport,
+  },
   {
     sourceName: kafkaTables.RHTP_COMMENTS,
     topicName: kafkaTopics.RHTP_COMMENTS,

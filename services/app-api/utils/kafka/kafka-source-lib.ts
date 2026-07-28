@@ -1,6 +1,19 @@
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { Kafka, Producer } from "kafkajs";
 
+/**
+ * Mapping entry relating a data source to its output topic.
+ *
+ * The provided `transform` function is applied and awaited after
+ * the data is unmarsharlled into a js object. If it returns undefined
+ * the entry will be skipped.
+ */
+export type SourceTopicMapping = {
+  sourceName: string;
+  topicName: string;
+  transform?: Function;
+};
+
 type KafkaPayload = {
   key: string;
   value: string;
@@ -10,10 +23,6 @@ type KafkaPayload = {
     eventTime?: string;
     eventID?: string;
   };
-};
-type SourceTopicMapping = {
-  sourceName: string;
-  topicName: string;
 };
 
 let kafka: Kafka;
@@ -29,7 +38,7 @@ class KafkaSourceLib {
    *
    * topicPrefix = "[data_center].[system_of_record].[business_domain].[event_type]";
    * version = "some version";
-   * tables = [list of table mappings];
+   * tables = [list of table mappings] When ;
    */
 
   topicPrefix: string;
@@ -86,12 +95,11 @@ class KafkaSourceLib {
   /**
    * Checks if a streamArn is a valid topic. Returns undefined otherwise
    * @param streamARN - DynamoDB streamARN
-   * @returns
+   * @returns table - SourceTopicMapping
    */
-  determineDynamoTopicName(streamARN: string) {
+  determineDynamoMapping(streamARN: string) {
     for (const table of this.tables) {
-      if (streamARN.includes(`/${table.sourceName}/`))
-        return this.topic(table.topicName);
+      if (streamARN.includes(`/${table.sourceName}/`)) return table;
     }
     console.log(`Topic not found for table arn: ${streamARN}`);
   }
@@ -100,14 +108,27 @@ class KafkaSourceLib {
     return unmarshall(r);
   }
 
-  createDynamoPayload(record: any): KafkaPayload {
+  async createDynamoPayload(
+    record: any,
+    transform?: Function
+  ): Promise<KafkaPayload | undefined> {
     const dynamodb = record.dynamodb;
     const { eventID, eventName } = record;
+
+    const keys = this.unmarshall(dynamodb.Keys);
+    let newImage = this.unmarshall(dynamodb.NewImage);
+
+    if (transform) {
+      newImage = await transform(keys, newImage);
+    }
+
+    if (!newImage) return undefined;
+
     const dynamoRecord = {
-      NewImage: this.unmarshall(dynamodb.NewImage),
-      OldImage: this.unmarshall(dynamodb.OldImage ?? {}),
-      Keys: this.unmarshall(dynamodb.Keys),
+      NewImage: newImage,
+      Keys: keys,
     };
+
     return {
       key: Object.values(dynamoRecord.Keys).join("#"),
       value: this.stringify(dynamoRecord),
@@ -127,14 +148,17 @@ class KafkaSourceLib {
   async createOutboundEvents(records: any[]) {
     let outboundEvents: { [key: string]: any } = {};
     for (const record of records) {
-      let payload, topicName;
+      let payload, topicName, table;
 
       // DYNAMO
-      topicName = this.determineDynamoTopicName(
+      table = this.determineDynamoMapping(
         String(record.eventSourceARN.toString())
       );
-      if (!topicName) continue;
-      payload = this.createDynamoPayload(record);
+      if (!table) continue;
+
+      topicName = this.topic(table.topicName);
+      payload = await this.createDynamoPayload(record, table.transform);
+      if (!payload) continue;
 
       //initialize configuration object keyed to topic for quick lookup
       if (!(outboundEvents[topicName] instanceof Object))

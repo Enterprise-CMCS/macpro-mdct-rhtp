@@ -133,28 +133,12 @@ export const scanAndCompileReports = async (
   );
 
   const items = (await collectPageItems(response)) as ReportTableItem[];
-  console.log("items", items.length, items);
-  console.log("scanned:", items);
 
   // Group items into subarrays by report, then build normally
   const getId = (item: ReportTableItem) => item["sortKey"].split("#")[0];
-  const groupedItems = items.reduce(
-    (acc: { [id: string]: ReportTableItem[] }, item) => ({
-      /* oxlint-disable no-accumulating-spread */
-      ...acc,
-      [getId(item)]: [...(acc[getId(item)] || []), item],
-    }),
-    {}
-  );
+  const groupedItems = Object_groupBy(items, getId);
 
-  console.log(
-    "Grouped:",
-    groupedItems,
-    Object.values(groupedItems).length,
-    items.length
-  );
-
-  const groupedReports = Object.values(groupedItems)
+  const groupedReports = (Object.values(groupedItems) as ReportTableItem[][])
     .map(mergeReportPages)
     .filter((report) => !!report);
   const filteredReports = groupedReports.filter(
@@ -164,7 +148,6 @@ export const scanAndCompileReports = async (
         reportSubTypes.length === 0 ||
         reportSubTypes.includes(report.subTypeKey))
   );
-  console.log("Filtered:", filteredReports);
 
   return filteredReports;
 };
@@ -255,3 +238,24 @@ type StoredPage = ReportPage & {
   pKey: StoredReport["pKey"];
   sortKey: `${Report["id"]}#${ReportPage["id"]}`;
 };
+
+/**
+ * Ponyfill for `Object.groupBy`, which _should_ be safe in Node 21+.
+ *
+ * But TS is complaining. Replace me when we're targeting ES2024, please.
+ */
+function Object_groupBy<TKey extends string | number | symbol, TItem>(
+  items: Iterable<TItem>,
+  selector: (item: TItem) => TKey
+) {
+  const groups: Partial<Record<TKey, TItem[]>> = {};
+  for (let item of items) {
+    const key = selector(item);
+    if (key in groups) {
+      groups[key]!.push(item);
+    } else {
+      groups[key] = [item];
+    }
+  }
+  return groups;
+}

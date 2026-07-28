@@ -3,7 +3,7 @@
 This document is a detailed look at the structure and fields of RHTP reports.
 For a more general overview, see [ReportDataStructure.md](./ReportDataStructure.md).
 
-<!-- TODO: ## Kafka Topics
+## Kafka Topics
 
 The RHTP report has a Kafka topic that receives messages when the data changes:
 
@@ -14,7 +14,7 @@ For example: `--rhtp--my-branch-name--aws.mdct.rhtp.rhtp-reports.v0`
 
 Comments added to the reports or to attached files are sent in a separate topic:
 
-`aws.mdct.rhtp.rhtp-comments.v0` -->
+`aws.mdct.rhtp.rhtp-comments.v0`
 
 ## Comment data
 

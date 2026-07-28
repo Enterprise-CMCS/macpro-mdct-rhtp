@@ -111,7 +111,7 @@ describe("Test Kafka Lib", () => {
     expect(mockSendBatch).toBeCalledTimes(0);
   });
 
-  test("Handles dynamo events with no OldImage", async () => {
+  test("Handles dynamo events", async () => {
     const dynamoInsertEvent = {
       Records: [
         {
@@ -138,7 +138,7 @@ describe("Test Kafka Lib", () => {
                 eventName: "INSERT",
               },
               key: "bar",
-              value: `{"NewImage":{"foo":"bar"},"OldImage":{},"Keys":{"foo":"bar"}}`,
+              value: `{"NewImage":{"foo":"bar"},"Keys":{"foo":"bar"}}`,
             }),
           ],
           topic: "--rhtp--test-stage--rhtp.aTable-reports.v0",

@@ -93,11 +93,11 @@ export const error = {
 export const reportTable = process.env.ReportsTable!;
 
 export const kafkaTables: { [key: string]: string } = {
-  // TODO: ...reportTables
+  RHTP: reportTable,
   RHTP_COMMENTS: process.env.CommentsTable!,
 };
 
 export const kafkaTopics: { [key in string]: string } = {
-  // TODO: RHTP: "rhtp-reports",
+  RHTP: "rhtp-reports",
   RHTP_COMMENTS: "rhtp-comments",
 };
