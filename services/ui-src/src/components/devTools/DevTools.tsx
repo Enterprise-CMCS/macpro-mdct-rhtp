@@ -59,8 +59,9 @@ const sx = {
     position: "fixed",
     display: "flex",
     right: "0",
-    zIndex: "999",
+    zIndex: "1001",
     alignItems: "flex-start",
+    maxHeight: "600px",
   },
   menuBox: {
     background: "white",
@@ -71,6 +72,8 @@ const sx = {
     borderRadius: "0px 0px 0px 12px",
     boxShadow: "0px 3px 9px rgba(0, 0, 0, 0.1)",
     minHeight: "110px",
+    maxHeight: "500px",
+    overflowY: "scroll",
   },
   primaryBtn: {
     width: "40px",
