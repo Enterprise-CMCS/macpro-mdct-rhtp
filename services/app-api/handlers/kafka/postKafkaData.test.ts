@@ -58,7 +58,7 @@ const mockReportEvent = {
       status: { S: "Not started" },
     },
   },
-} as any;
+};
 
 const mockCommentEvent = {
   eventSourceARN: "aaa/local-comments/bbb",
@@ -175,6 +175,15 @@ describe("Kafka message sending", () => {
         },
       ],
     });
+  });
+
+  it("should ignore events for changed report pages", async () => {
+    mockGetReport.mockResolvedValue(mockReport);
+    const record = structuredClone(mockReportEvent);
+    record.dynamodb.NewImage.sortKey = { S: "report123#pageABC" };
+    const event = { Records: [record] };
+    await handler(event);
+    expect(mockSendBatch).not.toHaveBeenCalled();
   });
 
   it("should ignore events from tables with no associated topic", async () => {

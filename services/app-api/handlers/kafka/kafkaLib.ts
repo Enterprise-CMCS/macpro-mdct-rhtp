@@ -42,23 +42,21 @@ export const kafkaHandler = (callbacks: KafkaCallbacks) => {
  */
 const convertToMessage = async (
   record: NonNullable<AwsStreamEvent["Records"]>[number],
-  { getDynamoMapping, getS3Topic, getS3Object }: KafkaCallbacks
+  { getDynamoInfo, getS3Topic, getS3Object }: KafkaCallbacks
 ) => {
   if ("dynamodb" in record) {
-    const mapping = getDynamoMapping!(record);
-
-    const topic = mapping?.topicRouting(record);
-    if (!topic) {
+    const dynamoInfo = await getDynamoInfo!(record);
+    if (!dynamoInfo) {
+      return undefined;
+    }
+    const { topic, payload: NewImage } = dynamoInfo;
+    if (!topic || !NewImage) {
       return undefined;
     }
     const { eventID, eventName, dynamodb } = record;
     const headers = { eventID, eventName };
     const Keys = unmarshall(dynamodb.Keys);
     const key = Object.values(Keys).join("#");
-    let NewImage = unmarshall(dynamodb.NewImage);
-    if (mapping?.transform) {
-      NewImage = await mapping.transform(NewImage);
-    }
     const value = JSON.stringify({ NewImage, Keys });
     return { topic, message: { headers, partition: 0, key, value } };
   } else if ("s3" in record) {
@@ -124,7 +122,7 @@ const LazyProducer = (() => {
 
 export type KafkaCallbacks = {
   getConfig: GetKafkaConfig;
-  getDynamoMapping?: GetDynamoMapping;
+  getDynamoInfo?: GetDynamoInfo;
   getS3Topic?: GetS3Topic;
   getS3Object?: GetS3Object;
 };
@@ -138,28 +136,13 @@ export type GetKafkaConfig = () => KafkaConfig | undefined;
 
 /**
  * On which Kafka topic, if any, should this Dynamo change be broadcast?
- * @returns The full topic name, OR undefined if no message should be sent.
+ * And what data should be sent?
+ * @returns The full topic name and the message payload to be sent,
+ * OR undefined if no message should be sent
  */
-export type GetDynamoTopic = (
+export type GetDynamoInfo = (
   record: DynamoDbStreamRecord
-) => string | undefined;
-
-export type GetDynamoMapping = (
-  record: DynamoDbStreamRecord
-) => SourceTopicMapping | undefined;
-
-/**
- * Mapping entry relating a data source to its output topic.
- *
- * The provided `transform` function is applied and awaited after
- * the data is unmarsharlled into a js object. If it returns undefined
- * the entry will be skipped.
- */
-export type SourceTopicMapping = {
-  sourceName: string;
-  topicRouting: GetDynamoTopic;
-  transform?: Function;
-};
+) => Promise<{ topic: string; payload: object } | undefined>;
 
 /**
  * On which Kafka topic, if any, should this S3 change be broadcast?

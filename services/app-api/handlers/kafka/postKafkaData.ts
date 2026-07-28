@@ -1,28 +1,7 @@
-import {
-  DynamoDbStreamRecord,
-  GetDynamoMapping,
-  GetKafkaConfig,
-  kafkaHandler,
-  SourceTopicMapping,
-} from "./kafkaLib";
-import { transformReport } from "./transforms";
-
-const simpleRoute = (_record: DynamoDbStreamRecord, topicName: string) => {
-  const namespace = process.env.topicNamespace ?? "";
-  return `${namespace}aws.mdct.rhtp.${topicName}.v0`;
-};
-
-const tables: SourceTopicMapping[] = [
-  {
-    sourceName: "reports",
-    transform: transformReport,
-    topicRouting: (record) => simpleRoute(record, "rhtp-reports"),
-  },
-  {
-    sourceName: "comments",
-    topicRouting: (record) => simpleRoute(record, "rhtp-comments"),
-  },
-];
+import { ReportType } from "@rhtp/shared";
+import { GetDynamoInfo, GetKafkaConfig, kafkaHandler } from "./kafkaLib";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { getReport } from "../../storage/reports";
 
 const getConfig: GetKafkaConfig = () => {
   const { brokerString, STAGE } = process.env;
@@ -51,19 +30,35 @@ const getConfig: GetKafkaConfig = () => {
   };
 };
 
-const getDynamoMapping: GetDynamoMapping = (record) => {
-  const table = tables.find((t) =>
-    record.eventSourceARN.includes(`/${process.env.STAGE}-${t.sourceName}/`)
-  );
-  if (!table) {
-    console.warn(`Ignoring record: no matching table mapping`);
-    return undefined;
-  }
+const getDynamoInfo: GetDynamoInfo = async (record) => {
+  const source = record.eventSourceARN;
+  const stage = process.env.STAGE ?? "";
+  const namespace = process.env.topicNamespace ?? "";
+  const payload = unmarshall(record.dynamodb.NewImage);
 
-  return table;
+  if (source.includes(`/${stage}-reports/`)) {
+    const isPage = payload.sortKey.includes("#");
+    if (isPage) {
+      // This must be a Page item, not a Report metadata item. Don't send it.
+      return;
+    }
+    // Fetch the pages and assemble the entire report before sending.
+    const report = await getReport(ReportType.RHTP, payload.state, payload.id);
+    return {
+      topic: `${namespace}aws.mdct.rhtp.rhtp-reports.v0`,
+      payload: report!,
+    };
+  } else if (source.includes(`/${stage}-comments/`)) {
+    return {
+      topic: `${namespace}aws.mdct.rhtp.rhtp-comments.v0`,
+      payload,
+    };
+  } else {
+    return;
+  }
 };
 
 export const handler = kafkaHandler({
   getConfig,
-  getDynamoMapping,
+  getDynamoInfo,
 });
