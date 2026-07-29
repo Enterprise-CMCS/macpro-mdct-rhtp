@@ -99,29 +99,32 @@ export const addReportFilesToZip = async (report: Report, zip: JSZip) => {
   }
 };
 
-const UseOfFundsReportType = ReportType.RHTP;
-export const addUseOfFundsFilesToZip = async (
+const ObligatedAndSpentFundsReportType = ReportType.RHTP;
+export const addObligatedAndSpentFundsFilesToZip = async (
   reportSubTypeKeys: string[],
   zip: JSZip,
   state?: StateAbbr
 ) => {
-  const useOfFundsFiles: {
+  const obligatedAndSpentFundsFiles: {
     id: string;
     state: StateAbbr;
     subType: string;
     file: UploadListProp;
   }[] = [];
-  const getUseOfFundsFiles = (report: Report) => {
-    const useOfFundsPage = report?.pages.find(
-      (page) => page.id === "use-of-funds"
+  const getObligatedAndSpentFundsFiles = (report: Report) => {
+    const obligatedAndSpentFundsPage = report?.pages.find(
+      (page) => page.id === "obligated-and-spent-funds"
     );
     const attachments =
-      useOfFundsPage?.elements
-        ?.filter((element) => element.type === ElementType.UseOfFundsAttachment)
+      obligatedAndSpentFundsPage?.elements
+        ?.filter(
+          (element) =>
+            element.type === ElementType.ObligatedAndSpentFundsAttachment
+        )
         .flatMap((attachment) => attachment.answer)
         .filter((answer) => !!answer) ?? [];
 
-    useOfFundsFiles.push({
+    obligatedAndSpentFundsFiles.push({
       id: report.id,
       state: report.state,
       subType: report.subTypeKey,
@@ -132,15 +135,15 @@ export const addUseOfFundsFilesToZip = async (
   const filteredReports = await scanAndCompileReports(reportSubTypeKeys, state);
 
   for (const report of filteredReports) {
-    getUseOfFundsFiles(report);
+    getObligatedAndSpentFundsFiles(report);
   }
 
-  for (const useOfFundsFile of useOfFundsFiles) {
-    const { id, file, state, subType } = useOfFundsFile;
+  for (const obligatedAndSpentFundsFile of obligatedAndSpentFundsFiles) {
+    const { id, file, state, subType } = obligatedAndSpentFundsFile;
     if (!file?.fileId || !file?.name) continue;
     const item = await s3Lib.getObject({
       Bucket: process.env.attachmentsBucketName,
-      Key: `${UseOfFundsReportType}/${state}/${id}/${file.fileId}`,
+      Key: `${ObligatedAndSpentFundsReportType}/${state}/${id}/${file.fileId}`,
     });
     const bytes = await item.Body?.transformToByteArray();
     if (bytes) {

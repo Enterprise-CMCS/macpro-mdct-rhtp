@@ -77,8 +77,8 @@ const mockReport: Report = {
           answer: metricAnswers,
         } as unknown as ActionTableTemplate,
         {
-          id: "use-of-funds-attachment",
-          type: ElementType.UseOfFundsAttachment,
+          id: "obligated-and-spent-funds-attachment",
+          type: ElementType.ObligatedAndSpentFundsAttachment,
           label: "mock label",
           answer: [
             {

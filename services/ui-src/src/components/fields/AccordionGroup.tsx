@@ -44,6 +44,8 @@ export const AccordionGroup = (
     }
   };
 
+  if (accordions.length === 0) return;
+
   return (
     <Box width="100%">
       <Box padding="1.5rem">

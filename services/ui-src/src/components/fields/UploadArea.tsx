@@ -17,7 +17,7 @@ import alert from "assets/icons/status/icon_status_alert.svg";
 interface Props {
   answer: UploadListProp[];
   saveToReport: (uploads: UploadListProp[]) => void;
-  deleteFromReport: (file: UploadListProp) => void;
+  deleteFromReport?: (file: UploadListProp) => void;
   uploadAreaHidden?: boolean;
   multiple?: boolean;
   disabled?: boolean;
