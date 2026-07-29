@@ -432,7 +432,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   });
 
   new LambdaDynamoEventSource(scope, "postKafkaData", {
-    entry: "services/app-api/handlers/kafka/post/postKafkaData.ts",
+    entry: "services/app-api/handlers/kafka/postKafkaData.ts",
     handler: "handler",
     timeout: Duration.seconds(120),
     memorySize: 2048,
@@ -446,7 +446,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       ...commonProps.environment,
     },
     tables: tables.filter((table) =>
-      ["RhtpReports", "Comments"].includes(table.node.id)
+      ["Reports", "Comments"].includes(table.node.id)
     ),
   });
 
