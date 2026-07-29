@@ -21,7 +21,7 @@ import {
   RhtpSubType,
 } from "@rhtp/shared";
 import { AccordionItem } from "components";
-import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
+import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.svg";
 import { parseHtml } from "utils";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
