@@ -81,6 +81,11 @@ export const UploadArea = ({
     fileInputRef.current.click();
   };
 
+  // prevent spacebar from scrolling the page
+  const suppressKeydownEvent = (e: React.KeyboardEvent<HTMLLabelElement>) => {
+    e.key === " " ? e.preventDefault() : null;
+  };
+
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
@@ -227,8 +232,8 @@ export const UploadArea = ({
               <label
                 id="drop-zone"
                 tabIndex={disableUploadArea() ? -1 : 0}
-                onKeyDown={(e: any) => e.preventDefault()} // prevent spacebar from scrolling page
-                onKeyUp={handleFileKeyboardEvent} // open file input window on enter/spacebar click
+                onKeyDown={suppressKeydownEvent} // prevent spacebar from scrolling page
+                onKeyUp={handleFileKeyboardEvent} // open file input window on enter/spacebar press
               >
                 Choose from folder
                 <input
