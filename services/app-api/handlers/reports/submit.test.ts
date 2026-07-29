@@ -7,6 +7,7 @@ import { validReport } from "../../utils/tests/mockReport";
 import { submitReport } from "./submit";
 import { authenticatedUser } from "../../utils/authentication";
 import { UserRoles } from "@rhtp/shared";
+import { sendEmail } from "../../utils/notifications/email";
 
 vi.mock("../../utils/authentication");
 const mockAuthenticatedUser = vi.mocked(authenticatedUser);
@@ -119,5 +120,6 @@ describe("Test submit report handler", () => {
     const res = await submitReport(testEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Ok);
+    expect(sendEmail).toHaveBeenCalled();
   });
 });
