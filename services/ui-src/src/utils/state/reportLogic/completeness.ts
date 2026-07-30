@@ -173,7 +173,7 @@ export const elementSatisfiesRequired = (
     );
     return answers.every((column) => column.value !== "");
   }
-  if (element.type == ElementType.UseOfFundsAttachment) {
+  if (element.type == ElementType.ObligatedAndSpentFundsAttachment) {
     return element.answer.length > 0;
   }
   if (element.id.includes("email") && typeof element.answer === "string") {

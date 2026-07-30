@@ -23,6 +23,7 @@ vi.mock("../../storage/reports", () => ({
   getReport: vi.fn().mockReturnValue({ id: "A report" }),
   queryReportsByType: vi.fn().mockReturnValue({ id: "A report" }),
   queryReportsForState: vi.fn().mockReturnValue([{ id: "A report" }]),
+  scanLiteReports: vi.fn().mockReturnValue([{ id: "A report" }]),
 }));
 
 const testEvent: APIGatewayProxyEvent = {

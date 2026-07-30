@@ -39,13 +39,13 @@ export interface UpdateInitiativeOptions {
 export interface ZipRequestBody {
   type: ZipRequestTypes;
   report?: ZipRequestReportDetails; // REPORT type
-  state?: string; // USE_OF_FUNDS type
-  reportSubTypeKeys?: string[]; // USE_OF_FUNDS type
+  state?: string; // OBLIGATED_AND_SPENT_FUNDS type
+  reportSubTypeKeys?: string[]; // OBLIGATED_AND_SPENT_FUNDS type
 }
 
 export enum ZipRequestTypes {
   REPORT = "REPORT",
-  USE_OF_FUNDS = "USE_OF_FUNDS",
+  OBLIGATED_AND_SPENT_FUNDS = "OBLIGATED_AND_SPENT_FUNDS",
 }
 
 export interface ZipRequestReportDetails {
@@ -97,6 +97,7 @@ export enum PageStatus {
 export enum CommentType {
   REPORT = "report",
   ATTACHMENT = "attachment",
+  ATTACHMENT_STATUS = "attachment_status",
 }
 
 export type Comment = {
@@ -208,7 +209,7 @@ export enum ElementType {
   InitiativesTable = "initiativesTable",
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
-  UseOfFundsAttachment = "useOfFundsAttachment",
+  ObligatedAndSpentFundsAttachment = "obligatedAndSpentFundsAttachment",
   ActionTable = "actionTable",
   AttachmentTable = "attachmentTable",
   SubmitForReview = "submitForReview",
@@ -235,7 +236,7 @@ export type PageElement =
   | InitiativesTableTemplate
   | TableCheckpointTemplate
   | AccordionGroupTemplate
-  | UseOfFundsAttachmentTemplate
+  | ObligatedAndSpentFundsAttachmentTemplate
   | AttachmentAreaTemplate
   | AttachmentTableTemplate
   | ActionTableTemplate
@@ -317,6 +318,7 @@ export interface StatusAlertTemplate extends DisplayElementTemplate {
   type: ElementType.StatusAlert;
   title: string;
   status: AlertTypes;
+  for?: string;
 }
 
 export interface SubHeaderTemplate extends DisplayElementTemplate {
@@ -412,8 +414,8 @@ export interface AccordionGroupTemplate {
   answer?: boolean[];
 }
 
-export type UseOfFundsAttachmentTemplate = {
-  type: ElementType.UseOfFundsAttachment;
+export type ObligatedAndSpentFundsAttachmentTemplate = {
+  type: ElementType.ObligatedAndSpentFundsAttachment;
   id: string;
   label: string;
   answer?: UploadListProp[];
@@ -437,7 +439,6 @@ export const FileStatusOptions = Object.values(AttachmentStatus).map(
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
-  stage?: string;
   checkpoint?: string;
   status: AttachmentStatus;
   canDelete: boolean;

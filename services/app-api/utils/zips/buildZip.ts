@@ -12,11 +12,7 @@ import {
 } from "@rhtp/shared";
 import s3Lib from "../../libs/s3-lib";
 import JSZip from "jszip";
-import {
-  getReport,
-  queryReportsByType,
-  queryReportsForState,
-} from "../../storage/reports";
+import { scanAndCompileReports } from "../../storage/reports";
 
 export const formatS3ZipKey = (zipId: string) => `zips/${zipId}.zip`;
 
@@ -103,65 +99,51 @@ export const addReportFilesToZip = async (report: Report, zip: JSZip) => {
   }
 };
 
-const UseOfFundsReportType = ReportType.RHTP;
-export const addUseOfFundsFilesToZip = async (
+const ObligatedAndSpentFundsReportType = ReportType.RHTP;
+export const addObligatedAndSpentFundsFilesToZip = async (
   reportSubTypeKeys: string[],
   zip: JSZip,
   state?: StateAbbr
 ) => {
-  const useOfFundsFiles: {
+  const obligatedAndSpentFundsFiles: {
     id: string;
     state: StateAbbr;
     subType: string;
     file: UploadListProp;
   }[] = [];
-  const getUseOfFundsFiles = (report: Report) => {
-    const useOfFundsPage = report?.pages.find(
-      (page) => page.id === "use-of-funds"
+  const getObligatedAndSpentFundsFiles = (report: Report) => {
+    const obligatedAndSpentFundsPage = report?.pages.find(
+      (page) => page.id === "obligated-and-spent-funds"
     );
     const attachments =
-      useOfFundsPage?.elements
-        ?.filter((element) => element.type === ElementType.UseOfFundsAttachment)
+      obligatedAndSpentFundsPage?.elements
+        ?.filter(
+          (element) =>
+            element.type === ElementType.ObligatedAndSpentFundsAttachment
+        )
         .flatMap((attachment) => attachment.answer)
         .filter((answer) => !!answer) ?? [];
 
-    useOfFundsFiles.push({
+    obligatedAndSpentFundsFiles.push({
       id: report.id,
       state: report.state,
       subType: report.subTypeKey,
       file: attachments[0],
     });
   };
-  if (state) {
-    const stateReports = await queryReportsForState(
-      UseOfFundsReportType,
-      state
-    );
-    const stateAndSubTypeReports = stateReports.filter((report) =>
-      reportSubTypeKeys.includes(report.subTypeKey)
-    );
-    for (const report of stateAndSubTypeReports) {
-      const { type, state, id } = report;
-      const result = await getReport(type, state, id);
-      if (!result) continue;
-      getUseOfFundsFiles(result);
-    }
-  } else {
-    // already has pages
-    const allReports = await queryReportsByType(UseOfFundsReportType);
-    const subTypeReports = allReports.filter((report) =>
-      reportSubTypeKeys.includes(report.subTypeKey)
-    );
-    for (const report of subTypeReports) {
-      getUseOfFundsFiles(report);
-    }
+
+  const filteredReports = await scanAndCompileReports(reportSubTypeKeys, state);
+
+  for (const report of filteredReports) {
+    getObligatedAndSpentFundsFiles(report);
   }
-  for (const useOfFundsFile of useOfFundsFiles) {
-    const { id, file, state, subType } = useOfFundsFile;
+
+  for (const obligatedAndSpentFundsFile of obligatedAndSpentFundsFiles) {
+    const { id, file, state, subType } = obligatedAndSpentFundsFile;
     if (!file?.fileId || !file?.name) continue;
     const item = await s3Lib.getObject({
       Bucket: process.env.attachmentsBucketName,
-      Key: `${UseOfFundsReportType}/${state}/${id}/${file.fileId}`,
+      Key: `${ObligatedAndSpentFundsReportType}/${state}/${id}/${file.fileId}`,
     });
     const bytes = await item.Body?.transformToByteArray();
     if (bytes) {

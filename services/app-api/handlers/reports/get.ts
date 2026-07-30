@@ -7,7 +7,7 @@ import {
 import { forbidden, ok } from "../../libs/response-lib";
 import {
   getReport as getReportFromDatabase,
-  queryReportsByType,
+  scanLiteReports,
   queryReportsForState,
 } from "../../storage/reports";
 import { canReadState, canReadAnyReport } from "../../utils/authorization";
@@ -43,14 +43,13 @@ export const getReportsForState = handler(
 );
 
 export const getReportsByType = handler(parseReportType, async (request) => {
-  const { reportType } = request.parameters;
   const user = request.user;
 
   if (!canReadAnyReport(user)) {
     return forbidden(error.UNAUTHORIZED);
   }
 
-  const reports = await queryReportsByType(reportType);
+  const reports = await scanLiteReports();
 
   return ok(reports);
 });

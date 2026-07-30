@@ -6,6 +6,7 @@ export { Banner } from "./alerts/Banner";
 // app
 export { App } from "./app/App";
 export { Error } from "./app/Error";
+//attachments
 // layout
 export { HomePage } from "./layout/HomePage";
 export { Header } from "./layout/Header";

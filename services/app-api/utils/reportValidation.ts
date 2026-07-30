@@ -25,6 +25,7 @@ import {
   isAllowedFileExtension,
   ZipRequestTypes,
   ZipRequestBody,
+  CommentType,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -164,10 +165,10 @@ export const uploadListPropSchema = object().shape({
     ),
 });
 
-const UseOfFundsAttachmentSchema = object().shape({
+const ObligatedAndSpentFundsAttachmentSchema = object().shape({
   type: string()
     .required()
-    .matches(new RegExp(ElementType.UseOfFundsAttachment)),
+    .matches(new RegExp(ElementType.ObligatedAndSpentFundsAttachment)),
   id: string().required(),
   label: string().required(),
   answer: array().of(uploadListPropSchema).min(0).max(1).notRequired(),
@@ -215,8 +216,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
       return tableCheckpointTemplateSchema;
-    case ElementType.UseOfFundsAttachment:
-      return UseOfFundsAttachmentSchema;
+    case ElementType.ObligatedAndSpentFundsAttachment:
+      return ObligatedAndSpentFundsAttachmentSchema;
     case ElementType.InitiativesTable:
       return initiativesTableSchema;
     case ElementType.AttachmentArea:
@@ -377,7 +378,6 @@ const attachmentTableSchema = object().shape({
       object().shape({
         attachment: uploadListPropSchema,
         initiatives: array().of(string().notRequired()).required(),
-        stage: string().notRequired(),
         checkpoint: string().notRequired(),
         status: string().required(),
         canDelete: boolean().notRequired(),
@@ -415,6 +415,7 @@ const statusAlertSchema = object().shape({
   title: string().required(),
   text: string().required(),
   status: string().required(),
+  for: string().notRequired(),
 });
 
 const formPageTemplateSchema = object().shape({
@@ -547,9 +548,11 @@ export const isZipRequestBody = (
       reportSubTypeKeys: array()
         .of(string().required())
         .when("type", {
-          is: ZipRequestTypes.USE_OF_FUNDS,
+          is: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
           then: (schema) =>
-            schema.required("Report sub types required for USE_OF_FUNDS zip"),
+            schema.required(
+              "Report sub types required for OBLIGATED_AND_SPENT_FUNDS zip"
+            ),
           otherwise: (schema) => schema.notRequired(),
         }),
     })
@@ -569,7 +572,7 @@ const commentSchema = object().shape({
   author: string().required(),
   authorEmail: string().required(),
   isInternal: boolean().required(),
-  type: string().required(),
+  type: mixed<CommentType>().oneOf(Object.values(CommentType)).required(),
   comment: string().notRequired(),
   statusChange: string().notRequired(),
   parentReportId: string().notRequired(),

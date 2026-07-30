@@ -62,7 +62,7 @@ export const startZipWorker = async (body: ZipRequestBody) => {
   if (type === ZipRequestTypes.REPORT && body.report) {
     const { reportType, state, id } = body.report;
     payload = { ...payload, reportType, state, id };
-  } else if (type === ZipRequestTypes.USE_OF_FUNDS) {
+  } else if (type === ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS) {
     const { state, reportSubTypeKeys } = body;
     payload = { ...payload, state, reportSubTypeKeys };
   } else {
