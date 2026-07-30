@@ -1,5 +1,10 @@
 import { User } from "../types/types";
-import { StateAbbr, UserRoles } from "@rhtp/shared";
+import {
+  StateAbbr,
+  UserRoles,
+  ZipRequestBody,
+  ZipRequestTypes,
+} from "@rhtp/shared";
 
 /** These roles are allowed to read data for any state */
 const statelessRoles = [
@@ -68,4 +73,17 @@ export const canReadAnyReport = (user: User) => {
 
 export const canModifyNotificationRecipients = (user: User) => {
   return user.role === UserRoles.APPROVER;
+};
+
+export const canRequestZip = (body: ZipRequestBody, user: User) => {
+  if (body.type === ZipRequestTypes.REPORT) {
+    if (user.role === UserRoles.STATE_USER) {
+      return body.report?.state === user.state;
+    } else {
+      return true;
+    }
+  } else {
+    // OBLIGATED_AND_SPENT_FUNDS type
+    return user.role === UserRoles.ADMIN;
+  }
 };
