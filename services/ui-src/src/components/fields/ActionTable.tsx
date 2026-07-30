@@ -33,7 +33,7 @@ const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
 
 /** For generating better aria label in the metrics table */
 const generateAriaLabel = (header: string, answer: ActionAnswerShape) => {
-  const label = answer.find((row) => row.id === "metric")?.value;
+  const label = answer.find((row) => row.id === "metric")?.value ?? "";
   return `${label} ${header}`;
 };
 
@@ -55,7 +55,6 @@ const buildRows = (
   answer.forEach((answerRow, answerRowIndex) => {
     const rowElement: (JSX.Element | string | number)[] = [];
     const disabled = isRowDisabled(rows, answerRow) || formDisabled;
-
     rows.map((column) => {
       //autogenerate next # column
       if (column.id === "no") {

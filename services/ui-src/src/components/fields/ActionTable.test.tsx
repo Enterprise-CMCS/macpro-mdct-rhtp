@@ -105,7 +105,7 @@ describe("Test ActionTable component", () => {
       expect(
         screen.getByRole("columnheader", { name: "Actions" })
       ).toBeVisible();
-      expect(screen.getAllByRole("textbox", { name: "" })[0]).toHaveValue(
+      expect(screen.getAllByRole("textbox", { name: "Text" })[0]).toHaveValue(
         "hello"
       );
     });
@@ -126,9 +126,9 @@ describe("Test ActionTable component", () => {
     });
     test("Row inputs are disabled when status value is Abandoned, but admin can still change status", async () => {
       expect(
-        screen.getByRole("row", { name: "2 bye Abandoned Edit/Abandon" })
+        screen.getByRole("row", { name: "2 Text bye Abandoned Edit/Abandon" })
       ).toBeVisible();
-      const textbox = screen.getAllByRole("textbox", { name: "" })[1];
+      const textbox = screen.getAllByRole("textbox", { name: "Text" })[1];
       expect(textbox).toHaveValue("bye");
       expect(textbox).toBeDisabled();
       const editBtn = screen.getAllByRole("button", { name: "Edit/Abandon" });
@@ -166,20 +166,20 @@ describe("Test ActionTable component", () => {
       expect(
         screen.queryByRole("columnheader", { name: "Actions" })
       ).not.toBeInTheDocument();
-      expect(screen.getAllByRole("textbox", { name: "" })[0]).toHaveValue(
+      expect(screen.getAllByRole("textbox", { name: "Text" })[0]).toHaveValue(
         "hello"
       );
     });
     test("Table triggers autosave", async () => {
-      const textbox = screen.getAllByRole("textbox", { name: "" })[0];
+      const textbox = screen.getAllByRole("textbox", { name: "Text" })[0];
       await userEvent.type(textbox, "mock");
       expect(updateSpy).toHaveBeenCalledTimes(4);
     });
     test("Row inputs are disabled when status value is Abandoned", async () => {
       expect(
-        screen.getByRole("row", { name: "2 bye Abandoned" })
+        screen.getByRole("row", { name: "2 Text bye Abandoned" })
       ).toBeVisible();
-      const textbox = screen.getAllByRole("textbox", { name: "" })[1];
+      const textbox = screen.getAllByRole("textbox", { name: "Text" })[1];
       expect(textbox).toHaveValue("bye");
       expect(textbox).toBeDisabled();
     });
