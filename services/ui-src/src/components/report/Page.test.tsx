@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import { useStore } from "utils";
 import { Page } from "./Page";
-import { AlertTypes, ElementType, PageElement } from "@rhtp/shared";
+import { AlertTypes, ElementType, PageElement, UserRoles } from "@rhtp/shared";
 
 vi.mock("react-router", () => ({
   useNavigate: vi.fn(),
@@ -150,13 +150,13 @@ const elements: PageElement[] = [
   {
     type: ElementType.InitiativesTable,
     id: "",
+    required: false,
   },
   {
     type: ElementType.AttachmentArea,
     id: "",
     label: "Attachment area label",
     required: true,
-    uploadedSubLabel: "mock sub label",
   },
   {
     type: ElementType.ListInput,
@@ -249,6 +249,24 @@ describe("Page Component with state user", () => {
       />
     );
     expect(container).not.toBeEmptyDOMElement();
+  });
+
+  test("state user cannot edit when element limited to other roles", () => {
+    const roleLimitedElements = [
+      {
+        ...textFieldElement[0],
+        editByRole: [UserRoles.ADMIN],
+      },
+    ];
+    render(
+      <Page
+        id="mock-page"
+        elements={roleLimitedElements}
+        setElements={vi.fn()}
+      />
+    );
+    const textField = screen.getByRole("textbox");
+    expect(textField).toBeDisabled();
   });
 });
 

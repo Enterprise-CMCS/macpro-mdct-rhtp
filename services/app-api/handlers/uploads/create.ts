@@ -11,9 +11,9 @@ export const createUpload = handler(
   parseFileUploadDownloadParameters,
   async (request) => {
     const { user, body } = request;
+    const { state, reportType, id: reportId } = request.parameters;
     // Format Info
     const { uploadedFileName, uploadedFileSize } = body as UploadFileData;
-    const { state, reportType, id } = request.parameters;
 
     const username = user.email ?? "";
     const fileId = `${KSUID.randomSync().string}_${uploadedFileName}`;
@@ -29,9 +29,9 @@ export const createUpload = handler(
     // Pre-sign url
     let psurl = await s3.createPresignedPost({
       Bucket: process.env.attachmentsBucketName,
-      Key: `${reportType}/${state}/${id}/${fileId}`,
+      Key: `${reportType}/${state}/${reportId}/${fileId}`,
     });
     psurl = fixLocalstackUrl(psurl);
-    return ok({ psurl: psurl, fileId: fileId });
+    return ok({ psurl, fileId });
   }
 );

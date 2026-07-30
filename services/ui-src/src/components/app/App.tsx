@@ -26,7 +26,8 @@ export const App = () => {
   const { user, showLocalLogins, setSidebar } = useStore();
   const { pathname, key } = useLocation();
 
-  const isExportPage = pathname.includes("/export");
+  //there are now two export pages due to the addition of the obligated and spent funds export zip
+  const isExportPage = pathname !== "/export" && pathname.includes("/export");
 
   // fire tealium page view on route change
   useEffect(() => {
@@ -40,6 +41,11 @@ export const App = () => {
       setSidebar(true);
     }
   }, [mqClasses]);
+
+  // on app load, check for clicked link pathname
+  useEffect(() => {
+    localStorage.setItem("ReturnURL", pathname);
+  }, []);
 
   const authenticatedRoutes = (
     <>

@@ -7,6 +7,7 @@ import cancelPrimary from "assets/icons/cancel/icon_cancel_primary.svg";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { ErrorMessages } from "../../constants";
+import { optionalTag } from "utils";
 
 const validateField = (rawValue: string, validation: string | undefined) => {
   let validationError = undefined;
@@ -19,8 +20,15 @@ const validateField = (rawValue: string, validation: string | undefined) => {
 
 export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
   const { updateElement, disabled, element } = props;
-  const { id, label, fieldLabel, helperText, buttonText, answer, validation } =
-    element;
+  const {
+    id,
+    fieldLabel,
+    helperText,
+    buttonText,
+    answer,
+    validation,
+    disabled: elementDisabled,
+  } = element;
   const [displayValue, setDisplayValue] = useState(answer ?? []);
   const [errorMessages, setErrorMessages] = useState([""]);
 
@@ -65,9 +73,13 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
     updateElement({ answer: newDisplay });
   };
 
+  const isDisabled = () => {
+    return disabled || elementDisabled;
+  };
+
   return (
     <fieldset key="list-input-field">
-      <Label fieldId={id}>{label}</Label>
+      <Label fieldId={id}>{optionalTag(element)}</Label>
       <Hint id={id}>{helperText}</Hint>
       {displayValue.map((field, index) => (
         <HStack
@@ -83,24 +95,25 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
             onChange={(evt) => onChangeHandler(evt, index)}
             onBlur={(evt) => onChangeHandler(evt, index)}
             errorMessage={errorMessages?.[index]}
-            disabled={disabled}
+            disabled={isDisabled()}
           />
           <Button
             variant="unstyled"
             onClick={() => onRemoveHandler(index)}
-            disabled={disabled}
+            disabled={isDisabled()}
             aria-label={`Remove ${field}`}
             leftIcon={<Image src={cancelPrimary} alt="Remove icon" />}
           />
         </HStack>
       ))}
       <Button
+        mt="spacer2"
         variant="outline"
         leftIcon={
-          <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
+          <Image src={isDisabled() ? addGray : addPrimary} alt="Add icon" />
         }
         onClick={onAddHandler}
-        disabled={disabled}
+        disabled={isDisabled()}
       >
         {buttonText}
       </Button>

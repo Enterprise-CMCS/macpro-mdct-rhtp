@@ -1,3 +1,4 @@
+// oxlint-disable unicorn/no-thenable
 import {
   array,
   boolean,
@@ -20,6 +21,11 @@ import {
   UpdateInitiativeOptions,
   RhtpSubType,
   Comment,
+  getExtension,
+  isAllowedFileExtension,
+  ZipRequestTypes,
+  ZipRequestBody,
+  CommentType,
 } from "@rhtp/shared";
 import { error } from "./constants";
 
@@ -51,71 +57,66 @@ const paragraphTemplateSchema = object().shape({
   id: string().required(),
   text: string().required(),
   title: string().notRequired(),
-  weight: string().notRequired(),
+  style: string().notRequired(),
 });
 
-const textboxTemplateSchema = object().shape({
-  type: string().required().matches(new RegExp(ElementType.Textbox)),
+const inputElementSchema = {
   id: string().required(),
   label: string().required(),
   helperText: string().notRequired(),
-  answer: string().notRequired(),
+  helperTextLink: object()
+    .shape({
+      link: string(),
+      label: string(),
+      text: string(),
+    })
+    .notRequired(),
   required: boolean().required(),
-  hideCondition: hideConditionSchema,
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
+  editByRole: array().of(string()).notRequired(),
+};
+
+const textboxTemplateSchema = object().shape({
+  type: string().required().matches(new RegExp(ElementType.Textbox)),
+  ...inputElementSchema,
+  answer: string().notRequired(),
+  hideCondition: hideConditionSchema,
 });
 
 const listInputTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ListInput)),
-  id: string().required(),
-  label: string().required(),
+  ...inputElementSchema,
   fieldLabel: string().required(),
-  helperText: string().required(),
   buttonText: string().required(),
   answer: array().of(string()).notRequired(),
-  required: boolean().required(),
   validation: string().notRequired(),
 });
 
 const numberFieldTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.NumberField)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   answer: number().notRequired(),
-  required: boolean().required(),
   mask: string().notRequired(),
-  quarterly: boolean().notRequired(),
-  disabled: boolean().notRequired(),
 });
 
 const textAreaTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.TextAreaField)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
-  required: boolean().required(),
-  quarterly: boolean().notRequired(),
-  disabled: boolean().notRequired(),
+  charLimit: number().notRequired(),
 });
 
 const dateTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Date)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().required(),
+  ...inputElementSchema,
   answer: string().notRequired(),
-  required: boolean().required(),
 });
 
 const dropdownTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Dropdown)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   options: array().of(
     object().shape({
       label: string().required(),
@@ -125,7 +126,6 @@ const dropdownTemplateSchema = object().shape({
     })
   ),
   answer: string().notRequired(),
-  required: boolean().required(),
 });
 
 const accordionTemplateSchema = object().shape({
@@ -135,25 +135,43 @@ const accordionTemplateSchema = object().shape({
   value: string().required(),
 });
 
-const UseOfFundsAttachmentSchema = object().shape({
+const hasAllowedFileExtension = (value?: string) => {
+  const ext = getExtension(value ?? "");
+  return !!ext && isAllowedFileExtension(ext);
+};
+
+export const uploadListPropSchema = object().shape({
+  name: string()
+    .transform((value) => (value === "" ? undefined : value))
+    .default("Uploaded File")
+    .required()
+    .test(
+      "allowed-extension",
+      "Unsupported file type",
+      hasAllowedFileExtension
+    ),
+  size: number().required(),
+  fileId: string()
+    .required()
+    .test("allowed-extension", "Unsupported file type", hasAllowedFileExtension)
+    .test(
+      "matches-name-extension",
+      "fileId extension must match name extension",
+      function (fileId) {
+        const nameExt = getExtension(this.parent.name ?? "");
+        const fileIdExt = getExtension(fileId ?? "");
+        return !!nameExt && nameExt === fileIdExt;
+      }
+    ),
+});
+
+const ObligatedAndSpentFundsAttachmentSchema = object().shape({
   type: string()
     .required()
-    .matches(new RegExp(ElementType.UseOfFundsAttachment)),
+    .matches(new RegExp(ElementType.ObligatedAndSpentFundsAttachment)),
   id: string().required(),
-  answer: array()
-    .of(
-      object().shape({
-        name: string()
-          .transform((value) => (value === "" ? undefined : value))
-          .default("Uploaded File")
-          .required(),
-        size: number().required(),
-        fileId: string().required(),
-      })
-    )
-    .min(0)
-    .max(1)
-    .notRequired(),
+  label: string().required(),
+  answer: array().of(uploadListPropSchema).min(0).max(1).notRequired(),
   required: boolean().required(),
 });
 
@@ -198,8 +216,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return listInputTemplateSchema;
     case ElementType.TableCheckpoint:
       return tableCheckpointTemplateSchema;
-    case ElementType.UseOfFundsAttachment:
-      return UseOfFundsAttachmentSchema;
+    case ElementType.ObligatedAndSpentFundsAttachment:
+      return ObligatedAndSpentFundsAttachmentSchema;
     case ElementType.InitiativesTable:
       return initiativesTableSchema;
     case ElementType.AttachmentArea:
@@ -219,9 +237,7 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
 
 const radioTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Radio)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   choices: array().of(
     object().shape({
       label: string().required(),
@@ -231,16 +247,13 @@ const radioTemplateSchema = object().shape({
     })
   ),
   answer: string().notRequired(),
-  required: boolean().required(),
   clickAction: string().notRequired(),
   hideCondition: hideConditionSchema,
 });
 
 const checkboxTemplateSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.Checkbox)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().notRequired(),
+  ...inputElementSchema,
   choices: array().of(
     object().shape({
       label: string().required(),
@@ -250,7 +263,6 @@ const checkboxTemplateSchema = object().shape({
     })
   ),
   answer: array().of(string()).notRequired(),
-  required: boolean().required(),
 });
 
 const tableCheckpointTemplateSchema = object().shape({
@@ -274,7 +286,7 @@ const accordionGroupTemplateSchema = object().shape({
     .of(
       object().shape({
         label: string().required(),
-        children: lazy(() => array().of(pageElementSchema).required()),
+        elements: lazy(() => array().of(pageElementSchema).required()),
       })
     )
     .required(),
@@ -292,26 +304,16 @@ const buttonLinkTemplateSchema = object().shape({
 
 const attachmentAreaSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.AttachmentArea)),
-  id: string().required(),
-  label: string().required(),
-  helperText: string().optional(),
-  uploadedSubLabel: string().required(),
-  required: boolean().required(),
-  answer: array().of(
-    object().shape({
-      name: string()
-        .transform((value) => (value === "" ? undefined : value))
-        .default("Uploaded File")
-        .required(),
-      size: number().required(),
-      fileId: string().required(),
-    })
-  ),
+  ...inputElementSchema,
+  answer: array().of(uploadListPropSchema),
+  subLabel: string().notRequired(),
+  message: string().notRequired(),
 });
 
 const ActionElementsSchema = {
   id: string().required(),
   type: string().required(),
+  hintText: string().notRequired(),
   disabled: boolean().notRequired(),
   mask: string().notRequired(),
 };
@@ -363,6 +365,9 @@ const actionTableSchema = object().shape({
 const initiativesTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.InitiativesTable)),
   id: string().required(),
+  quarterly: boolean().notRequired(),
+  disabled: boolean().notRequired(),
+  required: boolean().required(),
 });
 
 const attachmentTableSchema = object().shape({
@@ -371,16 +376,8 @@ const attachmentTableSchema = object().shape({
   answer: array()
     .of(
       object().shape({
-        attachment: object().shape({
-          name: string()
-            .transform((value) => (value === "" ? undefined : value))
-            .default("Uploaded File")
-            .required(),
-          size: number().required(),
-          fileId: string().required(),
-        }),
+        attachment: uploadListPropSchema,
         initiatives: array().of(string().notRequired()).required(),
-        stage: string().notRequired(),
         checkpoint: string().notRequired(),
         status: string().required(),
         canDelete: boolean().notRequired(),
@@ -418,6 +415,7 @@ const statusAlertSchema = object().shape({
   title: string().required(),
   text: string().required(),
   status: string().required(),
+  for: string().notRequired(),
 });
 
 const formPageTemplateSchema = object().shape({
@@ -524,6 +522,49 @@ export const isUpdateInitiativeBody = (
   });
 };
 
+export const isZipRequestBody = (
+  obj: object | undefined
+): obj is ZipRequestBody => {
+  const zipRequestBody = object()
+    .shape({
+      type: mixed<ZipRequestTypes>()
+        .oneOf(Object.values(ZipRequestTypes))
+        .required(),
+      report: object()
+        .shape({
+          state: string().required(),
+          id: string().required(),
+          reportType: mixed<ReportType>()
+            .oneOf(Object.values(ReportType))
+            .required(),
+        })
+        .when("type", {
+          is: ZipRequestTypes.REPORT,
+          then: (schema) =>
+            schema.required("Report information required for REPORT zip"),
+          otherwise: (schema) => schema.notRequired(),
+        }),
+      state: string().notRequired(),
+      reportSubTypeKeys: array()
+        .of(string().required())
+        .when("type", {
+          is: ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS,
+          then: (schema) =>
+            schema.required(
+              "Report sub types required for OBLIGATED_AND_SPENT_FUNDS zip"
+            ),
+          otherwise: (schema) => schema.notRequired(),
+        }),
+    })
+    .required()
+    .noUnknown();
+
+  return zipRequestBody.isValidSync(obj, {
+    stripUnknown: false,
+    strict: true,
+  });
+};
+
 const commentSchema = object().shape({
   contextId: string().required(),
   created: number().required(),
@@ -531,7 +572,7 @@ const commentSchema = object().shape({
   author: string().required(),
   authorEmail: string().required(),
   isInternal: boolean().required(),
-  type: string().required(),
+  type: mixed<CommentType>().oneOf(Object.values(CommentType)).required(),
   comment: string().notRequired(),
   statusChange: string().notRequired(),
   parentReportId: string().notRequired(),

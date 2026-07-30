@@ -27,10 +27,13 @@ interface Props {
 }
 
 export const ExportedReportTable = ({ rows }: Props) => {
-  const getTextColor = (element: ReportTableType) => {
-    return element.response === notAnsweredText && element.required
-      ? "error_darker"
-      : "black";
+  const buildRowValues = (element: ReportTableType) => {
+    const text = element.response ?? notAnsweredText;
+    const color =
+      text === notAnsweredText && element.required ? "error_darker" : "";
+    const isOptional =
+      !element.required && text === notAnsweredText ? ", optional" : "";
+    return { text, color, isOptional };
   };
 
   return (
@@ -42,18 +45,24 @@ export const ExportedReportTable = ({ rows }: Props) => {
         </Tr>
       </Thead>
       <Tbody>
-        {rows.map((row: ReportTableType, idx) => (
-          <Tr key={`${row.indicator}.${idx}`}>
-            <Td>
-              <Text>{row.indicator}</Text>
-              {row.helperText && (
-                <Text color="gray">{parseHtml(row.helperText)}</Text>
-              )}
-              {row.type === ElementType.Date && <Text>MM/DD/YYYY</Text>}
-            </Td>
-            <Td color={getTextColor(row)}>{row.response ?? notAnsweredText}</Td>
-          </Tr>
-        ))}
+        {rows.map((row: ReportTableType, idx) => {
+          const value = buildRowValues(row);
+          return (
+            <Tr key={`${row.indicator}.${idx}`}>
+              <Td>
+                <Text>{row.indicator}</Text>
+                {row.helperText && (
+                  <Text color="gray">{parseHtml(row.helperText)}</Text>
+                )}
+                {row.type === ElementType.Date && <Text>MM/DD/YYYY</Text>}
+              </Td>
+              <Td color={value.color}>
+                {value.text}
+                {value.isOptional}
+              </Td>
+            </Tr>
+          );
+        })}
       </Tbody>
     </Table>
   );

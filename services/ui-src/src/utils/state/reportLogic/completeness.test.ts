@@ -8,7 +8,7 @@ import {
   RadioTemplate,
   Report,
   TextboxTemplate,
-  UseOfFundsAttachmentTemplate,
+  ObligatedAndSpentFundsAttachmentTemplate,
 } from "@rhtp/shared";
 import {
   elementSatisfiesRequired,
@@ -167,7 +167,7 @@ describe("pageIsCompletable", () => {
               accordions: [
                 {
                   label: "",
-                  children: [
+                  elements: [
                     {
                       id: "good-question",
                       type: ElementType.Textbox,
@@ -299,13 +299,31 @@ describe("elementSatisfiesRequired", () => {
     expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
   });
 
-  test("handles UseOfFundsAttachment", () => {
+  test("handles ObligatedAndSpentFundsAttachment", () => {
     const element = {
-      type: ElementType.UseOfFundsAttachment,
-      id: "use-of-funds",
+      type: ElementType.ObligatedAndSpentFundsAttachment,
+      id: "obligated-and-spent-funds",
       answer: [{ name: "mock-file-name", size: 100, fileId: "mock-id" }],
       required: true,
-    } as UseOfFundsAttachmentTemplate;
+    } as ObligatedAndSpentFundsAttachmentTemplate;
     expect(elementSatisfiesRequired(element, [element])).toBeTruthy();
+  });
+
+  test("handles invalid email field", () => {
+    const element = {
+      type: ElementType.Textbox,
+      id: "test-email-field",
+      required: true,
+    } as TextboxTemplate;
+    const invalidEmail = {
+      ...element,
+      answer: "not-a-valid-email",
+    };
+    const validEmail = {
+      ...element,
+      answer: "test@email.com",
+    };
+    expect(elementSatisfiesRequired(invalidEmail, [invalidEmail])).toBeFalsy();
+    expect(elementSatisfiesRequired(validEmail, [validEmail])).toBeTruthy();
   });
 });

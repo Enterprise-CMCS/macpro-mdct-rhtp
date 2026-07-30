@@ -1,14 +1,18 @@
 import { Box, Checkbox, Image } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import arrowIcon from "assets/icons/arrows/icon_arrow_up_black.svg";
+import { InlineError } from "@cmsgov/design-system";
+import { DropdownOptions } from "types";
 
 interface Prop {
   label: string;
   values: string[];
-  options: { label: string; value: string }[];
+  options: DropdownOptions[];
   placeholder: string;
   countLabel: string;
   onChange: (item: string[]) => void;
+  errorMessage?: string;
+  disabled?: boolean;
 }
 
 export const MultiSelect = ({
@@ -18,11 +22,13 @@ export const MultiSelect = ({
   countLabel,
   placeholder,
   onChange,
+  errorMessage,
+  disabled,
 }: Prop) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [filteredValues, setFilteredValues] =
-    useState<{ label: string; value: string }[]>(options);
+    useState<DropdownOptions[]>(options);
 
   const onClick = () => {
     setIsOpen(!isOpen);
@@ -40,11 +46,15 @@ export const MultiSelect = ({
       }
     };
 
-    window.addEventListener("click", clickOutOfBounds);
+    //hotfix: when trying to use multiselect in a charkra modal, addEventListener does not register clicks unless it's attached to the modal itself
+    const modal = document.getElementsByClassName("chakra-modal__content");
+    const view = modal.length > 0 ? modal[0] : window;
+
+    (view as HTMLElement).addEventListener("click", clickOutOfBounds);
 
     //when component unmounts, it will run this function
     return () => {
-      window.removeEventListener("click", clickOutOfBounds);
+      (view as HTMLElement).removeEventListener("click", clickOutOfBounds);
     };
   }, []);
 
@@ -71,6 +81,10 @@ export const MultiSelect = ({
     }
   };
 
+  const counter = () => {
+    return values.filter((value) => value !== "all").length;
+  };
+
   const field = () => {
     return isOpen ? (
       <input
@@ -80,15 +94,17 @@ export const MultiSelect = ({
         onChange={onSearch}
         value={search}
         aria-label={`Search ${countLabel} by name`}
+        disabled={disabled}
       />
     ) : (
       <input
-        id="multi-filter"
-        name="multi-filter"
+        id="multi-select"
+        name="multi-select"
         type="button"
         onClick={onClick}
-        value={`${countLabel} (${values.length})`}
-        aria-label={`${countLabel} Filter`}
+        value={`${countLabel} (${counter()})`}
+        aria-label={`${countLabel} select`}
+        disabled={disabled}
       />
     );
   };
@@ -96,6 +112,7 @@ export const MultiSelect = ({
   return (
     <Box sx={sx.container} id="multiselect">
       <Box className="ds-c-label">{label}</Box>
+      {errorMessage ? <InlineError>{errorMessage}</InlineError> : null}
       <Box position="relative" id={`multiselect-field-${label}`}>
         <Box className="displayContainer">
           {field()}
@@ -135,7 +152,7 @@ const sx = {
     position: "relative",
     display: "flex",
     flexDir: "column",
-    width: "190px",
+    minWidth: "190px",
     zIndex: "1001",
     ".ds-c-label": {
       marginBottom: "8px",
@@ -163,6 +180,10 @@ const sx = {
         border: "2px solid black",
         borderRadius: "3px",
         padding: "8px",
+        "&:disabled": {
+          backgroundColor: "gray_lighter",
+          borderColor: "gray_light",
+        },
       },
       img: {
         position: "absolute",

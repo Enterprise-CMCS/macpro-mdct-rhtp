@@ -1,9 +1,10 @@
-import { putComment, queryComments } from "./comments";
+import { batchPutComments, putComment, queryComments } from "./comments";
 import { Comment, CommentType } from "@rhtp/shared";
 import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
+  BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 
@@ -27,7 +28,7 @@ describe("Comment storage helpers", () => {
     mockDynamo.reset();
   });
 
-  describe("putReport", () => {
+  describe("putComment", () => {
     test("should call DynamoDB to put comment data", async () => {
       const mockPut = vi.fn();
       mockDynamo.on(PutCommand).callsFake(mockPut);
@@ -86,6 +87,73 @@ describe("Comment storage helpers", () => {
           },
           ScanIndexForward: false,
           FilterExpression: "isInternal = :isInternal",
+        },
+        expect.any(Function)
+      );
+    });
+  });
+
+  describe("batchPutComments", () => {
+    test("should call DynamoDB to batch put comment data", async () => {
+      const mockBatchWrite = vi.fn();
+      mockDynamo.on(BatchWriteCommand).callsFake(mockBatchWrite);
+
+      await batchPutComments([mockComment]);
+
+      expect(mockBatchWrite).toHaveBeenCalledWith(
+        {
+          RequestItems: {
+            "local-comments": [
+              {
+                PutRequest: {
+                  Item: mockComment,
+                },
+              },
+            ],
+          },
+        },
+        expect.any(Function)
+      );
+    });
+
+    test("should batch properly", async () => {
+      const mockBatchWrite = vi.fn();
+      mockDynamo.on(BatchWriteCommand).callsFake(mockBatchWrite);
+
+      const manyComments = Array.from({ length: 26 }, () => mockComment);
+
+      await batchPutComments(manyComments);
+
+      const responseComments = Array.from({ length: 25 }, () => {
+        return {
+          PutRequest: {
+            Item: mockComment,
+          },
+        };
+      });
+
+      expect(mockBatchWrite).toHaveBeenNthCalledWith(
+        1,
+        {
+          RequestItems: {
+            "local-comments": responseComments,
+          },
+        },
+        expect.any(Function)
+      );
+
+      expect(mockBatchWrite).toHaveBeenNthCalledWith(
+        2,
+        {
+          RequestItems: {
+            "local-comments": [
+              {
+                PutRequest: {
+                  Item: mockComment,
+                },
+              },
+            ],
+          },
         },
         expect.any(Function)
       );

@@ -1,40 +1,128 @@
 import { JSX, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate } from "react-router";
 import {
   Button,
   Heading,
-  Text,
   Flex,
   Accordion,
   Spinner,
   Stack,
   HStack,
   Image,
+  Box,
+  Text,
 } from "@chakra-ui/react";
-import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
-import { Report, ReportType, StateNames } from "@rhtp/shared";
-import { PageTemplate, AccordionItem } from "components";
+import {
+  Dropdown as CmsdsDropdownField,
+  Dropdown,
+} from "@cmsgov/design-system";
+import {
+  AlertTypes,
+  dropdownEmptyOption,
+  Report,
+  ReportType,
+  StateDropdownOptions,
+  StateNames,
+  UserRoles,
+} from "@rhtp/shared";
+import { PageTemplate, AccordionItem, Modal, Alert } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
-import { formatMonthDayYear, getReportByType, reportBasePath } from "utils";
+import {
+  createReport,
+  formatMonthDayYear,
+  getReportByType,
+  reportBasePath,
+  useStore,
+} from "utils";
 import { MultiSelect } from "./Multiselect";
 import closeTag from "assets/icons/close/icon_close_tag.svg";
 import { budgetPeriodFilterOptions } from "./../../constants";
-import { ReportCommentDrawer } from "components/modals/CommentDrawers";
+import { ReportCommentDrawer } from "components/drawers/ReportCommentDrawer";
 import { getStatus } from "utils/other/status";
+import { getAssignedStatesByEmail } from "utils/api/requestMethods/notificationRecipients";
+import { DropdownOptions } from "types";
+import { useFlags } from "launchdarkly-react-client-sdk";
 
-const buildStateOptions = () => {
-  const stateValues = [];
-  for (const [key, value] of Object.entries(StateNames)) {
-    stateValues.push({
-      label: value,
-      value: key,
-    });
-  }
-  return stateValues;
+const AdminCreateReportModal = ({
+  modalDisclosure,
+  reports,
+  reloadReports,
+}: any) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [errorAlert, setErrorAlert] = useState();
+  const [selectedState, setSelectedState] = useState(dropdownEmptyOption.value);
+  const [dropdownOptions, setDropdownOptions] =
+    useState<DropdownOptions[]>(StateDropdownOptions);
+
+  const onClose = () => {
+    setErrorAlert(undefined);
+    setSelectedState(dropdownEmptyOption.value);
+    modalDisclosure.onClose();
+  };
+
+  const onSubmit = async () => {
+    setSubmitting(true);
+
+    try {
+      await createReport(ReportType.RHTP, selectedState);
+      await reloadReports(ReportType.RHTP);
+      onClose();
+    } catch (error: any) {
+      const errorMessage =
+        error.message?.split(" - ").at(-1) || "Unknown error";
+      setErrorAlert(errorMessage);
+    }
+
+    setSubmitting(false);
+  };
+
+  useEffect(() => {
+    const statesAlreadyCreated = reports.map((report: Report) => report.state);
+    const options = StateDropdownOptions.filter(
+      ({ value }) => !statesAlreadyCreated.includes(value)
+    );
+    setDropdownOptions([dropdownEmptyOption, ...options]);
+  }, [modalDisclosure.isOpen]);
+
+  return (
+    <Modal
+      modalDisclosure={{
+        isOpen: modalDisclosure.isOpen,
+        onClose: onClose,
+      }}
+      content={{
+        heading: "Start First Annual Report",
+        subheading:
+          "This will start the first annual report for the state selected below.",
+        actionButtonText: "Start",
+      }}
+      onConfirmHandler={onSubmit}
+      submitting={submitting}
+    >
+      {errorAlert !== undefined && (
+        <Alert status={AlertTypes.ERROR} title="Failed to create report">
+          {errorAlert}
+        </Alert>
+      )}
+      <Dropdown
+        label="State"
+        name="State"
+        onChange={(event) => setSelectedState(event.target.value)}
+        options={dropdownOptions}
+        value={selectedState}
+      />
+    </Modal>
+  );
 };
 
 const budgetPeriodValues = [1, 2, 3, 4, 5];
 const stateAbbr = Object.keys(StateNames);
+
+const getSavedStateFilter = () => {
+  const savedFilter = localStorage.getItem("states");
+  if (!savedFilter) return [];
+  return savedFilter.split(",");
+};
 
 export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -44,14 +132,10 @@ export const AdminDashboard = () => {
     (string | number | JSX.Element | undefined)[][]
   >([]);
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [budgetValue, setBudgetValue] = useState(
-    searchParams.get("budgetPeriod") || "All"
-  );
+  const [budgetValue, setBudgetValue] = useState("All");
   const [selectedStates, setSelectedStates] = useState<string[]>(
-    searchParams.get("states")?.split(",") ?? []
+    getSavedStateFilter()
   );
-  const states = buildStateOptions();
   const [lastSorted, setLastSorted] = useState<{
     sort: string;
     type: SORT_TYPE;
@@ -59,6 +143,19 @@ export const AdminDashboard = () => {
 
   const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report>();
+  const [createReportModalOpen, setCreateReportModalOpen] = useState(false);
+  const { email: userEmail, userRole } = useStore().user ?? {};
+  const flags = useFlags();
+  const userCanStartReport =
+    [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER].includes(
+      userRole as UserRoles
+    ) && flags?.adminCanEditReport;
+
+  const setStatesHandler = (states: string[]) => {
+    const sortedStates = states.toSorted();
+    localStorage.setItem("states", sortedStates.join(","));
+    setSelectedStates(sortedStates);
+  };
 
   const reloadReports = async (reportType: string) => {
     setIsLoading(true);
@@ -70,38 +167,32 @@ export const AdminDashboard = () => {
     setIsLoading(false);
   };
 
-  //when the page is loaded, we load the reports
+  const getAssignedStatesForUser = async () => {
+    const sessionStateFilter = localStorage.getItem("states");
+    if (!userEmail || sessionStateFilter !== null) return;
+    setIsLoading(true);
+    const assignedStates = await getAssignedStatesByEmail(userEmail);
+    setStatesHandler(assignedStates);
+    setIsLoading(false);
+  };
+
+  //when the page is loaded, we load the reports and states assigned to the user
   useEffect(() => {
     //we don't have any other report types so defaulting to RHTP
     reloadReports(ReportType.RHTP);
+    getAssignedStatesForUser();
   }, []);
 
   useEffect(() => {
-    const savingStates = selectedStates.join(",");
-
-    if (selectedStates.length === 0 && budgetValue === "All") {
-      setSearchParams();
-    } else {
-      setSearchParams({
-        budgetPeriod: budgetValue.toString(),
-        states: savingStates,
-      });
-    }
-  }, [selectedStates, budgetValue]);
-
-  useEffect(() => {
-    const paramBudgetPeriod = searchParams.get("budgetPeriod");
-    const paramStates = searchParams.get("states");
-
     const filterBudgetPeriod =
-      paramBudgetPeriod == null || paramBudgetPeriod == "All"
+      budgetValue == null || budgetValue == "All"
         ? budgetPeriodValues
-        : [parseInt(paramBudgetPeriod)];
+        : [parseInt(budgetValue)];
 
-    const filterStates =
-      paramStates == null || paramStates == ""
-        ? stateAbbr
-        : paramStates.split(",");
+    const sessionStateFilter = localStorage.getItem("states");
+    const filterStates = !sessionStateFilter
+      ? stateAbbr
+      : sessionStateFilter.split(",");
 
     const filtered = reports.filter(
       (report) =>
@@ -110,7 +201,7 @@ export const AdminDashboard = () => {
     );
 
     setSortedReports(filtered);
-  }, [reports, searchParams]);
+  }, [reports, selectedStates, budgetValue]);
 
   //after reports are filtered, we apply the last saved sort
   useEffect(() => {
@@ -122,7 +213,7 @@ export const AdminDashboard = () => {
   };
 
   const clearFilter = () => {
-    setSelectedStates([]);
+    setStatesHandler([]);
     setBudgetValue("All");
     setSortedReports(reports);
   };
@@ -133,11 +224,7 @@ export const AdminDashboard = () => {
 
   const removeTag = (deleteTag: string) => {
     const remainingTags = selectedStates.filter((tag) => tag != deleteTag);
-    setSelectedStates(remainingTags);
-    setSearchParams({
-      budgetPeriod: budgetValue.toString(),
-      states: remainingTags.join(","),
-    });
+    setStatesHandler(remainingTags);
   };
 
   const openCommentsDrawer = (report: Report) => {
@@ -145,9 +232,10 @@ export const AdminDashboard = () => {
     setCommentDrawerOpen(true);
   };
 
-  const closeCommentsDrawer = () => {
+  const closeCommentsDrawer = (shouldReload?: boolean) => {
     setSelectedReport(undefined);
     setCommentDrawerOpen(false);
+    if (shouldReload) reloadReports(ReportType.RHTP);
   };
 
   const buildRows = (reports: Report[]) => {
@@ -221,28 +309,64 @@ export const AdminDashboard = () => {
     <PageTemplate type="report" sxOverride={sx.layout}>
       <Stack sx={sx.box} gap="2rem">
         <Heading as="h1" variant="h1">
-          Admin Dashboard
+          RHTP Admin Dashboard
         </Heading>
-        <Text>
-          Instructions go here that need to be seen at all times. Provide
-          details and context to help the user complete this page.
-        </Text>
         <Accordion
           allowToggle={true}
           defaultIndex={[-1]} // sets the accordion to closed by default
         >
-          <AccordionItem label="Instructions">[Needs content]</AccordionItem>
+          <AccordionItem label="Admin Instructions">
+            {" "}
+            <Box sx={sx.accordionPanel}>
+              <ul>
+                <li>
+                  To view a state or territory's submission, select View Report.
+                </li>
+                <li>
+                  To allow a state or territory to edit a submission, select
+                  Comment/Status and change the status to Unlock.
+                </li>
+                <li>
+                  The # column shows the submission count. This increases by 1
+                  each time a state updates and resubmits a previous report.
+                </li>
+              </ul>
+            </Box>
+          </AccordionItem>
         </Accordion>
+        {userCanStartReport && (
+          <Box>
+            <Text mb="spacer2">
+              To begin the first annual report for a state, select Start First
+              Annual Report.
+            </Text>
+            <Button
+              variant="outline"
+              onClick={() => setCreateReportModalOpen(true)}
+            >
+              Start First Annual Report
+            </Button>
+          </Box>
+        )}
+        <Heading as="h2" variant="h2">
+          State Submissions
+        </Heading>
+        <Box>
+          The table below lists RHTP reports for all states. By default, this
+          list is automatically filtered to show your assigned states. Selecting
+          an option from the State(s) or Budget Period dropdowns will
+          immediately update the table content below. You can search and select
+          multiple states to add them to your view, or select Clear Filters to
+          reset the table.
+        </Box>
         <Flex gap="spacer3" alignItems="flex-end" sx={sx.filters}>
           <MultiSelect
             label="State(s)"
             placeholder="Search states"
             countLabel="States"
-            options={states}
+            options={StateDropdownOptions}
             values={selectedStates}
-            onChange={(selected) => {
-              setSelectedStates(selected);
-            }}
+            onChange={(selected) => setStatesHandler(selected)}
           />
           <CmsdsDropdownField
             name="budgetPeriodFilter"
@@ -255,14 +379,12 @@ export const AdminDashboard = () => {
             onClick={clearFilter}
             variant="link"
             height="40px"
+            fontWeight="bold"
             aria-label="Clear All Filters"
           >
             Clear Filters
           </Button>
         </Flex>
-        <Text>
-          [placeholder text for letting users know that filters auto apply]
-        </Text>
         {selectedStates.length > 0 && (
           <Flex gap=".75rem" flexWrap="wrap">
             {selectedStates.map((tag) => (
@@ -306,9 +428,16 @@ export const AdminDashboard = () => {
             onClose: closeCommentsDrawer,
           }}
           selectedReport={selectedReport}
-          reloadReports={reloadReports}
         />
       )}
+      <AdminCreateReportModal
+        modalDisclosure={{
+          isOpen: createReportModalOpen,
+          onClose: () => setCreateReportModalOpen(false),
+        }}
+        reports={reports}
+        reloadReports={reloadReports}
+      />
     </PageTemplate>
   );
 };
@@ -328,6 +457,11 @@ const sx = {
   filters: {
     ".ds-c-dropdown__menu-container": {
       zIndex: "1001",
+    },
+  },
+  accordionPanel: {
+    ".mobile &": {
+      paddingTop: "spacer2",
     },
   },
 };

@@ -17,7 +17,7 @@ export const generalInformation: FormPageTemplate = {
       label: "Authorized Organizational Representative (AOR)",
       required: true,
       helperText:
-        "Enter the name or position title for CMS to contact with questions about this report.",
+        "Enter the name for CMS to contact with questions about this report.",
       quarterly: true,
     },
     {
@@ -25,7 +25,7 @@ export const generalInformation: FormPageTemplate = {
       id: "aor-email",
       label: "Authorized Organizational Representative (AOR) Contact email",
       required: true,
-      helperText: "A department or program-wide email address is acceptable.",
+      helperText: "Enter the email address for the AOR.",
       quarterly: true,
     },
     {
@@ -34,7 +34,7 @@ export const generalInformation: FormPageTemplate = {
       label: "Principal Investigator or Program Director",
       required: true,
       helperText:
-        "Enter the name or position title for CMS to contact with questions about this report.",
+        "Enter the name for CMS to contact with questions about this report.",
       quarterly: true,
     },
     {
@@ -42,7 +42,24 @@ export const generalInformation: FormPageTemplate = {
       id: "pipd-email",
       label: "Principal Investigator or Program Director Contact email",
       required: true,
-      helperText: "A department or program-wide email address is acceptable.",
+      helperText: "Enter the email address for the PI/PD.",
+      quarterly: true,
+    },
+    {
+      type: ElementType.Textbox,
+      id: "poc-noa",
+      label: "Point of Contact (POC) listed in NoA",
+      required: false,
+      helperText: "Optionally added and approved by CMS.",
+      quarterly: true,
+    },
+    {
+      type: ElementType.Textbox,
+      id: "poc-email",
+      label: "Point of Contact (POC) email",
+      required: false,
+      helperText:
+        "Enter the email address for the Additional Point of Contact listed in the NoA.",
       quarterly: true,
     },
   ],

@@ -1,65 +1,41 @@
 import {
-  ActionAnswerShape,
   ActionTableTemplate,
   ElementType,
-  InitiativePageTemplate,
+  FormPageTemplate,
   PageStatus,
   PageType,
   Report,
-  TextboxTemplate,
 } from "@rhtp/shared";
-import { validReport } from "../tests/mockReport";
+import {
+  metricAnswers,
+  mockAddedInitiatives,
+  mockStatePolicyCommitments,
+  validReport,
+} from "../tests/mockReport";
 import { copyReport } from "./copyReport";
 
 const mockGetReport = vi.fn();
+const mockQueryComments = vi.fn();
+const mockBatchComments = vi.fn();
+const mockBatchUploads = vi.fn();
+const mockQueryUpload = vi.fn();
 
 vi.mock("../../storage/reports", () => ({
   getReport: () => mockGetReport(),
 }));
 
+vi.mock("../../storage/comments", () => ({
+  queryComments: () => mockQueryComments(),
+  batchPutComments: () => mockBatchComments(),
+}));
+
+vi.mock("../../storage/upload", () => ({
+  queryUpload: () => mockQueryUpload(),
+  batchPutUploads: () => mockBatchUploads(),
+}));
+
 const mockInitiativeAnswer = "mock text answer";
 const metricStartingCurrentValue = "1000";
-
-const metricAnswers: ActionAnswerShape[] = [
-  [
-    { id: "status", value: "active" },
-    { id: "metric", value: "hello" },
-    { id: "prevValue", value: "" },
-    { id: "currValue", value: metricStartingCurrentValue },
-    { id: "date", value: "2/2/2025" },
-  ],
-];
-
-const mockAddedInitiatives = [
-  {
-    id: "added-initiative-1",
-    title: "Added Initiative 1",
-    initiativeNumber: "0987",
-    elements: [
-      {
-        type: ElementType.Textbox,
-        id: "mock-added-initiative-element",
-        label: "Added Initiative element",
-        required: true,
-        answer: mockInitiativeAnswer,
-      } as TextboxTemplate,
-      {
-        id: "metrics-table", // id match for specific logic
-        type: ElementType.ActionTable,
-        label: "Metric table element",
-        required: true,
-        answer: metricAnswers,
-      } as unknown as ActionTableTemplate,
-    ],
-  },
-  {
-    id: "added-initiative-2",
-    title: "Added Initiative 2",
-    initiativeNumber: "1010",
-    status: PageStatus.ABANDONED,
-    elements: [],
-  },
-] as InitiativePageTemplate[];
 
 const mockOldReport: Report = {
   ...validReport,
@@ -95,8 +71,9 @@ const mockOldReport: Report = {
           answer: metricAnswers,
         } as unknown as ActionTableTemplate,
         {
-          id: "use-of-funds-attachment",
-          type: ElementType.UseOfFundsAttachment,
+          id: "obligated-and-spent-funds-attachment",
+          type: ElementType.ObligatedAndSpentFundsAttachment,
+          label: "mock label",
           answer: [
             {
               name: "file-name",
@@ -106,8 +83,28 @@ const mockOldReport: Report = {
           ],
           required: true,
         },
+        {
+          id: "initiative-narrative",
+          type: ElementType.TextAreaField,
+          label: "mock text area",
+          required: true,
+          answer: "mock answer for textfield",
+        },
       ],
     },
+    ...mockAddedInitiatives,
+    ...mockStatePolicyCommitments,
+    {
+      id: "sustainability-and-highlights",
+      elements: [
+        {
+          id: "mock-sah-input-element",
+          type: ElementType.Textbox,
+          required: true,
+          answer: "mock answer",
+        },
+      ],
+    } as FormPageTemplate,
   ],
 };
 
@@ -116,8 +113,7 @@ const mockNewReport: any = structuredClone(mockOldReport);
 mockNewReport.id = "mock-new-report";
 mockNewReport.copyFromReportId = "mock-old-report";
 delete mockNewReport.pages[1].elements[1].answer;
-// add initiative to old report that's not in new report, so we can test it copies
-mockOldReport.pages.push(...mockAddedInitiatives);
+delete mockNewReport.pages[5].elements[0].answer; // remove answer from sustainability and highlights element
 
 describe("copyReport util", () => {
   test("copyReport copies data from old report into new one, including initiative pages and answers", async () => {
@@ -142,6 +138,9 @@ describe("copyReport util", () => {
     expect(mockNewReport.pages[2].elements[0].answer).toEqual(
       mockInitiativeAnswer
     );
+
+    //did not copy initiative-narrative text area
+    expect(mockNewReport.pages[1].elements[4].answer).toEqual(undefined);
 
     // metrics in added initiative — current values get copied to previous value, then cleared
     const newMetricAnswerRow = mockNewReport.pages[2].elements[1].answer[0];
@@ -177,7 +176,45 @@ describe("copyReport util", () => {
       ])
     );
 
-    const existingUseOfFunds = mockNewReport.pages[1].elements[3].answer;
-    expect(existingUseOfFunds).toEqual([]);
+    const existingObligatedAndSpentFunds = mockNewReport.pages[1].elements[3];
+    expect(existingObligatedAndSpentFunds).not.toHaveProperty("answer");
+
+    // Verify state policy commitments are copied correctly
+    const newPolicyCommitments = mockNewReport.pages[4].elements[0].accordions;
+    expect(newPolicyCommitments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "State Policy Commitment 1",
+          elements: [
+            expect.objectContaining({
+              type: ElementType.Textbox,
+              id: "state-policy-commitment-1-textbox",
+              label: "State Policy Commitment 1 Textbox",
+              answer: "State Policy Commitment 1 Answer",
+            }),
+            {
+              answer: [
+                {
+                  fileId: "mock-id",
+                  name: "mock-name",
+                  size: 100,
+                },
+              ],
+              id: "attachment-id",
+              type: "attachmentArea",
+            },
+          ],
+        }),
+      ])
+    );
+
+    // verify sustainability and highlights is skipped and answers are not copied
+    const mockSustainabilityAndHighlightsPage = mockNewReport.pages[5];
+    expect(mockSustainabilityAndHighlightsPage.id).toEqual(
+      "sustainability-and-highlights"
+    );
+    expect(mockSustainabilityAndHighlightsPage.elements[0]).not.toHaveProperty(
+      "answer"
+    );
   });
 });

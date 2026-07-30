@@ -4,6 +4,6 @@ export default [
     version: ".v0",
     numPartitions: 1,
     replicationFactor: 3,
-    topics: [".rhtp-reports"],
+    topics: [".rhtp-reports", ".rhtp-comments"],
   },
 ];

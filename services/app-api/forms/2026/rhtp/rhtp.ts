@@ -6,26 +6,26 @@ import { initiativesTable } from "./pages/initiatives-table";
 import { reviewAndSubmit } from "./pages/review-and-submit";
 import { buildStatePolicyCommitments } from "./pages/state-policy-commitments/state-policy-commitments";
 import { sustainabilityAndHighlights } from "./pages/sustainability-and-highlights";
-import { useOfFunds } from "./pages/use-of-funds";
+import { obligatedAndSpentFunds } from "./pages/obligated-and-spent-funds";
 
 export const rhtpReportTemplate = (state: string): ReportPages => [
   {
     id: "root",
     childPageIds: [
       "general-information",
-      "initiative-attachments",
       "initiatives",
+      "initiative-attachments",
       "state-policy-commitments",
-      "use-of-funds",
+      "obligated-and-spent-funds",
       "sustainability-and-highlights",
       "review-submit",
     ],
   },
   generalInformation,
-  initiativeAttachments,
   initiativesTable,
+  initiativeAttachments,
   buildStatePolicyCommitments(state),
-  useOfFunds,
+  obligatedAndSpentFunds,
   sustainabilityAndHighlights,
   reviewAndSubmit,
   ...buildInitiativePages(state),

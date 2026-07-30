@@ -9,6 +9,7 @@ import {
   Report,
 } from "@rhtp/shared";
 import { isFormPageTemplate, assertExhaustive } from "types";
+import { isEmail } from "utils/validation/inputValidation";
 
 /**
  * Calculate the status of any page, including calculated values.
@@ -98,7 +99,7 @@ export const pageIsCompletable = (report: Report, pageId: string) => {
     for (const element of targetPage.elements) {
       if (element.type === ElementType.AccordionGroup) {
         const accordionElements = element.accordions.flatMap(
-          (accordion) => accordion.children
+          (accordion) => accordion.elements
         );
         for (const element of accordionElements) {
           const satisfied = elementSatisfiesRequired(
@@ -172,8 +173,11 @@ export const elementSatisfiesRequired = (
     );
     return answers.every((column) => column.value !== "");
   }
-  if (element.type == ElementType.UseOfFundsAttachment) {
+  if (element.type == ElementType.ObligatedAndSpentFundsAttachment) {
     return element.answer.length > 0;
+  }
+  if (element.id.includes("email") && typeof element.answer === "string") {
+    return isEmail(element.answer);
   }
 
   return true;

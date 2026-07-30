@@ -1,4 +1,4 @@
-import { ReportType, RhtpSubTypeData, RhtpSubTypeMap } from "@rhtp/shared";
+import { RhtpSubTypeData, RhtpSubTypeMap } from "@rhtp/shared";
 import { rhtpReportTemplate } from "../forms/2026/rhtp/rhtp";
 
 export const RhtpSubTypeTemplateMap: RhtpSubTypeData = {
@@ -90,10 +90,4 @@ export const error = {
   END_DATE_BEFORE_START_DATE: "End date can't be before start date",
 };
 
-export const reportTables: { [key in ReportType]: string } = {
-  RHTP: process.env.RhtpReportsTable!,
-};
-
-export const tableTopics: { [key in ReportType]: string } = {
-  RHTP: "rhtp-reports",
-};
+export const reportTable = process.env.ReportsTable!;

@@ -9,14 +9,17 @@ import {
   ExportedReportPage,
   ReportPageWrapper,
   ComponentInventory,
+  NotificationsPage,
+  ExportedZipPage,
 } from "components";
 import { useStore } from "utils";
 import { useEffect } from "react";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { ReportAutosaveProvider } from "components/report/ReportAutosaveProvider";
+import { UserRoles } from "@rhtp/shared";
 
 export const AppRoutes = () => {
-  const { userIsAdmin } = useStore().user ?? {};
+  const { userIsAdmin, userRole } = useStore().user ?? {};
 
   const { pathname } = useLocation();
   const isPdfActive = useFlags()?.viewPdf;
@@ -39,6 +42,17 @@ export const AppRoutes = () => {
             path="/admin"
             element={!userIsAdmin ? <Navigate to="/profile" /> : <AdminPage />}
           />
+          <Route
+            path="/notifications"
+            element={
+              userRole !== UserRoles.APPROVER ? (
+                <Navigate to="/profile" />
+              ) : (
+                <NotificationsPage />
+              )
+            }
+          />
+          <Route path="/export" element={<ExportedZipPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="*" element={<NotFoundPage />} />

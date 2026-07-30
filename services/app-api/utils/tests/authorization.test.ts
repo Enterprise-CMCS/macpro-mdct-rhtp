@@ -1,4 +1,5 @@
 import {
+  canModifyNotificationRecipients,
   canReadState,
   canReleaseReport,
   canWriteBanner,
@@ -27,6 +28,10 @@ const helpDeskUser = {
 const stateUser = {
   role: UserRoles.STATE_USER,
   state: "CO",
+} as User;
+
+const projectOfficerUser = {
+  role: UserRoles.PROJECT_OFFICER,
 } as User;
 
 describe("Authorization functions", () => {
@@ -102,6 +107,20 @@ describe("Authorization functions", () => {
       expect(canReleaseReport(stateUser)).toBe(false);
       expect(canReleaseReport(helpDeskUser)).toBe(false);
       expect(canReleaseReport(internalUser)).toBe(false);
+    });
+  });
+
+  describe("canModifyNotificationRecipients", () => {
+    test("should allow approvers", () => {
+      expect(canModifyNotificationRecipients(approverUser)).toBe(true);
+    });
+
+    test("should not allow state users, help desk, internal users, project officers, and admins", () => {
+      expect(canReleaseReport(stateUser)).toBe(false);
+      expect(canReleaseReport(helpDeskUser)).toBe(false);
+      expect(canReleaseReport(internalUser)).toBe(false);
+      expect(canModifyNotificationRecipients(adminUser)).toBe(false);
+      expect(canModifyNotificationRecipients(projectOfficerUser)).toBe(false);
     });
   });
 });

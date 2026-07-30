@@ -1,4 +1,9 @@
-import { FormPageTemplate, PageStatus, PageType } from "@rhtp/shared";
+import {
+  ElementType,
+  FormPageTemplate,
+  PageStatus,
+  PageType,
+} from "@rhtp/shared";
 import { validReport } from "../../tests/mockReport";
 import { updateInitiativeStatus } from "./initiatives";
 
@@ -17,6 +22,15 @@ describe("initiative utilities", () => {
             id: "mock-initiative-name-123",
             title: "Mock Initiative Name",
             type: PageType.Standard,
+            elements: [
+              {
+                type: ElementType.Textbox,
+                required: true,
+                label: "Contact title",
+                helperText:
+                  "Enter person's title or a position title for CMS to contact with questions about this request.",
+              },
+            ],
           } as FormPageTemplate,
         ],
       };

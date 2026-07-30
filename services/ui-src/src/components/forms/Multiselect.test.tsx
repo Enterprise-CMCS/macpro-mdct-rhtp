@@ -30,12 +30,12 @@ describe("<MultiSelect />", () => {
   it("Test Multiselect renders", () => {
     expect(screen.getByText("mock select")).toBeVisible();
     expect(
-      screen.getByRole("button", { name: "options Filter" })
+      screen.getByRole("button", { name: "options select" })
     ).toBeVisible();
   });
 
   it("Test multi-selection of the options", () => {
-    const dropdownBtn = screen.getByRole("button", { name: "options Filter" });
+    const dropdownBtn = screen.getByRole("button", { name: "options select" });
     fireEvent.click(dropdownBtn);
 
     const optCheckbox1 = screen.getByRole("checkbox", { name: "option 1" });
@@ -49,7 +49,7 @@ describe("<MultiSelect />", () => {
   });
 
   it("Test filter search", () => {
-    const dropdownBtn = screen.getByRole("button", { name: "options Filter" });
+    const dropdownBtn = screen.getByRole("button", { name: "options select" });
     fireEvent.click(dropdownBtn);
 
     const search = screen.getByRole("searchbox", {

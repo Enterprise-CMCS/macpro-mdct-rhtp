@@ -103,6 +103,12 @@ export const AddEditInitiativeModal = ({
     }
   };
 
+  const getSubHeaderText = () => {
+    return selectedInitiative
+      ? "Abandoning this initiative will mark it as abandoned. Historical data will be retained, but the state will no longer be prompted to update its progress."
+      : "";
+  };
+
   return (
     <Modal
       modalDisclosure={{
@@ -113,6 +119,7 @@ export const AddEditInitiativeModal = ({
       submitting={submitting}
       content={{
         heading: getHeaderText(),
+        subheading: getSubHeaderText(),
         actionButtonText: "Save",
         closeButtonText: "Cancel",
       }}

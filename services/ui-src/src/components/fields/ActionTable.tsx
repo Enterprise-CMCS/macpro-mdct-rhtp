@@ -1,17 +1,21 @@
-import { Flex, Button, Image } from "@chakra-ui/react";
-import { Hint, Label } from "@cmsgov/design-system";
+import { Flex, Button, Image, Heading, Stack } from "@chakra-ui/react";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useState } from "react";
+import { useParams } from "react-router";
 import {
   ActionTableTemplate,
   ActionRowElement,
   ActionAnswerShape,
   ElementType,
-  isCompleteStatus,
+  InitiativePageTemplate,
+  PageStatus,
 } from "@rhtp/shared";
-import { useStore } from "utils";
-import { buildElement } from "utils/state/reportLogic/tableBuilder";
+import { optionalTag, parseHtml, useStore } from "utils";
+import {
+  buildElement,
+  getErrorMessage,
+} from "utils/state/reportLogic/tableBuilder";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { unmaskByType } from "utils/validation/inputValidation";
@@ -30,10 +34,16 @@ const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
 const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
-  onChange: (value: string[], index: number, id: string) => void,
+  onChange: (
+    value: string[],
+    index: number,
+    id: string,
+    type: ElementType
+  ) => void,
   onEdit: (index: number) => void,
   formDisabled?: boolean,
-  canChangeStatus: boolean = false
+  canChangeStatus: boolean = false,
+  errorMessages: string[][] = []
 ) => {
   const formattedRows: (JSX.Element | string | number)[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
@@ -49,15 +59,27 @@ const buildRows = (
           ...column,
           disabled: disabled || column.disabled,
         };
-        const value = buildElement(formattedCol, element?.value!, (value) =>
-          onChange(value, answerRowIndex, column.id)
+
+        const value = buildElement(
+          formattedCol,
+          element?.value!,
+          (value) =>
+            onChange(value, answerRowIndex, column.id, formattedCol.type),
+          "",
+          errorMessages[answerRowIndex][
+            rows.findIndex((row) => row.id === column.id)
+          ]
         );
         rowElement.push(value || "--");
       }
     });
     if (canChangeStatus) {
       rowElement.push(
-        <Button variant="link" onClick={() => onEdit(answerRowIndex)}>
+        <Button
+          variant="link"
+          onClick={() => onEdit(answerRowIndex)}
+          disabled={formDisabled}
+        >
           Edit/Abandon
         </Button>
       );
@@ -92,7 +114,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
-  const actionsDisabled = isCompleteStatus(report?.status);
+  const { pageId } = useParams();
+  const initiative = report?.pages.find(
+    (page) => page.id === pageId
+  ) as InitiativePageTemplate;
+  const actionsDisabled =
+    disabled || element.disabled || initiative?.status === PageStatus.ABANDONED;
   const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
@@ -115,6 +142,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
+  const [errorMessages, setErrorMessages] = useState<string[][]>(
+    answer?.map(() => initial.map(() => "")) ?? []
+  );
+
   const formatAnswers = (
     data: ActionAnswerShape,
     answerType: "modal" | "row"
@@ -136,13 +167,23 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     });
   };
 
-  const onChange = (value: string[], index: number, id: string) => {
+  const onChange = (
+    value: string[],
+    index: number,
+    id: string,
+    type: ElementType
+  ) => {
     const newAnswer = [...(answer ?? [])];
+    const newErrorMessages = [...errorMessages];
     const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
+    const errorMessage = getErrorMessage(type, false, value);
+    newErrorMessages[index][rowIndex] = errorMessage;
+    setErrorMessages(newErrorMessages);
     const formattedValue = formatAnswers(
       [{ id: id, value: value[0] }],
       "row"
     )[0].value;
+
     newAnswer[index][rowIndex].value = formattedValue;
     props.updateElement({ answer: newAnswer });
   };
@@ -159,8 +200,9 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     answer ?? [],
     onChange,
     onModalEdit,
-    disabled || element.disabled,
-    canAddOrChangeStatus
+    actionsDisabled,
+    canAddOrChangeStatus,
+    errorMessages
   );
 
   const onSave = (data: ActionAnswerShape) => {
@@ -179,8 +221,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   return (
     <Flex gap="1.25rem" flexDirection="column" width="100%">
-      <Label>{pluralLabel}</Label>
-      <Hint id={id}>{hintText}</Hint>
+      <Heading as="h2" variant="subHeader">
+        {optionalTag({ label: pluralLabel, required: element.required })}
+      </Heading>
+      <p id={id}>{parseHtml(hintText)}</p>
       {canAddOrChangeStatus ? (
         <Button
           aria-label={`add ${label}`}
@@ -215,5 +259,38 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         disabled={actionsDisabled}
       />
     </Flex>
+  );
+};
+
+export const ActionTableExport = (element: ActionTableTemplate) => {
+  const showPrevValue = element.answer
+    ?.flat()
+    .filter((item) => item.id === "prevValue")
+    .every((item) => item.value !== "");
+
+  const filteredRows = showPrevValue
+    ? element.rows
+    : element.rows.filter((row) => row.id != "prevValue");
+
+  const headers = filteredRows.map((row) => ({ label: row.header }));
+  const ids = filteredRows.map((row) => row.id);
+
+  const buildRow = (element: ActionAnswerShape, index: number) => {
+    return ids.map((id) => {
+      if (id === "no") return index + 1;
+      const value = element.find((item) => id === item.id)?.value;
+      return !value || value === "" ? "Not applicable" : value;
+    });
+  };
+
+  const rows = element.answer?.map((row, index) => buildRow(row, index)) ?? [];
+
+  return (
+    <Stack width="720px" key={element.id}>
+      <Heading as="h2" className="chakra-heading" fontWeight="bold">
+        {element.label}
+      </Heading>
+      {ResponsiveTable(headers, rows, "pdf")}
+    </Stack>
   );
 };

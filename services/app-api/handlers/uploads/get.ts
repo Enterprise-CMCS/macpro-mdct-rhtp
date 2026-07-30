@@ -5,6 +5,10 @@ import { queryUpload } from "../../storage/upload";
 import { forbidden, ok } from "../../libs/response-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { error } from "../../utils/constants";
+import { getExtension, isAllowedFileExtension } from "@rhtp/shared";
+import { validateFileContentMatchesExtension } from "../../utils/fileContentValidation";
+
+const FILE_HEADER_BYTE_RANGE = "bytes=0-4100";
 
 export const getUploadsByFileId = handler(
   parseUploadParameters,
@@ -16,11 +20,36 @@ export const getUploadsByFileId = handler(
       return forbidden(error.UNAUTHORIZED);
     }
     const document = results.Items[0];
+    const extension =
+      getExtension(document.filename) ?? getExtension(document.fileId);
+    if (!extension || !isAllowedFileExtension(extension)) {
+      return forbidden(error.UNAUTHORIZED);
+    }
 
-    // Pre-sign url
+    const objectKey = `${reportType}/${state}/${id}/${document.fileId}`;
+    let fileHeader: Uint8Array;
+    try {
+      const object = await s3.getObject({
+        Bucket: process.env.attachmentsBucketName,
+        Key: objectKey,
+        Range: FILE_HEADER_BYTE_RANGE,
+      });
+      fileHeader = await object.Body!.transformToByteArray();
+    } catch {
+      return forbidden(error.UNAUTHORIZED);
+    }
+
+    const isValidContent = await validateFileContentMatchesExtension(
+      fileHeader,
+      extension
+    );
+    if (!isValidContent) {
+      return forbidden(error.UNAUTHORIZED);
+    }
+
     let psurl = await s3.getSignedDownloadUrl({
       Bucket: process.env.attachmentsBucketName,
-      Key: `${reportType}/${state}/${id}/${document.fileId}`,
+      Key: objectKey,
       ResponseContentDisposition: `attachment; filename = ${document.filename}`,
     });
     psurl = fixLocalstackUrl(psurl);

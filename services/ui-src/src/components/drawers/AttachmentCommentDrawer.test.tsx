@@ -1,0 +1,310 @@
+import { MockedFunction } from "vitest";
+import { AttachmentCommentDrawer } from "./AttachmentCommentDrawer";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { testA11yAct } from "utils/testing/commonTests";
+import {
+  AttachmentStatus,
+  InitiativeAnswerProp,
+  Comment,
+  CommentType,
+} from "@rhtp/shared";
+import { useStore } from "utils";
+import {
+  mockAdminUserStore,
+  mockHelpDeskUserStore,
+  mockUseStore,
+} from "utils/testing/setupTest";
+import { useFlags } from "launchdarkly-react-client-sdk";
+
+const mockGetComments = vi.fn().mockResolvedValue([
+  {
+    contextId: "mockContextId",
+    created: 123456,
+    id: "mockId",
+    author: "Mock Author",
+    authorEmail: "mockEmail",
+    isInternal: false,
+    comment: "Mock comment",
+    type: CommentType.ATTACHMENT,
+    parentReportId: "mockReportId",
+  } as Comment,
+]);
+
+const mockCreateComment = vi.fn().mockResolvedValue({
+  contextId: "mockContextId",
+  created: 123456,
+  id: "mockId",
+  author: "Mock Author",
+  authorEmail: "mockEmail",
+  isInternal: false,
+  comment: "Mock comment",
+} as Comment);
+
+vi.mock("utils/api/requestMethods/commentMethods", () => ({
+  getComments: (contextId: string, state: string) =>
+    mockGetComments(contextId, state),
+  createComment: (contextId: string, state: string, bodyParams: any) =>
+    mockCreateComment(contextId, state, bodyParams),
+}));
+
+vi.mock("utils/state/useStore");
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
+mockedUseStore.mockReturnValue(mockUseStore);
+
+vi.mock("launchdarkly-react-client-sdk");
+const mockFlags = vi.mocked(useFlags);
+mockFlags.mockReturnValue({
+  adminCommentsEnabled: true,
+});
+
+vi.mock("utils/api/requestMethods/report");
+
+const mockCloseHandler = vi.fn();
+const mockUpdateElement = vi.fn();
+
+const mockSelectedFile = {
+  name: "test.png",
+  size: 100,
+  fileId: "testfile123",
+};
+
+const mockAllFiles = [
+  {
+    attachment: mockSelectedFile,
+    initiatives: ["test 1", "test 2"],
+    status: AttachmentStatus.PENDING_REVIEW,
+    canDelete: true,
+  },
+];
+
+const AttachmentCommentDrawerComponent = (
+  allFiles: InitiativeAnswerProp[] = mockAllFiles,
+  disabled: boolean = false
+) => {
+  if (disabled) {
+    mockedUseStore.mockReturnValue({
+      ...mockUseStore,
+      report: {
+        ...mockUseStore.report,
+        status: "Submitted",
+      },
+    });
+  }
+  return (
+    <AttachmentCommentDrawer
+      modalDisclosure={{
+        isOpen: true,
+        onClose: mockCloseHandler,
+      }}
+      selectedFile={mockSelectedFile}
+      updateElement={mockUpdateElement}
+      allFiles={allFiles}
+    />
+  );
+};
+
+const renderAttachmentCommentDrawer = async () => {
+  render(AttachmentCommentDrawerComponent());
+  await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
+};
+
+describe("AttachmentCommentDrawer component", () => {
+  describe("with no comments", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+      mockGetComments.mockResolvedValueOnce([]);
+      await renderAttachmentCommentDrawer();
+    });
+
+    test("shows the contents", () => {
+      expect(
+        screen.getByRole("heading", { name: "Add comment to attachment" })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("textbox", { name: "Comment" })
+      ).toBeInTheDocument();
+    });
+
+    test("Modals close button can be clicked", async () => {
+      await userEvent.click(screen.getAllByText("Close")[0]);
+      expect(mockCloseHandler).toHaveBeenCalledTimes(1);
+    });
+
+    test("Fill and save comment", async () => {
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockSelectedFile.fileId,
+        "PA",
+        {
+          comment: "Test comment",
+          type: "attachment",
+          parentReportId: mockUseStore.report?.id,
+          isInternal: false,
+        }
+      );
+    });
+  });
+
+  describe("with previous comments", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+      mockGetComments.mockResolvedValueOnce([
+        {
+          contextId: "mockContextId",
+          created: 123456,
+          id: "mockId",
+          author: "CMS User",
+          authorEmail: "mockEmail",
+          isInternal: false,
+          comment: "",
+          statusChange: AttachmentStatus.PENDING_REVIEW,
+        },
+        {
+          contextId: "mockContextId",
+          created: 123456,
+          id: "mockId",
+          author: "CMS User",
+          authorEmail: "mockEmail",
+          isInternal: false,
+          comment: "Second comment from cms user",
+        },
+        {
+          contextId: "mockContextId",
+          created: 123456,
+          id: "mockId",
+          author: "CMS User",
+          authorEmail: "mockEmail",
+          isInternal: false,
+          comment: "First comment from cms user",
+        },
+      ] as Comment[]);
+
+      await renderAttachmentCommentDrawer();
+    });
+
+    test("Shows previous comments and status changes", async () => {
+      const previousComments = screen.getAllByRole("textbox");
+      expect(previousComments).toHaveLength(3); // one for new comment, two for existing, no textbox for empty comment with status change
+      // most recent comment should be first in the list
+      expect(previousComments[1]).toHaveValue("Second comment from cms user");
+      expect(previousComments[2]).toHaveValue("First comment from cms user");
+      expect(
+        screen.getByText("Status changed to: Pending Review")
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("test permissions", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    test("state user can edit comment box always", async () => {
+      mockedUseStore.mockReturnValue(mockUseStore);
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeEnabled();
+    });
+
+    test("state user must leave a comment to submit", async () => {
+      mockedUseStore.mockReturnValue(mockUseStore);
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeEnabled();
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(screen.getByText("A comment is required.")).toBeVisible();
+    });
+
+    test("admin user can edit when flag true", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockAdminUserStore);
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
+      expect(commentInput).toBeEnabled();
+    });
+
+    test("admin user cannot edit when flag false", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: false,
+      });
+      mockedUseStore.mockReturnValue(mockAdminUserStore);
+      await renderAttachmentCommentDrawer();
+      await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
+      expect(commentInput).toBeDisabled();
+    });
+
+    test("other users can never edit", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeDisabled();
+    });
+
+    test("cannot add comments when disabled", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue(mockUseStore); // state user
+      render(AttachmentCommentDrawerComponent(mockAllFiles, true)); // set disabled true
+      await waitFor(() => expect(mockGetComments).toHaveBeenCalled());
+      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      expect(commentInput).toBeDisabled();
+    });
+
+    test("admin user can make internal comments", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue({
+        ...mockUseStore,
+        ...mockAdminUserStore,
+      });
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", {
+        name: "Comment",
+      });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Internal (CMS Only)"));
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(mockCreateComment).toHaveBeenCalledWith(
+        mockSelectedFile.fileId,
+        "PA",
+        {
+          comment: "Test comment",
+          type: "attachment",
+          parentReportId: mockUseStore.report?.id,
+          isInternal: true,
+        }
+      );
+    });
+
+    test("admin user gets error if they do not select a comment type", async () => {
+      mockFlags.mockReturnValue({
+        adminCommentsEnabled: true,
+      });
+      mockedUseStore.mockReturnValue({
+        ...mockUseStore,
+        ...mockAdminUserStore,
+      });
+      await renderAttachmentCommentDrawer();
+      const commentInput = screen.getByRole("textbox", {
+        name: "Comment",
+      });
+      await userEvent.type(commentInput, "Test comment");
+      await userEvent.click(screen.getByText("Add comment"));
+      expect(screen.getByText("Please select a comment type.")).toBeVisible();
+    });
+  });
+
+  testA11yAct(AttachmentCommentDrawerComponent());
+});

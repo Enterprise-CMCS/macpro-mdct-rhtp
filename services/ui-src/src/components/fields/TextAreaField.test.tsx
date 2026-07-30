@@ -62,5 +62,18 @@ describe("<TextAreaField />", () => {
     expect(textField).not.toBeInTheDocument();
   });
 
+  test("Text area field prevents pasting in text beyond character limit", async () => {
+    const charLimitElement = {
+      ...mockedTextAreaElement,
+      charLimit: 10,
+    };
+    render(<TextAreaWrapper template={charLimitElement} />);
+    const textAreaField = screen.getByRole("textbox");
+    await userEvent.click(textAreaField);
+    await userEvent.paste("0123456789abcdefg");
+    await userEvent.tab();
+    expect(textAreaField).toHaveValue("0123456789");
+  });
+
   testA11y(<TextAreaWrapper template={mockedTextAreaElement} />);
 });

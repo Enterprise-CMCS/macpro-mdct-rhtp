@@ -14,42 +14,15 @@ import {
   getZipPresignedUrl,
 } from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import successIcon from "assets/icons/status/icon_status_check.svg";
 import DOMPurify from "dompurify";
-import { bytesToKiloBytes } from "./parsing";
+import { bytesToKiloBytes, parseHtml } from "./parsing";
 import {
   ReportType,
   UploadListProp,
   AttachmentStatus,
-  Report,
+  ZipRequestBody,
 } from "@rhtp/shared";
-
-export const acceptedFileTypes = [
-  ".bmp",
-  ".txt",
-  ".csv",
-  ".jar",
-  ".odt",
-  ".ods",
-  ".odp",
-  ".msg",
-  ".potx",
-  ".pptx",
-  ".ppt",
-  ".rtf",
-  ".tif",
-  ".gif",
-  ".jpeg",
-  ".png",
-  ".docm",
-  ".docx",
-  ".doc",
-  ".pdf",
-  ".jpg",
-  ".xlsx",
-  ".xltx",
-  ".xls",
-  ".xml",
-];
 
 const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
 
@@ -72,10 +45,8 @@ export const downloadFile = async (
   window.open(sanitizeLink);
 };
 
-export const getZipFile = async (report: Report) => {
-  const { state, id, type } = report;
-
-  const fileLink = await getZipPresignedUrl(type, state, id);
+export const getZipFile = async (body: ZipRequestBody) => {
+  const fileLink = await getZipPresignedUrl(body);
   const sanitizeLink = DOMPurify.sanitize(fileLink);
 
   const link = document.createElement("a");
@@ -84,18 +55,14 @@ export const getZipFile = async (report: Report) => {
 };
 
 export const canEditAttachment = (status: AttachmentStatus): boolean => {
-  if (status === AttachmentStatus.LOCKED_FOR_SCORING) return false;
-
-  return true;
+  return status !== AttachmentStatus.LOCKED_FOR_SCORING;
 };
 
 export const canDeleteAttachment = (
   status: AttachmentStatus,
   canDelete: boolean
 ): boolean => {
-  if (status === AttachmentStatus.PENDING_REVIEW && canDelete) return true;
-
-  return false;
+  return status === AttachmentStatus.PENDING_REVIEW && canDelete;
 };
 
 export const removeFile = async (
@@ -112,14 +79,16 @@ export const uploadListRender = (
   reportType: ReportType,
   state: string,
   id: string,
-  files: File[] | UploadListProp[],
-  onRemove: Function,
+  files:
+    | File[]
+    | UploadListProp[]
+    | { name: string; size: number; fileId: string; message?: string }[],
+  onRemove?: Function,
   onClick?: Function,
-  removeIconHidden: boolean = false,
   disabled?: boolean
 ) => {
   return (
-    <List variant="upload">
+    <List variant="upload" mb="spacer3">
       {files?.map((file, fileIdx) => (
         <ListItem key={`${file.name}.${fileIdx}`}>
           <VStack width="100%">
@@ -137,15 +106,22 @@ export const uploadListRender = (
                   </Button>
                 )}
                 <span>{bytesToKiloBytes(file.size)} KB</span>
+                {"message" in file && file.message && (
+                  <span className="successMsg">
+                    <Image src={successIcon} />
+                    Uploaded to: {parseHtml(file.message)}
+                  </span>
+                )}
               </VStack>
-              <Button
-                variant="unstyled"
-                aria-label={`delete ${file.name}`}
-                onClick={() => onRemove(file)}
-                rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
-                hidden={removeIconHidden}
-                disabled={disabled}
-              />
+              {onRemove && (
+                <Button
+                  variant="unstyled"
+                  aria-label={`delete ${file.name}`}
+                  onClick={() => onRemove(file)}
+                  rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                  disabled={disabled}
+                />
+              )}
             </HStack>
             {!onClick && (
               <Progress className="progress" size="lg" isIndeterminate />

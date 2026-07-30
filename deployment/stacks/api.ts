@@ -49,6 +49,8 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     launchDarklyLocalFlags = '{"local": false, "flags": {}}',
   } = props;
 
+  const isProduction = stage === "production";
+
   const service = "app-api";
 
   const kafkaSecurityGroup = new ec2.SecurityGroup(
@@ -93,7 +95,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     configSet.addEventDestination("sns", {
       destination: ses.EventDestination.snsTopic(topic),
       configurationSetEventDestinationName: `${project}-${stage}-email-topic`,
-      enabled: true,
+      enabled: isProduction, // only send alerts to sns in prod
       events: [
         ses.EmailSendingEvent.REJECT,
         ses.EmailSendingEvent.BOUNCE,
@@ -254,7 +256,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
   //paths made only for dev tool, not to be used on real data
-  if (stage !== "production") {
+  if (!isProduction) {
     new Lambda(scope, "deleteReport", {
       entry: "services/app-api/handlers/reports/delete.ts",
       handler: "deleteReport",
@@ -333,7 +335,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "triggerZipGeneration", {
     entry: "services/app-api/handlers/uploads/zip.ts",
     handler: "triggerZipGeneration",
-    path: "/reports/{reportType}/{state}/{id}/files/zip",
+    path: "/zips",
     method: "POST",
     additionalPolicies: [
       new PolicyStatement({
@@ -351,7 +353,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   new Lambda(scope, "getZipStatus", {
     entry: "services/app-api/handlers/uploads/zip.ts",
     handler: "getZipStatus",
-    path: "/reports/{reportType}/{state}/{id}/files/zip",
+    path: "/zips/{id}",
     method: "GET",
     ...commonProps,
   });
@@ -385,6 +387,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "createComment",
     path: "comments/{state}/{contextId}",
     method: "POST",
+    additionalPolicies: [sesPolicy],
     ...commonProps,
   });
 
@@ -396,8 +399,40 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "createNotificationRecipient", {
+    entry: "services/app-api/handlers/notifications/recipients/create.ts",
+    handler: "createNotificationRecipient",
+    path: "notifications/recipients/{state}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getNotificationRecipients", {
+    entry: "services/app-api/handlers/notifications/recipients/get.ts",
+    handler: "getNotificationRecipients",
+    path: "notifications/recipients",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getAssignedStatesByEmail", {
+    entry: "services/app-api/handlers/notifications/recipients/get.ts",
+    handler: "getAssignedStatesByEmail",
+    path: "notifications/recipientByEmail/{email}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "deleteNotificationRecipient", {
+    entry: "services/app-api/handlers/notifications/recipients/delete.ts",
+    handler: "deleteNotificationRecipient",
+    path: "notifications/recipients/{state}/{id}",
+    method: "DELETE",
+    ...commonProps,
+  });
+
   new LambdaDynamoEventSource(scope, "postKafkaData", {
-    entry: "services/app-api/handlers/kafka/post/postKafkaData.ts",
+    entry: "services/app-api/handlers/kafka/postKafkaData.ts",
     handler: "handler",
     timeout: Duration.seconds(120),
     memorySize: 2048,
@@ -410,7 +445,9 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       topicNamespace: isDev ? `--${project}--${stage}--` : "",
       ...commonProps.environment,
     },
-    tables: tables.filter((table) => ["RhtpReports"].includes(table.node.id)),
+    tables: tables.filter((table) =>
+      ["Reports", "Comments"].includes(table.node.id)
+    ),
   });
 
   if (!isLocalStack) {

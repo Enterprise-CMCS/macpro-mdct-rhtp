@@ -1,8 +1,10 @@
 process.env.BannersTable = "local-banners";
-process.env.RhtpReportsTable = "local-rhtp-reports";
+process.env.ReportsTable = "local-reports";
 process.env.CommentsTable = "local-comments";
 process.env.NotificationsTable = "local-notifications";
-
+process.env.NotificationRecipientsTable = "local-notifications-recipients";
+process.env.brokerString = "broker1,broker2";
+process.env.STAGE = "local";
 /*
  * This mock mutes all logger output during tests! Including console errors!
  *

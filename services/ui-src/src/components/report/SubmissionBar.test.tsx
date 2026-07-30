@@ -9,7 +9,7 @@ vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
 const mockSetModalComponent = vi.fn();
 const mockSetModalOpen = vi.fn();
-const getZipFile = vi.fn();
+const getReportZipFile = vi.fn();
 
 const mockNavigate = vi.fn();
 vi.mock("react-router", async (importOriginal) => ({
@@ -18,7 +18,7 @@ vi.mock("react-router", async (importOriginal) => ({
 }));
 
 vi.mock("utils/other/fileUtils", () => ({
-  getZipFile: () => getZipFile,
+  getReportZipFile: () => getReportZipFile,
 }));
 
 const report = {
@@ -50,7 +50,9 @@ describe("SubmissionBar", () => {
       render(<SubmissionBar />);
     });
     test("SubmissionBar renders", () => {
-      expect(screen.getByRole("button", { name: "ZIP Files" })).toBeVisible();
+      expect(
+        screen.getByRole("button", { name: "ZIP Attachment Files" })
+      ).toBeVisible();
       expect(
         screen.getByRole("button", { name: "Submit RHTP Report" })
       ).toBeVisible();
@@ -65,10 +67,12 @@ describe("SubmissionBar", () => {
       });
     });
     test("Click Zip Files", async () => {
-      const zipFilesBtn = screen.getByRole("button", { name: "ZIP Files" });
+      const zipFilesBtn = screen.getByRole("button", {
+        name: "ZIP Attachment Files",
+      });
       await userEvent.click(zipFilesBtn);
       waitFor(() => {
-        expect(getZipFile).toHaveBeenCalled();
+        expect(getReportZipFile).toHaveBeenCalled();
       });
     });
   });

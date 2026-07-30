@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TextField as CmsdsTextField } from "@cmsgov/design-system";
 import { Box } from "@chakra-ui/react";
-import { parseHtml } from "utils";
+import { optionalTag, parseHintText, useStore } from "utils";
 import {
   TextboxTemplate,
   NumberFieldTemplate,
@@ -20,6 +20,7 @@ import {
 export const TextField = (
   props: PageElementProps<TextboxTemplate | NumberFieldTemplate>
 ) => {
+  const { setModalComponent } = useStore();
   const { element: textbox, disabled } = props;
   const stringifyAnswer = (newAnswer: typeof textbox.answer) => {
     if (textbox.type === ElementType.NumberField) {
@@ -37,6 +38,14 @@ export const TextField = (
   const [hasFocus, setHasFocus] = useState(false);
 
   const hideElement = useElementIsHidden(textbox.hideCondition);
+
+  useEffect(() => {
+    const isEmailField = textbox.id.includes("email");
+    const defaultValueString = stringifyInput(displayValue);
+    if (isEmailField && defaultValueString && !isEmail(defaultValueString)) {
+      setErrorMessage(ErrorMessages.mustBeAnEmail);
+    }
+  }, []);
 
   useEffect(() => {
     /*
@@ -79,7 +88,7 @@ export const TextField = (
       updateElement({ answer: rawValue });
       if (!rawValue && textbox.required) {
         setErrorMessage(ErrorMessages.requiredResponse);
-      } else if (textbox.label.includes("email") && !isEmail(rawValue)) {
+      } else if (textbox.id.includes("email") && !isEmail(rawValue)) {
         setErrorMessage(ErrorMessages.mustBeAnEmail);
       } else {
         setErrorMessage("");
@@ -96,18 +105,17 @@ export const TextField = (
     }
   };
 
-  const parsedHint = textbox.helperText && parseHtml(textbox.helperText);
-  const labelText = textbox.label;
+  const parsedHint = parseHintText(textbox, setModalComponent);
 
   if (hideElement) {
     return null;
   }
 
   return (
-    <Box>
+    <Box width="100%">
       <CmsdsTextField
         name={textbox.id}
-        label={labelText || ""}
+        label={optionalTag(textbox)}
         hint={parsedHint}
         onChange={onChangeHandler}
         onBlur={onBlurHandler}
@@ -115,6 +123,7 @@ export const TextField = (
         value={displayValue}
         errorMessage={errorMessage}
         disabled={disabled || textbox.disabled}
+        fieldClassName={textbox.type}
       />
     </Box>
   );

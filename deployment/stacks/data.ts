@@ -21,16 +21,16 @@ export function createDataComponents(props: CreateDataComponentsProps) {
         type: dynamodb.AttributeType.STRING,
       },
     }),
-    new DynamoDBTable(scope, "RhtpReports", {
+    new DynamoDBTable(scope, "Reports", {
       stage,
       isDev,
-      name: "rhtp-reports",
+      name: "reports",
       partitionKey: {
-        name: "state",
+        name: "pKey",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: "id",
+        name: "sortKey",
         type: dynamodb.AttributeType.STRING,
       },
     }),
@@ -63,6 +63,16 @@ export function createDataComponents(props: CreateDataComponentsProps) {
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: { name: "created", type: dynamodb.AttributeType.NUMBER },
+    }),
+    new DynamoDBTable(scope, "NotificationRecipients", {
+      stage,
+      isDev,
+      name: "notifications-recipients",
+      partitionKey: {
+        name: "state",
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: { name: "id", type: dynamodb.AttributeType.STRING },
     }),
   ];
 

@@ -352,7 +352,7 @@
       },
       {
         "Name": "custom:cms_state",
-        "Value": "DC"
+        "Value": "SC"
       }
     ]
   },
@@ -527,6 +527,180 @@
       {
         "Name": "custom:cms_state",
         "Value": "UT"
+      }
+    ]
+  },
+  {
+    "username": "statedemo7@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo7@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo7"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "RI"
+      }
+    ]
+  },
+  {
+    "username": "statedemo8@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo8@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo8"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "MO"
+      }
+    ]
+  },
+  {
+    "username": "statedemo9@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo9@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo9"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "CO"
+      }
+    ]
+  },
+  {
+    "username": "statedemo10@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo10@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo10"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "NE"
+      }
+    ]
+  },
+  {
+    "username": "statedemo11@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo11@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo11"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "MT"
+      }
+    ]
+  },
+  {
+    "username": "statedemo12@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "statedemo12@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "State"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Demo12"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdctrhtp-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "TX"
       }
     ]
   },

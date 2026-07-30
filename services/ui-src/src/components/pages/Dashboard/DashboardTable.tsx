@@ -11,10 +11,11 @@ import {
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
-import { isCompleteStatus, LiteReport } from "@rhtp/shared";
+import { LiteReport } from "@rhtp/shared";
 import { formatMonthDayYear, reportBasePath, useStore } from "utils";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { getStatus } from "utils/other/status";
+import { ReportCommentDrawer } from "components/drawers/ReportCommentDrawer";
 
 interface DashboardTableProps {
   reports: LiteReport[];
@@ -26,6 +27,7 @@ interface TableProps extends DashboardTableProps {
   showAdminControlsColumn: boolean | undefined;
   navigate: NavigateFunction;
   userIsEndUser: boolean | undefined;
+  openCommentsDrawer: Function;
 }
 
 export const HorizontalTable = (props: TableProps) => {
@@ -50,20 +52,22 @@ export const HorizontalTable = (props: TableProps) => {
             <Td width="3rem">{report.submissionCount ?? 0}</Td>
           )}
           <Td>
-            <Button
-              onClick={() => props.navigate(reportBasePath(report))}
-              variant="outline"
-              width="100%"
-              aria-label={
-                !isCompleteStatus(report.status)
-                  ? `Edit ${report.name} report`
-                  : `View ${report.name} report`
-              }
-            >
-              {props.userIsEndUser && !isCompleteStatus(report.status)
-                ? "Edit"
-                : "View"}
-            </Button>
+            <HStack>
+              <Button
+                onClick={() => props.navigate(reportBasePath(report))}
+                variant="outline"
+                aria-label={`View ${report.name} report`}
+              >
+                View Report
+              </Button>
+              <Button
+                variant="link"
+                fontWeight="bold"
+                onClick={() => props.openCommentsDrawer(report)}
+              >
+                Comment
+              </Button>
+            </HStack>
           </Td>
         </Tr>
       ))}
@@ -108,15 +112,16 @@ export const VerticalTable = (props: TableProps) => {
               width="100px"
               height="30px"
               fontSize="body_sm"
-              aria-label={
-                !isCompleteStatus(report.status)
-                  ? "Edit " + report.name + " report"
-                  : "View " + report.name + " report"
-              }
+              aria-label={`View ${report.name} report`}
             >
-              {props.userIsEndUser && !isCompleteStatus(report.status)
-                ? "Edit"
-                : "View"}
+              View Report
+            </Button>
+            <Button
+              variant="link"
+              fontWeight="bold"
+              onClick={() => props.openCommentsDrawer(report)}
+            >
+              Comment
             </Button>
           </HStack>
           <Divider></Divider>
@@ -129,6 +134,18 @@ export const VerticalTable = (props: TableProps) => {
 export const DashboardTable = ({ reports }: DashboardTableProps) => {
   const navigate = useNavigate();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
+  const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<LiteReport>();
+
+  const openCommentsDrawer = (report: LiteReport) => {
+    setSelectedReport(report);
+    setCommentDrawerOpen(true);
+  };
+
+  const closeCommentsDrawer = () => {
+    setSelectedReport(undefined);
+    setCommentDrawerOpen(false);
+  };
 
   // Translate role to defined behaviors
   const showReportSubmissionsColumn = userIsAdmin;
@@ -154,6 +171,7 @@ export const DashboardTable = ({ reports }: DashboardTableProps) => {
           showAdminControlsColumn,
           navigate,
           userIsEndUser,
+          openCommentsDrawer,
         })}
       </Hide>
       <Show below="sm">
@@ -164,8 +182,18 @@ export const DashboardTable = ({ reports }: DashboardTableProps) => {
           showAdminControlsColumn,
           navigate,
           userIsEndUser,
+          openCommentsDrawer,
         })}
       </Show>
+      {selectedReport && (
+        <ReportCommentDrawer
+          modalDisclosure={{
+            isOpen: commentDrawerOpen,
+            onClose: closeCommentsDrawer,
+          }}
+          selectedReport={selectedReport}
+        />
+      )}
     </>
   );
 };

@@ -15,6 +15,43 @@ export const parseReportType = (event: APIGatewayProxyEvent) => {
   return { reportType };
 };
 
+export const parseEmail = (event: APIGatewayProxyEvent) => {
+  const { email } = event.pathParameters ?? {};
+
+  if (!email) {
+    logger.warn("Missing email in path");
+    return undefined;
+  }
+
+  return { email };
+};
+
+export const parseState = (event: APIGatewayProxyEvent) => {
+  const { state } = event.pathParameters ?? {};
+
+  if (!isStateAbbr(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+
+  return { state };
+};
+
+export const parseStateAndId = (event: APIGatewayProxyEvent) => {
+  const { id, state } = event.pathParameters ?? {};
+
+  if (!isStateAbbr(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+  if (!id) {
+    logger.warn("Missing ID in path");
+    return undefined;
+  }
+
+  return { id, state };
+};
+
 export const parseReportTypeAndState = (event: APIGatewayProxyEvent) => {
   const { reportType, state } = event.pathParameters ?? {};
 
@@ -121,6 +158,17 @@ export const parseFileUploadDownloadParameters = (
   }
 
   return { state, reportType, id };
+};
+
+export const parseZipIdParameters = (event: APIGatewayProxyEvent) => {
+  const { id } = event.pathParameters ?? {};
+
+  if (!id) {
+    logger.warn("Missing file ID in path");
+    return undefined;
+  }
+
+  return { id };
 };
 
 export const parseCommentPathParams = (event: APIGatewayProxyEvent) => {

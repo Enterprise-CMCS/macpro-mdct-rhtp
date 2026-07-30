@@ -7,7 +7,8 @@ import { submitReport, useStore, reportBasePath } from "utils";
 import { SubmitReportModal } from "./SubmitReportModal";
 import lookupIconPrimary from "assets/icons/search/icon_search_primary.svg";
 import whitePDFPrimary from "assets/icons/pdf/icon_pdf_white.svg";
-import { isCompleteStatus } from "@rhtp/shared";
+import { isCompleteStatus, ZipRequestTypes } from "@rhtp/shared";
+import { ZipModal } from "./ZipModal";
 import { getZipFile } from "utils/other/fileUtils";
 
 export const SubmissionBar = () => {
@@ -15,6 +16,7 @@ export const SubmissionBar = () => {
     useStore();
   const [submitting, setSubmitting] = useState<boolean>(false);
   const submittableMetrics = useStore(submittableMetricsSelector);
+  const [isZipLoading, setIsZipLoading] = useState(false);
 
   if (!report) {
     return null;
@@ -41,12 +43,19 @@ export const SubmissionBar = () => {
     setModalComponent(modal, "Are you sure you want to submit?");
   };
 
-  const [isZipLoading, setIsZipLoading] = useState(false);
-
   const getZipClick = async () => {
+    setModalOpen(false);
     setIsZipLoading(true);
     try {
-      await getZipFile(report);
+      const body = {
+        type: ZipRequestTypes.REPORT,
+        report: {
+          reportType: report.type,
+          state: report.state,
+          id: report.id,
+        },
+      };
+      await getZipFile(body);
     } catch (error) {
       // TODO: better visual handing of this error for client?
       // or not, because the timeout is 15 minutes
@@ -54,6 +63,12 @@ export const SubmissionBar = () => {
     }
 
     setIsZipLoading(false);
+  };
+
+  const zipModalContent = ZipModal(() => setModalOpen(false), getZipClick);
+
+  const zipModal = () => {
+    setModalComponent(zipModalContent, "Zip Attachment Files");
   };
 
   return (
@@ -84,15 +99,15 @@ export const SubmissionBar = () => {
           colorScheme="blue"
           variant={isSubmitted ? "outline" : "link"}
           fontWeight="bold"
-          onClick={getZipClick}
+          onClick={async () => zipModal()}
           disabled={isZipLoading}
         >
           {isZipLoading && (
             <Flex justify="center">
-              <Spinner size="md" />
+              <Spinner size="md" marginRight="spacer2" />
             </Flex>
           )}
-          ZIP Files
+          ZIP Attachment Files
         </Button>
       </Box>
       {user?.userIsEndUser && !isSubmitted && (

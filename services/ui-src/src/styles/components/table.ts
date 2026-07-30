@@ -85,7 +85,7 @@ const statusVariant = {
 
 const exportVariant = {
   table: {
-    "th, td": {
+    "tr, th, td": {
       borderColor: "gray_lighter",
     },
     td: {
@@ -95,27 +95,29 @@ const exportVariant = {
         fontWeight: "heading_sm_bold",
         color: "black",
       },
-      "&:first-child": {
-        "p:nth-child(2)": {
+      "&:first-of-type": {
+        "p:nth-of-type(2)": {
           color: "gray_medium",
         },
       },
-      "vertical-align": "top",
     },
   },
 };
 
 const reportDetailsVariant = {
-  tr: {
-    "th, td": {
-      borderColor: "transparent",
+  table: {
+    tr: {
+      border: "none",
+      "th, td": {
+        borderColor: "transparent",
+      },
     },
-  },
-  td: {
-    fontSize: "body_sm",
-    padding: "0",
-    color: "black",
-    width: "25%",
+    td: {
+      fontSize: "body_sm",
+      padding: "0",
+      color: "black",
+      width: "25%",
+    },
   },
 };
 
@@ -170,6 +172,7 @@ const metricVariant = {
       "&:last-of-type": {
         paddingRight: "0.75rem",
       },
+      verticalAlign: "bottom",
     },
   },
 };
@@ -179,6 +182,9 @@ const initiativeVariant = {
     th: {
       "&:last-of-type": {
         textAlign: "right",
+      },
+      "&:first-of-type": {
+        minWidth: "56px",
       },
     },
     td: {
@@ -193,6 +199,22 @@ const initiativeVariant = {
       ".chakra-button": {
         padding: "0 1rem",
       },
+      img: {
+        width: "24px",
+      },
+    },
+  },
+};
+
+const pdfVariant = {
+  table: {
+    th: {
+      borderBottomWidth: "2px",
+    },
+    tr: {
+      "&.borderless": {
+        border: "0",
+      },
     },
   },
 };
@@ -204,6 +226,7 @@ const variants = {
   reportDetails: reportDetailsVariant,
   metric: metricVariant,
   initiative: initiativeVariant,
+  pdf: pdfVariant,
 };
 
 const sizes = {};

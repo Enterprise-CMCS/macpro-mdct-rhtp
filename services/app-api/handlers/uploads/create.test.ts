@@ -14,10 +14,6 @@ mockAuthenticatedUser.mockResolvedValue({
   state: "PA",
 } as User);
 
-vi.mock("../../utils/authorization", () => ({
-  isAuthenticated: vi.fn().mockReturnValue(true),
-}));
-
 vi.mock("../../storage/upload", () => ({
   updateUpload: vi.fn(),
 }));
@@ -30,7 +26,7 @@ vi.mock("../../libs/s3-lib", () => ({
 
 const testEvent: APIGatewayProxyEvent = {
   ...proxyEvent,
-  body: `{"fileId":"mock-id"}`,
+  body: `{"uploadedFileName":"mock-id","uploadedFileType":"image/png"}`,
   pathParameters: {
     state: "PA",
     reportType: "RHTP",

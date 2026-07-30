@@ -93,10 +93,8 @@ describe("<UserProvider />", () => {
     });
 
     test("logout function", async () => {
-      await act(async () => {
-        const logoutButton = screen.getByRole("button", { name: "Logout" });
-        await userEvent.click(logoutButton);
-      });
+      const logoutButton = screen.getByRole("button", { name: "Logout" });
+      await userEvent.click(logoutButton);
       expect(window.location.pathname).toEqual("/");
     });
 

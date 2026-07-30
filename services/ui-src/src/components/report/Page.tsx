@@ -28,7 +28,7 @@ import {
 } from "components";
 import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
-import { UseOfFundsAttachmentElement } from "./UseOfFundsAttachment";
+import { ObligatedAndSpentFundsAttachmentElement } from "./ObligatedAndSpentFundsAttachment";
 import { AttachmentArea } from "components/fields/AttachmentArea";
 import { SubmitForReview } from "./SubmitForReview";
 
@@ -39,11 +39,16 @@ interface Props {
 }
 
 export const Page = ({ id, setElements, elements }: Props) => {
-  const { userIsEndUser } = useStore().user || {};
+  const { userIsEndUser, userRole } = useStore().user || {};
   const { report } = useStore();
 
   const buildElement = (element: PageElement, index: number) => {
-    const disabled = !userIsEndUser || isCompleteStatus(report?.status);
+    const roleCanEdit =
+      "editByRole" in element
+        ? element.editByRole!.includes(userRole!)
+        : userIsEndUser;
+    const disabled = !roleCanEdit || isCompleteStatus(report?.status);
+    const subType = report?.subType;
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([
         ...elements.slice(0, index),
@@ -62,7 +67,9 @@ export const Page = ({ id, setElements, elements }: Props) => {
       case ElementType.Textbox:
         return <TextField {...{ updateElement, disabled, element }} />;
       case ElementType.TextAreaField:
-        return <TextAreaField {...{ updateElement, disabled, element }} />;
+        return (
+          <TextAreaField {...{ updateElement, disabled, element, subType }} />
+        );
       case ElementType.NumberField:
         return <TextField {...{ updateElement, disabled, element }} />;
       case ElementType.Date:
@@ -89,9 +96,9 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <ListInput {...{ updateElement, disabled, element }} />;
       case ElementType.TableCheckpoint:
         return <TableCheckpoint {...{ updateElement, disabled, element }} />;
-      case ElementType.UseOfFundsAttachment:
+      case ElementType.ObligatedAndSpentFundsAttachment:
         return (
-          <UseOfFundsAttachmentElement
+          <ObligatedAndSpentFundsAttachmentElement
             {...{ updateElement, disabled, element }}
           />
         );

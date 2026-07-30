@@ -11,6 +11,7 @@ import {
   TableCheckpointTemplate,
   TextAreaBoxTemplate,
   MaskType,
+  AccordionTemplate,
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
 
@@ -56,7 +57,26 @@ const initiativeHeader: (
 const initiativeInstructions: ParagraphTemplate = {
   type: ElementType.Paragraph,
   id: "initiative-instructions",
-  text: "Use this page to provide information about your initiative and the metrics you use to measure its progress. Then, update any checkpoints for review. Note, only Initiative checkpoints and attachments can be updated in quarterly reporting cycles.",
+  text: "Use this page to provide information about your initiative and the metrics you use to measure its progress. Then, update any checkpoints for review.",
+};
+
+const initiativeAccordion: AccordionTemplate = {
+  type: ElementType.Accordion,
+  id: "initiative-accordion",
+  label: "What is included in Annual Reporting vs Quarterly Reporting?",
+  value:
+    "<b>Annual Reporting Data should include:</b>" +
+    "<ul>" +
+    "  <li>Initiative Progress Narrative</li>" +
+    "  <li>Initiative People Served</li>" +
+    "  <li>Initiative Metrics</li>" +
+    "  <li>Initiative Checkpoints</li>" +
+    "</ul>" +
+    "<b>Quarterly Reporting Data can include:</b>" +
+    "<ul>" +
+    "  <li>Initiative Progress Narrative (Optional)" +
+    "  <li>Initiative Checkpoints</li>" +
+    "</ul>",
 };
 
 const checkpointsHeader: SubHeaderTemplate = {
@@ -71,9 +91,9 @@ const checkpointsInstructions: ParagraphTemplate = {
   text:
     "<p>Checkpoints are grouped into the stages listed below. On this page, you can take the following actions on any checkpoint unless otherwise noted.</p>" +
     "<ul>" +
-    "  <li>Add or remove attachments with supporting documentation</li>" +
-    "  <li>Check if the checkpoint is ready for CMS review</li>" +
-    "  <li>Leave comments for CMS, or respond to comments from them by attachment</li>" +
+    "  <li>Add or remove attachments of evidentiary documentation.</li>" +
+    "  <li>Select the checkbox when the checkpoint is complete and ready for CMS review.</li>" +
+    "  <li>Leave comments for CMS, or respond to comments from them by attachment.</li>" +
     "</ul>",
 };
 
@@ -82,10 +102,19 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   id: "initiative-narrative",
   label: "Narrative",
   helperText:
-    "Provide a narrative description of the initiative’s progress during this reporting period.",
+    "Narrative is optional for quarterly reporting. Limit responses to 2,000 characters, or approximately 250–350 words.",
+  helperTextLink: {
+    link: "Initiative Progress Narrative Guidance",
+    label: "Initiative Progress Narrative Guidance",
+    text:
+      "<p>Provide a concise update on the progress of each initiative during the reporting period. Responses should focus on key activities completed, milestones reached, challenges encountered, and any notable outcomes or impacts to date.</p></br>" +
+      "<p>This section is intended for progress reporting purposes only and should not repeat the full project narrative from the NCC Kit. Please focus on recent initiative progress and avoid including broad background information unless it is necessary for context.</p></br>" +
+      "<p>States are encouraged to include any relevant updates that may be important for CMS to understand the status, implementation progress, or emerging results of the initiative.</p>",
+  },
   required: true,
   answer: narrative,
-  quarterly: false,
+  quarterly: true,
+  charLimit: 2000,
 });
 
 const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
@@ -93,6 +122,20 @@ const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
   id: "initiative-number-of-people-served",
   label: "Number of people served",
   mask: MaskType.CommaSeparated,
+  helperText: "Number of People Served is only reported annually.",
+  helperTextLink: {
+    link: "Reporting Guidelines",
+    label: "Number of People Served",
+    text:
+      "<p>States should provide a best estimate of the number of individuals who have benefited from RHT Program funds during the reporting period. Estimates should be reasonable, supported by available data, and reflect the scope and reach of the initiative.</p></br>" +
+      "<p>For system-based initiatives that do not provide direct services (e.g., IT systems, Health Information Exchanges), States may define the number of people served more broadly. For example:</p>" +
+      "<ul>" +
+      "<li>For health system–level initiatives, the number served may reflect the total population served by the system.</li>" +
+      "<li>For statewide systems (e.g., HIEs), the number served may reflect the number of patients with data in the system or the total number of state residents.</li>" +
+      "<li>These estimates do not need to be de-duplicated and do not need to be limited to rural populations if the initiative has a broader reach.</li>" +
+      "<li>States should aim to provide the most accurate and justifiable estimate possible and may include brief context in the narrative section if helpful for CMS’s understanding.</li>" +
+      "</ul>",
+  },
   required: true,
   quarterly: false,
 };
@@ -105,8 +148,8 @@ export const metricTable = (
     id: "metrics-table",
     label: "Metric",
     hintText:
-      "Each initiative should have at least 4 metrics to measure its progress toward initiative goals.",
-    quarterly: false,
+      "The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metrics are only reported annually. Contact your Project Officer if the metrics listed are incorrect. Note: Metrics are only reported annually.",
+    quarterly: true,
     modal: {
       title: "Metric",
       elements: [
@@ -115,6 +158,8 @@ export const metricTable = (
           type: ElementType.Dropdown,
           label: "Status",
           editOnly: true,
+          hintText:
+            "Setting \“Abandoned\" preserves its historical values for auditing but flags it as abandoned, removing it from the state's current active data entry requirements.,",
           children: [
             { label: "Active", value: "Active" },
             { label: "Abandoned", value: "Abandoned" },
@@ -230,6 +275,7 @@ export const buildInitiativePages = (
         returnToInitiativesDashboard,
         initiativeHeader(title, initiativeNumber),
         initiativeInstructions,
+        initiativeAccordion,
         initiativeNarrative(narrative),
         initiativeNumberOfPeopleServed,
         metricTable(metrics),

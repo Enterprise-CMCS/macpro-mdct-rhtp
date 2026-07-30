@@ -156,28 +156,43 @@ button {
   }
 }
 
-.ds-c-label {
+.ds-c-label,
+.ds-c-fieldset {
   margin: 0;
-  > span:first-of-type {
-    font-size: 16px;
-  }
 }
 
 .ds-c-hint {
   font-size: 14px;
+
+  &#metrics-table {
+    min-width: 80%;
+  }
 }
 
 .ds-c-field {
   margin: 8px 0 0 0;
   font-weight: 100;
+  &.numberField {
+    max-width: 240px;
+  }
 }
 
-.ds-c-fieldset {
-  margin: 0;
+.ds-c-inline-error {
+  font-size: 14px;
 }
 
 .chakra-modal__header {
   width: 85%;
+}
+
+.requiredText {
+  background-color: var(--chakra-colors-primary);
+  color: white;
+  border-radius: 24px;
+  font-size: 14px;
+  margin-left: 4px;
+  padding: 2px 6px;
+  width: fit-content;
 }
 
 .optionalText {
@@ -210,4 +225,20 @@ button {
 .tech-spec-icon-hint-size {
   @extend .tech-spec-icon;
   height: 0.9rem;
+}
+
+.column {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+}
+
+.successMsg {
+  display: flex;
+  img {
+    margin-right: 8px;
+    width: 20px;
+  }
+  font-size: 14px;
+  color: var(--chakra-colors-success_darker);
 }

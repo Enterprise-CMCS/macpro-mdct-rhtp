@@ -1,3 +1,4 @@
+import { MockedFunction } from "vitest";
 import {
   act,
   fireEvent,
@@ -10,10 +11,32 @@ import { RouterWrappedComponent } from "utils/testing/mockRouter";
 import { mockReport, mockReport2 } from "utils/testing/mockForm";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
+import { createReport, useStore } from "utils";
+import { mockAdminUserStore } from "utils/testing/setupTest";
+
+vi.mock("utils/state/useStore");
+const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
+mockedUseStore.mockReturnValue(mockAdminUserStore);
+
+vi.mock("launchdarkly-react-client-sdk", () => ({
+  useFlags: vi.fn().mockReturnValue({
+    adminCanEditReport: true,
+  }),
+}));
 
 const mockGetReport = vi.fn().mockResolvedValue([mockReport, mockReport2]);
 vi.mock("../../utils/api/requestMethods/report", () => ({
   getReportByType: () => mockGetReport(),
+  createReport: vi.fn(),
+}));
+
+vi.mock("../../utils/api/requestMethods/commentMethods", () => ({
+  getComments: vi.fn().mockResolvedValue([]),
+  createComment: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock("../../utils/api/requestMethods/notificationRecipients", () => ({
+  getAssignedStatesByEmail: vi.fn().mockResolvedValue([]),
 }));
 
 const mockUseNavigate = vi.fn();
@@ -21,6 +44,8 @@ vi.mock("react-router", async (importOriginal) => ({
   ...(await importOriginal()),
   useNavigate: () => mockUseNavigate,
 }));
+
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
 describe("<AdminDashboard />", () => {
   beforeEach(async () => {
@@ -35,10 +60,12 @@ describe("<AdminDashboard />", () => {
   });
   it("AdminDashboard renders", async () => {
     expect(
-      screen.getByRole("heading", { name: "Admin Dashboard" })
+      screen.getByRole("heading", { name: "RHTP Admin Dashboard" })
     ).toBeVisible();
-    expect(screen.getByRole("button", { name: "Instructions" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "States Filter" })).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Admin Instructions" })
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "States select" })).toBeVisible();
     expect(
       screen.getByRole("button", { name: "All Budget Period" })
     ).toBeVisible();
@@ -59,7 +86,7 @@ describe("<AdminDashboard />", () => {
     await waitFor(() => {
       expect(screen.getByText("plan id")).toBeVisible();
     });
-    const stateFilter = screen.getByRole("button", { name: "States Filter" });
+    const stateFilter = screen.getByRole("button", { name: "States select" });
     fireEvent.click(stateFilter);
 
     const search = screen.getByRole("searchbox", {
@@ -71,6 +98,7 @@ describe("<AdminDashboard />", () => {
     fireEvent.input(search, { target: { value: "Ala" } });
     const checkbox2 = screen.getByRole("checkbox", { name: "Alabama" });
     await userEvent.click(checkbox2);
+    expect(localStorage.getItem("states")).toEqual("AL,NJ");
 
     expect(
       screen.getByRole("button", { name: "Remove New Jersey tag" })
@@ -136,7 +164,7 @@ describe("<AdminDashboard />", () => {
     expect(mockUseNavigate).toHaveBeenCalled();
   });
 
-  it("Can open and close comment modal", async () => {
+  it("Can open and close comment drawer", async () => {
     const commentStatusButton = screen.getAllByRole("button", {
       name: "Comment/Status",
     })[0];
@@ -144,10 +172,54 @@ describe("<AdminDashboard />", () => {
     expect(
       screen.getByRole("heading", { name: /Add comment to/ })
     ).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    await userEvent.click(screen.getAllByRole("button", { name: "Close" })[0]);
     expect(
       screen.queryByRole("heading", { name: /Add comment to/ })
     ).not.toBeInTheDocument();
+  });
+
+  it("Can open and close admin create report modal", async () => {
+    const createReportButton = screen.getByRole("button", {
+      name: "Start First Annual Report",
+    });
+    await userEvent.click(createReportButton);
+    expect(
+      screen.getByRole("heading", { name: "Start First Annual Report" })
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(
+      screen.queryByRole("heading", { name: "Start First Annual Report" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("Cannot create report for state with existing report", async () => {
+    const createReportButton = screen.getByRole("button", {
+      name: "Start First Annual Report",
+    });
+    await userEvent.click(createReportButton);
+
+    const stateDropdown = screen.getAllByLabelText("State")[1];
+    await userEvent.click(stateDropdown);
+    // mock reports for NJ and MN so should not see those options
+    expect(
+      screen.queryByRole("option", { name: "New Jersey" })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("option", { name: "Minnesota" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("Can create report for state with no existing report", async () => {
+    const createReportButton = screen.getByRole("button", {
+      name: "Start First Annual Report",
+    });
+    await userEvent.click(createReportButton);
+
+    const stateDropdown = screen.getAllByLabelText("State")[1];
+    await userEvent.click(stateDropdown);
+    await userEvent.click(screen.getByRole("option", { name: "Alaska" }));
+    await userEvent.click(screen.getByRole("button", { name: "Start" }));
+    expect(createReport).toHaveBeenCalled();
   });
 });
 describe("Test A11y", () => {

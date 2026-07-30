@@ -1,14 +1,17 @@
 import {
+  AlertTypes,
   AttachmentAreaTemplate,
   DropdownTemplate,
   ElementType,
   FormPageTemplate,
   ListInputTemplate,
   PageType,
+  ParagraphTemplate,
   TextAreaBoxTemplate,
+  UserRoles,
 } from "@rhtp/shared";
 import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
-import { getDropdownOptions } from "./constants";
+import { cmsEvaluationStatusDefault, getDropdownOptions } from "./constants";
 
 const commitmentStatusDropdown = (
   label: string,
@@ -18,29 +21,53 @@ const commitmentStatusDropdown = (
   id: "commitment-status",
   label: "Current Status",
   options: getDropdownOptions(label),
-  required: true,
+  required: false,
   answer: status,
 });
+
+const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
+  type: ElementType.AttachmentArea,
+  id: "commitment-attachments",
+  label: "Attachments",
+  subLabel: `<b>State Policy Commitment:</b> ${label}`,
+  message: label,
+  helperText: "Upload state legislation.",
+  required: false,
+});
+const cmsStatusEvaluation = (label: string): DropdownTemplate => {
+  const dropdownOptions = [
+    cmsEvaluationStatusDefault,
+    ...getDropdownOptions(label),
+  ];
+
+  return {
+    type: ElementType.Dropdown,
+    id: "cms-status-evaluation",
+    label: "CMS Status Evaluation",
+    options: dropdownOptions,
+    required: false,
+    answer: cmsEvaluationStatusDefault.value,
+    editByRole: [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER],
+  };
+};
 
 const commitmentLinkListInput: ListInputTemplate = {
   type: ElementType.ListInput,
   id: "commitment-links",
-  label: "Supporting Evidence: Links",
-  helperText: "Add links to any supporting evidence materials posted online.",
+  label: "Links",
+  helperText: "Add URL to exact policy.",
   fieldLabel: "Link",
   buttonText: "Add link",
   validation: "link",
   required: false,
 };
 
-const commitmentAttachmentArea: AttachmentAreaTemplate = {
-  type: ElementType.AttachmentArea,
-  id: "commitment-attachments",
-  label: "Supporting Evidence: Attachments",
-  helperText: "Upload files to submit as supporting evidence",
-  uploadedSubLabel:
-    "These files have been attached to the state policy commitment above.",
-  required: false,
+const commitmentSupportParagraph: ParagraphTemplate = {
+  type: ElementType.Paragraph,
+  id: "commitment-support-paragraph",
+  title: "Supporting Evidence",
+  text: "States should only submit legislation links and attachments as acceptable evidence for their State policy commitments. CMS will not accept press releases or promotional links/attachments as substantial evidence.",
+  style: "hint",
 };
 
 const commitmentNotes: TextAreaBoxTemplate = {
@@ -64,10 +91,12 @@ const buildCommitments = (
   for (const { label, status } of commitmentsForState) {
     commitments.push({
       label,
-      children: [
+      elements: [
         commitmentStatusDropdown(label, status),
+        cmsStatusEvaluation(label),
+        commitmentSupportParagraph,
         commitmentLinkListInput,
-        commitmentAttachmentArea,
+        commitmentAttachmentArea(label),
         commitmentNotes,
       ],
     });
@@ -91,13 +120,21 @@ export const buildStatePolicyCommitments = (
     {
       type: ElementType.Paragraph,
       id: "initiatives-instructions",
-      text: "The commitments listed here are based on those your state submitted to CMS. Expand each one to update its status, evidence, and comments.",
+      text: "The commitments listed here are based on those identified in a State's approved application. Expand each one to update its status, evidence, and comments.",
     },
     {
       type: ElementType.AccordionGroup,
       id: "state-policy-commitments-group",
       accordions: [...buildCommitments(state)],
-      required: true,
+      required: false,
+    },
+    {
+      type: ElementType.StatusAlert,
+      id: "state-policy-empty-alert",
+      status: AlertTypes.INFO,
+      title: "No State Policy Commitments Found",
+      text: "No state policy commitments are on file for your state. If you believe this is an error, please contact your CMS Project Officer.",
+      for: "state-policy-commitments-group",
     },
   ],
 });

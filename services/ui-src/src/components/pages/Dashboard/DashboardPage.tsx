@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link as RouterLink, useParams, useSearchParams } from "react-router";
+import { Link as RouterLink, useParams } from "react-router";
 import {
   StateNames,
   isStateAbbr,
@@ -32,7 +32,7 @@ import { useStore } from "utils";
 import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
-import { DevTools } from "components/devTools/DevTools";
+import { DevTools, ToolType } from "components/devTools/DevTools";
 import { activeBannerSelector } from "utils/state/selectors";
 import { budgetPeriodFilterOptions } from "./../../../constants";
 
@@ -43,14 +43,10 @@ export const DashboardPage = () => {
   const [reports, setReports] = useState<LiteReport[]>([]);
   const [canCreateReport, setCanCreateReport] = useState(false);
   const [filteredReports, setFilteredReports] = useState<LiteReport[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [dropdownValue, setDropdownValue] = useState(
-    searchParams.get("budgetPeriod") || "All"
-  );
+  const [budgetPeriodFilter, setBudgetPeriodFilter] = useState("All");
 
   const fullStateName = isStateAbbr(state) ? StateNames[state] : "";
   const reportName = getReportName(reportType);
-  const filterBudgetPeriod = searchParams.get("budgetPeriod") || "All";
   const hasSubmittedReport = reports.some((report) =>
     isCompleteStatus(report.status)
   );
@@ -63,16 +59,16 @@ export const DashboardPage = () => {
   }, [reportType, state]);
 
   useEffect(() => {
-    if (filterBudgetPeriod === "All") {
+    if (budgetPeriodFilter === "All") {
       setFilteredReports(reports);
     } else {
       setFilteredReports(
         reports.filter(
-          (report) => report.budgetPeriod === parseInt(filterBudgetPeriod)
+          (report) => report.budgetPeriod === parseInt(budgetPeriodFilter)
         )
       );
     }
-  }, [reports, filterBudgetPeriod]);
+  }, [reports, budgetPeriodFilter]);
 
   useEffect(() => {
     const noReports = reports.length === 0;
@@ -99,13 +95,11 @@ export const DashboardPage = () => {
   } = useDisclosure();
 
   const handleBudgetPeriodChange = (evt: { target: { value: string } }) => {
-    setDropdownValue(evt.target.value);
+    setBudgetPeriodFilter(evt.target.value);
   };
 
-  const handleFilter = () => {
-    setSearchParams({
-      budgetPeriod: dropdownValue.toString(),
-    });
+  const clearFilter = () => {
+    setBudgetPeriodFilter("All");
   };
 
   return (
@@ -115,9 +109,10 @@ export const DashboardPage = () => {
         state={state}
         reloadReports={reloadReports}
         reports={reports}
+        type={ToolType.DASHBOARD}
       />
       <Link as={RouterLink} to="/" variant="return">
-        <Image src={arrowLeftIcon} alt="Arrow left" className="icon" />
+        <Image src={arrowLeftIcon} alt="" className="icon" />
         Return home
       </Link>
       {banner ? <Banner {...banner} key={banner.key} /> : null}
@@ -125,27 +120,23 @@ export const DashboardPage = () => {
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}
         </Heading>
+        <Box marginTop="spacer4">
+          Click the <b>“Start {reportName} Report”</b> button to begin creating
+          your report. Refer to the reference guide "RHTP_State Reporting
+          Expectations_Guide" as needed for additional support. Prior to
+          submitting your report confirm all the information is complete and
+          accurate.
+        </Box>
         <Accordion
           allowToggle={true}
           sx={sx.accordion}
           defaultIndex={[-1]} // sets the accordion to closed by default
         >
-          <AccordionItem label="Instructions" sx={sx.accordionItem}>
+          <AccordionItem
+            label="Understanding report statuses"
+            sx={sx.accordionItem}
+          >
             <Box sx={sx.accordionPanel}>
-              <p>
-                <strong>Creating a New Report</strong>
-              </p>
-              <p>
-                Click the <b>“Start {reportName}”</b> button to begin creating
-                your report. A series of questions will appear to gather the
-                necessary information for your report. Fill out each field
-                accurately to ensure your report is complete. Before submitting,
-                review the information you’ve provided. If everything looks
-                good, confirm your entries and proceed.
-              </p>
-              <p>
-                <strong>Understanding Report Statuses</strong>
-              </p>
               <ul>
                 <li>
                   <strong>Not started:</strong> The report has been created but
@@ -173,13 +164,18 @@ export const DashboardPage = () => {
         <Flex alignItems="flex-end" gap="spacer3">
           <CmsdsDropdownField
             name="budgetPeriodFilter"
-            label="Filter by Budget Period"
-            value={dropdownValue}
+            label="Budget Period"
+            value={budgetPeriodFilter}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodFilterOptions}
           />
-          <Button onClick={handleFilter} variant="outline">
-            Filter
+          <Button
+            onClick={clearFilter}
+            variant="link"
+            fontWeight="bold"
+            height="40px"
+          >
+            Clear Filter
           </Button>
         </Flex>
         {!isLoading && <DashboardTable reports={filteredReports} />}
@@ -190,8 +186,8 @@ export const DashboardPage = () => {
         )}
         {reports.length === 0 && (
           <Text variant="tableEmpty">
-            Keep track of your {reportName}s, once you start a report you can
-            access it here.
+            Keep track of your {reportName} Reports, once you start a report you
+            can access it here.
           </Text>
         )}
         <Flex justifyContent="center">

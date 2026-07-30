@@ -44,7 +44,7 @@ describe("SubmitForReview component", () => {
       render(<SubmitForReview />);
     });
     test("renders", () => {
-      expect(screen.getByText("Ready for Review?")).toBeVisible();
+      expect(screen.getAllByText("Submit for Review")).toHaveLength(2);
       expect(
         screen.getByRole("button", { name: "Submit for Review" })
       ).toBeVisible();

@@ -20,7 +20,7 @@ import sortIcon from "assets/icons/sort/icon_sort.svg";
 import sortAscIcon from "assets/icons/sort/icon_sort_asc.svg";
 import sortDescIcon from "assets/icons/sort/icon_sort_desc.svg";
 
-type TableRowType = string | number | JSX.Element | undefined | boolean;
+export type TableRowType = string | number | JSX.Element | undefined | boolean;
 
 export enum SORT_TYPE {
   DEFAULT,

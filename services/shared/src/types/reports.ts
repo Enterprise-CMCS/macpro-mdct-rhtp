@@ -36,6 +36,24 @@ export interface UpdateInitiativeOptions {
   initiativeAbandon: boolean;
 }
 
+export interface ZipRequestBody {
+  type: ZipRequestTypes;
+  report?: ZipRequestReportDetails; // REPORT type
+  state?: string; // OBLIGATED_AND_SPENT_FUNDS type
+  reportSubTypeKeys?: string[]; // OBLIGATED_AND_SPENT_FUNDS type
+}
+
+export enum ZipRequestTypes {
+  REPORT = "REPORT",
+  OBLIGATED_AND_SPENT_FUNDS = "OBLIGATED_AND_SPENT_FUNDS",
+}
+
+export interface ZipRequestReportDetails {
+  state: StateAbbr;
+  reportType: ReportType;
+  id: string;
+}
+
 export interface ReportOptions {
   name: string;
   subType: RhtpSubType;
@@ -69,6 +87,7 @@ export enum AlertTypes {
 }
 
 export enum PageStatus {
+  OPTIONAL = "Optional",
   NOT_STARTED = "Not started",
   IN_PROGRESS = "In progress",
   ABANDONED = "Abandoned",
@@ -78,6 +97,7 @@ export enum PageStatus {
 export enum CommentType {
   REPORT = "report",
   ATTACHMENT = "attachment",
+  ATTACHMENT_STATUS = "attachment_status",
 }
 
 export type Comment = {
@@ -90,7 +110,7 @@ export type Comment = {
   type: CommentType;
   parentReportId?: string;
   comment?: string;
-  statusChange?: AttachmentStatus;
+  statusChange?: AttachmentStatus | ReportStatus;
 };
 
 export interface Report extends ReportOptions {
@@ -164,7 +184,7 @@ export enum PageType {
 
 export type AccordionGroupItem = {
   label: string;
-  children: PageElement[];
+  elements: PageElement[];
 };
 
 export enum ElementType {
@@ -189,7 +209,7 @@ export enum ElementType {
   InitiativesTable = "initiativesTable",
   TableCheckpoint = "tableCheckpoint",
   AccordionGroup = "accordionGroup",
-  UseOfFundsAttachment = "useOfFundsAttachment",
+  ObligatedAndSpentFundsAttachment = "obligatedAndSpentFundsAttachment",
   ActionTable = "actionTable",
   AttachmentTable = "attachmentTable",
   SubmitForReview = "submitForReview",
@@ -216,7 +236,7 @@ export type PageElement =
   | InitiativesTableTemplate
   | TableCheckpointTemplate
   | AccordionGroupTemplate
-  | UseOfFundsAttachmentTemplate
+  | ObligatedAndSpentFundsAttachmentTemplate
   | AttachmentAreaTemplate
   | AttachmentTableTemplate
   | ActionTableTemplate
@@ -257,6 +277,9 @@ export type DividerTemplate = {
 export type InitiativesTableTemplate = {
   id: string;
   type: ElementType.InitiativesTable;
+  required: boolean;
+  quarterly?: boolean;
+  disabled?: boolean;
 };
 
 export type StatusTableTemplate = {
@@ -288,13 +311,14 @@ export interface HeaderTemplate extends DisplayElementTemplate {
 export interface ParagraphTemplate extends DisplayElementTemplate {
   type: ElementType.Paragraph;
   title?: string;
-  weight?: string;
+  style?: string;
 }
 
 export interface StatusAlertTemplate extends DisplayElementTemplate {
   type: ElementType.StatusAlert;
   title: string;
   status: AlertTypes;
+  for?: string;
 }
 
 export interface SubHeaderTemplate extends DisplayElementTemplate {
@@ -308,9 +332,11 @@ interface InputElementTemplate {
   id: string;
   label: string;
   helperText?: string;
+  helperTextLink?: { link: string; label: string; text: string };
   required: boolean;
   quarterly?: boolean;
   disabled?: boolean;
+  editByRole?: string[];
 }
 
 export interface CheckboxTemplate extends InputElementTemplate {
@@ -357,6 +383,7 @@ export interface TextAreaBoxTemplate extends InputElementTemplate {
   type: ElementType.TextAreaField;
   answer?: string;
   hideCondition?: HideCondition;
+  charLimit?: number;
 }
 
 export interface TextboxTemplate extends InputElementTemplate {
@@ -374,7 +401,8 @@ export interface TableCheckpointTemplate {
 
 export interface AttachmentAreaTemplate extends InputElementTemplate {
   type: ElementType.AttachmentArea;
-  uploadedSubLabel: string;
+  subLabel?: string;
+  message?: string;
   answer?: UploadListProp[];
 }
 
@@ -386,9 +414,10 @@ export interface AccordionGroupTemplate {
   answer?: boolean[];
 }
 
-export type UseOfFundsAttachmentTemplate = {
-  type: ElementType.UseOfFundsAttachment;
+export type ObligatedAndSpentFundsAttachmentTemplate = {
+  type: ElementType.ObligatedAndSpentFundsAttachment;
   id: string;
+  label: string;
   answer?: UploadListProp[];
   required: boolean;
 };
@@ -410,7 +439,6 @@ export const FileStatusOptions = Object.values(AttachmentStatus).map(
 export type InitiativeAnswerProp = {
   attachment: UploadListProp;
   initiatives: string[];
-  stage?: string;
   checkpoint?: string;
   status: AttachmentStatus;
   canDelete: boolean;
@@ -431,6 +459,7 @@ export interface ActionElement {
   type: ElementType;
   disabled?: boolean;
   mask?: MaskType;
+  hintText?: string;
 }
 
 export interface ActionRowElement extends ActionElement {

@@ -4,10 +4,10 @@ import {
   UploadListProp,
 } from "@rhtp/shared";
 import { PageElementProps } from "components/report/Elements";
-import { Button, Stack, Image, Text, Box } from "@chakra-ui/react";
-import { UploadModal } from "components/modals/UploadModal";
+import { Button, Stack, Image, Box } from "@chakra-ui/react";
+import { UploadDrawer } from "components/drawers/UploadDrawer";
 import { useState } from "react";
-import { useStore } from "utils";
+import { bytesToKiloBytes, optionalTag, useStore } from "utils";
 import {
   downloadFile,
   uploadListRender,
@@ -18,12 +18,19 @@ import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
 import { Modal } from "components/modals/Modal";
 import { Alert } from "components/alerts/Alert";
+import { notAnsweredText } from "../../constants";
 
 export const AttachmentArea = (
   props: PageElementProps<AttachmentAreaTemplate>
 ) => {
   const { disabled } = props;
-  const { label, helperText, answer, uploadedSubLabel } = props.element;
+  const {
+    helperText,
+    answer,
+    subLabel,
+    message,
+    disabled: elementDisabled,
+  } = props.element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
@@ -64,9 +71,13 @@ export const AttachmentArea = (
     updateElement({ answer: [...files, ...newFiles] });
   };
 
+  const isDisabled = () => {
+    return disabled || elementDisabled;
+  };
+
   return (
-    <Stack gap="0">
-      <Label fieldId={id}>{label}</Label>
+    <Stack width="100%" maxWidth="450px">
+      <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
         uploadListRender(
@@ -76,27 +87,28 @@ export const AttachmentArea = (
           files,
           onDeleteModalOpen,
           downloadFile,
-          false,
-          disabled
+          isDisabled()
         )}
       <Button
+        mt="spacer2"
         width="fit-content"
         onClick={() => setModalOpen(true)}
         variant="outline"
-        leftIcon={<Image src={disabled ? addGray : addIconPrimary} />}
-        disabled={disabled}
+        leftIcon={<Image src={isDisabled() ? addGray : addIconPrimary} />}
+        disabled={isDisabled()}
       >
         Upload Attachments
       </Button>
-      <UploadModal
+      <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: onModalClose,
         }}
+        hint={subLabel}
         answer={files}
         saveToReport={saveToReport}
         deleteFromReport={onRemove}
-        uploadedSubLabel={uploadedSubLabel}
+        notification={{ success: message! }}
       />
       {/** delete file modal */}
       <Modal
@@ -110,36 +122,35 @@ export const AttachmentArea = (
           actionButtonText: "Delete",
         }}
       >
-        <Alert status={AlertTypes.WARNING} title="Warning">
-          Deleting this attachment will remove it from the state policy
-          commitment
-        </Alert>
-        <Box mt={"spacer3"} mb={"spacer_half"}>
-          <Text sx={sx.uploadedLabel}>File</Text>
-          <Text sx={sx.uploadedSubLabel}>{uploadedSubLabel}</Text>
-        </Box>
-        {uploadListRender(
-          reportType,
-          state,
-          id,
-          selectedFile ? [selectedFile] : [],
-          onRemove,
-          downloadFile,
-          true // hide remove icon in delete modal
-        )}
+        <Stack spacing="spacer4" padding="0">
+          <Alert status={AlertTypes.WARNING} title="Warning">
+            Deleting this attachment will remove it from the page below
+          </Alert>
+          {uploadListRender(
+            reportType,
+            state,
+            id,
+            selectedFile ? [selectedFile] : [],
+            undefined,
+            downloadFile
+          )}
+        </Stack>
       </Modal>
     </Stack>
   );
 };
 
-const sx = {
-  uploadedLabel: {
-    marginBottom: ".50rem",
-    fontWeight: "600",
-  },
-  uploadedSubLabel: {
-    fontSize: "body_sm",
-    fontWeight: "body_sm",
-    color: "gray_dark",
-  },
+export const AttachmentAreaExport = (element: AttachmentAreaTemplate) => {
+  if (element.answer && element.answer.length > 0) {
+    const name = element.answer[0].name;
+    const size = element.answer[0].size;
+    return (
+      <Stack>
+        <Box>{name}</Box>
+        <Box color="gray">{bytesToKiloBytes(size)} KB</Box>
+      </Stack>
+    );
+  } else {
+    return notAnsweredText;
+  }
 };
