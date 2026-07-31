@@ -166,9 +166,14 @@ const metricVariant = {
         display: "none",
       },
       ".ds-c-label": {
-        width: 0,
-        height: 0,
-        color: "transparent",
+        border: 0,
+        clip: "rect(0 0 0 0)",
+        height: "1px",
+        margin: "-1px",
+        overflow: "hidden",
+        padding: 0,
+        position: "absolute",
+        width: "1px",
       },
       input: {
         "field-sizing": "content",
