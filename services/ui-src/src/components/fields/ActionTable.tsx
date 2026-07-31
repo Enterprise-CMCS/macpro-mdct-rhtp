@@ -143,12 +143,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const [errorMessages, setErrorMessages] = useState<
     Array<Map<string, string>>
   >(
-    answer?.map((row) => {
-      return new Map<string, string>(row.map((item) => [item.id, ""]));
-    }) ?? []
+    answer?.map(
+      (row) => new Map<string, string>(row.map((item) => [item.id, ""]))
+    ) ?? []
   );
-
-  console.log(errorMessages);
 
   const formatAnswers = (
     data: ActionAnswerShape,
