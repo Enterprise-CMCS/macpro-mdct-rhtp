@@ -2,9 +2,10 @@ import { test, expect } from "./fixtures/base";
 import { TIMEOUT_UI } from "../utils/timeouts";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
+  createRunScopedInitiativeValues,
   GENERAL_INFORMATION_SECTION,
   INITIATIVES_SECTION,
-} from "../utils/report-edit-helpers";
+} from "../utils/report-edit-shared-helpers";
 import { verifyCurrentSection } from "../utils/report-edit-assertions";
 
 test.describe("Report Editing - Initiatives Persistence", () => {
@@ -23,6 +24,11 @@ test.describe("Report Editing - Initiatives Persistence", () => {
     }
 
     await verifyCurrentSection(editor, INITIATIVES_SECTION);
+    await expect(
+      editor.page.getByRole("heading", { name: "Initiatives" })
+    ).toBeVisible();
+    await expect(editor.previousButton).toBeVisible();
+    await expect(editor.continueButton).toBeVisible();
 
     const addInitiativeButton = editor.page.getByRole("button", {
       name: /^Add initiative$/i,
@@ -35,10 +41,8 @@ test.describe("Report Editing - Initiatives Persistence", () => {
       return;
     }
 
-    const uniqueSuffix = `${Date.now()}`;
-    const initiativeNumber = uniqueSuffix.slice(-6);
-    const initiativeName = `Initiative ${uniqueSuffix}`;
-    const expectedDisplayName = `${initiativeNumber}: ${initiativeName}`;
+    const { initiativeNumber, initiativeName, expectedDisplayName } =
+      createRunScopedInitiativeValues("initiatives-persistence");
 
     // Act
     await addInitiativeButton.click();
@@ -67,16 +71,11 @@ test.describe("Report Editing - Initiatives Persistence", () => {
 
     const { reportType, state, reportId } = editor.getCurrentRouteParams();
 
-    await editor.navigateToSection(
+    await editor.navigateToSectionAndBack(
       reportType,
       state,
       reportId,
-      GENERAL_INFORMATION_SECTION
-    );
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
+      GENERAL_INFORMATION_SECTION,
       INITIATIVES_SECTION
     );
 

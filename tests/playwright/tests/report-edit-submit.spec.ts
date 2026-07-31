@@ -8,6 +8,7 @@ import {
   createUniqueAorValue,
   GENERAL_INFORMATION_SECTION,
   GENERAL_INFO_FIELDS,
+  getReportTestRunId,
   REVIEW_SUBMIT_SECTION,
   waitForAutosaveWithSectionRefresh,
 } from "../utils/report-edit-shared-helpers";
@@ -93,6 +94,8 @@ test.describe("Report Editing - Submission and Read-only", () => {
     await expect(
       editor.page.getByRole("heading", { name: "Review & Submit" })
     ).toBeVisible();
+    await expect(editor.continueButton).toBeHidden();
+    await expect(editor.previousButton).toBeHidden();
 
     const blockedMessageVisible = await blockedMessage
       .isVisible()
@@ -173,7 +176,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
       return;
     }
 
-    const aorValue = createUniqueAorValue();
+    const aorValue = createUniqueAorValue(getReportTestRunId());
     await verifyCurrentSection(editor, GENERAL_INFORMATION_SECTION);
     await ensureGeneralInfoReadyForEdit(editor);
     await editor.fillTextField(AOR_NAME_LABEL, aorValue);

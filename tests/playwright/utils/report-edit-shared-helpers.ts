@@ -43,14 +43,23 @@ export const GENERAL_INFO_FIELDS: GeneralInfoField[] = [
   { label: PIPD_EMAIL_LABEL, value: "pipd@test.gov" },
 ];
 
+const REPORT_TEST_RUN_ID =
+  process.env.PW_TEST_RUN_ID ??
+  process.env.GITHUB_RUN_ID ??
+  process.env.CI_PIPELINE_ID ??
+  randomUUID().replaceAll("-", "").slice(0, 10);
+
+export const getReportTestRunId = (): string => REPORT_TEST_RUN_ID;
+
 export const createRunId = (): string =>
   randomUUID().replaceAll("-", "").slice(0, 10);
 
-export const createUniqueAorValue = (runId: string = createRunId()): string =>
-  `AOR ${runId}`;
+export const createUniqueAorValue = (
+  runId: string = getReportTestRunId()
+): string => `AOR ${runId}`;
 
 export const createUniqueGeneralInfoFields = (
-  runId: string = createRunId()
+  runId: string = getReportTestRunId()
 ): GeneralInfoField[] =>
   GENERAL_INFO_FIELDS.map(({ label }) => {
     if (label === AOR_NAME_LABEL) {
@@ -71,6 +80,35 @@ export const createUniqueGeneralInfoFields = (
 
     return { label, value: `General Info ${runId}` };
   });
+
+const toSixDigitNumber = (seed: string): string => {
+  let hash = 0;
+  for (const char of seed) {
+    const codePoint = char.codePointAt(0) ?? 0;
+    hash = (hash * 31 + codePoint) % 1000000;
+  }
+
+  return String(hash).padStart(6, "0");
+};
+
+export const createRunScopedInitiativeValues = (
+  scope: string,
+  runId: string = getReportTestRunId()
+): {
+  initiativeNumber: string;
+  initiativeName: string;
+  expectedDisplayName: string;
+} => {
+  const seed = `${runId}-${scope}`;
+  const initiativeNumber = toSixDigitNumber(seed);
+  const initiativeName = `Initiative ${seed}`;
+
+  return {
+    initiativeNumber,
+    initiativeName,
+    expectedDisplayName: `${initiativeNumber}: ${initiativeName}`,
+  };
+};
 
 export const editGeneralInformationFields = async (
   editor: ReportEditorPage,
@@ -128,21 +166,6 @@ export const waitForAutosaveWithSectionRefresh = async (
   await editor.navigateToSection(reportType, state, reportId, sectionId);
 
   return waitForAutosaveVisible();
-};
-
-export const requireAutosaveWithSectionRefresh = async (
-  editor: ReportEditorPage,
-  sectionId: string,
-  failureReason: string,
-  options: AutosaveRefreshOptions = {}
-): Promise<void> => {
-  const autosaved = await waitForAutosaveWithSectionRefresh(
-    editor,
-    sectionId,
-    options
-  );
-
-  expect(autosaved, failureReason).toBeTruthy();
 };
 
 export const confirmAutosaveIndicatorIsVisible = async (

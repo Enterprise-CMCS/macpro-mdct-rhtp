@@ -3,7 +3,7 @@ import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange
 import {
   INITIATIVE_ATTACHMENTS_SECTION,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
-} from "../utils/report-edit-helpers";
+} from "../utils/report-edit-shared-helpers";
 import { verifyCurrentSection } from "../utils/report-edit-assertions";
 import { getFirstVisible } from "../utils/locators";
 import { TIMEOUT_UI } from "../utils/timeouts";
@@ -44,6 +44,11 @@ test.describe("Report Editing - Initiative Attachments", () => {
     }
 
     await verifyCurrentSection(editor, INITIATIVE_ATTACHMENTS_SECTION);
+    await expect(
+      editor.page.getByRole("heading", { name: "Initiative Attachments" })
+    ).toBeVisible();
+    await expect(editor.previousButton).toBeVisible();
+    await expect(editor.continueButton).toBeVisible();
 
     const table = getAttachmentsTable(editor.page);
     await expect(table).toBeVisible();
