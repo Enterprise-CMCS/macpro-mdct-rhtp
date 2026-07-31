@@ -29,7 +29,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useStore } from "utils";
-import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
+import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.svg";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import { DevTools, ToolType } from "components/devTools/DevTools";
