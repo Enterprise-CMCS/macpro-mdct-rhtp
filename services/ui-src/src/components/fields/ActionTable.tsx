@@ -43,7 +43,7 @@ const buildRows = (
   onEdit: (index: number) => void,
   formDisabled?: boolean,
   canChangeStatus: boolean = false,
-  errorMessages: string[][] = []
+  errorMessages: Array<Map<string, string>> = []
 ) => {
   const formattedRows: (JSX.Element | string | number)[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
@@ -66,9 +66,7 @@ const buildRows = (
           (value) =>
             onChange(value, answerRowIndex, column.id, formattedCol.type),
           "",
-          errorMessages[answerRowIndex][
-            rows.findIndex((row) => row.id === column.id)
-          ]
+          errorMessages[answerRowIndex].get(column.id)
         );
         rowElement.push(value || "--");
       }
@@ -142,9 +140,15 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
-  const [errorMessages, setErrorMessages] = useState<string[][]>(
-    answer?.map(() => initial.map(() => "")) ?? []
+  const [errorMessages, setErrorMessages] = useState<
+    Array<Map<string, string>>
+  >(
+    answer?.map((row) => {
+      return new Map<string, string>(row.map((item) => [item.id, ""]));
+    }) ?? []
   );
+
+  console.log(errorMessages);
 
   const formatAnswers = (
     data: ActionAnswerShape,
@@ -177,7 +181,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     const newErrorMessages = [...errorMessages];
     const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
     const errorMessage = getErrorMessage(type, false, value);
-    newErrorMessages[index][rowIndex] = errorMessage;
+
+    newErrorMessages[index].set(id, errorMessage);
     setErrorMessages(newErrorMessages);
     const formattedValue = formatAnswers(
       [{ id: id, value: value[0] }],
