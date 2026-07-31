@@ -162,8 +162,13 @@ const metricVariant = {
       ".ds-c-single-input-date-field": {
         minWidth: "100px",
       },
-      ".ds-c-label, .ds-c-label-mask": {
+      ".ds-c-label-mask": {
         display: "none",
+      },
+      ".ds-c-label": {
+        width: 0,
+        height: 0,
+        color: "transparent",
       },
       input: {
         "field-sizing": "content",
