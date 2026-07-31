@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
@@ -133,6 +133,13 @@ type AutosaveRefreshOptions = {
   fallbackSectionId?: string;
 };
 
+type UploadViaDialogOptions = {
+  filePath: string;
+  fileInputSelector?: string;
+  expectedFileName?: string | RegExp;
+  timeoutMs?: number;
+};
+
 export const waitForAutosaveWithSectionRefresh = async (
   editor: ReportEditorPage,
   sectionId: string,
@@ -174,4 +181,27 @@ export const confirmAutosaveIndicatorIsVisible = async (
   await expect(editor.saveStatusText).toBeVisible({
     timeout: TIMEOUT_AUTOSAVE,
   });
+};
+
+export const uploadFileViaDialog = async (
+  page: Page,
+  options: UploadViaDialogOptions
+): Promise<void> => {
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible({ timeout: options.timeoutMs });
+
+  await dialog
+    .locator(options.fileInputSelector ?? "input[type='file']")
+    .setInputFiles(options.filePath);
+
+  if (options.expectedFileName) {
+    await expect(dialog.getByText(options.expectedFileName)).toBeVisible({
+      timeout: options.timeoutMs,
+    });
+  }
+
+  const doneButton = dialog.getByRole("button", { name: /^Done$/i });
+  await expect(doneButton).toBeVisible({ timeout: options.timeoutMs });
+  await doneButton.click();
+  await expect(dialog).toBeHidden({ timeout: options.timeoutMs });
 };

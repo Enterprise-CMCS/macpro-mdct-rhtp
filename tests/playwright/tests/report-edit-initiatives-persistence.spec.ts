@@ -6,7 +6,11 @@ import {
   GENERAL_INFORMATION_SECTION,
   INITIATIVES_SECTION,
 } from "../utils/report-edit-shared-helpers";
-import { verifyCurrentSection } from "../utils/report-edit-assertions";
+import {
+  skipIfUnavailable,
+  verifyCurrentSection,
+  verifySectionShell,
+} from "../utils/report-edit-assertions";
 
 test.describe("Report Editing - Initiatives Persistence", () => {
   test("should add an initiative and persist it across section navigation @regression", async ({
@@ -23,21 +27,22 @@ test.describe("Report Editing - Initiatives Persistence", () => {
       return;
     }
 
-    await verifyCurrentSection(editor, INITIATIVES_SECTION);
-    await expect(
-      editor.page.getByRole("heading", { name: "Initiatives" })
-    ).toBeVisible();
-    await expect(editor.previousButton).toBeVisible();
-    await expect(editor.continueButton).toBeVisible();
+    await verifySectionShell(editor, {
+      sectionId: INITIATIVES_SECTION,
+      heading: "Initiatives",
+      previousButtonVisibility: "visible",
+      continueButtonVisibility: "visible",
+    });
 
     const addInitiativeButton = editor.page.getByRole("button", {
       name: /^Add initiative$/i,
     });
-    const canAddInitiative = await addInitiativeButton
-      .isVisible()
-      .catch(() => false);
-    if (!canAddInitiative) {
-      test.skip(true, "Add initiative action is not available for this user");
+    const addInitiativeUnavailable = await skipIfUnavailable(
+      () => addInitiativeButton.isVisible(),
+      (reason) => test.skip(true, reason),
+      "Add initiative action is not available for this user"
+    );
+    if (addInitiativeUnavailable) {
       return;
     }
 

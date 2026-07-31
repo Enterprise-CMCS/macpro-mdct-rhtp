@@ -20,6 +20,7 @@ import {
 import {
   verifyFieldIsReadOnly,
   verifyCurrentSection,
+  verifySectionShell,
 } from "../utils/report-edit-assertions";
 
 const ensureGeneralInfoReadyForEdit = async (
@@ -90,12 +91,12 @@ test.describe("Report Editing - Submission and Read-only", () => {
     }
     const { submitButton, blockedMessage, editor } = context;
 
-    await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
-    await expect(
-      editor.page.getByRole("heading", { name: "Review & Submit" })
-    ).toBeVisible();
-    await expect(editor.continueButton).toBeHidden();
-    await expect(editor.previousButton).toBeHidden();
+    await verifySectionShell(editor, {
+      sectionId: REVIEW_SUBMIT_SECTION,
+      heading: "Review & Submit",
+      previousButtonVisibility: "hidden",
+      continueButtonVisibility: "hidden",
+    });
 
     const blockedMessageVisible = await blockedMessage
       .isVisible()

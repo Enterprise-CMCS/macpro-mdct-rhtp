@@ -1,8 +1,8 @@
 import { test, expect } from "./fixtures/base";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
-  verifyCurrentSection,
   verifyFieldValue,
+  verifySectionShell,
 } from "../utils/report-edit-assertions";
 import {
   GENERAL_INFORMATION_SECTION,
@@ -29,21 +29,18 @@ test.describe("Report Editing - Sustainability Persistence", () => {
       return;
     }
 
-    await verifyCurrentSection(editor, SUSTAINABILITY_AND_HIGHLIGHTS_SECTION);
-    await expect(
-      editor.page.getByRole("heading", {
-        name: "Sustainability and Highlights",
-      })
-    ).toBeVisible();
+    await verifySectionShell(editor, {
+      sectionId: SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+      heading: "Sustainability and Highlights",
+      previousButtonVisibility: "visible",
+      continueButtonVisibility: "visible",
+    });
     await expect(
       editor.page.getByText("Success Stories", { exact: true })
     ).toBeVisible();
     await expect(
       editor.page.getByText("Sustainability Planning", { exact: true })
     ).toBeVisible();
-    await expect(editor.previousButton).toBeVisible();
-    await expect(editor.continueButton).toBeVisible();
-
     await editor.fillTextField(
       SUCCESS_STORIES_LABEL,
       SUSTAINABILITY_TEST_DATA.successStories

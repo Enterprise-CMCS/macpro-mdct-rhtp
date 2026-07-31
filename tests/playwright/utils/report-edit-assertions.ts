@@ -1,6 +1,15 @@
 import { expect } from "@playwright/test";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 
+type VisibilityState = "visible" | "hidden";
+
+type SectionShellOptions = {
+  sectionId: string;
+  heading?: string | RegExp;
+  previousButtonVisibility?: VisibilityState;
+  continueButtonVisibility?: VisibilityState;
+};
+
 /**
  * Verify that a field identified by label is disabled (read-only enforcement).
  */
@@ -34,3 +43,46 @@ export async function verifyCurrentSection(
     new RegExp(`/report/[^/]+/[^/]+/[^/]+/${expectedSectionId}(\\?.*)?$`)
   );
 }
+
+export async function verifySectionShell(
+  editor: ReportEditorPage,
+  options: SectionShellOptions
+): Promise<void> {
+  await verifyCurrentSection(editor, options.sectionId);
+
+  if (options.heading) {
+    await expect(
+      editor.page.getByRole("heading", { name: options.heading })
+    ).toBeVisible();
+  }
+
+  if (options.previousButtonVisibility === "visible") {
+    await expect(editor.previousButton).toBeVisible();
+  }
+
+  if (options.previousButtonVisibility === "hidden") {
+    await expect(editor.previousButton).toBeHidden();
+  }
+
+  if (options.continueButtonVisibility === "visible") {
+    await expect(editor.continueButton).toBeVisible();
+  }
+
+  if (options.continueButtonVisibility === "hidden") {
+    await expect(editor.continueButton).toBeHidden();
+  }
+}
+
+export const skipIfUnavailable = async (
+  check: () => Promise<boolean>,
+  onSkip: (reason: string) => void,
+  reason: string
+): Promise<boolean> => {
+  const available = await check().catch(() => false);
+  if (!available) {
+    onSkip(reason);
+    return true;
+  }
+
+  return false;
+};
