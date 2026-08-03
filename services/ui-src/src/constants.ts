@@ -27,8 +27,8 @@ export const autoCalculatesText = "Auto-calculates from previous response";
 export const HELP_DESK_EMAIL_ADDRESS = "mdct_help@cms.hhs.gov" as const;
 
 // TIMEOUT PARAMS
-export const IDLE_WINDOW = 2 * 10 * 1000; // ms
-export const PROMPT_AT = 1 * 10 * 1000; //ms
+export const IDLE_WINDOW = 30 * 60 * 1000; // ms
+export const PROMPT_AT = 29 * 60 * 1000; //ms
 
 export const budgetPeriodFilterOptions = [
   { label: "All", value: "All" },
