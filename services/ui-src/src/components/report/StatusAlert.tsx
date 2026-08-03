@@ -1,14 +1,28 @@
 import { useStore } from "utils";
 import { Alert } from "components/alerts/Alert";
 import { PageElementProps } from "./Elements";
-import { ElementType, StatusAlertTemplate } from "@rhtp/shared";
-import { currentPageSelector } from "utils/state/selectors";
+import { ElementType, PageStatus, StatusAlertTemplate } from "@rhtp/shared";
+import {
+  currentPageSelector,
+  submittableMetricsSelector,
+} from "utils/state/selectors";
+import { inferredReportStatus } from "utils/state/reportLogic/completeness";
 export const StatusAlert = (props: PageElementProps<StatusAlertTemplate>) => {
   const { report, currentPageId } = useStore();
   const { status, title, text } = props.element;
+  const submittableMetrics = useStore(submittableMetricsSelector);
   const currentPage = useStore(currentPageSelector);
 
   if (!report || !currentPageId) return <></>;
+
+  const isReviewPage = currentPageId === "review-submit";
+  if (isReviewPage && submittableMetrics?.submittable) {
+    return <></>;
+  } else if (
+    inferredReportStatus(report, currentPageId) !== PageStatus.COMPLETE
+  ) {
+    return <></>;
+  }
 
   //by default alerts are active unless they are tied to an element on the page
   const isAlertActive = (watchId: string) => {
