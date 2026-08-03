@@ -1,6 +1,7 @@
 import {
   DateField,
   DropdownField,
+  ListInput,
   RadioField,
   TextAreaField,
   TextField,
@@ -11,6 +12,12 @@ import {
   StatusTableElement,
   StatusAlert,
   CheckboxField,
+  AttachmentArea,
+  InitiativesTable,
+  TableCheckpoint,
+  AccordionGroup,
+  ActionTable,
+  AttachmentTable,
 } from "components";
 import {
   ButtonLinkElement,
@@ -36,6 +43,8 @@ import {
 } from "./pdfElementSectionHelpers";
 import { formatMonthDayYear } from "utils";
 import { SubmissionParagraph } from "components/report/SubmissionParagraph";
+import { ObligatedAndSpentFundsAttachmentElement } from "components/report/ObligatedAndSpentFundsAttachment";
+import { SubmitForReview } from "components/report/SubmitForReview";
 
 const logNewElement = (el: Partial<PageElement>) => console.log("Updated:", el);
 
@@ -374,6 +383,165 @@ export const elementObject: {
         }}
       />,
     ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.ListInput]: {
+    description: "A field for adding a series of inputs",
+    id: "id-listinput",
+    variants: [
+      <ListInput
+        updateElement={logNewElement}
+        element={{
+          type: ElementType.ListInput,
+          id: "id-listinput",
+          buttonText: "Add list input",
+          required: true,
+          fieldLabel: "input",
+          label: "List Input",
+        }}
+      ></ListInput>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.AttachmentArea]: {
+    description: "",
+    id: "id-attachment",
+    variants: [
+      <AttachmentArea
+        updateElement={logNewElement}
+        element={{
+          type: ElementType.AttachmentArea,
+          id: "id-attachment",
+          label: "label",
+          required: true,
+        }}
+      ></AttachmentArea>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.InitiativesTable]: {
+    description: "",
+    id: "id-initiative-table",
+    variants: [
+      <InitiativesTable
+        element={{
+          id: "id-initiative-table",
+          type: ElementType.InitiativesTable,
+          required: false,
+          quarterly: undefined,
+          disabled: undefined,
+        }}
+      ></InitiativesTable>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.TableCheckpoint]: {
+    description: "",
+    id: "id-table-checkpoint",
+    variants: [
+      <TableCheckpoint
+        element={{
+          type: ElementType.TableCheckpoint,
+          id: "id-table-checkpoint",
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></TableCheckpoint>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.AccordionGroup]: {
+    description: "",
+    id: "id-accordion-group",
+    variants: [
+      <AccordionGroup
+        element={{
+          type: ElementType.AccordionGroup,
+          id: "id-accordion-group",
+          accordions: [
+            {
+              label: "Accordiong Group 1",
+              elements: [],
+            },
+          ],
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></AccordionGroup>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.ObligatedAndSpentFundsAttachment]: {
+    description: "",
+    id: "id-funds-attachment",
+    variants: [
+      <ObligatedAndSpentFundsAttachmentElement
+        element={{
+          type: ElementType.ObligatedAndSpentFundsAttachment,
+          id: "",
+          label: "",
+          answer: undefined,
+          required: false,
+        }}
+        updateElement={logNewElement}
+      ></ObligatedAndSpentFundsAttachmentElement>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.ActionTable]: {
+    description: "",
+    id: "id-action-table",
+    variants: [
+      <ActionTable
+        element={{
+          type: ElementType.ActionTable,
+          id: "id-action-table",
+          label: "Action Table",
+          hintText: "hint text",
+          modal: {
+            title: "Modal",
+            elements: [
+              {
+                label: "",
+                required: false,
+                id: "",
+                type: ElementType.Header,
+              },
+            ],
+          },
+          rows: [
+            {
+              header: "Row 1",
+              id: "row-1",
+              type: ElementType.Header,
+            },
+          ],
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></ActionTable>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.AttachmentTable]: {
+    description: "",
+    id: "id-attachment-table",
+    variants: [
+      <AttachmentTable
+        element={{
+          type: ElementType.AttachmentTable,
+          id: "id-attachment-table",
+          answer: undefined,
+        }}
+        updateElement={logNewElement}
+      ></AttachmentTable>,
+    ],
+    pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.SubmitForReview]: {
+    description: "",
+    id: "id-submit-for-review",
+    variants: [<SubmitForReview></SubmitForReview>],
     pdfVariants: ["Checkbox currently not used in PDFs"],
   },
 };
