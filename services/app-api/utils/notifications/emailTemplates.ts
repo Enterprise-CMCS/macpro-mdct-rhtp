@@ -134,7 +134,7 @@ Please follow the steps below to navigate to the comment within the portal:
 
     1. Log in to the RHTP Portal: https://mdctrhtp.cms.gov
     2. Find ${reportName}
-    3. Select Comment from the report dashboard to review the State's notes.
+    3. Select Comment/Status from the report dashboard to review the State's notes.
 
 If you believe this notification was sent in error, or if you have questions, please reach out to the RHTP support desk.
 
