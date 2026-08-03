@@ -13,6 +13,9 @@ export type GeneralInfoField = {
 
 export type GeneralInfoFillMode = "overwrite" | "fill-empty";
 
+export const escapeRegExp = (str: string): string =>
+  str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+
 export const GENERAL_INFORMATION_SECTION = "general-information";
 export const INITIATIVE_ATTACHMENTS_SECTION = "initiative-attachments";
 export const INITIATIVES_SECTION = "initiatives";
@@ -43,11 +46,26 @@ export const GENERAL_INFO_FIELDS: GeneralInfoField[] = [
   { label: PIPD_EMAIL_LABEL, value: "pipd@test.gov" },
 ];
 
-const REPORT_TEST_RUN_ID =
-  process.env.PW_TEST_RUN_ID ??
-  process.env.GITHUB_RUN_ID ??
-  process.env.CI_PIPELINE_ID ??
-  randomUUID().replaceAll("-", "").slice(0, 10);
+const normalizeRunId = (id: string): string => {
+  const cleaned = id.replaceAll(/[^a-f0-9]/gi, "").slice(0, 10);
+  return cleaned.length > 0 ? cleaned : "";
+};
+
+const REPORT_TEST_RUN_ID = (() => {
+  const envId =
+    process.env.PW_TEST_RUN_ID ??
+    process.env.GITHUB_RUN_ID ??
+    process.env.CI_PIPELINE_ID;
+
+  if (envId) {
+    const normalized = normalizeRunId(envId);
+    if (normalized.length > 0) {
+      return normalized;
+    }
+  }
+
+  return randomUUID().replaceAll("-", "").slice(0, 10);
+})();
 
 export const getReportTestRunId = (): string => REPORT_TEST_RUN_ID;
 

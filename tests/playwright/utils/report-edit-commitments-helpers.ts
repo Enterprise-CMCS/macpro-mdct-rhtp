@@ -3,6 +3,7 @@ import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import {
   STATE_POLICY_COMMITMENTS_SECTION,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
+  escapeRegExp,
 } from "./report-edit-shared-helpers";
 import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "./timeouts";
 
@@ -203,10 +204,7 @@ export const verifyCommitmentValues = async (
     await getCommitmentLinkValues(commitmentContainer);
   expect(persistedLinkValues).toContain(expected.linkValue);
 
-  const escapedAttachmentFileName = expected.attachmentFileName.replaceAll(
-    ".",
-    String.raw`\.`
-  );
+  const escapedAttachmentFileName = escapeRegExp(expected.attachmentFileName);
   await expect(
     commitmentContainer
       .getByText(new RegExp(escapedAttachmentFileName, "i"))
