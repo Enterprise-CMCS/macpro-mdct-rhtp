@@ -5,7 +5,6 @@ import { TIMEOUT_LOADING } from "../utils/timeouts";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   AOR_NAME_LABEL,
-  createUniqueAorValue,
   GENERAL_INFORMATION_SECTION,
   GENERAL_INFO_FIELDS,
   getReportTestRunId,
@@ -177,7 +176,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
       return;
     }
 
-    const aorValue = createUniqueAorValue(getReportTestRunId());
+    const aorValue = `AOR Name ${getReportTestRunId()}`;
     await verifyCurrentSection(editor, GENERAL_INFORMATION_SECTION);
     await ensureGeneralInfoReadyForEdit(editor);
     await editor.fillTextField(AOR_NAME_LABEL, aorValue);
@@ -206,9 +205,8 @@ test.describe("Report Editing - Submission and Read-only", () => {
       GENERAL_INFORMATION_SECTION
     );
     await verifyCurrentSection(editor, GENERAL_INFORMATION_SECTION);
-    await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(/\S+/);
     await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(
-      /^AOR \d+$/
+      /^AOR Name [a-f0-9]+$/i
     );
     await verifyFieldIsReadOnly(editor, AOR_NAME_LABEL);
   });

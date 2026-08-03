@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
+import { TIMEOUT_UI } from "./timeouts";
 
 type VisibilityState = "visible" | "hidden";
 
@@ -76,9 +77,16 @@ export async function verifySectionShell(
 export const skipIfUnavailable = async (
   check: () => Promise<boolean>,
   onSkip: (reason: string) => void,
-  reason: string
+  reason: string,
+  timeoutMs = TIMEOUT_UI
 ): Promise<boolean> => {
-  const available = await check().catch(() => false);
+  // Polls briefly so post-navigation renders don't cause spurious skips.
+  const available = await expect
+    .poll(() => check().catch(() => false), { timeout: timeoutMs })
+    .toBeTruthy()
+    .then(() => true)
+    .catch(() => false);
+
   if (!available) {
     onSkip(reason);
     return true;

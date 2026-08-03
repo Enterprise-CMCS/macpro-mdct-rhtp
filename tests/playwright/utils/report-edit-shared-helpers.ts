@@ -54,16 +54,12 @@ export const getReportTestRunId = (): string => REPORT_TEST_RUN_ID;
 export const createRunId = (): string =>
   randomUUID().replaceAll("-", "").slice(0, 10);
 
-export const createUniqueAorValue = (
-  runId: string = getReportTestRunId()
-): string => `AOR ${runId}`;
-
 export const createUniqueGeneralInfoFields = (
   runId: string = getReportTestRunId()
 ): GeneralInfoField[] =>
   GENERAL_INFO_FIELDS.map(({ label }) => {
     if (label === AOR_NAME_LABEL) {
-      return { label, value: createUniqueAorValue(runId) };
+      return { label, value: `AOR Name ${runId}` };
     }
 
     if (label === AOR_EMAIL_LABEL) {

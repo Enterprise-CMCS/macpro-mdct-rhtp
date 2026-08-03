@@ -5,7 +5,6 @@ import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   AOR_EMAIL_LABEL,
   AOR_NAME_LABEL,
-  createUniqueAorValue,
   editGeneralInformationFields,
   GENERAL_INFORMATION_SECTION,
   getReportTestRunId,
@@ -51,7 +50,7 @@ test.describe("Report Editing - General Information Persistence", () => {
     const { reportType, state, reportId } = editor.getCurrentRouteParams();
     const runId = getReportTestRunId();
     const testDataMultiple = [
-      { label: AOR_NAME_LABEL, value: createUniqueAorValue(runId) },
+      { label: AOR_NAME_LABEL, value: `AOR Name ${runId}` },
       { label: AOR_EMAIL_LABEL, value: `aor-${runId}@test.gov` },
       { label: PIPD_NAME_LABEL, value: `PIPD Name ${runId}` },
       { label: PIPD_EMAIL_LABEL, value: `pipd-${runId}@test.gov` },
