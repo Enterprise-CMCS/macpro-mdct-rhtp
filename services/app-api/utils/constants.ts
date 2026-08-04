@@ -1,4 +1,4 @@
-import { ReportType, RhtpSubTypeData, RhtpSubTypeMap } from "@rhtp/shared";
+import { RhtpSubTypeData, RhtpSubTypeMap } from "@rhtp/shared";
 import { rhtpReportTemplate } from "../forms/2026/rhtp/rhtp";
 
 export const RhtpSubTypeTemplateMap: RhtpSubTypeData = {
@@ -90,16 +90,4 @@ export const error = {
   END_DATE_BEFORE_START_DATE: "End date can't be before start date",
 };
 
-export const reportTables: { [key in ReportType]: string } = {
-  RHTP: process.env.RhtpReportsTable!,
-};
-
-export const kafkaTables: { [key: string]: string } = {
-  ...reportTables,
-  RHTP_COMMENTS: process.env.CommentsTable!,
-};
-
-export const kafkaTopics: { [key in string]: string } = {
-  RHTP: "rhtp-reports",
-  RHTP_COMMENTS: "rhtp-comments",
-};
+export const reportTable = process.env.ReportsTable!;

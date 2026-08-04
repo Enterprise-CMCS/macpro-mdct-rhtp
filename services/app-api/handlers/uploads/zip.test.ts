@@ -16,13 +16,17 @@ import {
   addReportFilesToZip,
   addObligatedAndSpentFundsFilesToZip,
 } from "../../utils/zips/buildZip";
+import { canRequestZip } from "../../utils/authorization";
 
 vi.mock("../../utils/authentication");
 const mockAuthenticatedUser = vi.mocked(authenticatedUser);
 mockAuthenticatedUser.mockResolvedValue({
   role: UserRoles.ADMIN,
-  state: "PA",
 } as User);
+
+vi.mock("../../utils/authorization");
+const mockCanRequestZip = vi.mocked(canRequestZip);
+mockCanRequestZip.mockReturnValue(true);
 
 vi.mock("../../utils/zips/polling", () => ({
   getPSURL: vi.fn(),
@@ -138,6 +142,12 @@ describe("Test zip methods", () => {
       } as APIGatewayProxyEvent;
       const res = await triggerZipGeneration(badTestEvent);
       expect(res.statusCode).toBe(StatusCodes.BadRequest);
+    });
+
+    test("user not allowed returns forbidden", async () => {
+      mockCanRequestZip.mockReturnValueOnce(false);
+      const res = await triggerZipGeneration(mockTriggerReportZipEvent);
+      expect(res.statusCode).toBe(StatusCodes.Forbidden);
     });
 
     test("returns proper response for report event", async () => {
