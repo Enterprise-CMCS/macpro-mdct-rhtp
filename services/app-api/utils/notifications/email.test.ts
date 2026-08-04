@@ -212,6 +212,27 @@ describe("email utils", () => {
       expect(mockSaveNotifications).toHaveBeenCalled();
     });
 
+    test("should send an email for submit for review", async () => {
+      const mockSubmitForReviewComment = {
+        ...mockReportComment,
+        type: CommentType.SUBMIT_FOR_REVIEW,
+      };
+      mockGetReport.mockResolvedValue(validReport);
+      mockQueryRecipients.mockResolvedValueOnce([
+        { email: "cms.user@test.com" } as NotificationRecipientRecord,
+      ]);
+      await sendEmail({
+        state: "PA",
+        user: mockStateUser,
+        comment: mockSubmitForReviewComment,
+      });
+      expect(mockQueryUpload).not.toHaveBeenCalled();
+      expect(mockGetReport).toHaveBeenCalled();
+      expect(mockQueryRecipients).toHaveBeenCalled();
+      expect(sesLib.sendSesEmail).toHaveBeenCalled();
+      expect(mockSaveNotifications).toHaveBeenCalled();
+    });
+
     test("should send an email for attachment comment", async () => {
       mockQueryUpload.mockResolvedValue({
         Items: [{ filename: "mockfile.pdf" }],

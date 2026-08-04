@@ -96,6 +96,7 @@ export enum PageStatus {
 
 export enum CommentType {
   REPORT = "report",
+  SUBMIT_FOR_REVIEW = "submit_for_review",
   ATTACHMENT = "attachment",
   ATTACHMENT_STATUS = "attachment_status",
 }

@@ -82,7 +82,7 @@ describe("SubmitForReview component", () => {
         mockUseStore.report?.state,
         {
           comment: "Please review",
-          type: "report",
+          type: "submit_for_review",
           isInternal: false,
         }
       );

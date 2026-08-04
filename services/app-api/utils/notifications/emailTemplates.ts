@@ -9,6 +9,8 @@ export const getEmailTemplate = (emailTrigger: EMAIL_TRIGGERS, data: any) => {
       return getReportCommentTemplate(data);
     case EMAIL_TRIGGERS.REPORT_STATUS_CHANGE:
       return getReportStatusChangeTemplate(data);
+    case EMAIL_TRIGGERS.SUBMIT_FOR_REVIEW:
+      return getSubmitForReviewTemplate(data);
     case EMAIL_TRIGGERS.ATTACHMENT_COMMENT:
       return getAttachmentCommentTemplate(data);
     case EMAIL_TRIGGERS.ATTACHMENT_STATUS_CHANGE_LOCKED:
@@ -93,6 +95,50 @@ Update summary
     Date of change: ${new Date().toDateString()}
 
 If you believe this status change was made in error, or if you have questions regarding the requirements for this new status, please contact your system administrator or reach out to the RHTP support desk.
+`,
+      },
+    },
+  },
+});
+
+const getSubmitForReviewTemplate = ({
+  reportName,
+  recipients,
+}: {
+  reportName: string;
+  recipients: string[];
+}) => ({
+  Source: FROM_ADDRESS,
+  Destination: {
+    ToAddresses: recipients,
+  },
+  Message: {
+    Subject: { Data: `RHTP: ${reportName} sections ready for review` },
+    Body: {
+      Text: {
+        Data: `Dear User,
+
+This is an automated notification that sections of a report are ready for review within the MDCT Rural Health Transformation Program (RHTP) platform. Please note that this is not a final submission; the State is still working on this report and remains in an In Progress status.
+
+The State has included a report-level comment specifying which sections are ready for your review.
+
+Update summary
+
+    Report name: ${reportName}
+
+    Activity: New report-level comment added
+
+    Date of change: ${new Date().toDateString()}
+
+Please follow the steps below to navigate to the comment within the portal:
+
+    1. Log in to the RHTP Portal: https://mdctrhtp.cms.gov
+    2. Find ${reportName}
+    3. Select Comment/Status from the report dashboard to review the State's notes.
+
+If you believe this notification was sent in error, or if you have questions, please reach out to the RHTP support desk.
+
+    Sincerely,
 `,
       },
     },
