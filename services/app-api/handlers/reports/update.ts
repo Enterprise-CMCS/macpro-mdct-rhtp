@@ -4,7 +4,10 @@ import { parseReportParameters } from "../../libs/param-lib";
 import { badRequest, forbidden, ok } from "../../libs/response-lib";
 import { putReport } from "../../storage/reports";
 import { isCompleteStatus } from "@rhtp/shared";
-import { canPatchSubmittedReport, canWriteState } from "../../utils/authorization";
+import {
+  canPatchSubmittedReport,
+  canWriteState,
+} from "../../utils/authorization";
 import { error } from "../../utils/constants";
 import { validateReportPayload } from "../../utils/reportValidation";
 import {
@@ -40,19 +43,18 @@ export const updateReport = handler(parseReportParameters, async (request) => {
     return badRequest("Invalid request");
   }
 
+  let updatedReport;
+
   if (isCompleteStatus(reportRequest.status)) {
     if (!canPatchSubmittedReport(user)) {
       return forbidden(error.UNAUTHORIZED);
     }
-    const updatedReport = await updatePrivilegedFieldsOnly(reportRequest, user);
-    if (!updatedReport) {
-      return badRequest("Invalid request");
-    }
-    await putReport(updatedReport);
-    return ok();
+
+    updatedReport = await updatePrivilegedFieldsOnly(reportRequest, user);
+  } else {
+    updatedReport = await updateReportAnswers(reportRequest, user);
   }
 
-  const updatedReport = await updateReportAnswers(reportRequest, user);
   if (!updatedReport) {
     return badRequest("Invalid request");
   }

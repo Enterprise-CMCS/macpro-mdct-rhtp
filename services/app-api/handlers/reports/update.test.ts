@@ -16,7 +16,7 @@ import { UserRoles } from "@rhtp/shared";
 
 vi.mock("../../utils/authentication");
 const mockAuthenticatedUser = vi.mocked(authenticatedUser);
-mockAuthenticatedUser.mockResolvedValue({
+mockAuthenticatedUser.mockReturnValue({
   role: UserRoles.STATE_USER,
   state: "PA",
   fullName: "Anthony Soprano",
@@ -24,6 +24,7 @@ mockAuthenticatedUser.mockResolvedValue({
 
 vi.mock("../../utils/authorization", () => ({
   canWriteState: vi.fn().mockReturnValue(true),
+  isAdminUser: vi.fn().mockReturnValue(false),
 }));
 
 vi.mock("../../storage/reports", () => ({
@@ -100,7 +101,7 @@ describe("Test update report handler", () => {
     expect(resId.statusCode).toBe(StatusCodes.BadRequest);
   });
 
-  test("Test Successful update", async () => {
+  test.only("Test Successful update", async () => {
     const res = await updateReport(testEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Ok);

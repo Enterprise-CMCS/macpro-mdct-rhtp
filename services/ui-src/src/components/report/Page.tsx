@@ -14,7 +14,6 @@ import {
   isCompleteStatus,
   PageElement,
   ReportStatus,
-  UserRoles,
 } from "@rhtp/shared";
 import {
   DateField,

@@ -337,7 +337,6 @@ interface InputElementTemplate {
   required: boolean;
   quarterly?: boolean;
   disabled?: boolean;
-  editByRole?: string[];
   onlyCmsAdminCanEdit?: boolean;
   cmsAdminCanEditInSubmitted?: boolean;
 }

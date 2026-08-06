@@ -74,7 +74,6 @@ const inputElementSchema = {
   required: boolean().required(),
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
-  editByRole: array().of(string()).notRequired(),
   onlyCmsAdminCanEdit: boolean().notRequired(),
   cmsAdminCanEditInSubmitted: boolean().notRequired(),
 };

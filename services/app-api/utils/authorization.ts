@@ -21,6 +21,10 @@ const adminRoles = [
   UserRoles.PROJECT_OFFICER,
 ];
 
+export const isAdminUser = (user: User) => {
+  return adminRoles.includes(user.role);
+};
+
 export const canReadState = (user: User, state: StateAbbr) => {
   if (statelessRoles.includes(user.role)) {
     return true;
@@ -34,7 +38,7 @@ export const canReadState = (user: User, state: StateAbbr) => {
 export const canWriteState = (user: User, state: StateAbbr) => {
   // TODO: For the first year, Admins will be entering data manually for the states
   // Remove the bottom line to stop allowing Admins to create/edit reports.
-  if (adminRoles.includes(user.role)) return true;
+  if (isAdminUser(user)) return true;
 
   if (user.role == UserRoles.STATE_USER && user.state === state) {
     return true;
@@ -43,7 +47,7 @@ export const canWriteState = (user: User, state: StateAbbr) => {
 };
 
 export const canWriteInitiatives = (user: User) => {
-  return adminRoles.includes(user.role);
+  return isAdminUser(user);
 };
 
 export const canWriteBanner = (user: User) => {
@@ -51,15 +55,15 @@ export const canWriteBanner = (user: User) => {
 };
 
 export const canReleaseReport = (user: User) => {
-  return adminRoles.includes(user.role);
+  return isAdminUser(user);
 };
 
 export const canPatchSubmittedReport = (user: User) => {
-  return adminRoles.includes(user.role);
+  return isAdminUser(user);
 };
 
 export const canWriteComments = (user: User, state: StateAbbr) => {
-  if (adminRoles.includes(user.role)) return true;
+  if (isAdminUser(user)) return true;
 
   if (user.role == UserRoles.STATE_USER && user.state === state) {
     return true;
@@ -68,7 +72,7 @@ export const canWriteComments = (user: User, state: StateAbbr) => {
 };
 
 export const canReadInternalComments = (user: User) => {
-  return adminRoles.includes(user.role);
+  return isAdminUser(user);
 };
 
 export const canReadAnyReport = (user: User) => {
