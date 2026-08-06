@@ -101,7 +101,7 @@ describe("Test update report handler", () => {
     expect(resId.statusCode).toBe(StatusCodes.BadRequest);
   });
 
-  test.only("Test Successful update", async () => {
+  test("Test Successful update", async () => {
     const res = await updateReport(testEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Ok);
