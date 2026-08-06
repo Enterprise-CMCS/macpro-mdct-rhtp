@@ -9,7 +9,12 @@ import {
   DividerElement,
 } from "./Elements";
 import { assertExhaustive } from "types";
-import { ElementType, isCompleteStatus, PageElement } from "@rhtp/shared";
+import {
+  ElementType,
+  isCompleteStatus,
+  PageElement,
+  UserRoles,
+} from "@rhtp/shared";
 import {
   DateField,
   DropdownField,
@@ -39,15 +44,20 @@ interface Props {
 }
 
 export const Page = ({ id, setElements, elements }: Props) => {
-  const { userIsEndUser, userRole } = useStore().user || {};
+  const { userIsEndUser, userIsAdmin } = useStore().user || {};
   const { report } = useStore();
 
   const buildElement = (element: PageElement, index: number) => {
     const roleCanEdit =
-      "editByRole" in element
-        ? element.editByRole!.includes(userRole!)
-        : userIsEndUser;
-    const disabled = !roleCanEdit || isCompleteStatus(report?.status);
+      "onlyCmsAdminCanEdit" in element && element.onlyCmsAdminCanEdit
+        ? userIsAdmin
+        : !!userIsEndUser;
+    const statusAllowsEdit =
+      "cmsAdminCanEditInSubmitted" in element &&
+      element.cmsAdminCanEditInSubmitted
+        ? !isCompleteStatus(report?.status) || userIsAdmin
+        : !isCompleteStatus(report?.status);
+    const disabled = !roleCanEdit || !statusAllowsEdit;
     const subType = report?.subType;
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([

@@ -54,6 +54,10 @@ export const canReleaseReport = (user: User) => {
   return adminRoles.includes(user.role);
 };
 
+export const canPatchSubmittedReport = (user: User) => {
+  return adminRoles.includes(user.role);
+};
+
 export const canWriteComments = (user: User, state: StateAbbr) => {
   if (adminRoles.includes(user.role)) return true;
 
