@@ -54,17 +54,6 @@ export const getZipFile = async (body: ZipRequestBody) => {
   link.click();
 };
 
-export const canEditAttachment = (status: AttachmentStatus): boolean => {
-  return status !== AttachmentStatus.LOCKED_FOR_SCORING;
-};
-
-export const canDeleteAttachment = (
-  status: AttachmentStatus,
-  canDelete: boolean
-): boolean => {
-  return status === AttachmentStatus.PENDING_REVIEW && canDelete;
-};
-
 export const removeFile = async (
   reportType: ReportType,
   state: string,

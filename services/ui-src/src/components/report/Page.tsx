@@ -13,6 +13,7 @@ import {
   ElementType,
   isCompleteStatus,
   PageElement,
+  ReportStatus,
   UserRoles,
 } from "@rhtp/shared";
 import {
@@ -51,13 +52,16 @@ export const Page = ({ id, setElements, elements }: Props) => {
     const roleCanEdit =
       "onlyCmsAdminCanEdit" in element && element.onlyCmsAdminCanEdit
         ? userIsAdmin
-        : !!userIsEndUser;
+        : userIsEndUser;
     const statusAllowsEdit =
-      "cmsAdminCanEditInSubmitted" in element &&
-      element.cmsAdminCanEditInSubmitted
-        ? !isCompleteStatus(report?.status) || userIsAdmin
-        : !isCompleteStatus(report?.status);
+      !isCompleteStatus(report?.status) ||
+      ("onlyCmsAdminCanEdit" in element &&
+        element.onlyCmsAdminCanEdit &&
+        userIsAdmin &&
+        report?.status === ReportStatus.SUBMITTED);
+
     const disabled = !roleCanEdit || !statusAllowsEdit;
+
     const subType = report?.subType;
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([
