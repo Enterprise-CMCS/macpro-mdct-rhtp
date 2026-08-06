@@ -54,7 +54,8 @@ export const ReportPageWrapper = () => {
       }
       setIsLoading(false);
     } catch {
-      // console.log("oopsy")
+      //navigate user to access denied page
+      navigate("/403");
     }
   };
 

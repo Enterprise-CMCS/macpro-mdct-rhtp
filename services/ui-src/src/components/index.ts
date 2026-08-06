@@ -49,6 +49,7 @@ export { LoginIDM } from "./logins/LoginIDM";
 export { AdminPage } from "./pages/Admin/AdminPage";
 export { ExportedReportPage } from "./pages/Export/ExportedReportPage";
 export { HelpPage } from "./pages/HelpPage/HelpPage";
+export { AccessDeniedPage } from "./pages/AccessDenied/AccessDeniedPage";
 export { NotFoundPage } from "./pages/NotFound/NotFoundPage";
 export { NotificationsPage } from "./pages/Notifications/NotificationsPage";
 export { ProfilePage } from "./pages/Profile/ProfilePage";
