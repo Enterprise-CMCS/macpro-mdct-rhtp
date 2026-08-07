@@ -104,7 +104,7 @@ export function createUiComponents(props: CreateUiComponentsProps) {
             "script-src 'self' https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com tags.tiqcdn.com tags.tiqcdn.cn tags-eu.tiqcdn.com https://www.datadoghq-browser-agent.com ddog-gov.com https://dap.digitalgov.gov dap.digitalgov.gov https://*.adoberesources.net 'unsafe-inline'",
             "style-src 'self' maxcdn.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline'",
             "font-src 'self' maxcdn.bootstrapcdn.com fonts.gstatic.com",
-            "connect-src https://*.amazonaws.com/ https://*.amazoncognito.com https://www.google-analytics.com https://*.launchdarkly.us https://browser-intake-datadoghq.com https://dap.digitalgov.gov",
+            "connect-src https://*.amazonaws.com/ https://*.amazoncognito.com https://www.google-analytics.com https://*.launchdarkly.us https://browser-intake-datadoghq.com https://browser-intake-ddog-gov.com https://dap.digitalgov.gov",
             "frame-ancestors 'none'",
             "object-src 'none'",
           ].join("; "),
