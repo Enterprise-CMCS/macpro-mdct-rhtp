@@ -12,27 +12,17 @@ import {
 } from "components";
 import { Container, Divider, Flex, Heading, Stack } from "@chakra-ui/react";
 import { ErrorBoundary } from "react-error-boundary";
-import {
-  fireTealiumPageView,
-  makeMediaQueryClasses,
-  UserContext,
-  useStore,
-} from "utils";
+import { makeMediaQueryClasses, UserContext, useStore } from "utils";
 
 export const App = () => {
   const mqClasses = makeMediaQueryClasses();
   const context = useContext(UserContext);
   const { logout } = context;
   const { user, showLocalLogins, setSidebar } = useStore();
-  const { pathname, key } = useLocation();
+  const { pathname } = useLocation();
 
   //there are now two export pages due to the addition of the obligated and spent funds export zip
   const isExportPage = pathname !== "/export" && pathname.includes("/export");
-
-  // fire tealium page view on route change
-  useEffect(() => {
-    fireTealiumPageView(user, window.location.href, pathname);
-  }, [key]);
 
   useEffect(() => {
     if (mqClasses.includes("sidebarwide")) {
