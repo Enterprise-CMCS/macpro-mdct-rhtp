@@ -12,20 +12,44 @@ import {
 import { ReportEditorPage } from "./pageObjects/report-editor.page";
 import { TIMEOUT_UI } from "../utils/timeouts";
 
+const INITIATIVE_ROW_PATTERN = /^\d+:\s*.+/;
+const STATUS_TEXT_PATTERN =
+  /^Status: (Minimum requirements (not )?met|Abandoned)$/i;
+
 const getStatusIcon = (row: Locator): Locator =>
   row.getByRole("img", { name: /icon$/i });
 
 const getStatusText = (row: Locator): Locator =>
-  row.getByText(/^Status: (Minimum requirements (not )?met|Abandoned)$/i);
+  row.getByText(STATUS_TEXT_PATTERN);
 
 const getInitiativeName = (row: Locator): Locator =>
-  row.getByRole("cell").filter({ hasText: /^\d+:\s*.+/ });
+  row.getByRole("cell").filter({ hasText: INITIATIVE_ROW_PATTERN });
 
 const getInitiativeRows = (table: Locator): Locator =>
-  table.getByRole("row").filter({ hasText: /^\d+:\s*.+/ });
+  table.getByRole("row").filter({ hasText: INITIATIVE_ROW_PATTERN });
 
 const getEditButton = (row: Locator): Locator =>
-  row.getByRole("link", { name: /^Edit/i });
+  row.getByRole("link", { name: /^(Edit|View)\b/i });
+
+const verifyInitiativesTableHeaders = async (table: Locator): Promise<void> => {
+  await expect(
+    table.getByRole("columnheader", { name: "Status" })
+  ).toBeVisible();
+  await expect(
+    table.getByRole("columnheader", { name: "Initiative" })
+  ).toBeVisible();
+  await expect(
+    table.getByRole("columnheader", { name: "Actions" })
+  ).toBeVisible();
+};
+
+const waitForInitiativeRows = async (table: Locator, timeout: number) => {
+  await expect
+    .poll(() => getInitiativeRows(table).count(), { timeout })
+    .toBeGreaterThan(0);
+
+  return getInitiativeRows(table);
+};
 
 test.describe("Report Editing - Initiatives", () => {
   let editor: ReportEditorPage;
@@ -37,7 +61,12 @@ test.describe("Report Editing - Initiatives", () => {
       INITIATIVES_SECTION,
       (reason) => test.skip(true, reason)
     );
-    if (result) editor = result;
+    if (!result) {
+      throw new Error(
+        "openReportSectionOrSkip returned undefined without skipping the test"
+      );
+    }
+    editor = result;
   });
 
   test("should have the correct URL, heading, and navigation buttons @regression", async () => {
@@ -52,32 +81,15 @@ test.describe("Report Editing - Initiatives", () => {
   test("should display the initiatives table @regression", async () => {
     const table = editor.page.getByRole("table");
     await expect(table).toBeVisible();
-    await expect(
-      table.getByRole("columnheader", { name: "Status" })
-    ).toBeVisible();
-    await expect(
-      table.getByRole("columnheader", { name: "Initiative" })
-    ).toBeVisible();
-    await expect(
-      table.getByRole("columnheader", { name: "Actions" })
-    ).toBeVisible();
+    await verifyInitiativesTableHeaders(table);
   });
 
   test("should display name, status icon, status text, and Edit CTA for each initiative @regression", async () => {
     const table = editor.page.getByRole("table");
     await expect(table).toBeVisible({ timeout: TIMEOUT_UI });
 
-    const dataRows = getInitiativeRows(table);
-    // Wait for rows to render before counting — count() does not retry.
-    await expect(dataRows.first())
-      .toBeVisible({ timeout: TIMEOUT_UI })
-      .catch(() => {});
+    const dataRows = await waitForInitiativeRows(table, TIMEOUT_UI);
     const rowCount = await dataRows.count();
-
-    if (rowCount === 0) {
-      test.skip(true, "No initiatives available to verify");
-      return;
-    }
 
     for (let i = 0; i < rowCount; i++) {
       const row = dataRows.nth(i);
@@ -90,25 +102,19 @@ test.describe("Report Editing - Initiatives", () => {
 
   test("should navigate into an initiative when Edit is clicked @regression", async () => {
     const table = editor.page.getByRole("table");
-    const dataRows = getInitiativeRows(table);
-    await expect(dataRows.first())
-      .toBeVisible({ timeout: TIMEOUT_UI })
-      .catch(() => {});
-    const rowCount = await dataRows.count();
-
-    if (rowCount === 0) {
-      test.skip(true, "No initiatives available to verify");
-      return;
-    }
+    const dataRows = await waitForInitiativeRows(table, TIMEOUT_UI);
 
     const editButton = getEditButton(dataRows.first());
     await expect(editButton).toBeVisible({ timeout: TIMEOUT_UI });
     await editButton.click();
 
     // URL should move to an initiative sub-page, away from the initiatives list.
-    await expect(editor.page).not.toHaveURL(/\/initiatives$/, {
-      timeout: TIMEOUT_UI,
-    });
+    await expect(editor.page).toHaveURL(
+      /\/report\/[^/]+\/[^/]+\/[^/]+\/[^/?#]+(\?.*)?$/,
+      {
+        timeout: TIMEOUT_UI,
+      }
+    );
   });
 
   test("should navigate to the previous section when Previous is clicked @regression", async () => {
