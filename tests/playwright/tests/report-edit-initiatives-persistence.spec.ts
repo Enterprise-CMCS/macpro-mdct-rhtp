@@ -2,10 +2,15 @@ import { test, expect } from "./fixtures/base";
 import { TIMEOUT_UI } from "../utils/timeouts";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
+  createRunScopedInitiativeValues,
   GENERAL_INFORMATION_SECTION,
   INITIATIVES_SECTION,
-} from "../utils/report-edit-helpers";
-import { verifyCurrentSection } from "../utils/report-edit-assertions";
+} from "../utils/report-edit-shared-helpers";
+import {
+  skipIfUnavailable,
+  verifyCurrentSection,
+  verifySectionShell,
+} from "../utils/report-edit-assertions";
 
 test.describe("Report Editing - Initiatives Persistence", () => {
   test("should add an initiative and persist it across section navigation @regression", async ({
@@ -22,23 +27,27 @@ test.describe("Report Editing - Initiatives Persistence", () => {
       return;
     }
 
-    await verifyCurrentSection(editor, INITIATIVES_SECTION);
+    await verifySectionShell(editor, {
+      sectionId: INITIATIVES_SECTION,
+      heading: "Initiatives",
+      previousButtonVisibility: "visible",
+      continueButtonVisibility: "visible",
+    });
 
     const addInitiativeButton = editor.page.getByRole("button", {
       name: /^Add initiative$/i,
     });
-    const canAddInitiative = await addInitiativeButton
-      .isVisible()
-      .catch(() => false);
-    if (!canAddInitiative) {
-      test.skip(true, "Add initiative action is not available for this user");
+    const addInitiativeUnavailable = await skipIfUnavailable(
+      () => addInitiativeButton.isVisible(),
+      (reason) => test.skip(true, reason),
+      "Add initiative action is not available for this user"
+    );
+    if (addInitiativeUnavailable) {
       return;
     }
 
-    const uniqueSuffix = `${Date.now()}`;
-    const initiativeNumber = uniqueSuffix.slice(-6);
-    const initiativeName = `Initiative ${uniqueSuffix}`;
-    const expectedDisplayName = `${initiativeNumber}: ${initiativeName}`;
+    const { initiativeNumber, initiativeName, expectedDisplayName } =
+      createRunScopedInitiativeValues("initiatives-persistence");
 
     // Act
     await addInitiativeButton.click();
@@ -67,16 +76,11 @@ test.describe("Report Editing - Initiatives Persistence", () => {
 
     const { reportType, state, reportId } = editor.getCurrentRouteParams();
 
-    await editor.navigateToSection(
+    await editor.navigateToSectionAndBack(
       reportType,
       state,
       reportId,
-      GENERAL_INFORMATION_SECTION
-    );
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
+      GENERAL_INFORMATION_SECTION,
       INITIATIVES_SECTION
     );
 

@@ -1,14 +1,19 @@
 import { test, expect } from "./fixtures/base";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
-import { verifyFieldValue } from "../utils/report-edit-assertions";
+import {
+  verifyFieldValue,
+  verifySectionShell,
+} from "../utils/report-edit-assertions";
 import {
   GENERAL_INFORMATION_SECTION,
-  SUCCESS_STORIES_LABEL,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+  confirmAutosaveIndicatorIsVisible,
+} from "../utils/report-edit-shared-helpers";
+import {
+  SUCCESS_STORIES_LABEL,
   SUSTAINABILITY_PLANNING_LABEL,
   SUSTAINABILITY_TEST_DATA,
-  confirmAutosaveIndicatorIsVisible,
-} from "../utils/report-edit-helpers";
+} from "../utils/report-edit-submission-helpers";
 
 test.describe("Report Editing - Sustainability Persistence", () => {
   test("should fill Sustainability and Highlights text areas", async ({
@@ -24,6 +29,18 @@ test.describe("Report Editing - Sustainability Persistence", () => {
       return;
     }
 
+    await verifySectionShell(editor, {
+      sectionId: SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+      heading: "Sustainability and Highlights",
+      previousButtonVisibility: "visible",
+      continueButtonVisibility: "visible",
+    });
+    await expect(
+      editor.page.getByText("Success Stories", { exact: true })
+    ).toBeVisible();
+    await expect(
+      editor.page.getByText("Sustainability Planning", { exact: true })
+    ).toBeVisible();
     await editor.fillTextField(
       SUCCESS_STORIES_LABEL,
       SUSTAINABILITY_TEST_DATA.successStories

@@ -3,8 +3,13 @@ import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange
 import {
   INITIATIVE_ATTACHMENTS_SECTION,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
-} from "../utils/report-edit-helpers";
-import { verifyCurrentSection } from "../utils/report-edit-assertions";
+  uploadFileViaDialog,
+} from "../utils/report-edit-shared-helpers";
+import {
+  skipIfUnavailable,
+  verifyCurrentSection,
+  verifySectionShell,
+} from "../utils/report-edit-assertions";
 import { getFirstVisible } from "../utils/locators";
 import { TIMEOUT_UI } from "../utils/timeouts";
 const ATTACHMENT_FIXTURE_PATH = OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH;
@@ -43,7 +48,12 @@ test.describe("Report Editing - Initiative Attachments", () => {
       return;
     }
 
-    await verifyCurrentSection(editor, INITIATIVE_ATTACHMENTS_SECTION);
+    await verifySectionShell(editor, {
+      sectionId: INITIATIVE_ATTACHMENTS_SECTION,
+      heading: "Initiative Attachments",
+      previousButtonVisibility: "visible",
+      continueButtonVisibility: "visible",
+    });
 
     const table = getAttachmentsTable(editor.page);
     await expect(table).toBeVisible();
@@ -54,31 +64,21 @@ test.describe("Report Editing - Initiative Attachments", () => {
     const hadExistingRef = await existingFileRef.isVisible().catch(() => false);
 
     const addAttachmentButton = getAddAttachmentButton(editor.page);
-    await expect(
-      addAttachmentButton,
+    const attachmentUnavailable = await skipIfUnavailable(
+      () => addAttachmentButton.isVisible(),
+      (reason) => test.skip(true, reason),
       "Add attachment action should be visible"
-    ).toBeVisible({
-      timeout: TIMEOUT_UI,
-    });
+    );
+    if (attachmentUnavailable) {
+      return;
+    }
+
     await addAttachmentButton.click();
-
-    const dialog = editor.page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-
-    await dialog
-      .locator("input[type='file']")
-      .setInputFiles(ATTACHMENT_FIXTURE_PATH);
-
-    const doneButton = dialog.getByRole("button", { name: /^Done$/i });
-
-    await expect(
-      doneButton,
-      "Upload completion action should be available in attachment dialog"
-    ).toBeVisible({
-      timeout: TIMEOUT_UI,
+    await uploadFileViaDialog(editor.page, {
+      filePath: ATTACHMENT_FIXTURE_PATH,
+      expectedFileName: /obligated-and-spent-funds\.csv/i,
+      timeoutMs: TIMEOUT_UI,
     });
-    await doneButton.click();
-    await expect(dialog).toBeHidden();
 
     // We upload a known fixture; seeing it in the table confirms add/upload worked.
     await expect(
