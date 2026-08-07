@@ -45,7 +45,7 @@ export async function verifyCurrentSection(
   );
 }
 
-export async function verifySectionShell(
+export async function verifyReportSectionShell(
   editor: ReportEditorPage,
   options: SectionShellOptions
 ): Promise<void> {

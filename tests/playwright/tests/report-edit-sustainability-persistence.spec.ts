@@ -2,7 +2,7 @@ import { test, expect } from "./fixtures/base";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   verifyFieldValue,
-  verifySectionShell,
+  verifyReportSectionShell,
 } from "../utils/report-edit-assertions";
 import {
   GENERAL_INFORMATION_SECTION,
@@ -29,7 +29,7 @@ test.describe("Report Editing - Sustainability Persistence", () => {
       return;
     }
 
-    await verifySectionShell(editor, {
+    await verifyReportSectionShell(editor, {
       sectionId: SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
       heading: "Sustainability and Highlights",
       previousButtonVisibility: "visible",
