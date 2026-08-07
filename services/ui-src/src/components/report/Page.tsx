@@ -52,6 +52,7 @@ export const Page = ({ id, setElements, elements }: Props) => {
       "onlyCmsAdminCanEdit" in element && element.onlyCmsAdminCanEdit
         ? userIsAdmin
         : userIsEndUser;
+
     const statusAllowsEdit =
       !isCompleteStatus(report?.status) ||
       ("onlyCmsAdminCanEdit" in element &&
