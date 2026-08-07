@@ -15,8 +15,9 @@
         "mdctrhtp.cms.gov": "prod",
         "mdctrhtpval.cms.gov": "val",
         "mdctrhtpdev.cms.gov": "dev",
+        localhost: "local",
       };
-      const analyticsEnv = envMap[window.location.hostname] || "local";
+      const analyticsEnv = envMap[window.location.hostname] || "ephem"; // all cloudfront envs will default to this
       (function (h, o, u, n, d) {
         h = h[d] = h[d] || {
           q: [],
