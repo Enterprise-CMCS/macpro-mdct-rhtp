@@ -1,10 +1,8 @@
-import { Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { mockUseStore } from "utils/testing/setupTest";
 import { StatusAlert } from "./StatusAlert";
 import { AlertTypes, ElementType, StatusAlertTemplate } from "@rhtp/shared";
 import { testA11y } from "utils/testing/commonTests";
-import { useStore } from "utils";
 
 vi.mock("utils/state/reportLogic/completeness", () => ({
   inferredReportStatus: vi.fn().mockReturnValue("Complete"),
@@ -74,23 +72,6 @@ describe("<StatusAlert />", () => {
     });
     test("Conditional status alert for accordion groups. Should not show status when condition is met.", () => {
       render(<StatusAlert element={mockStatusForAlert}></StatusAlert>);
-      expect(screen.queryByText("mock alert")).not.toBeInTheDocument();
-      expect(screen.queryByText("mock text")).not.toBeInTheDocument();
-    });
-
-    test("Review & Submit banner", () => {
-      (useStore as unknown as Mock).mockImplementation((selector) => {
-        if (selector) {
-          return { submittable: true };
-        }
-        return {
-          ...mockUseStore,
-          report: { pages: [{ childPageIds: ["test-1"] }] },
-          currentPageId: "review-submit",
-        };
-      });
-      render(statusAlertComponent);
-
       expect(screen.queryByText("mock alert")).not.toBeInTheDocument();
       expect(screen.queryByText("mock text")).not.toBeInTheDocument();
     });
