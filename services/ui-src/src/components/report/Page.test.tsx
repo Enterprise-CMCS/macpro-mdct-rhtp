@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import { useStore } from "utils";
 import { Page } from "./Page";
-import { AlertTypes, ElementType, PageElement, UserRoles } from "@rhtp/shared";
+import { AlertTypes, ElementType, PageElement } from "@rhtp/shared";
 
 vi.mock("react-router", () => ({
   useNavigate: vi.fn(),
@@ -251,11 +251,11 @@ describe("Page Component with state user", () => {
     expect(container).not.toBeEmptyDOMElement();
   });
 
-  test("state user cannot edit when element limited to other roles", () => {
+  test("state user cannot edit when element is only editable by admin", () => {
     const roleLimitedElements = [
       {
         ...textFieldElement[0],
-        editByRole: [UserRoles.ADMIN],
+        onlyCmsAdminCanEdit: true,
       },
     ];
     render(

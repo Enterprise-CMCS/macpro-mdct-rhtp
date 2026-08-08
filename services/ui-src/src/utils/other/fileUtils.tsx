@@ -17,12 +17,7 @@ import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes, parseHtml } from "./parsing";
-import {
-  ReportType,
-  UploadListProp,
-  AttachmentStatus,
-  ZipRequestBody,
-} from "@rhtp/shared";
+import { ReportType, UploadListProp, ZipRequestBody } from "@rhtp/shared";
 
 const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
 
@@ -52,17 +47,6 @@ export const getZipFile = async (body: ZipRequestBody) => {
   const link = document.createElement("a");
   link.href = sanitizeLink;
   link.click();
-};
-
-export const canEditAttachment = (status: AttachmentStatus): boolean => {
-  return status !== AttachmentStatus.LOCKED_FOR_SCORING;
-};
-
-export const canDeleteAttachment = (
-  status: AttachmentStatus,
-  canDelete: boolean
-): boolean => {
-  return status === AttachmentStatus.PENDING_REVIEW && canDelete;
 };
 
 export const removeFile = async (
