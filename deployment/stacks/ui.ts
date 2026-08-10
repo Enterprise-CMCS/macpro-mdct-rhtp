@@ -105,6 +105,7 @@ export function createUiComponents(props: CreateUiComponentsProps) {
             "style-src 'self' maxcdn.bootstrapcdn.com fonts.googleapis.com 'unsafe-inline'",
             "font-src 'self' maxcdn.bootstrapcdn.com fonts.gstatic.com",
             "connect-src https://*.amazonaws.com/ https://*.amazoncognito.com https://www.google-analytics.com https://*.launchdarkly.us https://browser-intake-datadoghq.com https://browser-intake-ddog-gov.com https://dap.digitalgov.gov",
+            "worker-src 'self' blob:",
             "frame-ancestors 'none'",
             "object-src 'none'",
           ].join("; "),
