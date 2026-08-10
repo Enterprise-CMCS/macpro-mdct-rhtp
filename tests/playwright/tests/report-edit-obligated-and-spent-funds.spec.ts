@@ -11,7 +11,7 @@ import {
 import {
   skipIfUnavailable,
   verifyCurrentSection,
-  verifySectionShell,
+  verifyReportSectionShell,
 } from "../utils/report-edit-assertions";
 import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "../utils/timeouts";
 import { promises as fs } from "node:fs";
@@ -81,7 +81,7 @@ test.describe("Report Editing - Obligated and Spent Funds", () => {
       return;
     }
 
-    await verifySectionShell(editor, {
+    await verifyReportSectionShell(editor, {
       sectionId: OBLIGATED_AND_SPENT_FUNDS_SECTION,
       heading: "Obligated and Spent Funds",
       previousButtonVisibility: "visible",
