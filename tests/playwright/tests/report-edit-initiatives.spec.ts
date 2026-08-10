@@ -93,9 +93,17 @@ test.describe("Report Editing - Initiatives", () => {
 
     for (let i = 0; i < rowCount; i++) {
       const row = dataRows.nth(i);
+      const statusText = getStatusText(row);
       await expect(getInitiativeName(row)).toBeVisible();
-      await expect(getStatusIcon(row)).toBeVisible();
-      await expect(getStatusText(row)).toBeVisible();
+      await expect(statusText).toBeVisible();
+
+      const statusValue = (await statusText.textContent())?.trim() ?? "";
+      if (/Abandoned/i.test(statusValue)) {
+        await expect(getStatusIcon(row)).toHaveCount(0);
+      } else {
+        await expect(getStatusIcon(row)).toBeVisible();
+      }
+
       await expect(getEditButton(row)).toBeVisible();
     }
   });
