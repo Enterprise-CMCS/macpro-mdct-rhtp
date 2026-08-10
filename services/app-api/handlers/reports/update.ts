@@ -3,7 +3,7 @@ import { handler } from "../../libs/handler-lib";
 import { parseReportParameters } from "../../libs/param-lib";
 import { badRequest, forbidden, ok } from "../../libs/response-lib";
 import { putReport } from "../../storage/reports";
-import { isCompleteStatus } from "@rhtp/shared";
+import { ReportStatus } from "@rhtp/shared";
 import {
   canPatchSubmittedReport,
   canWriteState,
@@ -38,20 +38,23 @@ export const updateReport = handler(parseReportParameters, async (request) => {
   if (
     reportType !== reportRequest.type ||
     state !== reportRequest.state ||
-    id !== reportRequest.id
+    id !== reportRequest.id ||
+    reportRequest.status === ReportStatus.ACCEPTED
   ) {
     return badRequest("Invalid request");
   }
 
   let updatedReport;
 
-  if (isCompleteStatus(reportRequest.status)) {
+  // If the report has been Submitted, CMS Admins can update only a few specific fields on a submitted report.
+  if (reportRequest.status === ReportStatus.SUBMITTED) {
     if (!canPatchSubmittedReport(user)) {
       return forbidden(error.UNAUTHORIZED);
     }
 
     updatedReport = await updatePrivilegedFieldsOnly(reportRequest, user);
   } else {
+    // Regular update flow
     updatedReport = await updateReportAnswers(reportRequest, user);
   }
 

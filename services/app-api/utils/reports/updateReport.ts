@@ -125,6 +125,8 @@ export const updateReportAnswers = async (
   return report;
 };
 
+// Goes through the whole report and only updates the elements that have the cmsAdminCanEditInSubmitted flag set to true
+// Currently only updates State Policy Commitment CMS Status, and Attachment Statuses (special use case for that, as the above flag would not suffice)
 const updatePrivilegedPageElements = (
   elements: PageElement[],
   requestElements: PageElement[]
