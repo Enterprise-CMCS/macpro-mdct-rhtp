@@ -42,6 +42,7 @@ import { getStatus } from "utils/other/status";
 import { getAssignedStatesByEmail } from "utils/api/requestMethods/notificationRecipients";
 import { DropdownOptions } from "types";
 import { useFlags } from "launchdarkly-react-client-sdk";
+import { DevTools, ToolType } from "components/devTools/DevTools";
 
 const AdminCreateReportModal = ({
   modalDisclosure,
@@ -307,6 +308,14 @@ export const AdminDashboard = () => {
 
   return (
     <PageTemplate type="report" sxOverride={sx.layout}>
+      {userCanStartReport && (
+        <DevTools
+          reportType={ReportType.RHTP}
+          reloadReports={reloadReports}
+          reports={reports}
+          type={ToolType.DASHBOARD}
+        />
+      )}
       <Stack sx={sx.box} gap="2rem">
         <Heading as="h1" variant="h1">
           RHTP Admin Dashboard
