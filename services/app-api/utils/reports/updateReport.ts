@@ -2,6 +2,7 @@ import { User } from "../../types/types";
 import {
   AccordionGroupItem,
   AccordionGroupTemplate,
+  AttachmentTableTemplate,
   CheckboxTemplate,
   ChoiceTemplate,
   DropdownTemplate,
@@ -12,23 +13,26 @@ import {
   ReportStatus,
 } from "@rhtp/shared";
 import { getReport as getReportFromDatabase } from "../../storage/reports";
+import { isAdminUser } from "../authorization";
 
 export const updateStatePolicyCommitments = (
   accordions: AccordionGroupItem[],
-  requestAccordions: AccordionGroupItem[]
+  requestAccordions: AccordionGroupItem[],
+  user: User
 ) => {
   for (const accordionItem of accordions) {
     const requestAccordionItem = requestAccordions.find(
       (newAccordionItem) => newAccordionItem.label === accordionItem.label
     );
     if (!requestAccordionItem) continue;
-    updateElements(accordionItem.elements, requestAccordionItem.elements);
+    updateElements(accordionItem.elements, requestAccordionItem.elements, user);
   }
 };
 
 export const updateChoiceTemplates = (
   choiceTemplates: ChoiceTemplate[],
-  requestChoiceTemplates: ChoiceTemplate[]
+  requestChoiceTemplates: ChoiceTemplate[],
+  user: User
 ) => {
   for (const choiceTemplate of choiceTemplates) {
     const requestTemplate = requestChoiceTemplates.find(
@@ -42,14 +46,16 @@ export const updateChoiceTemplates = (
       continue;
     updateElements(
       choiceTemplate.checkedChildren,
-      requestTemplate.checkedChildren
+      requestTemplate.checkedChildren,
+      user
     );
   }
 };
 
 export const updateElements = (
   elements: PageElement[],
-  requestElements: PageElement[]
+  requestElements: PageElement[],
+  user: User
 ) => {
   for (const element of elements) {
     // Handle nested elements
@@ -57,7 +63,11 @@ export const updateElements = (
       const newElement = requestElements.find(
         (newElement) => newElement.id === element.id
       ) as AccordionGroupTemplate;
-      updateStatePolicyCommitments(element.accordions, newElement.accordions);
+      updateStatePolicyCommitments(
+        element.accordions,
+        newElement.accordions,
+        user
+      );
     }
     if (
       element.type == ElementType.Checkbox ||
@@ -66,18 +76,25 @@ export const updateElements = (
       const newElement = requestElements.find(
         (newElement) => newElement.id === element.id
       ) as CheckboxTemplate | RadioTemplate;
-      updateChoiceTemplates(element.choices, newElement.choices);
+      updateChoiceTemplates(element.choices, newElement.choices, user);
     }
     if (element.type == ElementType.Dropdown) {
       const newElement = requestElements.find(
         (newElement) => newElement.id === element.id
       ) as DropdownTemplate;
-      updateChoiceTemplates(element.options, newElement.options);
+      updateChoiceTemplates(element.options, newElement.options, user);
     }
     const requestElement = requestElements.find(
       (newElement) => newElement.id === element.id
     );
     if (!requestElement || !("answer" in requestElement)) {
+      continue;
+    }
+    if (
+      "onlyCmsAdminCanEdit" in element &&
+      element.onlyCmsAdminCanEdit &&
+      !isAdminUser(user)
+    ) {
       continue;
     }
     if (requestElement?.type === element.type) {
@@ -103,7 +120,75 @@ export const updateReportAnswers = async (
     let requestPage = newPages.find((newPage) => newPage.id === page.id);
 
     if (!page.elements || !requestPage || !requestPage.elements) continue;
-    updateElements(page.elements, requestPage.elements);
+    updateElements(page.elements, requestPage.elements, user);
+  }
+  return report;
+};
+
+// Goes through the whole report and only updates the elements that have the cmsAdminCanEditInSubmitted flag set to true
+// Currently only updates State Policy Commitment CMS Status, and Attachment Statuses (special use case for that, as the above flag would not suffice)
+const updatePrivilegedPageElements = (
+  elements: PageElement[],
+  requestElements: PageElement[]
+) => {
+  for (const element of elements) {
+    if (element.type === ElementType.AccordionGroup) {
+      const reqGroup = requestElements.find(
+        (el) => el.id === element.id
+      ) as AccordionGroupTemplate;
+      if (!reqGroup) continue;
+      for (const accordion of element.accordions) {
+        const reqAccordion = reqGroup.accordions.find(
+          (a) => a.label === accordion.label
+        );
+        if (!reqAccordion) continue;
+        updatePrivilegedPageElements(accordion.elements, reqAccordion.elements);
+      }
+      continue;
+    }
+
+    if (element.type === ElementType.AttachmentTable) {
+      const reqEl = requestElements.find(
+        (el) => el.id === element.id
+      ) as AttachmentTableTemplate;
+      if (!reqEl?.answer) continue;
+      for (const file of element.answer ?? []) {
+        const reqFile = reqEl.answer.find(
+          (f) => f.attachment.fileId === file.attachment.fileId
+        );
+        if (reqFile) file.status = reqFile.status;
+      }
+      continue;
+    }
+
+    if (
+      !(
+        "cmsAdminCanEditInSubmitted" in element &&
+        element.cmsAdminCanEditInSubmitted
+      )
+    )
+      continue;
+    const reqEl = requestElements.find((el) => el.id === element.id);
+    if (!reqEl || !("answer" in reqEl) || reqEl.type !== element.type) continue;
+    element.answer = reqEl.answer;
+  }
+};
+
+export const updatePrivilegedFieldsOnly = async (
+  reportRequest: Report,
+  user: User
+) => {
+  const { id, pages: newPages, state, type } = reportRequest;
+  const report = await getReportFromDatabase(type, state, id!);
+  if (!report) return;
+
+  report.lastEdited = Date.now();
+  report.lastEditedBy = user.fullName;
+
+  for (const page of report.pages) {
+    const requestPage = newPages.find((p) => p.id === page.id);
+    if (!page.elements || !requestPage?.elements) continue;
+    updatePrivilegedPageElements(page.elements, requestPage.elements);
   }
   return report;
 };

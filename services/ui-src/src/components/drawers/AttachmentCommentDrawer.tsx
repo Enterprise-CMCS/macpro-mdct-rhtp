@@ -193,6 +193,7 @@ export const AttachmentCommentDrawer = ({
             type="radio"
             onChange={onChange}
             errorMessage={errorMessages.commentType}
+            disabled={commentsDisabled}
             choices={[
               {
                 label: "External (Shared with States)",

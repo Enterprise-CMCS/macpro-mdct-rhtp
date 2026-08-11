@@ -303,7 +303,6 @@ export const TableCheckpoint = (
             onClick={() => onDrawerClick("COMMENT", row.file)}
             aria-label={`Comment on ${row.file.name}`}
             fontWeight="bold"
-            disabled={disabled}
           >
             <Image src={commentIcon} alt="Remove" minWidth="24px" />
           </Button>

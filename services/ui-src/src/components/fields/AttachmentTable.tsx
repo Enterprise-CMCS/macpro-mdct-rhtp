@@ -155,7 +155,6 @@ export const AttachmentTable = (
             variant="outline"
             onClick={() => onDrawerClick("MANAGE", row)}
             aria-label={`Manage file or info for ${row.attachment.name}`}
-            disabled={disabled}
           >
             Manage
           </Button>
@@ -164,7 +163,6 @@ export const AttachmentTable = (
             onClick={() => onDrawerClick("COMMENT", row)}
             aria-label={`Comment on ${row.attachment.name}`}
             fontWeight="bold"
-            disabled={disabled}
           >
             <Image src={commentIcon} alt="Remove" minWidth="24px" />
           </Button>
