@@ -86,15 +86,6 @@ const openAnnualReportFromDashboard = async (
 
   await expect(annualEditableRow).toBeVisible({ timeout: TIMEOUT_UI });
 
-  const hasAnnualEditableRow =
-    (await annualEditableRow.count()) > 0 &&
-    (await annualEditableRow.isVisible());
-
-  test.skip(
-    !hasAnnualEditableRow,
-    "No editable annual report row available for this state user"
-  );
-
   const annualOpenButton = annualEditableRow
     .getByRole("button", { name: /View .* report/i })
     .first();
@@ -130,20 +121,66 @@ const verifyAnnualContextFromHeader = async (
   ).toBeVisible({ timeout: TIMEOUT_UI });
 };
 
-const verifyMetricsTableHeaders = async (table: Locator): Promise<void> => {
-  await expect(table.getByRole("columnheader", { name: "#" })).toBeVisible();
-  await expect(
-    table.getByRole("columnheader", { name: "Status" })
-  ).toBeVisible();
-  await expect(
-    table.getByRole("columnheader", { name: "Target" })
-  ).toBeVisible();
-  await expect(
-    table.getByRole("columnheader", { name: "Current Value" })
-  ).toBeVisible();
-  await expect(
-    table.getByRole("columnheader", { name: "As of Date MM/DD/YYYY" })
-  ).toBeVisible();
+const verifyMetricsTableHeaders = async (table: Locator): Promise<boolean> => {
+  const previousValueHeader = table.getByRole("columnheader", {
+    name: "Previous value",
+  });
+  const hasPreviousValueColumn = await previousValueHeader
+    .isVisible()
+    .catch(() => false);
+  const expectedHeaders = [
+    "#",
+    "Status",
+    "Metric",
+    "Target",
+    ...(hasPreviousValueColumn ? ["Previous value"] : []),
+    "Current value",
+    "As of Date MM/DD/YYYY",
+  ];
+
+  for (const header of expectedHeaders) {
+    await expect(
+      table.getByRole("columnheader", { name: new RegExp(`^${header}$`, "i") })
+    ).toBeVisible();
+  }
+
+  return hasPreviousValueColumn;
+};
+
+const verifyMetricsTableRows = async (
+  table: Locator,
+  hasPreviousValueColumn: boolean
+): Promise<void> => {
+  const dataRows = table.locator("tbody").getByRole("row");
+  const rowCount = await dataRows.count();
+
+  expect(rowCount).toBeGreaterThan(0);
+
+  for (let index = 0; index < rowCount; index++) {
+    const row = dataRows.nth(index);
+    const cells = row.getByRole("cell");
+    const currentValueIndex = hasPreviousValueColumn ? 5 : 4;
+    const dateIndex = hasPreviousValueColumn ? 6 : 5;
+
+    await expect(row).toBeVisible();
+    await expect(cells).toHaveCount(hasPreviousValueColumn ? 7 : 6);
+    await expect(cells.nth(0)).toHaveText(/^[1-9]\d*$/);
+    await expect(cells.nth(1)).toHaveText(/^(Active|Abandoned)$/i);
+    await expect(cells.nth(2)).toHaveText(/\S+/);
+    await expect(cells.nth(3)).toHaveText(/^(--|\S[\s\S]*)$/);
+
+    if (hasPreviousValueColumn) {
+      await expect(cells.nth(4).locator("input")).toBeDisabled();
+    }
+
+    await expect(cells.nth(currentValueIndex).locator("input")).toBeEditable();
+
+    const dateInput = cells
+      .nth(dateIndex)
+      .locator('input[inputmode="numeric"]');
+    await expect(dateInput).toBeEditable();
+    await expect(dateInput).toHaveAttribute("inputmode", "numeric");
+  }
 };
 
 const verifyCheckpointTableHeaders = async (table: Locator): Promise<void> => {
@@ -207,14 +244,14 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
   test("should display a Narrative label, prepopulated editable text area, and be required for non-admin users @regression", async () => {
     await verifyAnnualContextFromHeader(editor);
 
-    const narrativeLabelRequired = editor.page
-      .getByLabel(/^Narrative/i)
-      .getByText(/Required/i);
+    const narrativeRequiredLabel = editor.page
+      .locator("label")
+      .filter({ hasText: /^NarrativeRequired$/i });
     const narrativeTextArea = editor.page.getByRole("textbox", {
       name: /^Narrative/i,
     });
 
-    await expect(narrativeLabelRequired).toBeVisible();
+    await expect(narrativeRequiredLabel).toBeVisible();
     await expect(narrativeTextArea).toBeVisible();
     await expect(narrativeTextArea).toHaveValue(/\S+/); // Ensure the text area is prepopulated with non-whitespace content
   });
@@ -222,14 +259,14 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
   test("should display a Number of people served label, editable text area, and be required for non-admin users @regression", async () => {
     await verifyAnnualContextFromHeader(editor);
 
-    const peopleServedLabelRequired = editor.page
-      .getByLabel(/Number of people served/i)
-      .getByText(/Required/i);
+    const peopleServedRequiredLabel = editor.page
+      .locator("label")
+      .filter({ hasText: /^Number of people servedRequired$/i });
     const peopleServedTextArea = editor.page.getByRole("textbox", {
       name: /Number of people served/i,
     });
 
-    await expect(peopleServedLabelRequired).toBeVisible();
+    await expect(peopleServedRequiredLabel).toBeVisible();
     await expect(peopleServedTextArea).toBeVisible();
     await expect(peopleServedTextArea).toBeEditable();
   });
@@ -237,14 +274,18 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
   test("should display the Metrics heading and table for non-admin users @regression", async () => {
     await verifyAnnualContextFromHeader(editor);
 
-    const metricsHeading = editor.page.getByRole("heading", {
-      name: /^Metrics/i,
+    const metricsHeading = editor.page
+      .getByRole("heading", { name: /^Metrics/i })
+      .getByText(/Required/i);
+    const metricsTable = editor.page.getByRole("table").filter({
+      has: editor.page.getByRole("columnheader", { name: "Metric" }),
     });
-    const metricsTable = editor.page.getByRole("table", { name: /^Metrics$/i });
 
     await expect(metricsHeading).toBeVisible({ timeout: TIMEOUT_UI });
     await expect(metricsTable).toBeVisible({ timeout: TIMEOUT_UI });
-    await verifyMetricsTableHeaders(metricsTable);
+    const hasPreviousValueColumn =
+      await verifyMetricsTableHeaders(metricsTable);
+    await verifyMetricsTableRows(metricsTable, hasPreviousValueColumn);
   });
 
   test("should display the Checkpoints heading for non-admin users @regression", async () => {
