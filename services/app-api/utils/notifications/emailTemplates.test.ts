@@ -57,7 +57,7 @@ describe("emailTemplate util", () => {
         },
         Message: expect.objectContaining({
           Subject: {
-            Data: `RHTP: ${genericData.reportName} sections ready for review`,
+            Data: `RHTP: Feedback requested for ${genericData.reportName}`,
           },
         }),
       })
