@@ -64,7 +64,7 @@ export const sendEmail = async ({
   let attachmentName: string | undefined;
   let emailTrigger: EMAIL_TRIGGERS | undefined;
 
-  // Report submitted for review
+  // Report feedback requested
   if (
     comment &&
     comment.type === CommentType.REQUEST_FEEDBACK &&

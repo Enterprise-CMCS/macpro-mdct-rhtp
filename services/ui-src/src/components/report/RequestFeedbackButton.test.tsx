@@ -88,7 +88,7 @@ describe("RequestFeedbackButton component", () => {
           isInternal: false,
         }
       );
-      expect(screen.getByText("Submitted for Review")).toBeVisible();
+      expect(screen.getByText("Feedback requested")).toBeVisible();
     });
   });
 });
