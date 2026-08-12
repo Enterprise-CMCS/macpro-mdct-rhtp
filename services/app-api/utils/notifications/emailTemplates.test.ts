@@ -45,9 +45,9 @@ describe("emailTemplate util", () => {
     );
   });
 
-  test("returns submit for review template for submit for review trigger", () => {
+  test("returns request feedback template for request feedback trigger", () => {
     const template = getEmailTemplate(
-      EMAIL_TRIGGERS.SUBMIT_FOR_REVIEW,
+      EMAIL_TRIGGERS.REQUEST_FEEDBACK,
       genericData
     );
     expect(template).toEqual(

@@ -229,8 +229,8 @@ const pageElementSchema = lazy((value: PageElement): Schema => {
       return attachmentTableSchema;
     case ElementType.ActionTable:
       return actionTableSchema;
-    case ElementType.SubmitForReview:
-      return submitForReviewSchema;
+    case ElementType.RequestFeedbackButton:
+      return requestFeedbackButtonSchema;
     default:
       throw new Error("Page Element type is not valid");
   }
@@ -438,8 +438,10 @@ const reviewSubmitTemplateSchema = formPageTemplateSchema.shape({
   submittedView: array().of(pageElementSchema).required(),
 });
 
-const submitForReviewSchema = object().shape({
-  type: string().required().matches(new RegExp(ElementType.SubmitForReview)),
+const requestFeedbackButtonSchema = object().shape({
+  type: string()
+    .required()
+    .matches(new RegExp(ElementType.RequestFeedbackButton)),
   id: string().required(),
 });
 

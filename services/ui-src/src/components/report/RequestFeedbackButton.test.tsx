@@ -1,6 +1,6 @@
 import { MockedFunction } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { SubmitForReview } from "./SubmitForReview";
+import { RequestFeedbackButton } from "./RequestFeedbackButton";
 import { useStore } from "utils";
 import { mockUseStore } from "utils/testing/setupTest";
 import userEvent from "@testing-library/user-event";
@@ -13,14 +13,16 @@ vi.mock("utils/api/requestMethods/commentMethods");
 const mockCreateComment = vi.mocked(createComment);
 
 const openAndCompleteFormWithText = async (text: string) => {
-  const modalButton = screen.getByRole("button", { name: "Submit for Review" });
+  const modalButton = screen.getByRole("button", {
+    name: "Request PO Feedback",
+  });
   await userEvent.click(modalButton);
   expect(
-    screen.getByRole("heading", { name: "Submit for Review" })
+    screen.getByRole("heading", { name: "Request PO Feedback" })
   ).toBeVisible();
   const commentBox = screen.getByRole("textbox", { name: "Add Comment" });
   const submitButton = screen.getByRole("button", {
-    name: "Submit for Review",
+    name: "Request PO Feedback",
   });
   expect(commentBox).toBeVisible();
   expect(submitButton).toBeVisible();
@@ -30,10 +32,10 @@ const openAndCompleteFormWithText = async (text: string) => {
   await userEvent.click(submitButton);
 };
 
-describe("SubmitForReview component", () => {
+describe("RequestFeedbackButton component", () => {
   test("does not render when no report in store", () => {
     mockedUseStore.mockReturnValue({});
-    const { container } = render(<SubmitForReview />);
+    const { container } = render(<RequestFeedbackButton />);
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -41,28 +43,28 @@ describe("SubmitForReview component", () => {
     beforeEach(() => {
       vi.clearAllMocks();
       mockedUseStore.mockReturnValue(mockUseStore);
-      render(<SubmitForReview />);
+      render(<RequestFeedbackButton />);
     });
     test("renders", () => {
-      expect(screen.getAllByText("Submit for Review")).toHaveLength(2);
+      expect(screen.getAllByText("Request PO Feedback")).toHaveLength(2);
       expect(
-        screen.getByRole("button", { name: "Submit for Review" })
+        screen.getByRole("button", { name: "Request PO Feedback" })
       ).toBeVisible();
     });
 
     test("can open and close modal", async () => {
       const modalButton = screen.getByRole("button", {
-        name: "Submit for Review",
+        name: "Request PO Feedback",
       });
       await userEvent.click(modalButton);
       expect(
-        screen.getByRole("heading", { name: "Submit for Review" })
+        screen.getByRole("heading", { name: "Request PO Feedback" })
       ).toBeVisible();
       expect(
         screen.getByRole("textbox", { name: "Add Comment" })
       ).toBeVisible();
       expect(
-        screen.getByRole("button", { name: "Submit for Review" })
+        screen.getByRole("button", { name: "Request PO Feedback" })
       ).toBeVisible();
       const closeButton = screen.getByRole("button", { name: "Close" });
       await userEvent.click(closeButton);
@@ -82,7 +84,7 @@ describe("SubmitForReview component", () => {
         mockUseStore.report?.state,
         {
           comment: "Please review",
-          type: "submit_for_review",
+          type: "request_feedback",
           isInternal: false,
         }
       );

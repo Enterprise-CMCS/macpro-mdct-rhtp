@@ -45,7 +45,7 @@ const arrangeReviewSubmitSection = async (statePage: StatePage) => {
   }
 
   const submitButton = editor.page.getByRole("button", {
-    name: /Submit for Review/i,
+    name: /Request PO Feedback/i,
   });
   const blockedMessage = editor.page.getByText(
     "Your form is not ready for submission",
