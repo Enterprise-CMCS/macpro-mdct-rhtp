@@ -158,9 +158,9 @@ const EditRecipientModal = ({
         onClose: onClose,
       }}
       content={{
-        heading: "Edit email",
+        heading: "Edit assigned states",
         subheading:
-          "Enter or edit an email address below for that user to receive notifications from their assigned state.",
+          "Edit states assigned to the email displayed below to receive notifications.",
         actionButtonText: "Save",
       }}
       onConfirmHandler={onSubmit}
@@ -292,7 +292,7 @@ const NotificationRecipientModal = ({
       content={{
         heading: "Add email",
         subheading:
-          "Enter or edit an email address below for that user to receive notifications from their assigned state.",
+          "Enter an email address and select states below for a user to receive notifications from the assigned states.",
         actionButtonText: "Save",
       }}
       onConfirmHandler={onSubmit}
