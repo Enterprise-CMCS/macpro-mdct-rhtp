@@ -27,6 +27,7 @@ import {
   deleteNotificationRecipient,
   getNotificationRecipients,
 } from "utils/api/requestMethods/notificationRecipients";
+import { parseHtml } from "utils";
 
 const DeleteRecipientModal = ({
   modalDisclosure,
@@ -157,7 +158,9 @@ const EditRecipientModal = ({
         onClose: onClose,
       }}
       content={{
-        heading: "Edit assigned states",
+        heading: "Edit email",
+        subheading:
+          "Enter or edit an email address below for that user to receive notifications from their assigned state.",
         actionButtonText: "Save",
       }}
       onConfirmHandler={onSubmit}
@@ -287,7 +290,9 @@ const NotificationRecipientModal = ({
         onClose: onClose,
       }}
       content={{
-        heading: "Add Email",
+        heading: "Add email",
+        subheading:
+          "Enter or edit an email address below for that user to receive notifications from their assigned state.",
         actionButtonText: "Save",
       }}
       onConfirmHandler={onSubmit}
@@ -332,8 +337,13 @@ type NotificationRecipientModalProps = {
 const headers = [{ label: "Email" }, { label: "States" }, { label: "Actions" }];
 
 const accordionContent = {
-  label: "Accordion heading",
-  content: "More info coming soon",
+  label: "Notification Assignments",
+  content: `<p>Select + add email to input an email address and assign multiple states to a Project Officer. Multiple Project Officers can be assigned to a single state as backups.</p>
+  <br>
+<p>To edit an assignment or adjust states select “Edit”</p>
+<br>
+<p>To remove an email address  select “Delete”</p>
+`,
 };
 
 type CollectedStateRecipientRecord = NotificationRecipientRecord & {
@@ -427,12 +437,15 @@ export const NotificationsPage = () => {
           Notifications Settings
         </Heading>
         <Text sx={sx.subHeaderText}>
-          Instructions go here that need to be seen at all times. Provide
-          details and context to help the user complete this page.
+          The notification assignments page should be used to assign CMS Project
+          Officers to the states they manage. By making these assignments PO’s
+          will have a filtered view of their states reports as well as receive
+          email notifications when states submit reports or make comments on
+          reports and attachments.
         </Text>
         <Accordion allowToggle={true} defaultIndex={[-1]} sx={sx.accordion}>
           <AccordionItem label={accordionContent.label}>
-            {accordionContent.content}
+            {parseHtml(accordionContent.content)}
           </AccordionItem>
         </Accordion>
         <Button
@@ -452,7 +465,7 @@ export const NotificationsPage = () => {
           </Box>
         ) : (
           <Text variant="tableEmpty">
-            Click "Add email" to start adding assigned notification recipients.
+            No email routing rules are configured yet.
           </Text>
         ))}
       <NotificationRecipientModal
