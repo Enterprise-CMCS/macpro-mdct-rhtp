@@ -438,7 +438,7 @@ export const NotificationsPage = () => {
         </Heading>
         <Text sx={sx.subHeaderText}>
           The notification assignments page should be used to assign CMS Project
-          Officers to the states they manage. By making these assignments PO’s
+          Officers to the states they manage. By making these assignments POs
           will have a filtered view of their states reports as well as receive
           email notifications when states submit reports or make comments on
           reports and attachments.
