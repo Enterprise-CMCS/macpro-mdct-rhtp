@@ -14,6 +14,7 @@ import {
   getZipPresignedUrl,
 } from "../api/requestMethods/fileMethods";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
+import cancelIconGray from "assets/icons/cancel/icon_cancel_gray.svg";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes, parseHtml } from "./parsing";
@@ -102,7 +103,12 @@ export const uploadListRender = (
                   variant="unstyled"
                   aria-label={`delete ${file.name}`}
                   onClick={() => onRemove(file)}
-                  rightIcon={<Image src={cancelIcon} alt="Remove Icon" />}
+                  rightIcon={
+                    <Image
+                      src={disabled ? cancelIconGray : cancelIcon}
+                      alt="Remove Icon"
+                    />
+                  }
                   disabled={disabled}
                 />
               )}
