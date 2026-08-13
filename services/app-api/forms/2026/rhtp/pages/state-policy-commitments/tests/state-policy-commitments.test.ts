@@ -12,7 +12,7 @@ describe("test state policy commitment functions", () => {
       // expected page
       expect.objectContaining({
         id: "state-policy-commitments",
-        title: "State Policy Commitments",
+        title: "State Policy Action Commitments",
         type: PageType.Standard,
         sidebar: true,
         // expected elements

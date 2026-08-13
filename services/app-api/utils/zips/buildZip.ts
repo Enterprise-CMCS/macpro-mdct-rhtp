@@ -73,7 +73,7 @@ export const addReportFilesToZip = async (report: Report, zip: JSZip) => {
       files: getInitiativeFiles(sortedElements?.initiative),
     },
     {
-      name: "State Policy Commitments",
+      name: "State Policy Action Commitments",
       files: getAccordionFiles(sortedElements?.accordions),
     },
     {
