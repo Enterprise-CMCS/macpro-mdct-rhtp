@@ -29,7 +29,7 @@ const ExportCard = (title: string, desc: string, onClick: () => void) => {
       <HStack justifyContent="space-between" padding="1.50rem">
         <Stack>
           <Text fontWeight="bold">{title}</Text>
-          <Text width={"36rem"}>{desc}</Text>
+          <Text maxWidth={"36rem"}>{desc}</Text>
         </Stack>
         <Button variant="outline" onClick={onClick}>
           Export
