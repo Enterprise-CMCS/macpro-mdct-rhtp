@@ -8,9 +8,14 @@ import {
   PageType,
   ParagraphTemplate,
   TextAreaBoxTemplate,
+  StatusAlertTemplate,
 } from "@rhtp/shared";
 import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
-import { cmsEvaluationStatusDefault, getDropdownOptions } from "./constants";
+import {
+  cmsEvaluationStatusDefault,
+  cmsCommitmentFulfilled,
+  getDropdownOptions,
+} from "./constants";
 
 const commitmentStatusDropdown = (
   label: string,
@@ -37,6 +42,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   const dropdownOptions = [
     cmsEvaluationStatusDefault,
     ...getDropdownOptions(label),
+    cmsCommitmentFulfilled,
   ];
 
   return {
@@ -79,6 +85,15 @@ const commitmentNotes: TextAreaBoxTemplate = {
   required: false,
 };
 
+const commitmentAlert: StatusAlertTemplate = {
+  type: ElementType.StatusAlert,
+  id: "state-policy-commitment-disabled-alert",
+  status: AlertTypes.INFO,
+  title: "State Policy Commitment locked from editing due to status.",
+  text: "",
+  for: "commitment-status",
+};
+
 const buildCommitments = (
   state: string,
   statePolicyCommitments: {
@@ -98,6 +113,7 @@ const buildCommitments = (
         commitmentLinkListInput,
         commitmentAttachmentArea(label),
         commitmentNotes,
+        commitmentAlert,
       ],
     });
   }

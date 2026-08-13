@@ -2,7 +2,16 @@ import { Accordion, Box, Button } from "@chakra-ui/react";
 import { Page } from "components/report/Page";
 import { AccordionItem } from "components";
 import { PageElementProps } from "components/report/Elements";
-import { AccordionGroupTemplate, PageElement } from "@rhtp/shared";
+import {
+  AccordionGroupTemplate,
+  AlertTypes,
+  ElementType,
+  PageElement,
+  cmsStatusThatLocksSPAC,
+  DropdownTemplate,
+  StatusAlertTemplate,
+  SPACItemsThatLock,
+} from "@rhtp/shared";
 import { useState } from "react";
 
 export const AccordionGroup = (
@@ -46,6 +55,31 @@ export const AccordionGroup = (
 
   if (accordions.length === 0) return;
 
+  console.log("PROPS OF ACCORDION GROUP", props);
+
+  const mapAccordionElements = (elements: PageElement[]): PageElement[] => {
+    const isSPACPage = props.element.id === "state-policy-commitments-group";
+
+    const cmsStatusDropdown = elements.find(
+      (element) => element.id === "cms-status-evaluation"
+    ) as DropdownTemplate;
+
+    if (!isSPACPage || !cmsStatusDropdown) return elements;
+
+    const isSPACLocked = cmsStatusThatLocksSPAC.includes(
+      cmsStatusDropdown.answer ?? ""
+    );
+
+    return elements.map((element) => {
+      console.log("WHAT IS ELEMENT", element);
+      return {
+        ...element,
+        ...(isSPACLocked &&
+          SPACItemsThatLock.includes(element.id) && { disabled: true }),
+      };
+    });
+  };
+
   return (
     <Box width="100%">
       <Box padding="1.5rem">
@@ -71,7 +105,7 @@ export const AccordionGroup = (
             <Page
               id="radio-children"
               setElements={(element) => setAccordionChildren(element, index)}
-              elements={accordion.elements}
+              elements={mapAccordionElements(accordion.elements)}
             />
           </AccordionItem>
         ))}
