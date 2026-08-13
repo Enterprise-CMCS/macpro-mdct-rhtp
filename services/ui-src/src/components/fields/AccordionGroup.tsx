@@ -5,11 +5,9 @@ import { PageElementProps } from "components/report/Elements";
 import {
   AccordionGroupTemplate,
   AlertTypes,
-  ElementType,
   PageElement,
   cmsStatusThatLocksSPAC,
   DropdownTemplate,
-  StatusAlertTemplate,
   SPACItemsThatLock,
 } from "@rhtp/shared";
 import { useState } from "react";
