@@ -414,7 +414,7 @@ const statusAlertSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.StatusAlert)),
   id: string().required(),
   title: string().required(),
-  text: string().notRequired(),
+  text: string().required(),
   status: string().required(),
   for: string().notRequired(),
 });

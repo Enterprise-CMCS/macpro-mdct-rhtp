@@ -22,20 +22,7 @@ vi.mock("utils/state/useStore", () => ({
               {
                 id: "mock-accordion-group",
                 type: ElementType.AccordionGroup,
-                accordions: [
-                  {
-                    label: "mock accordion",
-                    elements: [
-                      {
-                        id: "mock-nested-accordion-group",
-                        type: ElementType.AccordionGroup,
-                        required: false,
-                        accordions: [],
-                      },
-                    ],
-                  },
-                ],
-                required: false,
+                accordions: [{ id: "mock id" }],
               },
             ],
           };
@@ -74,11 +61,6 @@ const mockStatusForAlert: StatusAlertTemplate = {
   for: "mock-accordion-group",
 };
 
-const mockStatusForNestedAlert: StatusAlertTemplate = {
-  ...mockStatusForAlert,
-  for: "mock-nested-accordion-group",
-};
-
 const statusAlertComponent = (
   <StatusAlert element={mockStatusAlert}></StatusAlert>
 );
@@ -92,12 +74,6 @@ describe("<StatusAlert />", () => {
     });
     test("Conditional status alert for accordion groups. Should not show status when condition is met.", () => {
       render(<StatusAlert element={mockStatusForAlert}></StatusAlert>);
-      expect(screen.queryByText("mock alert")).not.toBeInTheDocument();
-      expect(screen.queryByText("mock text")).not.toBeInTheDocument();
-    });
-
-    test("Conditional status alert finds elements nested in accordion groups", () => {
-      render(<StatusAlert element={mockStatusForNestedAlert}></StatusAlert>);
       expect(screen.queryByText("mock alert")).not.toBeInTheDocument();
       expect(screen.queryByText("mock text")).not.toBeInTheDocument();
     });

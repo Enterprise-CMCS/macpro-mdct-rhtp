@@ -8,7 +8,6 @@ import {
   PageType,
   ParagraphTemplate,
   TextAreaBoxTemplate,
-  StatusAlertTemplate,
 } from "@rhtp/shared";
 import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
 import {
@@ -85,15 +84,6 @@ const commitmentNotes: TextAreaBoxTemplate = {
   required: false,
 };
 
-const commitmentAlert: StatusAlertTemplate = {
-  type: ElementType.StatusAlert,
-  id: "state-policy-commitment-disabled-alert",
-  status: AlertTypes.INFO,
-  title: "State Policy Commitment locked from editing due to status.",
-  text: "",
-  for: "cms-status-evaluation",
-};
-
 const buildCommitments = (
   state: string,
   statePolicyCommitments: {
@@ -107,7 +97,6 @@ const buildCommitments = (
     commitments.push({
       label,
       elements: [
-        commitmentAlert,
         commitmentStatusDropdown(label, status),
         cmsStatusEvaluation(label),
         commitmentSupportParagraph,

@@ -1,12 +1,15 @@
 import { Accordion, Box, Button } from "@chakra-ui/react";
 import { Page } from "components/report/Page";
-import { AccordionItem } from "components";
+import { AccordionItem, Alert } from "components";
 import { PageElementProps } from "components/report/Elements";
 import {
   AccordionGroupTemplate,
+  AlertTypes,
+  ElementType,
   PageElement,
   cmsStatusThatLocksSPAC,
   DropdownTemplate,
+  StatusAlertTemplate,
   SPACItemsThatLock,
 } from "@rhtp/shared";
 import { useState } from "react";
@@ -52,24 +55,26 @@ export const AccordionGroup = (
 
   if (accordions.length === 0) return;
 
-  const mapAccordionElements = (elements: PageElement[]): PageElement[] => {
-    const isSPACPage = props.element.id === "state-policy-commitments-group";
-
-    const cmsStatusDropdown = elements.find(
-      (element) => element.id === "cms-status-evaluation"
-    ) as DropdownTemplate;
-
-    if (!isSPACPage || !cmsStatusDropdown) return elements;
-
-    const isSPACLocked = cmsStatusThatLocksSPAC.includes(
-      cmsStatusDropdown.answer ?? ""
-    );
+  const mapAccordionElements = (
+    elements: PageElement[],
+    isSPACLocked: boolean
+  ): PageElement[] => {
     return elements.map((element) => {
       return {
         ...element,
         disabled: isSPACLocked && SPACItemsThatLock.includes(element.id),
       };
     });
+  };
+
+  const isSPACLocked = (elements: PageElement[]): boolean => {
+    const cmsStatusDropdown = elements.find(
+      (element) => element.id === "cms-status-evaluation"
+    ) as DropdownTemplate;
+
+    if (!cmsStatusDropdown) return false;
+
+    return cmsStatusThatLocksSPAC.includes(cmsStatusDropdown.answer ?? "");
   };
 
   return (
@@ -88,19 +93,29 @@ export const AccordionGroup = (
         </Button>
       </Box>
       <Accordion allowMultiple variant="border" index={accordionState}>
-        {accordions.map((accordion, index) => (
-          <AccordionItem
-            key={`${accordion.label}-${index}`}
-            label={accordion.label}
-            onClick={() => toggle(index)}
-          >
-            <Page
-              id="radio-children"
-              setElements={(element) => setAccordionChildren(element, index)}
-              elements={mapAccordionElements(accordion.elements)}
-            />
-          </AccordionItem>
-        ))}
+        {accordions.map((accordion, index) => {
+          const isLocked = isSPACLocked(accordion.elements);
+          return (
+            <AccordionItem
+              key={`${accordion.label}-${index}`}
+              label={accordion.label}
+              onClick={() => toggle(index)}
+            >
+              {isLocked && (
+                <Alert
+                  status={AlertTypes.INFO}
+                  title="State Policy Commitment locked from editing due to status."
+                ></Alert>
+              )}
+
+              <Page
+                id="radio-children"
+                setElements={(element) => setAccordionChildren(element, index)}
+                elements={mapAccordionElements(accordion.elements, isLocked)}
+              />
+            </AccordionItem>
+          );
+        })}
       </Accordion>
     </Box>
   );
