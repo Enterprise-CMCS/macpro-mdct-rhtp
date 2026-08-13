@@ -10,7 +10,7 @@ import { inferredReportStatus } from "utils/state/reportLogic/completeness";
 export const StatusAlert = (props: PageElementProps<StatusAlertTemplate>) => {
   const { report, currentPageId } = useStore();
   const { status, title, text } = props.element;
-  console.log("PROPS OF STATUS ALERT", props);
+
   const submittableMetrics = useStore(submittableMetricsSelector);
   const currentPage = useStore(currentPageSelector);
 
