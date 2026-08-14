@@ -208,6 +208,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   });
 
   new Lambda(scope, "deleteBanner", {
+    entry: "services/app-api/handlers/banners/update.ts",
+    handler: "updateBanner",
+    path: "banners/{bannerId}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "deleteBanner", {
     entry: "services/app-api/handlers/banners/delete.ts",
     handler: "deleteBanner",
     path: "banners/{bannerId}",

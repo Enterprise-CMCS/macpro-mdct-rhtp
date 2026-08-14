@@ -100,6 +100,7 @@ export const mockBannerStore: BannerState = {
   _lastFetchTime: 0,
   fetchBanners: async () => {},
   createBanner: async () => {},
+  editBanner: async () => {},
   deleteBanner: async () => {},
 };
 
