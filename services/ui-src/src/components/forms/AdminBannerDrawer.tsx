@@ -1,5 +1,5 @@
-import { ChangeEvent, useState } from "react";
-import { Button, Flex } from "@chakra-ui/react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Flex } from "@chakra-ui/react";
 import { Banner, Drawer } from "components";
 import {
   Dropdown as CmsdsDropdown,
@@ -42,14 +42,22 @@ const noErrorState = {
   endDate: "",
 };
 
-export const AdminBannerForm = ({ createBanner }: Props) => {
+export const AdminBannerDrawer = ({
+  data,
+  content,
+  onSubmit,
+  modalDisclosure,
+}: Props) => {
   const allBanners = useStore((state) => state.allBanners);
 
-  const [formData, setFormData] = useState(initialFormValues);
+  const [formData, setFormData] = useState(data ?? initialFormValues);
   const [touchedState, setTouchedState] = useState(untouchedState);
   const [formErrors, setFormErrors] = useState(noErrorState);
   const [submitting, setSubmitting] = useState(false);
-  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    setFormData(data ?? initialFormValues);
+  }, [data]);
 
   const onChange = (evt: {
     target: { name: string; value: string; maskedValue?: string };
@@ -163,7 +171,7 @@ export const AdminBannerForm = ({ createBanner }: Props) => {
     setTouchedState({ ...touchedState, [name]: true });
   };
 
-  const onSubmit = async () => {
+  const onConfirmHandler = async () => {
     // This check ensures errors appear when the user clicks submit,
     // without first having clicked any of the required input fields.
     const newErrors = structuredClone(formErrors);
@@ -180,22 +188,14 @@ export const AdminBannerForm = ({ createBanner }: Props) => {
     }
 
     setSubmitting(true);
-
-    const newBannerData: BannerFormData = {
-      ...formData,
-      startDate: format_mdy_to_ymd(formData.startDate),
-      endDate: format_mdy_to_ymd(formData.endDate),
-    };
-
-    try {
-      await createBanner(newBannerData);
+    await onSubmit(formData).then(() => {
       window.scrollTo(0, 0);
       setFormData(initialFormValues);
       setTouchedState(untouchedState);
       setFormErrors(noErrorState);
-    } finally {
-      setSubmitting(false);
-    }
+    });
+
+    setSubmitting(false);
   };
 
   const hintText = () => {
@@ -216,106 +216,82 @@ export const AdminBannerForm = ({ createBanner }: Props) => {
   };
 
   return (
-    <>
-      <form id="addAdminBanner" onSubmit={onSubmit}>
-        <Flex flexDirection="column" gap="1.5rem">
-          <Drawer
-            modalDisclosure={{
-              isOpen: isModalOpen,
-              onClose: () => {
-                setModalOpen(false);
-              },
-            }}
-            content={{
-              heading: "Create a new banner",
-              subheading: undefined,
-              solidButtonText: "Create banner",
-              outlineButtonText: "Cancel",
-            }}
-            onConfirmHandler={onSubmit}
-            onOutlineHandler={() => {
-              setModalOpen(false);
-            }}
-            submitting={submitting}
-            disableConfirm={submitting}
-          >
-            <Flex gap="1.5rem" flexDir="column">
-              <CmsdsDropdown
-                name="area"
-                label="Site area"
-                onChange={onChange}
-                onBlur={onBlur}
-                options={bannerAreaOptions}
-                value={formData.area}
-                errorMessage={formErrors.area}
-              />
-              <CmsdsTextField
-                name="title"
-                label="Title"
-                onChange={onChange}
-                onBlur={onBlur}
-                value={formData.title}
-                errorMessage={formErrors.title}
-                data-required="true"
-              />
-              <CmsdsTextField
-                name="description"
-                label="Description"
-                hint={hintText()}
-                onChange={onChange}
-                onBlur={onBlur}
-                value={formData.description}
-                errorMessage={formErrors.description}
-                multiline
-                rows={3}
-                data-required="true"
-              />
-              <CmsdsTextField
-                name="link"
-                label="Link (Optional)"
-                onChange={onChange}
-                onBlur={onBlur}
-                value={formData.link}
-                errorMessage={formErrors.link}
-                data-required="false"
-              />
-              <CmsdsDateField
-                name="startDate"
-                label="Start date"
-                onChange={onStartDateChange}
-                onBlur={onBlur}
-                value={formData.startDate}
-                errorMessage={formErrors.startDate}
-                data-required="true"
-              />
-              <CmsdsDateField
-                name="endDate"
-                label="End date"
-                onChange={onEndDateChange}
-                onBlur={onBlur}
-                value={formData.endDate}
-                errorMessage={formErrors.endDate}
-                data-required="true"
-              />
-              <Banner
-                title={formData.title || "New banner title"}
-                description={formData.description || "New banner description"}
-                link={formData.link}
-              />
-            </Flex>
-          </Drawer>
-        </Flex>
-      </form>
-      <Button type="submit" onClick={() => setModalOpen(true)}>
-        Create a new banner
-      </Button>
-    </>
+    <Drawer
+      modalDisclosure={modalDisclosure}
+      content={content}
+      onConfirmHandler={onConfirmHandler}
+      onOutlineHandler={() => {
+        modalDisclosure.onClose();
+      }}
+      submitting={submitting}
+      disableConfirm={submitting}
+    >
+      <Flex gap="1.5rem" flexDir="column">
+        <CmsdsDropdown
+          name="area"
+          label="Site area"
+          onChange={onChange}
+          onBlur={onBlur}
+          options={bannerAreaOptions}
+          value={formData.area}
+          errorMessage={formErrors.area}
+        />
+        <CmsdsTextField
+          name="title"
+          label="Title"
+          onChange={onChange}
+          onBlur={onBlur}
+          value={formData.title}
+          errorMessage={formErrors.title}
+          data-required="true"
+        />
+        <CmsdsTextField
+          name="description"
+          label="Description"
+          hint={hintText()}
+          onChange={onChange}
+          onBlur={onBlur}
+          value={formData.description}
+          errorMessage={formErrors.description}
+          multiline
+          rows={3}
+          data-required="true"
+        />
+        <CmsdsTextField
+          name="link"
+          label="Link (Optional)"
+          onChange={onChange}
+          onBlur={onBlur}
+          value={formData.link}
+          errorMessage={formErrors.link}
+          data-required="false"
+        />
+        <CmsdsDateField
+          name="startDate"
+          label="Start date"
+          onChange={onStartDateChange}
+          onBlur={onBlur}
+          value={formData.startDate}
+          errorMessage={formErrors.startDate}
+          data-required="true"
+        />
+        <CmsdsDateField
+          name="endDate"
+          label="End date"
+          onChange={onEndDateChange}
+          onBlur={onBlur}
+          value={formData.endDate}
+          errorMessage={formErrors.endDate}
+          data-required="true"
+        />
+        <Banner
+          title={formData.title || "New banner title"}
+          description={formData.description || "New banner description"}
+          link={formData.link}
+        />
+      </Flex>
+    </Drawer>
   );
-};
-
-const format_mdy_to_ymd = (dateString: string) => {
-  const [m, d, y] = dateString.split("/");
-  return [y, m, d].join("-");
 };
 
 /**
@@ -355,5 +331,16 @@ export const findConflictingBanner = (
 };
 
 interface Props {
-  createBanner: (data: BannerFormData) => Promise<void>;
+  modalDisclosure: {
+    isOpen: boolean;
+    onClose: () => void;
+  };
+  content: {
+    heading: string;
+    subheading?: string;
+    solidButtonText: string;
+    outlineButtonText: string;
+  };
+  onSubmit: (data: BannerFormData) => Promise<void>;
+  data?: BannerFormData;
 }

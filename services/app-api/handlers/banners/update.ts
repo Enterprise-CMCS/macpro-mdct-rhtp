@@ -8,7 +8,6 @@ import { isValidBanner } from "../../utils/bannerValidation";
 
 export const updateBanner = handler(parseBannerId, async (request) => {
   const user = request.user;
-  const { bannerId } = request.parameters;
 
   if (!canWriteBanner(user)) {
     return forbidden(error.UNAUTHORIZED);
@@ -18,15 +17,6 @@ export const updateBanner = handler(parseBannerId, async (request) => {
     return badRequest("Invalid request");
   }
 
-  const currentTime = new Date().toISOString();
-
-  const newBanner = {
-    ...request.body,
-    key: bannerId,
-    createdAt: currentTime,
-    createdBy: user.fullName,
-  };
-
-  await putBanner(newBanner);
+  await putBanner(request.body);
   return ok();
 });

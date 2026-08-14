@@ -23,15 +23,17 @@ async function createBanner(bannerData: BannerFormData) {
   return await apiLib.post<BannerShape>("/banners", options);
 }
 
-async function editBanner(bannerKey: string, bannerData: BannerFormData) {
+async function editBanner(bannerData: BannerFormData) {
   const requestHeaders = await getRequestHeaders();
   const request = {
     headers: { ...requestHeaders },
     body: { ...bannerData },
   };
 
+  const key = "key" in bannerData ? bannerData.key : "";
+
   updateTimeout();
-  return await apiLib.post(`/banners/${bannerKey}`, request);
+  return await apiLib.post(`/banners/${key}`, request);
 }
 
 async function deleteBanner(bannerKey: string) {

@@ -51,7 +51,7 @@ const bannerStore = (set: Set<BannerState>, get: Get<BannerState>) => ({
     await get().fetchBanners();
   },
   editBanner: async (bannerKey: string, banner: BannerFormData) => {
-    await editBanner(bannerKey, banner);
+    await editBanner(banner);
     await get().fetchBanners();
   },
   deleteBanner: async (bannerKey: string) => {

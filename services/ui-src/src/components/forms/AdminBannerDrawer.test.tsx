@@ -1,5 +1,5 @@
 import { act, render, screen } from "@testing-library/react";
-import { AdminBannerForm } from "components";
+import { AdminBannerDrawer } from "components";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
 import { BannerShape } from "@rhtp/shared";
@@ -8,17 +8,25 @@ import { useStore } from "utils";
 const mockCreateBanner = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-const AdminBannerFormComponent = (
-  <AdminBannerForm createBanner={mockCreateBanner} />
+const AdminBannerDrawerComponent = (
+  <AdminBannerDrawer
+    content={{
+      heading: "Create a new banner",
+      solidButtonText: "Create banner",
+      outlineButtonText: "Cancel",
+    }}
+    modalDisclosure={{ isOpen: true, onClose: () => {} }}
+    onSubmit={mockCreateBanner}
+  />
 );
 
-describe("<AdminBannerForm />", () => {
+describe("<AdminBannerDrawer />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    render(AdminBannerFormComponent);
+    render(AdminBannerDrawerComponent);
   });
 
-  test("AdminBannerForm can be filled and submitted without error", async () => {
+  test("AdminBannerDrawer can be filled and submitted without error", async () => {
     const siteAreaDropdown = screen.getAllByLabelText("Site area")[0];
     await userEvent.selectOptions(siteAreaDropdown, "RHTP");
 
@@ -55,13 +63,13 @@ describe("<AdminBannerForm />", () => {
     });
   });
 
-  testA11yAct(AdminBannerFormComponent);
+  testA11yAct(AdminBannerDrawerComponent);
 });
 
-describe("AdminBannerForm validation", () => {
+describe("AdminBannerDrawer validation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    render(AdminBannerFormComponent);
+    render(AdminBannerDrawerComponent);
   });
 
   test("Display form errors when user tries to submit completely blank form", async () => {

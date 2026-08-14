@@ -9,14 +9,21 @@ import {
   Divider,
   Image,
 } from "@chakra-ui/react";
-import { AdminBannerForm, Banner, PageTemplate } from "components";
+import { AdminBannerDrawer, Banner, PageTemplate } from "components";
 import {
   compareDates,
+  editBanner,
   formatMonthDayYear,
   parseAsLocalDate,
   useStore,
 } from "utils";
-import { BannerArea, bannerAreaLabels, BannerShape } from "@rhtp/shared";
+import {
+  BannerArea,
+  bannerAreaLabels,
+  bannerAreaOptions,
+  BannerFormData,
+  BannerShape,
+} from "@rhtp/shared";
 import iconActive from "assets/icons/status/icon_status_check.svg";
 import iconScheduled from "assets/icons/status/icon_status_inprogress.svg";
 import iconExpired from "assets/icons/alert/icon_warning.svg";
@@ -25,6 +32,20 @@ export const AdminPage = () => {
   const { allBanners, fetchBanners, createBanner, deleteBanner } = useStore();
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState<Record<string, boolean>>({});
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [selectedBanner, setSelectedBanner] = useState<BannerFormData>();
+  const [mode, setMode] = useState<"CREATE" | "EDIT">("CREATE");
+
+  const content = {
+    CREATE: {
+      heading: "Create a new Banner",
+      button: "Create banner",
+    },
+    EDIT: {
+      heading: `Edit ${bannerAreaOptions.find((option) => option.value === selectedBanner?.area)?.label} Banner`,
+      button: "Edit banner",
+    },
+  };
 
   useEffect(() => {
     (async () => {
@@ -35,8 +56,36 @@ export const AdminPage = () => {
 
   const bannerGroups = groupAndSortBanners(allBanners);
 
-  const onEdit = (_bannerKey: string) => {
-    console.log("on edit");
+  const onSubmit = async (formData: BannerFormData) => {
+    const newBannerData: BannerFormData = {
+      ...formData,
+      startDate: format_mdy_to_ymd(formData.startDate),
+      endDate: format_mdy_to_ymd(formData.endDate),
+    };
+
+    try {
+      if (mode === "CREATE") await createBanner(newBannerData);
+      else if (mode === "EDIT") {
+        await editBanner(newBannerData);
+      }
+    } finally {
+      setModalOpen(false);
+    }
+  };
+
+  const onCreate = () => {
+    setMode("CREATE");
+    setSelectedBanner(undefined);
+    setModalOpen(true);
+  };
+
+  const onEdit = (bannerKey: string) => {
+    setMode("EDIT");
+    const findBanner = allBanners.find((banner) => banner.key === bannerKey);
+    if (findBanner) {
+      setModalOpen(true);
+      setSelectedBanner(findBanner);
+    }
   };
 
   const onDelete = async (bannerKey: string) => {
@@ -55,7 +104,25 @@ export const AdminPage = () => {
           Banner Editor
         </Heading>
         <Text mb="1.25rem">Manage the announcement banners below.</Text>
-        <AdminBannerForm createBanner={createBanner} />
+        <Button type="submit" onClick={onCreate}>
+          Create a new banner
+        </Button>
+
+        <AdminBannerDrawer
+          modalDisclosure={{
+            isOpen: isModalOpen,
+            onClose: () => {
+              setModalOpen(false);
+            },
+          }}
+          content={{
+            heading: content[mode].heading,
+            solidButtonText: content[mode].button,
+            outlineButtonText: "Cancel",
+          }}
+          onSubmit={(data: BannerFormData) => onSubmit(data)}
+          data={selectedBanner}
+        />
       </Box>
       <Box>
         <Heading as="h2" sx={sx.sectionHeader}>
@@ -197,4 +264,9 @@ const sx = {
     width: "100%",
     flexDirection: "column",
   },
+};
+
+const format_mdy_to_ymd = (dateString: string) => {
+  const [m, d, y] = dateString.split("/");
+  return [y, m, d].join("-");
 };
