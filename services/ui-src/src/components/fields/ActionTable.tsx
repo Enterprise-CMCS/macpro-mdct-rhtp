@@ -1,4 +1,4 @@
-import { Flex, Button, Image, Heading, Stack } from "@chakra-ui/react";
+import { Flex, Button, Image, Heading, Stack, Text } from "@chakra-ui/react";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useState } from "react";
@@ -11,7 +11,7 @@ import {
   InitiativePageTemplate,
   PageStatus,
 } from "@rhtp/shared";
-import { optionalTag, parseHtml, useStore } from "utils";
+import { optionalTag, parseHintText, useStore } from "utils";
 import {
   buildElement,
   getErrorMessage,
@@ -113,8 +113,9 @@ const adjustElement = (element: ActionTableTemplate) => {
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
+  const { setModalComponent } = useStore();
   const { disabled, element } = props;
-  const { id, label, hintText, modal, rows, answer } = adjustElement(element);
+  const { heading, label, modal, rows, answer } = adjustElement(element);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
@@ -124,7 +125,6 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   ) as InitiativePageTemplate;
   const actionsDisabled =
     disabled || element.disabled || initiative?.status === PageStatus.ABANDONED;
-  const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)
@@ -228,12 +228,14 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const headers = rows.map((row) => ({ label: row.header }));
   if (canAddOrChangeStatus) headers.push({ label: "Actions" });
 
+  const parsedHint = parseHintText(element, setModalComponent);
+
   return (
-    <Flex gap="1.25rem" flexDirection="column" width="100%">
+    <Flex flexDirection="column" width="100%">
       <Heading as="h2" variant="subHeader">
-        {optionalTag({ label: pluralLabel, required: element.required })}
+        {optionalTag({ label: heading, required: element.required })}
       </Heading>
-      <p id={id}>{parseHtml(hintText)}</p>
+      <Text marginBottom={"1.25rem"}>{parsedHint}</Text>
       {canAddOrChangeStatus ? (
         <Button
           aria-label={`add ${label}`}

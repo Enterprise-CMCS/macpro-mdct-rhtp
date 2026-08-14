@@ -1,4 +1,23 @@
-import { ElementType, FormPageTemplate, PageType } from "@rhtp/shared";
+import {
+  AccordionTemplate,
+  ElementType,
+  FormPageTemplate,
+  PageType,
+} from "@rhtp/shared";
+
+export const initiativeAttachmentStatusInstructions: AccordionTemplate = {
+  type: ElementType.Accordion,
+  id: "initiatives-instructions-accordion",
+  label: "Understanding initiative statuses",
+  value:
+    "<ul>" +
+    "  <li><b>Pending Review (System Automated):</b> This status is applied automatically when you upload a new file to signal to CMS that your document is ready for review. While in this status, if no comments have been made, you retain full editing power and can delete or swap the file freely.</li>" +
+    "  <li><b>Needs Revision (CMS Project Officer):</b> Your reviewer selects this status when a document requires updates or corrective context before it can be formally approved. For compliance tracking, the file is locked from deletion. Please review CMS feedback and upload a revised version as needed.</li>" +
+    "  <li><b>Informational (CMS or State User):</b> This status is used for files that are for reference only and do not affect your performance scoring. Once selected, the file is locked from deletion so it remains a permanent part of your state record-keeping history.</li>" +
+    "  <li><b>Archived (CMS or State User):</b> This status allows you to safely hide older, outdated file versions from your active workspace view without purging them from your historical audit trail. The system locks the file from deletion, preserving it securely in the background for permanent compliance tracking.</li>" +
+    "  <li><b>Locked for Scoring (CMS Admin Only):</b> CMS applies this status once a file has been reviewed and is reading for scoring. When in this status, the files are locked and cannot be edited or deleted.</li>" +
+    "</ul>",
+};
 
 export const initiativeAttachments: FormPageTemplate = {
   id: "initiative-attachments",
@@ -24,19 +43,7 @@ export const initiativeAttachments: FormPageTemplate = {
         "</ul>" +
         "<br />",
     },
-    {
-      type: ElementType.Accordion,
-      id: "initiatives-instructions-accordion",
-      label: "Understanding initiative statuses",
-      value:
-        "<ul>" +
-        "  <li><b>Pending Review</b> - This status is applied automatically when a new attachment is added. It lets CMS know the document is ready to be reviewed.</li>" +
-        "  <li><b>Needs revision</b> - CMS uses this status when a document needs updates or corrections from the state. Please review CMS feedback and upload a revised version as needed. When in this status, attachments can no longer be deleted.</li>" +
-        "  <li><b>Locked for Scoring</b> - CMS uses this status when a document has been locked for scoring. When in this status, attachments are locked and cannot be edited or deleted.</li>" +
-        "  <li><b>Informational</b> - CMS or the state may use this status for documents that are for reference only. These documents are not used for scoring. When in this status, attachments can no longer be deleted.</li>" +
-        "  <li><b>Archived</b> - CMS or the state may use this status for documents that are no longer part of the active submission but should be kept for records. When in this status, attachments can no longer be deleted.</li>" +
-        "</ul>",
-    },
+    initiativeAttachmentStatusInstructions,
     {
       type: ElementType.AttachmentTable,
       id: "initiative-attachments-table",

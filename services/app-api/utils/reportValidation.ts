@@ -49,6 +49,13 @@ const subHeaderTemplateSchema = object().shape({
   id: string().required(),
   text: string().required(),
   helperText: string().notRequired(),
+  helperTextLink: object()
+    .shape({
+      link: string(),
+      label: string(),
+      text: string(),
+    })
+    .notRequired(),
   hideCondition: hideConditionSchema,
 });
 
@@ -321,9 +328,8 @@ const ActionElementsSchema = {
 
 const actionTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ActionTable)),
-  id: string().required(),
-  label: string().required(),
-  hintText: string().required(),
+  ...inputElementSchema,
+  heading: string().required(),
   modal: object()
     .shape({
       title: string().required(),
@@ -358,9 +364,6 @@ const actionTableSchema = object().shape({
     )
     .required(),
   answer: array().of(mixed()).notRequired(),
-  quarterly: boolean().notRequired(),
-  disabled: boolean().notRequired(),
-  required: boolean().required(),
 });
 
 const initiativesTableSchema = object().shape({

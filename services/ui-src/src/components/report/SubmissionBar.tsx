@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { Link as RouterLink } from "react-router";
-import { Stack, Box, Button, Spinner, Image, Flex } from "@chakra-ui/react";
+import {
+  Stack,
+  Box,
+  Button,
+  Spinner,
+  Image,
+  Flex,
+  Heading,
+  Text,
+} from "@chakra-ui/react";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { submitReport, useStore, reportBasePath } from "utils";
 import { SubmitReportModal } from "./SubmitReportModal";
@@ -80,6 +89,12 @@ export const SubmissionBar = () => {
       mt={5}
     >
       <Box>
+        <Heading as="h2">Post Submission Activities</Heading>
+        <Text paddingY={"1rem"} maxWidth={"28rem"}>
+          After submitting your report, download the PDF copy of the report and
+          the ZIP file of attachments, then upload them to Grant Solutions for
+          official record-keeping.
+        </Text>
         {isPdfActive && (
           <Button
             as={RouterLink}

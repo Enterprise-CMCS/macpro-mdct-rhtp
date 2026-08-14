@@ -27,7 +27,7 @@ export const obligatedAndSpentFunds: FormPageTemplate = {
     {
       type: ElementType.Paragraph,
       id: "obligated-and-spent-funds-main-instructions",
-      text: "Select “Add Obligated and Spent Funds” option below to attach the Obligated and Spent Funds file for this reporting period.",
+      text: "Select “Add Obligated and Spent Funds” option below then, select the budget period with which the attachment applies for this reporting period.",
     },
     ObligatedAndSpentFundsAttachmentElement,
   ],

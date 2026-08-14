@@ -168,7 +168,7 @@ export const ManageDrawer = ({
         {canDelete ? (
           <Alert status={AlertTypes.WARNING} title="Warning">
             Deleting this attachment will remove it from all initiatives,
-            stages, and checkpoints above.
+            stages, and checkpoints and will be removed from the system.
           </Alert>
         ) : (
           <Text>

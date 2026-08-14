@@ -325,6 +325,7 @@ export interface StatusAlertTemplate extends DisplayElementTemplate {
 export interface SubHeaderTemplate extends DisplayElementTemplate {
   type: ElementType.SubHeader;
   helperText?: string;
+  helperTextLink?: { link: string; label: string; text: string };
   hideCondition?: HideCondition;
 }
 
@@ -478,11 +479,9 @@ export interface ActionModalElement extends ActionElement {
 
 export type ActionAnswerShape = { id: string; value: string | number }[];
 
-export interface ActionTableTemplate {
+export interface ActionTableTemplate extends InputElementTemplate {
   type: ElementType.ActionTable;
-  id: string;
-  label: string;
-  hintText: string;
+  heading: string;
   modal: {
     title: string;
     hintText?: string;
@@ -490,9 +489,6 @@ export interface ActionTableTemplate {
   };
   rows: ActionRowElement[];
   answer?: ActionAnswerShape[];
-  quarterly?: boolean;
-  disabled?: boolean;
-  required: boolean;
 }
 
 export interface RequestFeedbackButtonTemplate {
