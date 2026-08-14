@@ -212,10 +212,10 @@ describe("email utils", () => {
       expect(mockSaveNotifications).toHaveBeenCalled();
     });
 
-    test("should send an email for submit for review", async () => {
-      const mockSubmitForReviewComment = {
+    test("should send an email for request feedback", async () => {
+      const mockRequestFeedbackComment = {
         ...mockReportComment,
-        type: CommentType.SUBMIT_FOR_REVIEW,
+        type: CommentType.REQUEST_FEEDBACK,
       };
       mockGetReport.mockResolvedValue(validReport);
       mockQueryRecipients.mockResolvedValueOnce([
@@ -224,7 +224,7 @@ describe("email utils", () => {
       await sendEmail({
         state: "PA",
         user: mockStateUser,
-        comment: mockSubmitForReviewComment,
+        comment: mockRequestFeedbackComment,
       });
       expect(mockQueryUpload).not.toHaveBeenCalled();
       expect(mockGetReport).toHaveBeenCalled();

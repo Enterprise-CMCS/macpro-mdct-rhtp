@@ -96,7 +96,7 @@ export enum PageStatus {
 
 export enum CommentType {
   REPORT = "report",
-  SUBMIT_FOR_REVIEW = "submit_for_review",
+  REQUEST_FEEDBACK = "request_feedback",
   ATTACHMENT = "attachment",
   ATTACHMENT_STATUS = "attachment_status",
 }
@@ -213,7 +213,7 @@ export enum ElementType {
   ObligatedAndSpentFundsAttachment = "obligatedAndSpentFundsAttachment",
   ActionTable = "actionTable",
   AttachmentTable = "attachmentTable",
-  SubmitForReview = "submitForReview",
+  RequestFeedbackButton = "requestFeedbackButton",
 }
 
 export type PageElement =
@@ -241,7 +241,7 @@ export type PageElement =
   | AttachmentAreaTemplate
   | AttachmentTableTemplate
   | ActionTableTemplate
-  | SubmitForReviewTemplate;
+  | RequestFeedbackButtonTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -495,8 +495,8 @@ export interface ActionTableTemplate {
   required: boolean;
 }
 
-export interface SubmitForReviewTemplate {
-  type: ElementType.SubmitForReview;
+export interface RequestFeedbackButtonTemplate {
+  type: ElementType.RequestFeedbackButton;
   id: string;
 }
 

@@ -330,8 +330,8 @@ const ensureReportIsSubmittable = async (
   const finalSubmitButton = editor.page.getByRole("button", {
     name: /Submit .* Report/i,
   });
-  const submitForReviewButton = editor.page.getByRole("button", {
-    name: /^Submit for Review$/i,
+  const requestFeedbackButton = editor.page.getByRole("button", {
+    name: /^Request PO Feedback$/i,
   });
 
   const waitForFinalSubmitEnabled = async (): Promise<boolean> => {
@@ -418,15 +418,15 @@ const ensureReportIsSubmittable = async (
       return { submittable: true };
     }
 
-    const reviewVisible = await submitForReviewButton
+    const reviewVisible = await requestFeedbackButton
       .isVisible()
       .catch(() => false);
     const reviewEnabled = reviewVisible
-      ? await submitForReviewButton.isEnabled().catch(() => false)
+      ? await requestFeedbackButton.isEnabled().catch(() => false)
       : false;
 
     if (reviewEnabled) {
-      await submitForReviewButton.click();
+      await requestFeedbackButton.click();
 
       const enabledAfterReview = await waitForFinalSubmitEnabled();
       if (enabledAfterReview) {
@@ -437,7 +437,7 @@ const ensureReportIsSubmittable = async (
     return {
       submittable: false,
       reason:
-        "Report reached Review & Submit but final submit remains disabled after Submit for Review",
+        "Report reached Review & Submit but final submit remains disabled after Request PO Feedback",
     };
   }
 

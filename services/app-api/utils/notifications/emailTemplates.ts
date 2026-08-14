@@ -9,8 +9,8 @@ export const getEmailTemplate = (emailTrigger: EMAIL_TRIGGERS, data: any) => {
       return getReportCommentTemplate(data);
     case EMAIL_TRIGGERS.REPORT_STATUS_CHANGE:
       return getReportStatusChangeTemplate(data);
-    case EMAIL_TRIGGERS.SUBMIT_FOR_REVIEW:
-      return getSubmitForReviewTemplate(data);
+    case EMAIL_TRIGGERS.REQUEST_FEEDBACK:
+      return getRequestFeedbackTemplate(data);
     case EMAIL_TRIGGERS.ATTACHMENT_COMMENT:
       return getAttachmentCommentTemplate(data);
     case EMAIL_TRIGGERS.ATTACHMENT_STATUS_CHANGE_LOCKED:
@@ -101,7 +101,7 @@ If you believe this status change was made in error, or if you have questions re
   },
 });
 
-const getSubmitForReviewTemplate = ({
+const getRequestFeedbackTemplate = ({
   reportName,
   recipients,
 }: {
@@ -113,7 +113,7 @@ const getSubmitForReviewTemplate = ({
     ToAddresses: recipients,
   },
   Message: {
-    Subject: { Data: `RHTP: ${reportName} sections ready for review` },
+    Subject: { Data: `RHTP: Feedback requested for ${reportName}` },
     Body: {
       Text: {
         Data: `Dear User,
