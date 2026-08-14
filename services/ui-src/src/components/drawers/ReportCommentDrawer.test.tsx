@@ -89,7 +89,9 @@ describe("ReportCommentDrawer component", () => {
           name: "Add comment to report",
         })
       ).toBeInTheDocument();
-      expect(screen.getAllByLabelText("Status")[1]).toBeInTheDocument();
+      expect(
+        screen.getAllByLabelText("Status (optional)")[1]
+      ).toBeInTheDocument();
     });
 
     test("Modals close button can be clicked", async () => {
@@ -98,7 +100,7 @@ describe("ReportCommentDrawer component", () => {
     });
 
     test("Status dropdown disabled for unsubmitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status")[1];
+      const statusDropdown = screen.getAllByLabelText("Status (optional)")[1];
       expect(statusDropdown).toBeDisabled();
     });
   });
@@ -113,7 +115,7 @@ describe("ReportCommentDrawer component", () => {
     });
 
     test("Admin can release a submitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status")[1];
+      const statusDropdown = screen.getAllByLabelText("Status (optional)")[1];
       expect(statusDropdown).toBeEnabled();
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Unlock" }));
@@ -123,7 +125,7 @@ describe("ReportCommentDrawer component", () => {
     });
 
     test("Admin can accept a submitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status")[1];
+      const statusDropdown = screen.getAllByLabelText("Status (optional)")[1];
       expect(statusDropdown).toBeEnabled();
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Accepted" }));
