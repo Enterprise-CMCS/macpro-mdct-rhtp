@@ -13,6 +13,8 @@ import {
 import { Container, Divider, Flex, Heading, Stack } from "@chakra-ui/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { makeMediaQueryClasses, UserContext, useStore } from "utils";
+import { MagicNumberField } from "components/fields/MagicTextField";
+import { TextField } from "@cmsgov/design-system";
 
 export const App = () => {
   const mqClasses = makeMediaQueryClasses();
@@ -59,6 +61,8 @@ export const App = () => {
             </Heading>
           </Container>
           <Container sx={sx.loginContainer}>
+            <MagicNumberField name="x" label="Magic Numeric Input" />
+            <TextField name="y" label="Currency" />
             <Stack spacing={8}>
               <LoginIDM />
               <Divider />
