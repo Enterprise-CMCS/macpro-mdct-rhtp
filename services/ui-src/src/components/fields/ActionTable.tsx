@@ -11,7 +11,7 @@ import {
   InitiativePageTemplate,
   PageStatus,
 } from "@rhtp/shared";
-import { optionalTag, parseHintText, useStore } from "utils";
+import { optionalTag, parseHtml, useStore } from "utils";
 import {
   buildElement,
   getErrorMessage,
@@ -113,9 +113,9 @@ const adjustElement = (element: ActionTableTemplate) => {
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const { setModalComponent } = useStore();
   const { disabled, element } = props;
-  const { heading, label, modal, rows, answer } = adjustElement(element);
+  const { heading, helperText, label, modal, rows, answer } =
+    adjustElement(element);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
@@ -228,14 +228,16 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const headers = rows.map((row) => ({ label: row.header }));
   if (canAddOrChangeStatus) headers.push({ label: "Actions" });
 
-  const parsedHint = parseHintText(element, setModalComponent);
-
   return (
     <Flex flexDirection="column" width="100%">
       <Heading as="h2" variant="subHeader">
         {optionalTag({ label: heading, required: element.required })}
       </Heading>
-      <Text marginBottom={"1.25rem"}>{parsedHint}</Text>
+      {helperText && (
+        <Text color="gray_dark" marginY={"1rem"}>
+          {parseHtml(helperText)}
+        </Text>
+      )}
       {canAddOrChangeStatus ? (
         <Button
           aria-label={`add ${label}`}

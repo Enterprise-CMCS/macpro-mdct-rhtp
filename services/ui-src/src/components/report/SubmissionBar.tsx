@@ -10,6 +10,7 @@ import {
   Flex,
   Heading,
   Text,
+  Divider,
 } from "@chakra-ui/react";
 import { submittableMetricsSelector } from "utils/state/selectors";
 import { submitReport, useStore, reportBasePath } from "utils";
@@ -81,60 +82,70 @@ export const SubmissionBar = () => {
   };
 
   return (
-    <Stack
-      direction="row"
-      width="100%"
-      display="flex"
-      justifyContent="space-between"
-      mt={5}
-    >
-      <Box>
-        <Heading as="h2">Post Submission Activities</Heading>
-        <Text paddingY={"1rem"} maxWidth={"28rem"}>
-          After submitting your report, download the PDF copy of the report and
-          the ZIP file of attachments, then upload them to Grant Solutions for
-          official record-keeping.
-        </Text>
-        {isPdfActive && (
-          <Button
-            as={RouterLink}
-            to={reportBasePath(report) + "/export"}
-            target="_blank"
-            colorScheme="blue"
-            variant={isSubmitted ? "primary" : "outline"}
-            marginRight="spacer4"
-            leftIcon={
-              <Image src={isSubmitted ? whitePDFPrimary : lookupIconPrimary} />
-            }
-          >
-            {isSubmitted ? "Download" : "Review"} PDF
-          </Button>
-        )}
-        <Button
-          colorScheme="blue"
-          variant={isSubmitted ? "outline" : "link"}
-          fontWeight="bold"
-          onClick={async () => zipModal()}
-          disabled={isZipLoading}
-        >
-          {isZipLoading && (
-            <Flex justify="center">
-              <Spinner size="md" marginRight="spacer2" />
-            </Flex>
+    <>
+      <Stack
+        direction="row"
+        width="100%"
+        display="flex"
+        justifyContent="space-between"
+        marginY={5}
+      >
+        <Box>
+          <Heading as="h2" fontWeight={"bold"}>
+            Post Submission Activities
+          </Heading>
+          <Text paddingY={"1rem"}>
+            After submitting your report, download the PDF copy of the report
+            and the ZIP file of attachments, then upload them to Grant Solutions
+            for official record-keeping.
+          </Text>
+          {isPdfActive && (
+            <Button
+              as={RouterLink}
+              to={reportBasePath(report) + "/export"}
+              target="_blank"
+              colorScheme="blue"
+              variant={isSubmitted ? "primary" : "outline"}
+              marginRight="spacer4"
+              leftIcon={
+                <Image
+                  src={isSubmitted ? whitePDFPrimary : lookupIconPrimary}
+                />
+              }
+            >
+              {isSubmitted ? "Download" : "Review"} PDF
+            </Button>
           )}
-          ZIP Attachment Files
-        </Button>
-      </Box>
+          <Button
+            colorScheme="blue"
+            variant={isSubmitted ? "outline" : "link"}
+            fontWeight="bold"
+            onClick={async () => zipModal()}
+            disabled={isZipLoading}
+          >
+            {isZipLoading && (
+              <Flex justify="center">
+                <Spinner size="md" marginRight="spacer2" />
+              </Flex>
+            )}
+            ZIP Attachment Files
+          </Button>
+        </Box>
+      </Stack>
       {user?.userIsEndUser && !isSubmitted && (
-        <Button
-          alignSelf="flex-end"
-          onClick={async () => displayModal()}
-          disabled={!submittableMetrics?.submittable || submitting}
-        >
-          {submitting && <Spinner size="sm" marginRight="spacer2" />}
-          {`Submit ${report.type} Report`}
-        </Button>
+        <>
+          <Divider></Divider>
+          <Button
+            marginTop={"2rem"}
+            alignSelf="flex-end"
+            onClick={async () => displayModal()}
+            disabled={!submittableMetrics?.submittable || submitting}
+          >
+            {submitting && <Spinner size="sm" marginRight="spacer2" />}
+            {`Submit ${report.type} Report`}
+          </Button>
+        </>
       )}
-    </Stack>
+    </>
   );
 };

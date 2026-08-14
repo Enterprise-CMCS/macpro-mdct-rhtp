@@ -120,16 +120,20 @@ export const DashboardPage = () => {
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}
         </Heading>
-        <Box marginTop="spacer4">
-          Click the <b>“Start {reportName} Report”</b> button to begin creating
-          your report.
-          <br />
-          Your work is securely auto-saved in real-time as you type.
-          <br />
-          Need step-by-step reporting parameters? Check the "Get Help" page in
-          the top right-hand corner with a link to the Comprehensive RHTP Field
-          & Guidance Guide.
-        </Box>
+        <Flex marginTop="spacer4" gap={"1rem"} direction={"column"}>
+          <Text>
+            Click the <b>“Start {reportName} Report”</b> button to begin
+            creating your report.
+          </Text>
+          <Text>
+            Your work is securely auto-saved in real-time as you type.
+          </Text>
+          <Text>
+            Need step-by-step reporting parameters? Check the "Get Help" page in
+            the top right-hand corner with a link to the Comprehensive RHTP
+            Field & Guidance Guide.
+          </Text>
+        </Flex>
         <Accordion
           allowToggle={true}
           sx={sx.accordion}

@@ -304,6 +304,12 @@ interface DisplayElementTemplate {
   text: string;
 }
 
+interface HelperTextLink {
+  link: string;
+  label: string;
+  text: string;
+}
+
 export interface HeaderTemplate extends DisplayElementTemplate {
   type: ElementType.Header;
   icon?: HeaderIcon;
@@ -313,6 +319,7 @@ export interface ParagraphTemplate extends DisplayElementTemplate {
   type: ElementType.Paragraph;
   title?: string;
   style?: string;
+  helperTextLink?: HelperTextLink;
 }
 
 export interface StatusAlertTemplate extends DisplayElementTemplate {
@@ -325,7 +332,6 @@ export interface StatusAlertTemplate extends DisplayElementTemplate {
 export interface SubHeaderTemplate extends DisplayElementTemplate {
   type: ElementType.SubHeader;
   helperText?: string;
-  helperTextLink?: { link: string; label: string; text: string };
   hideCondition?: HideCondition;
 }
 
@@ -334,7 +340,7 @@ interface InputElementTemplate {
   id: string;
   label: string;
   helperText?: string;
-  helperTextLink?: { link: string; label: string; text: string };
+  helperTextLink?: HelperTextLink;
   required: boolean;
   quarterly?: boolean;
   disabled?: boolean;

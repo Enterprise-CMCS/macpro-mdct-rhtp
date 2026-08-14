@@ -29,6 +29,14 @@ import {
 } from "@rhtp/shared";
 import { error } from "./constants";
 
+const helperTextLinkSchema = object()
+  .shape({
+    link: string(),
+    label: string(),
+    text: string(),
+  })
+  .notRequired();
+
 const hideConditionSchema = object()
   .shape({
     controllerElementId: string().required(),
@@ -49,13 +57,6 @@ const subHeaderTemplateSchema = object().shape({
   id: string().required(),
   text: string().required(),
   helperText: string().notRequired(),
-  helperTextLink: object()
-    .shape({
-      link: string(),
-      label: string(),
-      text: string(),
-    })
-    .notRequired(),
   hideCondition: hideConditionSchema,
 });
 
@@ -65,19 +66,14 @@ const paragraphTemplateSchema = object().shape({
   text: string().required(),
   title: string().notRequired(),
   style: string().notRequired(),
+  helperTextLink: helperTextLinkSchema,
 });
 
 const inputElementSchema = {
   id: string().required(),
   label: string().required(),
   helperText: string().notRequired(),
-  helperTextLink: object()
-    .shape({
-      link: string(),
-      label: string(),
-      text: string(),
-    })
-    .notRequired(),
+  helperTextLink: helperTextLinkSchema,
   required: boolean().required(),
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
