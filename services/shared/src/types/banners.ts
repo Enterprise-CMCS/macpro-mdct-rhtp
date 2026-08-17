@@ -18,6 +18,7 @@ export interface BannerFormData {
   link?: string;
   startDate: string;
   endDate: string;
+  key?: string;
 }
 
 export interface BannerShape extends BannerFormData {

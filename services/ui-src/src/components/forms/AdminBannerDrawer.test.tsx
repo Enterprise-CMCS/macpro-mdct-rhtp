@@ -30,11 +30,11 @@ describe("<AdminBannerDrawer />", () => {
     const siteAreaDropdown = screen.getAllByLabelText("Site area")[0];
     await userEvent.selectOptions(siteAreaDropdown, "RHTP");
 
-    const titleInput = screen.getByLabelText("Title text");
+    const titleInput = screen.getByLabelText("Title");
     await userEvent.click(titleInput);
     await userEvent.paste("mock title");
 
-    const descriptionInput = screen.getByLabelText("Description text");
+    const descriptionInput = screen.getByLabelText("Description");
     await userEvent.click(descriptionInput);
     await userEvent.paste("mock description");
 
@@ -50,7 +50,7 @@ describe("<AdminBannerDrawer />", () => {
     await userEvent.click(endDateInput);
     await userEvent.paste("01/02/1970");
 
-    const submitButton = screen.getByText("Create Banner");
+    const submitButton = screen.getByText("Create banner");
     await userEvent.click(submitButton);
 
     expect(mockCreateBanner).toHaveBeenCalledWith({

@@ -7,7 +7,7 @@ import {
   SingleInputDateField as CmsdsDateField,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
-import { parseAsLocalDate, parseMMDDYYYY, useStore } from "utils";
+import { optionalTag, parseAsLocalDate, parseMMDDYYYY, useStore } from "utils";
 import {
   BannerArea,
   bannerAreaOptions,
@@ -48,7 +48,10 @@ export const AdminBannerDrawer = ({
   onSubmit,
   modalDisclosure,
 }: Props) => {
-  const allBanners = useStore((state) => state.allBanners);
+  //used to check for date conflict with other banners, filtered so it doesn't check against itself
+  const allBanners = useStore((state) => state.allBanners).filter(
+    (banner) => banner.key !== data?.key
+  );
 
   const [formData, setFormData] = useState(data ?? initialFormValues);
   const [touchedState, setTouchedState] = useState(untouchedState);
@@ -57,6 +60,7 @@ export const AdminBannerDrawer = ({
 
   useEffect(() => {
     setFormData(data ?? initialFormValues);
+    setFormErrors(noErrorState);
   }, [data]);
 
   const onChange = (evt: {
@@ -259,7 +263,7 @@ export const AdminBannerDrawer = ({
         />
         <CmsdsTextField
           name="link"
-          label="Link (Optional)"
+          label={optionalTag({ label: "Link", required: false })}
           onChange={onChange}
           onBlur={onBlur}
           value={formData.link}

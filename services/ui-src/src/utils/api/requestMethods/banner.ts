@@ -30,9 +30,8 @@ async function updateBanner(bannerData: BannerFormData) {
     body: { ...bannerData },
   };
 
-  const key = "key" in bannerData ? bannerData.key : "";
   updateTimeout();
-  return await apiLib.put(`/banners/${key}`, options);
+  return await apiLib.put(`/banners/${bannerData.key}`, options);
 }
 
 async function deleteBanner(bannerKey: string) {
