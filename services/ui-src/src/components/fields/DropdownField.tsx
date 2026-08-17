@@ -39,7 +39,7 @@ export const DropdownField = (props: PageElementProps<DropdownTemplate>) => {
       onChange={onChangeHandler}
       options={dropdown.options}
       value={displayValue}
-      disabled={props.disabled}
+      disabled={props.disabled || dropdown.disabled}
     />
   );
 };
