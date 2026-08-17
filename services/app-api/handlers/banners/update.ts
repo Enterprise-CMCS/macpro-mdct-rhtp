@@ -18,5 +18,5 @@ export const updateBanner = handler(parseBannerId, async (request) => {
   }
 
   await putBanner(request.body);
-  return ok();
+  return ok(request.body);
 });

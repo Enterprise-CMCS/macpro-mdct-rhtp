@@ -12,7 +12,8 @@ import {
 import { AdminBannerDrawer, Banner, PageTemplate } from "components";
 import {
   compareDates,
-  editBanner,
+  format_mdy_to_ymd,
+  format_ymd_to_mdy,
   formatMonthDayYear,
   parseAsLocalDate,
   useStore,
@@ -29,7 +30,8 @@ import iconScheduled from "assets/icons/status/icon_status_inprogress.svg";
 import iconExpired from "assets/icons/alert/icon_warning.svg";
 
 export const AdminPage = () => {
-  const { allBanners, fetchBanners, createBanner, deleteBanner } = useStore();
+  const { allBanners, fetchBanners, createBanner, updateBanner, deleteBanner } =
+    useStore();
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState<Record<string, boolean>>({});
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
@@ -64,9 +66,10 @@ export const AdminPage = () => {
     };
 
     try {
-      if (mode === "CREATE") await createBanner(newBannerData);
-      else if (mode === "EDIT") {
-        await editBanner(newBannerData);
+      if (mode === "CREATE") {
+        await createBanner(newBannerData);
+      } else if (mode === "EDIT") {
+        await updateBanner(newBannerData);
       }
     } finally {
       setModalOpen(false);
@@ -84,7 +87,12 @@ export const AdminPage = () => {
     const findBanner = allBanners.find((banner) => banner.key === bannerKey);
     if (findBanner) {
       setModalOpen(true);
-      setSelectedBanner(findBanner);
+
+      setSelectedBanner({
+        ...findBanner,
+        startDate: format_ymd_to_mdy(findBanner.startDate),
+        endDate: format_ymd_to_mdy(findBanner.endDate),
+      });
     }
   };
 
@@ -264,9 +272,4 @@ const sx = {
     width: "100%",
     flexDirection: "column",
   },
-};
-
-const format_mdy_to_ymd = (dateString: string) => {
-  const [m, d, y] = dateString.split("/");
-  return [y, m, d].join("-");
 };

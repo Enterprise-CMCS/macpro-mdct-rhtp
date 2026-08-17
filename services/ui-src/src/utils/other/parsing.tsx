@@ -59,3 +59,13 @@ export const parseHintText = (
     )
   );
 };
+
+export const format_mdy_to_ymd = (dateString: string) => {
+  const [m, d, y] = dateString.split("/");
+  return [y, m, d].join("-");
+};
+
+export const format_ymd_to_mdy = (dateString: string) => {
+  const [y, m, d] = dateString.split("-");
+  return [m, d, y].join("/");
+};

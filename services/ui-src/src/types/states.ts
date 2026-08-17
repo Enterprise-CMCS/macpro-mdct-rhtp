@@ -14,7 +14,7 @@ export interface BannerState {
   _lastFetchTime: number;
   fetchBanners: () => Promise<void>;
   createBanner: (data: BannerFormData) => Promise<void>;
-  editBanner: (id: string, data: BannerFormData) => Promise<void>;
+  updateBanner: (data: BannerFormData) => Promise<void>;
   deleteBanner: (id: string) => Promise<void>;
 }
 
