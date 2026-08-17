@@ -58,8 +58,8 @@ describe("<AdminBannerDrawer />", () => {
       title: "mock title",
       description: "mock description",
       link: "http://example.com",
-      startDate: "1970-01-01",
-      endDate: "1970-01-02",
+      startDate: "01/01/1970",
+      endDate: "01/02/1970",
     });
   });
 
@@ -73,7 +73,7 @@ describe("AdminBannerDrawer validation", () => {
   });
 
   test("Display form errors when user tries to submit completely blank form", async () => {
-    const submitButton = screen.getByText("Create Banner");
+    const submitButton = screen.getByText("Create banner");
     await userEvent.click(submitButton);
 
     const responseIsRequiredErrorMessage = screen.getAllByText(
@@ -138,9 +138,9 @@ describe("AdminBannerDrawer validation", () => {
   });
 
   test("User has form errors but then fills out the form and errors go away", async () => {
-    const submitButton = screen.getByText("Create Banner");
-    const titleInput = screen.getByLabelText("Title text");
-    const descriptionInput = screen.getByLabelText("Description text");
+    const submitButton = screen.getByText("Create banner");
+    const titleInput = screen.getByLabelText("Title");
+    const descriptionInput = screen.getByLabelText("Description");
     const linkInput = screen.getByLabelText("Link", { exact: false });
     const startDateInput = screen.getByLabelText("Start date");
     const endDateInput = screen.getByLabelText("End date");
@@ -178,8 +178,8 @@ describe("AdminBannerDrawer validation", () => {
       title: "mock title",
       description: "mock description",
       link: "http://example.com",
-      startDate: "1970-01-01",
-      endDate: "1970-01-02",
+      startDate: "01/01/1970",
+      endDate: "01/02/1970",
     });
   });
 });

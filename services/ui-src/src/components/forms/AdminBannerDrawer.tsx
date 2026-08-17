@@ -192,12 +192,11 @@ export const AdminBannerDrawer = ({
     }
 
     setSubmitting(true);
-    await onSubmit(formData).then(() => {
-      window.scrollTo(0, 0);
-      setFormData(initialFormValues);
-      setTouchedState(untouchedState);
-      setFormErrors(noErrorState);
-    });
+    await onSubmit(formData);
+    window.scrollTo(0, 0);
+    setFormData(initialFormValues);
+    setTouchedState(untouchedState);
+    setFormErrors(noErrorState);
 
     setSubmitting(false);
   };
