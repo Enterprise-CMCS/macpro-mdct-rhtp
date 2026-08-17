@@ -8,7 +8,7 @@ import {
 import {
   skipIfUnavailable,
   verifyCurrentSection,
-  verifySectionShell,
+  verifyReportSectionShell,
 } from "../utils/report-edit-assertions";
 import { getFirstVisible } from "../utils/locators";
 import { TIMEOUT_UI } from "../utils/timeouts";
@@ -48,7 +48,7 @@ test.describe("Report Editing - Initiative Attachments", () => {
       return;
     }
 
-    await verifySectionShell(editor, {
+    await verifyReportSectionShell(editor, {
       sectionId: INITIATIVE_ATTACHMENTS_SECTION,
       heading: "Initiative Attachments",
       previousButtonVisibility: "visible",

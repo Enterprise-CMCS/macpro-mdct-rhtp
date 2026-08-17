@@ -19,7 +19,7 @@ import {
 import {
   verifyFieldIsReadOnly,
   verifyCurrentSection,
-  verifySectionShell,
+  verifyReportSectionShell,
 } from "../utils/report-edit-assertions";
 
 const ensureGeneralInfoReadyForEdit = async (
@@ -45,7 +45,7 @@ const arrangeReviewSubmitSection = async (statePage: StatePage) => {
   }
 
   const submitButton = editor.page.getByRole("button", {
-    name: /Submit for Review/i,
+    name: /Request PO Feedback/i,
   });
   const blockedMessage = editor.page.getByText(
     "Your form is not ready for submission",
@@ -90,7 +90,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
     }
     const { submitButton, blockedMessage, editor } = context;
 
-    await verifySectionShell(editor, {
+    await verifyReportSectionShell(editor, {
       sectionId: REVIEW_SUBMIT_SECTION,
       heading: "Review & Submit",
       previousButtonVisibility: "hidden",

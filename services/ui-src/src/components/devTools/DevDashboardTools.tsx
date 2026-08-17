@@ -27,16 +27,16 @@ const dateOptions = [
 
 interface Props {
   reportType: string;
-  state: string;
-  reloadReports?: Function;
   reports: LiteReport[];
+  reloadReports?: Function;
+  state?: string;
 }
 
 export const DevDashboardTools = ({
   reportType,
-  state,
-  reloadReports,
   reports,
+  reloadReports,
+  state,
 }: Props) => {
   const { devDate, setDevDate } = useStore();
   const [devDateLabel, setDevDateLabel] = useState<string>(
@@ -44,7 +44,10 @@ export const DevDashboardTools = ({
   );
 
   const [selectedReport, setSelectedReport] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>();
+  const [loading, setLoading] = useState(false);
+
+  // only state user dashboard specifies a state
+  const isStateUser = !!state;
 
   const onDateChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const newDate = e.target.value ?? Date.now();
@@ -54,12 +57,14 @@ export const DevDashboardTools = ({
 
   const onDeleteReport = async () => {
     setLoading(true);
-    await deleteReport(reportType, state, selectedReport);
+    const [state, id] = selectedReport.split("#"); // split value from select option below
+    await deleteReport(reportType, state, id);
     if (reloadReports) reloadReports(reportType, state);
     setLoading(false);
   };
   const onDeleteAllReports = async () => {
     setLoading(true);
+    if (!state) return;
     await deleteReportsForState(reportType, state);
     if (reloadReports) reloadReports(reportType, state);
     setLoading(false);
@@ -67,19 +72,23 @@ export const DevDashboardTools = ({
 
   return (
     <>
-      <Text fontWeight="bold">Current Dev Date: {devDateLabel}</Text>
-      <Select
-        placeholder="Select an open date"
-        onChange={onDateChange}
-        aria-label="select an open date"
-      >
-        {dateOptions.map((date, index) => (
-          <option key={`${date.value}-${index}`} value={date.value}>
-            {date.label}
-          </option>
-        ))}
-      </Select>
-      <Divider></Divider>
+      {isStateUser && (
+        <>
+          <Text fontWeight="bold">Current Dev Date: {devDateLabel}</Text>
+          <Select
+            placeholder="Select an open date"
+            onChange={onDateChange}
+            aria-label="select an open date"
+          >
+            {dateOptions.map((date, index) => (
+              <option key={`${date.value}-${index}`} value={date.value}>
+                {date.label}
+              </option>
+            ))}
+          </Select>
+          <Divider />
+        </>
+      )}
       <Text fontWeight="bold">Delete a Report</Text>
       <Select
         placeholder="Select a report to delete"
@@ -89,7 +98,10 @@ export const DevDashboardTools = ({
         aria-label="select a report to delete"
       >
         {reports.map((report, index) => (
-          <option key={`${report.name}-${index}`} value={report.id}>
+          <option
+            key={`${report.name}-${index}`}
+            value={`${report.state}#${report.id}`}
+          >
             {report.name}
           </option>
         ))}
@@ -97,11 +109,15 @@ export const DevDashboardTools = ({
       <Button onClick={onDeleteReport} disabled={!selectedReport || loading}>
         Delete Report
       </Button>
-      <Divider></Divider>
-      <Text fontWeight="bold">Delete all reports</Text>
-      <Button onClick={onDeleteAllReports} disabled={loading}>
-        Delete All {reportType} Reports For {state}
-      </Button>
+      {isStateUser && (
+        <>
+          <Divider />
+          <Text fontWeight="bold">Delete all reports</Text>
+          <Button onClick={onDeleteAllReports} disabled={loading}>
+            Delete All {reportType} Reports For {state}
+          </Button>
+        </>
+      )}
     </>
   );
 };

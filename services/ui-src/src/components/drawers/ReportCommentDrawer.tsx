@@ -201,7 +201,7 @@ export const ReportCommentDrawer = ({
   };
 
   const userSpecificSubheading = userIsAdmin
-    ? "[Instructional text]"
+    ? "Below CMS Project Officers can add comments or adjust the report status."
     : "Enter a comment below to comment on the report. A notification will be sent to your CMS Project Officer.";
 
   return (
@@ -244,7 +244,12 @@ export const ReportCommentDrawer = ({
             {userIsAdmin && (
               <Fragment>
                 <Dropdown
-                  label="Status"
+                  label={
+                    <>
+                      Status
+                      <span className="optionalText"> (optional)</span>
+                    </>
+                  }
                   name="status"
                   onChange={onChange}
                   options={statusOptions}

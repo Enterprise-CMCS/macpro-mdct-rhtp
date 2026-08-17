@@ -12,12 +12,14 @@ import {
   AttachmentStatus,
   CommentType,
   InitiativeAnswerProp,
+  isCompleteStatus,
+  ReportStatus,
   UploadListProp,
+  UserRoles,
 } from "@rhtp/shared";
 import { Alert, Drawer } from "components";
 import { StatusDropdown } from "components/fields/attachments/StatusDropdown";
 import { StageCheckpointDropdown } from "components/fields/attachments/StageCheckpointDropdown";
-import { canDeleteAttachment, canEditAttachment } from "utils/other/fileUtils";
 import { createComment } from "utils/api/requestMethods/commentMethods";
 import { useStore } from "utils";
 
@@ -42,6 +44,23 @@ export const ManageDrawer = ({
     canDelete: true,
   });
   const { report } = useStore();
+  const { userIsAdmin, userRole } = useStore().user || {};
+  const isFilled = () => {
+    return initiatives.length > 0 && checkpoint !== "";
+  };
+  const canEdit =
+    userRole === UserRoles.STATE_USER
+      ? !isCompleteStatus(report?.status) &&
+        status !== AttachmentStatus.LOCKED_FOR_SCORING
+      : !isCompleteStatus(report?.status);
+  const canEditStatus = userIsAdmin
+    ? canEdit || report?.status === ReportStatus.SUBMITTED
+    : canEdit;
+  const canDelete =
+    file.status === AttachmentStatus.PENDING_REVIEW &&
+    file.canDelete &&
+    canEdit;
+  const canSubmit = (canEdit || canEditStatus) && isFilled();
 
   useEffect(() => {
     const file = files.find(
@@ -89,10 +108,6 @@ export const ManageDrawer = ({
     setSubmitting(false);
   };
 
-  const isFilled = () => {
-    return initiatives.length > 0 && checkpoint;
-  };
-
   const onDropdownHandler = (initiatives: string[], checkpoint?: string) => {
     setInitiatives(initiatives);
     setCheckpoint(checkpoint ?? "");
@@ -111,8 +126,8 @@ export const ManageDrawer = ({
         outlineButtonText: "Delete attachment",
         solidButtonText: "Save changes",
       }}
-      disableConfirm={!isFilled()}
-      disableOutline={!canDeleteAttachment(status, file.canDelete)}
+      disableConfirm={!canSubmit}
+      disableOutline={!canDelete}
     >
       <Stack gap="1.5rem">
         <Text>
@@ -121,6 +136,7 @@ export const ManageDrawer = ({
         <StatusDropdown
           status={file.status}
           onChange={(status) => setStatus(status)}
+          disabled={!canEditStatus}
         ></StatusDropdown>
         <Divider></Divider>
         <Heading variant="h2">Adjust initiatives and stage/checkpoint</Heading>
@@ -143,11 +159,13 @@ export const ManageDrawer = ({
         <StageCheckpointDropdown
           answer={file}
           onDropdownHandler={onDropdownHandler}
-          disabled={!canEditAttachment(file.status)}
+          disabled={
+            !canEdit || file.status === AttachmentStatus.LOCKED_FOR_SCORING
+          }
           errorCheck={true}
         />
         <Heading variant="h2">Delete attachment</Heading>
-        {canDeleteAttachment(file.status, file.canDelete) ? (
+        {canDelete ? (
           <Alert status={AlertTypes.WARNING} title="Warning">
             Deleting this attachment will remove it from all initiatives,
             stages, and checkpoints above.

@@ -7,10 +7,10 @@ import { useState } from "react";
 
 interface Props {
   reportType: string | undefined;
-  state: string | undefined;
-  reloadReports?: Function;
   reports: LiteReport[];
   type: ToolType;
+  reloadReports?: Function;
+  state?: string;
 }
 
 export enum ToolType {
@@ -20,13 +20,13 @@ export enum ToolType {
 
 export const DevTools = ({
   reportType,
-  state,
-  reloadReports,
   reports,
   type,
+  reloadReports,
+  state,
 }: Props) => {
   const devTools = useFlags()?.devTools;
-  if (!devTools || !reportType || !state) return;
+  if (!devTools || !reportType) return;
 
   const [showOptions, setShowOptions] = useState<boolean>();
 
@@ -45,9 +45,9 @@ export const DevTools = ({
               state={state}
               reports={reports}
               reloadReports={reloadReports}
-            ></DevDashboardTools>
+            />
           )}
-          {type === ToolType.REPORT && <DevReportTools></DevReportTools>}
+          {type === ToolType.REPORT && <DevReportTools />}
         </Stack>
       )}
     </Box>

@@ -42,6 +42,7 @@ import { getStatus } from "utils/other/status";
 import { getAssignedStatesByEmail } from "utils/api/requestMethods/notificationRecipients";
 import { DropdownOptions } from "types";
 import { useFlags } from "launchdarkly-react-client-sdk";
+import { DevTools, ToolType } from "components/devTools/DevTools";
 
 const AdminCreateReportModal = ({
   modalDisclosure,
@@ -307,6 +308,14 @@ export const AdminDashboard = () => {
 
   return (
     <PageTemplate type="report" sxOverride={sx.layout}>
+      {userCanStartReport && (
+        <DevTools
+          reportType={ReportType.RHTP}
+          reloadReports={reloadReports}
+          reports={reports}
+          type={ToolType.DASHBOARD}
+        />
+      )}
       <Stack sx={sx.box} gap="2rem">
         <Heading as="h1" variant="h1">
           RHTP Admin Dashboard
@@ -330,6 +339,11 @@ export const AdminDashboard = () => {
                   The # column shows the submission count. This increases by 1
                   each time a state updates and resubmits a previous report.
                 </li>
+                <li>
+                  To “Accept” a report, select Comment/Status and choose
+                  “Accept” once all the report information has been reviewed and
+                  verified.
+                </li>
               </ul>
             </Box>
           </AccordionItem>
@@ -338,7 +352,8 @@ export const AdminDashboard = () => {
           <Box>
             <Text mb="spacer2">
               To begin the first annual report for a state, select Start First
-              Annual Report.
+              Annual Report. Note, this function will no longer be available
+              after the first Annual Report.
             </Text>
             <Button
               variant="outline"

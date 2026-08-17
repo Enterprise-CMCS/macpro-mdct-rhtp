@@ -29,7 +29,7 @@ const ExportCard = (title: string, desc: string, onClick: () => void) => {
       <HStack justifyContent="space-between" padding="1.50rem">
         <Stack>
           <Text fontWeight="bold">{title}</Text>
-          <Text>{desc}</Text>
+          <Text maxWidth={"36rem"}>{desc}</Text>
         </Stack>
         <Button variant="outline" onClick={onClick}>
           Export
@@ -104,7 +104,7 @@ export const ExportedZipPage = () => {
         setModalData({
           ...modalData,
           heading:
-            "Obligated and Spent Funds: By Reports (includes All States)",
+            "Obligated and Spent Funds: By Reports (includes All States) Export",
           subheading:
             "Report includes all states. Select one or many reports to include in the download.",
         });
@@ -151,20 +151,21 @@ export const ExportedZipPage = () => {
         <Heading as="h1" variant="h1" tabIndex={-1}>
           Export RHTP Files and Data
         </Heading>
-        <Text>
-          Instructions go here that need to be seen at all times. Provide
-          details and context to help the user complete this page.
+        <Text paddingTop={"1rem"}>
+          Select an export option below to download RHTP Obligated and Spent
+          Funds. Files exported will populate into a Zip file based on your
+          selected criteria.
         </Text>
       </Box>
       <Flex flexDirection="column" gap="spacer4">
         {ExportCard(
           "Obligated and Spent Funds: By Reports (includes All States)",
-          "{Details about what is included in the export}",
+          "Download a complete summary of all obligated and spent funds across every state. This export aggregates financial data organized by report type across all available reporting periods.",
           () => setExportData("REPORTS")
         )}
         {ExportCard(
           "Obligated and Spent Funds: By State and Report(s)",
-          "{Details about what is included in the export}",
+          "Customize your export by selecting specific states and individual reporting periods. Ideal for targeted financial tracking, state-level auditing, and custom date range comparisons.",
           () => setExportData("STATE")
         )}
       </Flex>

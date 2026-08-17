@@ -8,10 +8,13 @@ import {
   PageType,
   ParagraphTemplate,
   TextAreaBoxTemplate,
-  UserRoles,
 } from "@rhtp/shared";
 import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
-import { cmsEvaluationStatusDefault, getDropdownOptions } from "./constants";
+import {
+  cmsEvaluationStatusDefault,
+  cmsCommitmentFulfilled,
+  getDropdownOptions,
+} from "./constants";
 
 const commitmentStatusDropdown = (
   label: string,
@@ -38,6 +41,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   const dropdownOptions = [
     cmsEvaluationStatusDefault,
     ...getDropdownOptions(label),
+    cmsCommitmentFulfilled,
   ];
 
   return {
@@ -47,7 +51,8 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
     options: dropdownOptions,
     required: false,
     answer: cmsEvaluationStatusDefault.value,
-    editByRole: [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER],
+    onlyCmsAdminCanEdit: true,
+    cmsAdminCanEditInSubmitted: true,
   };
 };
 

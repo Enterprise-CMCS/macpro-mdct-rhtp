@@ -9,7 +9,7 @@ import {
 import {
   skipIfUnavailable,
   verifyCurrentSection,
-  verifySectionShell,
+  verifyReportSectionShell,
 } from "../utils/report-edit-assertions";
 
 test.describe("Report Editing - Initiatives Persistence", () => {
@@ -27,7 +27,7 @@ test.describe("Report Editing - Initiatives Persistence", () => {
       return;
     }
 
-    await verifySectionShell(editor, {
+    await verifyReportSectionShell(editor, {
       sectionId: INITIATIVES_SECTION,
       heading: "Initiatives",
       previousButtonVisibility: "visible",
