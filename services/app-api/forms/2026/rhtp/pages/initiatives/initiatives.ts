@@ -223,7 +223,7 @@ export const metricTable = (
       },
       {
         id: "prevValue",
-        header: "Previous value",
+        header: "Previous annual value",
         type: ElementType.NumberField,
         disabled: true,
         mask: MaskType.CommaSeparated,
