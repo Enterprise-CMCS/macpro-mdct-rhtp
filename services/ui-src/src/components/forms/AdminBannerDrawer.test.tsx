@@ -90,6 +90,7 @@ describe("AdminBannerDrawer validation", () => {
       area: "home",
       startDate: "2026-01-10",
       endDate: "2026-01-20",
+      key: "123456",
     } as BannerShape;
     act(() => {
       useStore.setState({ allBanners: [existingBanner] });
