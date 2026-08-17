@@ -71,7 +71,7 @@ const commitmentSupportParagraph: ParagraphTemplate = {
   type: ElementType.Paragraph,
   id: "commitment-support-paragraph",
   title: "Supporting Evidence",
-  text: "States should only submit legislation links and attachments as acceptable evidence for their State policy commitments. CMS will not accept press releases or promotional links/attachments as substantial evidence.",
+  text: "States should only submit legislation links and attachments as acceptable evidence for their State policy action commitments. CMS will not accept press releases or promotional links/attachments as substantial evidence.",
   style: "hint",
 };
 
@@ -113,14 +113,14 @@ export const buildStatePolicyCommitments = (
   state: string
 ): FormPageTemplate => ({
   id: "state-policy-commitments",
-  title: "State Policy Commitments",
+  title: "State Policy Action Commitments",
   type: PageType.Standard,
   sidebar: true,
   elements: [
     {
       type: ElementType.Header,
       id: "state-policy-commitments-header",
-      text: "State Policy Commitments",
+      text: "State Policy Action Commitments",
     },
     {
       type: ElementType.Paragraph,
@@ -137,8 +137,8 @@ export const buildStatePolicyCommitments = (
       type: ElementType.StatusAlert,
       id: "state-policy-empty-alert",
       status: AlertTypes.INFO,
-      title: "No State Policy Commitments Found",
-      text: "No state policy commitments are on file for your state. If you believe this is an error, please contact your CMS Project Officer.",
+      title: "No State Policy Action Commitments Found",
+      text: "No state policy action commitments are on file for your state. If you believe this is an error, please contact your CMS Project Officer.",
       for: "state-policy-commitments-group",
     },
   ],
