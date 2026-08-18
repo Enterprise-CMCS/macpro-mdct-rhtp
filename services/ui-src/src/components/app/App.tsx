@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router";
 import {
   AppRoutes,
@@ -9,10 +9,13 @@ import {
   PostLogoutRedirect,
   Footer,
   Timeout,
+  TextField,
 } from "components";
 import { Container, Divider, Flex, Heading, Stack } from "@chakra-ui/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { makeMediaQueryClasses, UserContext, useStore } from "utils";
+import { MagicNumberField } from "components/fields/MagicNumberField";
+import { ElementType, TextboxTemplate, MaskType } from "@rhtp/shared";
 
 export const App = () => {
   const mqClasses = makeMediaQueryClasses();
@@ -20,6 +23,15 @@ export const App = () => {
   const { logout } = context;
   const { user, showLocalLogins, setSidebar } = useStore();
   const { pathname } = useLocation();
+
+  const [numberField, setNumberField] = useState<TextboxTemplate>({
+    type: ElementType.Textbox,
+    id: "id-number-field-required",
+    label: "NumberField from components",
+    required: false,
+    // mask: MaskType.MagicNumber,
+    mask: MaskType.CommaSeparated,
+  });
 
   //there are now two export pages due to the addition of the obligated and spent funds export zip
   const isExportPage = pathname !== "/export" && pathname.includes("/export");
@@ -59,6 +71,13 @@ export const App = () => {
             </Heading>
           </Container>
           <Container sx={sx.loginContainer}>
+            <MagicNumberField name="x" label="Magic Numeric Input" />
+            <TextField
+              element={numberField}
+              updateElement={(updates) =>
+                setNumberField((current) => ({ ...current, ...updates }))
+              }
+            />
             <Stack spacing={8}>
               <LoginIDM />
               <Divider />

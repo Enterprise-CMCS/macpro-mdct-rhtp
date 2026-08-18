@@ -45,7 +45,7 @@ const TextFieldWrapper = ({
     updateSpy(updatedElement);
     setElement({ ...element, ...updatedElement } as typeof element);
   };
-  return <TextField element={template as any} updateElement={onChange} />;
+  return <TextField element={element as any} updateElement={onChange} />;
 };
 
 describe("<TextField />", () => {
@@ -114,6 +114,21 @@ describe("<TextField />", () => {
     );
 
     const textField = screen.getByRole("textbox");
+    expect(textField).toHaveValue("1,234");
+  });
+
+  test("Masked NumberField applies its mask on blur", async () => {
+    const maskedNumberField = {
+      ...mockedNumberField,
+      mask: MaskType.CommaSeparated,
+    };
+    render(<TextFieldWrapper template={maskedNumberField} />);
+
+    const textField = screen.getByRole("textbox");
+    await userEvent.type(textField, "1234");
+    expect(textField).toHaveValue("1234");
+
+    await userEvent.tab();
     expect(textField).toHaveValue("1,234");
   });
 

@@ -23,12 +23,13 @@ export const TextField = (
   const { setModalComponent } = useStore();
   const { element: textbox, disabled } = props;
   const stringifyAnswer = (newAnswer: typeof textbox.answer) => {
+    if (textbox.mask) {
+      newAnswer = maskByType(textbox.mask, newAnswer);
+    }
     if (textbox.type === ElementType.NumberField) {
-      if (textbox.mask) {
-        newAnswer = maskByType(textbox.mask, newAnswer);
-      }
       return stringifyInput(newAnswer as number);
     }
+
     return newAnswer ?? "";
   };
 
@@ -67,7 +68,7 @@ export const TextField = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const rawValue = event.target.value;
-    setDisplayValue(stringifyAnswer(rawValue));
+    setDisplayValue(rawValue);
 
     if (textbox.type === ElementType.NumberField) {
       const updateElement = (props as PageElementProps<NumberFieldTemplate>)

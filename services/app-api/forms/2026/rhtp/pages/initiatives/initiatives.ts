@@ -175,16 +175,16 @@ export const metricTable = (
         {
           id: "target",
           label: "What is the target for this metric?",
-          type: ElementType.NumberField,
+          type: ElementType.Textbox,
           required: false,
           mask: MaskType.CommaSeparated,
         },
         {
           id: "currValue",
           label: "What is the metric’s current value?",
-          type: ElementType.NumberField,
+          type: ElementType.Textbox,
           required: false,
-          mask: MaskType.CommaSeparated,
+          mask: MaskType.MagicNumber,
         },
         {
           id: "date",
@@ -207,14 +207,14 @@ export const metricTable = (
       {
         id: "prevValue",
         header: "Previous value",
-        type: ElementType.NumberField,
+        type: ElementType.Textbox,
         disabled: true,
         mask: MaskType.CommaSeparated,
       },
       {
         id: "currValue",
         header: "Current value",
-        type: ElementType.NumberField,
+        type: ElementType.Textbox,
         mask: MaskType.CommaSeparated,
       },
       { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },

@@ -392,6 +392,7 @@ export interface TextboxTemplate extends InputElementTemplate {
   type: ElementType.Textbox;
   answer?: string;
   hideCondition?: HideCondition;
+  mask?: MaskType;
 }
 
 export interface TableCheckpointTemplate {
@@ -454,6 +455,7 @@ export type AttachmentTableTemplate = {
 
 export enum MaskType {
   CommaSeparated = "CommaSeparated",
+  MagicNumber = "MagicNumber",
 }
 
 export interface ActionElement {
