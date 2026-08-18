@@ -46,19 +46,8 @@ const getHelperText = (element: PageElement) => {
 };
 
 export const ExportedReportWrapper = ({ section }: Props) => {
-  const uniqueElements = "checkpoint-table";
-
-  const filteredElements = section.elements?.filter((element) => {
-    const hasAnswer =
-      "answer" in element &&
-      element.answer !== undefined &&
-      element.answer !== "";
-    const isRequired = !("required" in element) || element.required !== false;
-    return hasAnswer || isRequired || uniqueElements.includes(element.id);
-  });
-
-  if (filteredElements == undefined) return null;
-
+  const sectionElements = section?.elements;
+  if (!sectionElements) return null;
   const expandCheckedChildren = (elements: PageElement[]): PageElement[] => {
     return elements.flatMap((element) => {
       if ("choices" in element) {
@@ -98,7 +87,7 @@ export const ExportedReportWrapper = ({ section }: Props) => {
     });
   };
 
-  const expandedElements = expandCheckedChildren(filteredElements);
+  const expandedElements = expandCheckedChildren(sectionElements);
 
   const elements =
     expandedElements?.map((element) => {
