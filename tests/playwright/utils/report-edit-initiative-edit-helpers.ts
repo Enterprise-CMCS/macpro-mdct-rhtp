@@ -228,7 +228,8 @@ export const getManageAttachmentButton = (
   fileName: string
 ): Locator =>
   row.getByRole("button", {
-    name: new RegExp(`Manage file or info for ${fileName}`, "i"),
+    name: `Manage file or info for ${fileName}`,
+    exact: true,
   });
 
 export const getCommentAttachmentButton = (
@@ -236,7 +237,8 @@ export const getCommentAttachmentButton = (
   fileName: string
 ): Locator =>
   row.getByRole("button", {
-    name: new RegExp(`Comment on ${fileName}`, "i"),
+    name: `Comment on ${fileName}`,
+    exact: true,
   });
 
 export const closeCommentDrawer = async (drawer: Locator): Promise<void> => {
