@@ -3,6 +3,7 @@ import { ReactNode, Fragment, useEffect, useState } from "react";
 import { elementObject } from "./elementObject";
 import { ElementType, Report, ReportStatus, ReportType } from "@rhtp/shared";
 import { useStore } from "utils";
+import { currentPageSelector } from "utils/state/selectors";
 
 export const ComponentInventory = () => {
   const { loadReport } = useStore();
@@ -28,7 +29,7 @@ export const ComponentInventory = () => {
     pages: [
       {
         id: "root",
-        childPageIds: ["first-child"],
+        childPageIds: ["init-1"],
       },
       {
         sidebar: false,
@@ -36,7 +37,7 @@ export const ComponentInventory = () => {
         initiativeNumber: "1",
         id: "init-1",
         type: "standard",
-        title: "Maternal Health",
+        title: "Mock Initiative",
         status: "In progress",
       },
     ],
@@ -45,6 +46,27 @@ export const ComponentInventory = () => {
   useEffect(() => {
     loadReport(mockReport);
     setIsLoading(false);
+    const pageMap = new Map([
+      ["root", 0],
+      ["init-1", 1],
+    ]);
+
+    currentPageSelector({
+      report: mockReport,
+      pageMap: pageMap,
+      currentPageId: "init-1",
+      modalOpen: false,
+      sidebarOpen: false,
+      loadReport: () => {},
+      updateReport: () => {},
+      setCurrentPageId: () => {},
+      setModalOpen: () => {},
+      setModalComponent: () => {},
+      setAnswers: () => {},
+      completePage: () => {},
+      setSidebar: () => {},
+      saveReport: () => {},
+    });
     // Cleanup function runs on unmount
     return () => loadReport(undefined);
   }, []);

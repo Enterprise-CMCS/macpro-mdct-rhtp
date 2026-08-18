@@ -547,7 +547,13 @@ export const elementObject: {
               type: ElementType.Date,
             },
           ],
-          answer: [[{ id: "row-1", value: "2" }]],
+          answer: [
+            [
+              { id: "row-1", value: "2" },
+              { id: "row-2", value: "" },
+              { id: "row-3", value: "" },
+            ],
+          ],
           required: true,
         }}
         updateElement={logNewElement}
