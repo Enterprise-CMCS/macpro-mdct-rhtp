@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
-import { LiteReport } from "@rhtp/shared";
+import { isCompleteStatus, LiteReport } from "@rhtp/shared";
 import { formatMonthDayYear, reportBasePath, useStore } from "utils";
 import { Fragment, useState } from "react";
 import { getStatus } from "utils/other/status";
@@ -58,7 +58,9 @@ export const HorizontalTable = (props: TableProps) => {
                 variant="outline"
                 aria-label={`View ${report.name} report`}
               >
-                View Report
+                {isCompleteStatus(report.status)
+                  ? "View Report"
+                  : "Enter Active Report"}
               </Button>
               <Button
                 variant="link"

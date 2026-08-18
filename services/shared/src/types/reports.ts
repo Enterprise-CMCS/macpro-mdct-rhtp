@@ -304,6 +304,12 @@ interface DisplayElementTemplate {
   text: string;
 }
 
+interface HelperTextLink {
+  link: string;
+  label: string;
+  text: string;
+}
+
 export interface HeaderTemplate extends DisplayElementTemplate {
   type: ElementType.Header;
   icon?: HeaderIcon;
@@ -313,6 +319,7 @@ export interface ParagraphTemplate extends DisplayElementTemplate {
   type: ElementType.Paragraph;
   title?: string;
   style?: string;
+  helperTextLink?: HelperTextLink;
 }
 
 export interface StatusAlertTemplate extends DisplayElementTemplate {
@@ -333,7 +340,7 @@ interface InputElementTemplate {
   id: string;
   label: string;
   helperText?: string;
-  helperTextLink?: { link: string; label: string; text: string };
+  helperTextLink?: HelperTextLink;
   required: boolean;
   quarterly?: boolean;
   disabled?: boolean;
@@ -478,11 +485,9 @@ export interface ActionModalElement extends ActionElement {
 
 export type ActionAnswerShape = { id: string; value: string | number }[];
 
-export interface ActionTableTemplate {
+export interface ActionTableTemplate extends InputElementTemplate {
   type: ElementType.ActionTable;
-  id: string;
-  label: string;
-  hintText: string;
+  heading: string;
   modal: {
     title: string;
     hintText?: string;
@@ -490,9 +495,6 @@ export interface ActionTableTemplate {
   };
   rows: ActionRowElement[];
   answer?: ActionAnswerShape[];
-  quarterly?: boolean;
-  disabled?: boolean;
-  required: boolean;
 }
 
 export interface RequestFeedbackButtonTemplate {

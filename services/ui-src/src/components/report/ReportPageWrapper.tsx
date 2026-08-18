@@ -128,8 +128,8 @@ export const ReportPageWrapper = () => {
               )}
             </form>
           </Box>
-          <Divider></Divider>
-          {currentPage.hideNavButtons && <SubmissionBar />}
+          {currentPage.hideNavButtons ? <SubmissionBar /> : <Divider></Divider>}
+
           {!currentPage.hideNavButtons && parentPage && (
             <>
               <Flex width="100%" marginTop="spacer3">

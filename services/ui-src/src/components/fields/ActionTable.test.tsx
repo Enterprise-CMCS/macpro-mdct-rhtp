@@ -18,7 +18,7 @@ const mockActionTableElement: ActionTableTemplate = {
   id: "mock-action-table-id",
   type: ElementType.ActionTable,
   label: "",
-  hintText: "",
+  heading: "",
   modal: {
     title: "Metrics",
     hintText: undefined,
