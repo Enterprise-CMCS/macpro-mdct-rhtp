@@ -138,7 +138,7 @@ export const ManageDrawer = ({
           onChange={(status) => setStatus(status)}
           disabled={!canEditStatus}
         ></StatusDropdown>
-        <Divider borderColor={"gray_dark"} />
+        <Divider borderColor={"gray_light"} />
         <Heading variant="h2">Adjust initiatives and stage/checkpoint</Heading>
         <Text>
           <b>Important:</b> If you edit the checkpoint, that change will update
@@ -164,6 +164,7 @@ export const ManageDrawer = ({
           }
           errorCheck={true}
         />
+        <Divider borderColor={"gray_light"} />
         <Heading variant="h2">Delete attachment</Heading>
         {canDelete ? (
           <Alert status={AlertTypes.WARNING} title="Warning">
