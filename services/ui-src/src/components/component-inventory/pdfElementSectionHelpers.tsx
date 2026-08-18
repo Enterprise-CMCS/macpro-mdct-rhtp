@@ -83,3 +83,138 @@ export const radioFieldSection: FormPageTemplate = {
     },
   ],
 };
+
+export const listFieldSection: FormPageTemplate = {
+  id: "mock-list-id",
+  title: "mock-list-title",
+  type: PageType.Standard,
+  elements: [
+    {
+      type: ElementType.ListInput,
+      id: "id-listinput",
+      buttonText: "Add list input",
+      required: true,
+      fieldLabel: "input",
+      label: "List Input",
+      answer: ["list input 1"],
+    },
+  ],
+};
+
+export const attachmentAreaSection: FormPageTemplate = {
+  id: "mock-attachment-area-id",
+  title: "mock-attachment-area-title",
+  type: PageType.Standard,
+  elements: [
+    {
+      type: ElementType.AttachmentArea,
+      id: "id-attachment",
+      label: "label",
+      required: true,
+    },
+  ],
+};
+
+export const tableCheckpointSection: FormPageTemplate = {
+  id: "mock-table-checkpoint-id",
+  title: "mock-table-checkpoint-title",
+  type: PageType.Standard,
+  elements: [
+    {
+      type: ElementType.TableCheckpoint,
+      id: "id-table-checkpoint",
+      required: true,
+    },
+  ],
+};
+
+export const accordionGroupSection: FormPageTemplate = {
+  id: "mock-accordion-group-id",
+  title: "mock-accordion-group-title",
+  type: PageType.Standard,
+  elements: [
+    {
+      type: ElementType.AccordionGroup,
+      id: "id-accordion-group",
+      accordions: [
+        {
+          label: "Accordiong Group 1",
+          elements: [
+            {
+              type: ElementType.Textbox,
+              id: "mock-textbox",
+              label: "Mock Textbox",
+              required: false,
+              answer: "answer",
+            },
+          ],
+        },
+      ],
+      required: true,
+    },
+  ],
+};
+
+export const obligatedAndSpentFundsSection: FormPageTemplate = {
+  id: "mock-obligated-spent-fund-id",
+  title: "mock-obligated-spent-fund-title",
+  type: PageType.Standard,
+  elements: [
+    {
+      type: ElementType.ObligatedAndSpentFundsAttachment,
+      id: "id-obligated-spent-funds",
+      label: "Obligated And Spend",
+      answer: [],
+      required: false,
+    },
+  ],
+};
+
+export const actionTableSection: FormPageTemplate = {
+  id: "mock-action-table-id",
+  title: "mock-action-table-title",
+  type: PageType.Standard,
+  elements: [
+    {
+      type: ElementType.ActionTable,
+      id: "id-action-table",
+      label: "Action Table",
+      heading: "Action Table",
+      helperText: "hint text",
+      modal: {
+        title: "Modal",
+        elements: [],
+      },
+      rows: [
+        {
+          header: "Text Field",
+          id: "row-1",
+          type: ElementType.Paragraph,
+        },
+        {
+          header: "Textbox Field",
+          id: "row-2",
+          type: ElementType.Textbox,
+        },
+        {
+          header: "Date Field",
+          id: "row-3",
+          type: ElementType.Date,
+        },
+      ],
+      answer: [
+        [
+          { id: "row-1", value: "1" },
+          { id: "row-2", value: "textbox 1" },
+          { id: "row-3", value: "01/01/2021" },
+        ],
+        [
+          { id: "row-1", value: "2" },
+          { id: "row-2", value: "textbox 2" },
+          { id: "row-3", value: "02/02/2022" },
+        ],
+      ],
+      required: true,
+    },
+  ],
+};

@@ -30,6 +30,15 @@ export const ComponentInventory = () => {
         id: "root",
         childPageIds: ["first-child"],
       },
+      {
+        sidebar: false,
+        elements: [],
+        initiativeNumber: "1",
+        id: "init-1",
+        type: "standard",
+        title: "Maternal Health",
+        status: "In progress",
+      },
     ],
   } as Report;
 

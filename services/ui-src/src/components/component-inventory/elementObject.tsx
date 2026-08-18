@@ -28,6 +28,7 @@ import {
 } from "components/report/Elements";
 import {
   AlertTypes,
+  AttachmentStatus,
   ElementType,
   HeaderIcon,
   NumberFieldTemplate,
@@ -40,6 +41,12 @@ import {
   textAreaSection,
   numberFieldSection,
   radioFieldSection,
+  listFieldSection,
+  attachmentAreaSection,
+  tableCheckpointSection,
+  accordionGroupSection,
+  obligatedAndSpentFundsSection,
+  actionTableSection,
 } from "./pdfElementSectionHelpers";
 import { formatMonthDayYear } from "utils";
 import { SubmissionParagraph } from "components/report/SubmissionParagraph";
@@ -401,7 +408,7 @@ export const elementObject: {
         }}
       ></ListInput>,
     ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
+    pdfVariants: [<ExportedReportWrapper section={listFieldSection} />],
   },
   [ElementType.AttachmentArea]: {
     description: "",
@@ -417,7 +424,169 @@ export const elementObject: {
         }}
       ></AttachmentArea>,
     ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
+    pdfVariants: [<ExportedReportWrapper section={attachmentAreaSection} />],
+  },
+  [ElementType.TableCheckpoint]: {
+    description: "",
+    id: "id-table-checkpoint",
+    variants: [
+      <TableCheckpoint
+        element={{
+          type: ElementType.TableCheckpoint,
+          id: "id-table-checkpoint",
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></TableCheckpoint>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={tableCheckpointSection} />],
+  },
+  [ElementType.AccordionGroup]: {
+    description: "",
+    id: "id-accordion-group",
+    variants: [
+      <AccordionGroup
+        element={{
+          type: ElementType.AccordionGroup,
+          id: "id-accordion-group",
+          accordions: [
+            {
+              label: "Accordiong Group 1",
+              elements: [
+                {
+                  type: ElementType.Textbox,
+                  id: "",
+                  label: "",
+                  required: false,
+                },
+              ],
+            },
+            {
+              label: "Accordiong Group 2",
+              elements: [
+                {
+                  type: ElementType.Textbox,
+                  id: "",
+                  label: "",
+                  required: false,
+                },
+              ],
+            },
+          ],
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></AccordionGroup>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={accordionGroupSection} />],
+  },
+  [ElementType.ObligatedAndSpentFundsAttachment]: {
+    description: "",
+    id: "id-funds-attachment",
+    variants: [
+      <ObligatedAndSpentFundsAttachmentElement
+        element={{
+          type: ElementType.ObligatedAndSpentFundsAttachment,
+          id: "id-obligated-spent-funds",
+          label: "Obligated And Spend",
+          answer: [],
+          required: false,
+        }}
+        updateElement={logNewElement}
+      ></ObligatedAndSpentFundsAttachmentElement>,
+      <ObligatedAndSpentFundsAttachmentElement
+        element={{
+          type: ElementType.ObligatedAndSpentFundsAttachment,
+          id: "id-obligated-spent-funds",
+          label: "Filled Obligated And Spent Funds",
+          answer: [
+            {
+              fileId: "mock-file-id",
+              name: "mock file",
+              size: 100,
+            },
+          ],
+          required: false,
+        }}
+        updateElement={logNewElement}
+      ></ObligatedAndSpentFundsAttachmentElement>,
+    ],
+    pdfVariants: [
+      <ExportedReportWrapper section={obligatedAndSpentFundsSection} />,
+    ],
+  },
+  [ElementType.ActionTable]: {
+    description: "",
+    id: "id-action-table",
+    variants: [
+      <ActionTable
+        element={{
+          type: ElementType.ActionTable,
+          id: "id-action-table",
+          label: "Action Table",
+          heading: "Action Table",
+          helperText: "hint text",
+          modal: {
+            title: "Modal",
+            elements: [],
+          },
+          rows: [
+            {
+              header: "Text Field",
+              id: "row-1",
+              type: ElementType.Paragraph,
+            },
+            {
+              header: "Textbox Field",
+              id: "row-2",
+              type: ElementType.Textbox,
+            },
+            {
+              header: "Date Field",
+              id: "row-3",
+              type: ElementType.Date,
+            },
+          ],
+          answer: [[{ id: "row-1", value: "2" }]],
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></ActionTable>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={actionTableSection} />],
+  },
+  [ElementType.AttachmentTable]: {
+    description: "",
+    id: "id-attachment-table",
+    variants: [
+      <AttachmentTable
+        element={{
+          type: ElementType.AttachmentTable,
+          id: "id-attachment-table",
+          answer: [
+            {
+              checkpoint: "planning-2",
+              initiatives: ["init-1"],
+              attachment: {
+                name: "attachment name",
+                size: 100,
+                fileId: "mock-file-id",
+              },
+              status: AttachmentStatus.PENDING_REVIEW,
+              canDelete: true,
+            },
+          ],
+        }}
+        updateElement={logNewElement}
+      ></AttachmentTable>,
+    ],
+    pdfVariants: ["Attachment Table currently not used in PDFs"],
+  },
+  [ElementType.RequestFeedbackButton]: {
+    description: "",
+    id: "id-submit-for-review",
+    variants: [<RequestFeedbackButton></RequestFeedbackButton>],
+    pdfVariants: ["Request Feedback button currently not used in PDFs"],
   },
   [ElementType.InitiativesTable]: {
     description: "",
@@ -433,115 +602,6 @@ export const elementObject: {
         }}
       ></InitiativesTable>,
     ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
-  },
-  [ElementType.TableCheckpoint]: {
-    description: "",
-    id: "id-table-checkpoint",
-    variants: [
-      <TableCheckpoint
-        element={{
-          type: ElementType.TableCheckpoint,
-          id: "id-table-checkpoint",
-          required: true,
-        }}
-        updateElement={logNewElement}
-      ></TableCheckpoint>,
-    ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
-  },
-  [ElementType.AccordionGroup]: {
-    description: "",
-    id: "id-accordion-group",
-    variants: [
-      <AccordionGroup
-        element={{
-          type: ElementType.AccordionGroup,
-          id: "id-accordion-group",
-          accordions: [
-            {
-              label: "Accordiong Group 1",
-              elements: [],
-            },
-          ],
-          required: true,
-        }}
-        updateElement={logNewElement}
-      ></AccordionGroup>,
-    ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
-  },
-  [ElementType.ObligatedAndSpentFundsAttachment]: {
-    description: "",
-    id: "id-funds-attachment",
-    variants: [
-      <ObligatedAndSpentFundsAttachmentElement
-        element={{
-          type: ElementType.ObligatedAndSpentFundsAttachment,
-          id: "",
-          label: "",
-          answer: undefined,
-          required: false,
-        }}
-        updateElement={logNewElement}
-      ></ObligatedAndSpentFundsAttachmentElement>,
-    ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
-  },
-  [ElementType.ActionTable]: {
-    description: "",
-    id: "id-action-table",
-    variants: [
-      <ActionTable
-        element={{
-          type: ElementType.ActionTable,
-          id: "id-action-table",
-          label: "Action Table",
-          heading: "",
-          modal: {
-            title: "Modal",
-            elements: [
-              {
-                label: "",
-                required: false,
-                id: "",
-                type: ElementType.Header,
-              },
-            ],
-          },
-          rows: [
-            {
-              header: "Row 1",
-              id: "row-1",
-              type: ElementType.Header,
-            },
-          ],
-          required: true,
-        }}
-        updateElement={logNewElement}
-      ></ActionTable>,
-    ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
-  },
-  [ElementType.AttachmentTable]: {
-    description: "",
-    id: "id-attachment-table",
-    variants: [
-      <AttachmentTable
-        element={{
-          type: ElementType.AttachmentTable,
-          id: "id-attachment-table",
-          answer: undefined,
-        }}
-        updateElement={logNewElement}
-      ></AttachmentTable>,
-    ],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
-  },
-  [ElementType.RequestFeedbackButton]: {
-    description: "",
-    id: "id-submit-for-review",
-    variants: [<RequestFeedbackButton></RequestFeedbackButton>],
-    pdfVariants: ["Checkbox currently not used in PDFs"],
+    pdfVariants: ["Initiative Table currently not used in PDFs"],
   },
 };
