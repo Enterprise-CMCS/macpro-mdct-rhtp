@@ -217,7 +217,10 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
       await verifyAnnualContextFromHeader(editor);
       await returnToInitiativesDashboard(editor);
 
-      await expect(editor.page.getByRole("table")).toBeVisible({
+      const initiativesTable = editor.page.getByRole("table").filter({
+        has: editor.page.getByRole("columnheader", { name: "Initiative" }),
+      });
+      await expect(initiativesTable).toBeVisible({
         timeout: TIMEOUT_UI,
       });
     });

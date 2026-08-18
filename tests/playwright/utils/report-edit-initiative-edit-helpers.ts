@@ -104,7 +104,9 @@ export const openAnnualReportFromDashboard = async (
   await expect(annualOpenButton).toBeVisible({ timeout: TIMEOUT_UI });
 
   await Promise.all([
-    editor.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?$/),
+    editor.page.waitForURL(
+      /\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?(?:[?#].*)?$/
+    ),
     annualOpenButton.click(),
   ]);
   await editor.waitForLoadingComplete();
