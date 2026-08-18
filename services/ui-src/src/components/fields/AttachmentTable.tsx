@@ -14,7 +14,6 @@ import {
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/fileUtils";
 import { checkpointList } from "verbiage/checkpoints";
-import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
@@ -164,7 +163,7 @@ export const AttachmentTable = (
             aria-label={`Comment on ${row.attachment.name}`}
             fontWeight="bold"
           >
-            <Image src={commentIcon} alt="Remove" minWidth="24px" />
+            Comment
           </Button>
         </HStack>
       );

@@ -25,7 +25,12 @@ export const Table = ({ content, variant, children }: Props) => {
           {/* Head Row */}
           <Tr>
             {content.headRow.map((headerCell: string, index: number) => (
-              <Th key={`${index}-head-cell`} scope="col" sx={sx.tableHeader}>
+              <Th
+                key={`${index}-head-cell`}
+                scope="col"
+                sx={sx.tableHeader}
+                textAlign={headerCell === "Actions" ? "center" : undefined}
+              >
                 {parseHtml(headerCell)}
               </Th>
             ))}

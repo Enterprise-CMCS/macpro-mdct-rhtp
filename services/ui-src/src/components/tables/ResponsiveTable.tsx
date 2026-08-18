@@ -71,7 +71,10 @@ const HorizontalTable = (
       <Thead>
         <Tr>
           {headers.map((item) => (
-            <Th key={item.label}>
+            <Th
+              key={item.label}
+              textAlign={item.label === "Actions" ? "center" : undefined}
+            >
               {item.sortable ? (
                 <Button
                   variant="sort"

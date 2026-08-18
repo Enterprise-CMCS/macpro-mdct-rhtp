@@ -17,7 +17,6 @@ import {
 } from "@rhtp/shared";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
 import { UploadDrawer } from "components/drawers/UploadDrawer";
@@ -304,7 +303,7 @@ export const TableCheckpoint = (
             aria-label={`Comment on ${row.file.name}`}
             fontWeight="bold"
           >
-            <Image src={commentIcon} alt="Remove" minWidth="24px" />
+            Comment
           </Button>
         </Flex>
       );

@@ -138,7 +138,7 @@ export const ManageDrawer = ({
           onChange={(status) => setStatus(status)}
           disabled={!canEditStatus}
         ></StatusDropdown>
-        <Divider></Divider>
+        <Divider borderColor={"gray_dark"} />
         <Heading variant="h2">Adjust initiatives and stage/checkpoint</Heading>
         <Text>
           <b>Important:</b> If you edit the checkpoint, that change will update
