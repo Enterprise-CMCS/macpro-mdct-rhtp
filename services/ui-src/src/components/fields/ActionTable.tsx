@@ -94,27 +94,9 @@ const buildRows = (
   return formattedRows;
 };
 
-const adjustElement = (element: ActionTableTemplate) => {
-  const newElement = structuredClone(element);
-  //if prevValue has no values in any row, it will hide the whole column
-  if (element.rows.some((row) => row.id === "prevValue")) {
-    const countFilledPrevValue = element.answer
-      ?.flat()
-      .filter(
-        (answer) => answer.id === "prevValue" && answer.value != ""
-      ).length;
-
-    if (countFilledPrevValue != undefined && countFilledPrevValue === 0) {
-      newElement.rows = newElement.rows.filter((row) => row.id !== "prevValue");
-    }
-  }
-
-  return newElement;
-};
-
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { disabled, element } = props;
-  const { id, label, hintText, modal, rows, answer } = adjustElement(element);
+  const { id, label, hintText, modal, rows, answer } = element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
@@ -272,17 +254,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 };
 
 export const ActionTableExport = (element: ActionTableTemplate) => {
-  const showPrevValue = element.answer
-    ?.flat()
-    .filter((item) => item.id === "prevValue")
-    .every((item) => item.value !== "");
-
-  const filteredRows = showPrevValue
-    ? element.rows
-    : element.rows.filter((row) => row.id != "prevValue");
-
-  const headers = filteredRows.map((row) => ({ label: row.header }));
-  const ids = filteredRows.map((row) => row.id);
+  const headers = element.rows.map((row) => ({ label: row.header }));
+  const ids = element.rows.map((row) => row.id);
 
   const buildRow = (element: ActionAnswerShape, index: number) => {
     return ids.map((id) => {

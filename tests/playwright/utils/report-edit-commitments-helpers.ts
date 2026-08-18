@@ -118,7 +118,7 @@ export const verifyCommitmentSectionLoaded = async (
   await expect(
     editor.page
       .locator("h1")
-      .filter({ hasText: "State Policy Commitments" })
+      .filter({ hasText: "State Policy Action Commitments" })
       .first()
   ).toBeVisible();
 };
