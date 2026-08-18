@@ -20,6 +20,7 @@ import { getReport } from "../../storage/reports";
 export enum EMAIL_TRIGGERS {
   REPORT_COMMENT = "REPORT_COMMENT",
   REPORT_STATUS_CHANGE = "REPORT_STATUS_CHANGE",
+  REQUEST_FEEDBACK = "REQUEST_FEEDBACK",
   ATTACHMENT_COMMENT = "ATTACHMENT_COMMENT",
   ATTACHMENT_STATUS_CHANGE_LOCKED = "ATTACHMENT_STATUS_CHANGE_LOCKED",
   ATTACHMENT_STATUS_CHANGE_NEEDS_REVISION = "ATTACHMENT_STATUS_CHANGE_NEEDS_REVISION",
@@ -62,6 +63,17 @@ export const sendEmail = async ({
   let uploadId: string | undefined;
   let attachmentName: string | undefined;
   let emailTrigger: EMAIL_TRIGGERS | undefined;
+
+  // Report feedback requested
+  if (
+    comment &&
+    comment.type === CommentType.REQUEST_FEEDBACK &&
+    !comment.isInternal &&
+    comment.comment
+  ) {
+    emailTrigger = EMAIL_TRIGGERS.REQUEST_FEEDBACK;
+    reportId = comment.contextId;
+  }
 
   // New external comment on a report
   if (

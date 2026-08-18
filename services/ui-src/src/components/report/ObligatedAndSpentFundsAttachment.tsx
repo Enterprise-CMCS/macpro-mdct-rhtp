@@ -89,7 +89,8 @@ export const ObligatedAndSpentFundsAttachmentElement = (
         id,
         files,
         onDeleteModalOpen,
-        downloadFile
+        downloadFile,
+        disabled
       )}
 
       <Modal
@@ -102,6 +103,7 @@ export const ObligatedAndSpentFundsAttachmentElement = (
           heading: "Delete Obligated and Spent Funds",
           actionButtonText: "Delete",
         }}
+        disableConfirm={disabled}
       >
         <Alert status={AlertTypes.WARNING} title="Warning">
           Deleting this attachment will remove it from the Obligated and Spent
@@ -116,7 +118,8 @@ export const ObligatedAndSpentFundsAttachmentElement = (
           id,
           files,
           undefined,
-          downloadFile
+          downloadFile,
+          disabled
         )}
       </Modal>
     </Fragment>

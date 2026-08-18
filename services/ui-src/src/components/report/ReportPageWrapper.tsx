@@ -54,7 +54,8 @@ export const ReportPageWrapper = () => {
       }
       setIsLoading(false);
     } catch {
-      // console.log("oopsy")
+      //navigate user to access denied page
+      navigate("/403");
     }
   };
 
@@ -127,8 +128,8 @@ export const ReportPageWrapper = () => {
               )}
             </form>
           </Box>
-          <Divider></Divider>
-          {currentPage.hideNavButtons && <SubmissionBar />}
+          {currentPage.hideNavButtons ? <SubmissionBar /> : <Divider></Divider>}
+
           {!currentPage.hideNavButtons && parentPage && (
             <>
               <Flex width="100%" marginTop="spacer3">

@@ -41,7 +41,7 @@ describe("NotificationsPage component", () => {
       const addEmailButton = screen.getByRole("button", { name: "Add email" });
       await userEvent.click(addEmailButton);
       expect(
-        screen.getByRole("heading", { name: "Add Email" })
+        screen.getByRole("heading", { name: "Add email" })
       ).toBeInTheDocument();
       expect(
         screen.getByRole("textbox", { name: "Email" })
@@ -49,7 +49,7 @@ describe("NotificationsPage component", () => {
       const closeButton = screen.getByRole("button", { name: "Close" });
       await userEvent.click(closeButton);
       expect(
-        screen.queryByRole("heading", { name: "Add Email" })
+        screen.queryByRole("heading", { name: "Add email" })
       ).not.toBeInTheDocument();
     });
 
@@ -57,7 +57,7 @@ describe("NotificationsPage component", () => {
       const addEmailButton = screen.getByRole("button", { name: "Add email" });
       await userEvent.click(addEmailButton);
       expect(
-        screen.getByRole("heading", { name: "Add Email" })
+        screen.getByRole("heading", { name: "Add email" })
       ).toBeInTheDocument();
       expect(
         screen.getByRole("textbox", { name: "Email" })
@@ -73,7 +73,9 @@ describe("NotificationsPage component", () => {
     test("modal closes on submit with valid inputs", async () => {
       const addEmailButton = screen.getByText("Add email");
       await userEvent.click(addEmailButton);
-      expect(screen.getByText("Add Email")).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Add email" })
+      ).toBeInTheDocument();
 
       const emailInput = screen.getByLabelText("Email");
       await userEvent.click(emailInput);
@@ -87,7 +89,9 @@ describe("NotificationsPage component", () => {
       const submitButton = screen.getByText("Save");
       await userEvent.click(submitButton);
       await waitFor(() => {
-        expect(screen.queryByText("Add Email")).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole("heading", { name: "Add email" })
+        ).not.toBeInTheDocument();
       });
       expect(mockCreateRecipient).toHaveBeenCalled();
       expect(mockGetRecipients).toHaveBeenCalled();

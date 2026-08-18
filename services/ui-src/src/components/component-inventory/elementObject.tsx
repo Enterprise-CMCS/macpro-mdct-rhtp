@@ -44,7 +44,7 @@ import {
 import { formatMonthDayYear } from "utils";
 import { SubmissionParagraph } from "components/report/SubmissionParagraph";
 import { ObligatedAndSpentFundsAttachmentElement } from "components/report/ObligatedAndSpentFundsAttachment";
-import { SubmitForReview } from "components/report/SubmitForReview";
+import { RequestFeedbackButton } from "components/report/RequestFeedbackButton";
 
 const logNewElement = (el: Partial<PageElement>) => console.log("Updated:", el);
 
@@ -497,7 +497,7 @@ export const elementObject: {
           type: ElementType.ActionTable,
           id: "id-action-table",
           label: "Action Table",
-          hintText: "hint text",
+          heading: "",
           modal: {
             title: "Modal",
             elements: [
@@ -538,10 +538,10 @@ export const elementObject: {
     ],
     pdfVariants: ["Checkbox currently not used in PDFs"],
   },
-  [ElementType.SubmitForReview]: {
+  [ElementType.RequestFeedbackButton]: {
     description: "",
     id: "id-submit-for-review",
-    variants: [<SubmitForReview></SubmitForReview>],
+    variants: [<RequestFeedbackButton></RequestFeedbackButton>],
     pdfVariants: ["Checkbox currently not used in PDFs"],
   },
 };

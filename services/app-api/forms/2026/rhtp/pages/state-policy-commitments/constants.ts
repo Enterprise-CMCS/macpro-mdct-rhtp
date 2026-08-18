@@ -48,6 +48,11 @@ export const cmsEvaluationStatusDefault = {
   value: "Not yet evaluated",
 };
 
+export const cmsCommitmentFulfilled = {
+  label: "Commitment fulfilled",
+  value: "Commitment fulfilled",
+};
+
 export const getDropdownOptions = (label: string) => {
   switch (label) {
     case "B.3. SNAP Food Restriction Waiver Policy":

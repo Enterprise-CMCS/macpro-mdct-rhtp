@@ -40,9 +40,9 @@ export const parseHintText = (
   const text = element.helperTextLink?.text;
 
   return (
-    element.helperText && (
+    (element.helperText || link) && (
       <span className="column">
-        {parseHtml(element.helperText)}
+        {element.helperText && parseHtml(element.helperText)}
         {link && (
           <Button
             variant="link"

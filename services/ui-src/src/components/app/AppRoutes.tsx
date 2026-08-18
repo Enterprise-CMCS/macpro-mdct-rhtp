@@ -5,6 +5,7 @@ import {
   HomePage,
   ProfilePage,
   DashboardPage,
+  AccessDeniedPage,
   NotFoundPage,
   ExportedReportPage,
   ReportPageWrapper,
@@ -55,6 +56,7 @@ export const AppRoutes = () => {
           <Route path="/export" element={<ExportedZipPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/help" element={<HelpPage />} />
+          <Route path="/403" element={<AccessDeniedPage />} />
           <Route path="*" element={<NotFoundPage />} />
           <Route
             path="/report/:reportType/:state"

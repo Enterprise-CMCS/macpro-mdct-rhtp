@@ -9,7 +9,12 @@ import {
   DividerElement,
 } from "./Elements";
 import { assertExhaustive } from "types";
-import { ElementType, isCompleteStatus, PageElement } from "@rhtp/shared";
+import {
+  ElementType,
+  isCompleteStatus,
+  PageElement,
+  ReportStatus,
+} from "@rhtp/shared";
 import {
   DateField,
   DropdownField,
@@ -30,7 +35,7 @@ import { useStore } from "utils";
 import { SubmissionParagraph } from "./SubmissionParagraph";
 import { ObligatedAndSpentFundsAttachmentElement } from "./ObligatedAndSpentFundsAttachment";
 import { AttachmentArea } from "components/fields/AttachmentArea";
-import { SubmitForReview } from "./SubmitForReview";
+import { RequestFeedbackButton } from "./RequestFeedbackButton";
 
 interface Props {
   id: string;
@@ -39,15 +44,24 @@ interface Props {
 }
 
 export const Page = ({ id, setElements, elements }: Props) => {
-  const { userIsEndUser, userRole } = useStore().user || {};
+  const { userIsEndUser, userIsAdmin } = useStore().user || {};
   const { report } = useStore();
 
   const buildElement = (element: PageElement, index: number) => {
     const roleCanEdit =
-      "editByRole" in element
-        ? element.editByRole!.includes(userRole!)
+      "onlyCmsAdminCanEdit" in element && element.onlyCmsAdminCanEdit
+        ? userIsAdmin
         : userIsEndUser;
-    const disabled = !roleCanEdit || isCompleteStatus(report?.status);
+
+    const statusAllowsEdit =
+      !isCompleteStatus(report?.status) ||
+      ("cmsAdminCanEditInSubmitted" in element &&
+        element.cmsAdminCanEditInSubmitted &&
+        userIsAdmin &&
+        report?.status === ReportStatus.SUBMITTED);
+
+    const disabled = !roleCanEdit || !statusAllowsEdit;
+
     const subType = report?.subType;
     const updateElement = (updatedElement: Partial<typeof element>) => {
       setElements([
@@ -112,8 +126,8 @@ export const Page = ({ id, setElements, elements }: Props) => {
         return <ActionTable {...{ updateElement, disabled, element }} />;
       case ElementType.AttachmentTable:
         return <AttachmentTable {...{ updateElement, disabled, element }} />;
-      case ElementType.SubmitForReview:
-        return <SubmitForReview />;
+      case ElementType.RequestFeedbackButton:
+        return <RequestFeedbackButton />;
       default:
         assertExhaustive(element);
         return null;

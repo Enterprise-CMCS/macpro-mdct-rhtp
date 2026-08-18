@@ -18,7 +18,7 @@ const mockActionTableElement: ActionTableTemplate = {
   id: "mock-action-table-id",
   type: ElementType.ActionTable,
   label: "",
-  hintText: "",
+  heading: "",
   modal: {
     title: "Metrics",
     hintText: undefined,
@@ -51,23 +51,15 @@ const mockActionTableElement: ActionTableTemplate = {
       header: "Status",
       type: ElementType.Paragraph,
     },
-    {
-      id: "prevValue",
-      header: "Previous Value",
-      type: ElementType.Textbox,
-      disabled: true,
-    },
   ],
   answer: [
     [
       { id: "mock-text", value: "hello" },
       { id: "status", value: "active" },
-      { id: "prevValue", value: "" },
     ],
     [
       { id: "mock-text", value: "bye" },
       { id: "status", value: "Abandoned" },
-      { id: "prevValue", value: "" },
     ],
   ],
   required: true,
@@ -92,20 +84,14 @@ describe("Test ActionTable component", () => {
       ).toBe(2);
       const { rows } = mockActionTableElement;
       rows.forEach((row) => {
-        if (row.id !== "prevValue") {
-          expect(
-            screen.getByRole("columnheader", { name: row.header })
-          ).toBeVisible();
-        } else {
-          expect(
-            screen.queryByRole("columnheader", { name: row.header })
-          ).not.toBeInTheDocument();
-        }
+        expect(
+          screen.getByRole("columnheader", { name: row.header })
+        ).toBeVisible();
       });
       expect(
         screen.getByRole("columnheader", { name: "Actions" })
       ).toBeVisible();
-      expect(screen.getAllByRole("textbox", { name: "" })[0]).toHaveValue(
+      expect(screen.getAllByRole("textbox", { name: "Text" })[0]).toHaveValue(
         "hello"
       );
     });
@@ -126,9 +112,9 @@ describe("Test ActionTable component", () => {
     });
     test("Row inputs are disabled when status value is Abandoned, but admin can still change status", async () => {
       expect(
-        screen.getByRole("row", { name: "2 bye Abandoned Edit/Abandon" })
+        screen.getByRole("row", { name: "2 Text bye Abandoned Edit/Abandon" })
       ).toBeVisible();
-      const textbox = screen.getAllByRole("textbox", { name: "" })[1];
+      const textbox = screen.getAllByRole("textbox", { name: "Text" })[1];
       expect(textbox).toHaveValue("bye");
       expect(textbox).toBeDisabled();
       const editBtn = screen.getAllByRole("button", { name: "Edit/Abandon" });
@@ -153,33 +139,27 @@ describe("Test ActionTable component", () => {
       ).not.toBeInTheDocument();
       const { rows } = mockActionTableElement;
       rows.forEach((row) => {
-        if (row.id !== "prevValue") {
-          expect(
-            screen.getByRole("columnheader", { name: row.header })
-          ).toBeVisible();
-        } else {
-          expect(
-            screen.queryByRole("columnheader", { name: row.header })
-          ).not.toBeInTheDocument();
-        }
+        expect(
+          screen.getByRole("columnheader", { name: row.header })
+        ).toBeVisible();
       });
       expect(
         screen.queryByRole("columnheader", { name: "Actions" })
       ).not.toBeInTheDocument();
-      expect(screen.getAllByRole("textbox", { name: "" })[0]).toHaveValue(
+      expect(screen.getAllByRole("textbox", { name: "Text" })[0]).toHaveValue(
         "hello"
       );
     });
     test("Table triggers autosave", async () => {
-      const textbox = screen.getAllByRole("textbox", { name: "" })[0];
+      const textbox = screen.getAllByRole("textbox", { name: "Text" })[0];
       await userEvent.type(textbox, "mock");
       expect(updateSpy).toHaveBeenCalledTimes(4);
     });
     test("Row inputs are disabled when status value is Abandoned", async () => {
       expect(
-        screen.getByRole("row", { name: "2 bye Abandoned" })
+        screen.getByRole("row", { name: "2 Text bye Abandoned" })
       ).toBeVisible();
-      const textbox = screen.getAllByRole("textbox", { name: "" })[1];
+      const textbox = screen.getAllByRole("textbox", { name: "Text" })[1];
       expect(textbox).toHaveValue("bye");
       expect(textbox).toBeDisabled();
     });

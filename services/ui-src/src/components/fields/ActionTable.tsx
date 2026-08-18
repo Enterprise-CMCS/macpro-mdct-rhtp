@@ -1,4 +1,4 @@
-import { Flex, Button, Image, Heading, Stack } from "@chakra-ui/react";
+import { Flex, Button, Image, Heading, Stack, Text } from "@chakra-ui/react";
 import { ActionModal } from "components/modals/ActionModal";
 import { PageElementProps } from "components/report/Elements";
 import { JSX, useState } from "react";
@@ -31,6 +31,12 @@ const isRowDisabled = (rows: ActionRowElement[], answer: ActionAnswerShape) => {
   return false;
 };
 
+/** For generating better aria label in the metrics table */
+const generateAriaLabel = (header: string, answer: ActionAnswerShape) => {
+  const label = answer.find((row) => row.id === "metric")?.value ?? "";
+  return `${label} ${header}`;
+};
+
 const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
@@ -43,7 +49,7 @@ const buildRows = (
   onEdit: (index: number) => void,
   formDisabled?: boolean,
   canChangeStatus: boolean = false,
-  errorMessages: string[][] = []
+  errorMessages: Array<Map<string, string>> = []
 ) => {
   const formattedRows: (JSX.Element | string | number)[][] = [];
   answer.forEach((answerRow, answerRowIndex) => {
@@ -65,10 +71,8 @@ const buildRows = (
           element?.value!,
           (value) =>
             onChange(value, answerRowIndex, column.id, formattedCol.type),
-          "",
-          errorMessages[answerRowIndex][
-            rows.findIndex((row) => row.id === column.id)
-          ]
+          generateAriaLabel(column.header, answerRow),
+          errorMessages[answerRowIndex].get(column.id)
         );
         rowElement.push(value || "--");
       }
@@ -90,27 +94,9 @@ const buildRows = (
   return formattedRows;
 };
 
-const adjustElement = (element: ActionTableTemplate) => {
-  const newElement = structuredClone(element);
-  //if prevValue has no values in any row, it will hide the whole column
-  if (element.rows.some((row) => row.id === "prevValue")) {
-    const countFilledPrevValue = element.answer
-      ?.flat()
-      .filter(
-        (answer) => answer.id === "prevValue" && answer.value != ""
-      ).length;
-
-    if (countFilledPrevValue != undefined && countFilledPrevValue === 0) {
-      newElement.rows = newElement.rows.filter((row) => row.id !== "prevValue");
-    }
-  }
-
-  return newElement;
-};
-
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const { disabled, element } = props;
-  const { id, label, hintText, modal, rows, answer } = adjustElement(element);
+  const { heading, helperText, label, modal, rows, answer } = element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
   const { report } = useStore();
@@ -120,7 +106,6 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   ) as InitiativePageTemplate;
   const actionsDisabled =
     disabled || element.disabled || initiative?.status === PageStatus.ABANDONED;
-  const pluralLabel = `${label}s`;
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)
@@ -142,8 +127,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
-  const [errorMessages, setErrorMessages] = useState<string[][]>(
-    answer?.map(() => initial.map(() => "")) ?? []
+  const [errorMessages, setErrorMessages] = useState<
+    Array<Map<string, string>>
+  >(
+    answer?.map(
+      (row) => new Map<string, string>(row.map((item) => [item.id, ""]))
+    ) ?? []
   );
 
   const formatAnswers = (
@@ -177,7 +166,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     const newErrorMessages = [...errorMessages];
     const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
     const errorMessage = getErrorMessage(type, false, value);
-    newErrorMessages[index][rowIndex] = errorMessage;
+
+    newErrorMessages[index].set(id, errorMessage);
     setErrorMessages(newErrorMessages);
     const formattedValue = formatAnswers(
       [{ id: id, value: value[0] }],
@@ -220,11 +210,15 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   if (canAddOrChangeStatus) headers.push({ label: "Actions" });
 
   return (
-    <Flex gap="1.25rem" flexDirection="column" width="100%">
+    <Flex flexDirection="column" width="100%">
       <Heading as="h2" variant="subHeader">
-        {optionalTag({ label: pluralLabel, required: element.required })}
+        {optionalTag({ label: heading, required: element.required })}
       </Heading>
-      <p id={id}>{parseHtml(hintText)}</p>
+      {helperText && (
+        <Text color="gray_dark" marginY={"1rem"}>
+          {parseHtml(helperText)}
+        </Text>
+      )}
       {canAddOrChangeStatus ? (
         <Button
           aria-label={`add ${label}`}
@@ -263,17 +257,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 };
 
 export const ActionTableExport = (element: ActionTableTemplate) => {
-  const showPrevValue = element.answer
-    ?.flat()
-    .filter((item) => item.id === "prevValue")
-    .every((item) => item.value !== "");
-
-  const filteredRows = showPrevValue
-    ? element.rows
-    : element.rows.filter((row) => row.id != "prevValue");
-
-  const headers = filteredRows.map((row) => ({ label: row.header }));
-  const ids = filteredRows.map((row) => row.id);
+  const headers = element.rows.map((row) => ({ label: row.header }));
+  const ids = element.rows.map((row) => row.id);
 
   const buildRow = (element: ActionAnswerShape, index: number) => {
     return ids.map((id) => {

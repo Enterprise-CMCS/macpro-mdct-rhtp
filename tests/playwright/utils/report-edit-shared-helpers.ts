@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
@@ -12,6 +12,9 @@ export type GeneralInfoField = {
 };
 
 export type GeneralInfoFillMode = "overwrite" | "fill-empty";
+
+export const escapeRegExp = (str: string): string =>
+  str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 
 export const GENERAL_INFORMATION_SECTION = "general-information";
 export const INITIATIVE_ATTACHMENTS_SECTION = "initiative-attachments";
@@ -43,18 +46,38 @@ export const GENERAL_INFO_FIELDS: GeneralInfoField[] = [
   { label: PIPD_EMAIL_LABEL, value: "pipd@test.gov" },
 ];
 
+const normalizeRunId = (id: string): string => {
+  const cleaned = id.replaceAll(/[^a-f0-9]/gi, "").slice(0, 10);
+  return cleaned.length > 0 ? cleaned : "";
+};
+
+const REPORT_TEST_RUN_ID = (() => {
+  const envId =
+    process.env.PW_TEST_RUN_ID ??
+    process.env.GITHUB_RUN_ID ??
+    process.env.CI_PIPELINE_ID;
+
+  if (envId) {
+    const normalized = normalizeRunId(envId);
+    if (normalized.length > 0) {
+      return normalized;
+    }
+  }
+
+  return randomUUID().replaceAll("-", "").slice(0, 10);
+})();
+
+export const getReportTestRunId = (): string => REPORT_TEST_RUN_ID;
+
 export const createRunId = (): string =>
   randomUUID().replaceAll("-", "").slice(0, 10);
 
-export const createUniqueAorValue = (runId: string = createRunId()): string =>
-  `AOR ${runId}`;
-
 export const createUniqueGeneralInfoFields = (
-  runId: string = createRunId()
+  runId: string = getReportTestRunId()
 ): GeneralInfoField[] =>
   GENERAL_INFO_FIELDS.map(({ label }) => {
     if (label === AOR_NAME_LABEL) {
-      return { label, value: createUniqueAorValue(runId) };
+      return { label, value: `AOR Name ${runId}` };
     }
 
     if (label === AOR_EMAIL_LABEL) {
@@ -71,6 +94,35 @@ export const createUniqueGeneralInfoFields = (
 
     return { label, value: `General Info ${runId}` };
   });
+
+const toSixDigitNumber = (seed: string): string => {
+  let hash = 0;
+  for (const char of seed) {
+    const codePoint = char.codePointAt(0) ?? 0;
+    hash = (hash * 31 + codePoint) % 1000000;
+  }
+
+  return String(hash).padStart(6, "0");
+};
+
+export const createRunScopedInitiativeValues = (
+  scope: string,
+  runId: string = getReportTestRunId()
+): {
+  initiativeNumber: string;
+  initiativeName: string;
+  expectedDisplayName: string;
+} => {
+  const seed = `${runId}-${scope}`;
+  const initiativeNumber = toSixDigitNumber(seed);
+  const initiativeName = `Initiative ${seed}`;
+
+  return {
+    initiativeNumber,
+    initiativeName,
+    expectedDisplayName: `${initiativeNumber}: ${initiativeName}`,
+  };
+};
 
 export const editGeneralInformationFields = async (
   editor: ReportEditorPage,
@@ -93,6 +145,13 @@ export const editGeneralInformationFields = async (
 type AutosaveRefreshOptions = {
   timeoutMs?: number;
   fallbackSectionId?: string;
+};
+
+type UploadViaDialogOptions = {
+  filePath: string;
+  fileInputSelector?: string;
+  expectedFileName?: string | RegExp;
+  timeoutMs?: number;
 };
 
 export const waitForAutosaveWithSectionRefresh = async (
@@ -130,25 +189,33 @@ export const waitForAutosaveWithSectionRefresh = async (
   return waitForAutosaveVisible();
 };
 
-export const requireAutosaveWithSectionRefresh = async (
-  editor: ReportEditorPage,
-  sectionId: string,
-  failureReason: string,
-  options: AutosaveRefreshOptions = {}
-): Promise<void> => {
-  const autosaved = await waitForAutosaveWithSectionRefresh(
-    editor,
-    sectionId,
-    options
-  );
-
-  expect(autosaved, failureReason).toBeTruthy();
-};
-
 export const confirmAutosaveIndicatorIsVisible = async (
   editor: ReportEditorPage
 ): Promise<void> => {
   await expect(editor.saveStatusText).toBeVisible({
     timeout: TIMEOUT_AUTOSAVE,
   });
+};
+
+export const uploadFileViaDialog = async (
+  page: Page,
+  options: UploadViaDialogOptions
+): Promise<void> => {
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible({ timeout: options.timeoutMs });
+
+  await dialog
+    .locator(options.fileInputSelector ?? "input[type='file']")
+    .setInputFiles(options.filePath);
+
+  if (options.expectedFileName) {
+    await expect(dialog.getByText(options.expectedFileName)).toBeVisible({
+      timeout: options.timeoutMs,
+    });
+  }
+
+  const doneButton = dialog.getByRole("button", { name: /^Done$/i });
+  await expect(doneButton).toBeVisible({ timeout: options.timeoutMs });
+  await doneButton.click();
+  await expect(dialog).toBeHidden({ timeout: options.timeoutMs });
 };
