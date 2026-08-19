@@ -179,10 +179,12 @@ export const ObligatedAndSpentFundsAttachmentElementExport = (
   element: ObligatedAndSpentFundsAttachmentTemplate
 ) => {
   if (element.answer && element.answer.length > 0) {
+    const label = element.answer[0].label;
     const name = element.answer[0].name;
     const size = element.answer[0].size;
     return (
       <Stack>
+        <Box fontWeight="bold">{label}</Box>
         <Box>{name}</Box>
         <Box color="gray">{bytesToKiloBytes(size)} KB</Box>
       </Stack>

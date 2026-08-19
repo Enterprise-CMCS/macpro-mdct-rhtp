@@ -24,12 +24,13 @@ export const renderExpandedAnswers = (element: PageElement) => {
   switch (element.type) {
     case ElementType.ListInput:
     case ElementType.AttachmentArea:
+    case ElementType.ObligatedAndSpentFundsAttachment:
       return element.answer?.map(
         (item, index) =>
           ({
             type: element.type,
             label: `${element.label}  ${index + 1}`,
-            helperText: element.helperText,
+            helperText: "helperText" in element ? element.helperText : "",
             answer: [item],
           }) as any
       );
@@ -77,7 +78,10 @@ export const ExportedReportWrapper = ({ section }: Props) => {
           expandedElements.push(...childElements);
         }
         return expandedElements;
-      } else if (element.type === ElementType.AttachmentArea) {
+      } else if (
+        element.type === ElementType.AttachmentArea ||
+        element.type === ElementType.ObligatedAndSpentFundsAttachment
+      ) {
         //expand attachments that are outside an accordion
         return renderExpandedAnswers(element);
       } else {
