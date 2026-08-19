@@ -411,7 +411,7 @@ export const elementObject: {
     pdfVariants: [<ExportedReportWrapper section={listFieldSection} />],
   },
   [ElementType.AttachmentArea]: {
-    description: "",
+    description: "An area for uploading files.",
     id: "id-attachment",
     variants: [
       <AttachmentArea
@@ -421,13 +421,21 @@ export const elementObject: {
           id: "id-attachment",
           label: "label",
           required: true,
+          answer: [
+            {
+              name: "mock-file.txt",
+              size: 100,
+              fileId: "mock-id",
+            },
+          ],
         }}
       ></AttachmentArea>,
     ],
     pdfVariants: [<ExportedReportWrapper section={attachmentAreaSection} />],
   },
   [ElementType.TableCheckpoint]: {
-    description: "",
+    description:
+      "All the checkpoints table that are used in the initiative pages.",
     id: "id-table-checkpoint",
     variants: [
       <TableCheckpoint
@@ -446,7 +454,8 @@ export const elementObject: {
     pdfVariants: [<ExportedReportWrapper section={tableCheckpointSection} />],
   },
   [ElementType.AccordionGroup]: {
-    description: "",
+    description:
+      "Accordion groups that can have an array of fields inside the accordion",
     id: "id-accordion-group",
     variants: [
       <AccordionGroup
@@ -485,19 +494,9 @@ export const elementObject: {
     pdfVariants: [<ExportedReportWrapper section={accordionGroupSection} />],
   },
   [ElementType.ObligatedAndSpentFundsAttachment]: {
-    description: "",
+    description: "A page specific element, used for uploading budget reports.",
     id: "id-funds-attachment",
     variants: [
-      <ObligatedAndSpentFundsAttachmentElement
-        element={{
-          type: ElementType.ObligatedAndSpentFundsAttachment,
-          id: "id-obligated-spent-funds",
-          label: "Obligated And Spend",
-          answer: [],
-          required: false,
-        }}
-        updateElement={logNewElement}
-      ></ObligatedAndSpentFundsAttachmentElement>,
       <ObligatedAndSpentFundsAttachmentElement
         element={{
           type: ElementType.ObligatedAndSpentFundsAttachment,
@@ -520,7 +519,8 @@ export const elementObject: {
     ],
   },
   [ElementType.ActionTable]: {
-    description: "",
+    description:
+      "Generic table that has a the ability to add more columns if you're an admin user",
     id: "id-action-table",
     variants: [
       <ActionTable
@@ -553,9 +553,14 @@ export const elementObject: {
           ],
           answer: [
             [
+              { id: "row-1", value: "1" },
+              { id: "row-2", value: "textbox 1" },
+              { id: "row-3", value: "01/01/2021" },
+            ],
+            [
               { id: "row-1", value: "2" },
-              { id: "row-2", value: "" },
-              { id: "row-3", value: "" },
+              { id: "row-2", value: "textbox 2" },
+              { id: "row-3", value: "02/02/2022" },
             ],
           ],
           required: true,
@@ -566,7 +571,8 @@ export const elementObject: {
     pdfVariants: [<ExportedReportWrapper section={actionTableSection} />],
   },
   [ElementType.AttachmentTable]: {
-    description: "",
+    description:
+      "A table that tracks all the attachments that's been uploading in the initiatives pages.",
     id: "id-attachment-table",
     variants: [
       <AttachmentTable
@@ -593,13 +599,14 @@ export const elementObject: {
     pdfVariants: ["Attachment Table currently not used in PDFs"],
   },
   [ElementType.RequestFeedbackButton]: {
-    description: "",
-    id: "id-submit-for-review",
+    description: "A field that allows the user to send comments to the CMS PO.",
+    id: "id-request-feedback-button",
     variants: [<RequestFeedbackButton></RequestFeedbackButton>],
     pdfVariants: ["Request Feedback button currently not used in PDFs"],
   },
   [ElementType.InitiativesTable]: {
-    description: "",
+    description:
+      "A table listing all the avaliable Initiatives that the user can edit.",
     id: "id-initiative-table",
     variants: [
       <InitiativesTable

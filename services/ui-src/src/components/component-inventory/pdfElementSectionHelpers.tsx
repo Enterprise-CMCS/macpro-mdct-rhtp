@@ -116,6 +116,13 @@ export const attachmentAreaSection: FormPageTemplate = {
       id: "id-attachment",
       label: "label",
       required: true,
+      answer: [
+        {
+          name: "mock-file.txt",
+          size: 100,
+          fileId: "mock-id",
+        },
+      ],
     },
   ],
 };
@@ -174,7 +181,13 @@ export const obligatedAndSpentFundsSection: FormPageTemplate = {
       type: ElementType.ObligatedAndSpentFundsAttachment,
       id: "id-obligated-spent-funds",
       label: "Obligated And Spend",
-      answer: [],
+      answer: [
+        {
+          fileId: "mock-file-id",
+          name: "mock file",
+          size: 100,
+        },
+      ],
       required: false,
     },
   ],
