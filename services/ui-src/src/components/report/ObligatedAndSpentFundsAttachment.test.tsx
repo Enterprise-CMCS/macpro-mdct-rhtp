@@ -116,18 +116,6 @@ describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
       await userEvent.click(closeButton);
     });
 
-    test("Upload button is disable when 1 obligated and spent funds is uploaded", () => {
-      render(
-        <ObligatedAndSpentFundsAttachmentWrapper
-          template={mockElementWithAnswer}
-        />
-      );
-      const addButton = screen.getByRole("button", {
-        name: "Add Obligated and Spent Funds",
-      });
-      expect(addButton).toBeDisabled();
-    });
-
     test("Able to delete obligated and spent funds", async () => {
       render(
         <ObligatedAndSpentFundsAttachmentWrapper

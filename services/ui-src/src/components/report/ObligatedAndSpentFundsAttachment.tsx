@@ -3,6 +3,7 @@ import {
   AlertTypes,
   UploadListProp,
   ObligatedAndSpentFundsAttachmentTemplate,
+  dropdownEmptyOption,
 } from "@rhtp/shared";
 import { PageElementProps } from "./Elements";
 import { Fragment, useState } from "react";
@@ -18,7 +19,7 @@ import {
 } from "utils/other/fileUtils";
 import { Modal } from "components/modals/Modal";
 import { Alert } from "components/alerts/Alert";
-import { budgetPeriodFilterOptions, notAnsweredText } from "../../constants";
+import { budgetPeriodOptions, notAnsweredText } from "../../constants";
 
 export const ObligatedAndSpentFundsAttachmentElement = (
   props: PageElementProps<ObligatedAndSpentFundsAttachmentTemplate>
@@ -31,10 +32,15 @@ export const ObligatedAndSpentFundsAttachmentElement = (
   const { answer, label } = element;
   const files = answer ?? [];
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
+
+  const budgetPeriodDropdownOptions = [
+    dropdownEmptyOption,
+    ...budgetPeriodOptions,
+  ];
   const [budgetPeriod, setBudgetPeriod] = useState<string>("");
 
   const saveToReport = (newFiles: UploadListProp[]) => {
-    const selectedBudget = budgetPeriodFilterOptions.find(
+    const selectedBudget = budgetPeriodDropdownOptions.find(
       (opt) => opt.value == budgetPeriod
     );
     const modifiedFiles = newFiles.map((file) => ({
@@ -66,7 +72,7 @@ export const ObligatedAndSpentFundsAttachmentElement = (
   };
 
   const getNotification = () => {
-    const selectedBudget = budgetPeriodFilterOptions.find(
+    const selectedBudget = budgetPeriodDropdownOptions.find(
       (opt) => opt.value == budgetPeriod
     );
     const instruction =
@@ -103,6 +109,7 @@ export const ObligatedAndSpentFundsAttachmentElement = (
           isOpen: modalOpen,
           onClose: () => {
             setModalOpen(false);
+            setBudgetPeriod("");
           },
         }}
         selections={
@@ -111,7 +118,7 @@ export const ObligatedAndSpentFundsAttachmentElement = (
             label="Filter by Budget Period"
             value={budgetPeriod}
             onChange={handleBudgetPeriodChange}
-            options={budgetPeriodFilterOptions}
+            options={budgetPeriodDropdownOptions}
           />
         }
         modalHeading={"Add Obligated and Spent Funds"}
