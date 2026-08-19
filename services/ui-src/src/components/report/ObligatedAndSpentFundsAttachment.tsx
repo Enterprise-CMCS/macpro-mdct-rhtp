@@ -124,8 +124,8 @@ export const ObligatedAndSpentFundsAttachmentElement = (
         modalHeading={"Add Obligated and Spent Funds"}
         answer={files}
         saveToReport={saveToReport}
-        deleteFromReport={onRemove}
         notification={getNotification()}
+        disabled={budgetPeriod === ""}
       ></UploadDrawer>
       {files.length > 0 && (
         <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">

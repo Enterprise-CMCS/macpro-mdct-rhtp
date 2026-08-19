@@ -98,12 +98,15 @@ describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
       render(
         <ObligatedAndSpentFundsAttachmentWrapper template={mockedElement} />
       );
-
       const addButton = screen.getByRole("button", {
         name: "Add Obligated and Spent Funds",
       });
+      const dropdown = screen.getAllByLabelText("Filter by Budget Period")[0];
+      await userEvent.selectOptions(dropdown, "Budget Period2");
       await userEvent.click(addButton);
-      expect(screen.getByText("Select a file to upload")).toBeVisible();
+      expect(
+        screen.getByText("Select a file or files to upload")
+      ).toBeVisible();
       const dropArea = screen.getByLabelText("file drop area");
       await act(async () => {
         fireEvent.drop(dropArea, {
