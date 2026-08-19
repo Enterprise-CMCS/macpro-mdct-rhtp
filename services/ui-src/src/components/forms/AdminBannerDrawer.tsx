@@ -206,7 +206,7 @@ export const AdminBannerDrawer = ({
       <div>
         Formatting is supported with these HTML tags:
         <ul>
-          <li>&lt;string&gt;</li>
+          <li>&lt;strong&gt;</li>
           <li>&lt;em&gt;</li>
           <li>&lt;p&gt;</li>
           <li>&lt;ul&gt;</li>
