@@ -435,6 +435,10 @@ export const elementObject: {
           type: ElementType.TableCheckpoint,
           id: "id-table-checkpoint",
           required: true,
+          answer: [
+            { id: "planning-1", checked: true },
+            { id: "midway-imp-1", checked: true },
+          ],
         }}
         updateElement={logNewElement}
       ></TableCheckpoint>,

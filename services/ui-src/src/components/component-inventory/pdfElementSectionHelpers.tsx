@@ -1,4 +1,9 @@
-import { ElementType, FormPageTemplate, PageType } from "@rhtp/shared";
+import {
+  ElementType,
+  FormPageTemplate,
+  PageType,
+  TableCheckpointTemplate,
+} from "@rhtp/shared";
 
 export const textboxSection: FormPageTemplate = {
   id: "mock-textbox-id",
@@ -124,7 +129,12 @@ export const tableCheckpointSection: FormPageTemplate = {
       type: ElementType.TableCheckpoint,
       id: "id-table-checkpoint",
       required: true,
-    },
+      answer: [
+        { id: "planning-1", checked: true },
+        { id: "midway-imp-1", checked: true },
+      ],
+      initId: "1",
+    } as TableCheckpointTemplate & { initId: string },
   ],
 };
 
