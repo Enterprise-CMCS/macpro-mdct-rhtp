@@ -69,7 +69,7 @@ const REPORT_TEST_RUN_ID = (() => {
 
 export const getReportTestRunId = (): string => REPORT_TEST_RUN_ID;
 
-export const createRunId = (): string =>
+export const createArtifactId = (): string =>
   randomUUID().replaceAll("-", "").slice(0, 10);
 
 export const createUniqueGeneralInfoFields = (
