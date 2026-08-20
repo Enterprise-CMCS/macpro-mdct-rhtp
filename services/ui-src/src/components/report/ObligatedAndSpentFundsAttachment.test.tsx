@@ -102,7 +102,9 @@ describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
         name: "Add Obligated and Spent Funds",
       });
       await userEvent.click(addButton);
-      const dropdown = screen.getAllByLabelText("Filter by Budget Period")[0];
+      const dropdown = screen.getAllByLabelText(
+        "Which budget period does this document apply to?"
+      )[0];
       await userEvent.selectOptions(dropdown, "Budget Period 2");
       await userEvent.click(addButton);
       expect(
