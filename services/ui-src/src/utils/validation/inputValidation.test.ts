@@ -3,6 +3,7 @@ import {
   isUrl,
   magicNumberMask,
   makeEmptyStringCopyOf,
+  numberNAMask,
   validateDate,
   validateNumber,
 } from "./inputValidation";
@@ -172,22 +173,6 @@ describe("Input validation utilities", () => {
       expect(isUrl(undefined)).toBe(false);
     });
 
-    describe("magicNumberMask()", () => {
-      test.each([
-        { input: "1000", expected: "1,000" },
-        { input: "$1000", expected: "$1,000" },
-        { input: "100000", expected: "100,000" },
-      ])("formats '$input' as '$expected'", ({ input, expected }) => {
-        expect(magicNumberMask(input)).toBe(expected);
-      });
-
-      test.each([
-        { input: "1000%", expected: "1000%" },
-        { input: "N/A", expected: "N/A" },
-      ])("does not add commas to '$input'", ({ input, expected }) => {
-        expect(magicNumberMask(input)).toBe(expected);
-      });
-    });
     test("should reject the empty string", () => {
       expect(isUrl("")).toBe(false);
     });
@@ -234,6 +219,43 @@ describe("Input validation utilities", () => {
       { input: "totally-plausible/email.3@test.coforma.io" },
     ])("should accept the string '$input'", ({ input }) => {
       expect(isEmail(input)).toBe(true);
+    });
+  });
+
+  describe("magicNumberMask()", () => {
+    test.each([
+      { input: "1000", expected: "1,000" },
+      { input: "1000.123", expected: "1,000.123" },
+      { input: "-1000.123", expected: "-1,000.123" },
+      { input: "$1000", expected: "$1,000" },
+      { input: "100000", expected: "100,000" },
+      { input: "100000%", expected: "100000%" },
+      { input: "n/a", expected: "N/A" },
+      { input: "0", expected: "0" },
+      { input: "abc", expected: "" },
+    ])("formats '$input' as '$expected'", ({ input, expected }) => {
+      expect(magicNumberMask(input)).toBe(expected);
+    });
+
+    test.each([
+      { input: "1000%", expected: "1000%" },
+      { input: "N/A", expected: "N/A" },
+    ])("does not add commas to '$input'", ({ input, expected }) => {
+      expect(magicNumberMask(input)).toBe(expected);
+    });
+  });
+
+  describe("numberNAMask()", () => {
+    test.each([
+      { input: "1000", expected: "1,000" },
+      { input: "1000.123", expected: "1,000.123" },
+      { input: "-1000.123", expected: "-1,000.123" },
+      { input: "100000", expected: "100,000" },
+      { input: "n/a", expected: "N/A" },
+      { input: "0", expected: "0" },
+      { input: "abc", expected: "" },
+    ])("formats '$input' as '$expected'", ({ input, expected }) => {
+      expect(numberNAMask(input)).toBe(expected);
     });
   });
 });
