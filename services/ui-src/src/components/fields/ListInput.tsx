@@ -79,9 +79,7 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
 
   return (
     <fieldset key="list-input-field">
-      <Label component={"legend"} fieldId={id}>
-        {optionalTag(element)}
-      </Label>
+      <Label component={"legend"}>{optionalTag(element)}</Label>
       <Hint id={id}>{helperText}</Hint>
       {displayValue.map((field, index) => (
         <HStack
