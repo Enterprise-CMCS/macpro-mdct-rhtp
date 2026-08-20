@@ -102,16 +102,14 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
             onClick={() => onRemoveHandler(index)}
             disabled={isDisabled()}
             aria-label={`Remove ${field}`}
-            leftIcon={<Image src={cancelPrimary} alt="Remove icon" />}
+            leftIcon={<Image src={cancelPrimary} alt="Remove" />}
           />
         </HStack>
       ))}
       <Button
         mt="spacer2"
         variant="outline"
-        leftIcon={
-          <Image src={isDisabled() ? addGray : addPrimary} alt="Add icon" />
-        }
+        leftIcon={<Image src={isDisabled() ? addGray : addPrimary} alt="Add" />}
         onClick={onAddHandler}
         disabled={isDisabled()}
       >

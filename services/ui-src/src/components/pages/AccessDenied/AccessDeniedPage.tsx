@@ -6,7 +6,7 @@ export const AccessDeniedPage = () => {
   return (
     <PageTemplate sxOverride={sx.layout}>
       <Flex sx={sx.heading}>
-        <Image src={warningIcon} alt="warning icon" sx={sx.warningIcon} />
+        <Image src={warningIcon} alt="warning" sx={sx.warningIcon} />
         <Heading as="h1" variant="h1">
           Access Denied
         </Heading>
