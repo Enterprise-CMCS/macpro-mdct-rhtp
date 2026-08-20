@@ -51,6 +51,7 @@ export const buildElement = (
           element={
             {
               ...element,
+              label: label ?? "textbox",
               answer: defaultValue,
               skipOptionalTag: true,
             } as TextboxTemplate

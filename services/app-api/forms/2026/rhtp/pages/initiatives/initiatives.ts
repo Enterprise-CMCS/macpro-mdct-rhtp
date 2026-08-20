@@ -3,7 +3,6 @@ import {
   ButtonLinkTemplate,
   ElementType,
   HeaderTemplate,
-  NumberFieldTemplate,
   PageStatus,
   PageType,
   ParagraphTemplate,

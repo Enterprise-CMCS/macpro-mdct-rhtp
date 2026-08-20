@@ -56,7 +56,7 @@ describe("Test tableBuilder functions", () => {
     });
     test("Textbox triggers onChange", async () => {
       const textbox = screen.getByRole("textbox", {
-        name: "Mock Textbox(optional)",
+        name: "Mock Textbox",
       });
       await userEvent.type(textbox, "mock");
       await userEvent.tab();
@@ -79,7 +79,7 @@ describe("Test tableBuilder functions", () => {
       render(<StatefulMaskedTextbox />);
 
       const input = screen.getByRole("textbox", {
-        name: "Masked textbox(optional)",
+        name: "Masked textbox",
       });
       await userEvent.type(input, "1234");
       expect(input).toHaveValue("1234");
