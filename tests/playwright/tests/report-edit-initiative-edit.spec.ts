@@ -56,8 +56,12 @@ const verifyTableHeaders = async (
 };
 
 const verifyMetricsTableHeaders = async (table: Locator): Promise<boolean> => {
-  const headerCount = await table.getByRole("columnheader").count();
-  const hasPreviousValueColumn = headerCount === 7;
+  const previousAnnualValueHeader = table.getByRole("columnheader", {
+    name: /^Previous annual value$/i,
+  });
+  const hasPreviousValueColumn = await previousAnnualValueHeader
+    .isVisible()
+    .catch(() => false);
   const expectedHeaders = [
     "#",
     "Status",
