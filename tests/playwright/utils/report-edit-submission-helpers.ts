@@ -305,7 +305,7 @@ const completeObligatedAndSpentFundsForSubmission = async (
     .locator("input[type='file']#file-input")
     .setInputFiles(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH);
   await expect(
-    uploadDialog.getByText("obligated-and-spent-funds.csv")
+    uploadDialog.getByRole("button", { name: "obligated-and-spent-funds.csv" })
   ).toBeVisible();
 
   await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
