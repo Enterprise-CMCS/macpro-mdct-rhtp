@@ -115,7 +115,7 @@ export const ObligatedAndSpentFundsAttachmentElement = (
         selections={
           <CmsdsDropdownField
             name="budgetPeriodFilter"
-            label="Filter by Budget Period"
+            label="Which budget period does this document apply to?"
             value={budgetPeriod}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodDropdownOptions}
