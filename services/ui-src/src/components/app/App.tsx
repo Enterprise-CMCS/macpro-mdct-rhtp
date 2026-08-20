@@ -56,7 +56,7 @@ export const App = () => {
       {!user && showLocalLogins && (
         <>
           <SkipNav />
-          <main>
+          <main id="main-content" tabIndex={-1} style={sx.loginMain}>
             <Container sx={sx.appContainer}>
               <Heading as="h1" fontSize="heading_3xl" variant="login">
                 RHTP
@@ -108,5 +108,8 @@ const sx = {
     maxWidth: "25rem",
     height: "full",
     marginY: "auto",
+  },
+  loginMain: {
+    display: "block",
   },
 };
