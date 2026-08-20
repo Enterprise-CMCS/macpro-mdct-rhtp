@@ -101,8 +101,9 @@ describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
       const addButton = screen.getByRole("button", {
         name: "Add Obligated and Spent Funds",
       });
+      await userEvent.click(addButton);
       const dropdown = screen.getAllByLabelText("Filter by Budget Period")[0];
-      await userEvent.selectOptions(dropdown, "Budget Period2");
+      await userEvent.selectOptions(dropdown, "Budget Period 2");
       await userEvent.click(addButton);
       expect(
         screen.getByText("Select a file or files to upload")
