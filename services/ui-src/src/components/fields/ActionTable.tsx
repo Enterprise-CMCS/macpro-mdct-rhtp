@@ -127,13 +127,13 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
-  const initialErrorMessages = answer?.map(
-    (row) => new Map<string, string>(row.map((item) => [item.id, ""]))
-  );
-
   const [errorMessages, setErrorMessages] = useState<
     Array<Map<string, string>>
-  >(initialErrorMessages ?? []);
+  >(
+    answer?.map(
+      (row) => new Map<string, string>(row.map((item) => [item.id, ""]))
+    ) ?? []
+  );
 
   const formatAnswers = (
     data: ActionAnswerShape,
