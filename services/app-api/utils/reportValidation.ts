@@ -76,6 +76,7 @@ const inputElementSchema = {
   disabled: boolean().notRequired(),
   onlyCmsAdminCanEdit: boolean().notRequired(),
   cmsAdminCanEditInSubmitted: boolean().notRequired(),
+  skipOptionalTag: boolean().notRequired(),
 };
 
 const textboxTemplateSchema = object().shape({
@@ -83,6 +84,7 @@ const textboxTemplateSchema = object().shape({
   ...inputElementSchema,
   answer: string().notRequired(),
   hideCondition: hideConditionSchema,
+  mask: string().notRequired(),
 });
 
 const listInputTemplateSchema = object().shape({

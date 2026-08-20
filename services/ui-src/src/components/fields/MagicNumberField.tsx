@@ -34,7 +34,7 @@ const magicNumberMask = (value: string | number = "", _valueOnly = false) => {
       formattedValue = `-${formattedValue}`;
     }
   }
-  console.log("magic number format", formattedValue);
+
   return formattedValue;
 };
 

@@ -138,6 +138,8 @@ export const maskByType = (type: MaskType, value: any) => {
       return commaSeparatedMask(value);
     case MaskType.MagicNumber:
       return magicNumberMask(value);
+    case MaskType.NumberNA:
+      return numberNAMask(value);
     default:
       return value;
   }
@@ -148,6 +150,8 @@ export const unmaskByType = (type: MaskType, value: any) => {
     case MaskType.CommaSeparated:
       return parseNumber(stringifyInput(value));
     case MaskType.MagicNumber:
+      return value;
+    case MaskType.NumberNA:
       return value;
     default:
       return value;
@@ -179,8 +183,11 @@ export const commaSeparatedMask = (value: string | number) => {
   return sign + intFormat.format(Math.abs(intNum)) + decPart;
 };
 
+/**
+ * A mask that accepts bare numbers, dollar amounts, percentages, and "N/A"
+ * Also adds commas as thousands separators to numbers and dollar amounts.
+ */
 export const magicNumberMask = (value = "") => {
-  console.log("rawValue", value);
   const rawValue = String(value);
   let formattedValue = "";
   let numericValue = undefined;
@@ -201,15 +208,45 @@ export const magicNumberMask = (value = "") => {
     if (hasPercent) {
       formattedValue = `${numericValue}%`;
     } else if (hasDollar) {
-      formattedValue = `$${numericValue}`;
+      formattedValue = `$${commaSeparatedMask(numericValue)}`;
     } else {
-      formattedValue = `${numericValue}`;
+      formattedValue = commaSeparatedMask(numericValue);
     }
 
     if (hasNegative) {
       formattedValue = `-${formattedValue}`;
     }
   }
-  console.log("magic number mask", formattedValue);
+
+  return formattedValue;
+};
+
+/**
+ * A mask that accepts bare numbers, and "N/A"
+ *  * Also adds commas as thousands separators
+ */
+export const numberNAMask = (value = "") => {
+  const rawValue = String(value);
+  let formattedValue = "";
+  let numericValue = undefined;
+
+  const hasDigits = /\d/.test(rawValue);
+  const startsWithN = rawValue.startsWith("N") || rawValue.startsWith("n");
+  const hasNegative = rawValue.includes("-");
+  const stripped = rawValue
+    .replaceAll(/[^\d\.]/g, "")
+    .match(/^(\d*\.?\d*)/)![1];
+  if (!hasDigits && startsWithN) {
+    formattedValue = "N/A";
+  } else if (hasDigits) {
+    numericValue = Number(stripped);
+
+    formattedValue = `${commaSeparatedMask(numericValue)}`;
+
+    if (hasNegative) {
+      formattedValue = `-${formattedValue}`;
+    }
+  }
+
   return formattedValue;
 };

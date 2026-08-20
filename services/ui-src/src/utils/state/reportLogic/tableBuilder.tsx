@@ -1,11 +1,12 @@
 import {
-  TextField,
+  TextField as CmsdsTextField,
   SingleInputDateField,
   Dropdown,
   DropdownOption,
 } from "@cmsgov/design-system";
+import { TextField as RhtpTextField } from "components";
 import { ErrorMessages } from "../../../constants";
-import { ActionElement, ElementType } from "@rhtp/shared";
+import { ActionElement, ElementType, TextboxTemplate } from "@rhtp/shared";
 import {
   parseNumber,
   validateDate,
@@ -44,9 +45,27 @@ export const buildElement = (
         />
       );
     case ElementType.Textbox:
+      return (
+        <RhtpTextField
+          key={`textbox-${label}`}
+          element={
+            {
+              ...element,
+              answer: defaultValue,
+              skipOptionalTag: true,
+            } as TextboxTemplate
+          }
+          updateElement={(updatedElement: Partial<TextboxTemplate>) => {
+            if (updatedElement.answer !== undefined) {
+              onChange([updatedElement.answer]);
+            }
+          }}
+          disabled={element.disabled}
+        />
+      );
     case ElementType.NumberField:
       return (
-        <TextField
+        <CmsdsTextField
           key={`textbox-${label}`}
           label={label}
           name={label ?? "textbox"}
@@ -65,7 +84,7 @@ export const buildElement = (
       );
     case ElementType.TextAreaField:
       return (
-        <TextField
+        <CmsdsTextField
           key={`textarea-${label}`}
           label={label}
           name={label ?? "textarea"}

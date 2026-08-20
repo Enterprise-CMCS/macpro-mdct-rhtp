@@ -12,6 +12,7 @@ import {
   TextAreaBoxTemplate,
   MaskType,
   AccordionTemplate,
+  TextboxTemplate,
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
 
@@ -117,11 +118,11 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   charLimit: 2000,
 });
 
-const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
-  type: ElementType.NumberField,
+const initiativeNumberOfPeopleServed: TextboxTemplate = {
+  type: ElementType.Textbox,
   id: "initiative-number-of-people-served",
   label: "Number of people served",
-  mask: MaskType.CommaSeparated,
+  mask: MaskType.NumberNA,
   helperText: "Number of People Served is only reported annually.",
   helperTextLink: {
     link: "Reporting Guidelines",
@@ -177,7 +178,7 @@ export const metricTable = (
           label: "What is the target for this metric?",
           type: ElementType.Textbox,
           required: false,
-          mask: MaskType.CommaSeparated,
+          mask: MaskType.MagicNumber,
         },
         {
           id: "currValue",
@@ -202,20 +203,20 @@ export const metricTable = (
         id: "target",
         header: "Target",
         type: ElementType.Paragraph,
-        mask: MaskType.CommaSeparated,
+        mask: MaskType.MagicNumber,
       },
       {
         id: "prevValue",
         header: "Previous value",
         type: ElementType.Textbox,
         disabled: true,
-        mask: MaskType.CommaSeparated,
+        mask: MaskType.MagicNumber,
       },
       {
         id: "currValue",
         header: "Current value",
         type: ElementType.Textbox,
-        mask: MaskType.CommaSeparated,
+        mask: MaskType.MagicNumber,
       },
       { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },
     ],

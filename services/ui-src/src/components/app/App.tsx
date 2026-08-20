@@ -29,8 +29,8 @@ export const App = () => {
     id: "id-number-field-required",
     label: "NumberField from components",
     required: false,
-    // mask: MaskType.MagicNumber,
-    mask: MaskType.CommaSeparated,
+    mask: MaskType.MagicNumber,
+    // mask: MaskType.CommaSeparated,
   });
 
   //there are now two export pages due to the addition of the obligated and spent funds export zip
