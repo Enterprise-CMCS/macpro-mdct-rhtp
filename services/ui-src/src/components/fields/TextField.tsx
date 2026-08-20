@@ -100,7 +100,16 @@ export const TextField = (
   const onBlurHandler = () => {
     // When the user is done typing, overwrite the answer with the parsed value.
     setHasFocus(false);
-    setDisplayValue(stringifyAnswer(textbox.answer));
+    // Need to save the masked value to the store if the textbox has a mask
+    if (textbox.type === ElementType.Textbox && textbox.mask) {
+      const updateElement = (props as PageElementProps<TextboxTemplate>)
+        .updateElement;
+      const maskedAnswer = maskByType(textbox.mask, displayValue);
+      updateElement({ answer: maskedAnswer });
+      setDisplayValue(maskedAnswer);
+    } else {
+      setDisplayValue(stringifyAnswer(textbox.answer));
+    }
     if (!textbox.answer && textbox.required) {
       setErrorMessage(ErrorMessages.requiredResponse);
     }
