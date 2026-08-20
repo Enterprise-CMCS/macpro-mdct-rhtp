@@ -163,9 +163,9 @@ export const metricTable = (
     heading: "Track Initiative Performance Metrics",
     label: "Metric",
     helperText:
-      "<p>The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metric values are only required to be reported annually. Any value reported on a Quarterly Report will be pre-populated but editable for the remainder of the Program Year. Contact your Project Officer if the metrics listed are incorrect.</p><br>" +
-      "<p>Additionally, <b>“As of Date”</b> is NOT today's date. This must be the historical date on which the metric value was either extracted from a database or calculated by the State. This value should not be updated until the metric value is updated or the previous value is confirmed by subsequent analysis.</p><br>" +
-      "<p>Current Values: Enter a number, currency (e.g., $100), percentage (e.g., 50%), or N/A if no data. <b>Invalid entries will automatically clear.</p>",
+      "The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metric values are only required to be reported annually. Any value reported on a Quarterly Report will be pre-populated but editable for the remainder of the Program Year. Contact your Project Officer if the metrics listed are incorrect.<br>" +
+      "Additionally, <b>“As of Date”</b> is NOT today's date. This must be the historical date on which the metric value was either extracted from a database or calculated by the State. This value should not be updated until the metric value is updated or the previous value is confirmed by subsequent analysis.<br>" +
+      "Current Values: Enter a number, currency (e.g., $100), percentage (e.g., 50%), or N/A if no data. <b>Invalid entries will automatically clear.",
     quarterly: true,
     modal: {
       title: "Metric",
