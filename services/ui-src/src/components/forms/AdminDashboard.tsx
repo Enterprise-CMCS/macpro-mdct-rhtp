@@ -385,7 +385,7 @@ export const AdminDashboard = () => {
           />
           <CmsdsDropdownField
             name="budgetPeriodFilter"
-            label="Budget Period"
+            label="Filter by Budget Period"
             value={budgetValue}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodFilterOptions}

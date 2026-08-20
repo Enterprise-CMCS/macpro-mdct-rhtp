@@ -71,6 +71,19 @@ export const optionalInQuarterly = [
   "metrics-table",
 ];
 
+export const cmsStatusThatLocksSPAC = [
+  "Commitment abandoned",
+  "Implemented",
+  "Commitment fulfilled",
+];
+
+export const SPACItemsThatLock = [
+  "commitment-status",
+  "commitment-support-paragraph",
+  "commitment-links",
+  "commitment-attachments",
+];
+
 export const acceptedFileTypes = [
   ".bmp",
   ".txt",

@@ -29,6 +29,14 @@ import {
 } from "@rhtp/shared";
 import { error } from "./constants";
 
+const helperTextLinkSchema = object()
+  .shape({
+    link: string(),
+    label: string(),
+    text: string(),
+  })
+  .notRequired();
+
 const hideConditionSchema = object()
   .shape({
     controllerElementId: string().required(),
@@ -58,19 +66,14 @@ const paragraphTemplateSchema = object().shape({
   text: string().required(),
   title: string().notRequired(),
   style: string().notRequired(),
+  helperTextLink: helperTextLinkSchema,
 });
 
 const inputElementSchema = {
   id: string().required(),
   label: string().required(),
   helperText: string().notRequired(),
-  helperTextLink: object()
-    .shape({
-      link: string(),
-      label: string(),
-      text: string(),
-    })
-    .notRequired(),
+  helperTextLink: helperTextLinkSchema,
   required: boolean().required(),
   quarterly: boolean().notRequired(),
   disabled: boolean().notRequired(),
@@ -323,9 +326,8 @@ const ActionElementsSchema = {
 
 const actionTableSchema = object().shape({
   type: string().required().matches(new RegExp(ElementType.ActionTable)),
-  id: string().required(),
-  label: string().required(),
-  hintText: string().required(),
+  ...inputElementSchema,
+  heading: string().required(),
   modal: object()
     .shape({
       title: string().required(),
@@ -360,9 +362,6 @@ const actionTableSchema = object().shape({
     )
     .required(),
   answer: array().of(mixed()).notRequired(),
-  quarterly: boolean().notRequired(),
-  disabled: boolean().notRequired(),
-  required: boolean().required(),
 });
 
 const initiativesTableSchema = object().shape({

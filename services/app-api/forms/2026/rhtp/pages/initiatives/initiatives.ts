@@ -14,6 +14,7 @@ import {
   TextboxTemplate,
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
+import { initiativeAttachmentStatusInstructions } from "../initiative-attachments";
 
 type MetricData = {
   name: string;
@@ -94,7 +95,19 @@ const checkpointsInstructions: ParagraphTemplate = {
     "  <li>Add or remove attachments of evidentiary documentation.</li>" +
     "  <li>Select the checkbox when the checkpoint is complete and ready for CMS review.</li>" +
     "  <li>Leave comments for CMS, or respond to comments from them by attachment.</li>" +
-    "</ul>",
+    "</ul>" +
+    "<br>",
+  helperTextLink: {
+    link: "Understanding Your Initiative Attachments",
+    label: "Understanding Your Initiative Attachments",
+    text:
+      "<p>These are files uploaded directly inside individual stages/checkpoint to prove your team has hit specific milestones (such as an operational governance chart or a finalized project plan). These documents directly impact your upcoming annual performance score.</p></br>" +
+      "<p>Why do some checkpoints require a manual file upload while others do not?</p></br>" +
+      "<ul>" +
+      "  <li><b>State-Driven Milestones (Upload Required):</b>These require active verification from your state team. For milestones like Checkpoint 0.1 (Establish Governance) or Checkpoint 2.3 (Establish Metric Reporting Methodology), you must manually upload your local documentation so your Project Officer can evaluate it.</li>" +
+      "  <li><b>CMS-Driven Milestones (Locked / Automated Verification):</b>These checkpoints track formal federal review processes, such as Checkpoint 1.1 (CMS Approval of Project Plan) or Checkpoint 3.1 (CMS Approval of Updated Project Plan). Because verification depends on an internal administrative action by CMS, your State team cannot upload files here. Your Project Officer will verify your previous work to advance your score.</li>" +
+      "</ul>",
+  },
 };
 
 const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
@@ -122,7 +135,8 @@ const initiativeNumberOfPeopleServed: TextboxTemplate = {
   id: "initiative-number-of-people-served",
   label: "Number of people served",
   mask: MaskType.NumberNA,
-  helperText: "Number of People Served is only reported annually.",
+  helperText:
+    "Number of People Served is only reported annually. If this number is not applicable for the initiative, enter N/A.",
   helperTextLink: {
     link: "Reporting Guidelines",
     label: "Number of People Served",
@@ -146,9 +160,12 @@ export const metricTable = (
   const table: ActionTableTemplate = {
     type: ElementType.ActionTable,
     id: "metrics-table",
+    heading: "Track Initiative Performance Metrics",
     label: "Metric",
-    hintText:
-      "The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metrics are only reported annually. Contact your Project Officer if the metrics listed are incorrect. Note: Metrics are only reported annually.",
+    helperText:
+      "<p>The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metric values are only required to be reported annually. Any value reported on a Quarterly Report will be pre-populated but editable for the remainder of the Program Year. Contact your Project Officer if the metrics listed are incorrect.</p><br>" +
+      "<p>Additionally, <b>“As of Date”</b> is NOT today's date. This must be the historical date on which the metric value was either extracted from a database or calculated by the State. This value should not be updated until the metric value is updated or the previous value is confirmed by subsequent analysis.</p><br>" +
+      "<p>Current Values: Enter a number, currency (e.g., $100), percentage (e.g., 50%), or N/A if no data. <b>Invalid entries will automatically clear.</p>",
     quarterly: true,
     modal: {
       title: "Metric",
@@ -206,7 +223,7 @@ export const metricTable = (
       },
       {
         id: "prevValue",
-        header: "Previous value",
+        header: "Previous annual value",
         type: ElementType.Textbox,
         disabled: true,
         mask: MaskType.MagicNumber,
@@ -281,6 +298,7 @@ export const buildInitiativePages = (
         metricTable(metrics),
         checkpointsHeader,
         checkpointsInstructions,
+        initiativeAttachmentStatusInstructions,
         checkpointsTables,
         BackToInitiativesButton,
       ],

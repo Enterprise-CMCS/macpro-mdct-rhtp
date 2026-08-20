@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "./fixtures/base";
 import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange";
 import {
-  createRunId,
+  createArtifactId,
   GENERAL_INFORMATION_SECTION,
   getReportTestRunId,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
@@ -25,7 +25,7 @@ const createUniqueUploadFixture = async (): Promise<{
   fileName: string;
   filePath: string;
 }> => {
-  const fileName = `obligated-and-spent-funds-${getReportTestRunId()}-${createRunId()}.csv`;
+  const fileName = `obligated-and-spent-funds-${getReportTestRunId()}-${createArtifactId()}.csv`;
   const filePath = join(tmpdir(), fileName);
   await fs.copyFile(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH, filePath);
   return { fileName, filePath };
