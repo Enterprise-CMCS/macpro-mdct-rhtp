@@ -301,12 +301,17 @@ const completeObligatedAndSpentFundsForSubmission = async (
   const uploadDialog = editor.page.getByRole("dialog");
   await expect(uploadDialog).toBeVisible();
 
-  await uploadDialog
-    .locator("input[type='file']#file-input")
-    .setInputFiles(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH);
+  const fileInput = uploadDialog.locator('input[type="file"]');
+  await expect(fileInput).toBeEnabled();
+  await fileInput.setInputFiles(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH);
   await expect(
-    uploadDialog.getByText("obligated-and-spent-funds.csv")
-  ).toBeVisible();
+    uploadDialog.getByRole("heading", { name: /^Upload Status$/i })
+  ).toBeVisible({ timeout: TIMEOUT_UI });
+  await expect(
+    uploadDialog.getByText(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH, {
+      exact: true,
+    })
+  ).toBeVisible({ timeout: TIMEOUT_UI });
 
   await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
   await expect(uploadDialog).toBeHidden();
