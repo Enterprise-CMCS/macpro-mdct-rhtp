@@ -79,7 +79,9 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
 
   return (
     <fieldset key="list-input-field">
-      <Label fieldId={id}>{optionalTag(element)}</Label>
+      <Label component={"legend"} fieldId={id}>
+        {optionalTag(element)}
+      </Label>
       <Hint id={id}>{helperText}</Hint>
       {displayValue.map((field, index) => (
         <HStack
@@ -101,7 +103,7 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
             variant="unstyled"
             onClick={() => onRemoveHandler(index)}
             disabled={isDisabled()}
-            aria-label={`Remove ${field}`}
+            aria-label={`Remove ${fieldLabel} ${index + 1}`}
             leftIcon={<Image src={cancelPrimary} alt="Remove icon" />}
           />
         </HStack>
