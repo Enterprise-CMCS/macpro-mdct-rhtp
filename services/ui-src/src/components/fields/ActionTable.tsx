@@ -146,13 +146,13 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     index: number | undefined;
   }>({ data: initial, index: undefined });
 
+  const initialErrorMessages = answer?.map(
+    (row) => new Map<string, string>(row.map((item) => [item.id, ""]))
+  );
+
   const [errorMessages, setErrorMessages] = useState<
     Array<Map<string, string>>
-  >(
-    answer?.map(
-      (row) => new Map<string, string>(row.map((item) => [item.id, ""]))
-    ) ?? []
-  );
+  >(initialErrorMessages ?? []);
 
   const formatAnswers = (
     data: ActionAnswerShape,
@@ -217,6 +217,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const onSave = (data: ActionAnswerShape) => {
     const newData = formatAnswers(data, "modal");
     if (modalData.index === undefined) {
+      setErrorMessages([...errorMessages, new Map<string, string>()]);
       props.updateElement({ answer: [...(answer ?? []), newData] });
     } else {
       const newAnswer = [...answer!];
