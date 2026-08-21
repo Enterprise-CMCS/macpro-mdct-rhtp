@@ -88,7 +88,7 @@ export const ListInput = (props: PageElementProps<ListInputTemplate>) => {
           key={`list-item-stack-${index}`}
         >
           <TextField
-            autoFocus
+            autoFocus={true}
             key={`list-item-${index}`}
             name={`list-item-${index}`}
             label={`${fieldLabel} ${index + 1}`}
