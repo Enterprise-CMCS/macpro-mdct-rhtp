@@ -2,7 +2,8 @@
 
 // STATES
 const isProdEnv =
-  window.location.hostname === "mdctrhtp.cms.gov" ||
+  (typeof window !== "undefined" &&
+    window.location.hostname === "mdctrhtp.cms.gov") ||
   process?.env?.STAGE === "production";
 
 export const StateNames = {
