@@ -56,10 +56,10 @@ const verifyTableHeaders = async (
 };
 
 const verifyMetricsTableHeaders = async (table: Locator): Promise<boolean> => {
-  const previousValueHeader = table.getByRole("columnheader", {
-    name: "Previous value",
+  const previousAnnualValueHeader = table.getByRole("columnheader", {
+    name: /^Previous annual value$/i,
   });
-  const hasPreviousValueColumn = await previousValueHeader
+  const hasPreviousValueColumn = await previousAnnualValueHeader
     .isVisible()
     .catch(() => false);
   const expectedHeaders = [
@@ -67,7 +67,7 @@ const verifyMetricsTableHeaders = async (table: Locator): Promise<boolean> => {
     "Status",
     "Metric",
     "Target",
-    ...(hasPreviousValueColumn ? ["Previous value"] : []),
+    ...(hasPreviousValueColumn ? ["Previous annual value"] : []),
     "Current value",
     "As of Date MM/DD/YYYY",
   ];
@@ -262,9 +262,9 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
     test("should display the Metrics heading and table for non-admin users @regression", async () => {
       await verifyAnnualContextFromHeader(editor);
 
-      const metricsHeading = editor.page
-        .getByRole("heading", { name: /^Metrics/i })
-        .getByText(/Required/i);
+      const metricsHeading = editor.page.getByRole("heading", {
+        name: /^Track Initiative Performance Metrics\s*Required$/i,
+      });
       const metricsTable = editor.page.getByRole("table").filter({
         has: editor.page.getByRole("columnheader", { name: "Metric" }),
       });
