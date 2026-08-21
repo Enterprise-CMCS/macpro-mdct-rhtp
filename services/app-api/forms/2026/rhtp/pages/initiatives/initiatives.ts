@@ -3,7 +3,6 @@ import {
   ButtonLinkTemplate,
   ElementType,
   HeaderTemplate,
-  NumberFieldTemplate,
   PageStatus,
   PageType,
   ParagraphTemplate,
@@ -12,6 +11,7 @@ import {
   TextAreaBoxTemplate,
   MaskType,
   AccordionTemplate,
+  TextboxTemplate,
   DividerTemplate,
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
@@ -131,13 +131,13 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   charLimit: 2000,
 });
 
-const initiativeNumberOfPeopleServed: NumberFieldTemplate = {
-  type: ElementType.NumberField,
+const initiativeNumberOfPeopleServed: TextboxTemplate = {
+  type: ElementType.Textbox,
   id: "initiative-number-of-people-served",
   label: "Number of people served",
-  mask: MaskType.CommaSeparated,
+  mask: MaskType.NumberNA,
   helperText:
-    "Number of People Served is only reported annually. If this number is not applicable for the initiative, enter N/A.",
+    "Number of People Served is only reported annually. If this number is not applicable for the initiative, enter N/A. <b>Invalid entries will automatically clear.</b>",
   helperTextLink: {
     link: "Reporting Guidelines",
     label: "Number of People Served",
@@ -164,9 +164,9 @@ export const metricTable = (
     heading: "Track Initiative Performance Metrics",
     label: "Metric",
     helperText:
-      "<p>The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metric values are only required to be reported annually. Any value reported on a Quarterly Report will be pre-populated but editable for the remainder of the Program Year. Contact your Project Officer if the metrics listed are incorrect.</p><br>" +
-      "<p>Additionally, <b>“As of Date”</b> is NOT today's date. This must be the historical date on which the metric value was either extracted from a database or calculated by the State. This value should not be updated until the metric value is updated or the previous value is confirmed by subsequent analysis.</p><br>" +
-      "<p>Current Values: Enter a number, currency (e.g., $100), percentage (e.g., 50%), or N/A if no data. <b>Invalid entries will automatically clear.</p>",
+      "The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metric values are only required to be reported annually. Any value reported on a Quarterly Report will be pre-populated but editable for the remainder of the Program Year. Contact your Project Officer if the metrics listed are incorrect.<br>" +
+      "Additionally, <b>“As of Date”</b> is NOT today's date. This must be the historical date on which the metric value was either extracted from a database or calculated by the State. This value should not be updated until the metric value is updated or the previous value is confirmed by subsequent analysis.<br>" +
+      "Current Values: Enter a number, currency (e.g., $100), percentage (e.g., 50%), or N/A if no data. <b>Invalid entries will automatically clear.</b>",
     quarterly: true,
     modal: {
       title: "Metric",
@@ -177,7 +177,7 @@ export const metricTable = (
           label: "Status",
           editOnly: true,
           hintText:
-            "Setting \“Abandoned\" preserves its historical values for auditing but flags it as abandoned, removing it from the state's current active data entry requirements.,",
+            "Setting \“Abandoned\" preserves its historical values for auditing but flags it as abandoned, removing it from the state's current active data entry requirements.",
           children: [
             { label: "Active", value: "Active" },
             { label: "Abandoned", value: "Abandoned" },
@@ -193,16 +193,16 @@ export const metricTable = (
         {
           id: "target",
           label: "What is the target for this metric?",
-          type: ElementType.NumberField,
+          type: ElementType.Textbox,
           required: false,
-          mask: MaskType.CommaSeparated,
+          mask: MaskType.MagicNumber,
         },
         {
           id: "currValue",
           label: "What is the metric’s current value?",
-          type: ElementType.NumberField,
+          type: ElementType.Textbox,
           required: false,
-          mask: MaskType.CommaSeparated,
+          mask: MaskType.MagicNumber,
         },
         {
           id: "date",
@@ -220,20 +220,20 @@ export const metricTable = (
         id: "target",
         header: "Target",
         type: ElementType.Paragraph,
-        mask: MaskType.CommaSeparated,
+        mask: MaskType.MagicNumber,
       },
       {
         id: "prevValue",
         header: "Previous annual value",
-        type: ElementType.NumberField,
+        type: ElementType.Textbox,
         disabled: true,
-        mask: MaskType.CommaSeparated,
+        mask: MaskType.MagicNumber,
       },
       {
         id: "currValue",
         header: "Current value",
-        type: ElementType.NumberField,
-        mask: MaskType.CommaSeparated,
+        type: ElementType.Textbox,
+        mask: MaskType.MagicNumber,
       },
       { id: "date", header: "As of Date MM/DD/YYYY", type: ElementType.Date },
     ],

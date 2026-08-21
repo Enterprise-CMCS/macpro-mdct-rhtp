@@ -198,6 +198,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const onSave = (data: ActionAnswerShape) => {
     const newData = formatAnswers(data, "modal");
     if (modalData.index === undefined) {
+      setErrorMessages([...errorMessages, new Map<string, string>()]);
       props.updateElement({ answer: [...(answer ?? []), newData] });
     } else {
       const newAnswer = [...answer!];
@@ -210,15 +211,11 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   if (canAddOrChangeStatus) headers.push({ label: "Actions" });
 
   return (
-    <Flex flexDirection="column" width="100%">
+    <Flex gap="1.25rem" flexDirection="column" width="100%">
       <Heading as="h2" variant="subHeader">
         {optionalTag({ label: heading, required: element.required })}
       </Heading>
-      {helperText && (
-        <Text color="gray_dark" marginY={"1rem"}>
-          {parseHtml(helperText)}
-        </Text>
-      )}
+      {helperText && <Text color="gray_dark">{parseHtml(helperText)}</Text>}
       {canAddOrChangeStatus ? (
         <Button
           aria-label={`add ${label}`}
