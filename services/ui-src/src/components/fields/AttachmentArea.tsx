@@ -107,7 +107,6 @@ export const AttachmentArea = (
         hint={subLabel}
         answer={files}
         saveToReport={saveToReport}
-        deleteFromReport={onRemove}
         notification={{ success: message! }}
       />
       {/** delete file modal */}

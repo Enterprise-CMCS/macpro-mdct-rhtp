@@ -145,6 +145,7 @@ const hasAllowedFileExtension = (value?: string) => {
 };
 
 export const uploadListPropSchema = object().shape({
+  label: string().notRequired(),
   name: string()
     .transform((value) => (value === "" ? undefined : value))
     .default("Uploaded File")
@@ -175,7 +176,7 @@ const ObligatedAndSpentFundsAttachmentSchema = object().shape({
     .matches(new RegExp(ElementType.ObligatedAndSpentFundsAttachment)),
   id: string().required(),
   label: string().required(),
-  answer: array().of(uploadListPropSchema).min(0).max(1).notRequired(),
+  answer: array().of(uploadListPropSchema).notRequired(),
   required: boolean().required(),
 });
 

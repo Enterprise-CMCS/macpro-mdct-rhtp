@@ -270,7 +270,7 @@ export const UploadArea = ({
               reportType,
               state,
               id,
-              modifiedAnswer(answer ?? []),
+              modifiedAnswer(answer.toReversed() ?? []),
               deleteFromReport,
               downloadFile,
               uploadAreaHidden

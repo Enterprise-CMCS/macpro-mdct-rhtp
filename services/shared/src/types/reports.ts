@@ -172,6 +172,7 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 export type PageId = string;
 
 export type UploadListProp = {
+  label?: string;
   name: string;
   size: number;
   fileId: string;

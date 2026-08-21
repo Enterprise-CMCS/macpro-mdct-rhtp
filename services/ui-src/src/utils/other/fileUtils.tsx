@@ -64,10 +64,7 @@ export const uploadListRender = (
   reportType: ReportType,
   state: string,
   id: string,
-  files:
-    | File[]
-    | UploadListProp[]
-    | { name: string; size: number; fileId: string; message?: string }[],
+  files: File[] | UploadListProp[] | (UploadListProp & { message?: string })[],
   onRemove?: Function,
   onClick?: Function,
   disabled?: boolean
@@ -79,6 +76,7 @@ export const uploadListRender = (
           <VStack width="100%">
             <HStack width="100%" justifyContent="space-between">
               <VStack alignItems="flex-start">
+                {"label" in file && <Text fontWeight="bold">{file.label}</Text>}
                 {!onClick ? (
                   <Text>{file.name}</Text>
                 ) : (
