@@ -1,6 +1,10 @@
 //Shared constants between frontend and backend
 
 // STATES
+const isProdEnv =
+  window.location.hostname === "mdctrhtp.cms.gov" ||
+  process?.env?.STAGE === "production";
+
 export const StateNames = {
   AL: "Alabama",
   AK: "Alaska",
@@ -52,8 +56,8 @@ export const StateNames = {
   WV: "West Virginia",
   WI: "Wisconsin",
   WY: "Wyoming",
-  ZZ: "Test State ZZ",
-} as const;
+  ...(!isProdEnv && { ZZ: "Test State ZZ" }),
+};
 
 export const dropdownEmptyOption = { label: "- Select an option -", value: "" };
 
