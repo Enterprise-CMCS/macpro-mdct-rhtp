@@ -754,5 +754,9 @@ export const fakeStateUser = {
       Name: "custom:cms_roles",
       Value: "mdctrhtp-state-user",
     },
+    {
+      Name: "custom:cms_state",
+      Value: "ZZ",
+    },
   ],
 };
