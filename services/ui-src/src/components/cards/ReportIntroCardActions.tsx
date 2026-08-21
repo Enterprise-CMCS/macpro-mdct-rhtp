@@ -34,7 +34,7 @@ export const ReportIntroCardActions = ({ reportType }: Props) => {
         rightIcon={<Image src={nextIcon} alt="Link Icon" height="1rem" />}
         sx={sx.link}
       >
-        Enter {getAbbreviation(reportType)} Report online
+        Enter {getAbbreviation(reportType)} Report
       </Button>
     </Flex>
   );
