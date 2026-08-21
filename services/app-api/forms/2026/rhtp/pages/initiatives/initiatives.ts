@@ -136,7 +136,7 @@ const initiativeNumberOfPeopleServed: TextboxTemplate = {
   label: "Number of people served",
   mask: MaskType.NumberNA,
   helperText:
-    "Number of People Served is only reported annually. If this number is not applicable for the initiative, enter N/A.",
+    "Number of People Served is only reported annually. If this number is not applicable for the initiative, enter N/A. <b>Invalid entries will automatically clear.",
   helperTextLink: {
     link: "Reporting Guidelines",
     label: "Number of People Served",
