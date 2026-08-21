@@ -124,12 +124,14 @@ export const addObligatedAndSpentFundsFilesToZip = async (
         .flatMap((attachment) => attachment.answer)
         .filter((answer) => !!answer) ?? [];
 
-    obligatedAndSpentFundsFiles.push({
-      id: report.id,
-      state: report.state,
-      subType: report.subTypeKey,
-      file: attachments[0],
-    });
+    for (const attachment of attachments) {
+      obligatedAndSpentFundsFiles.push({
+        id: report.id,
+        state: report.state,
+        subType: report.subTypeKey,
+        file: attachment,
+      });
+    }
   };
 
   const filteredReports = await scanAndCompileReports(reportSubTypeKeys, state);
