@@ -58,7 +58,8 @@ describe("<ListInput />", () => {
       expect(
         screen.queryByRole("textbox", { name: "mock field 1" })
       ).not.toBeInTheDocument();
-      expect(updateSpy).toHaveBeenCalledTimes(2);
+      //autofocus will cause an extra run
+      expect(updateSpy).toHaveBeenCalledTimes(3);
     });
 
     test("ListInput shows error when user does not fillout the field", async () => {
@@ -70,7 +71,11 @@ describe("<ListInput />", () => {
       // remove focus by adding another textbox
       await userEvent.click(addBtn);
       expect(screen.getByText("A response is required")).toBeVisible();
-      await userEvent.type(textbox, "text");
+      //get all textboxes on the page and fill them out
+      const textboxes = screen.getAllByRole("textbox");
+      for (const textbox of textboxes) {
+        await userEvent.type(textbox, "text");
+      }
       expect(
         screen.queryByText("A response is required")
       ).not.toBeInTheDocument();
