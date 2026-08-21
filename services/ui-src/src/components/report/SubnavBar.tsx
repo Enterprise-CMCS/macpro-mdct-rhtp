@@ -25,11 +25,7 @@ export const SubnavBar = () => {
           <Flex sx={sx.subnavFlexRight}>
             {lastSavedTime && (
               <>
-                <Image
-                  src={checkIcon}
-                  alt="gray checkmark icon"
-                  sx={sx.checkIcon}
-                />
+                <Image src={checkIcon} alt="gray checkmark" sx={sx.checkIcon} />
                 <Text sx={sx.saveStatusText}>{saveStatusText}</Text>
               </>
             )}

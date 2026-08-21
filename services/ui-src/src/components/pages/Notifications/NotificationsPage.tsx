@@ -450,7 +450,7 @@ export const NotificationsPage = () => {
         </Accordion>
         <Button
           variant="outline"
-          leftIcon={<Image src={addPrimary} alt="Add icon" />}
+          leftIcon={<Image src={addPrimary} alt="Add" />}
           onClick={() => setAddModalOpen(true)}
           sx={sx.addEmailButton}
         >

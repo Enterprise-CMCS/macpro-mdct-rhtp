@@ -48,7 +48,7 @@ export const HeaderElement = ({
       case HeaderIcon.Check:
         return {
           src: successIcon,
-          alt: "complete icon",
+          alt: "complete",
           text: "Complete",
         };
       default:

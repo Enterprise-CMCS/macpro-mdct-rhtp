@@ -222,10 +222,7 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           variant="outline"
           alignSelf="flex-start"
           leftIcon={
-            <Image
-              src={actionsDisabled ? addGray : addPrimary}
-              alt="Add icon"
-            />
+            <Image src={actionsDisabled ? addGray : addPrimary} alt="Add" />
           }
           onClick={() => {
             setModalOpen(true);

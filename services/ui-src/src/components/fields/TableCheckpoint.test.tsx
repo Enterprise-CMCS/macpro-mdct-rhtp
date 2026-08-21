@@ -8,7 +8,6 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
-import { useParams } from "react-router";
 import {
   ElementType,
   TableCheckpointTemplate,
@@ -25,10 +24,6 @@ import { removeFile } from "utils/other/fileUtils";
 
 vi.mock("utils/state/useStore");
 const mockedUseStore = useStore as unknown as MockedFunction<typeof useStore>;
-
-vi.mock("react-router", () => ({
-  useParams: vi.fn().mockReturnValue({ pageId: "mock-init-1" }),
-}));
 
 vi.mock("utils/other/fileUtils", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -100,6 +95,7 @@ const consoleMock = vi.spyOn(console, "error").mockImplementation(vi.fn());
 window.open = vi.fn();
 
 const mockReport = {
+  id: "mock-init-1",
   report: {
     id: "mock-report-id",
     state: "PA",
@@ -147,7 +143,7 @@ describe("<TableCheckpoint />", () => {
     expect(screen.getAllByText("Not applicable")).toHaveLength(3);
   });
   test("receive an error when state or year is not provided", async () => {
-    (useParams as Mock).mockResolvedValueOnce("");
+    (mockedUseStore as Mock).mockResolvedValueOnce("");
     await act(async () => {
       render(TableCheckpointComponent);
     });

@@ -62,10 +62,12 @@ const mockBannerHome3 = {
 
 const fetchBanners = vi.fn();
 const createBanner = vi.fn();
+const updateBanner = vi.fn();
 const deleteBanner = vi.fn();
 const bannerMethods = {
   fetchBanners,
   createBanner,
+  updateBanner,
   deleteBanner,
 };
 
@@ -170,6 +172,52 @@ describe("<AdminPage />", () => {
     await screen.findByText("Scheduled");
 
     expect(screen.getByText(dates, { exact: false })).toBeVisible();
+  });
+
+  it("Open Banner Drawer and create a new banner", async () => {
+    render(<AdminPage />);
+    await userEvent.click(
+      screen.getByRole("button", {
+        name: "Create a new banner",
+      })
+    );
+    const siteAreaDropdown = screen.getAllByLabelText("Site area")[0];
+    await userEvent.selectOptions(siteAreaDropdown, "RHTP");
+
+    const titleInput = screen.getByLabelText("Title");
+    await userEvent.click(titleInput);
+    await userEvent.paste("mock title");
+
+    const descriptionInput = screen.getByLabelText("Description");
+    await userEvent.click(descriptionInput);
+    await userEvent.paste("mock description");
+
+    const linkInput = screen.getByLabelText("Link", { exact: false });
+    await userEvent.click(linkInput);
+    await userEvent.paste("http://example.com");
+
+    const startDateInput = screen.getByLabelText("Start date");
+    await userEvent.click(startDateInput);
+    await userEvent.paste("01/01/1970");
+
+    const endDateInput = screen.getByLabelText("End date");
+    await userEvent.click(endDateInput);
+    await userEvent.paste("01/02/1970");
+
+    const submitButton = screen.getByText("Create banner");
+    await userEvent.click(submitButton);
+
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+  });
+
+  it("Edit banner opens and fills the drawer", async () => {
+    useStore.setState({ allBanners: [mockBannerHome1], ...bannerMethods });
+    render(<AdminPage />);
+    await screen.findByText("Expired");
+    await userEvent.click(screen.getByText("Edit"));
+    expect(screen.getByDisplayValue("Home Alert - past")).toBeVisible();
+    expect(screen.getByDisplayValue("mock description")).toBeVisible();
+    await userEvent.click(screen.getByText("Edit banner"));
   });
 
   testA11yAct(<AdminPage />, () => {

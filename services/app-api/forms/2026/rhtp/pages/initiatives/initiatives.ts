@@ -12,6 +12,7 @@ import {
   MaskType,
   AccordionTemplate,
   TextboxTemplate,
+  DividerTemplate,
 } from "@rhtp/shared";
 import INITIATIVES from "./data/initiatives.json";
 import { initiativeAttachmentStatusInstructions } from "../initiative-attachments";
@@ -257,6 +258,11 @@ export const metricTable = (
   return table;
 };
 
+const divider: DividerTemplate = {
+  type: ElementType.Divider,
+  id: "divider",
+};
+
 const checkpointsTables: TableCheckpointTemplate = {
   type: ElementType.TableCheckpoint,
   id: "checkpoint-table",
@@ -288,6 +294,7 @@ export const buildInitiativePages = (
       status: status ?? PageStatus.NOT_STARTED,
       type: PageType.Standard,
       sidebar: false,
+      hideNavButtons: true,
       elements: [
         returnToInitiativesDashboard,
         initiativeHeader(title, initiativeNumber),
@@ -300,6 +307,7 @@ export const buildInitiativePages = (
         checkpointsInstructions,
         initiativeAttachmentStatusInstructions,
         checkpointsTables,
+        divider,
         BackToInitiativesButton,
       ],
     });

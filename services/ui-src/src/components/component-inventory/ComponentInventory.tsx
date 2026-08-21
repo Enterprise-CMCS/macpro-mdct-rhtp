@@ -1,8 +1,9 @@
 import { Divider, Heading, Spinner, Flex } from "@chakra-ui/react";
 import { ReactNode, Fragment, useEffect, useState } from "react";
 import { elementObject } from "./elementObject";
-import { ElementType, Report, ReportStatus } from "@rhtp/shared";
+import { ElementType, Report, ReportStatus, ReportType } from "@rhtp/shared";
 import { useStore } from "utils";
+import { currentPageSelector } from "utils/state/selectors";
 
 export const ComponentInventory = () => {
   const { loadReport } = useStore();
@@ -19,6 +20,8 @@ export const ComponentInventory = () => {
   const mockReport = {
     name: "Mock Report",
     state: "PA",
+    id: "mock-id",
+    type: ReportType.RHTP,
     status: ReportStatus.IN_PROGRESS,
     submissionCount: 0,
     submitted: 1,
@@ -26,7 +29,16 @@ export const ComponentInventory = () => {
     pages: [
       {
         id: "root",
-        childPageIds: ["first-child"],
+        childPageIds: ["init-1"],
+      },
+      {
+        sidebar: false,
+        elements: [],
+        initiativeNumber: "1",
+        id: "init-1",
+        type: "standard",
+        title: "Mock Initiative",
+        status: "In progress",
       },
     ],
   } as Report;
@@ -34,6 +46,27 @@ export const ComponentInventory = () => {
   useEffect(() => {
     loadReport(mockReport);
     setIsLoading(false);
+    const pageMap = new Map([
+      ["root", 0],
+      ["init-1", 1],
+    ]);
+
+    currentPageSelector({
+      report: mockReport,
+      pageMap: pageMap,
+      currentPageId: "init-1",
+      modalOpen: false,
+      sidebarOpen: false,
+      loadReport: () => {},
+      updateReport: () => {},
+      setCurrentPageId: () => {},
+      setModalOpen: () => {},
+      setModalComponent: () => {},
+      setAnswers: () => {},
+      completePage: () => {},
+      setSidebar: () => {},
+      saveReport: () => {},
+    });
     // Cleanup function runs on unmount
     return () => loadReport(undefined);
   }, []);
