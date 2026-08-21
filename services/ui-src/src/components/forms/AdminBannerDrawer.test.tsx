@@ -1,5 +1,5 @@
 import { act, render, screen } from "@testing-library/react";
-import { AdminBannerForm } from "components";
+import { AdminBannerDrawer } from "components";
 import userEvent from "@testing-library/user-event";
 import { testA11yAct } from "utils/testing/commonTests";
 import { BannerShape } from "@rhtp/shared";
@@ -8,25 +8,33 @@ import { useStore } from "utils";
 const mockCreateBanner = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
-const AdminBannerFormComponent = (
-  <AdminBannerForm createBanner={mockCreateBanner} />
+const AdminBannerDrawerComponent = (
+  <AdminBannerDrawer
+    content={{
+      heading: "Create a new banner",
+      solidButtonText: "Create banner",
+      outlineButtonText: "Cancel",
+    }}
+    modalDisclosure={{ isOpen: true, onClose: () => {} }}
+    onSubmit={mockCreateBanner}
+  />
 );
 
-describe("<AdminBannerForm />", () => {
+describe("<AdminBannerDrawer />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    render(AdminBannerFormComponent);
+    render(AdminBannerDrawerComponent);
   });
 
-  test("AdminBannerForm can be filled and submitted without error", async () => {
+  test("AdminBannerDrawer can be filled and submitted without error", async () => {
     const siteAreaDropdown = screen.getAllByLabelText("Site area")[0];
     await userEvent.selectOptions(siteAreaDropdown, "RHTP");
 
-    const titleInput = screen.getByLabelText("Title text");
+    const titleInput = screen.getByLabelText("Title");
     await userEvent.click(titleInput);
     await userEvent.paste("mock title");
 
-    const descriptionInput = screen.getByLabelText("Description text");
+    const descriptionInput = screen.getByLabelText("Description");
     await userEvent.click(descriptionInput);
     await userEvent.paste("mock description");
 
@@ -42,7 +50,7 @@ describe("<AdminBannerForm />", () => {
     await userEvent.click(endDateInput);
     await userEvent.paste("01/02/1970");
 
-    const submitButton = screen.getByText("Create Banner");
+    const submitButton = screen.getByText("Create banner");
     await userEvent.click(submitButton);
 
     expect(mockCreateBanner).toHaveBeenCalledWith({
@@ -50,22 +58,22 @@ describe("<AdminBannerForm />", () => {
       title: "mock title",
       description: "mock description",
       link: "http://example.com",
-      startDate: "1970-01-01",
-      endDate: "1970-01-02",
+      startDate: "01/01/1970",
+      endDate: "01/02/1970",
     });
   });
 
-  testA11yAct(AdminBannerFormComponent);
+  testA11yAct(AdminBannerDrawerComponent);
 });
 
-describe("AdminBannerForm validation", () => {
+describe("AdminBannerDrawer validation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    render(AdminBannerFormComponent);
+    render(AdminBannerDrawerComponent);
   });
 
   test("Display form errors when user tries to submit completely blank form", async () => {
-    const submitButton = screen.getByText("Create Banner");
+    const submitButton = screen.getByText("Create banner");
     await userEvent.click(submitButton);
 
     const responseIsRequiredErrorMessage = screen.getAllByText(
@@ -82,6 +90,7 @@ describe("AdminBannerForm validation", () => {
       area: "home",
       startDate: "2026-01-10",
       endDate: "2026-01-20",
+      key: "123456",
     } as BannerShape;
     act(() => {
       useStore.setState({ allBanners: [existingBanner] });
@@ -130,9 +139,9 @@ describe("AdminBannerForm validation", () => {
   });
 
   test("User has form errors but then fills out the form and errors go away", async () => {
-    const submitButton = screen.getByText("Create Banner");
-    const titleInput = screen.getByLabelText("Title text");
-    const descriptionInput = screen.getByLabelText("Description text");
+    const submitButton = screen.getByText("Create banner");
+    const titleInput = screen.getByLabelText("Title");
+    const descriptionInput = screen.getByLabelText("Description");
     const linkInput = screen.getByLabelText("Link", { exact: false });
     const startDateInput = screen.getByLabelText("Start date");
     const endDateInput = screen.getByLabelText("End date");
@@ -170,8 +179,8 @@ describe("AdminBannerForm validation", () => {
       title: "mock title",
       description: "mock description",
       link: "http://example.com",
-      startDate: "1970-01-01",
-      endDate: "1970-01-02",
+      startDate: "01/01/1970",
+      endDate: "01/02/1970",
     });
   });
 });
