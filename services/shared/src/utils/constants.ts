@@ -1,6 +1,13 @@
 //Shared constants between frontend and backend
 
 // STATES
+
+// NOTE: this is the thing we would need to remove to allow a ZZ IDM user to exist if it is requested
+const isProdEnv =
+  (typeof window !== "undefined" &&
+    window.location.hostname === "mdctrhtp.cms.gov") ||
+  (typeof process !== "undefined" && process.env.STAGE === "production");
+
 export const StateNames = {
   AL: "Alabama",
   AK: "Alaska",
@@ -52,7 +59,8 @@ export const StateNames = {
   WV: "West Virginia",
   WI: "Wisconsin",
   WY: "Wyoming",
-} as const;
+  ...(!isProdEnv && { ZZ: "Test State ZZ" }),
+};
 
 export const dropdownEmptyOption = { label: "- Select an option -", value: "" };
 

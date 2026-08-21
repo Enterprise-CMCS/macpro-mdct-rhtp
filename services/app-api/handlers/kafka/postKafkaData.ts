@@ -35,6 +35,7 @@ const getDynamoInfo: GetDynamoInfo = async (record) => {
   const stage = process.env.STAGE ?? "";
   const namespace = process.env.topicNamespace ?? "";
   const payload = unmarshall(record.dynamodb.NewImage);
+  if (payload.state === "ZZ") return; // safeguard that we don't send ZZ state data to dataconnect
 
   if (source.includes(`/${stage}-reports/`)) {
     const isPage = payload.sortKey.includes("#");
