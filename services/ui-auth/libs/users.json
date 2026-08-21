@@ -730,11 +730,11 @@
     ]
   },
   {
-    "username": "stateZZ@test.com",
+    "username": "stateuserZZ@test.com",
     "attributes": [
       {
         "Name": "email",
-        "Value": "stateZZ@test.com"
+        "Value": "stateuserZZ@test.com"
       },
       {
         "Name": "given_name",
