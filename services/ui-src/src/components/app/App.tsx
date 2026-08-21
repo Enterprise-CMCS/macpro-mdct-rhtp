@@ -14,6 +14,8 @@ import {
 import { Container, Divider, Flex, Heading, Stack } from "@chakra-ui/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { makeMediaQueryClasses, UserContext, useStore } from "utils";
+import { currentPageSelector } from "utils/state/selectors";
+import { ElementType } from "@rhtp/shared";
 
 export const App = () => {
   const mqClasses = makeMediaQueryClasses();
@@ -21,6 +23,7 @@ export const App = () => {
   const { logout } = context;
   const { user, showLocalLogins, setSidebar } = useStore();
   const { pathname } = useLocation();
+  const currentPage = useStore(currentPageSelector);
 
   //there are now two export pages due to the addition of the obligated and spent funds export zip
   const isExportPage = pathname !== "/export" && pathname.includes("/export");
@@ -37,6 +40,31 @@ export const App = () => {
   useEffect(() => {
     localStorage.setItem("ReturnURL", pathname);
   }, []);
+
+  useEffect(() => {
+    const titleMap = {
+      "/": "Rural Health Transformation Program",
+      "/help": "How can we help you? - RHTP",
+      "/profile": "My Account - RHTP",
+      "/export": "Export RHTP Files and Data - RHTP",
+      "/admin": "Banner Admin - RHTP",
+    };
+
+    //this is a fail safe if we are missing a title map options, but it can't be default as it clashes with any loading text on the page
+    const findByHeader = () => {
+      const target =
+        document.querySelector("h1") ?? document.querySelector("#main-content");
+      return target?.textContent;
+    };
+
+    //if there's a title tied to a path, use that, else try to find it by the heading on the page
+    const title = titleMap[pathname as keyof typeof titleMap] ?? findByHeader();
+    const header = currentPage?.elements?.find(
+      (element) => element.type === ElementType.Header
+    ) ?? { text: "" };
+
+    document.title = title ?? `${header.text} - RHTP`;
+  }, [pathname, currentPage]);
 
   const authenticatedRoutes = (
     <>
