@@ -13,9 +13,13 @@ import {
 } from "components";
 import { Container, Divider, Flex, Heading, Stack } from "@chakra-ui/react";
 import { ErrorBoundary } from "react-error-boundary";
-import { makeMediaQueryClasses, UserContext, useStore } from "utils";
+import {
+  getTabTitle,
+  makeMediaQueryClasses,
+  UserContext,
+  useStore,
+} from "utils";
 import { currentPageSelector } from "utils/state/selectors";
-import { ElementType } from "@rhtp/shared";
 
 export const App = () => {
   const mqClasses = makeMediaQueryClasses();
@@ -42,28 +46,8 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    const titleMap = {
-      "/": "Rural Health Transformation Program",
-      "/help": "How can we help you? - RHTP",
-      "/profile": "My Account - RHTP",
-      "/export": "Export RHTP Files and Data - RHTP",
-      "/admin": "Banner Admin - RHTP",
-    };
-
-    //this is a fail safe if we are missing a title map options, but it can't be default as it clashes with any loading text on the page
-    const findByHeader = () => {
-      const target =
-        document.querySelector("h1") ?? document.querySelector("#main-content");
-      return target?.textContent;
-    };
-
-    //if there's a title tied to a path, use that, else try to find it by the heading on the page
-    const title = titleMap[pathname as keyof typeof titleMap] ?? findByHeader();
-    const header = currentPage?.elements?.find(
-      (element) => element.type === ElementType.Header
-    ) ?? { text: "" };
-
-    document.title = title ?? `${header.text} - RHTP`;
+    //setting tab title for each page
+    document.title = getTabTitle(pathname, currentPage);
   }, [pathname, currentPage]);
 
   const authenticatedRoutes = (
