@@ -213,7 +213,6 @@ export function createUiAuthComponents(props: CreateUiAuthComponentsProps) {
       environment: {
         userPoolId: userPool.userPoolId,
         bootstrapUsersPassword,
-        ...(isDev && { isDev: "true" }), // can only assign string, not boolean, but exists/not exists will work the same
       },
       isDev,
     }).lambda;

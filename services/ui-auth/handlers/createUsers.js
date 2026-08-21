@@ -1,10 +1,8 @@
 import * as cognitolib from "../libs/cognito-lib.js";
-import { testUsers, fakeStateUser } from "../libs/users.js";
+import users from "../libs/users.json" with { type: "json" };
 const userPoolId = process.env.userPoolId;
-const isDev = !!process.env.isDev;
 
 export const handler = async (_event, _context, _callback) => {
-  const users = isDev ? [fakeStateUser, ...testUsers] : testUsers;
   for (var i = 0; i < users.length; i++) {
     var poolData = {
       UserPoolId: userPoolId,
