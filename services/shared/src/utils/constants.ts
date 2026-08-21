@@ -52,6 +52,7 @@ export const StateNames = {
   WV: "West Virginia",
   WI: "Wisconsin",
   WY: "Wyoming",
+  ZZ: "Test State ZZ",
 } as const;
 
 export const dropdownEmptyOption = { label: "- Select an option -", value: "" };
