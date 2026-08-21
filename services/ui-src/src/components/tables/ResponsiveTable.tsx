@@ -87,6 +87,7 @@ const HorizontalTable = (
               aria-sort={
                 item.label === sort.label ? ariaSortType(sort.type) : "none"
               }
+              textAlign={item.label === "Actions" ? "center" : undefined}
             >
               {item.sortable ? (
                 <Button

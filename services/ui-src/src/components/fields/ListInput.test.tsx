@@ -51,7 +51,9 @@ describe("<ListInput />", () => {
       ).toBeVisible();
       expect(updateSpy).toHaveBeenCalledTimes(1);
 
-      const removeBtn = screen.getByRole("button", { name: "Remove" });
+      const removeBtn = screen.getByRole("button", {
+        name: "Remove mock field 1",
+      });
       await userEvent.click(removeBtn);
       expect(
         screen.queryByRole("textbox", { name: "mock field 1" })
