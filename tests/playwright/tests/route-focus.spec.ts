@@ -14,7 +14,7 @@ test.describe("Route change", () => {
     // Arrange
     await statePage.page.goto("/");
     const link = statePage.page.getByRole("link", {
-      name: "Enter RHTP Report online",
+      name: "Enter RHTP Report",
       exact: true,
     });
     await expect(link).toBeVisible();
