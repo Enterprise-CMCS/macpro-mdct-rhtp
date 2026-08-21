@@ -18,21 +18,21 @@ export const TableStatusIcon = ({ tableStatus, showLabel, isPdf }: Props) => {
       case PageStatus.COMPLETE:
         return {
           src: successIcon,
-          alt: "complete icon",
+          alt: "complete",
           text: "Complete",
           textColor: "success",
         };
       case PageStatus.IN_PROGRESS:
         return {
           src: inProgressIcon,
-          alt: "in progress icon",
+          alt: "in progress",
           text: "In progress",
           textColor: "primary",
         };
       case PageStatus.NOT_STARTED:
         return {
           src: isPdf ? notStartedPDFIcon : notStartedIcon,
-          alt: "not started icon",
+          alt: "not started",
           text: "Not started",
           textColor: "error_darker",
         };

@@ -16,11 +16,12 @@ export const StatusAlert = (props: PageElementProps<StatusAlertTemplate>) => {
 
   if (!report || !currentPageId) return <></>;
 
+  //this tracks the alert for the Review & Submit page, changes based on whether the report is filled or not
   const isReviewPage = currentPageId === "review-submit";
-  if (isReviewPage && submittableMetrics?.submittable) {
-    return <></>;
-  } else if (
-    inferredReportStatus(report, currentPageId) !== PageStatus.COMPLETE
+  if (
+    isReviewPage &&
+    submittableMetrics?.submittable &&
+    inferredReportStatus(report, currentPageId) === PageStatus.COMPLETE
   ) {
     return <></>;
   }

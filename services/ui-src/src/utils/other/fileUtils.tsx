@@ -104,7 +104,7 @@ export const uploadListRender = (
                   rightIcon={
                     <Image
                       src={disabled ? cancelIconGray : cancelIcon}
-                      alt="Remove Icon"
+                      alt="Remove"
                     />
                   }
                   disabled={disabled}

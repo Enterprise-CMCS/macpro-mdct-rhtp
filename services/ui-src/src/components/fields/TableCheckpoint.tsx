@@ -17,11 +17,9 @@ import {
 } from "@rhtp/shared";
 import addIconPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
-import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { Label } from "@cmsgov/design-system";
 import { useContext, useEffect, useState } from "react";
 import { UploadDrawer } from "components/drawers/UploadDrawer";
-import { useParams } from "react-router";
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/fileUtils";
 import {
@@ -38,6 +36,7 @@ import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDra
 import { ResponsiveTable } from "components/tables/ResponsiveTable";
 import { ManageDrawer } from "components/drawers/ManageDrawer";
 import { StageCheckpointDropdown } from "./attachments/StageCheckpointDropdown";
+import { currentPageSelector } from "utils/state/selectors";
 
 /** Formatting the the data from the elements into renderable rows for the table */
 const buildRows = (
@@ -120,7 +119,7 @@ export const TableCheckpoint = (
   const [isCommentsOpen, setCommentsOpen] = useState<boolean>(false);
   const [isManageOpen, setManageOpen] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<UploadListProp[]>([]);
-  const { pageId } = useParams();
+  const pageId = useStore(currentPageSelector)?.id;
   const { report, setAnswers } = useStore();
   const initiative = report?.pages.find(
     (page) => page.id === pageId
@@ -304,7 +303,7 @@ export const TableCheckpoint = (
             aria-label={`Comment on ${row.file.name}`}
             fontWeight="bold"
           >
-            <Image src={commentIcon} alt="Remove" minWidth="24px" />
+            Comment
           </Button>
         </Flex>
       );

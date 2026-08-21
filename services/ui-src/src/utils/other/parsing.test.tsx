@@ -1,5 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { parseHtml, optionalTag } from "utils";
+import {
+  parseHtml,
+  optionalTag,
+  format_mdy_to_ymd,
+  format_ymd_to_mdy,
+} from "utils";
 
 vi.mock("dompurify", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -35,6 +40,16 @@ describe("utils/parsing", () => {
       render(element);
       expect(screen.getByText("mock label")).toBeInTheDocument();
       expect(screen.getByText("Required")).toBeInTheDocument();
+    });
+  });
+  describe("format date", () => {
+    test("should convert date from MM/DD/YYYY to YYYY-MM-DD", () => {
+      const element = format_mdy_to_ymd("02/03/2022");
+      expect(element).toBe("2022-02-03");
+    });
+    test("should convert date from YYYY-MM-DD to MM/DD/YYYY", () => {
+      const element = format_ymd_to_mdy("2022-02-03");
+      expect(element).toBe("02/03/2022");
     });
   });
 });

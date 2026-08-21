@@ -17,7 +17,7 @@ import { currentPageSelector } from "utils/state/selectors";
 import nextArrowIcon from "assets/icons/arrows/icon_arrow_next_white.svg";
 import prevArrowIcon from "assets/icons/arrows/icon_arrow_prev_primary.svg";
 import { isReviewSubmitPage } from "types";
-import { isCompleteStatus, PageElement } from "@rhtp/shared";
+import { isCompleteStatus, PageElement, PageType } from "@rhtp/shared";
 import { ReportAutosaveContext } from "./ReportAutosaveProvider";
 import { SubmissionBar } from "./SubmissionBar";
 import { DevTools, ToolType } from "components/devTools/DevTools";
@@ -128,10 +128,12 @@ export const ReportPageWrapper = () => {
               )}
             </form>
           </Box>
-          {currentPage.hideNavButtons ? <SubmissionBar /> : <Divider></Divider>}
+          {currentPage.hideNavButtons &&
+            currentPage.type === PageType.ReviewSubmit && <SubmissionBar />}
 
           {!currentPage.hideNavButtons && parentPage && (
             <>
+              <Divider></Divider>
               <Flex width="100%" marginTop="spacer3">
                 {parentPage.index > 0 && (
                   <Button

@@ -83,7 +83,7 @@ describe("StatusTable with state user", () => {
     // Section title and status for Section 1
     expect(screen.getByText("Section 1")).toBeInTheDocument();
     expect(screen.getByText("Complete")).toBeInTheDocument();
-    expect(screen.getByAltText("complete icon")).toBeInTheDocument();
+    expect(screen.getByAltText("complete")).toBeInTheDocument();
   });
 
   test("should navigate to the correct editable page when the Edit button is clicked", async () => {
