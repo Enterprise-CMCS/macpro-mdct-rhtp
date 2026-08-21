@@ -31,7 +31,7 @@ export const ReportIntroCardActions = ({ reportType }: Props) => {
           e.preventDefault();
           navigate(dashboardRoute);
         }}
-        rightIcon={<Image src={nextIcon} alt="Link Icon" height="1rem" />}
+        rightIcon={<Image src={nextIcon} alt="Link" height="1rem" />}
         sx={sx.link}
       >
         Enter {getAbbreviation(reportType)} Report

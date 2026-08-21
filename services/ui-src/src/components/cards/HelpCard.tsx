@@ -7,11 +7,11 @@ import { ReactNode } from "react";
 const iconMap = {
   spreadsheet: {
     image: spreadsheetIcon,
-    alt: "spreadsheet icon",
+    alt: "spreadsheet",
   },
   settings: {
     image: settingsIcon,
-    alt: "settings icon",
+    alt: "settings",
   },
 };
 

@@ -249,9 +249,7 @@ export const AttachmentTable = (
         aria-label="Add Attachment"
         variant="outline"
         alignSelf="flex-start"
-        leftIcon={
-          <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
-        }
+        leftIcon={<Image src={disabled ? addGray : addPrimary} alt="Add" />}
         onClick={onAddClick}
         disabled={disabled}
       >
