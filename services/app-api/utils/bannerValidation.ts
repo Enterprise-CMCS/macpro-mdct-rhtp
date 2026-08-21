@@ -21,6 +21,7 @@ export const isValidBanner = (banner: unknown): banner is BannerFormData => {
     // System-generated fields; may be present in update requests
     "key",
     "createdAt",
+    "createdBy",
     "lastAltered",
     "lastAlteredBy",
   ];

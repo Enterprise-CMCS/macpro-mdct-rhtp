@@ -1,6 +1,7 @@
 import {
   DateField,
   DropdownField,
+  ListInput,
   RadioField,
   TextAreaField,
   TextField,
@@ -11,6 +12,12 @@ import {
   StatusTableElement,
   StatusAlert,
   CheckboxField,
+  AttachmentArea,
+  InitiativesTable,
+  TableCheckpoint,
+  AccordionGroup,
+  ActionTable,
+  AttachmentTable,
 } from "components";
 import {
   ButtonLinkElement,
@@ -21,6 +28,7 @@ import {
 } from "components/report/Elements";
 import {
   AlertTypes,
+  AttachmentStatus,
   ElementType,
   HeaderIcon,
   NumberFieldTemplate,
@@ -33,9 +41,17 @@ import {
   textAreaSection,
   numberFieldSection,
   radioFieldSection,
+  listFieldSection,
+  attachmentAreaSection,
+  tableCheckpointSection,
+  accordionGroupSection,
+  obligatedAndSpentFundsSection,
+  actionTableSection,
 } from "./pdfElementSectionHelpers";
 import { formatMonthDayYear } from "utils";
 import { SubmissionParagraph } from "components/report/SubmissionParagraph";
+import { ObligatedAndSpentFundsAttachmentElement } from "components/report/ObligatedAndSpentFundsAttachment";
+import { RequestFeedbackButton } from "components/report/RequestFeedbackButton";
 
 const logNewElement = (el: Partial<PageElement>) => console.log("Updated:", el);
 
@@ -375,5 +391,234 @@ export const elementObject: {
       />,
     ],
     pdfVariants: ["Checkbox currently not used in PDFs"],
+  },
+  [ElementType.ListInput]: {
+    description: "A field for adding a series of inputs",
+    id: "id-listinput",
+    variants: [
+      <ListInput
+        updateElement={logNewElement}
+        element={{
+          type: ElementType.ListInput,
+          id: "id-listinput",
+          buttonText: "Add list input",
+          required: true,
+          fieldLabel: "input",
+          label: "List Input",
+        }}
+      ></ListInput>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={listFieldSection} />],
+  },
+  [ElementType.AttachmentArea]: {
+    description: "An area for uploading files.",
+    id: "id-attachment",
+    variants: [
+      <AttachmentArea
+        updateElement={logNewElement}
+        element={{
+          type: ElementType.AttachmentArea,
+          id: "id-attachment",
+          label: "label",
+          required: true,
+          answer: [
+            {
+              name: "mock-file.txt",
+              size: 100,
+              fileId: "mock-id",
+            },
+          ],
+        }}
+      ></AttachmentArea>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={attachmentAreaSection} />],
+  },
+  [ElementType.TableCheckpoint]: {
+    description:
+      "All the checkpoints table that are used in the initiative pages.",
+    id: "id-table-checkpoint",
+    variants: [
+      <TableCheckpoint
+        element={{
+          type: ElementType.TableCheckpoint,
+          id: "id-table-checkpoint",
+          required: true,
+          answer: [
+            { id: "planning-1", checked: true },
+            { id: "midway-imp-1", checked: true },
+          ],
+        }}
+        updateElement={logNewElement}
+      ></TableCheckpoint>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={tableCheckpointSection} />],
+  },
+  [ElementType.AccordionGroup]: {
+    description:
+      "Accordion groups that can have an array of fields inside the accordion",
+    id: "id-accordion-group",
+    variants: [
+      <AccordionGroup
+        element={{
+          type: ElementType.AccordionGroup,
+          id: "id-accordion-group",
+          accordions: [
+            {
+              label: "Accordiong Group 1",
+              elements: [
+                {
+                  type: ElementType.Textbox,
+                  id: "",
+                  label: "",
+                  required: false,
+                },
+              ],
+            },
+            {
+              label: "Accordiong Group 2",
+              elements: [
+                {
+                  type: ElementType.Textbox,
+                  id: "",
+                  label: "",
+                  required: false,
+                },
+              ],
+            },
+          ],
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></AccordionGroup>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={accordionGroupSection} />],
+  },
+  [ElementType.ObligatedAndSpentFundsAttachment]: {
+    description: "A page specific element, used for uploading budget reports.",
+    id: "id-funds-attachment",
+    variants: [
+      <ObligatedAndSpentFundsAttachmentElement
+        element={{
+          type: ElementType.ObligatedAndSpentFundsAttachment,
+          id: "id-obligated-spent-funds",
+          label: "Filled Obligated And Spent Funds",
+          answer: [
+            {
+              fileId: "mock-file-id",
+              name: "mock file",
+              size: 100,
+            },
+          ],
+          required: false,
+        }}
+        updateElement={logNewElement}
+      ></ObligatedAndSpentFundsAttachmentElement>,
+    ],
+    pdfVariants: [
+      <ExportedReportWrapper section={obligatedAndSpentFundsSection} />,
+    ],
+  },
+  [ElementType.ActionTable]: {
+    description:
+      "Generic table that has a the ability to add more columns if you're an admin user",
+    id: "id-action-table",
+    variants: [
+      <ActionTable
+        element={{
+          type: ElementType.ActionTable,
+          id: "id-action-table",
+          label: "Action Table",
+          heading: "Action Table",
+          helperText: "hint text",
+          modal: {
+            title: "Modal",
+            elements: [],
+          },
+          rows: [
+            {
+              header: "Text Field",
+              id: "row-1",
+              type: ElementType.Paragraph,
+            },
+            {
+              header: "Textbox Field",
+              id: "row-2",
+              type: ElementType.Textbox,
+            },
+            {
+              header: "Date Field",
+              id: "row-3",
+              type: ElementType.Date,
+            },
+          ],
+          answer: [
+            [
+              { id: "row-1", value: "1" },
+              { id: "row-2", value: "textbox 1" },
+              { id: "row-3", value: "01/01/2021" },
+            ],
+            [
+              { id: "row-1", value: "2" },
+              { id: "row-2", value: "textbox 2" },
+              { id: "row-3", value: "02/02/2022" },
+            ],
+          ],
+          required: true,
+        }}
+        updateElement={logNewElement}
+      ></ActionTable>,
+    ],
+    pdfVariants: [<ExportedReportWrapper section={actionTableSection} />],
+  },
+  [ElementType.AttachmentTable]: {
+    description:
+      "A table that tracks all the attachments that's been uploading in the initiatives pages.",
+    id: "id-attachment-table",
+    variants: [
+      <AttachmentTable
+        element={{
+          type: ElementType.AttachmentTable,
+          id: "id-attachment-table",
+          answer: [
+            {
+              checkpoint: "planning-2",
+              initiatives: ["init-1"],
+              attachment: {
+                name: "attachment name",
+                size: 100,
+                fileId: "mock-file-id",
+              },
+              status: AttachmentStatus.PENDING_REVIEW,
+              canDelete: true,
+            },
+          ],
+        }}
+        updateElement={logNewElement}
+      ></AttachmentTable>,
+    ],
+    pdfVariants: ["Attachment Table currently not used in PDFs"],
+  },
+  [ElementType.RequestFeedbackButton]: {
+    description: "A field that allows the user to send comments to the CMS PO.",
+    id: "id-request-feedback-button",
+    variants: [<RequestFeedbackButton></RequestFeedbackButton>],
+    pdfVariants: ["Request Feedback button currently not used in PDFs"],
+  },
+  [ElementType.InitiativesTable]: {
+    description:
+      "A table listing all the avaliable Initiatives that the user can edit.",
+    id: "id-initiative-table",
+    variants: [
+      <InitiativesTable
+        element={{
+          id: "id-initiative-table",
+          type: ElementType.InitiativesTable,
+          required: false,
+          quarterly: undefined,
+          disabled: undefined,
+        }}
+      ></InitiativesTable>,
+    ],
+    pdfVariants: ["Initiative Table currently not used in PDFs"],
   },
 };
