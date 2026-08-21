@@ -107,6 +107,14 @@ button {
   }
 }
 
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+[tabindex="-1"]:focus-visible {
+  @include tabbed-focus;
+}
+
 #main-content {
   &:focus {
     box-shadow: none !important;

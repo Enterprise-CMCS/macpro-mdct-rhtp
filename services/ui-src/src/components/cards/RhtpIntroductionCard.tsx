@@ -11,17 +11,17 @@ import { ReportType } from "@rhtp/shared";
 export const RhtpIntroductionCard = () => {
   return (
     <ReportIntroCard title="RHTP Report">
-      <p>
+      <Text>
         The{" "}
-        <a href="https://www.cms.gov/priorities/rural-health-transformation-rht-program/overview">
+        <Link href="https://www.cms.gov/priorities/rural-health-transformation-rht-program/overview">
           Rural Health Transformation Program
-        </a>{" "}
+        </Link>{" "}
         aims to improve healthcare access, quality, and outcomes in rural
         communities. States using funding from this program to enhance their
         healthcare ecosystems must report on how the funds are being used, and
         what progress they are making towards healthcare goals. Reports are
         submitted quarterly, with the 4th being an annual summary.
-      </p>
+      </Text>
       <ReportIntroCardActions reportType={ReportType.RHTP} />
       <Accordion allowToggle={true} defaultIndex={[-1]}>
         <AccordionItem label="When is the RHTP report due?">
