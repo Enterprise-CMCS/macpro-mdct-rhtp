@@ -137,7 +137,7 @@ const initiativeNumberOfPeopleServed: TextboxTemplate = {
   label: "Number of people served",
   mask: MaskType.NumberNA,
   helperText:
-    "Number of People Served is only reported annually. If this number is not applicable for the initiative, enter N/A. <b>Invalid entries will automatically clear.",
+    "Number of People Served is only reported annually. If this number is not applicable for the initiative, enter N/A. <b>Invalid entries will automatically clear.</b>",
   helperTextLink: {
     link: "Reporting Guidelines",
     label: "Number of People Served",
@@ -166,7 +166,7 @@ export const metricTable = (
     helperText:
       "The metrics for each initiative will be <b>pre-populated</b> based on the information previously provided. Metric values are only required to be reported annually. Any value reported on a Quarterly Report will be pre-populated but editable for the remainder of the Program Year. Contact your Project Officer if the metrics listed are incorrect.<br>" +
       "Additionally, <b>“As of Date”</b> is NOT today's date. This must be the historical date on which the metric value was either extracted from a database or calculated by the State. This value should not be updated until the metric value is updated or the previous value is confirmed by subsequent analysis.<br>" +
-      "Current Values: Enter a number, currency (e.g., $100), percentage (e.g., 50%), or N/A if no data. <b>Invalid entries will automatically clear.",
+      "Current Values: Enter a number, currency (e.g., $100), percentage (e.g., 50%), or N/A if no data. <b>Invalid entries will automatically clear.</b>",
     quarterly: true,
     modal: {
       title: "Metric",
@@ -177,7 +177,7 @@ export const metricTable = (
           label: "Status",
           editOnly: true,
           hintText:
-            "Setting \“Abandoned\" preserves its historical values for auditing but flags it as abandoned, removing it from the state's current active data entry requirements.,",
+            "Setting \“Abandoned\" preserves its historical values for auditing but flags it as abandoned, removing it from the state's current active data entry requirements.",
           children: [
             { label: "Active", value: "Active" },
             { label: "Abandoned", value: "Abandoned" },
