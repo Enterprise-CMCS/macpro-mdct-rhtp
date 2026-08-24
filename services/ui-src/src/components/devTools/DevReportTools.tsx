@@ -80,8 +80,6 @@ export const DevReportTools = () => {
       }
       if (element.type === "actionTable")
         return { ...element, answer: fillActionTable(element) };
-      else if (element.type === ElementType.ObligatedAndSpentFundsAttachment)
-        return;
       else {
         const answer =
           "answer" in element &&
