@@ -30,7 +30,7 @@ export const ObligatedAndSpentFundsAttachmentElement = (
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const { id, state, type: reportType } = report!;
   const { answer, label } = element;
-  const files = answer ?? [];
+  const files = answer?.toReversed() ?? [];
   const [selectedFile, setSelectedFile] = useState<UploadListProp>();
 
   const budgetPeriodDropdownOptions = [
