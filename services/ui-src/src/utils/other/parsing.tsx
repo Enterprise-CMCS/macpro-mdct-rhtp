@@ -15,15 +15,21 @@ export const bytesToKiloBytes = (bytes: number) => {
   return Math.ceil(bytes / 1000);
 };
 
-export const optionalTag = (element: { label: string; required: boolean }) => {
+export const optionalTag = (element: {
+  label: string;
+  required: boolean;
+  skipOptionalTag?: boolean;
+}) => {
+  const skipOptionalTag = element.skipOptionalTag ?? false;
   return (
     <>
       {element.label}
-      {element.required ? (
-        <span className="requiredText">Required</span>
-      ) : (
-        <span className="optionalText"> (optional)</span>
-      )}
+      {!skipOptionalTag &&
+        (element.required ? (
+          <span className="requiredText">Required</span>
+        ) : (
+          <span className="optionalText"> (optional)</span>
+        ))}
     </>
   );
 };

@@ -23,12 +23,13 @@ export const TextField = (
   const { setModalComponent } = useStore();
   const { element: textbox, disabled } = props;
   const stringifyAnswer = (newAnswer: typeof textbox.answer) => {
+    if (textbox.mask) {
+      newAnswer = maskByType(textbox.mask, newAnswer);
+    }
     if (textbox.type === ElementType.NumberField) {
-      if (textbox.mask) {
-        newAnswer = maskByType(textbox.mask, newAnswer);
-      }
       return stringifyInput(newAnswer as number);
     }
+
     return newAnswer ?? "";
   };
 
@@ -67,7 +68,7 @@ export const TextField = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const rawValue = event.target.value;
-    setDisplayValue(stringifyAnswer(rawValue));
+    setDisplayValue(rawValue);
 
     if (textbox.type === ElementType.NumberField) {
       const updateElement = (props as PageElementProps<NumberFieldTemplate>)
@@ -99,7 +100,16 @@ export const TextField = (
   const onBlurHandler = () => {
     // When the user is done typing, overwrite the answer with the parsed value.
     setHasFocus(false);
-    setDisplayValue(stringifyAnswer(textbox.answer));
+    // Need to save the masked value to the store if the textbox has a mask
+    if (textbox.type === ElementType.Textbox && textbox.mask) {
+      const updateElement = (props as PageElementProps<TextboxTemplate>)
+        .updateElement;
+      const maskedAnswer = maskByType(textbox.mask, displayValue);
+      updateElement({ answer: maskedAnswer });
+      setDisplayValue(maskedAnswer);
+    } else {
+      setDisplayValue(stringifyAnswer(textbox.answer));
+    }
     if (!textbox.answer && textbox.required) {
       setErrorMessage(ErrorMessages.requiredResponse);
     }

@@ -347,6 +347,7 @@ interface InputElementTemplate {
   disabled?: boolean;
   onlyCmsAdminCanEdit?: boolean;
   cmsAdminCanEditInSubmitted?: boolean;
+  skipOptionalTag?: boolean;
 }
 
 export interface CheckboxTemplate extends InputElementTemplate {
@@ -400,6 +401,7 @@ export interface TextboxTemplate extends InputElementTemplate {
   type: ElementType.Textbox;
   answer?: string;
   hideCondition?: HideCondition;
+  mask?: MaskType;
 }
 
 export interface TableCheckpointTemplate {
@@ -462,6 +464,8 @@ export type AttachmentTableTemplate = {
 
 export enum MaskType {
   CommaSeparated = "CommaSeparated",
+  MagicNumber = "MagicNumber",
+  NumberNA = "NumberNA",
 }
 
 export interface ActionElement {
@@ -481,7 +485,6 @@ export interface ActionModalElement extends ActionElement {
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;
-  mask?: MaskType;
 }
 
 export type ActionAnswerShape = { id: string; value: string | number }[];

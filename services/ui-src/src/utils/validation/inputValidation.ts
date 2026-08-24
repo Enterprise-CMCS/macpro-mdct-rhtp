@@ -136,6 +136,10 @@ export const maskByType = (type: MaskType, value: any) => {
   switch (type) {
     case MaskType.CommaSeparated:
       return commaSeparatedMask(value);
+    case MaskType.MagicNumber:
+      return magicNumberMask(value);
+    case MaskType.NumberNA:
+      return numberNAMask(value);
     default:
       return value;
   }
@@ -145,6 +149,10 @@ export const unmaskByType = (type: MaskType, value: any) => {
   switch (type) {
     case MaskType.CommaSeparated:
       return parseNumber(stringifyInput(value));
+    case MaskType.MagicNumber:
+      return value;
+    case MaskType.NumberNA:
+      return value;
     default:
       return value;
   }
@@ -173,4 +181,72 @@ export const commaSeparatedMask = (value: string | number) => {
 
   const sign = intPart.startsWith("-") ? "-" : "";
   return sign + intFormat.format(Math.abs(intNum)) + decPart;
+};
+
+/**
+ * A mask that accepts bare numbers, dollar amounts, percentages, and "N/A"
+ * Also adds commas as thousands separators to numbers and dollar amounts.
+ */
+export const magicNumberMask = (value = "") => {
+  const rawValue = String(value);
+  let formattedValue = "";
+  let numericValue = undefined;
+
+  const hasDigits = /\d/.test(rawValue);
+  const startsWithN = rawValue.startsWith("N") || rawValue.startsWith("n");
+  const hasNegative = rawValue.includes("-");
+  const hasDollar = rawValue.includes("$");
+  const hasPercent = rawValue.includes("%");
+  const stripped = rawValue
+    .replaceAll(/[^\d\.]/g, "")
+    .match(/^(\d*\.?\d*)/)![1];
+  if (!hasDigits && startsWithN) {
+    formattedValue = "N/A";
+  } else if (hasDigits) {
+    numericValue = Number(stripped);
+
+    if (hasPercent) {
+      formattedValue = `${numericValue}%`;
+    } else if (hasDollar) {
+      formattedValue = `$${commaSeparatedMask(numericValue)}`;
+    } else {
+      formattedValue = commaSeparatedMask(numericValue);
+    }
+
+    if (hasNegative) {
+      formattedValue = `-${formattedValue}`;
+    }
+  }
+
+  return formattedValue;
+};
+
+/**
+ * A mask that accepts bare numbers, and "N/A"
+ *  * Also adds commas as thousands separators
+ */
+export const numberNAMask = (value = "") => {
+  const rawValue = String(value);
+  let formattedValue = "";
+  let numericValue = undefined;
+
+  const hasDigits = /\d/.test(rawValue);
+  const startsWithN = rawValue.startsWith("N") || rawValue.startsWith("n");
+  const hasNegative = rawValue.includes("-");
+  const stripped = rawValue
+    .replaceAll(/[^\d\.]/g, "")
+    .match(/^(\d*\.?\d*)/)![1];
+  if (!hasDigits && startsWithN) {
+    formattedValue = "N/A";
+  } else if (hasDigits) {
+    numericValue = Number(stripped);
+
+    formattedValue = `${commaSeparatedMask(numericValue)}`;
+
+    if (hasNegative) {
+      formattedValue = `-${formattedValue}`;
+    }
+  }
+
+  return formattedValue;
 };
