@@ -283,6 +283,21 @@ const completeObligatedAndSpentFundsForSubmission = async (
   }
 
   await addObligatedAndSpentFundsButton.click();
+
+  const budgetDropdown = editor.page
+    .getByRole("button", {
+      name: /Which budget period does this document apply to?/i,
+    })
+    .first();
+  await expect(budgetDropdown).toBeVisible();
+  await expect(budgetDropdown).toBeEnabled();
+  await budgetDropdown.click();
+  const budgetOption = editor.page.getByRole("option", {
+    name: /Budget Period 1/i,
+  });
+  await expect(budgetOption).toBeVisible();
+  await budgetOption.click();
+
   const uploadDialog = editor.page.getByRole("dialog");
   await expect(uploadDialog).toBeVisible();
 
@@ -290,7 +305,7 @@ const completeObligatedAndSpentFundsForSubmission = async (
     .locator("input[type='file']#file-input")
     .setInputFiles(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH);
   await expect(
-    uploadDialog.getByText("obligated-and-spent-funds.csv")
+    uploadDialog.getByRole("button", { name: "obligated-and-spent-funds.csv" })
   ).toBeVisible();
 
   await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
