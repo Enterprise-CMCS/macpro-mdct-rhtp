@@ -25,19 +25,64 @@ export const GOVERNANCE_CHECKPOINT = /0\.1 Establish governance/i;
 const INITIATIVE_ROW_PATTERN = /^\d+:\s*.+/;
 const EDITABLE_STATUS_PATTERN = /^(Not started|In progress|In revision)$/i;
 
-export const getInitiativeRows = (table: Locator): Locator =>
+export type ReportPeriod = "annual" | "quarterly";
+export type AdminMetricControlsVisibility = "visible" | "hidden";
+
+const REPORT_PERIOD_LABELS: Record<ReportPeriod, string> = {
+  annual: "Annual Report",
+  quarterly: "Quarterly Report",
+};
+
+const getInitiativeRows = (table: Locator): Locator =>
   table.getByRole("row").filter({ hasText: INITIATIVE_ROW_PATTERN });
 
-export const getEditButton = (row: Locator): Locator =>
+const getEditButton = (row: Locator): Locator =>
   row.getByRole("link", { name: /^(Edit|View)\b/i });
 
-export const getNonAbandonedInitiativeRows = (table: Locator): Locator =>
+const getNonAbandonedInitiativeRows = (table: Locator): Locator =>
   getInitiativeRows(table).filter({ hasNotText: /Status:\s*Abandoned/i });
+
+export const verifyAdminMetricControls = async (
+  editor: ReportEditorPage,
+  visibility: AdminMetricControlsVisibility
+): Promise<void> => {
+  const addMetricButton = editor.page.getByRole("button", {
+    name: /^Add Metric$/i,
+  });
+  const metricsTable = editor.page.getByRole("table").filter({
+    has: editor.page.getByRole("columnheader", { name: "Metric" }),
+  });
+  const metricRows = metricsTable.locator("tbody").getByRole("row");
+  const editAbandonButtons = metricRows.getByRole("button", {
+    name: /^Edit\/Abandon$/i,
+  });
+
+  await expect(metricsTable).toBeVisible({ timeout: TIMEOUT_UI });
+  const metricRowCount = await metricRows.count();
+  expect(metricRowCount).toBeGreaterThan(0);
+
+  if (visibility === "hidden") {
+    await expect(addMetricButton).toHaveCount(0);
+    await expect(editAbandonButtons).toHaveCount(0);
+    return;
+  }
+
+  await expect(addMetricButton).toBeVisible({ timeout: TIMEOUT_UI });
+  await expect(editAbandonButtons).toHaveCount(metricRowCount);
+
+  for (let index = 0; index < metricRowCount; index++) {
+    await expect(
+      metricRows.nth(index).getByRole("button", {
+        name: /^Edit\/Abandon$/i,
+      })
+    ).toBeVisible({ timeout: TIMEOUT_UI });
+  }
+};
 
 const getInitiativeNumberAndName = (row: Locator): Locator =>
   row.getByText(INITIATIVE_ROW_PATTERN).first();
 
-export const getOpenInitiativeHeading = (editor: ReportEditorPage): Locator =>
+const getOpenInitiativeHeading = (editor: ReportEditorPage): Locator =>
   editor.page.getByRole("heading", { name: INITIATIVE_ROW_PATTERN }).first();
 
 const getInitiativeNumberAndNameText = async (row: Locator): Promise<string> =>
@@ -81,44 +126,45 @@ export const openInitiativeFromList = async (
   return selectedInitiativeNumberAndName;
 };
 
-export const openAnnualReportFromDashboard = async (
-  editor: ReportEditorPage
+export const openReportFromDashboard = async (
+  editor: ReportEditorPage,
+  period: ReportPeriod
 ): Promise<void> => {
   const { reportType, state } = editor.getCurrentRouteParams();
   await editor.navigateTo(`/report/${reportType}/${state}`);
   await editor.waitForLoadingComplete();
 
-  const annualEditableRow = editor.page
+  const reportRow = editor.page
     .getByRole("table")
     .getByRole("row")
-    .filter({ hasText: /Annual Report/i })
+    .filter({ hasText: REPORT_PERIOD_LABELS[period] })
     .filter({
       has: editor.page.getByRole("cell", { name: EDITABLE_STATUS_PATTERN }),
     })
     .first();
 
-  await expect(annualEditableRow).toBeVisible({ timeout: TIMEOUT_UI });
-  const annualOpenButton = annualEditableRow
+  await expect(reportRow).toBeVisible({ timeout: TIMEOUT_UI });
+  const openReportButton = reportRow
     .getByRole("button", { name: /View .* report/i })
     .first();
-  await expect(annualOpenButton).toBeVisible({ timeout: TIMEOUT_UI });
+  await expect(openReportButton).toBeVisible({ timeout: TIMEOUT_UI });
 
   await Promise.all([
     editor.page.waitForURL(
       /\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?(?:[?#].*)?$/
     ),
-    annualOpenButton.click(),
+    openReportButton.click(),
   ]);
   await editor.waitForLoadingComplete();
 
   const {
-    reportType: annualReportType,
-    state: annualState,
+    reportType: openedReportType,
+    state: openedState,
     reportId,
   } = editor.getCurrentRouteParams();
   await editor.navigateToSection(
-    annualReportType,
-    annualState,
+    openedReportType,
+    openedState,
     reportId,
     INITIATIVES_SECTION
   );
