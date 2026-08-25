@@ -6,21 +6,7 @@ import {
   DropdownOption,
   ChoiceList,
 } from "@cmsgov/design-system";
-import {
-  Divider,
-  Heading,
-  Text,
-  Spinner,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-  Button,
-  Image,
-  Flex,
-} from "@chakra-ui/react";
+import { Divider, Text, Spinner, Button, Flex } from "@chakra-ui/react";
 import {
   ReportStatus,
   Report,
@@ -34,8 +20,8 @@ import {
   createComment,
   getComments,
 } from "utils/api/requestMethods/commentMethods";
-import closeIcon from "assets/icons/close/icon_close_primary.svg";
 import { PreviousComments } from "./PreviousComments";
+import { Drawer } from "./Drawer";
 
 const AdminReportStatusOptions = [
   ReportStatus.SUBMITTED,
@@ -206,136 +192,95 @@ export const ReportCommentDrawer = ({
 
   return (
     <Drawer
-      isOpen={modalDisclosure.isOpen}
-      onClose={modalDisclosure.onClose}
-      placement="right"
+      modalDisclosure={modalDisclosure}
+      onConfirmHandler={modalDisclosure.onClose}
+      content={{
+        heading: "Add comment to report",
+        subheading: userSpecificSubheading,
+        solidButtonText: "Close",
+      }}
     >
-      <DrawerOverlay />
-      <DrawerContent maxWidth={"576px"}>
-        <Flex sx={sx.drawerCloseContainer}>
-          <Button
-            leftIcon={<Image src={closeIcon} alt="Close" />}
-            variant="link"
-            onClick={() => modalDisclosure.onClose()}
-            fontWeight="bold"
-          >
-            Close
-          </Button>
-        </Flex>
-        <DrawerHeader>
-          <Flex direction="column" gap="spacer3">
-            <Heading as="h1" sx={sx.drawerHeaderText}>
-              Add comment to report
-            </Heading>
-          </Flex>
-        </DrawerHeader>
-        <DrawerBody>
-          <Flex direction="column" gap="spacer4" marginBottom="spacer4">
-            <Text sx={sx.drawerSubheading}>{userSpecificSubheading}</Text>
-            <Text fontSize="body_lg" fontWeight="body_lg">
-              <b>Report:</b> {name}
-            </Text>
-            {errorMessages.overall && (
-              <Text fontSize="body_md" color="red">
-                {errorMessages.overall}
-              </Text>
-            )}
+      <Flex direction="column" gap="spacer4" marginBottom="spacer4">
+        <Text fontSize="body_lg" fontWeight="body_lg">
+          <b>Report:</b> {name}
+        </Text>
+        {errorMessages.overall && (
+          <Text fontSize="body_md" color="red">
+            {errorMessages.overall}
+          </Text>
+        )}
 
-            {userIsAdmin && (
-              <Fragment>
-                <Dropdown
-                  label={
-                    <>
-                      Status
-                      <span className="optionalText"> (optional)</span>
-                    </>
-                  }
-                  name="status"
-                  onChange={onChange}
-                  options={statusOptions}
-                  value={displayValue.status}
-                  disabled={statusDisabled}
-                  errorMessage={errorMessages.status}
-                />
-                <ChoiceList
-                  label="External or Internal Comment"
-                  hint="Choose whether this comment is hidden from the state or shared."
-                  name="commentType"
-                  type="radio"
-                  onChange={onChange}
-                  errorMessage={errorMessages.commentType}
-                  choices={[
-                    {
-                      label: "External (Shared with States)",
-                      value: "external",
-                    },
-                    { label: "Internal (CMS Only)", value: "internal" },
-                  ]}
-                />
-              </Fragment>
-            )}
-            <TextField
-              name={"comment"}
+        {userIsAdmin && (
+          <Fragment>
+            <Dropdown
               label={
                 <>
-                  Comment
-                  {commentsOptional && (
-                    <span className="optionalText"> (optional)</span>
-                  )}
+                  Status
+                  <span className="optionalText"> (optional)</span>
                 </>
               }
+              name="status"
               onChange={onChange}
-              value={displayValue.comment}
-              disabled={commentsDisabled}
-              multiline
-              rows={3}
-              errorMessage={errorMessages.comment}
+              options={statusOptions}
+              value={displayValue.status}
+              disabled={statusDisabled}
+              errorMessage={errorMessages.status}
             />
-          </Flex>
-          <Button
-            onClick={onSubmit}
-            isDisabled={commentsDisabled}
-            isLoading={submitting}
-            variant="outline"
-          >
-            Add comment
-          </Button>
-          <Divider marginTop={"spacer3"} borderColor={"black"} />
-          {commentsLoading ? (
-            <Flex gap="spacer2" alignItems="center" marginTop="spacer4">
-              <Spinner size="md" />
-              <Text>Comments loading...</Text>
-            </Flex>
-          ) : null}
-          {pastComments.length > 0 ? (
-            <PreviousComments
-              comments={pastComments}
-              userIsAdmin={userIsAdmin!}
+            <ChoiceList
+              label="External or Internal Comment"
+              hint="Choose whether this comment is hidden from the state or shared."
+              name="commentType"
+              type="radio"
+              onChange={onChange}
+              errorMessage={errorMessages.commentType}
+              choices={[
+                {
+                  label: "External (Shared with States)",
+                  value: "external",
+                },
+                { label: "Internal (CMS Only)", value: "internal" },
+              ]}
             />
-          ) : null}
-        </DrawerBody>
-        <DrawerFooter>
-          <Button onClick={() => modalDisclosure.onClose()}>Close</Button>
-        </DrawerFooter>
-      </DrawerContent>
+          </Fragment>
+        )}
+        <TextField
+          name={"comment"}
+          label={
+            <>
+              Comment
+              {commentsOptional && (
+                <span className="optionalText"> (optional)</span>
+              )}
+            </>
+          }
+          onChange={onChange}
+          value={displayValue.comment}
+          disabled={commentsDisabled}
+          multiline
+          rows={3}
+          errorMessage={errorMessages.comment}
+        />
+      </Flex>
+      <Button
+        onClick={onSubmit}
+        isDisabled={commentsDisabled}
+        isLoading={submitting}
+        variant="outline"
+      >
+        Add comment
+      </Button>
+      <Divider marginTop={"spacer3"} borderColor={"black"} />
+      {commentsLoading ? (
+        <Flex gap="spacer2" alignItems="center" marginTop="spacer4">
+          <Spinner size="md" />
+          <Text>Comments loading...</Text>
+        </Flex>
+      ) : null}
+      {pastComments.length > 0 ? (
+        <PreviousComments comments={pastComments} userIsAdmin={userIsAdmin!} />
+      ) : null}
     </Drawer>
   );
-};
-
-const sx = {
-  drawerHeaderText: {
-    fontSize: "heading_2xl",
-    fontWeight: "heading_2xl",
-  },
-  drawerCloseContainer: {
-    position: "absolute",
-    right: "spacer4",
-    top: "spacer2",
-  },
-  drawerSubheading: {
-    fontSize: "body_md",
-    fontWeight: "normal",
-  },
 };
 
 interface Props {
