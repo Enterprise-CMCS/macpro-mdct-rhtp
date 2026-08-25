@@ -7,6 +7,7 @@ import {
   HStack,
   Stack,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
 import { Dropdown } from "@cmsgov/design-system";
 import { PageTemplate } from "components/layout/PageTemplate";
@@ -20,7 +21,12 @@ import { MultiSelect } from "components/forms/Multiselect";
 import { RhtpSubTypeMap, ZipRequestTypes } from "@rhtp/shared";
 import { getZipFile } from "utils/other/fileUtils";
 
-const ExportCard = (title: string, desc: string, onClick: () => void) => {
+const ExportCard = (
+  title: string,
+  desc: string,
+  onClick: () => void,
+  isZipLoading: boolean
+) => {
   return (
     <Card
       boxShadow="0px 3px 9px rgba(0, 0, 0, 0.2)"
@@ -31,7 +37,12 @@ const ExportCard = (title: string, desc: string, onClick: () => void) => {
           <Text fontWeight="bold">{title}</Text>
           <Text maxWidth={"36rem"}>{desc}</Text>
         </Stack>
-        <Button variant="outline" onClick={onClick}>
+        <Button variant="outline" onClick={onClick} disabled={isZipLoading}>
+          {isZipLoading && (
+            <Flex justify="center">
+              <Spinner size="md" marginRight="spacer2" />
+            </Flex>
+          )}
           Export
         </Button>
       </HStack>
@@ -40,7 +51,8 @@ const ExportCard = (title: string, desc: string, onClick: () => void) => {
 };
 
 export const ExportedZipPage = () => {
-  const [isExporting, setIsExporting] = useState(false);
+  const [isStateExporting, setIsStateExporting] = useState(false);
+  const [isReportsExporting, setIsReportsExporting] = useState(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<{
     heading: string;
@@ -123,7 +135,12 @@ export const ExportedZipPage = () => {
   };
 
   const onExport = async () => {
-    setIsExporting(true);
+    if (view === "STATE") {
+      setIsStateExporting(true);
+    } else if (view === "REPORTS") {
+      setIsReportsExporting(true);
+    }
+    setModalOpen(false);
 
     const reports = selectedReports.filter((report) => report !== "all");
     const body = {
@@ -133,8 +150,11 @@ export const ExportedZipPage = () => {
     };
     await getZipFile(body);
 
-    setIsExporting(false);
-    setModalOpen(false);
+    if (view === "STATE") {
+      setIsStateExporting(false);
+    } else if (view === "REPORTS") {
+      setIsReportsExporting(false);
+    }
   };
 
   const isReportSelectDisabled = () => {
@@ -161,12 +181,14 @@ export const ExportedZipPage = () => {
         {ExportCard(
           "Obligated and Spent Funds: By Reports (includes All States)",
           "Download a complete summary of all obligated and spent funds across every state. This export aggregates financial data organized by report type across all available reporting periods.",
-          () => setExportData("REPORTS")
+          () => setExportData("REPORTS"),
+          isReportsExporting
         )}
         {ExportCard(
           "Obligated and Spent Funds: By State and Report(s)",
           "Customize your export by selecting specific states and individual reporting periods. Ideal for targeted financial tracking, state-level auditing, and custom date range comparisons.",
-          () => setExportData("STATE")
+          () => setExportData("STATE"),
+          isStateExporting
         )}
       </Flex>
       <Modal
@@ -178,10 +200,19 @@ export const ExportedZipPage = () => {
         }}
         content={modalData}
         onConfirmHandler={onExport}
-        submitting={isExporting}
         disableConfirm={isExportSubmitDisabled()}
       >
         <Stack gap="1.5rem" sx={sx.override}>
+          <div>
+            <p>
+              Once the download starts, you can safely navigate away from this
+              page; it will continue running in the background. If this export
+              contains large files, the download time will vary depending on
+              your internet speed.
+            </p>
+            <br />
+            <p>Do not refresh your browser until the download is complete.</p>
+          </div>
           {view === "STATE" && (
             <Dropdown
               label="State"

@@ -203,18 +203,10 @@ export const AdminBannerDrawer = ({
 
   const hintText = () => {
     return (
-      <div>
-        Formatting is supported with these HTML tags:
-        <ul>
-          <li>&lt;strong&gt;</li>
-          <li>&lt;em&gt;</li>
-          <li>&lt;p&gt;</li>
-          <li>&lt;ul&gt;</li>
-          <li>&lt;ol&gt;</li>
-          <li>&lt;li&gt;</li>
-          <li>&lt;a&gt;</li>
-        </ul>
-      </div>
+      <>
+        Formatting is supported with these HTML tags: &lt;strong&gt;,
+        &lt;em&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;a&gt;.
+      </>
     );
   };
 
