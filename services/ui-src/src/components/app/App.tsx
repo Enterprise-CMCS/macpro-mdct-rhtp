@@ -13,7 +13,13 @@ import {
 } from "components";
 import { Container, Divider, Flex, Heading, Stack } from "@chakra-ui/react";
 import { ErrorBoundary } from "react-error-boundary";
-import { makeMediaQueryClasses, UserContext, useStore } from "utils";
+import {
+  getTabTitle,
+  makeMediaQueryClasses,
+  UserContext,
+  useStore,
+} from "utils";
+import { currentPageSelector } from "utils/state/selectors";
 
 export const App = () => {
   const mqClasses = makeMediaQueryClasses();
@@ -21,6 +27,7 @@ export const App = () => {
   const { logout } = context;
   const { user, showLocalLogins, setSidebar } = useStore();
   const { pathname } = useLocation();
+  const currentPage = useStore(currentPageSelector);
 
   //there are now two export pages due to the addition of the obligated and spent funds export zip
   const isExportPage = pathname !== "/export" && pathname.includes("/export");
@@ -37,6 +44,11 @@ export const App = () => {
   useEffect(() => {
     localStorage.setItem("ReturnURL", pathname);
   }, []);
+
+  useEffect(() => {
+    //setting tab title for each page
+    document.title = getTabTitle(pathname, currentPage);
+  }, [pathname, currentPage]);
 
   const authenticatedRoutes = (
     <>

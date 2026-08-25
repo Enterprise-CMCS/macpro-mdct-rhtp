@@ -118,6 +118,15 @@ export const acceptedFileTypes = [
   ".xls",
 ];
 
+export const tabTitleMap = {
+  "/": "Rural Health Transformation Program",
+  "/help": "How can we help you? - RHTP",
+  "/profile": "My Account - RHTP",
+  "/export": "Export RHTP Files and Data - RHTP",
+  "/admin": "Banner Admin - RHTP",
+  "/403": "Access Denied",
+};
+
 export const getExtension = (filename: string): string | undefined => {
   const lastDot = filename.lastIndexOf(".");
   if (lastDot <= 0 || lastDot === filename.length - 1) {
