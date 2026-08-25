@@ -237,15 +237,6 @@ export const AttachmentCommentDrawer = ({
 };
 
 const sx = {
-  drawerHeaderText: {
-    fontSize: "heading_2xl",
-    fontWeight: "heading_2xl",
-  },
-  drawerCloseContainer: {
-    position: "absolute",
-    right: "spacer4",
-    top: "spacer2",
-  },
   drawerSubheading: {
     fontSize: "body_md",
     fontWeight: "normal",
