@@ -22,16 +22,33 @@ export const CHECKPOINT_STAGE_LABELS = [
 
 export const GOVERNANCE_CHECKPOINT = /0\.1 Establish governance/i;
 
+export const CHECKPOINT_TABLE_HEADERS = [
+  "#",
+  "Checkpoint",
+  "Ready for CMS Review",
+  "Attachments",
+  "Status",
+  "Actions",
+];
+
 const INITIATIVE_ROW_PATTERN = /^\d+:\s*.+/;
 const EDITABLE_STATUS_PATTERN = /^(Not started|In progress|In revision)$/i;
+const CHECKPOINT_STATUS_PATTERN =
+  /^(Pending Review|Needs Revision|Locked for Scoring|Informational|Archived)$/i;
 
 export type ReportPeriod = "annual" | "quarterly";
 export type AdminMetricControlsVisibility = "visible" | "hidden";
+export type MetricsTableOptions = {
+  adminControls?: boolean;
+};
 
 const REPORT_PERIOD_LABELS: Record<ReportPeriod, string> = {
   annual: "Annual Report",
   quarterly: "Quarterly Report",
 };
+
+const escapeRegExp = (value: string): string =>
+  value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 
 const getInitiativeRows = (table: Locator): Locator =>
   table.getByRole("row").filter({ hasText: INITIATIVE_ROW_PATTERN });
@@ -76,6 +93,176 @@ export const verifyAdminMetricControls = async (
         name: /^Edit\/Abandon$/i,
       })
     ).toBeVisible({ timeout: TIMEOUT_UI });
+  }
+};
+
+export const verifyTableHeaders = async (
+  table: Locator,
+  expectedHeaders: string[]
+): Promise<void> => {
+  const headers = table.getByRole("columnheader");
+
+  await expect(headers).toHaveCount(expectedHeaders.length);
+  await expect(headers).toHaveText(expectedHeaders);
+};
+
+export const verifyMetricsTableHeaders = async (
+  table: Locator,
+  options: MetricsTableOptions = {}
+): Promise<boolean> => {
+  const previousAnnualValueHeader = table.getByRole("columnheader", {
+    name: /^Previous annual value$/i,
+  });
+  const hasPreviousValueColumn = await previousAnnualValueHeader
+    .isVisible()
+    .catch(() => false);
+  const expectedHeaders = [
+    "#",
+    "Status",
+    "Metric",
+    "Target",
+    ...(hasPreviousValueColumn ? ["Previous annual value"] : []),
+    "Current value",
+    "As of Date MM/DD/YYYY",
+    ...(options.adminControls ? ["Actions"] : []),
+  ];
+
+  await verifyTableHeaders(table, expectedHeaders);
+
+  return hasPreviousValueColumn;
+};
+
+export const verifyMetricsTableRows = async (
+  table: Locator,
+  hasPreviousValueColumn: boolean,
+  options: MetricsTableOptions = {}
+): Promise<void> => {
+  const dataRows = table.locator("tbody").getByRole("row");
+  const rowCount = await dataRows.count();
+
+  expect(rowCount).toBeGreaterThan(0);
+
+  for (let index = 0; index < rowCount; index++) {
+    const row = dataRows.nth(index);
+    const cells = row.getByRole("cell");
+    const currentValueIndex = hasPreviousValueColumn ? 5 : 4;
+    const dateIndex = hasPreviousValueColumn ? 6 : 5;
+
+    await expect(row).toBeVisible();
+    await expect(cells).toHaveCount(
+      (hasPreviousValueColumn ? 7 : 6) + (options.adminControls ? 1 : 0)
+    );
+    await expect(cells.nth(0)).toHaveText(/^[1-9]\d*$/);
+    await expect(cells.nth(1)).toHaveText(/^(Active|Abandoned)$/i);
+    await expect(cells.nth(2)).toHaveText(/\S+/);
+    await expect(cells.nth(3)).toHaveText(/^(--|\S[\s\S]*)$/);
+
+    const status = ((await cells.nth(1).textContent()) ?? "").trim();
+    const currentValueInput = cells.nth(currentValueIndex).locator("input");
+    const dateInput = cells
+      .nth(dateIndex)
+      .locator('input[inputmode="numeric"]');
+
+    if (hasPreviousValueColumn) {
+      await expect(cells.nth(4).locator("input")).toBeDisabled();
+    }
+
+    if (/^Abandoned$/i.test(status)) {
+      await expect(currentValueInput).toBeDisabled();
+      await expect(dateInput).toBeDisabled();
+    } else {
+      await expect(currentValueInput).toBeEditable();
+      await expect(dateInput).toBeEditable();
+    }
+
+    await expect(dateInput).toHaveAttribute("inputmode", "numeric");
+
+    if (options.adminControls) {
+      await expect(
+        cells.nth(hasPreviousValueColumn ? 7 : 6).getByRole("button", {
+          name: /^Edit\/Abandon$/i,
+        })
+      ).toBeVisible({ timeout: TIMEOUT_UI });
+    }
+  }
+};
+
+export const verifyEditableAnnualInitiativeFields = async (
+  editor: ReportEditorPage
+): Promise<void> => {
+  const narrativeRequiredLabel = editor.page
+    .locator("label")
+    .filter({ hasText: /^NarrativeRequired$/i });
+  const narrativeTextArea = editor.page.getByRole("textbox", {
+    name: /^Narrative/i,
+  });
+  const peopleServedRequiredLabel = editor.page
+    .locator("label")
+    .filter({ hasText: /^Number of people servedRequired$/i });
+  const peopleServedTextArea = editor.page.getByRole("textbox", {
+    name: /Number of people served/i,
+  });
+
+  await expect(narrativeRequiredLabel).toBeVisible();
+  await expect(narrativeTextArea).toBeVisible();
+  await expect(narrativeTextArea).toHaveValue(/\S+/);
+  await expect(narrativeTextArea).toBeEditable();
+  await expect(peopleServedRequiredLabel).toBeVisible();
+  await expect(peopleServedTextArea).toBeVisible();
+  await expect(peopleServedTextArea).toBeEditable();
+};
+
+export const verifyCheckpointTableHeaders = async (
+  table: Locator
+): Promise<void> => {
+  await verifyTableHeaders(table, CHECKPOINT_TABLE_HEADERS);
+};
+
+export const verifyCheckpointStageRows = async (
+  table: Locator
+): Promise<void> => {
+  const dataRows = table.locator("tbody").getByRole("row");
+  const rowCount = await dataRows.count();
+
+  expect(rowCount).toBeGreaterThan(0);
+
+  for (let index = 0; index < rowCount; index++) {
+    const row = dataRows.nth(index);
+    const cells = row.getByRole("cell");
+
+    await expect(row).toBeVisible();
+    await expect(cells).toHaveCount(6);
+    await expect(cells.nth(0)).toHaveText(/^(|\d+\.\d+)$/);
+    await expect(cells.nth(1)).toHaveText(/^(|\S[\s\S]*)$/);
+
+    const checkpointLabel = (await cells.nth(1).textContent())?.trim() ?? "";
+    const readinessCheckbox = cells.nth(2).getByRole("checkbox");
+
+    if (checkpointLabel) {
+      await expect(cells.nth(0)).toHaveText(/^\d+\.\d+$/);
+      await expect(readinessCheckbox).toBeEnabled();
+    } else {
+      await expect(readinessCheckbox).toHaveCount(0);
+    }
+
+    const attachmentText = ((await cells.nth(3).textContent()) ?? "").trim();
+    const hasAttachment =
+      attachmentText !== "" && !/^(Not applicable|--)$/i.test(attachmentText);
+
+    await expect(cells.nth(3)).toHaveText(/^(|Not applicable|--|\S[\s\S]*)$/);
+
+    if (hasAttachment) {
+      await expect(cells.nth(4)).toHaveText(CHECKPOINT_STATUS_PATTERN);
+      await expect(
+        cells.nth(5).getByRole("button", { name: /Manage file or info/i })
+      ).toBeVisible();
+      await expect(
+        cells.nth(5).getByRole("button", { name: /Comment on/i })
+      ).toBeVisible();
+    } else {
+      await expect(cells.nth(4)).toHaveText(/^$/);
+      await expect(cells.nth(5).getByRole("button")).toHaveCount(0);
+    }
   }
 };
 
@@ -227,6 +414,18 @@ export const getCheckpointRow = (
     .filter({ hasText: checkpointName })
     .first();
 
+export const getCheckpointStatusFromRow = async (
+  row: Locator
+): Promise<string> => {
+  const status = (
+    (await row.getByRole("cell").nth(4).textContent()) ?? ""
+  ).trim();
+
+  expect(status).toMatch(/\S+/);
+
+  return status;
+};
+
 export const returnToInitiativesDashboard = async (
   editor: ReportEditorPage
 ): Promise<void> => {
@@ -243,15 +442,37 @@ export const returnToInitiativesDashboard = async (
   ]);
 };
 
-export const reopenInitiativeFromDashboard = async (
+export const verifyInitiativesDashboardVisible = async (
   editor: ReportEditorPage
-): Promise<string> => {
+): Promise<void> => {
   const initiativesTable = editor.page.getByRole("table").filter({
     has: editor.page.getByRole("columnheader", { name: "Initiative" }),
   });
+
   await expect(initiativesTable).toBeVisible({ timeout: TIMEOUT_UI });
+};
+
+export const reopenInitiativeFromDashboard = async (
+  editor: ReportEditorPage
+): Promise<string> => {
+  await verifyInitiativesDashboardVisible(editor);
+  const initiativesTable = editor.page.getByRole("table").filter({
+    has: editor.page.getByRole("columnheader", { name: "Initiative" }),
+  });
   return openInitiativeFromList(editor, initiativesTable);
 };
+
+export const getCheckpointAttachmentRowByFileName = (
+  editor: ReportEditorPage,
+  stageLabel: string,
+  fileName: string
+): Locator =>
+  getCheckpointStage(editor, stageLabel)
+    .getByRole("table")
+    .locator("tbody")
+    .getByRole("row")
+    .filter({ hasText: fileName })
+    .first();
 
 export type UploadFixture = { fileName: string; filePath: string };
 
@@ -277,6 +498,44 @@ export const getManageAttachmentButton = (
     name: `Manage file or info for ${fileName}`,
     exact: true,
   });
+
+export const verifyManageAttachmentDrawerControls = async (
+  drawer: Locator,
+  fileName: string,
+  checkpointStatus: string
+): Promise<void> => {
+  await expect(drawer).toContainText(fileName);
+  await expect(drawer).toContainText(/Current status/i);
+  await expect(drawer).toContainText(
+    new RegExp(escapeRegExp(checkpointStatus), "i")
+  );
+
+  const statusDropdown = drawer
+    .getByRole("button", { name: /Status\s*\(optional\)/i })
+    .first();
+  const initiativeChoices = drawer.getByRole("checkbox");
+  const checkpointDropdown = drawer
+    .getByRole("button", {
+      name: /Which stage\/checkpoint does this attachment apply to\?/i,
+    })
+    .first();
+  const deleteAttachmentButton = drawer.getByRole("button", {
+    name: /^Delete attachment$/i,
+  });
+  const saveChangesButton = drawer.getByRole("button", {
+    name: /^Save changes$/i,
+  });
+
+  await expect(statusDropdown).toBeVisible();
+  await expect(statusDropdown).toBeEnabled();
+  await expect(initiativeChoices.first()).toBeVisible();
+  await expect(checkpointDropdown).toBeVisible();
+  await expect(checkpointDropdown).toBeEnabled();
+  await expect(deleteAttachmentButton).toBeVisible();
+  await expect(deleteAttachmentButton).toBeEnabled();
+  await expect(saveChangesButton).toBeVisible();
+  await expect(saveChangesButton).toBeEnabled();
+};
 
 export const getCommentAttachmentButton = (
   row: Locator,
