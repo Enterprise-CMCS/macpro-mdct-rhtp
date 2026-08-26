@@ -54,7 +54,7 @@ const copyAnswer = (
   status?: PageStatus
 ) => {
   for (const oldElement of oldElements) {
-    // Copying over State Policy Commitments
+    // Copying over State Policy Action Commitments
     if ("accordions" in oldElement) {
       const newElement = newElements.find(
         (newElement) => newElement.id === oldElement.id

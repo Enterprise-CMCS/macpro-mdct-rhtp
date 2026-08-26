@@ -39,7 +39,7 @@ export const PreviousComments = ({
           {userIsAdmin &&
             (comment.isInternal ? (
               <Flex alignItems="center" gap="spacer1">
-                <Image src={lockIcon} alt="lock icon" sx={sx.icon} />
+                <Image src={lockIcon} alt="lock" sx={sx.icon} />
                 <Text fontWeight={"body_sm"} color={"gray_dark"}>
                   CMS Internal
                 </Text>

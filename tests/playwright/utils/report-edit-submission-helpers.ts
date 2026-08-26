@@ -4,19 +4,21 @@ import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import type { StatePage } from "../tests/pageObjects/state.page";
 import { reportType, stateAbbreviation } from "./consts";
 import {
+  isEnvironmentInterruptionError,
   openReportSection,
   type OpenReportSectionResult,
 } from "./report-edit-arrange";
 import {
-  createRunId,
+  createRunScopedInitiativeValues,
   editGeneralInformationFields,
   GENERAL_INFO_FIELDS,
   GENERAL_INFORMATION_SECTION,
+  getReportTestRunId,
   INITIATIVES_SECTION,
-  REVIEW_SUBMIT_SECTION,
-  SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
   OBLIGATED_AND_SPENT_FUNDS_SECTION,
+  REVIEW_SUBMIT_SECTION,
+  SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
 } from "./report-edit-shared-helpers";
 import { TIMEOUT_LOADING, TIMEOUT_UI } from "./timeouts";
 
@@ -26,30 +28,15 @@ const STATE = stateAbbreviation;
 export const SUCCESS_STORIES_LABEL = /success stories/i;
 export const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
 
-const SUSTAINABILITY_RUN_ID =
-  process.env.GITHUB_RUN_ID ??
-  process.env.CI_PIPELINE_ID ??
-  Math.floor(Date.now() / (10 * 60 * 1000)).toString();
+const REPORT_TEST_RUN_ID = getReportTestRunId();
 
 export const SUSTAINABILITY_TEST_DATA = {
   successStories:
     "This is a test success story demonstrating measurable outcomes from RHT implementation." +
-    ` Run: ${SUSTAINABILITY_RUN_ID}`,
+    ` Run: ${REPORT_TEST_RUN_ID}`,
   sustainabilityPlan:
     "Our sustainability strategy includes long-term funding commitments and workforce development partnerships." +
-    ` Run: ${SUSTAINABILITY_RUN_ID}`,
-};
-
-export const createSustainabilityTestData = (runId: string = createRunId()) => {
-  const testId = `${runId}-${Math.floor(Math.random() * 10000)}`;
-  return {
-    successStories:
-      "This is a test success story demonstrating measurable outcomes from RHT implementation." +
-      ` Test: ${testId}`,
-    sustainabilityPlan:
-      "Our sustainability strategy includes long-term funding commitments and workforce development partnerships." +
-      ` Test: ${testId}`,
-  };
+    ` Run: ${REPORT_TEST_RUN_ID}`,
 };
 
 const SUSTAINABILITY_RETRY_INTERRUPTED_REASON =
@@ -64,7 +51,7 @@ const SUBMISSION_PREPARATION_TIMEOUT_REASON =
 const SUBMISSION_PREPARATION_INTERRUPTED_REASON =
   "Submission preparation interrupted by deployed environment page closure";
 
-export const sustainabilityFieldsEditable = async (
+const sustainabilityFieldsEditable = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
   const [successEnabled, planningEnabled] = await Promise.all([
@@ -79,35 +66,6 @@ export const sustainabilityFieldsEditable = async (
   ]);
 
   return successEnabled && planningEnabled;
-};
-
-export type SustainabilityFieldValues = {
-  successStories: string;
-  sustainabilityPlan: string;
-};
-
-export const fillSustainabilityFields = async (
-  editor: ReportEditorPage,
-  values: SustainabilityFieldValues
-): Promise<void> => {
-  const successStoriesField = editor.getTextField(SUCCESS_STORIES_LABEL);
-  const planningField = editor.getTextField(SUSTAINABILITY_PLANNING_LABEL);
-
-  await expect(successStoriesField).toBeEnabled();
-  await expect(planningField).toBeEnabled();
-
-  await editor.fillTextField(SUCCESS_STORIES_LABEL, values.successStories);
-  await editor.fillTextField(
-    SUSTAINABILITY_PLANNING_LABEL,
-    values.sustainabilityPlan
-  );
-
-  // Validate data entry before save assertions so failures distinguish input vs persistence issues.
-  await expect(successStoriesField).toHaveValue(values.successStories);
-  await expect(planningField).toHaveValue(values.sustainabilityPlan);
-
-  // Blur the final edited field to trigger autosave.
-  await editor.page.keyboard.press("Tab");
 };
 
 export const openUnsubmittedSectionWithSustainabilityRetry = async (
@@ -182,23 +140,6 @@ export const openUnsubmittedSectionWithSustainabilityRetry = async (
   return { ok: false, reason: lastFailureReason };
 };
 
-export const openSustainabilityEditorOrSkip = async (
-  statePage: StatePage,
-  onSkip: (reason: string) => void
-): Promise<ReportEditorPage | undefined> => {
-  const opened = await openUnsubmittedSectionWithSustainabilityRetry(
-    statePage,
-    SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
-  );
-
-  if (!opened.ok) {
-    onSkip(opened.reason);
-    return undefined;
-  }
-
-  return opened.editor;
-};
-
 const getIncompleteReviewSections = async (
   editor: ReportEditorPage
 ): Promise<Array<{ title: string; status: string }>> => {
@@ -255,11 +196,11 @@ const completeSustainabilityForSubmission = async (
 
   await editor.fillTextField(
     SUCCESS_STORIES_LABEL,
-    `Success story for submission ${Date.now()}`
+    `Success story for submission ${REPORT_TEST_RUN_ID}`
   );
   await editor.fillTextField(
     SUSTAINABILITY_PLANNING_LABEL,
-    `Sustainability plan for submission ${Date.now()}`
+    `Sustainability plan for submission ${REPORT_TEST_RUN_ID}`
   );
   await editor.page.keyboard.press("Tab");
 
@@ -294,10 +235,8 @@ const completeInitiativesForSubmission = async (
     return existingInitiativeVisible;
   }
 
-  const uniqueSuffix = `${Date.now()}`;
-  const initiativeNumber = uniqueSuffix.slice(-6);
-  const initiativeName = `Initiative ${uniqueSuffix}`;
-  const expectedDisplayName = `${initiativeNumber}: ${initiativeName}`;
+  const { initiativeNumber, initiativeName, expectedDisplayName } =
+    createRunScopedInitiativeValues("submit-readiness", REPORT_TEST_RUN_ID);
 
   await addInitiativeButton.click();
 
@@ -344,6 +283,21 @@ const completeObligatedAndSpentFundsForSubmission = async (
   }
 
   await addObligatedAndSpentFundsButton.click();
+
+  const budgetDropdown = editor.page
+    .getByRole("button", {
+      name: /Which budget period does this document apply to?/i,
+    })
+    .first();
+  await expect(budgetDropdown).toBeVisible();
+  await expect(budgetDropdown).toBeEnabled();
+  await budgetDropdown.click();
+  const budgetOption = editor.page.getByRole("option", {
+    name: /Budget Period 1/i,
+  });
+  await expect(budgetOption).toBeVisible();
+  await budgetOption.click();
+
   const uploadDialog = editor.page.getByRole("dialog");
   await expect(uploadDialog).toBeVisible();
 
@@ -351,7 +305,7 @@ const completeObligatedAndSpentFundsForSubmission = async (
     .locator("input[type='file']#file-input")
     .setInputFiles(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH);
   await expect(
-    uploadDialog.getByText("obligated-and-spent-funds.csv")
+    uploadDialog.getByRole("button", { name: "obligated-and-spent-funds.csv" })
   ).toBeVisible();
 
   await uploadDialog.getByRole("button", { name: /^Done$/i }).click();
@@ -391,8 +345,8 @@ const ensureReportIsSubmittable = async (
   const finalSubmitButton = editor.page.getByRole("button", {
     name: /Submit .* Report/i,
   });
-  const submitForReviewButton = editor.page.getByRole("button", {
-    name: /^Submit for Review$/i,
+  const requestFeedbackButton = editor.page.getByRole("button", {
+    name: /^Request PO Feedback$/i,
   });
 
   const waitForFinalSubmitEnabled = async (): Promise<boolean> => {
@@ -479,15 +433,15 @@ const ensureReportIsSubmittable = async (
       return { submittable: true };
     }
 
-    const reviewVisible = await submitForReviewButton
+    const reviewVisible = await requestFeedbackButton
       .isVisible()
       .catch(() => false);
     const reviewEnabled = reviewVisible
-      ? await submitForReviewButton.isEnabled().catch(() => false)
+      ? await requestFeedbackButton.isEnabled().catch(() => false)
       : false;
 
     if (reviewEnabled) {
-      await submitForReviewButton.click();
+      await requestFeedbackButton.click();
 
       const enabledAfterReview = await waitForFinalSubmitEnabled();
       if (enabledAfterReview) {
@@ -498,7 +452,7 @@ const ensureReportIsSubmittable = async (
     return {
       submittable: false,
       reason:
-        "Report reached Review & Submit but final submit remains disabled after Submit for Review",
+        "Report reached Review & Submit but final submit remains disabled after Request PO Feedback",
     };
   }
 
@@ -539,11 +493,6 @@ export type SubmissionOutcome = {
   reason?: string;
 };
 
-export const isEnvironmentInterruptionError = (error: unknown): boolean => {
-  const message = error instanceof Error ? error.message : String(error);
-  return /Target page, context or browser has been closed/i.test(message);
-};
-
 export const prepareReportForSubmissionWithTimeout = async (
   editor: ReportEditorPage,
   timeoutMs = 90000
@@ -553,12 +502,20 @@ export const prepareReportForSubmissionWithTimeout = async (
     reason: SUBMISSION_PREPARATION_TIMEOUT_REASON,
   };
 
-  return Promise.race([
-    prepareReportForSubmission(editor),
-    new Promise<SubmissionPreparationResult>((resolve) => {
-      setTimeout(() => resolve(timeoutResult), timeoutMs);
-    }),
-  ]);
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  try {
+    return await Promise.race([
+      prepareReportForSubmission(editor),
+      new Promise<SubmissionPreparationResult>((resolve) => {
+        timeoutId = setTimeout(() => resolve(timeoutResult), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
 };
 
 export const submitPreparedReport = async (

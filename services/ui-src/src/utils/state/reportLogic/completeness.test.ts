@@ -290,7 +290,7 @@ describe("elementSatisfiesRequired", () => {
       type: ElementType.ActionTable,
       id: "metrics-table",
       label: "action table",
-      hintText: "hint text",
+      heading: "Heading",
       modal: { title: "", elements: [] },
       rows: [{ id: "row", type: ElementType.Paragraph, header: "" }],
       answer: [[{ id: "row", value: "2" as string }]],

@@ -5,9 +5,9 @@ import { TIMEOUT_LOADING } from "../utils/timeouts";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   AOR_NAME_LABEL,
-  createUniqueAorValue,
   GENERAL_INFORMATION_SECTION,
   GENERAL_INFO_FIELDS,
+  getReportTestRunId,
   REVIEW_SUBMIT_SECTION,
   waitForAutosaveWithSectionRefresh,
 } from "../utils/report-edit-shared-helpers";
@@ -19,6 +19,7 @@ import {
 import {
   verifyFieldIsReadOnly,
   verifyCurrentSection,
+  verifyReportSectionShell,
 } from "../utils/report-edit-assertions";
 
 const ensureGeneralInfoReadyForEdit = async (
@@ -44,7 +45,7 @@ const arrangeReviewSubmitSection = async (statePage: StatePage) => {
   }
 
   const submitButton = editor.page.getByRole("button", {
-    name: /Submit for Review/i,
+    name: /Request PO Feedback/i,
   });
   const blockedMessage = editor.page.getByText(
     "Your form is not ready for submission",
@@ -89,10 +90,12 @@ test.describe("Report Editing - Submission and Read-only", () => {
     }
     const { submitButton, blockedMessage, editor } = context;
 
-    await verifyCurrentSection(editor, REVIEW_SUBMIT_SECTION);
-    await expect(
-      editor.page.getByRole("heading", { name: "Review & Submit" })
-    ).toBeVisible();
+    await verifyReportSectionShell(editor, {
+      sectionId: REVIEW_SUBMIT_SECTION,
+      heading: "Review & Submit",
+      previousButtonVisibility: "hidden",
+      continueButtonVisibility: "hidden",
+    });
 
     const blockedMessageVisible = await blockedMessage
       .isVisible()
@@ -173,7 +176,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
       return;
     }
 
-    const aorValue = createUniqueAorValue();
+    const aorValue = `AOR Name ${getReportTestRunId()}`;
     await verifyCurrentSection(editor, GENERAL_INFORMATION_SECTION);
     await ensureGeneralInfoReadyForEdit(editor);
     await editor.fillTextField(AOR_NAME_LABEL, aorValue);
@@ -202,9 +205,8 @@ test.describe("Report Editing - Submission and Read-only", () => {
       GENERAL_INFORMATION_SECTION
     );
     await verifyCurrentSection(editor, GENERAL_INFORMATION_SECTION);
-    await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(/\S+/);
     await expect(editor.page.getByLabel(AOR_NAME_LABEL)).toHaveValue(
-      /^AOR \d+$/
+      /^AOR Name [a-f0-9]+$/i
     );
     await verifyFieldIsReadOnly(editor, AOR_NAME_LABEL);
   });

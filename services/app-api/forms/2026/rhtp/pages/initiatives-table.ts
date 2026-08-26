@@ -14,7 +14,7 @@ export const initiativesTable: FormPageTemplate = {
     {
       type: ElementType.Paragraph,
       id: "initiatives-instructions",
-      text: "<p>The list below includes initiatives you have previously submitted to CMS. Select <b>Edit</b> for each initiative to report on its progress.</p>",
+      text: "<p>The list below includes initiatives you have previously submitted to CMS. Select <b>Edit</b> for each initiative to report on its progress.</p><br><p>Each initiative will include attachments. To view all attachments across all initiatives, visit the Initiatives Attachment page.</p>",
     },
     {
       type: ElementType.InitiativesTable,

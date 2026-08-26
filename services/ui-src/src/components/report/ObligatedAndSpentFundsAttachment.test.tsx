@@ -98,12 +98,18 @@ describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
       render(
         <ObligatedAndSpentFundsAttachmentWrapper template={mockedElement} />
       );
-
       const addButton = screen.getByRole("button", {
         name: "Add Obligated and Spent Funds",
       });
       await userEvent.click(addButton);
-      expect(screen.getByText("Select a file to upload")).toBeVisible();
+      const dropdown = screen.getAllByLabelText(
+        "Which budget period does this document apply to?"
+      )[0];
+      await userEvent.selectOptions(dropdown, "Budget Period 2");
+      await userEvent.click(addButton);
+      expect(
+        screen.getByText("Select a file or files to upload")
+      ).toBeVisible();
       const dropArea = screen.getByLabelText("file drop area");
       await act(async () => {
         fireEvent.drop(dropArea, {
@@ -114,18 +120,6 @@ describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
 
       const closeButton = screen.getByRole("button", { name: "Close" });
       await userEvent.click(closeButton);
-    });
-
-    test("Upload button is disable when 1 obligated and spent funds is uploaded", () => {
-      render(
-        <ObligatedAndSpentFundsAttachmentWrapper
-          template={mockElementWithAnswer}
-        />
-      );
-      const addButton = screen.getByRole("button", {
-        name: "Add Obligated and Spent Funds",
-      });
-      expect(addButton).toBeDisabled();
     });
 
     test("Able to delete obligated and spent funds", async () => {

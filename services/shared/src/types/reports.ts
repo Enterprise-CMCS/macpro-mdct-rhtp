@@ -96,6 +96,7 @@ export enum PageStatus {
 
 export enum CommentType {
   REPORT = "report",
+  REQUEST_FEEDBACK = "request_feedback",
   ATTACHMENT = "attachment",
   ATTACHMENT_STATUS = "attachment_status",
 }
@@ -171,6 +172,7 @@ export interface ReviewSubmitTemplate extends FormPageTemplate {
 export type PageId = string;
 
 export type UploadListProp = {
+  label?: string;
   name: string;
   size: number;
   fileId: string;
@@ -212,7 +214,7 @@ export enum ElementType {
   ObligatedAndSpentFundsAttachment = "obligatedAndSpentFundsAttachment",
   ActionTable = "actionTable",
   AttachmentTable = "attachmentTable",
-  SubmitForReview = "submitForReview",
+  RequestFeedbackButton = "requestFeedbackButton",
 }
 
 export type PageElement =
@@ -240,7 +242,7 @@ export type PageElement =
   | AttachmentAreaTemplate
   | AttachmentTableTemplate
   | ActionTableTemplate
-  | SubmitForReviewTemplate;
+  | RequestFeedbackButtonTemplate;
 
 export type HideCondition = {
   controllerElementId: string;
@@ -303,6 +305,12 @@ interface DisplayElementTemplate {
   text: string;
 }
 
+interface HelperTextLink {
+  link: string;
+  label: string;
+  text: string;
+}
+
 export interface HeaderTemplate extends DisplayElementTemplate {
   type: ElementType.Header;
   icon?: HeaderIcon;
@@ -312,6 +320,7 @@ export interface ParagraphTemplate extends DisplayElementTemplate {
   type: ElementType.Paragraph;
   title?: string;
   style?: string;
+  helperTextLink?: HelperTextLink;
 }
 
 export interface StatusAlertTemplate extends DisplayElementTemplate {
@@ -332,11 +341,13 @@ interface InputElementTemplate {
   id: string;
   label: string;
   helperText?: string;
-  helperTextLink?: { link: string; label: string; text: string };
+  helperTextLink?: HelperTextLink;
   required: boolean;
   quarterly?: boolean;
   disabled?: boolean;
-  editByRole?: string[];
+  onlyCmsAdminCanEdit?: boolean;
+  cmsAdminCanEditInSubmitted?: boolean;
+  skipOptionalTag?: boolean;
 }
 
 export interface CheckboxTemplate extends InputElementTemplate {
@@ -390,6 +401,7 @@ export interface TextboxTemplate extends InputElementTemplate {
   type: ElementType.Textbox;
   answer?: string;
   hideCondition?: HideCondition;
+  mask?: MaskType;
 }
 
 export interface TableCheckpointTemplate {
@@ -452,6 +464,8 @@ export type AttachmentTableTemplate = {
 
 export enum MaskType {
   CommaSeparated = "CommaSeparated",
+  MagicNumber = "MagicNumber",
+  NumberNA = "NumberNA",
 }
 
 export interface ActionElement {
@@ -471,16 +485,13 @@ export interface ActionModalElement extends ActionElement {
   editOnly?: boolean;
   children?: { label: string; value: string }[];
   required: boolean;
-  mask?: MaskType;
 }
 
 export type ActionAnswerShape = { id: string; value: string | number }[];
 
-export interface ActionTableTemplate {
+export interface ActionTableTemplate extends InputElementTemplate {
   type: ElementType.ActionTable;
-  id: string;
-  label: string;
-  hintText: string;
+  heading: string;
   modal: {
     title: string;
     hintText?: string;
@@ -488,13 +499,10 @@ export interface ActionTableTemplate {
   };
   rows: ActionRowElement[];
   answer?: ActionAnswerShape[];
-  quarterly?: boolean;
-  disabled?: boolean;
-  required: boolean;
 }
 
-export interface SubmitForReviewTemplate {
-  type: ElementType.SubmitForReview;
+export interface RequestFeedbackButtonTemplate {
+  type: ElementType.RequestFeedbackButton;
   id: string;
 }
 

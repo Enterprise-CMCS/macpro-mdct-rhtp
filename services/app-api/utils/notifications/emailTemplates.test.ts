@@ -45,6 +45,25 @@ describe("emailTemplate util", () => {
     );
   });
 
+  test("returns request feedback template for request feedback trigger", () => {
+    const template = getEmailTemplate(
+      EMAIL_TRIGGERS.REQUEST_FEEDBACK,
+      genericData
+    );
+    expect(template).toEqual(
+      expect.objectContaining({
+        Destination: {
+          ToAddresses: genericData.recipients,
+        },
+        Message: expect.objectContaining({
+          Subject: {
+            Data: `RHTP: Feedback requested for ${genericData.reportName}`,
+          },
+        }),
+      })
+    );
+  });
+
   test("returns attachment comment template for attachment comment trigger", () => {
     const template = getEmailTemplate(
       EMAIL_TRIGGERS.ATTACHMENT_COMMENT,

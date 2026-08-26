@@ -52,6 +52,17 @@ const setNextSort = (type: SORT_TYPE) => {
   }
 };
 
+const ariaSortType = (type: SORT_TYPE) => {
+  switch (type) {
+    case SORT_TYPE.ASCENDING:
+      return "ascending";
+    case SORT_TYPE.DESCENDING:
+      return "descending";
+    default:
+      return "none";
+  }
+};
+
 const HorizontalTable = (
   headers: { label: string; sortable?: boolean }[],
   rows: TableRowType[][],
@@ -71,7 +82,13 @@ const HorizontalTable = (
       <Thead>
         <Tr>
           {headers.map((item) => (
-            <Th key={item.label}>
+            <Th
+              key={item.label}
+              aria-sort={
+                item.label === sort.label ? ariaSortType(sort.type) : "none"
+              }
+              textAlign={item.label === "Actions" ? "center" : undefined}
+            >
               {item.sortable ? (
                 <Button
                   variant="sort"

@@ -24,15 +24,17 @@ argument-hint: "Describe what you want to test or the Playwright problem you're 
 - Do not invent folder paths, fixture names, scripts, or auth file names.
 - Treat repository examples as optional adapters, not global requirements.
 - If repo conventions are unknown, use Playwright defaults and state assumptions explicitly.
+- Before any file edit, file creation, file deletion, refactor, or command that changes repository state, request and receive explicit user approval.
 
 ## Agent Execution Protocol
 
 1. Restate the target behavior in one sentence before editing.
 2. Identify whether existing fixtures and page objects can be reused.
-3. Make the smallest code change that satisfies the behavior.
-4. Validate with the narrowest Playwright command first (single spec or grep).
-5. If validation fails, classify as locator, timing, auth, or environment and apply the matching fix path.
-6. Report files changed, validation command run, and remaining risks.
+3. Request user approval for the planned changes; do not edit until approval is received.
+4. Make the smallest code change that satisfies the behavior.
+5. Validate with the narrowest Playwright command first (single spec or grep).
+6. If validation fails, classify as locator, timing, auth, or environment and apply the matching fix path.
+7. Report files changed, validation command run, and remaining risks.
 
 ### Key Patterns
 
@@ -174,6 +176,7 @@ If these values are missing, the agent should proceed with generic Playwright de
 - Locators are role/label-first and scoped when needed.
 - Assertions verify user-visible behavior (not internal implementation details only).
 - Smallest relevant Playwright command was run and result was reported.
+- User approval was obtained before any repository-modifying action.
 
 ## Response Contract for Agents
 

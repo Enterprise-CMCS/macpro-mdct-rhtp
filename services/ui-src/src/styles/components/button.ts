@@ -88,14 +88,14 @@ const linkVariant = () => ({
   textDecoration: "underline",
   textWrap: "auto",
   _hover: {
-    color: "#0071bc",
-    opacity: "0.4",
+    color: "primary_darker",
     textDecoration: "underline",
+    backgroundColor: "transparent",
   },
   _disabled: {
     background: "transparent",
     minWidth: "2.5rem",
-    color: "#0071bc",
+    color: "primary_darker",
   },
 });
 // inverse variants

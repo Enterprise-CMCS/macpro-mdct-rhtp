@@ -1,6 +1,13 @@
 //Shared constants between frontend and backend
 
 // STATES
+
+// NOTE: this is the thing we would need to remove to allow a ZZ IDM user to exist if it is requested
+const isProdEnv =
+  (typeof window !== "undefined" &&
+    window.location.hostname === "mdctrhtp.cms.gov") ||
+  (typeof process !== "undefined" && process.env.STAGE === "production");
+
 export const StateNames = {
   AL: "Alabama",
   AK: "Alaska",
@@ -52,7 +59,8 @@ export const StateNames = {
   WV: "West Virginia",
   WI: "Wisconsin",
   WY: "Wyoming",
-} as const;
+  ...(!isProdEnv && { ZZ: "Test State ZZ" }),
+};
 
 export const dropdownEmptyOption = { label: "- Select an option -", value: "" };
 
@@ -69,6 +77,19 @@ export const optionalInQuarterly = [
   "initiative-narrative",
   "success-stories",
   "metrics-table",
+];
+
+export const cmsStatusThatLocksSPAC = [
+  "Commitment abandoned",
+  "Implemented",
+  "Commitment fulfilled",
+];
+
+export const SPACItemsThatLock = [
+  "commitment-status",
+  "commitment-support-paragraph",
+  "commitment-links",
+  "commitment-attachments",
 ];
 
 export const acceptedFileTypes = [
@@ -96,6 +117,15 @@ export const acceptedFileTypes = [
   ".xltx",
   ".xls",
 ];
+
+export const tabTitleMap = {
+  "/": "Rural Health Transformation Program",
+  "/help": "How can we help you? - RHTP",
+  "/profile": "My Account - RHTP",
+  "/export": "Export RHTP Files and Data - RHTP",
+  "/admin": "Banner Admin - RHTP",
+  "/403": "Access Denied",
+};
 
 export const getExtension = (filename: string): string | undefined => {
   const lastDot = filename.lastIndexOf(".");

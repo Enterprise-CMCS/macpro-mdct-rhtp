@@ -13,6 +13,7 @@ import { optionalTag, useStore } from "utils";
 interface Props {
   status: AttachmentStatus;
   onChange: (status: AttachmentStatus) => void;
+  disabled?: boolean;
 }
 
 const buildStatusOptions = (isStateUser: boolean, currentStatus: string) => {
@@ -29,13 +30,10 @@ const buildStatusOptions = (isStateUser: boolean, currentStatus: string) => {
   return statusOptions;
 };
 
-export const StatusDropdown = ({ status, onChange }: Props) => {
+export const StatusDropdown = ({ status, onChange, disabled }: Props) => {
   const { userRole } = useStore().user ?? {};
   const isStateUser = userRole === UserRoles.STATE_USER;
   const statusOptions = buildStatusOptions(isStateUser, status);
-
-  const statusDisabled =
-    isStateUser && status === AttachmentStatus.LOCKED_FOR_SCORING;
 
   const [displayValue, setDisplayValue] = useState(status);
 
@@ -76,7 +74,7 @@ export const StatusDropdown = ({ status, onChange }: Props) => {
         onChange={setDropdownValue}
         options={statusOptions}
         value={displayValue}
-        disabled={statusDisabled}
+        disabled={disabled}
       />
     </Stack>
   );

@@ -56,7 +56,7 @@ export const Sidebar = () => {
     const hasChildSections = childSections && childSections.length > 0;
 
     return (
-      <Box key={page.id}>
+      <Box key={page.id} inert={!sidebarOpen}>
         <Link
           variant={"sidebar"}
           className={page.id === currentPageId ? "selected" : ""}
@@ -97,12 +97,6 @@ export const Sidebar = () => {
   return (
     <Box sx={sx.sidebar} className={sidebarOpen ? "open" : "closed"}>
       <Flex sx={sx.sidebarNav}>
-        <Flex sx={sx.sidebarList}>
-          <Heading variant="sidebar">{title}</Heading>
-          {report.pages[root].childPageIds?.map((child) =>
-            navSection(pageMap.get(child)!)
-          )}
-        </Flex>
         <Button
           aria-label="Open/Close sidebar menu"
           variant="sidebarToggle"
@@ -115,6 +109,12 @@ export const Sidebar = () => {
             className={sidebarOpen ? "left" : "right"}
           />
         </Button>
+        <Flex sx={sx.sidebarList}>
+          <Heading variant="sidebar">{title}</Heading>
+          {report.pages[root].childPageIds?.map((child) =>
+            navSection(pageMap.get(child)!)
+          )}
+        </Flex>
       </Flex>
     </Box>
   );
@@ -131,6 +131,9 @@ const sx = {
     },
     "&.closed": {
       marginLeft: "-20.5rem",
+    },
+    "[inert] > *": {
+      opacity: 0.5,
     },
     ".tablet &, .mobile &": {
       position: "sticky",

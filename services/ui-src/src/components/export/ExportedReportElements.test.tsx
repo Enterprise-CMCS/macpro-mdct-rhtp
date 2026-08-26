@@ -72,7 +72,7 @@ describe("Test ExportedReportElements", () => {
       type: ElementType.ActionTable,
       id: "mock-action-table",
       label: "action table",
-      hintText: "action table hint text",
+      heading: "Action Table",
       modal: {
         title: "",
         elements: [],

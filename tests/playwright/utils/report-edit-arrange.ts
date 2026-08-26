@@ -82,7 +82,7 @@ const openDashboardModal = async (
   }
 };
 
-const isEnvironmentInterruptionError = (error: unknown): boolean => {
+export const isEnvironmentInterruptionError = (error: unknown): boolean => {
   const message = error instanceof Error ? error.message : String(error);
   return (
     /Target page, context or browser has been closed/i.test(message) ||
@@ -314,7 +314,7 @@ export const openReportSection = async (
   }
 };
 
-export const openReportSectionWithTimeout = async (
+const openReportSectionWithTimeout = async (
   statePage: StatePage,
   targetState: "unsubmitted" | "submitted",
   sectionId: string,
@@ -325,6 +325,8 @@ export const openReportSectionWithTimeout = async (
   const timeoutReason =
     options.timeoutReason ?? "Timed out opening report section";
 
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
   try {
     return await Promise.race([
       openReportSection(
@@ -334,7 +336,10 @@ export const openReportSectionWithTimeout = async (
         unsubmittedCandidateIndex
       ),
       new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error(timeoutReason)), timeoutMs);
+        timeoutId = setTimeout(
+          () => reject(new Error(timeoutReason)),
+          timeoutMs
+        );
       }),
     ]);
   } catch (error) {
@@ -351,7 +356,49 @@ export const openReportSectionWithTimeout = async (
     }
 
     throw error;
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
   }
+};
+
+const resolveSectionOrSkip = (
+  section: OpenReportSectionResult,
+  skip: SkipHandler
+): ReportEditorPage | undefined => {
+  if (!section.ok) {
+    skip(section.reason);
+    return undefined;
+  }
+
+  return section.editor;
+};
+
+const openReportSectionAndHandleSkip = async (
+  statePage: StatePage,
+  targetState: "unsubmitted" | "submitted",
+  sectionId: string,
+  skip: SkipHandler,
+  unsubmittedCandidateIndex = 0,
+  options?: OpenReportSectionOptions
+): Promise<ReportEditorPage | undefined> => {
+  const section = options
+    ? await openReportSectionWithTimeout(
+        statePage,
+        targetState,
+        sectionId,
+        options,
+        unsubmittedCandidateIndex
+      )
+    : await openReportSection(
+        statePage,
+        targetState,
+        sectionId,
+        unsubmittedCandidateIndex
+      );
+
+  return resolveSectionOrSkip(section, skip);
 };
 
 export const openReportSectionOrSkip = async (
@@ -361,19 +408,13 @@ export const openReportSectionOrSkip = async (
   skip: SkipHandler,
   unsubmittedCandidateIndex = 0
 ): Promise<ReportEditorPage | undefined> => {
-  const section = await openReportSection(
+  return openReportSectionAndHandleSkip(
     statePage,
     targetState,
     sectionId,
+    skip,
     unsubmittedCandidateIndex
   );
-
-  if (!section.ok) {
-    skip(section.reason);
-    return undefined;
-  }
-
-  return section.editor;
 };
 
 export const openReportSectionWithTimeoutOrSkip = async (
@@ -384,18 +425,12 @@ export const openReportSectionWithTimeoutOrSkip = async (
   options: OpenReportSectionOptions = {},
   unsubmittedCandidateIndex = 0
 ): Promise<ReportEditorPage | undefined> => {
-  const section = await openReportSectionWithTimeout(
+  return openReportSectionAndHandleSkip(
     statePage,
     targetState,
     sectionId,
-    options,
-    unsubmittedCandidateIndex
+    skip,
+    unsubmittedCandidateIndex,
+    options
   );
-
-  if (!section.ok) {
-    skip(section.reason);
-    return undefined;
-  }
-
-  return section.editor;
 };
