@@ -1,7 +1,7 @@
 {
   "name": "macpro-mdct-rhtp",
   "version": "",
-  "description": "",
+  "description": "The Rural Health Transformation Program (RHTP) is a major initiative established by the Centers for Medicare & Medicaid Services (CMS) to modernize, strengthen, and sustain healthcare delivery across rural America.",
   "longDescription": "",
   "permissions": {
     "licenses": [
@@ -36,20 +36,21 @@
     "HTML",
     "Smarty"
   ],
-  "contractNumber": [],
+  "contractNumber": ["47QTCA20D000W"],
   "SBOM": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/network/dependencies",
-  "relatedCode": [],
-  "reusedCode": [],
-  "partners": [],
-  "date": {
-    "created": "2026-01-13T19:50:51Z",
-    "lastModified": "2026-07-31T14:47:29Z",
-    "metadataLastUpdated": "2026-08-01T00:41:30.097Z"
-  },
-  "tags": [],
+  "relatedCode": [
+    {
+      "name": "macpro-mdct-rhtp",
+      "URL": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp",
+      "isGovernmentRepo": true
+    }
+  ], 
+  "tags": [
+    "mdct"
+  ],
   "contact": {
-    "email": "",
-    "name": ""
+    "email": "brendan.myers@coforma.com",
+    "name": "Brendan Myers"
   },
   "feedbackMechanism": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/issues",
   "AIUseCaseID": "0",
