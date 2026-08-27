@@ -51,8 +51,14 @@ function main() {
     ).split(";");
     const metricStatuses =
       initiativeData["Metric Statuses (Semicolon-Separated)"].split(";");
-    const metricTargets =
-      initiativeData["Metric Targets (Semicolon-Separated)"].split(";"); // TODO: update naming as needed once we have CMS data
+    // const metricTargets =
+    //   initiativeData["Metric Targets (Semicolon-Separated)"].split(";"); // TODO: update naming as needed once we have CMS data
+    const metricCurrentValue =
+      initiativeData["Metric Current Value (Semicolon-Separated)"].split(";");
+    const metricDates =
+      initiativeData["Metric Current Value Date (Semicolon-Separated)"].split(
+        ";"
+      );
     const initiative = {
       id: crypto.randomUUID(),
       title: stripNewlineAndTrim(initiativeData["Initiative name"]),
@@ -61,6 +67,9 @@ function main() {
       ),
       narrative: initiativeData["Initiative Narrative"],
       status: stripNewlineAndTrim(initiativeData["Initiative status"]),
+      numberOfPeopleServed: stripNewlineAndTrim(
+        initiativeData["Number of people served"]
+      ),
     };
 
     const metrics = [];
@@ -68,7 +77,10 @@ function main() {
       const metric = {
         name: metricName.trim(),
         status: metricStatuses[index]?.trim() || "Active",
-        target: metricTargets[index]?.trim() || "",
+        // target: metricTargets[index]?.trim() || "",
+        target: "",
+        currValue: metricCurrentValue[index]?.trim() || "",
+        date: metricDates[index]?.trim() || "",
       };
       metrics.push(metric);
     });

@@ -21,6 +21,8 @@ type MetricData = {
   name: string;
   status: string;
   target?: string; // TODO: (probably) make required once we have new CMS data with targets
+  currValue?: string;
+  date?: string;
 };
 
 type InitiativeData = {
@@ -29,6 +31,7 @@ type InitiativeData = {
   initiativeNumber: string;
   narrative?: string;
   status?: PageStatus | undefined;
+  numberOfPeopleServed?: string;
   metrics?: MetricData[];
 };
 
@@ -131,7 +134,9 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   charLimit: 2000,
 });
 
-const initiativeNumberOfPeopleServed: TextboxTemplate = {
+const initiativeNumberOfPeopleServed = (
+  numberOfPeopleServed: string = ""
+): TextboxTemplate => ({
   type: ElementType.Textbox,
   id: "initiative-number-of-people-served",
   label: "Number of people served",
@@ -153,7 +158,8 @@ const initiativeNumberOfPeopleServed: TextboxTemplate = {
   },
   required: true,
   quarterly: false,
-};
+  answer: numberOfPeopleServed,
+});
 
 export const metricTable = (
   metrics: MetricData[] = []
@@ -248,8 +254,8 @@ export const metricTable = (
       { id: "metric", value: metric.name },
       { id: "target", value: metric.target },
       { id: "prevValue", value: "" },
-      { id: "currValue", value: "" },
-      { id: "date", value: "" },
+      { id: "currValue", value: metric.currValue },
+      { id: "date", value: metric.date },
     ];
     metricAnswers.push(answer);
   });
@@ -285,6 +291,7 @@ export const buildInitiativePages = (
     initiativeNumber,
     status,
     narrative,
+    numberOfPeopleServed,
     metrics,
   } of initiativesForState) {
     initiativePages.push({
@@ -301,7 +308,7 @@ export const buildInitiativePages = (
         initiativeInstructions,
         initiativeAccordion,
         initiativeNarrative(narrative),
-        initiativeNumberOfPeopleServed,
+        initiativeNumberOfPeopleServed(numberOfPeopleServed),
         metricTable(metrics),
         checkpointsHeader,
         checkpointsInstructions,
