@@ -56,7 +56,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   };
 };
 
-const commitmentLinkListInput: ListInputTemplate = {
+const commitmentLinkListInput = (link?: string): ListInputTemplate => ({
   type: ElementType.ListInput,
   id: "commitment-links",
   label: "Links",
@@ -65,7 +65,8 @@ const commitmentLinkListInput: ListInputTemplate = {
   buttonText: "Add link",
   validation: "link",
   required: false,
-};
+  answer: link ? [link] : [],
+});
 
 const commitmentSupportParagraph: ParagraphTemplate = {
   type: ElementType.Paragraph,
@@ -87,20 +88,20 @@ const commitmentNotes: TextAreaBoxTemplate = {
 const buildCommitments = (
   state: string,
   statePolicyCommitments: {
-    [key: string]: { label: string; status: string }[];
+    [key: string]: { label: string; status: string; link: string }[];
   } = STATE_POLICY_COMMITMENTS
 ) => {
   if (!(state in statePolicyCommitments)) return [];
   const commitmentsForState = statePolicyCommitments[state];
   const commitments = [];
-  for (const { label, status } of commitmentsForState) {
+  for (const { label, status, link } of commitmentsForState) {
     commitments.push({
       label,
       elements: [
         commitmentStatusDropdown(label, status),
         cmsStatusEvaluation(label),
         commitmentSupportParagraph,
-        commitmentLinkListInput,
+        commitmentLinkListInput(link),
         commitmentAttachmentArea(label),
         commitmentNotes,
       ],

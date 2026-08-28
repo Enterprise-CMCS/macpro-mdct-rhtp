@@ -13,6 +13,7 @@ const headingMap = {
   State: "state",
   "State policy commitment name": "label",
   Status: "status",
+  Link: "link",
 };
 
 const commitmentMap = new Map();
@@ -21,6 +22,7 @@ function main() {
   const file = fs.readFileSync("./commitments.csv").toLocaleString();
   const rows = file.split("\n"); // SPLIT ROWS
   const headings = rows.shift().split(",");
+
   rows.forEach((row, rowIndex) => {
     const commitment = {};
     let state = "";

@@ -11,6 +11,8 @@
  *  Initiative Number: initiativeNumber
  *  Initiative status: status
  *  Initiative Narrative: narrative
+ *  Metric Current Value (Semicolon-Separated): metricCurrentValue
+ *  Metric Current Value Date (Semicolon-Separated): metricDates
  *  Initiative Metrics (Semicolon Separated): metrics
  *  Metric Statuses (Semicolon-Separated): metricStatuses
  * 
@@ -23,6 +25,8 @@
     "Initiative Narrative": "Sample narrative",
     "Initiative Metrics (Semicolon Separated)": "Sample metric 1;Sample Metric 2",
     "Metric Statuses (Semicolon-Separated)": "Active;Active"
+    "Metric Current Value (Semicolon-Separated)": "100;200",
+    "Metric Current Value Date (Semicolon-Separated)": "11/11/2026;11/12/2026"
   },
  */
 
@@ -52,7 +56,7 @@ function main() {
     const metricStatuses =
       initiativeData["Metric Statuses (Semicolon-Separated)"].split(";");
     // const metricTargets =
-    //   initiativeData["Metric Targets (Semicolon-Separated)"].split(";"); // TODO: update naming as needed once we have CMS data
+    //   initiativeData["Metric Targets (Semicolon-Separated)"].split(";"); // TODO: comment back in if we get this data
     const metricCurrentValue =
       initiativeData["Metric Current Value (Semicolon-Separated)"].split(";");
     const metricDates =
@@ -77,7 +81,7 @@ function main() {
       const metric = {
         name: metricName.trim(),
         status: metricStatuses[index]?.trim() || "Active",
-        // target: metricTargets[index]?.trim() || "",
+        // target: metricTargets[index]?.trim() || "", // TODO: comment back in if we get this data
         target: "",
         currValue: metricCurrentValue[index]?.trim() || "",
         date: metricDates[index]?.trim() || "",
