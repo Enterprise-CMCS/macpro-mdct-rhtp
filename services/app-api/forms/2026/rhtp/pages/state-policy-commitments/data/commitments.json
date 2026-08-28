@@ -3,24 +3,24 @@
     {
       "label": "B.3. SNAP Food Restriction Waiver Policy",
       "status": "Not yet started",
-      "link": "http://localhost:3000/"
+      "link": ""
     }
   ],
   "AK": [
     {
       "label": "B.2. Presidential Fitness Test",
       "status": "Not yet started",
-      "link": "http://localhost:3000/"
+      "link": ""
     },
     {
       "label": "B.3. SNAP Food Restriction Waiver Policy",
       "status": "Not yet started",
-      "link": "https://jiraent.cms.gov/secure/RapidBoard.jspa?rapidView=7985&projectKey=CMDCT#"
+      "link": ""
     },
     {
       "label": "B.4. Nutrition Continuing Medical Education",
       "status": "Not yet started",
-      "link": "https://jiraent.cms.gov/secure/RapidBoard.jspa?rapidView=7985&projectKey=CMDCT#"
+      "link": ""
     },
     {
       "label": "C.3. CON - Ancillaries",
@@ -64,6 +64,842 @@
     },
     {
       "label": "D.3. Pharmacist - Independent Prescribing",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "AZ": [
+    {
+      "label": "D.2. EMS - EMS Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "AR": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician - Medical Licensure Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "CT": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "DE": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. Overall CON Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. PA - Scope of Practice",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "GA": [
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Supervision of Dental Assistants",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "F.1. Medicaid Payment for Remote Patient Monitoring (RPM)",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "HI": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Nurse - Nurse Licensure Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Psychology - PSYPACT",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "IL": [
+    {
+      "label": "D.2. Nurse - Nurse Licensure Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "IN": [
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "IA": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Behavioral Outpatient",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Psychology - PSYPACT",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "KS": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "F.1. Medicaid Payment for Store and Forward",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "LA": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "MA": [
+    {
+      "label": "D.2. Nurse - Nurse Licensure Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Psychology - PSYPACT",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "MI": [
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Drug Administration",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Lab Testing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Independent Prescribing",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "MS": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "MO": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "F.1. Telehealth License/Registration Process (including special licenses)",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "MT": [
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. EMS - EMS Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Dental Hygiene Diagnosis",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Dental Hygiene Treatment Planning",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "F.1. Medicaid Payment for Store and Forward",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "F.1. Medicaid Payment for Remote Patient Monitoring (RPM)",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "NE": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Long-term Care Facilities",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "NV": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "NH": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. EMS - EMS Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Lab Testing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Independent Prescribing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Dental Hygiene Diagnosis",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Direct Medicaid Reimbursement",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "NJ": [
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. EMS - EMS Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. NP - Scope of Practice",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "NM": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician - Medical Licensure Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. EMS - EMS Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Psychology - PSYPACT",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "NC": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. EMS - EMS Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "ND": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "OH": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "OK": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "OR": [
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. EMS - EMS Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Lab Testing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Independent Prescribing",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "PA": [
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "RI": [
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. Overall CON Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician - Medical Licensure Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "SC": [
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. Overall CON Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Provision of Sealants",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Direct Access to Prophylaxis",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "SD": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "TN": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. Overall CON Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Behavioral Outpatient",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Medical Outpatient",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Medical Inpatient",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Day Services",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Long-term Care Facilities",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Ancillaries",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. CON - Other",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. PA - Scope of Practice",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. NP - Scope of Practice",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Lab Testing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Independent Prescribing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "TX": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "UT": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "VT": [
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "C.3. Overall CON Score",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "VA": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "WV": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "F.1. Medicaid Payment for Remote Patient Monitoring (RPM)",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "WI": [
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    }
+  ],
+  "WY": [
+    {
+      "label": "B.2. Presidential Fitness Test",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.3. SNAP Food Restriction Waiver Policy",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "B.4. Nutrition Continuing Medical Education",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.2. Physician Assistant - PA Compact",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Overall Score",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Drug Administration",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Lab Testing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Pharmacist - Independent Prescribing",
+      "status": "Not yet started",
+      "link": ""
+    },
+    {
+      "label": "D.3. Dental Hygienist - Overall Score",
       "status": "Not yet started",
       "link": ""
     }
