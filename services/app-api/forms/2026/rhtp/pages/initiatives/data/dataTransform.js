@@ -44,7 +44,7 @@ function main() {
   const csvData = fs.readFileSync("./initiatives.csv").toLocaleString();
   const { data: dataSet, errors } = Papa.parse(csvData, { header: true });
   if (errors.length > 0) {
-    console.log("ERRORS:", result.errors);
+    console.log("ERRORS:", errors);
     exit(1);
   }
 

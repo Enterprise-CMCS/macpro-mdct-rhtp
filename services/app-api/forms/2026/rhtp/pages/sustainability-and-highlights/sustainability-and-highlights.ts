@@ -1,6 +1,12 @@
 import { ElementType, FormPageTemplate, PageType } from "@rhtp/shared";
+import SUCCESS_AND_HIGHLIGHTS from "./data/success-and-highlights.json";
 
-export const sustainabilityAndHighlights: FormPageTemplate = {
+export const sustainabilityAndHighlights = (
+  state: string,
+  successAndHighlights: {
+    [key: string]: { successStory: string; highlight: string };
+  } = SUCCESS_AND_HIGHLIGHTS
+): FormPageTemplate => ({
   id: "sustainability-and-highlights",
   title: "Sustainability and Highlights",
   type: PageType.Standard,
@@ -26,6 +32,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       required: true,
       quarterly: true,
       charLimit: 3000,
+      answer: successAndHighlights[state]?.successStory || "",
     },
     {
       id: "success-stories-paragraph",
@@ -72,6 +79,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       required: true,
       quarterly: false,
       charLimit: 3000,
+      answer: successAndHighlights[state]?.highlight || "",
     },
     {
       id: "sustainability-paragraph",
@@ -102,4 +110,4 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       quarterly: false,
     },
   ],
-};
+});

@@ -5,7 +5,7 @@ import { buildInitiativePages } from "./pages/initiatives/initiatives";
 import { initiativesTable } from "./pages/initiatives-table";
 import { reviewAndSubmit } from "./pages/review-and-submit";
 import { buildStatePolicyCommitments } from "./pages/state-policy-commitments/state-policy-commitments";
-import { sustainabilityAndHighlights } from "./pages/sustainability-and-highlights";
+import { sustainabilityAndHighlights } from "./pages/sustainability-and-highlights/sustainability-and-highlights";
 import { obligatedAndSpentFunds } from "./pages/obligated-and-spent-funds";
 
 export const rhtpReportTemplate = (state: string): ReportPages => [
@@ -26,7 +26,7 @@ export const rhtpReportTemplate = (state: string): ReportPages => [
   initiativeAttachments,
   buildStatePolicyCommitments(state),
   obligatedAndSpentFunds,
-  sustainabilityAndHighlights,
+  sustainabilityAndHighlights(state),
   reviewAndSubmit,
   ...buildInitiativePages(state),
 ];
