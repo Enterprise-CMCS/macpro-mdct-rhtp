@@ -193,6 +193,7 @@ export const AttachmentCommentDrawer = ({
             type="radio"
             onChange={onChange}
             errorMessage={errorMessages.commentType}
+            disabled={commentsDisabled}
             choices={[
               {
                 label: "External (Shared with States)",
@@ -236,15 +237,6 @@ export const AttachmentCommentDrawer = ({
 };
 
 const sx = {
-  drawerHeaderText: {
-    fontSize: "heading_2xl",
-    fontWeight: "heading_2xl",
-  },
-  drawerCloseContainer: {
-    position: "absolute",
-    right: "spacer4",
-    top: "spacer2",
-  },
   drawerSubheading: {
     fontSize: "body_md",
     fontWeight: "normal",

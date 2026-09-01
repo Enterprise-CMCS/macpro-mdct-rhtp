@@ -1,4 +1,4 @@
-import { apiLib, updateTimeout } from "utils";
+import { apiLib } from "utils";
 import { getRequestHeaders } from "./getRequestHeaders";
 import { BannerFormData, BannerShape } from "@rhtp/shared";
 
@@ -8,7 +8,6 @@ async function getBanners() {
     headers: { ...requestHeaders },
   };
 
-  updateTimeout();
   return await apiLib.get<BannerShape[]>("/banners", options);
 }
 
@@ -19,8 +18,17 @@ async function createBanner(bannerData: BannerFormData) {
     body: { ...bannerData },
   };
 
-  updateTimeout();
   return await apiLib.post<BannerShape>("/banners", options);
+}
+
+async function updateBanner(bannerData: BannerFormData) {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+    body: { ...bannerData },
+  };
+
+  return await apiLib.put(`/banners/${bannerData.key}`, options);
 }
 
 async function deleteBanner(bannerKey: string) {
@@ -29,8 +37,7 @@ async function deleteBanner(bannerKey: string) {
     headers: { ...requestHeaders },
   };
 
-  updateTimeout();
   return await apiLib.del(`/banners/${bannerKey}`, request);
 }
 
-export { getBanners, createBanner, deleteBanner };
+export { getBanners, createBanner, updateBanner, deleteBanner };

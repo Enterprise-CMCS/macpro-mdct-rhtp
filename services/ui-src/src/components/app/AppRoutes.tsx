@@ -5,6 +5,7 @@ import {
   HomePage,
   ProfilePage,
   DashboardPage,
+  AccessDeniedPage,
   NotFoundPage,
   ExportedReportPage,
   ReportPageWrapper,
@@ -12,8 +13,8 @@ import {
   NotificationsPage,
   ExportedZipPage,
 } from "components";
-import { useStore } from "utils";
-import { useEffect } from "react";
+import { useStore, focusHeading } from "utils";
+import { useEffect, useRef } from "react";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import { ReportAutosaveProvider } from "components/report/ReportAutosaveProvider";
 import { UserRoles } from "@rhtp/shared";
@@ -25,11 +26,17 @@ export const AppRoutes = () => {
   const isPdfActive = useFlags()?.viewPdf;
 
   const componentInventoryPageEnabled = useFlags()?.componentInventory;
+  const firstRouteRender = useRef(true);
 
   useEffect(() => {
-    const appWrapper = document.getElementById("app-wrapper")!;
-    appWrapper?.focus();
-    window.scrollTo(0, 0);
+    if (firstRouteRender.current) {
+      firstRouteRender.current = false;
+      return;
+    }
+
+    // Wait for the next paint
+    const rafId = requestAnimationFrame(focusHeading);
+    return () => cancelAnimationFrame(rafId);
   }, [pathname]);
 
   return (
@@ -55,6 +62,7 @@ export const AppRoutes = () => {
           <Route path="/export" element={<ExportedZipPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/help" element={<HelpPage />} />
+          <Route path="/403" element={<AccessDeniedPage />} />
           <Route path="*" element={<NotFoundPage />} />
           <Route
             path="/report/:reportType/:state"

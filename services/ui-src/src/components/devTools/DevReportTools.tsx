@@ -50,7 +50,7 @@ export const DevReportTools = () => {
       case ElementType.TextAreaField:
         return "mock text area field";
       case ElementType.ObligatedAndSpentFundsAttachment:
-        return files;
+        return files.map((file) => ({ ...file, label: "Budget Period 1" }));
     }
     return console.error("Type ignored: " + type + ". Element id: " + id);
   };
@@ -80,11 +80,19 @@ export const DevReportTools = () => {
       }
       if (element.type === "actionTable")
         return { ...element, answer: fillActionTable(element) };
-      else
+      else {
+        const answer =
+          "answer" in element &&
+          element.answer != "" &&
+          element.answer != undefined
+            ? element.answer
+            : undefined;
+
         return {
           ...element,
-          answer: getAnswerByType(element.type, element.id),
+          answer: answer ?? getAnswerByType(element.type, element.id),
         };
+      }
     });
   };
 

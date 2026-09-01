@@ -24,12 +24,13 @@ export const renderExpandedAnswers = (element: PageElement) => {
   switch (element.type) {
     case ElementType.ListInput:
     case ElementType.AttachmentArea:
+    case ElementType.ObligatedAndSpentFundsAttachment:
       return element.answer?.map(
         (item, index) =>
           ({
             type: element.type,
             label: `${element.label}  ${index + 1}`,
-            helperText: element.helperText,
+            helperText: "helperText" in element ? element.helperText : "",
             answer: [item],
           }) as any
       );
@@ -46,19 +47,8 @@ const getHelperText = (element: PageElement) => {
 };
 
 export const ExportedReportWrapper = ({ section }: Props) => {
-  const uniqueElements = "checkpoint-table";
-
-  const filteredElements = section.elements?.filter((element) => {
-    const hasAnswer =
-      "answer" in element &&
-      element.answer !== undefined &&
-      element.answer !== "";
-    const isRequired = !("required" in element) || element.required !== false;
-    return hasAnswer || isRequired || uniqueElements.includes(element.id);
-  });
-
-  if (filteredElements == undefined) return null;
-
+  const sectionElements = section?.elements;
+  if (!sectionElements) return null;
   const expandCheckedChildren = (elements: PageElement[]): PageElement[] => {
     return elements.flatMap((element) => {
       if ("choices" in element) {
@@ -88,7 +78,10 @@ export const ExportedReportWrapper = ({ section }: Props) => {
           expandedElements.push(...childElements);
         }
         return expandedElements;
-      } else if (element.type === ElementType.AttachmentArea) {
+      } else if (
+        element.type === ElementType.AttachmentArea ||
+        element.type === ElementType.ObligatedAndSpentFundsAttachment
+      ) {
         //expand attachments that are outside an accordion
         return renderExpandedAnswers(element);
       } else {
@@ -98,7 +91,7 @@ export const ExportedReportWrapper = ({ section }: Props) => {
     });
   };
 
-  const expandedElements = expandCheckedChildren(filteredElements);
+  const expandedElements = expandCheckedChildren(sectionElements);
 
   const elements =
     expandedElements?.map((element) => {

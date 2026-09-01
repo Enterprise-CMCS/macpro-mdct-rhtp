@@ -26,14 +26,24 @@ export const reviewAndSubmit: ReviewSubmitTemplate = {
       text: "Review & Submit",
     },
     {
-      type: ElementType.SubmitForReview,
-      id: "review-submit-for-review",
+      type: ElementType.RequestFeedbackButton,
+      id: "review-request-feedback",
     },
     {
       type: ElementType.Paragraph,
       id: "review-text",
       title: "Ready to Submit?",
       text: "Double check that everything in your RHTP Report is accurate. To make edits to your report after submitting, contact your CMS RHTP Lead to unlock your report.",
+      helperTextLink: {
+        link: "Status Definitions",
+        label: "Status Definitions",
+        text:
+          "<ul>" +
+          "  <li><b>Complete:</b> Minimum requirements met.</li>" +
+          "  <li><b>Incomplete:</b> Minimum requirements not met; One or more required fields for this reporting period are missing or empty. Please fill them out to unlock report submission.</li>" +
+          "  <li><b>No Status:</b> Section has no required fields.</li>" +
+          "</ul>",
+      },
     },
     {
       type: ElementType.StatusTable,

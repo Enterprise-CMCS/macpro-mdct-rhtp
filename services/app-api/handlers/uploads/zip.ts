@@ -1,6 +1,6 @@
 import { handler } from "../../libs/handler-lib";
 import { emptyParser, parseZipIdParameters } from "../../libs/param-lib";
-import { badRequest, ok } from "../../libs/response-lib";
+import { badRequest, forbidden, ok } from "../../libs/response-lib";
 import { getReport } from "../../storage/reports";
 import { ReportType, StateAbbr, ZipRequestTypes } from "@rhtp/shared";
 import JSZip from "jszip";
@@ -10,6 +10,7 @@ import {
 } from "../../utils/zips/buildZip";
 import { getPSURL, zipBuffer, startZipWorker } from "../../utils/zips/polling";
 import { isZipRequestBody } from "../../utils/reportValidation";
+import { canRequestZip } from "../../utils/authorization";
 
 export interface ZipReportWorkerEvent {
   type: ZipRequestTypes.REPORT;
@@ -27,9 +28,12 @@ export interface ZipObligatedAndSpentFundsWorkerEvent {
 }
 
 export const triggerZipGeneration = handler(emptyParser, async (request) => {
-  const { body } = request;
+  const { body, user } = request;
   if (!isZipRequestBody(body)) {
     return badRequest("Invalid request");
+  }
+  if (!canRequestZip(body, user)) {
+    return forbidden("User cannot request these files");
   }
   const zipId = await startZipWorker(body);
   return ok({ status: "pending", zipId });

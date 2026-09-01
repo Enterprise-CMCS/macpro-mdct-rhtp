@@ -19,6 +19,7 @@ import {
 import {
   createBanner,
   deleteBanner,
+  updateBanner,
   getBanners,
 } from "utils/api/requestMethods/banner";
 
@@ -47,6 +48,10 @@ const bannerStore = (set: Set<BannerState>, get: Get<BannerState>) => ({
   },
   createBanner: async (banner: BannerFormData) => {
     await createBanner(banner);
+    await get().fetchBanners();
+  },
+  updateBanner: async (banner: BannerFormData) => {
+    await updateBanner(banner);
     await get().fetchBanners();
   },
   deleteBanner: async (bannerKey: string) => {

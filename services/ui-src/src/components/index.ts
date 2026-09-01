@@ -40,7 +40,7 @@ export { TableCheckpoint } from "./fields/TableCheckpoint";
 export { ActionTable } from "./fields/ActionTable";
 export { AttachmentTable } from "./fields/AttachmentTable";
 // forms
-export { AdminBannerForm } from "./forms/AdminBannerForm";
+export { AdminBannerDrawer } from "./forms/AdminBannerDrawer";
 export { AdminDashboard } from "./forms/AdminDashboard";
 // logins
 export { LoginCognito } from "./logins/LoginCognito";
@@ -49,6 +49,7 @@ export { LoginIDM } from "./logins/LoginIDM";
 export { AdminPage } from "./pages/Admin/AdminPage";
 export { ExportedReportPage } from "./pages/Export/ExportedReportPage";
 export { HelpPage } from "./pages/HelpPage/HelpPage";
+export { AccessDeniedPage } from "./pages/AccessDenied/AccessDeniedPage";
 export { NotFoundPage } from "./pages/NotFound/NotFoundPage";
 export { NotificationsPage } from "./pages/Notifications/NotificationsPage";
 export { ProfilePage } from "./pages/Profile/ProfilePage";
@@ -78,5 +79,7 @@ export { TableStatusIcon } from "./tables/TableStatusIcon";
 // dashboard
 export { DashboardPage } from "./pages/Dashboard/DashboardPage";
 export { DashboardTable } from "./pages/Dashboard/DashboardTable";
+// skipNav
+export { SkipNav } from "./skipNav/SkipNav";
 // component inventory
 export { ComponentInventory } from "./component-inventory/ComponentInventory";

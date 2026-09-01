@@ -1,18 +1,53 @@
 import { Fragment, useEffect, useState } from "react";
-import { Box, Button, Flex, Heading, Text, Spinner } from "@chakra-ui/react";
-import { AdminBannerForm, Banner, PageTemplate } from "components";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Text,
+  Spinner,
+  Divider,
+  Image,
+} from "@chakra-ui/react";
+import { AdminBannerDrawer, Banner, PageTemplate } from "components";
 import {
   compareDates,
+  format_mdy_to_ymd,
+  format_ymd_to_mdy,
   formatMonthDayYear,
   parseAsLocalDate,
   useStore,
 } from "utils";
-import { BannerArea, bannerAreaLabels, BannerShape } from "@rhtp/shared";
+import {
+  BannerArea,
+  bannerAreaLabels,
+  bannerAreaOptions,
+  BannerFormData,
+  BannerShape,
+} from "@rhtp/shared";
+import iconActive from "assets/icons/status/icon_status_check.svg";
+import iconScheduled from "assets/icons/status/icon_status_inprogress.svg";
+import iconExpired from "assets/icons/alert/icon_warning.svg";
 
 export const AdminPage = () => {
-  const { allBanners, fetchBanners, createBanner, deleteBanner } = useStore();
+  const { allBanners, fetchBanners, createBanner, updateBanner, deleteBanner } =
+    useStore();
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState<Record<string, boolean>>({});
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [selectedBanner, setSelectedBanner] = useState<BannerFormData>();
+  const [mode, setMode] = useState<"CREATE" | "EDIT">("CREATE");
+
+  const content = {
+    CREATE: {
+      heading: "Create a new Banner",
+      button: "Create banner",
+    },
+    EDIT: {
+      heading: `Edit ${bannerAreaOptions.find((option) => option.value === selectedBanner?.area)?.label} Banner`,
+      button: "Edit banner",
+    },
+  };
 
   useEffect(() => {
     (async () => {
@@ -22,6 +57,44 @@ export const AdminPage = () => {
   }, []);
 
   const bannerGroups = groupAndSortBanners(allBanners);
+
+  const onSubmit = async (formData: BannerFormData) => {
+    const newBannerData: BannerFormData = {
+      ...formData,
+      startDate: format_mdy_to_ymd(formData.startDate),
+      endDate: format_mdy_to_ymd(formData.endDate),
+    };
+
+    try {
+      if (mode === "CREATE") {
+        await createBanner(newBannerData);
+      } else if (mode === "EDIT") {
+        await updateBanner(newBannerData);
+      }
+    } finally {
+      setModalOpen(false);
+    }
+  };
+
+  const onCreate = () => {
+    setMode("CREATE");
+    setSelectedBanner(undefined);
+    setModalOpen(true);
+  };
+
+  const onEdit = (bannerKey: string) => {
+    setMode("EDIT");
+    const findBanner = allBanners.find((banner) => banner.key === bannerKey);
+    if (findBanner) {
+      setModalOpen(true);
+
+      setSelectedBanner({
+        ...findBanner,
+        startDate: format_ymd_to_mdy(findBanner.startDate),
+        endDate: format_ymd_to_mdy(findBanner.endDate),
+      });
+    }
+  };
 
   const onDelete = async (bannerKey: string) => {
     setIsDeleting({ ...isDeleting, [bannerKey]: true });
@@ -36,9 +109,28 @@ export const AdminPage = () => {
     <PageTemplate data-testid="admin-view">
       <Box>
         <Heading as="h1" id="AdminHeader" tabIndex={-1} sx={sx.headerText}>
-          Banner Admin
+          Banner Editor
         </Heading>
-        <Text>Manage the announcement banners below.</Text>
+        <Text mb="1.25rem">Manage the announcement banners below.</Text>
+        <Button type="submit" onClick={onCreate}>
+          Create a new banner
+        </Button>
+
+        <AdminBannerDrawer
+          modalDisclosure={{
+            isOpen: isModalOpen,
+            onClose: () => {
+              setModalOpen(false);
+            },
+          }}
+          content={{
+            heading: content[mode].heading,
+            solidButtonText: content[mode].button,
+            outlineButtonText: "Cancel",
+          }}
+          onSubmit={(data: BannerFormData) => onSubmit(data)}
+          data={selectedBanner}
+        />
       </Box>
       <Box>
         <Heading as="h2" sx={sx.sectionHeader}>
@@ -61,10 +153,17 @@ export const AdminPage = () => {
                 {banners.map((banner) => (
                   <Fragment key={banner.key}>
                     <Banner {...banner} key={banner.key} />
-                    <Flex sx={sx.bannerStatusAndButtonContainer}>
-                      {displayStatus(banner)}
+                    <Flex>{displayStatus(banner)}</Flex>
+                    <Flex justify="flex-end">
                       <Button
-                        variant="danger"
+                        variant="outline"
+                        onClick={() => onEdit(banner.key)}
+                        marginRight="1.5rem"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="link"
                         onClick={() => onDelete(banner.key)}
                         aria-label={`Delete banner titled ${banner.title}`}
                       >
@@ -75,20 +174,14 @@ export const AdminPage = () => {
                         )}
                       </Button>
                     </Flex>
+                    <Divider></Divider>
                   </Fragment>
                 ))}
-                <hr />
               </Flex>
             ))}
           </Flex>
         )}
       </Box>
-      <Flex sx={sx.newBannerBox} gap=".75rem">
-        <Heading as="h2" sx={sx.sectionHeader}>
-          Create a New Banner
-        </Heading>
-        <AdminBannerForm createBanner={createBanner} />
-      </Flex>
     </PageTemplate>
   );
 };
@@ -128,10 +221,17 @@ function displayStatus(banner: BannerShape) {
   const startDateEt = formatMonthDayYear(startDate.valueOf());
   const endDateEt = formatMonthDayYear(endDate.valueOf());
 
+  const icons = {
+    Expired: iconExpired,
+    Active: iconActive,
+    Scheduled: iconScheduled,
+  };
+
   return (
-    <Text sx={sx.statusText}>
-      <span className={status}>{status}</span>: {startDateEt}&ndash;{endDateEt}
-    </Text>
+    <Flex>
+      <Image src={icons[status]} marginRight="0.5rem" width="24px" />
+      <span>{status}</span>: {startDateEt}&ndash;{endDateEt}
+    </Flex>
   );
 }
 
@@ -156,19 +256,6 @@ const sx = {
   bannerGroupContainer: {
     flexDirection: "column",
     gap: "2rem",
-  },
-  bannerStatusAndButtonContainer: {
-    display: "grid",
-    gridTemplateColumns: "1fr 10rem",
-    marginTop: "-1rem",
-    button: {
-      fontWeight: "bold",
-    },
-  },
-  statusText: {
-    ".Expired": { color: "error" },
-    ".Active": { color: "success" },
-    ".Scheduled": { color: "primary" },
   },
   spinnerContainer: {
     marginTop: "spacer1",

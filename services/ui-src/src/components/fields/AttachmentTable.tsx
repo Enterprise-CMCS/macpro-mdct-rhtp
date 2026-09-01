@@ -14,7 +14,6 @@ import {
 import { useStore } from "utils";
 import { downloadFile, removeFile } from "utils/other/fileUtils";
 import { checkpointList } from "verbiage/checkpoints";
-import commentIcon from "assets/icons/comment/icon_comment.svg";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import addPrimary from "assets/icons/add/icon_add_blue.svg";
 import addGray from "assets/icons/add/icon_add_gray.svg";
@@ -155,7 +154,6 @@ export const AttachmentTable = (
             variant="outline"
             onClick={() => onDrawerClick("MANAGE", row)}
             aria-label={`Manage file or info for ${row.attachment.name}`}
-            disabled={disabled}
           >
             Manage
           </Button>
@@ -164,9 +162,8 @@ export const AttachmentTable = (
             onClick={() => onDrawerClick("COMMENT", row)}
             aria-label={`Comment on ${row.attachment.name}`}
             fontWeight="bold"
-            disabled={disabled}
           >
-            <Image src={commentIcon} alt="Remove" minWidth="24px" />
+            Comment
           </Button>
         </HStack>
       );
@@ -252,9 +249,7 @@ export const AttachmentTable = (
         aria-label="Add Attachment"
         variant="outline"
         alignSelf="flex-start"
-        leftIcon={
-          <Image src={disabled ? addGray : addPrimary} alt="Add icon" />
-        }
+        leftIcon={<Image src={disabled ? addGray : addPrimary} alt="Add" />}
         onClick={onAddClick}
         disabled={disabled}
       >

@@ -1,5 +1,5 @@
 import { Box, Heading, Text, VStack, Image } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { acceptedFileTypes, AlertTypes, UploadListProp } from "@rhtp/shared";
 import {
   recordFileInDatabaseAndGetUploadUrl,
@@ -36,6 +36,7 @@ export const UploadArea = ({
   disabled,
   notification,
 }: Props) => {
+  const fileInputRef: any = useRef(null);
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
@@ -69,6 +70,20 @@ export const UploadArea = ({
     return (
       (!multiple && (answer.length > 0 || filesToUpload.length > 0)) || disabled
     );
+  };
+
+  const handleFileKeyboardEvent = (
+    e: React.KeyboardEvent<HTMLLabelElement>
+  ) => {
+    e.preventDefault();
+    if ((e.key !== "Enter" && e.key !== " ") || fileInputRef.current === null)
+      return;
+    fileInputRef.current.click();
+  };
+
+  // prevent spacebar from scrolling the page
+  const suppressKeydownEvent = (e: React.KeyboardEvent<HTMLLabelElement>) => {
+    e.key === " " ? e.preventDefault() : null;
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -214,11 +229,17 @@ export const UploadArea = ({
           >
             <span>
               Drag {multiple ? "files" : "file"} here or
-              <label id="drop-zone">
+              <label
+                id="drop-zone"
+                tabIndex={disableUploadArea() ? -1 : 0}
+                onKeyDown={suppressKeydownEvent} // prevent spacebar from scrolling page
+                onKeyUp={handleFileKeyboardEvent} // open file input window on enter/spacebar press
+              >
                 Choose from folder
                 <input
                   type="file"
                   id="file-input"
+                  ref={fileInputRef}
                   multiple={multiple}
                   accept={acceptedFileTypes.join(",")}
                   onChange={onFileChange}

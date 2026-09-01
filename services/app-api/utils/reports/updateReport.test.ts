@@ -12,7 +12,10 @@ import {
   mockStatePolicyCommitments,
   validReport,
 } from "../tests/mockReport";
-import { updateReportAnswers } from "./updateReport";
+import {
+  updatePrivilegedFieldsOnly,
+  updateReportAnswers,
+} from "./updateReport";
 import { User } from "../../types/types";
 
 const mockGetReport = vi.fn();
@@ -41,6 +44,12 @@ const mockStateUser = {
   fullName: "Mock State User",
   email: "mockstate@user.com",
   role: UserRoles.STATE_USER,
+} as User;
+
+const mockAdminUser = {
+  fullName: "Mock Admin User",
+  email: "mockadmin@user.com",
+  role: UserRoles.ADMIN,
 } as User;
 
 const mockReport: Report = {
@@ -140,6 +149,22 @@ const mockReport: Report = {
           required: true,
           answer: "mock answer",
         },
+        {
+          id: "mock-cms-only-element",
+          type: ElementType.Textbox,
+          label: "CMS-only input element",
+          required: true,
+          answer: "original cms-only answer",
+          onlyCmsAdminCanEdit: true,
+        },
+        {
+          id: "mock-cms-submitted-element",
+          type: ElementType.Textbox,
+          label: "CMS submitted-editable element",
+          required: true,
+          answer: "original cms-submitted answer",
+          cmsAdminCanEditInSubmitted: true,
+        },
       ],
     },
     ...mockAddedInitiatives,
@@ -170,10 +195,12 @@ mockReportRequest.pages[1].elements[6].choices[0].checkedChildren[0].answer =
 mockReportRequest.pages[4].elements[0].accordions[0].elements[0].answer =
   "New answer 2";
 mockReportRequest.pages[1].elements[1].label = "HIJACKED"; // This should be prevented
+mockReportRequest.pages[1].elements[7].answer = "New cms-only answer";
+mockReportRequest.pages[1].elements[8].answer = "New cms-submitted answer";
 
 describe("updateReport util", () => {
-  test("updateReportcopies only changed data in answer fields", async () => {
-    mockGetReport.mockReturnValue(mockReport);
+  test("updateReport copies only changed data in answer fields", async () => {
+    mockGetReport.mockReturnValue(structuredClone(mockReport));
     // no answer in report before copy
     const result: any = await updateReportAnswers(
       mockReportRequest,
@@ -202,5 +229,45 @@ describe("updateReport util", () => {
 
     // Verify no injecting into anything but answer
     expect(result.pages[1].elements[1].answer).not.toEqual("HIJACKED");
+  });
+
+  test("updateReport does not update onlyCmsAdminCanEdit elements for non-admin users, but does for admin users", async () => {
+    mockGetReport.mockReturnValue(structuredClone(mockReport));
+    const stateResult: any = await updateReportAnswers(
+      mockReportRequest,
+      mockStateUser
+    );
+
+    // state user cannot update the onlyCmsAdminCanEdit element
+    expect(stateResult.pages[1].elements[7].answer).toEqual(
+      "original cms-only answer"
+    );
+
+    mockGetReport.mockReturnValue(structuredClone(mockReport));
+    const adminResult: any = await updateReportAnswers(
+      mockReportRequest,
+      mockAdminUser
+    );
+
+    // admin user can update the onlyCmsAdminCanEdit element
+    expect(adminResult.pages[1].elements[7].answer).toEqual(
+      "New cms-only answer"
+    );
+  });
+
+  test("updatePrivilegedFieldsOnly only updates cmsAdminCanEditInSubmitted elements", async () => {
+    mockGetReport.mockReturnValue(structuredClone(mockReport));
+    const result: any = await updatePrivilegedFieldsOnly(
+      mockReportRequest,
+      mockAdminUser
+    );
+
+    // cmsAdminCanEditInSubmitted element gets updated
+    expect(result.pages[1].elements[8].answer).toEqual(
+      "New cms-submitted answer"
+    );
+
+    // regular element is not updated by updatePrivilegedFieldsOnly
+    expect(result.pages[1].elements[1].answer).toEqual("mock answer");
   });
 });

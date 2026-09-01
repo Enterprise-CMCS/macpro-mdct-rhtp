@@ -76,7 +76,7 @@ export const AttachmentArea = (
   };
 
   return (
-    <Stack width="100%" maxWidth="450px">
+    <Stack width="100%" maxWidth="450px" gap="0">
       <Label fieldId={id}>{optionalTag(props.element)}</Label>
       {helperText && <Hint id={id}>{helperText}</Hint>}
       {files.length > 0 &&
@@ -107,7 +107,6 @@ export const AttachmentArea = (
         hint={subLabel}
         answer={files}
         saveToReport={saveToReport}
-        deleteFromReport={onRemove}
         notification={{ success: message! }}
       />
       {/** delete file modal */}

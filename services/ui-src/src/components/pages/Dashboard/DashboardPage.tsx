@@ -29,7 +29,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useStore } from "utils";
-import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
+import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.svg";
 import { getReportsForState } from "utils/api/requestMethods/report";
 import { Dropdown as CmsdsDropdownField } from "@cmsgov/design-system";
 import { DevTools, ToolType } from "components/devTools/DevTools";
@@ -120,20 +120,27 @@ export const DashboardPage = () => {
         <Heading as="h1" variant="h1">
           {fullStateName} {reportName}
         </Heading>
-        <Box marginTop="spacer4">
-          Click the <b>“Start {reportName} Report”</b> button to begin creating
-          your report. Refer to the reference guide "RHTP_State Reporting
-          Expectations_Guide" as needed for additional support. Prior to
-          submitting your report confirm all the information is complete and
-          accurate.
-        </Box>
+        <Flex marginTop="spacer4" gap={"1rem"} direction={"column"}>
+          <Text>
+            Click the <b>“Start {reportName} Report”</b> button to begin
+            creating your report.
+          </Text>
+          <Text>
+            Your work is securely auto-saved in real-time as you type.
+          </Text>
+          <Text>
+            Need step-by-step reporting parameters? Check the "Get Help" page in
+            the top right-hand corner with a link to the Comprehensive RHTP
+            Field & Guidance Guide.
+          </Text>
+        </Flex>
         <Accordion
           allowToggle={true}
           sx={sx.accordion}
           defaultIndex={[-1]} // sets the accordion to closed by default
         >
           <AccordionItem
-            label="Understanding report statuses"
+            label="Understanding Report Status and Email Notification"
             sx={sx.accordionItem}
           >
             <Box sx={sx.accordionPanel}>
@@ -155,6 +162,38 @@ export const DashboardPage = () => {
                   the state for revisions or additional information after
                   submission.
                 </li>
+                <li>
+                  <strong>Accepted:</strong> The report has been submitted and
+                  accepted by CMS after review.
+                </li>
+              </ul>
+              <p>
+                The RHTP application automatically triggers email notifications
+                to your state team for these key milestones:
+              </p>
+              <ul>
+                <li>
+                  <strong>When You Submit a Report:</strong> The moment your
+                  state team hits finalize, an immediate automated confirmation
+                  email is sent to your point-of-contact roster. This serves as
+                  your digital receipt and proof of timely completion.
+                </li>
+                <li>
+                  <strong>When a Project Officer Leaves a Comment:</strong> If
+                  your CMS Project Officer drops an edit flag or a direct
+                  request on an initiative attachment, the platform instantly
+                  emails you an alert with details on what attachment needs
+                  attention.
+                </li>
+                <li>
+                  <strong>
+                    When a Report Status is "Unlocked for Revision":
+                  </strong>{" "}
+                  If your initial submission requires adjustments, CMS will
+                  unlock the document. An automated notification will detail the
+                  necessary changes and grant you immediate data entry access
+                  again.
+                </li>
               </ul>
             </Box>
           </AccordionItem>
@@ -164,7 +203,7 @@ export const DashboardPage = () => {
         <Flex alignItems="flex-end" gap="spacer3">
           <CmsdsDropdownField
             name="budgetPeriodFilter"
-            label="Budget Period"
+            label="Filter by Budget Period"
             value={budgetPeriodFilter}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodFilterOptions}

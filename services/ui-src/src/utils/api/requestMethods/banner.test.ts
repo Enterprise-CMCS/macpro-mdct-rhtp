@@ -1,4 +1,4 @@
-import { getBanners, createBanner, deleteBanner } from "./banner";
+import { getBanners, createBanner, deleteBanner, updateBanner } from "./banner";
 import { BannerAreas, BannerFormData } from "@rhtp/shared";
 import { initAuthManager } from "utils/auth/authLifecycle";
 
@@ -27,6 +27,12 @@ describe("utils/banner", () => {
   describe("createBanner()", () => {
     test("executes", () => {
       expect(createBanner(mockBanner)).toBeTruthy();
+    });
+  });
+
+  describe("updateBanner()", () => {
+    test("executes", () => {
+      expect(updateBanner(mockBanner)).toBeTruthy();
     });
   });
 

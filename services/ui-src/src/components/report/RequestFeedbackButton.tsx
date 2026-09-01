@@ -7,12 +7,12 @@ import { Modal } from "components/modals/Modal";
 import { useStore } from "utils";
 import { createComment } from "utils/api/requestMethods/commentMethods";
 
-export const SubmitForReview = () => {
+export const RequestFeedbackButton = () => {
   const [displayValue, setDisplayValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmittedForReview, setIsSubmittedForReview] = useState(false);
+  const [didRequestFeedback, setDidRequestFeedback] = useState(false);
   const { userIsEndUser } = useStore()?.user ?? {};
   const { report } = useStore();
 
@@ -36,7 +36,7 @@ export const SubmitForReview = () => {
     try {
       await createComment(report.id, report.state, {
         comment: displayValue,
-        type: CommentType.REPORT,
+        type: CommentType.REQUEST_FEEDBACK,
         isInternal: false,
       });
     } catch (error) {
@@ -50,28 +50,27 @@ export const SubmitForReview = () => {
 
     setDisplayValue("");
     setErrorMessage("");
-    setIsSubmittedForReview(true);
+    setDidRequestFeedback(true);
     setModalOpen(false);
     setIsSubmitting(false);
   };
 
   return (
     <Stack width={"100%"}>
-      {isSubmittedForReview ? (
-        <Alert title={"Submitted for Review"} status={AlertTypes.SUCCESS}>
-          Your submission was sent to CMS for preliminary review of the details
-          entered to date. You can still edit the report in preparation for
-          final submission.
+      {didRequestFeedback ? (
+        <Alert title={"Feedback requested"} status={AlertTypes.SUCCESS}>
+          You requested feedback from your PO for preliminary review of the
+          details entered to date. You can still edit the report in preparation
+          for final submission.
         </Alert>
       ) : null}
       <Text fontSize="heading_md" fontWeight="heading_md">
-        Submit for Review
+        Request PO Feedback
       </Text>
       <Text fontSize="body_md">
-        Select “Submit for Review” to send a notification to CMS that the report
-        is ready for a preliminary review. States will still have edit
-        functionality to complete the rest of the report until you have selected
-        to fully “Submit” the report below.
+        Highly Optional. This does NOT lock your report. Use this strictly if
+        you want to flag a section for early alignment with your PO via the
+        platform similar to email correspondence.
       </Text>
       <Button
         variant="outline"
@@ -80,7 +79,7 @@ export const SubmitForReview = () => {
         onClick={() => setModalOpen(true)}
         disabled={!userIsEndUser}
       >
-        Submit for Review
+        Request PO Feedback
       </Button>
       <Modal
         modalDisclosure={{
@@ -93,10 +92,10 @@ export const SubmitForReview = () => {
         onConfirmHandler={onSubmit}
         submitting={isSubmitting}
         content={{
-          heading: "Submit for Review",
+          heading: "Request PO Feedback",
           subheading:
-            "Add a comment below to detail to the CMS PO what portion of the report is ready for preliminary review. Once you select “Submit for Review” a notification will be sent to CMS PO’s.",
-          actionButtonText: "Submit for Review",
+            "Add a comment below to detail to the CMS PO what section of the report is ready for feedback. Once you select Request PO Feedback, an email notification will be sent to your PO’s. You can continue to edit your report.",
+          actionButtonText: "Request PO Feedback",
           closeButtonText: "Cancel",
         }}
       >

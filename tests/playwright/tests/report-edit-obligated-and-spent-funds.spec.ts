@@ -1,11 +1,18 @@
 import { test, expect, type Page } from "./fixtures/base";
 import { openReportSectionWithTimeoutOrSkip } from "../utils/report-edit-arrange";
 import {
+  createArtifactId,
   GENERAL_INFORMATION_SECTION,
+  getReportTestRunId,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
   OBLIGATED_AND_SPENT_FUNDS_SECTION,
-} from "../utils/report-edit-helpers";
-import { verifyCurrentSection } from "../utils/report-edit-assertions";
+  uploadFileViaDialog,
+} from "../utils/report-edit-shared-helpers";
+import {
+  skipIfUnavailable,
+  verifyCurrentSection,
+  verifyReportSectionShell,
+} from "../utils/report-edit-assertions";
 import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "../utils/timeouts";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
@@ -18,7 +25,7 @@ const createUniqueUploadFixture = async (): Promise<{
   fileName: string;
   filePath: string;
 }> => {
-  const fileName = `obligated-and-spent-funds-${Date.now()}.csv`;
+  const fileName = `obligated-and-spent-funds-${getReportTestRunId()}-${createArtifactId()}.csv`;
   const filePath = join(tmpdir(), fileName);
   await fs.copyFile(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH, filePath);
   return { fileName, filePath };
@@ -37,8 +44,6 @@ const withUniqueUploadFixture = async (
 
 const getAddObligatedAndSpentFundsButton = (page: Page) =>
   page.getByRole("button", { name: /Add Obligated and Spent Funds/i });
-
-const getUploadDialog = (page: Page) => page.getByRole("dialog");
 
 const getUploadedFileEntry = (page: Page, fileName: string) =>
   page.getByText(new RegExp(escapeRegExp(fileName), "i"));
@@ -76,7 +81,13 @@ test.describe("Report Editing - Obligated and Spent Funds", () => {
       return;
     }
 
-    await verifyCurrentSection(editor, OBLIGATED_AND_SPENT_FUNDS_SECTION);
+    await verifyReportSectionShell(editor, {
+      sectionId: OBLIGATED_AND_SPENT_FUNDS_SECTION,
+      heading: "Obligated and Spent Funds",
+      previousButtonVisibility: "visible",
+      continueButtonVisibility: "visible",
+    });
+
     await withUniqueUploadFixture(async ({ fileName, filePath }) => {
       const addObligatedAndSpentFundsButton =
         getAddObligatedAndSpentFundsButton(editor.page);
@@ -84,34 +95,22 @@ test.describe("Report Editing - Obligated and Spent Funds", () => {
         timeout: TIMEOUT_UI,
       });
 
-      const canAddObligatedAndSpentFunds = await addObligatedAndSpentFundsButton
-        .isEnabled()
-        .catch(() => false);
-      if (!canAddObligatedAndSpentFunds) {
-        test.skip(
-          true,
-          "Add Obligated and Spent Funds is disabled in this environment"
-        );
+      const addButtonUnavailable = await skipIfUnavailable(
+        () => addObligatedAndSpentFundsButton.isEnabled(),
+        (reason) => test.skip(true, reason),
+        "Add Obligated and Spent Funds is disabled in this environment"
+      );
+      if (addButtonUnavailable) {
         return;
       }
 
       await addObligatedAndSpentFundsButton.click();
-
-      const dialog = getUploadDialog(editor.page);
-      await expect(dialog).toBeVisible({ timeout: TIMEOUT_UI });
-
-      await dialog
-        .locator("input[type='file']#file-input")
-        .setInputFiles(filePath);
-
-      await expect(
-        dialog.getByText(new RegExp(escapeRegExp(fileName), "i"))
-      ).toBeVisible({
-        timeout: TIMEOUT_UI,
+      await uploadFileViaDialog(editor.page, {
+        filePath,
+        fileInputSelector: "input[type='file']#file-input",
+        expectedFileName: new RegExp(escapeRegExp(fileName), "i"),
+        timeoutMs: TIMEOUT_UI,
       });
-
-      await dialog.getByRole("button", { name: /^Done$/i }).click();
-      await expect(dialog).toBeHidden({ timeout: TIMEOUT_UI });
 
       await waitForObligatedAndSpentFundsPersistence(editor, fileName);
     });
@@ -144,33 +143,22 @@ test.describe("Report Editing - Obligated and Spent Funds", () => {
         timeout: TIMEOUT_UI,
       });
 
-      const canAddObligatedAndSpentFunds = await addObligatedAndSpentFundsButton
-        .isEnabled()
-        .catch(() => false);
-      if (!canAddObligatedAndSpentFunds) {
-        test.skip(
-          true,
-          "Add Obligated and Spent Funds is disabled in this environment"
-        );
+      const addButtonUnavailable = await skipIfUnavailable(
+        () => addObligatedAndSpentFundsButton.isEnabled(),
+        (reason) => test.skip(true, reason),
+        "Add Obligated and Spent Funds is disabled in this environment"
+      );
+      if (addButtonUnavailable) {
         return;
       }
 
       await addObligatedAndSpentFundsButton.click();
-
-      const dialog = getUploadDialog(editor.page);
-      await expect(dialog).toBeVisible({ timeout: TIMEOUT_UI });
-
-      await dialog
-        .locator("input[type='file']#file-input")
-        .setInputFiles(filePath);
-      await expect(
-        dialog.getByText(new RegExp(escapeRegExp(fileName), "i"))
-      ).toBeVisible({
-        timeout: TIMEOUT_UI,
+      await uploadFileViaDialog(editor.page, {
+        filePath,
+        fileInputSelector: "input[type='file']#file-input",
+        expectedFileName: new RegExp(escapeRegExp(fileName), "i"),
+        timeoutMs: TIMEOUT_UI,
       });
-
-      await dialog.getByRole("button", { name: /^Done$/i }).click();
-      await expect(dialog).toBeHidden({ timeout: TIMEOUT_UI });
 
       await waitForObligatedAndSpentFundsPersistence(editor, fileName);
 

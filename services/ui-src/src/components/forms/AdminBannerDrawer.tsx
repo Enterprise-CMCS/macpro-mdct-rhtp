@@ -1,13 +1,13 @@
-import { ChangeEvent, FormEvent, useState } from "react";
-import { Button, Flex, Spinner } from "@chakra-ui/react";
-import { Banner } from "components";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Flex } from "@chakra-ui/react";
+import { Banner, Drawer } from "components";
 import {
   Dropdown as CmsdsDropdown,
   TextField as CmsdsTextField,
   SingleInputDateField as CmsdsDateField,
 } from "@cmsgov/design-system";
 import { ErrorMessages } from "../../constants";
-import { parseAsLocalDate, parseMMDDYYYY, useStore } from "utils";
+import { optionalTag, parseAsLocalDate, parseMMDDYYYY, useStore } from "utils";
 import {
   BannerArea,
   bannerAreaOptions,
@@ -42,13 +42,26 @@ const noErrorState = {
   endDate: "",
 };
 
-export const AdminBannerForm = ({ createBanner }: Props) => {
-  const allBanners = useStore((state) => state.allBanners);
+export const AdminBannerDrawer = ({
+  data,
+  content,
+  onSubmit,
+  modalDisclosure,
+}: Props) => {
+  //used to check for date conflict with other banners, filtered so it doesn't check against itself
+  const allBanners = useStore((state) => state.allBanners).filter(
+    (banner) => banner.key !== data?.key
+  );
 
-  const [formData, setFormData] = useState(initialFormValues);
+  const [formData, setFormData] = useState(data ?? initialFormValues);
   const [touchedState, setTouchedState] = useState(untouchedState);
   const [formErrors, setFormErrors] = useState(noErrorState);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setFormData(data ?? initialFormValues);
+    setFormErrors(noErrorState);
+  }, [data]);
 
   const onChange = (evt: {
     target: { name: string; value: string; maskedValue?: string };
@@ -162,9 +175,7 @@ export const AdminBannerForm = ({ createBanner }: Props) => {
     setTouchedState({ ...touchedState, [name]: true });
   };
 
-  const onSubmit = async (evt: FormEvent) => {
-    evt.preventDefault();
-
+  const onConfirmHandler = async () => {
     // This check ensures errors appear when the user clicks submit,
     // without first having clicked any of the required input fields.
     const newErrors = structuredClone(formErrors);
@@ -181,104 +192,101 @@ export const AdminBannerForm = ({ createBanner }: Props) => {
     }
 
     setSubmitting(true);
+    await onSubmit(formData);
+    window.scrollTo(0, 0);
+    setFormData(initialFormValues);
+    setTouchedState(untouchedState);
+    setFormErrors(noErrorState);
 
-    const newBannerData: BannerFormData = {
-      ...formData,
-      startDate: format_mdy_to_ymd(formData.startDate),
-      endDate: format_mdy_to_ymd(formData.endDate),
-    };
+    setSubmitting(false);
+  };
 
-    try {
-      await createBanner(newBannerData);
-      window.scrollTo(0, 0);
-      setFormData(initialFormValues);
-      setTouchedState(untouchedState);
-      setFormErrors(noErrorState);
-    } finally {
-      setSubmitting(false);
-    }
+  const hintText = () => {
+    return (
+      <>
+        Formatting is supported with these HTML tags: &lt;strong&gt;,
+        &lt;em&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;a&gt;.
+      </>
+    );
   };
 
   return (
-    <>
-      <form id="addAdminBanner" onSubmit={onSubmit}>
-        <Flex flexDirection="column" gap="1.5rem">
-          <CmsdsDropdown
-            name="area"
-            label="Site area"
-            onChange={onChange}
-            onBlur={onBlur}
-            options={bannerAreaOptions}
-            value={formData.area}
-            errorMessage={formErrors.area}
-          />
-          <CmsdsTextField
-            name="title"
-            label="Title text"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={formData.title}
-            errorMessage={formErrors.title}
-            data-required="true"
-          />
-          <CmsdsTextField
-            name="description"
-            label="Description text"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={formData.description}
-            errorMessage={formErrors.description}
-            multiline
-            rows={3}
-            data-required="true"
-          />
-          <CmsdsTextField
-            name="link"
-            label="Link"
-            hint="Optional"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={formData.link}
-            errorMessage={formErrors.link}
-            data-required="false"
-          />
-          <CmsdsDateField
-            name="startDate"
-            label="Start date"
-            onChange={onStartDateChange}
-            onBlur={onBlur}
-            value={formData.startDate}
-            errorMessage={formErrors.startDate}
-            data-required="true"
-          />
-          <CmsdsDateField
-            name="endDate"
-            label="End date"
-            onChange={onEndDateChange}
-            onBlur={onBlur}
-            value={formData.endDate}
-            errorMessage={formErrors.endDate}
-            data-required="true"
-          />
-        </Flex>
-      </form>
-      <Banner
-        title={formData.title || "New banner title"}
-        description={formData.description || "New banner description"}
-        link={formData.link}
-      />
-      <Flex sx={sx.previewFlex}>
-        <Button form="addAdminBanner" type="submit" sx={sx.createBannerButton}>
-          {submitting ? <Spinner size="md" /> : "Create Banner"}
-        </Button>
+    <Drawer
+      modalDisclosure={modalDisclosure}
+      content={content}
+      onConfirmHandler={onConfirmHandler}
+      onOutlineHandler={() => {
+        modalDisclosure.onClose();
+      }}
+      submitting={submitting}
+      disableConfirm={submitting}
+    >
+      <Flex gap="1.5rem" flexDir="column">
+        <CmsdsDropdown
+          name="area"
+          label="Site area"
+          onChange={onChange}
+          onBlur={onBlur}
+          options={bannerAreaOptions}
+          value={formData.area}
+          errorMessage={formErrors.area}
+        />
+        <CmsdsTextField
+          name="title"
+          label="Title"
+          onChange={onChange}
+          onBlur={onBlur}
+          value={formData.title}
+          errorMessage={formErrors.title}
+          data-required="true"
+        />
+        <CmsdsTextField
+          name="description"
+          label="Description"
+          hint={hintText()}
+          onChange={onChange}
+          onBlur={onBlur}
+          value={formData.description}
+          errorMessage={formErrors.description}
+          multiline
+          rows={3}
+          data-required="true"
+        />
+        <CmsdsTextField
+          name="link"
+          label={optionalTag({ label: "Link", required: false })}
+          onChange={onChange}
+          onBlur={onBlur}
+          value={formData.link}
+          errorMessage={formErrors.link}
+          data-required="false"
+        />
+        <CmsdsDateField
+          name="startDate"
+          label="Start date"
+          onChange={onStartDateChange}
+          onBlur={onBlur}
+          value={formData.startDate}
+          errorMessage={formErrors.startDate}
+          data-required="true"
+        />
+        <CmsdsDateField
+          name="endDate"
+          label="End date"
+          onChange={onEndDateChange}
+          onBlur={onBlur}
+          value={formData.endDate}
+          errorMessage={formErrors.endDate}
+          data-required="true"
+        />
+        <Banner
+          title={formData.title || "New banner title"}
+          description={formData.description || "New banner description"}
+          link={formData.link}
+        />
       </Flex>
-    </>
+    </Drawer>
   );
-};
-
-const format_mdy_to_ymd = (dateString: string) => {
-  const [m, d, y] = dateString.split("/");
-  return [y, m, d].join("-");
 };
 
 /**
@@ -318,16 +326,16 @@ export const findConflictingBanner = (
 };
 
 interface Props {
-  createBanner: (data: BannerFormData) => Promise<void>;
+  modalDisclosure: {
+    isOpen: boolean;
+    onClose: () => void;
+  };
+  content: {
+    heading: string;
+    subheading?: string;
+    solidButtonText: string;
+    outlineButtonText: string;
+  };
+  onSubmit: (data: BannerFormData) => Promise<void>;
+  data?: BannerFormData;
 }
-
-const sx = {
-  previewFlex: {
-    flexDirection: "column",
-  },
-  createBannerButton: {
-    width: "14rem",
-    marginTop: "spacer2 !important",
-    alignSelf: "end",
-  },
-};

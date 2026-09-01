@@ -54,7 +54,6 @@ export const getZipPresignedUrl = async (body: ZipRequestBody) => {
 
   for (let i = 0; i < MAX_POLLS; i++) {
     await new Promise<void>((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-    console.log(`Polling for zip status... (attempt ${i + 1}/${MAX_POLLS})`);
 
     const freshHeaders = await getRequestHeaders();
     const result = await apiLib.get<ZipStatusResponse>(`/zips/${zipId}`, {

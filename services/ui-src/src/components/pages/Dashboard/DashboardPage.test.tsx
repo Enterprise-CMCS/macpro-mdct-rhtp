@@ -137,7 +137,7 @@ describe("DashboardPage with state user", () => {
 
     await userEvent.click(screen.getByText("Clear Filter"));
     await userEvent.selectOptions(
-      screen.queryAllByLabelText("Budget Period")[0],
+      screen.queryAllByLabelText("Filter by Budget Period")[0],
       "Budget Period 1"
     );
 

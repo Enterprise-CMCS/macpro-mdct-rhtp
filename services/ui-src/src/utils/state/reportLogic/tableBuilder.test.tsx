@@ -1,7 +1,8 @@
-import { ElementType } from "@rhtp/shared";
+import { ElementType, MaskType } from "@rhtp/shared";
 import { buildElement, getErrorMessage } from "./tableBuilder";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 
 const mockOnChange = vi.fn();
 vi.spyOn(console, "error").mockImplementation(vi.fn());
@@ -54,11 +55,39 @@ describe("Test tableBuilder functions", () => {
       expect(mockOnChange).toHaveBeenCalled();
     });
     test("Textbox triggers onChange", async () => {
-      const textbox = screen.getByRole("textbox", { name: "Mock Textbox" });
+      const textbox = screen.getByRole("textbox", {
+        name: "Mock Textbox",
+      });
       await userEvent.type(textbox, "mock");
       await userEvent.tab();
-      expect(mockOnChange).toHaveBeenCalledTimes(5);
+      expect(mockOnChange).toHaveBeenCalledTimes(4);
     });
+
+    test("Masked textbox formats its value on blur", async () => {
+      const StatefulMaskedTextbox = () => {
+        const [value, setValue] = useState<string | number>("");
+        return buildElement(
+          {
+            ...elements[2],
+            mask: MaskType.CommaSeparated,
+          },
+          value,
+          ([nextValue]) => setValue(nextValue),
+          "Masked textbox"
+        );
+      };
+      render(<StatefulMaskedTextbox />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Masked textbox",
+      });
+      await userEvent.type(input, "1234");
+      expect(input).toHaveValue("1234");
+
+      await userEvent.tab();
+      expect(input).toHaveValue("1,234");
+    });
+
     test("TextAreaField triggers onChange", async () => {
       const textbox = screen.getByRole("textbox", {
         name: "Mock TextAreaField",

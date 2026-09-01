@@ -21,8 +21,8 @@ import {
   RhtpSubType,
 } from "@rhtp/shared";
 import { AccordionItem } from "components";
-import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.png";
-import { parseHtml } from "utils";
+import arrowLeftIcon from "assets/icons/arrows/icon_arrow_left_blue.svg";
+import { parseHintText, parseHtml, useStore } from "utils";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import { useElementIsHidden } from "utils/state/hooks/useElementIsHidden";
 
@@ -48,7 +48,7 @@ export const HeaderElement = ({
       case HeaderIcon.Check:
         return {
           src: successIcon,
-          alt: "complete icon",
+          alt: "complete",
           text: "Complete",
         };
       default:
@@ -100,6 +100,7 @@ export const SubHeaderElement = ({
 export const ParagraphElement = ({
   element,
 }: PageElementProps<ParagraphTemplate>) => {
+  const { setModalComponent } = useStore();
   const styleObject = (type: string) => {
     let styleDefault = { weight: "normal", size: "body_md", color: "base" };
 
@@ -114,6 +115,8 @@ export const ParagraphElement = ({
 
   const obj = styleObject(element.style ?? "");
 
+  const parsedHint = parseHintText(element, setModalComponent);
+
   return (
     <Stack>
       {element.title && (
@@ -124,6 +127,7 @@ export const ParagraphElement = ({
       <Box fontSize={obj.size} fontWeight={obj.weight} color={obj.color}>
         {parseHtml(element.text)}
       </Box>
+      <Text>{parsedHint}</Text>
     </Stack>
   );
 };
