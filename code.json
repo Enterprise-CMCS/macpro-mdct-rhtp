@@ -21,7 +21,7 @@
   "disclaimerURL": "",
   "disclaimerText": "",
   "vcs": "git",
-  "laborHours": 12934,
+  "laborHours": 13126,
   "reuseFrequency": {
     "forks": 0,
     "clones": 0
@@ -32,11 +32,13 @@
     "TypeScript",
     "JavaScript",
     "SCSS",
-    "Shell",
     "HTML",
+    "Shell",
     "Smarty"
   ],
-  "contractNumber": ["47QTCA20D000W"],
+  "contractNumber": [
+    "47QTCA20D000W"
+  ],
   "SBOM": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp/network/dependencies",
   "relatedCode": [
     {
@@ -44,7 +46,14 @@
       "URL": "https://github.com/Enterprise-CMCS/macpro-mdct-rhtp",
       "isGovernmentRepo": true
     }
-  ], 
+  ],
+  "reusedCode": [],
+  "partners": [],
+  "date": {
+    "created": "2026-01-13T19:50:51Z",
+    "lastModified": "2026-08-31T17:33:16Z",
+    "metadataLastUpdated": "2026-09-01T00:42:43.541Z"
+  },
   "tags": [
     "mdct"
   ],
