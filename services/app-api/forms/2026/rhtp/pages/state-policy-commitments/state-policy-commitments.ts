@@ -9,12 +9,18 @@ import {
   ParagraphTemplate,
   TextAreaBoxTemplate,
 } from "@rhtp/shared";
-import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
 import {
   cmsEvaluationStatusDefault,
   cmsCommitmentFulfilled,
   getDropdownOptions,
 } from "./constants";
+import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
+
+const COMMITMENTS_KEY = "import/commitments.json";
+
+type StatePolicyCommitmentsData = {
+  [key: string]: { label: string; status: string; link: string }[];
+};
 
 const commitmentStatusDropdown = (
   label: string,
@@ -87,9 +93,7 @@ const commitmentNotes: TextAreaBoxTemplate = {
 
 const buildCommitments = (
   state: string,
-  statePolicyCommitments: {
-    [key: string]: { label: string; status: string; link: string }[];
-  } = STATE_POLICY_COMMITMENTS
+  statePolicyCommitments: StatePolicyCommitmentsData
 ) => {
   if (!(state in statePolicyCommitments)) return [];
   const commitmentsForState = statePolicyCommitments[state];
@@ -110,8 +114,9 @@ const buildCommitments = (
   return commitments;
 };
 
-export const buildStatePolicyCommitments = (
-  state: string
+const buildPage = (
+  state: string,
+  statePolicyCommitments: StatePolicyCommitmentsData
 ): FormPageTemplate => ({
   id: "state-policy-commitments",
   title: "State Policy Action Commitments",
@@ -131,7 +136,7 @@ export const buildStatePolicyCommitments = (
     {
       type: ElementType.AccordionGroup,
       id: "state-policy-commitments-group",
-      accordions: [...buildCommitments(state)],
+      accordions: [...buildCommitments(state, statePolicyCommitments)],
       required: false,
     },
     {
@@ -144,3 +149,14 @@ export const buildStatePolicyCommitments = (
     },
   ],
 });
+
+// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+export const buildStatePolicyCommitments = (
+  state: string,
+  statePolicyCommitments?: StatePolicyCommitmentsData
+): FormPageTemplate | Promise<FormPageTemplate> => {
+  if (statePolicyCommitments) return buildPage(state, statePolicyCommitments);
+  return getJsonFromS3<StatePolicyCommitmentsData>(COMMITMENTS_KEY).then(
+    (fetched) => buildPage(state, fetched ?? {})
+  );
+};

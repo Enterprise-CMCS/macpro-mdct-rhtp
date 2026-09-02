@@ -1,19 +1,39 @@
+import { Mock } from "vitest";
 import { PageType } from "@rhtp/shared";
-import { sustainabilityAndHighlights } from "../sustainability-and-highlights";
-import SUCCESS_AND_HIGHLIGHTS from "../data/success-and-highlights.json";
+import { buildSustainabilityAndHighlightsPage } from "../sustainability-and-highlights";
+import s3Lib from "../../../../../../libs/s3-lib";
 
 const state = "AL";
-const successAndHighlights = SUCCESS_AND_HIGHLIGHTS[state];
+const successAndHighlights = {
+  successStory: "Success Story Text 1",
+  highlight: "Highlight Text 1",
+};
+
+vi.mock("../../../../../../libs/s3-lib", () => ({
+  default: {
+    getObject: vi.fn(),
+  },
+}));
 
 describe("sustainability and highlights utilities", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (s3Lib.getObject as Mock).mockResolvedValue({
+      Body: {
+        transformToString: () =>
+          Promise.resolve(JSON.stringify({ [state]: successAndHighlights })),
+      },
+    });
   });
 
   describe("sustainabilityAndHighlights utility", () => {
-    test("builds a page with state-specific success stories and sustainability planning", () => {
-      const result = sustainabilityAndHighlights(state);
+    test("builds a page with state-specific success stories and sustainability planning fetched from S3", async () => {
+      const result = await buildSustainabilityAndHighlightsPage(state);
 
+      expect(s3Lib.getObject).toHaveBeenCalledWith({
+        Bucket: process.env.attachmentsBucketName,
+        Key: "import/success-and-highlights.json",
+      });
       expect(result).toEqual(
         expect.objectContaining({
           id: "sustainability-and-highlights",
@@ -28,6 +48,27 @@ describe("sustainability and highlights utilities", () => {
             expect.objectContaining({
               id: "sustainability-planning",
               answer: successAndHighlights.highlight,
+            }),
+          ]),
+        })
+      );
+    });
+
+    test("uses provided data instead of fetching from S3 when given", () => {
+      const result = buildSustainabilityAndHighlightsPage(state, {
+        [state]: {
+          successStory: "override story",
+          highlight: "override highlight",
+        },
+      });
+
+      expect(s3Lib.getObject).not.toHaveBeenCalled();
+      expect(result).toEqual(
+        expect.objectContaining({
+          elements: expect.arrayContaining([
+            expect.objectContaining({
+              id: "success-stories",
+              answer: "override story",
             }),
           ]),
         })

@@ -14,8 +14,10 @@ import {
   TextboxTemplate,
   DividerTemplate,
 } from "@rhtp/shared";
-import INITIATIVES from "./data/initiatives.json";
+import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 import { initiativeAttachmentStatusInstructions } from "../initiative-attachments";
+
+const INITIATIVES_KEY = "import/initiatives.json";
 
 type MetricData = {
   name: string;
@@ -276,12 +278,9 @@ const checkpointsTables: TableCheckpointTemplate = {
 };
 
 // TODO - better array typing and parsing once we have initiatives by state
-export const buildInitiativePages = (
-  state: string,
-  initiatives: { [key: string]: InitiativeData[] } = INITIATIVES as {
-    [key: string]: InitiativeData[];
-  }
-) => {
+type InitiativesData = { [key: string]: InitiativeData[] };
+
+const buildPages = (state: string, initiatives: InitiativesData) => {
   if (!(state in initiatives)) return [];
   const initiativesForState = initiatives[state];
   const initiativePages = [];
@@ -320,4 +319,15 @@ export const buildInitiativePages = (
     });
   }
   return initiativePages;
+};
+
+// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+export const buildInitiativePages = (
+  state: string,
+  initiatives?: InitiativesData
+): ReturnType<typeof buildPages> | Promise<ReturnType<typeof buildPages>> => {
+  if (initiatives) return buildPages(state, initiatives);
+  return getJsonFromS3<InitiativesData>(INITIATIVES_KEY).then((fetched) =>
+    buildPages(state, fetched ?? {})
+  );
 };

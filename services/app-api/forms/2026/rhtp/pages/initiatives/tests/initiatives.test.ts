@@ -12,7 +12,7 @@ describe("initiative utilities", () => {
 
   describe("buildInitiativePages utility", () => {
     test("test builds pages for each initiative given", () => {
-      const result = buildInitiativePages(state);
+      const result = buildInitiativePages(state, INITIATIVES as any) as any[];
       expect(result.length).toEqual(INITIATIVES[state].length);
       expect(result).toEqual(
         expect.arrayContaining([

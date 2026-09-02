@@ -4,10 +4,11 @@ import {
   STATE_POLICY_COMMITMENT_NAMES,
 } from "../constants";
 import { buildStatePolicyCommitments } from "../state-policy-commitments";
+import STATE_POLICY_COMMITMENTS from "../data/commitments.json";
 
 describe("test state policy commitment functions", () => {
   test("buildStatePolicyCommitments()", () => {
-    const page = buildStatePolicyCommitments("PA");
+    const page = buildStatePolicyCommitments("PA", STATE_POLICY_COMMITMENTS);
     expect(page).toEqual(
       // expected page
       expect.objectContaining({
