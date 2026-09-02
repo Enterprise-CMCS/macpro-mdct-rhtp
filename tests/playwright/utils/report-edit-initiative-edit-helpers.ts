@@ -70,6 +70,13 @@ export const getMetricsTable = (editor: ReportEditorPage): Locator =>
     has: editor.page.getByRole("columnheader", { name: "Metric" }),
   });
 
+export const getMetricRow = (table: Locator, metricName: string): Locator =>
+  table
+    .locator("tbody")
+    .getByRole("row")
+    .filter({ hasText: metricName })
+    .first();
+
 export const createMetricTestData = (
   name: string,
   date: string
@@ -663,6 +670,23 @@ export const getManageAttachmentButton = (
     name: `Manage file or info for ${fileName}`,
     exact: true,
   });
+
+export const openManageAttachmentDrawer = async (
+  editor: ReportEditorPage,
+  row: Locator,
+  fileName: string
+): Promise<Locator> => {
+  const manageButton = getManageAttachmentButton(row, fileName);
+  await expect(manageButton).toBeVisible({ timeout: TIMEOUT_UI });
+  await manageButton.click();
+
+  const manageDrawer = editor.page.getByRole("dialog");
+  await expect(
+    manageDrawer.getByRole("heading", { name: /^Manage Attachment$/i })
+  ).toBeVisible({ timeout: TIMEOUT_UI });
+
+  return manageDrawer;
+};
 
 export const verifyManageAttachmentDrawerControls = async (
   drawer: Locator,

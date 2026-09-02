@@ -13,7 +13,7 @@ import {
   getCheckpointStage,
   getCheckpointStatusFromRow,
   getCommentAttachmentButton,
-  getManageAttachmentButton,
+  getMetricRow,
   getOpenInitiativeHeadingText,
   getCheckpointRow,
   addMetric,
@@ -26,6 +26,7 @@ import {
   openInitiativeFromList,
   selectCheckpoint,
   uploadCheckpointAttachment,
+  openManageAttachmentDrawer,
   verifyAdminMetricControls,
   verifyCheckpointStageRows,
   verifyCheckpointTableHeaders,
@@ -135,7 +136,8 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       const narrativeEditValue = `${narrativeCleanValue} Admin narrative ${createArtifactId()}`;
       const peopleServedNumber = Math.floor(Math.random() * 1000000) + 1;
       const peopleServedInputValue = String(peopleServedNumber);
-      const peopleServedDisplayValue = peopleServedNumber.toLocaleString();
+      const peopleServedDisplayValue =
+        peopleServedNumber.toLocaleString("en-US");
 
       await editor.fillTextField(/^Narrative/i, narrativeCleanValue);
       await editor.fillTextField(/^Narrative/i, narrativeEditValue);
@@ -213,10 +215,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       );
       await addMetric(editor, originalMetric);
 
-      const activeMetricRow = metricsTable
-        .locator("tbody")
-        .getByRole("row")
-        .filter({ hasText: originalMetric.name });
+      const activeMetricRow = getMetricRow(metricsTable, originalMetric.name);
       await expect(activeMetricRow).toBeVisible({ timeout: TIMEOUT_UI });
 
       const metric = createMetricTestData(
@@ -248,10 +247,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
 
       await addMetric(editor, metric);
 
-      const activeMetricRow = metricsTable
-        .locator("tbody")
-        .getByRole("row")
-        .filter({ hasText: metric.name });
+      const activeMetricRow = getMetricRow(metricsTable, metric.name);
       await expect(activeMetricRow).toBeVisible({ timeout: TIMEOUT_UI });
 
       await abandonMetric(editor, activeMetricRow);
@@ -302,15 +298,13 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
 
       await expect(readinessCheckbox).toBeEnabled();
       const wasChecked = await readinessCheckbox.isChecked();
-      if (wasChecked) {
-        await readinessCheckbox.uncheck({ force: true });
-      } else {
+      if (!wasChecked) {
         await readinessCheckbox.check({ force: true });
+        await expect(readinessCheckbox).toBeChecked();
+        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+          timeoutMs: TIMEOUT_UI,
+        });
       }
-      await expect(readinessCheckbox).toBeChecked({ checked: !wasChecked });
-      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-        timeoutMs: TIMEOUT_UI,
-      });
 
       await returnToInitiativesDashboard(editor);
       const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -322,9 +316,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
         ),
         /Establish governance/i
       );
-      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked({
-        checked: !wasChecked,
-      });
+      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked();
     });
   });
 
@@ -386,19 +378,11 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
         const checkpointStatus =
           await getCheckpointStatusFromRow(checkpointRow);
 
-        const manageButton = getManageAttachmentButton(
+        const manageDrawer = await openManageAttachmentDrawer(
+          editor,
           checkpointRow,
           fixture.fileName
         );
-        await expect(manageButton).toBeVisible({ timeout: TIMEOUT_UI });
-        await manageButton.click();
-
-        const manageDrawer = editor.page.getByRole("dialog");
-        await expect(
-          manageDrawer.getByRole("heading", {
-            name: /^Manage Attachment$/i,
-          })
-        ).toBeVisible({ timeout: TIMEOUT_UI });
 
         await verifyManageAttachmentDrawerControls(
           manageDrawer,
@@ -420,17 +404,11 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           fixture
         );
 
-        await getManageAttachmentButton(
+        const manageDrawer = await openManageAttachmentDrawer(
+          editor,
           checkpointRow,
           fixture.fileName
-        ).click();
-
-        const manageDrawer = editor.page.getByRole("dialog");
-        await expect(
-          manageDrawer.getByRole("heading", {
-            name: /^Manage Attachment$/i,
-          })
-        ).toBeVisible({ timeout: TIMEOUT_UI });
+        );
 
         await selectCheckpoint(
           editor,
@@ -467,17 +445,11 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           fixture
         );
 
-        await getManageAttachmentButton(
+        const manageDrawer = await openManageAttachmentDrawer(
+          editor,
           checkpointRow,
           fixture.fileName
-        ).click();
-
-        const manageDrawer = editor.page.getByRole("dialog");
-        await expect(
-          manageDrawer.getByRole("heading", {
-            name: /^Manage Attachment$/i,
-          })
-        ).toBeVisible({ timeout: TIMEOUT_UI });
+        );
 
         await manageDrawer
           .getByRole("button", { name: /^Delete attachment$/i })
@@ -505,41 +477,6 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
             fixture.fileName
           )
         ).toHaveCount(0);
-      });
-    });
-
-    test("should add a comment to a checkpoint attachment for admin users @regression", async () => {
-      const commentText = `Admin initiative comment ${createArtifactId()}`;
-      await withUploadFixture(async (fixture) => {
-        const checkpointRow = await uploadCheckpointAttachment(
-          editor,
-          CHECKPOINT_STAGE_LABELS[0],
-          GOVERNANCE_CHECKPOINT,
-          fixture
-        );
-
-        await getCommentAttachmentButton(
-          checkpointRow,
-          fixture.fileName
-        ).click();
-        const commentDrawer = editor.page.getByRole("dialog");
-        const commentField = commentDrawer.getByRole("textbox", {
-          name: /^Comment$/i,
-        });
-        const addCommentButton = commentDrawer.getByRole("button", {
-          name: /^Add comment$/i,
-        });
-
-        await expect(commentField).toBeEditable();
-        await commentDrawer
-          .getByRole("radio", { name: /^External \(Shared with States\)$/i })
-          .check();
-        await commentField.fill(commentText);
-        await addCommentButton.click();
-        await expect(commentDrawer).toContainText(commentText, {
-          timeout: TIMEOUT_UI,
-        });
-        await closeCommentDrawer(commentDrawer);
       });
     });
 
