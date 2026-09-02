@@ -171,12 +171,13 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
 
       await expect(readinessCheckbox).toBeVisible();
       await expect(readinessCheckbox).toBeEnabled();
-      await expect(readinessCheckbox).not.toBeChecked();
-
-      // Chakra's visual checkbox control covers the native input, so force the state change.
-      await readinessCheckbox.check({ force: true });
-
-      await expect(readinessCheckbox).toBeChecked();
+      const wasChecked = await readinessCheckbox.isChecked();
+      if (wasChecked) {
+        await readinessCheckbox.uncheck({ force: true });
+      } else {
+        await readinessCheckbox.check({ force: true });
+      }
+      await expect(readinessCheckbox).toBeChecked({ checked: !wasChecked });
     });
 
     test("should persist checkpoint readiness after reopening the initiative for a non-admin user @regression", async () => {
@@ -189,9 +190,13 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
       const readinessCheckbox = checkpointRow.getByRole("checkbox");
 
       await expect(readinessCheckbox).toBeEnabled();
-      // Chakra's visual checkbox control covers the native input, so force the state change.
-      await readinessCheckbox.check({ force: true });
-      await expect(readinessCheckbox).toBeChecked();
+      const wasChecked = await readinessCheckbox.isChecked();
+      if (wasChecked) {
+        await readinessCheckbox.uncheck({ force: true });
+      } else {
+        await readinessCheckbox.check({ force: true });
+      }
+      await expect(readinessCheckbox).toBeChecked({ checked: !wasChecked });
 
       await returnToInitiativesDashboard(editor);
       const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -203,7 +208,9 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
         ),
         /Establish governance/i
       );
-      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked();
+      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked({
+        checked: !wasChecked,
+      });
     });
 
     test("should open the attachment upload drawer from a checkpoint stage for non-admin users @regression", async () => {

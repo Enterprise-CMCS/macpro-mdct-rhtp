@@ -3,6 +3,7 @@ import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   createArtifactId,
   INITIATIVES_SECTION,
+  waitForAutosaveWithSectionRefresh,
 } from "../utils/report-edit-shared-helpers";
 import {
   CHECKPOINT_STAGE_LABELS,
@@ -15,6 +16,11 @@ import {
   getManageAttachmentButton,
   getOpenInitiativeHeadingText,
   getCheckpointRow,
+  addMetric,
+  abandonMetric,
+  createMetricTestData,
+  editMetric,
+  getMetricsTable,
   openReportFromDashboard,
   openCheckpointUploadDrawer,
   openInitiativeFromList,
@@ -23,11 +29,13 @@ import {
   verifyAdminMetricControls,
   verifyCheckpointStageRows,
   verifyCheckpointTableHeaders,
-  verifyEditableAnnualInitiativeFields,
+  verifyVisibleAnnualInitiativeFields,
   verifyInitiativesDashboardVisible,
   verifyManageAttachmentDrawerControls,
   verifyMetricsTableHeaders,
   verifyMetricsTableRows,
+  verifyAbandonedMetricRow,
+  verifyMetricRow,
   type ReportPeriod,
   returnToInitiativesDashboard,
   reopenInitiativeFromDashboard,
@@ -49,6 +57,24 @@ const verifyReportContextFromHeader = async (
       .filter({ hasText: reportPeriodLabel })
       .first()
   ).toBeVisible({ timeout: TIMEOUT_UI });
+};
+
+const getRandomDateString = (
+  startDate = new Date(1999, 0, 1),
+  endDate = new Date()
+): string => {
+  const startTime = startDate.getTime();
+  const endTime = endDate.getTime();
+  const randomTime =
+    startTime + Math.floor(Math.random() * (endTime - startTime + 1));
+
+  const date = new Date(randomTime);
+
+  return [
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+    date.getFullYear(),
+  ].join("/");
 };
 
 test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
@@ -96,7 +122,44 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
 
   test.describe("annual initiative fields", () => {
     test("should display annual initiative fields for admin users @regression", async () => {
-      await verifyEditableAnnualInitiativeFields(editor);
+      await verifyVisibleAnnualInitiativeFields(editor);
+    });
+
+    test("should edit and persist annual initiative fields for admin users @regression", async () => {
+      const narrativeValue = await editor
+        .getTextField(/^Narrative/i)
+        .inputValue();
+      const narrativeCleanValue = narrativeValue
+        .replaceAll(/(?:\s+Admin narrative [a-f0-9]{10})+$/gi, "")
+        .trimEnd();
+      const narrativeEditValue = `${narrativeCleanValue} Admin narrative ${createArtifactId()}`;
+      const peopleServedNumber = Math.floor(Math.random() * 1000000) + 1;
+      const peopleServedInputValue = String(peopleServedNumber);
+      const peopleServedDisplayValue = peopleServedNumber.toLocaleString();
+
+      await editor.fillTextField(/^Narrative/i, narrativeCleanValue);
+      await editor.fillTextField(/^Narrative/i, narrativeEditValue);
+      await editor.fillTextField(
+        /Number of people served/i,
+        peopleServedInputValue
+      );
+      await editor.page.keyboard.press("Tab");
+
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+        timeoutMs: TIMEOUT_UI,
+      });
+
+      await returnToInitiativesDashboard(editor);
+
+      const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+      expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+      await expect(editor.getTextField(/^Narrative/i)).toHaveValue(
+        narrativeEditValue
+      );
+      await expect(editor.getTextField(/Number of people served/i)).toHaveValue(
+        peopleServedDisplayValue
+      );
     });
   });
 
@@ -118,6 +181,91 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       await verifyMetricsTableRows(metricsTable, hasPreviousValueColumn, {
         adminControls: true,
       });
+    });
+
+    test("should add a metric for admin users and persist it after returning to the dashboard", async () => {
+      const metric = createMetricTestData(
+        `Admin metric ${createArtifactId()}`,
+        getRandomDateString()
+      );
+
+      await addMetric(editor, metric);
+
+      const metricsTable = getMetricsTable(editor);
+      await verifyMetricRow(metricsTable, metric);
+
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+        timeoutMs: TIMEOUT_UI,
+      });
+      await returnToInitiativesDashboard(editor);
+
+      const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+      expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+      await verifyMetricRow(getMetricsTable(editor), metric);
+    });
+
+    test("should edit an active metric for admin users and persist the changes @regression", async () => {
+      const metricsTable = getMetricsTable(editor);
+      const originalMetric = createMetricTestData(
+        `Admin metric to edit ${createArtifactId()}`,
+        getRandomDateString()
+      );
+      await addMetric(editor, originalMetric);
+
+      const activeMetricRow = metricsTable
+        .locator("tbody")
+        .getByRole("row")
+        .filter({ hasText: originalMetric.name });
+      await expect(activeMetricRow).toBeVisible({ timeout: TIMEOUT_UI });
+
+      const metric = createMetricTestData(
+        `Admin metric edited ${createArtifactId()}`,
+        getRandomDateString()
+      );
+
+      await editMetric(editor, activeMetricRow, metric);
+
+      await verifyMetricRow(metricsTable, metric);
+
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+        timeoutMs: TIMEOUT_UI,
+      });
+      await returnToInitiativesDashboard(editor);
+
+      const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+      expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+      await verifyMetricRow(getMetricsTable(editor), metric);
+    });
+
+    test("should abandon a metric for admin users and persist the status @regression", async () => {
+      const metricsTable = getMetricsTable(editor);
+      const metric = createMetricTestData(
+        `Admin metric to abandon ${createArtifactId()}`,
+        getRandomDateString()
+      );
+
+      await addMetric(editor, metric);
+
+      const activeMetricRow = metricsTable
+        .locator("tbody")
+        .getByRole("row")
+        .filter({ hasText: metric.name });
+      await expect(activeMetricRow).toBeVisible({ timeout: TIMEOUT_UI });
+
+      await abandonMetric(editor, activeMetricRow);
+      await verifyAbandonedMetricRow(metricsTable, metric.name);
+
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+        timeoutMs: TIMEOUT_UI,
+      });
+      await returnToInitiativesDashboard(editor);
+
+      const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+      expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+      await verifyAbandonedMetricRow(getMetricsTable(editor), metric.name);
     });
   });
 
@@ -153,8 +301,16 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       const readinessCheckbox = checkpointRow.getByRole("checkbox");
 
       await expect(readinessCheckbox).toBeEnabled();
-      await readinessCheckbox.check({ force: true });
-      await expect(readinessCheckbox).toBeChecked();
+      const wasChecked = await readinessCheckbox.isChecked();
+      if (wasChecked) {
+        await readinessCheckbox.uncheck({ force: true });
+      } else {
+        await readinessCheckbox.check({ force: true });
+      }
+      await expect(readinessCheckbox).toBeChecked({ checked: !wasChecked });
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+        timeoutMs: TIMEOUT_UI,
+      });
 
       await returnToInitiativesDashboard(editor);
       const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -166,7 +322,9 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
         ),
         /Establish governance/i
       );
-      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked();
+      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked({
+        checked: !wasChecked,
+      });
     });
   });
 
@@ -253,6 +411,103 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       });
     });
 
+    test("should save and persist checkpoint attachment changes for admin users @regression", async () => {
+      await withUploadFixture(async (fixture) => {
+        const checkpointRow = await uploadCheckpointAttachment(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0],
+          GOVERNANCE_CHECKPOINT,
+          fixture
+        );
+
+        await getManageAttachmentButton(
+          checkpointRow,
+          fixture.fileName
+        ).click();
+
+        const manageDrawer = editor.page.getByRole("dialog");
+        await expect(
+          manageDrawer.getByRole("heading", {
+            name: /^Manage Attachment$/i,
+          })
+        ).toBeVisible({ timeout: TIMEOUT_UI });
+
+        await selectCheckpoint(
+          editor,
+          manageDrawer,
+          /0\.2 Submit project plan to CMS/i
+        );
+        await manageDrawer
+          .getByRole("button", { name: /^Save changes$/i })
+          .click();
+        await expect(manageDrawer).toBeHidden({ timeout: TIMEOUT_UI });
+
+        await returnToInitiativesDashboard(editor);
+        const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+        expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+        const updatedCheckpointRow = getCheckpointAttachmentRowByFileName(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0],
+          fixture.fileName
+        );
+        await expect(updatedCheckpointRow).toContainText(
+          /0\.2\s*Submit project plan to CMS/i,
+          { timeout: TIMEOUT_UI }
+        );
+      });
+    });
+
+    test("should delete and persist removal of a checkpoint attachment for admin users @regression", async () => {
+      await withUploadFixture(async (fixture) => {
+        const checkpointRow = await uploadCheckpointAttachment(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0],
+          GOVERNANCE_CHECKPOINT,
+          fixture
+        );
+
+        await getManageAttachmentButton(
+          checkpointRow,
+          fixture.fileName
+        ).click();
+
+        const manageDrawer = editor.page.getByRole("dialog");
+        await expect(
+          manageDrawer.getByRole("heading", {
+            name: /^Manage Attachment$/i,
+          })
+        ).toBeVisible({ timeout: TIMEOUT_UI });
+
+        await manageDrawer
+          .getByRole("button", { name: /^Delete attachment$/i })
+          .click();
+        await expect(manageDrawer).toBeHidden({ timeout: TIMEOUT_UI });
+
+        const deletedAttachmentRow = getCheckpointAttachmentRowByFileName(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0],
+          fixture.fileName
+        );
+        await expect(deletedAttachmentRow).toHaveCount(0);
+
+        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+          timeoutMs: TIMEOUT_UI,
+        });
+        await returnToInitiativesDashboard(editor);
+        const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+        expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+        await expect(
+          getCheckpointAttachmentRowByFileName(
+            editor,
+            CHECKPOINT_STAGE_LABELS[0],
+            fixture.fileName
+          )
+        ).toHaveCount(0);
+      });
+    });
+
     test("should add a comment to a checkpoint attachment for admin users @regression", async () => {
       const commentText = `Admin initiative comment ${createArtifactId()}`;
       await withUploadFixture(async (fixture) => {
@@ -276,12 +531,72 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
         });
 
         await expect(commentField).toBeEditable();
+        await commentDrawer
+          .getByRole("radio", { name: /^External \(Shared with States\)$/i })
+          .check();
         await commentField.fill(commentText);
         await addCommentButton.click();
         await expect(commentDrawer).toContainText(commentText, {
           timeout: TIMEOUT_UI,
         });
         await closeCommentDrawer(commentDrawer);
+      });
+    });
+
+    test("should persist a checkpoint attachment comment for admin users @regression", async () => {
+      const commentText = `Admin initiative comment ${createArtifactId()}`;
+
+      await withUploadFixture(async (fixture) => {
+        const checkpointRow = await uploadCheckpointAttachment(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0],
+          GOVERNANCE_CHECKPOINT,
+          fixture
+        );
+
+        await getCommentAttachmentButton(
+          checkpointRow,
+          fixture.fileName
+        ).click();
+
+        const commentDrawer = editor.page.getByRole("dialog");
+        const commentField = commentDrawer.getByRole("textbox", {
+          name: /^Comment$/i,
+        });
+        await commentDrawer
+          .getByRole("radio", { name: /^External \(Shared with States\)$/i })
+          .check();
+        await commentField.fill(commentText);
+        await commentDrawer
+          .getByRole("button", { name: /^Add comment$/i })
+          .click();
+        await expect(commentDrawer).toContainText(commentText, {
+          timeout: TIMEOUT_UI,
+        });
+        await closeCommentDrawer(commentDrawer);
+        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
+          timeoutMs: TIMEOUT_UI,
+        });
+
+        await returnToInitiativesDashboard(editor);
+        const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+        expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+        const reopenedCheckpointRow = getCheckpointAttachmentRowByFileName(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0],
+          fixture.fileName
+        );
+        await getCommentAttachmentButton(
+          reopenedCheckpointRow,
+          fixture.fileName
+        ).click();
+
+        const reopenedCommentDrawer = editor.page.getByRole("dialog");
+        await expect(reopenedCommentDrawer).toContainText(commentText, {
+          timeout: TIMEOUT_UI,
+        });
+        await closeCommentDrawer(reopenedCommentDrawer);
       });
     });
   });

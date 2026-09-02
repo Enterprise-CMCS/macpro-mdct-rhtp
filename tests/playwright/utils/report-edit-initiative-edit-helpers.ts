@@ -1,6 +1,7 @@
 import { expect, type Locator } from "@playwright/test";
 import {
   createArtifactId,
+  escapeRegExp,
   getReportTestRunId,
   INITIATIVES_SECTION,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
@@ -41,14 +42,19 @@ export type AdminMetricControlsVisibility = "visible" | "hidden";
 export type MetricsTableOptions = {
   adminControls?: boolean;
 };
+export type MetricTestData = {
+  name: string;
+  targetInput: string;
+  targetDisplay: string;
+  currentInput: string;
+  currentDisplay: string;
+  date: string;
+};
 
 const REPORT_PERIOD_LABELS: Record<ReportPeriod, string> = {
   annual: "Annual Report",
   quarterly: "Quarterly Report",
 };
-
-const escapeRegExp = (value: string): string =>
-  value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 
 const getInitiativeRows = (table: Locator): Locator =>
   table.getByRole("row").filter({ hasText: INITIATIVE_ROW_PATTERN });
@@ -58,6 +64,165 @@ const getEditButton = (row: Locator): Locator =>
 
 const getNonAbandonedInitiativeRows = (table: Locator): Locator =>
   getInitiativeRows(table).filter({ hasNotText: /Status:\s*Abandoned/i });
+
+export const getMetricsTable = (editor: ReportEditorPage): Locator =>
+  editor.page.getByRole("table").filter({
+    has: editor.page.getByRole("columnheader", { name: "Metric" }),
+  });
+
+export const createMetricTestData = (
+  name: string,
+  date: string
+): MetricTestData => {
+  const targetNumber = Math.floor(Math.random() * 1000000) + 1;
+  const currentNumber = Math.floor(Math.random() * 1000000) + 1;
+
+  return {
+    name,
+    targetInput: String(targetNumber),
+    targetDisplay: targetNumber.toLocaleString("en-US"),
+    currentInput: String(currentNumber),
+    currentDisplay: currentNumber.toLocaleString("en-US"),
+    date,
+  };
+};
+
+export const addMetric = async (
+  editor: ReportEditorPage,
+  metric: MetricTestData
+): Promise<void> => {
+  const addMetricButton = editor.page.getByRole("button", {
+    name: /^Add Metric$/i,
+  });
+
+  await expect(addMetricButton).toBeVisible({ timeout: TIMEOUT_UI });
+  await addMetricButton.click();
+  await expect(editor.page.getByRole("dialog")).toBeVisible({
+    timeout: TIMEOUT_UI,
+  });
+
+  await editor.fillTextField(/^Metric name/i, metric.name);
+  await editor.fillTextField(
+    /^What is the target for this metric/i,
+    metric.targetInput
+  );
+  await editor.fillTextField(
+    /^What is the metric['’]s current value/i,
+    metric.currentInput
+  );
+  await editor.fillTextField(/^Date of the current value/i, metric.date);
+
+  await editor.page.getByRole("button", { name: /^Save$/i }).click();
+  await expect(editor.page.getByRole("dialog")).toBeHidden({
+    timeout: TIMEOUT_UI,
+  });
+};
+
+export const editMetric = async (
+  editor: ReportEditorPage,
+  row: Locator,
+  metric: MetricTestData
+): Promise<void> => {
+  await row.getByRole("button", { name: /^Edit\/Abandon$/i }).click();
+
+  const dialog = editor.page.getByRole("dialog");
+  await expect(
+    dialog.getByRole("heading", { name: /^Edit Metric$/i })
+  ).toBeVisible({ timeout: TIMEOUT_UI });
+
+  await editor.fillTextField(/^Metric name/i, metric.name);
+  await editor.fillTextField(
+    /^What is the target for this metric/i,
+    metric.targetInput
+  );
+  await editor.fillTextField(
+    /^What is the metric['’]s current value/i,
+    metric.currentInput
+  );
+  await editor.fillTextField(/^Date of the current value/i, metric.date);
+
+  await dialog.getByRole("button", { name: /^Save$/i }).click();
+  await expect(dialog).toBeHidden({ timeout: TIMEOUT_UI });
+};
+
+export const abandonMetric = async (
+  editor: ReportEditorPage,
+  row: Locator
+): Promise<void> => {
+  await row.getByRole("button", { name: /^Edit\/Abandon$/i }).click();
+
+  const dialog = editor.page.getByRole("dialog");
+  await expect(
+    dialog.getByRole("heading", { name: /^Edit Metric$/i })
+  ).toBeVisible({ timeout: TIMEOUT_UI });
+
+  const statusDropdown = dialog.getByLabel(/^Status$/i);
+  await statusDropdown.click();
+  const abandonedOption = editor.page.getByRole("option", {
+    name: /^Abandoned$/i,
+  });
+  await expect(abandonedOption).toBeVisible({ timeout: TIMEOUT_UI });
+  await abandonedOption.click();
+  await expect(statusDropdown).toHaveText(/^Abandoned$/i);
+
+  await dialog.getByRole("button", { name: /^Save$/i }).click();
+  await expect(dialog).toBeHidden({ timeout: TIMEOUT_UI });
+};
+
+export const verifyAbandonedMetricRow = async (
+  table: Locator,
+  metricName: string
+): Promise<void> => {
+  const metricRow = table
+    .locator("tbody")
+    .getByRole("row")
+    .filter({ hasText: metricName });
+
+  await expect(metricRow).toHaveCount(1);
+  await expect(metricRow).toBeVisible({ timeout: TIMEOUT_UI });
+  await expect(
+    metricRow.getByRole("cell", { name: /^Abandoned$/i })
+  ).toBeVisible({ timeout: TIMEOUT_UI });
+
+  const hasPreviousValueColumn = await table
+    .getByRole("columnheader", { name: /^Previous annual value$/i })
+    .isVisible()
+    .catch(() => false);
+  const cells = metricRow.getByRole("cell");
+  const currentValueIndex = hasPreviousValueColumn ? 5 : 4;
+  const dateIndex = hasPreviousValueColumn ? 6 : 5;
+
+  await expect(cells.nth(currentValueIndex).locator("input")).toBeDisabled();
+  await expect(cells.nth(dateIndex).locator("input")).toBeDisabled();
+};
+
+export const verifyMetricRow = async (
+  table: Locator,
+  metric: MetricTestData
+): Promise<void> => {
+  const metricRow = table
+    .locator("tbody")
+    .getByRole("row")
+    .filter({ hasText: metric.name });
+
+  await expect(metricRow).toHaveCount(1);
+  await expect(metricRow).toBeVisible({ timeout: TIMEOUT_UI });
+
+  const cells = metricRow.getByRole("cell");
+  const hasPreviousValueColumn = await table
+    .getByRole("columnheader", { name: /^Previous annual value$/i })
+    .isVisible()
+    .catch(() => false);
+  const currentValueIndex = hasPreviousValueColumn ? 5 : 4;
+  const dateIndex = hasPreviousValueColumn ? 6 : 5;
+
+  await expect(cells.nth(2)).toHaveText(metric.name);
+  await expect(cells.nth(3)).toHaveText(metric.targetDisplay);
+  await expect(cells.nth(currentValueIndex).locator("input")).toHaveValue(
+    metric.currentDisplay
+  );
+  await expect(cells.nth(dateIndex).locator("input")).toHaveValue(metric.date);
+};
 
 export const verifyAdminMetricControls = async (
   editor: ReportEditorPage,
@@ -187,7 +352,7 @@ export const verifyMetricsTableRows = async (
   }
 };
 
-export const verifyEditableAnnualInitiativeFields = async (
+export const verifyVisibleAnnualInitiativeFields = async (
   editor: ReportEditorPage
 ): Promise<void> => {
   const narrativeRequiredLabel = editor.page
@@ -432,7 +597,7 @@ export const returnToInitiativesDashboard = async (
   const backButton = editor.page.getByRole("button", {
     name: "Back to Initiatives",
   });
-  await expect(backButton).toBeVisible();
+  await expect(backButton).toBeVisible({ timeout: TIMEOUT_UI });
 
   await Promise.all([
     editor.page.waitForURL(
