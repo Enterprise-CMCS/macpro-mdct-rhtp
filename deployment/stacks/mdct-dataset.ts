@@ -53,7 +53,7 @@ export function createDataSetComponents(props: CreateUploadsComponentsProps) {
 
   const s3MalwareProtectionRole = new iam.Role(
     scope,
-    "S3MalwareProtectionRole",
+    "DataSetS3MalwareProtectionRole",
     {
       assumedBy: new iam.ServicePrincipal(
         "malware-protection-plan.guardduty.amazonaws.com"
@@ -154,19 +154,23 @@ export function createDataSetComponents(props: CreateUploadsComponentsProps) {
     expiration: Duration.days(1),
   });
 
-  new guardduty.CfnMalwareProtectionPlan(scope, "MalwareProtectionPlan", {
-    actions: {
-      tagging: {
-        status: "ENABLED",
+  new guardduty.CfnMalwareProtectionPlan(
+    scope,
+    "DataSetMalwareProtectionPlan",
+    {
+      actions: {
+        tagging: {
+          status: "ENABLED",
+        },
       },
-    },
-    protectedResource: {
-      s3Bucket: {
-        bucketName: datasetBucketName,
+      protectedResource: {
+        s3Bucket: {
+          bucketName: datasetBucketName,
+        },
       },
-    },
-    role: s3MalwareProtectionRole.roleArn,
-  });
+      role: s3MalwareProtectionRole.roleArn,
+    }
+  );
 
   return datasetBucket;
 }
