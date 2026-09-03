@@ -54,24 +54,19 @@ describe("sustainability and highlights utilities", () => {
       );
     });
 
-    test("uses provided data instead of fetching from S3 when given", () => {
-      const result = buildSustainabilityAndHighlightsPage(state, {
-        [state]: {
-          successStory: "override story",
-          highlight: "override highlight",
-        },
-      });
+    test("builds a page with empty answers when S3 does not return data", async () => {
+      (s3Lib.getObject as Mock).mockResolvedValueOnce({});
 
-      expect(s3Lib.getObject).not.toHaveBeenCalled();
-      expect(result).toEqual(
-        expect.objectContaining({
-          elements: expect.arrayContaining([
-            expect.objectContaining({
-              id: "success-stories",
-              answer: "override story",
-            }),
-          ]),
-        })
+      const result = await buildSustainabilityAndHighlightsPage(state);
+
+      expect(result.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: "success-stories", answer: "" }),
+          expect.objectContaining({
+            id: "sustainability-planning",
+            answer: "",
+          }),
+        ])
       );
     });
   });

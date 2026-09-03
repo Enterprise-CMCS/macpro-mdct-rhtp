@@ -1,4 +1,4 @@
-import { generalInformation } from "../../forms/2026/rhtp/pages/general-information";
+import { buildGeneralInformationPage } from "../../forms/2026/rhtp/pages/general-information/general-information";
 import { initiativeAttachments } from "../../forms/2026/rhtp/pages/initiative-attachments";
 import { buildInitiativePages } from "../../forms/2026/rhtp/pages/initiatives/initiatives";
 import { initiativesTable } from "../../forms/2026/rhtp/pages/initiatives-table";
@@ -39,7 +39,7 @@ const pages = [
       "review-submit",
     ],
   },
-  generalInformation,
+  buildGeneralInformationPage(state, {}) as FormPageTemplate,
   initiativesTable,
   initiativeAttachments,
   buildStatePolicyCommitments(state, {}) as FormPageTemplate,

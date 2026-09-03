@@ -1,4 +1,6 @@
 /**
+ * NOTE: DO NOT COMMIT THE GENERATED FILE WITH ACTUAL STATES DATA TO THE REPO
+ *
  * This is a utility for transforming a csv of success and highlight
  * information into a json file. The function expects the csv data
  * in a certain format in order for the transformation to happen properly.
@@ -18,7 +20,7 @@ function stripNewlineAndTrim(input) {
 
 function main() {
   const csvData = fs
-    .readFileSync("./success-and-highlights.csv")
+    .readFileSync("./success-and-highlights-DONT-COMMIT.csv")
     .toLocaleString();
   const { data: dataSet, errors } = Papa.parse(csvData, { header: true });
   if (errors.length > 0) {
@@ -40,7 +42,7 @@ function main() {
   }
 
   fs.writeFileSync(
-    `./success-and-highlights.json`,
+    `./success-and-highlights-DONT-COMMIT.json`,
     JSON.stringify(successAndHighlightsObj, null, 2)
   );
 }

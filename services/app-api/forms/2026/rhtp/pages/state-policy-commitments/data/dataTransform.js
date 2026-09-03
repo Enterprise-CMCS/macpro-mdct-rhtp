@@ -1,4 +1,6 @@
 /**
+ * NOTE: DO NOT COMMIT THE GENERATED FILE WITH ACTUAL STATES DATA TO THE REPO (empty-commitments.json is ok)
+ *
  * This is a utility for transforming a csv of state policy commitment
  * information into a json file. The function expects the csv data
  * in a certain format in order for the transformation to happen properly.

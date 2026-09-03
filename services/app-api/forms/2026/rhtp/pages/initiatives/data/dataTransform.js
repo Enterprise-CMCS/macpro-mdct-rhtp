@@ -1,4 +1,6 @@
 /**
+ * NOTE: DO NOT COMMIT THE GENERATED FILE WITH ACTUAL STATES DATA TO THE REPO (empty-initiatives.json is ok)
+ * 
  * This is a utility for transforming a csv of initiative information
  * into a json file. The function expects the csv data in a certain
  * format in order for the transformation to happen properly.
@@ -41,7 +43,9 @@ function stripNewlineAndTrim(input) {
 }
 
 function main() {
-  const csvData = fs.readFileSync("./initiatives.csv").toLocaleString();
+  const csvData = fs
+    .readFileSync("./initiatives-DONT-COMMIT.csv")
+    .toLocaleString();
   const { data: dataSet, errors } = Papa.parse(csvData, { header: true });
   if (errors.length > 0) {
     console.log("ERRORS:", errors);
@@ -100,7 +104,7 @@ function main() {
   }
 
   fs.writeFileSync(
-    `./initiatives.json`,
+    `./initiatives-DONT-COMMIT.json`,
     JSON.stringify(initiativeObj, null, 2)
   );
 }

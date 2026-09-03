@@ -1,5 +1,5 @@
 import { ReportPages } from "@rhtp/shared";
-import { generalInformation } from "./pages/general-information";
+import { buildGeneralInformationPage } from "./pages/general-information/general-information";
 import { initiativeAttachments } from "./pages/initiative-attachments";
 import { buildInitiativePages } from "./pages/initiatives/initiatives";
 import { initiativesTable } from "./pages/initiatives-table";
@@ -23,7 +23,7 @@ export const rhtpReportTemplate = async (
       "review-submit",
     ],
   },
-  generalInformation,
+  await buildGeneralInformationPage(state),
   initiativesTable,
   initiativeAttachments,
   await buildStatePolicyCommitments(state),

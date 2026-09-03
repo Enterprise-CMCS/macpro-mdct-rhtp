@@ -12,7 +12,4 @@ export const getJsonFromS3 = async <T>(key: string): Promise<T | undefined> => {
   } catch {
     return undefined;
   }
-
-  // const body = await object.Body?.transformToString();
-  // return body ? JSON.parse(body) : undefined;
 };

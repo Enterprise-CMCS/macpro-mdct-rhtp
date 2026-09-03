@@ -1,9 +1,17 @@
+import { Mock } from "vitest";
 import { PageType } from "@rhtp/shared";
 import { buildInitiativePages } from "../initiatives";
 import INITIATIVES from "../data/empty-initiatives.json";
+import s3Lib from "../../../../../../libs/s3-lib";
 
 const state = "PA";
 const firstInitiative = INITIATIVES[state][0];
+
+vi.mock("../../../../../../libs/s3-lib", () => ({
+  default: {
+    getObject: vi.fn(),
+  },
+}));
 
 describe("initiative utilities", () => {
   beforeEach(() => {
@@ -25,6 +33,14 @@ describe("initiative utilities", () => {
           }),
         ])
       );
+    });
+
+    test("uses empty initiatives data when S3 does not return data", async () => {
+      (s3Lib.getObject as Mock).mockResolvedValueOnce({});
+
+      const result = await buildInitiativePages(state);
+
+      expect(result).toEqual(buildInitiativePages(state, INITIATIVES as any));
     });
   });
 });
