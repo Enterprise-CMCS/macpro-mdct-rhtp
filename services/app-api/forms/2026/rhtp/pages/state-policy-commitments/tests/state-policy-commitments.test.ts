@@ -4,7 +4,7 @@ import {
   STATE_POLICY_COMMITMENT_NAMES,
 } from "../constants";
 import { buildStatePolicyCommitments } from "../state-policy-commitments";
-import STATE_POLICY_COMMITMENTS from "../data/commitments.json";
+import STATE_POLICY_COMMITMENTS from "../data/empty-commitments.json";
 
 describe("test state policy commitment functions", () => {
   test("buildStatePolicyCommitments()", () => {

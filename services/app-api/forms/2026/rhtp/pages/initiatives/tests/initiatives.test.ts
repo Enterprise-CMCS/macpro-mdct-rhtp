@@ -1,6 +1,6 @@
 import { PageType } from "@rhtp/shared";
 import { buildInitiativePages } from "../initiatives";
-import INITIATIVES from "../data/initiatives.json";
+import INITIATIVES from "../data/empty-initiatives.json";
 
 const state = "PA";
 const firstInitiative = INITIATIVES[state][0];

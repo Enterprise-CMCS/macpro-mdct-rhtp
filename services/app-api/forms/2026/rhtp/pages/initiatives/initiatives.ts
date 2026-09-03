@@ -16,6 +16,7 @@ import {
 } from "@rhtp/shared";
 import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 import { initiativeAttachmentStatusInstructions } from "../initiative-attachments";
+import EMPTY_INITIATIVES from "./data/empty-initiatives.json";
 
 const INITIATIVES_KEY = "import/initiatives.json";
 
@@ -328,6 +329,7 @@ export const buildInitiativePages = (
 ): ReturnType<typeof buildPages> | Promise<ReturnType<typeof buildPages>> => {
   if (initiatives) return buildPages(state, initiatives);
   return getJsonFromS3<InitiativesData>(INITIATIVES_KEY).then((fetched) =>
-    buildPages(state, fetched ?? {})
+    // Use manually uploaded S3 data if available, otherwise use empty initiatives JSON
+    buildPages(state, fetched ?? (EMPTY_INITIATIVES as InitiativesData))
   );
 };

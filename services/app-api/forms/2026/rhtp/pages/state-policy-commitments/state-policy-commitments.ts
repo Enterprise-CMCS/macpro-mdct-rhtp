@@ -15,6 +15,7 @@ import {
   getDropdownOptions,
 } from "./constants";
 import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
+import EMPTY_STATE_POLICY_COMMITMENTS from "./data/empty-commitments.json";
 
 const COMMITMENTS_KEY = "import/commitments.json";
 
@@ -157,6 +158,7 @@ export const buildStatePolicyCommitments = (
 ): FormPageTemplate | Promise<FormPageTemplate> => {
   if (statePolicyCommitments) return buildPage(state, statePolicyCommitments);
   return getJsonFromS3<StatePolicyCommitmentsData>(COMMITMENTS_KEY).then(
-    (fetched) => buildPage(state, fetched ?? {})
+    // Use manually uploaded S3 data if available, otherwise use empty commitments JSON
+    (fetched) => buildPage(state, fetched ?? EMPTY_STATE_POLICY_COMMITMENTS)
   );
 };
