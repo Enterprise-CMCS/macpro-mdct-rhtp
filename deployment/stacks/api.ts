@@ -442,6 +442,38 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "createDataSetUpload", {
+    entry: "services/app-api/handlers/datasetUpload/create.ts",
+    handler: "createDataSetUpload",
+    path: "/dataset/{state}/{id}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getUploadsByState", {
+    entry: "services/app-api/handlers/datasetUpload/get.ts",
+    handler: "getUploadsByState",
+    path: "/dataset/{state}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getDataSetUploadsByFileId", {
+    entry: "services/app-api/handlers/datasetUpload/get.ts",
+    handler: "getDataSetUploadsByFileId",
+    path: "/dataset/{state}/{id}/files/{fileId}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "deleteDataSetUpload", {
+    entry: "services/app-api/handlers/datasetUpload/delete.ts",
+    handler: "deleteDataSetUpload",
+    path: "/dataset/{state}/{id}/files/{fileId}",
+    method: "DELETE",
+    ...commonProps,
+  });
+
   new LambdaDynamoEventSource(scope, "postKafkaData", {
     entry: "services/app-api/handlers/kafka/postKafkaData.ts",
     handler: "handler",

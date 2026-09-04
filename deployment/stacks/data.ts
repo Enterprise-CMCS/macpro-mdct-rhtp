@@ -44,6 +44,7 @@ export function createDataComponents(props: CreateDataComponentsProps) {
       },
       sortKey: { name: "fileId", type: dynamodb.AttributeType.STRING },
     }),
+    //TODO: re-evaluate the partitionKey
     new DynamoDBTable(scope, "DataSetUploads", {
       stage,
       isDev,
