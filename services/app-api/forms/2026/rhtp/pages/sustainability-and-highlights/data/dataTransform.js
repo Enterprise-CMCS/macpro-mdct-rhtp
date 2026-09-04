@@ -30,14 +30,14 @@ function main() {
 
   for (const stateData of dataSet) {
     const state = stripNewlineAndTrim(stateData.State);
-    const successStory = stripNewlineAndTrim(stateData["Success Story"]);
-    const highlight = stripNewlineAndTrim(
-      stateData["Sustainability Highlights "]
+    const successStory = stripNewlineAndTrim(stateData["Success Stories"]);
+    const sustainabilityPlanning = stripNewlineAndTrim(
+      stateData["Sustainability Planning"]
     );
 
     successAndHighlightsObj[state] = {
       successStory,
-      highlight,
+      sustainabilityPlanning,
     };
   }
 

@@ -4,7 +4,7 @@ import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 const SUCCESS_AND_HIGHLIGHTS_KEY = "import/success-and-highlights.json";
 
 export type SuccessAndHighlightsData = {
-  [key: string]: { successStory: string; highlight: string };
+  [key: string]: { successStory: string; sustainabilityPlanning: string };
 };
 
 const buildPage = (
@@ -83,7 +83,7 @@ const buildPage = (
       required: true,
       quarterly: false,
       charLimit: 3000,
-      answer: data[state]?.highlight || "",
+      answer: data[state]?.sustainabilityPlanning || "",
     },
     {
       id: "sustainability-paragraph",

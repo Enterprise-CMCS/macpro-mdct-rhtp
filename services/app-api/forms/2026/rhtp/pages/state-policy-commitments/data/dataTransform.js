@@ -9,44 +9,53 @@
  */
 
 const { STATE_POLICY_COMMITMENT_NAMES } = require("../constants.ts");
+const { exit } = require("node:process");
 const fs = require("node:fs");
-
-const headingMap = {
-  State: "state",
-  "State policy commitment name": "label",
-  Status: "status",
-  Link: "link",
-};
+const Papa = require("papaparse");
 
 const commitmentMap = new Map();
 
-function main() {
-  const file = fs.readFileSync("./commitments.csv").toLocaleString();
-  const rows = file.split("\n"); // SPLIT ROWS
-  const headings = rows.shift().split(",");
+function stripNewlineAndTrim(input) {
+  return input.replaceAll("\n", " ").trim();
+}
 
-  rows.forEach((row, rowIndex) => {
-    const commitment = {};
-    let state = "";
-    columns = row.split(","); //SPLIT COLUMNS
-    columns.forEach((col, colIndex) => {
-      const key = headingMap[headings[colIndex].trim()];
-      if (key === "state") {
-        state = col;
-      } else if (
-        key === "label" &&
-        !STATE_POLICY_COMMITMENT_NAMES.includes(col.trim())
-      ) {
-        throw new Error(
-          `Unexpected commitment name found in row ${rowIndex + 1}: ${col}. Please correct and rerun`
-        );
-      } else {
-        commitment[key] = col.trim();
-      }
-    });
+function main() {
+  const csvData = fs
+    .readFileSync("./commitments-DONT-COMMIT.csv")
+    .toLocaleString();
+  const { data: dataSet, errors } = Papa.parse(csvData, { header: true });
+  if (errors.length > 0) {
+    console.log("ERRORS:", errors);
+    exit(1);
+  }
+
+  for (const [rowIndex, stateData] of dataSet.entries()) {
+    const state = stripNewlineAndTrim(stateData.State);
+    const criterion = stripNewlineAndTrim(
+      stateData["Workload Funding Score Factor Criterion"]
+    );
+    const scoreFactor = stripNewlineAndTrim(stateData["Score Factor"]);
+
+    const label = `${scoreFactor} ${criterion}`.trim();
+    if (!STATE_POLICY_COMMITMENT_NAMES.includes(label)) {
+      throw new Error(
+        `Unexpected commitment name found in row ${rowIndex + 1}: ${label}. Please correct and rerun`
+      );
+    }
+
+    const links = stripNewlineAndTrim(stateData["Supporting Evidence"])
+      .split(",")
+      .map((link) => link.trim())
+      .filter((link) => link.length > 0);
+
+    const commitment = {
+      label,
+      status: stripNewlineAndTrim(stateData["Current Status"]),
+      links,
+    };
     const commitmentsByState = commitmentMap.get(state) || [];
     commitmentMap.set(state, [...commitmentsByState, commitment]);
-  });
+  }
 
   const commitmentObj = {};
   for (const [state, commitments] of commitmentMap.entries()) {
@@ -54,7 +63,7 @@ function main() {
   }
 
   fs.writeFileSync(
-    `./commitments.json`,
+    `./commitments-DONT-COMMIT.json`,
     JSON.stringify(commitmentObj, null, 2)
   );
 }

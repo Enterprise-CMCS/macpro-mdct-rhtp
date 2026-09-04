@@ -6,7 +6,7 @@ import s3Lib from "../../../../../../libs/s3-lib";
 const state = "AL";
 const successAndHighlights = {
   successStory: "Success Story Text 1",
-  highlight: "Highlight Text 1",
+  sustainabilityPlanning: "Highlight Text 1",
 };
 
 vi.mock("../../../../../../libs/s3-lib", () => ({
@@ -47,7 +47,7 @@ describe("sustainability and highlights utilities", () => {
             }),
             expect.objectContaining({
               id: "sustainability-planning",
-              answer: successAndHighlights.highlight,
+              answer: successAndHighlights.sustainabilityPlanning,
             }),
           ]),
         })

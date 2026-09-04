@@ -4,3 +4,13 @@ node_modules
 .build
 
 coverage
+
+# These include real data from the state for the first time import 
+success-and-highlights-DONT-COMMIT.csv
+success-and-highlights-DONT-COMMIT.json
+commitments-DONT-COMMIT.csv
+commitments-DONT-COMMIT.json
+initiatives-DONT-COMMIT.csv
+initiatives-DONT-COMMIT.json
+general-information-DONT-COMMIT.csv
+general-information-DONT-COMMIT.json

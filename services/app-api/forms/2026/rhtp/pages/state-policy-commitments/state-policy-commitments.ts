@@ -20,7 +20,7 @@ import EMPTY_STATE_POLICY_COMMITMENTS from "./data/empty-commitments.json";
 const COMMITMENTS_KEY = "import/commitments.json";
 
 type StatePolicyCommitmentsData = {
-  [key: string]: { label: string; status: string; link: string }[];
+  [key: string]: { label: string; status: string; links: string[] }[];
 };
 
 const commitmentStatusDropdown = (
@@ -63,7 +63,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   };
 };
 
-const commitmentLinkListInput = (link?: string): ListInputTemplate => ({
+const commitmentLinkListInput = (links?: string[]): ListInputTemplate => ({
   type: ElementType.ListInput,
   id: "commitment-links",
   label: "Links",
@@ -72,7 +72,7 @@ const commitmentLinkListInput = (link?: string): ListInputTemplate => ({
   buttonText: "Add link",
   validation: "link",
   required: false,
-  answer: link ? [link] : [],
+  answer: links || [],
 });
 
 const commitmentSupportParagraph: ParagraphTemplate = {
@@ -99,14 +99,14 @@ const buildCommitments = (
   if (!(state in statePolicyCommitments)) return [];
   const commitmentsForState = statePolicyCommitments[state];
   const commitments = [];
-  for (const { label, status, link } of commitmentsForState) {
+  for (const { label, status, links } of commitmentsForState) {
     commitments.push({
       label,
       elements: [
         commitmentStatusDropdown(label, status),
         cmsStatusEvaluation(label),
         commitmentSupportParagraph,
-        commitmentLinkListInput(link),
+        commitmentLinkListInput(links),
         commitmentAttachmentArea(label),
         commitmentNotes,
       ],

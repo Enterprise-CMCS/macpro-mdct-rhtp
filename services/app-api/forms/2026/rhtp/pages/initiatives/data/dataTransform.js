@@ -69,14 +69,14 @@ function main() {
       );
     const initiative = {
       id: crypto.randomUUID(),
-      title: stripNewlineAndTrim(initiativeData["Initiative name"]),
+      title: stripNewlineAndTrim(initiativeData["Initiative Name"]),
       initiativeNumber: stripNewlineAndTrim(
         initiativeData["Initiative Number"]
       ),
       narrative: initiativeData["Initiative Narrative"],
-      status: stripNewlineAndTrim(initiativeData["Initiative status"]),
+      status: stripNewlineAndTrim(initiativeData["Initiative Status"]),
       numberOfPeopleServed: stripNewlineAndTrim(
-        initiativeData["Number of people served"]
+        initiativeData["Number of People Served"]
       ),
     };
 
