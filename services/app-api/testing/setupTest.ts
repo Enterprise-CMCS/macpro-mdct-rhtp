@@ -32,3 +32,24 @@ vi.mock("../libs/debug-lib", () => {
     flush: vi.fn(),
   };
 });
+
+/*
+ * Default mock for s3-lib so any code that transitively fetches data from S3
+ * (e.g. building the RHTP report template) doesn't attempt real AWS calls
+ * during tests. Individual test files can override this with their own
+ * `vi.mock("../../libs/s3-lib", ...)` as needed.
+ */
+vi.mock("../libs/s3-lib", () => ({
+  default: {
+    deleteObject: vi.fn(),
+    headObject: vi.fn(),
+    createPresignedPost: vi.fn(),
+    getSignedDownloadUrl: vi.fn(),
+    getObject: vi.fn().mockResolvedValue({
+      Body: { transformToString: () => Promise.resolve("{}") },
+    }),
+    getObjectTagging: vi.fn(),
+    putObject: vi.fn(),
+    copyObject: vi.fn(),
+  },
+}));

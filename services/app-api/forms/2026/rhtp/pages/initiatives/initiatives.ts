@@ -14,13 +14,18 @@ import {
   TextboxTemplate,
   DividerTemplate,
 } from "@rhtp/shared";
-import INITIATIVES from "./data/initiatives.json";
+import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 import { initiativeAttachmentStatusInstructions } from "../initiative-attachments";
+import EMPTY_INITIATIVES from "./data/empty-initiatives.json";
+
+const INITIATIVES_KEY = "import/initiatives.json";
 
 type MetricData = {
   name: string;
   status: string;
   target?: string; // TODO: (probably) make required once we have new CMS data with targets
+  currValue?: string;
+  date?: string;
 };
 
 type InitiativeData = {
@@ -29,6 +34,7 @@ type InitiativeData = {
   initiativeNumber: string;
   narrative?: string;
   status?: PageStatus | undefined;
+  numberOfPeopleServed?: string;
   metrics?: MetricData[];
 };
 
@@ -131,7 +137,9 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   charLimit: 2000,
 });
 
-const initiativeNumberOfPeopleServed: TextboxTemplate = {
+const initiativeNumberOfPeopleServed = (
+  numberOfPeopleServed: string = ""
+): TextboxTemplate => ({
   type: ElementType.Textbox,
   id: "initiative-number-of-people-served",
   label: "Number of people served",
@@ -153,7 +161,8 @@ const initiativeNumberOfPeopleServed: TextboxTemplate = {
   },
   required: true,
   quarterly: false,
-};
+  answer: numberOfPeopleServed,
+});
 
 export const metricTable = (
   metrics: MetricData[] = []
@@ -248,8 +257,8 @@ export const metricTable = (
       { id: "metric", value: metric.name },
       { id: "target", value: metric.target },
       { id: "prevValue", value: "" },
-      { id: "currValue", value: "" },
-      { id: "date", value: "" },
+      { id: "currValue", value: metric.currValue },
+      { id: "date", value: metric.date },
     ];
     metricAnswers.push(answer);
   });
@@ -270,12 +279,9 @@ const checkpointsTables: TableCheckpointTemplate = {
 };
 
 // TODO - better array typing and parsing once we have initiatives by state
-export const buildInitiativePages = (
-  state: string,
-  initiatives: { [key: string]: InitiativeData[] } = INITIATIVES as {
-    [key: string]: InitiativeData[];
-  }
-) => {
+type InitiativesData = { [key: string]: InitiativeData[] };
+
+const buildPages = (state: string, initiatives: InitiativesData) => {
   if (!(state in initiatives)) return [];
   const initiativesForState = initiatives[state];
   const initiativePages = [];
@@ -285,6 +291,7 @@ export const buildInitiativePages = (
     initiativeNumber,
     status,
     narrative,
+    numberOfPeopleServed,
     metrics,
   } of initiativesForState) {
     initiativePages.push({
@@ -301,7 +308,7 @@ export const buildInitiativePages = (
         initiativeInstructions,
         initiativeAccordion,
         initiativeNarrative(narrative),
-        initiativeNumberOfPeopleServed,
+        initiativeNumberOfPeopleServed(numberOfPeopleServed),
         metricTable(metrics),
         checkpointsHeader,
         checkpointsInstructions,
@@ -313,4 +320,16 @@ export const buildInitiativePages = (
     });
   }
   return initiativePages;
+};
+
+// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+export const buildInitiativePages = (
+  state: string,
+  initiatives?: InitiativesData
+): ReturnType<typeof buildPages> | Promise<ReturnType<typeof buildPages>> => {
+  if (initiatives) return buildPages(state, initiatives);
+  return getJsonFromS3<InitiativesData>(INITIATIVES_KEY).then((fetched) =>
+    // Use manually uploaded S3 data if available, otherwise use empty initiatives JSON
+    buildPages(state, fetched ?? (EMPTY_INITIATIVES as InitiativesData))
+  );
 };

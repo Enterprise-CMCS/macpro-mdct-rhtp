@@ -516,7 +516,7 @@ export interface RhtpSubTypeData {
     nextReportSubType: string;
     type: RhtpSubType;
     budgetPeriod: number;
-    reportTemplateBuilder?: (state: string) => ReportPages;
+    reportTemplateBuilder?: (state: string) => Promise<ReportPages>;
   };
 }
 
