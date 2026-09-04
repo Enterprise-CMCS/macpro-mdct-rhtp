@@ -160,6 +160,55 @@ export const parseFileUploadDownloadParameters = (
   return { state, reportType, id };
 };
 
+export const parseDataSetFileUploadDownloadParameters = (
+  event: APIGatewayProxyEvent
+) => {
+  const { state, id, fileId } = event.pathParameters ?? {};
+
+  if (!isStateAbbr(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+
+  if (!id || !fileId) {
+    logger.warn("Missing file ID in path");
+    return undefined;
+  }
+
+  return { state, id, fileId };
+};
+
+export const parseDataSetFileCreateParameters = (
+  event: APIGatewayProxyEvent
+) => {
+  const { state, id } = event.pathParameters ?? {};
+
+  if (!isStateAbbr(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+
+  if (!id) {
+    logger.warn("Missing file ID in path");
+    return undefined;
+  }
+
+  return { state, id };
+};
+
+export const parseDataSetFileUploadParameters = (
+  event: APIGatewayProxyEvent
+) => {
+  const { state } = event.pathParameters ?? {};
+
+  if (!isStateAbbr(state)) {
+    logger.warn("Invalid state abbreviation in path");
+    return undefined;
+  }
+
+  return { state };
+};
+
 export const parseZipIdParameters = (event: APIGatewayProxyEvent) => {
   const { id } = event.pathParameters ?? {};
 

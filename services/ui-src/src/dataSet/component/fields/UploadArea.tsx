@@ -1,0 +1,325 @@
+import { Box, Heading, Text, VStack, Image } from "@chakra-ui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { acceptedFileTypes, AlertTypes, UploadListProp } from "@rhtp/shared";
+import {
+  recordFileInDatabaseAndGetUploadUrl,
+  uploadFileToS3,
+} from "../api/requestMethods/datasetUploads";
+import {
+  downloadFile,
+  getFileWithSafeName,
+  uploadListRender,
+} from "../util/other/fileUtils";
+import { useStore } from "utils";
+import { Alert } from "components/alerts/Alert";
+import alert from "assets/icons/status/icon_status_alert.svg";
+
+interface Props {
+  answer: UploadListProp[];
+  saveToReport: (uploads: UploadListProp[]) => void;
+  deleteFromReport?: (file: UploadListProp) => void;
+  multiple?: boolean;
+  disabled?: boolean;
+  notification?: {
+    instruction?: { type: AlertTypes; text: string };
+    success?: string;
+  };
+}
+
+export const UploadArea = ({
+  answer,
+  saveToReport,
+  deleteFromReport,
+  multiple = true,
+  disabled,
+  notification,
+}: Props) => {
+  const fileInputRef: any = useRef(null);
+  const { id } = { id: "1234" };
+
+  const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+  const [uploadErrors, setUploadErrors] = useState<string[]>([]);
+  const [uploadSuccess, setUploadSuccess] = useState<
+    {
+      fileId: string;
+      message: string;
+    }[]
+  >([]);
+
+  const { state } = useStore().user ?? {};
+
+  useEffect(() => {
+    if (filesToUpload && filesToUpload.length > 0) {
+      const fetchData = async () =>
+        await onUploadFiles().then((response) => {
+          setUploadSuccess([
+            ...uploadSuccess,
+            ...response.map((file) => ({
+              fileId: file.fileId,
+              message: notification?.success ?? "",
+            })),
+          ]);
+          setFilesToUpload([]);
+          saveToReport(response);
+        });
+      fetchData();
+    }
+  }, [filesToUpload]);
+
+  const disableUploadArea = () => {
+    return (
+      (!multiple && (answer.length > 0 || filesToUpload.length > 0)) || disabled
+    );
+  };
+
+  const handleFileKeyboardEvent = (
+    e: React.KeyboardEvent<HTMLLabelElement>
+  ) => {
+    e.preventDefault();
+    if ((e.key !== "Enter" && e.key !== " ") || fileInputRef.current === null)
+      return;
+    fileInputRef.current.click();
+  };
+
+  // prevent spacebar from scrolling the page
+  const suppressKeydownEvent = (e: React.KeyboardEvent<HTMLLabelElement>) => {
+    e.key === " " ? e.preventDefault() : null;
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const filterFilesAndStartUpload = (files: File[]) => {
+    const filteredFiles = files.filter((file) => {
+      if (file === null) return false;
+      const splitName = file.name.split(".");
+
+      if (splitName.at(0)?.trim() === "") {
+        setUploadErrors((prevErrors) => [
+          ...(prevErrors ?? []),
+          `File ${file.name} has an invalid name and was not uploaded`,
+        ]);
+        return false;
+      }
+
+      const fileType = splitName.at(-1)?.toLowerCase();
+
+      if (!fileType || !acceptedFileTypes.includes(`.${fileType}`)) {
+        setUploadErrors((prevErrors) => [
+          ...(prevErrors ?? []),
+          `File ${file.name} has unsupported file type and was not uploaded`,
+        ]);
+        return false;
+      }
+
+      return true;
+    });
+
+    const prevFiles = filesToUpload ?? [];
+
+    setFilesToUpload([...prevFiles, ...filteredFiles]);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (disableUploadArea()) return;
+
+    const files = [...event.dataTransfer.items]
+      .map((item) => item.getAsFile())
+      .filter((file) => file != null);
+
+    if (files.length > 1 && !multiple) {
+      setUploadErrors(["File is limited to 1"]);
+    } else {
+      setUploadErrors([]);
+      filterFilesAndStartUpload(files);
+    }
+  };
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      filterFilesAndStartUpload([...event.target.files]);
+    }
+  };
+
+  const onUploadFiles = async () => {
+    const files = filesToUpload ?? [];
+    const savedFiles = [];
+    for (var i = 0; i < files.length; i++) {
+      const displayName = files[i].name;
+      const file = getFileWithSafeName(files[i]);
+      try {
+        const { presignedUploadUrl, fileId } =
+          await recordFileInDatabaseAndGetUploadUrl(state!, id, file);
+        savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
+        await uploadFileToS3({ presignedUploadUrl }, file);
+      } catch (error) {
+        console.error("File upload error", error);
+        setUploadErrors((prevErrors) => [
+          ...(prevErrors ?? []),
+          `File ${file.name} failed to upload`,
+        ]);
+      }
+    }
+    return savedFiles;
+  };
+
+  const modifiedAnswer = (answer: UploadListProp[]) => {
+    return answer.map((item) => ({
+      ...item,
+      message: uploadSuccess.find((success) => success.fileId === item.fileId)
+        ?.message,
+    }));
+  };
+
+  const displayUploadStatus = () => {
+    return filesToUpload.length > 0 || answer.length > 0;
+  };
+
+  return (
+    <VStack sx={sx.container} gap="1rem" alignItems="flex-start">
+      <>
+        <div>
+          <Text sx={sx.uploadedLabel}>
+            Select a {multiple ? "file or files" : "file"} to upload
+          </Text>
+          <Text sx={sx.hint}>
+            Accepted file types: PDF, JPG/JPEG, PNG, TIFF/TIF, DOC/DOCX,
+            PPT/PPTX, XLS
+          </Text>
+        </div>
+        {uploadErrors.length > 0 && (
+          <Box>
+            {uploadErrors.map((error, index) => (
+              <Text
+                sx={sx.uploadErrorLabel}
+                key={`upload-error-${index}`}
+                display="flex"
+              >
+                <Image
+                  src={alert}
+                  alt={"error"}
+                  marginRight="0.5rem"
+                  width="16px"
+                />
+                {error}
+              </Text>
+            ))}
+          </Box>
+        )}
+        {notification?.instruction && (
+          <Alert
+            status={notification.instruction.type}
+            title={""}
+            showIcon={false}
+          >
+            {notification.instruction.text}
+          </Alert>
+        )}
+        <Box
+          sx={sx.uploadBox}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          width="100%"
+          aria-label="file drop area"
+          className={disableUploadArea() ? "disabled" : ""}
+        >
+          <span>
+            Drag {multiple ? "files" : "file"} here or
+            <label
+              id="drop-zone"
+              tabIndex={disableUploadArea() ? -1 : 0}
+              onKeyDown={suppressKeydownEvent} // prevent spacebar from scrolling page
+              onKeyUp={handleFileKeyboardEvent} // open file input window on enter/spacebar press
+            >
+              Choose from folder
+              <input
+                type="file"
+                id="file-input"
+                ref={fileInputRef}
+                multiple={multiple}
+                accept={acceptedFileTypes.join(",")}
+                onChange={onFileChange}
+                disabled={disableUploadArea()}
+              />
+            </label>
+          </span>
+        </Box>
+      </>
+      {displayUploadStatus() && (
+        <>
+          <div>
+            <Heading as="h2" variant="h3">
+              Upload Status
+            </Heading>
+          </div>
+          {filesToUpload.length > 0 &&
+            uploadListRender(state!, id, filesToUpload ?? [], deleteFromReport)}
+          {answer.length > 0 &&
+            uploadListRender(
+              state!,
+              id,
+              modifiedAnswer(answer ?? []),
+              deleteFromReport,
+              downloadFile
+            )}
+        </>
+      )}
+    </VStack>
+  );
+};
+
+const sx = {
+  container: {
+    h2: {
+      margin: "1.5rem 0",
+      fontWeight: "700",
+    },
+
+    ".ds-c-alert": {
+      width: "100%",
+    },
+  },
+  uploadedLabel: {
+    fontWeight: "600",
+  },
+  uploadErrorLabel: {
+    color: "error",
+    fontSize: "14px",
+    marginY: "0.25rem",
+  },
+  hint: {
+    fontSize: "14px",
+    color: "gray_dark",
+  },
+  uploadBox: {
+    display: "flex",
+    flexDir: "column",
+    border: "1px dashed #0071bc",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "2rem",
+
+    span: {
+      display: "flex",
+      margin: ".50rem",
+    },
+
+    label: {
+      paddingLeft: ".25rem",
+      marginBlock: 0,
+      color: "primary",
+      textDecoration: "underline",
+      fontWeight: "700",
+    },
+
+    "#file-input": {
+      display: "none",
+    },
+
+    "&.disabled": {
+      opacity: "0.4",
+    },
+  },
+};
