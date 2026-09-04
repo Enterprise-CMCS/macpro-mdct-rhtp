@@ -3,6 +3,8 @@ import { Stack, Text } from "@chakra-ui/react";
 import { DataSetType } from "../forms/Dashboard";
 
 export const EditDrawer = ({ modalDisclosure, onModalSubmit, file }: Props) => {
+  if (!file) return;
+
   return (
     <Drawer
       modalDisclosure={modalDisclosure}

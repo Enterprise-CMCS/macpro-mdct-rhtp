@@ -52,7 +52,7 @@ export const getDataSetUploadsByFileId = handler(
     }
 
     let psurl = await s3.getSignedDownloadUrl({
-      Bucket: process.env.attachmentsBucketName,
+      Bucket: process.env.datasetBucketName,
       Key: objectKey,
       ResponseContentDisposition: `attachment; filename = ${document.filename}`,
     });
