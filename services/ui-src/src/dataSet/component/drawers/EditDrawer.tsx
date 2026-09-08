@@ -1,6 +1,5 @@
 import { Drawer } from "components";
 import { Stack, Text } from "@chakra-ui/react";
-import { DataSetType } from "../forms/Dashboard";
 import { JSX } from "react";
 
 export const EditDrawer = ({
@@ -39,6 +38,6 @@ interface Props {
     onClose: () => void;
   };
   onModalSubmit?: () => void;
-  file: DataSetType;
+  file: { filename: string; uploadedUsername: string; uploadedDate: string };
   selections?: JSX.Element;
 }

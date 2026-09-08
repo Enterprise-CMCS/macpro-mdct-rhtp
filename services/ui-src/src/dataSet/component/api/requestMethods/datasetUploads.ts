@@ -1,11 +1,19 @@
 import { getRequestHeaders } from "utils/api/requestMethods/getRequestHeaders";
 import { apiLib } from "../apiLib";
-import { DataSetType } from "dataSet/component/forms/Dashboard";
 
 interface PathURL {
   psurl: string;
   fileId: string;
 }
+
+export type DataSetUploadType = {
+  filename: string;
+  fileId: string;
+  datasetId: string;
+  uploadedUsername: string;
+  uploadedDate: string;
+  state: string;
+};
 
 export const getAllFiles = async () => {
   const requestHeaders = await getRequestHeaders();
@@ -13,7 +21,7 @@ export const getAllFiles = async () => {
     headers: { ...requestHeaders },
   };
 
-  return await apiLib.get<DataSetType[]>(`/dataset/NY`, options)!;
+  return await apiLib.get<DataSetUploadType[]>(`/dataset/NY`, options)!;
 };
 
 export async function getFilesByState(state: string) {
@@ -22,7 +30,7 @@ export async function getFilesByState(state: string) {
     headers: { ...requestHeaders },
   };
 
-  return await apiLib.get<DataSetType[]>(`/dataset/${state}`, options)!;
+  return await apiLib.get<DataSetUploadType[]>(`/dataset/${state}`, options)!;
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
