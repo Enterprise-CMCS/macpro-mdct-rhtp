@@ -21,7 +21,6 @@ import {
   createMetricTestData,
   editMetric,
   getMetricsTable,
-  openReportFromDashboard,
   openCheckpointUploadDrawer,
   openInitiativeFromList,
   selectCheckpoint,
@@ -37,7 +36,6 @@ import {
   verifyMetricsTableRows,
   verifyAbandonedMetricRow,
   verifyMetricRow,
-  type ReportPeriod,
   returnToInitiativesDashboard,
   reopenInitiativeFromDashboard,
   withUploadFixture,
@@ -45,7 +43,6 @@ import {
 import { ReportEditorPage } from "./pageObjects/report-editor.page";
 import { TIMEOUT_UI } from "../utils/timeouts";
 
-const REPORT_PERIOD: ReportPeriod = "annual";
 const REPORT_PERIOD_LABEL = /Annual Report/i;
 
 const verifyReportContextFromHeader = async (
@@ -96,7 +93,6 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
     }
 
     editor = result;
-    await openReportFromDashboard(editor, REPORT_PERIOD);
     await verifyReportContextFromHeader(editor, REPORT_PERIOD_LABEL);
 
     const table = editor.page.getByRole("table");
@@ -530,7 +526,13 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
         ).click();
 
         const reopenedCommentDrawer = editor.page.getByRole("dialog");
-        await expect(reopenedCommentDrawer).toContainText(commentText, {
+        const previousCommentField = reopenedCommentDrawer.locator(
+          '[name^="previous-comment-"]'
+        );
+        await expect(previousCommentField).toBeDisabled({
+          timeout: TIMEOUT_UI,
+        });
+        await expect(previousCommentField).toHaveValue(commentText, {
           timeout: TIMEOUT_UI,
         });
         await closeCommentDrawer(reopenedCommentDrawer);
