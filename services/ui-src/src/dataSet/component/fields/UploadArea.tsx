@@ -24,6 +24,7 @@ interface Props {
     instruction?: { type: AlertTypes; text: string };
     success?: string;
   };
+  dataSetId: string;
 }
 
 export const UploadArea = ({
@@ -33,10 +34,9 @@ export const UploadArea = ({
   multiple = true,
   disabled,
   notification,
+  dataSetId,
 }: Props) => {
   const fileInputRef: any = useRef(null);
-  const { id } = { id: "1234" };
-
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
   const [uploadSuccess, setUploadSuccess] = useState<
@@ -151,7 +151,7 @@ export const UploadArea = ({
       const file = getFileWithSafeName(files[i]);
       try {
         const { presignedUploadUrl, fileId } =
-          await recordFileInDatabaseAndGetUploadUrl(state!, id, file);
+          await recordFileInDatabaseAndGetUploadUrl(state!, dataSetId, file);
         savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
         await uploadFileToS3({ presignedUploadUrl }, file);
       } catch (error) {
@@ -255,11 +255,16 @@ export const UploadArea = ({
             </Heading>
           </div>
           {filesToUpload.length > 0 &&
-            uploadListRender(state!, id, filesToUpload ?? [], deleteFromReport)}
+            uploadListRender(
+              state!,
+              dataSetId,
+              filesToUpload ?? [],
+              deleteFromReport
+            )}
           {answer.length > 0 &&
             uploadListRender(
               state!,
-              id,
+              dataSetId,
               modifiedAnswer(answer ?? []),
               deleteFromReport,
               downloadFile

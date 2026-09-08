@@ -55,6 +55,15 @@ export function createDataComponents(props: CreateDataComponentsProps) {
       },
       sortKey: { name: "fileId", type: dynamodb.AttributeType.STRING },
     }),
+    new DynamoDBTable(scope, "DataSets", {
+      stage,
+      isDev,
+      name: "dataSets",
+      partitionKey: {
+        name: "key",
+        type: dynamodb.AttributeType.STRING,
+      },
+    }),
     new DynamoDBTable(scope, "Comments", {
       stage,
       isDev,

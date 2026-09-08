@@ -1,7 +1,7 @@
 import { handler } from "../../libs/handler-lib";
 import s3 from "../../libs/s3-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
-import { parseDataSetFileCreateParameters } from "../../libs/param-lib";
+import { parseDataSetFileCreateParameters } from "../../dataSets/libs/param-lib";
 import { ok } from "../../libs/response-lib";
 import { updateUpload } from "../../storage/datasetUpload";
 import { UploadFileData } from "../../types/uploads";

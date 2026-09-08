@@ -7,6 +7,15 @@ interface PathURL {
   fileId: string;
 }
 
+export const getAllFiles = async () => {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  return await apiLib.get<DataSetType[]>(`/dataset/NY`, options)!;
+};
+
 export async function getFilesByState(state: string) {
   const requestHeaders = await getRequestHeaders();
   const options = {
@@ -66,6 +75,18 @@ export const getFileDownloadUrl = async (
     options
   );
   return response.psurl;
+};
+
+export const updateUploadedFile = async (
+  state: string,
+  id: string,
+  fileId: string
+) => {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+  await apiLib.put(`/dataset/${state}/${id}/files/${fileId}`, options);
 };
 
 export const deleteUploadedFile = async (

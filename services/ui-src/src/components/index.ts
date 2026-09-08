@@ -83,3 +83,7 @@ export { DashboardTable } from "./pages/Dashboard/DashboardTable";
 export { SkipNav } from "./skipNav/SkipNav";
 // component inventory
 export { ComponentInventory } from "./component-inventory/ComponentInventory";
+
+//DataSets
+export { ExportFilesPage } from "../dataSet/component/pages/Export/ExportFilesPage";
+export { ManageDataSets } from "../dataSet/component/pages/DataSet/ManageDataSets";

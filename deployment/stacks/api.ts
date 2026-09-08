@@ -442,6 +442,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  //------------------- Start of DataSet API Routes -------------------
   new Lambda(scope, "createDataSetUpload", {
     entry: "services/app-api/handlers/datasetUpload/create.ts",
     handler: "createDataSetUpload",
@@ -466,6 +467,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "updateDataSetUpload", {
+    entry: "services/app-api/handlers/datasetUpload/update.ts",
+    handler: "updateDataSetUpload",
+    path: "/dataset/{state}/{id}/files/{fileId}",
+    method: "PUT",
+    ...commonProps,
+  });
+
   new Lambda(scope, "deleteDataSetUpload", {
     entry: "services/app-api/handlers/datasetUpload/delete.ts",
     handler: "deleteDataSetUpload",
@@ -473,6 +482,32 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     method: "DELETE",
     ...commonProps,
   });
+
+  new Lambda(scope, "createDataSet", {
+    entry: "services/app-api/handlers/dataset/create.ts",
+    handler: "createDataSet",
+    path: "datasets",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "updateDataSet", {
+    entry: "services/app-api/handlers/dataset/update.ts",
+    handler: "updateDataSet",
+    path: "datasets/{id}",
+    method: "PUT",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getDataSets", {
+    entry: "services/app-api/handlers/dataset/get.ts",
+    handler: "getDataSets",
+    path: "datasets",
+    method: "GET",
+    ...commonProps,
+  });
+
+  //------------------- End of DataSet API Routes -------------------
 
   new LambdaDynamoEventSource(scope, "postKafkaData", {
     entry: "services/app-api/handlers/kafka/postKafkaData.ts",

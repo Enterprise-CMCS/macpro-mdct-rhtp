@@ -3,7 +3,7 @@ import { handler } from "../../libs/handler-lib";
 import {
   parseDataSetFileUploadParameters,
   parseDataSetFileUploadDownloadParameters,
-} from "../../libs/param-lib";
+} from "../../dataSets/libs/param-lib";
 import { queryUpload, queryStateUpload } from "../../storage/datasetUpload";
 import { forbidden, ok } from "../../libs/response-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
@@ -74,6 +74,21 @@ export const getUploadsByState = handler(
 
     const uploads = await queryStateUpload();
 
+    return ok(uploads);
+  }
+);
+
+export const getDataSetUploads = handler(
+  parseDataSetFileUploadParameters,
+  async (request) => {
+    const { state } = request.parameters;
+    const { user } = request;
+
+    if (!canReadState(user, state)) {
+      return forbidden(error.UNAUTHORIZED);
+    }
+
+    const uploads = await queryStateUpload();
     return ok(uploads);
   }
 );

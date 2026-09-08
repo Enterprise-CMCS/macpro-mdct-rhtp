@@ -9,20 +9,14 @@ import {
   Image,
   Text,
 } from "@chakra-ui/react";
-import { AlertTypes, StateNames } from "@rhtp/shared";
+import { StateDropdownOptions } from "@rhtp/shared";
 import { PageTemplate } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { useStore } from "utils";
 import { MultiSelect } from "components/forms/Multiselect";
-import { UploadDrawer } from "dataSet/component/drawers/UploadDrawer";
-import { Dropdown, DropdownChangeObject } from "@cmsgov/design-system";
-import {
-  getFilesByState,
-  updateUploadedFile,
-} from "../api/requestMethods/datasetUploads";
+import { getFilesByState } from "../api/requestMethods/datasetUploads";
 import { downloadFile, removeFile } from "../util/other/fileUtils";
 import cancelIcon from "assets/icons/cancel/icon_cancel_primary.svg";
-import { EditDrawer } from "../drawers/EditDrawer";
 import { getDataSets } from "../api/requestMethods/datasets";
 import { DropdownOptions } from "types";
 
@@ -34,27 +28,24 @@ export type DataSetType = {
   uploadedDate: string;
 };
 
-export const Dashboard = () => {
+export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<DataSetType[]>([]);
+  const [_displayValue, _setDisplayValue] = useState<string>();
   const [tableRows, setTableRows] = useState<
     (string | number | JSX.Element | undefined)[][]
   >([]);
+  const [selectedStates, _setSelectedStates] = useState<string[]>([]);
   const [lastSorted, setLastSorted] = useState<{
     sort: string;
     type: SORT_TYPE;
   }>({ sort: "", type: SORT_TYPE.DEFAULT });
 
-  //Filters
+  const [_uploadDrawerOpen, _setUploadDrawerOpen] = useState(false);
+  const [_editDrawerOpen, setEditDrawerOpen] = useState(false);
   const { state } = useStore().user ?? {};
-  const [filterDataSet, _setFilterDataSet] = useState<string[]>([]);
-  const [displayValue, setDisplayValue] = useState<string>();
-  const [dataSetOptions, setDataSetOptions] = useState<DropdownOptions[]>([]);
-
-  const [selectedFile, setSelectedFile] = useState<DataSetType>();
-
-  const [uploadDrawerOpen, setUploadDrawerOpen] = useState(false);
-  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [_selectedFile, setSelectedFile] = useState<DataSetType>();
+  const [_dataSetOptions, setDataSetOptions] = useState<DropdownOptions[]>([]);
 
   const setStatesHandler = (_states: string[]) => {};
 
@@ -127,7 +118,7 @@ export const Dashboard = () => {
 
       return [
         file.filename,
-        dataSetOptions.find((opt) => opt.value === file.datasetId)?.label,
+        file.datasetId,
         file.uploadedUsername,
         file.uploadedDate,
         columnAction,
@@ -168,58 +159,31 @@ export const Dashboard = () => {
     setTableRows(buildRows(runSort(files)));
   };
 
-  const setDataSetDropdown = (
-    event: React.ChangeEvent<HTMLInputElement> | DropdownChangeObject
-  ) => {
-    setDisplayValue(event.target.value);
-  };
-
-  const getNotification = () => {
-    const set = dataSetOptions.find((opt) => opt.value === displayValue)?.label;
-    const instruction =
-      !displayValue || displayValue === ""
-        ? {
-            type: AlertTypes.WARNING,
-            text: "Select a data set above to unlock file upload.",
-          }
-        : {
-            type: AlertTypes.INFO,
-            text: `Upload files corresponding to ${set}`,
-          };
-
-    return {
-      instruction: instruction,
-      success: `${set}`,
-    };
-  };
-
-  const saveFiles = () => {
-    if (selectedFile) {
-      updateUploadedFile(state!, selectedFile.datasetId!, selectedFile.fileId!);
-      reloadFiles();
-    }
-  };
-
   return (
     <PageTemplate type="report" sxOverride={sx.layout}>
       <Stack sx={sx.box} gap="2rem">
         <Heading as="h1" variant="h1">
-          {StateNames[state as keyof typeof StateNames]} File Upload
+          File Upload Admin Dashboard
         </Heading>
         <Text>
           Use this page to upload documents and data requested by CMS. Select
           the relevant data set for each file before uploading.
         </Text>
-        <Button onClick={() => setUploadDrawerOpen(true)} maxWidth="156px">
-          Upload File(s)
-        </Button>
         <Flex gap="spacer3" alignItems="flex-end" sx={sx.filters}>
+          <MultiSelect
+            label="State(s)"
+            placeholder="Search states"
+            countLabel="States"
+            options={StateDropdownOptions}
+            values={selectedStates}
+            onChange={(selected) => setStatesHandler(selected)}
+          />
           <MultiSelect
             label="Filter by Data Set:"
             placeholder="Search data set"
             countLabel="Data Set"
-            options={dataSetOptions}
-            values={filterDataSet}
+            options={StateDropdownOptions}
+            values={selectedStates}
             onChange={(selected) => setStatesHandler(selected)}
           />
           <Button
@@ -251,44 +215,6 @@ export const Dashboard = () => {
           )
         )}
       </Stack>
-      <UploadDrawer
-        modalDisclosure={{
-          isOpen: uploadDrawerOpen,
-          onClose: () => setUploadDrawerOpen(false),
-        }}
-        selections={
-          <Dropdown
-            label={"Select the associated data set for the file(s)."}
-            name="associated-data-set"
-            onChange={setDataSetDropdown}
-            options={dataSetOptions}
-            value={displayValue}
-          />
-        }
-        answer={[]}
-        saveToReport={saveFiles}
-        notification={getNotification()}
-        disabled={!displayValue}
-        dataSetId={displayValue ?? ""}
-      />
-      <EditDrawer
-        modalDisclosure={{
-          isOpen: editDrawerOpen,
-          onClose: () => setEditDrawerOpen(false),
-        }}
-        selections={
-          <Dropdown
-            label={"Associated data set"}
-            name="associated-data-set"
-            hint="Updating the data set will reassign this file to that data set."
-            onChange={setDataSetDropdown}
-            options={dataSetOptions}
-            value={displayValue}
-          />
-        }
-        onModalSubmit={saveFiles}
-        file={selectedFile!}
-      />
     </PageTemplate>
   );
 };
