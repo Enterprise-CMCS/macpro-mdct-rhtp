@@ -176,7 +176,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
   });
 
   const environment = {
-    NODE_OPTIONS: "--enable-source-maps",
+    NODE_OPTIONS: "--enable-source-maps --experimental-require-module", // experimental-require-module added for compatibility between node and jsdom
     STAGE: stage,
     launchDarklyServer,
     launchDarklyLocalFlags,

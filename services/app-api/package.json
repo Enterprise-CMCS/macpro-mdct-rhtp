@@ -17,7 +17,7 @@
     "@rhtp/shared": "workspace:*",
     "dompurify": "^3.4.11",
     "file-type": "^22.0.1",
-    "jsdom": "^26.0.0",
+    "jsdom": "^30.0.1",
     "jszip": "3.10.1",
     "jwt-decode": "3.1.2",
     "kafkajs": "^2.2.4",
@@ -26,7 +26,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@types/jsdom": "^27.0.0",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^24.10.1",
     "@types/papaparse": "^5",
     "@vitest/coverage-v8": "4.0.18",

@@ -155,9 +155,11 @@ describe("NotificationsPage component", () => {
       });
       expect(editButton).toBeVisible();
       await userEvent.click(editButton);
-      expect(
-        screen.getByRole("dialog", { name: "Edit assigned states" })
-      ).toBeVisible();
+      waitFor(() =>
+        expect(
+          screen.getByRole("dialog", { name: "Edit assigned states" })
+        ).toBeVisible()
+      );
 
       const dropdownBtn = screen.getByLabelText("States select");
       await userEvent.click(dropdownBtn);
@@ -178,11 +180,13 @@ describe("NotificationsPage component", () => {
       });
       expect(deleteButton).toBeVisible();
       await userEvent.click(deleteButton);
-      expect(
-        screen.getByRole("dialog", {
-          name: `Are you sure you want to delete ${mockRecipient.email}?`,
-        })
-      ).toBeVisible();
+      waitFor(() =>
+        expect(
+          screen.getByRole("dialog", {
+            name: `Are you sure you want to delete ${mockRecipient.email}?`,
+          })
+        ).toBeVisible()
+      );
 
       const submitButton = screen.getByRole("button", { name: "Delete" });
       await userEvent.click(submitButton);
