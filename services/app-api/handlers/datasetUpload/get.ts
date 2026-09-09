@@ -3,6 +3,7 @@ import { handler } from "../../libs/handler-lib";
 import {
   parseDataSetFileUploadParameters,
   parseDataSetFileUploadDownloadParameters,
+  emptyParser,
 } from "../../dataSets/libs/param-lib";
 import {
   queryUpload,
@@ -91,17 +92,13 @@ export const getUploadsByState = handler(
 /**
  * get all file uploaded, used for admin dashboard
  */
-export const getDataSetUploads = handler(
-  parseDataSetFileUploadParameters,
-  async (request) => {
-    const { state } = request.parameters;
-    const { user } = request;
+export const getDataSetUploads = handler(emptyParser, async (request) => {
+  const { user } = request;
 
-    if (!canReadState(user, state)) {
-      return forbidden(error.UNAUTHORIZED);
-    }
-
-    const uploads = await queryViewUploads();
-    return ok(uploads);
+  if (!canReadState(user, user.state!)) {
+    return forbidden(error.UNAUTHORIZED);
   }
-);
+
+  const uploads = await queryViewUploads();
+  return ok(uploads);
+});
