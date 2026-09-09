@@ -1,6 +1,6 @@
 import { JSX, useEffect, useState } from "react";
 import { Button, Heading, Flex, Spinner, Stack, Text } from "@chakra-ui/react";
-import { StateDropdownOptions } from "@rhtp/shared";
+import { StateDropdownOptions, StateNames } from "@rhtp/shared";
 import { PageTemplate } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { useStore } from "utils";
@@ -60,12 +60,20 @@ export const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedDataSets.length > 0) {
-      setSortedFiles(
-        files.filter((file) => selectedDataSets.includes(file.datasetId))
-      );
+    if (selectedDataSets.length > 0 || selectedStates.length > 0) {
+      const filteredDataSet =
+        selectedDataSets.length > 0
+          ? files.filter((file) => selectedDataSets.includes(file.datasetId))
+          : files;
+      const filteredStates =
+        selectedStates.length > 0
+          ? filteredDataSet.filter((file) =>
+              selectedStates.includes(file.uploadedState)
+            )
+          : filteredDataSet;
+      setSortedFiles(filteredStates);
     } else setSortedFiles(files);
-  }, [files, selectedDataSets]);
+  }, [files, selectedStates, selectedDataSets]);
 
   useEffect(() => {
     sortRows(lastSorted.sort, lastSorted.type);
@@ -88,7 +96,7 @@ export const AdminDashboard = () => {
       );
 
       return [
-        "state",
+        StateNames[file.uploadedState as keyof typeof StateNames],
         file.filename,
         dataSetOptions.find((opt) => opt.value === file.datasetId)?.label,
         file.uploadedUsername,
