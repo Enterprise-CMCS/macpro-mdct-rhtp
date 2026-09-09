@@ -59,7 +59,7 @@ export const zipWorker = async (
     tags = `${tags}&reportType=${reportType}&state=${state}&id=${id}&subTypeKeys=${report.subTypeKey}`;
   } else if (type === ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS) {
     const { reportSubTypeKeys: dataSetKeys, state } = event;
-    await addDataSetFilesToZip(zip);
+    await addDataSetFilesToZip(dataSetKeys, zip);
     tags = `${tags}&subTypeKeys=${dataSetKeys.join("-")}${state ? `&state=${state}` : ""}`;
   } else if (type === ZipRequestTypes.DATA_SET) {
     const { reportSubTypeKeys: dataSetKeys, state } = event;

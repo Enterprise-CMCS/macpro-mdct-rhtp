@@ -53,6 +53,7 @@ const ExportCard = (
 };
 
 export const ExportFilesPage = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isStateExporting, setIsStateExporting] = useState(false);
   const [isReportsExporting, setIsReportsExporting] = useState(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -69,10 +70,12 @@ export const ExportFilesPage = () => {
   const [dataSetOptions, setDataSetOptions] = useState<DropdownOptions[]>([]);
 
   const reloadDataSet = async () => {
+    setIsLoading(true);
     const dataSets = await getDataSets();
     setDataSetOptions(
       dataSets.map((set) => ({ label: set.name, value: set.key! }))
     );
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -180,20 +183,26 @@ export const ExportFilesPage = () => {
           downloaded as a compressed ZIP file.
         </Text>
       </Box>
-      <Flex flexDirection="column" gap="spacer4">
-        {ExportCard(
-          "By Data Set (All States)",
-          "Bulk export submitted files from all participating states for a single data set request.",
-          () => setExportData("DATASET"),
-          isReportsExporting
-        )}
-        {ExportCard(
-          "By State and Data Set",
-          "Export all submitted files for a single state filtered by a specific data set request.",
-          () => setExportData("STATE"),
-          isStateExporting
-        )}
-      </Flex>
+      {isLoading ? (
+        <Flex justify="center">
+          <Spinner size="md" />
+        </Flex>
+      ) : (
+        <Flex flexDirection="column" gap="spacer4">
+          {ExportCard(
+            "By Data Set (All States)",
+            "Bulk export submitted files from all participating states for a single data set request.",
+            () => setExportData("DATASET"),
+            isReportsExporting
+          )}
+          {ExportCard(
+            "By State and Data Set",
+            "Export all submitted files for a single state filtered by a specific data set request.",
+            () => setExportData("STATE"),
+            isStateExporting
+          )}
+        </Flex>
+      )}
       <Modal
         modalDisclosure={{
           isOpen: modalOpen,

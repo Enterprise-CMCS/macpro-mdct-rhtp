@@ -158,7 +158,10 @@ export const addObligatedAndSpentFundsFilesToZip = async (
   }
 };
 
-export const addDataSetFilesToZip = async (zip: JSZip) => {
+export const addDataSetFilesToZip = async (
+  dataSetKeys: string[],
+  zip: JSZip
+) => {
   const dataSetUploadFiles: {
     id: string;
     state: string;
@@ -177,7 +180,9 @@ export const addDataSetFilesToZip = async (zip: JSZip) => {
   const files = await queryViewUploads();
 
   for (const file of files) {
-    getDataSetFiles(file);
+    if (dataSetKeys.includes(file.datasetId)) {
+      getDataSetFiles(file);
+    }
   }
 
   for (const dataSetUploadFile of dataSetUploadFiles) {
