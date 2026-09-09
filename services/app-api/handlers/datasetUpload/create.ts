@@ -15,7 +15,7 @@ export const createDataSetUpload = handler(
     // Format Info
     const { uploadedFileName, uploadedFileSize } = body as UploadFileData;
 
-    const username = user.email ?? "";
+    const username = user.fullName ?? "";
     const fileId = `${KSUID.randomSync().string}_${uploadedFileName}`;
 
     await updateUpload(

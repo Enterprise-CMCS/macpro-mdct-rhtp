@@ -4,7 +4,11 @@ import {
   parseDataSetFileUploadParameters,
   parseDataSetFileUploadDownloadParameters,
 } from "../../dataSets/libs/param-lib";
-import { queryUpload, queryStateUpload } from "../../storage/datasetUpload";
+import {
+  queryUpload,
+  queryStateUpload,
+  queryViewUploads,
+} from "../../storage/datasetUpload";
 import { forbidden, ok } from "../../libs/response-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { error } from "../../utils/constants";
@@ -14,6 +18,9 @@ import { canReadState } from "../../utils/authorization";
 
 const FILE_HEADER_BYTE_RANGE = "bytes=0-4100";
 
+/**
+ * This is for downloading the file stored in S3 bucket
+ */
 export const getDataSetUploadsByFileId = handler(
   parseDataSetFileUploadDownloadParameters,
   async (request) => {
@@ -62,6 +69,9 @@ export const getDataSetUploadsByFileId = handler(
   }
 );
 
+/**
+ * get file uploaded by state
+ */
 export const getUploadsByState = handler(
   parseDataSetFileUploadParameters,
   async (request) => {
@@ -72,12 +82,15 @@ export const getUploadsByState = handler(
       return forbidden(error.UNAUTHORIZED);
     }
 
-    const uploads = await queryStateUpload();
+    const uploads = await queryStateUpload(state);
 
     return ok(uploads);
   }
 );
 
+/**
+ * get all file uploaded, used for admin dashboard
+ */
 export const getDataSetUploads = handler(
   parseDataSetFileUploadParameters,
   async (request) => {
@@ -88,7 +101,7 @@ export const getDataSetUploads = handler(
       return forbidden(error.UNAUTHORIZED);
     }
 
-    const uploads = await queryStateUpload();
+    const uploads = await queryViewUploads();
     return ok(uploads);
   }
 );

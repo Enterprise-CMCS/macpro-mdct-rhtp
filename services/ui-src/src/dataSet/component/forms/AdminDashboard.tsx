@@ -7,7 +7,7 @@ import { useStore } from "utils";
 import { MultiSelect } from "components/forms/Multiselect";
 import {
   DataSetUploadType,
-  getFilesByState,
+  getFiles,
 } from "../api/requestMethods/datasetUploads";
 import { downloadFile } from "../util/other/fileUtils";
 import { getDataSets } from "../api/requestMethods/datasets";
@@ -47,7 +47,7 @@ export const AdminDashboard = () => {
   };
 
   const reloadFiles = async () => {
-    const result = await getFilesByState("NY");
+    const result = await getFiles();
     setFiles(
       result.toSorted((a, b) => (b.uploadedDate! < a.uploadedDate! ? -1 : 1))
     );

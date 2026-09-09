@@ -467,6 +467,14 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     ...commonProps,
   });
 
+  new Lambda(scope, "getDataSetUploads", {
+    entry: "services/app-api/handlers/datasetUpload/get.ts",
+    handler: "getDataSetUploads",
+    path: "dataset",
+    method: "GET",
+    ...commonProps,
+  });
+
   new Lambda(scope, "updateDataSetUpload", {
     entry: "services/app-api/handlers/datasetUpload/update.ts",
     handler: "updateDataSetUpload",

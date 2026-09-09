@@ -15,15 +15,6 @@ export type DataSetUploadType = {
   state: string;
 };
 
-export const getAllFiles = async () => {
-  const requestHeaders = await getRequestHeaders();
-  const options = {
-    headers: { ...requestHeaders },
-  };
-
-  return await apiLib.get<DataSetUploadType[]>(`/dataset/NY`, options)!;
-};
-
 export async function getFilesByState(state: string) {
   const requestHeaders = await getRequestHeaders();
   const options = {
@@ -31,6 +22,15 @@ export async function getFilesByState(state: string) {
   };
 
   return await apiLib.get<DataSetUploadType[]>(`/dataset/${state}`, options)!;
+}
+
+export async function getFiles() {
+  const requestHeaders = await getRequestHeaders();
+  const options = {
+    headers: { ...requestHeaders },
+  };
+
+  return await apiLib.get<DataSetUploadType[]>(`/dataset/`, options)!;
 }
 
 export const recordFileInDatabaseAndGetUploadUrl = async (
