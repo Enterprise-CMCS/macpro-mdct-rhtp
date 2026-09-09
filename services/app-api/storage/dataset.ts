@@ -4,7 +4,7 @@ import { createClient } from "./dynamo/dynamodb-lib";
 export type DataSetType = {
   key: string;
   name: string;
-  status: boolean;
+  status: string;
   createdAt: string;
   createdBy: string;
 };

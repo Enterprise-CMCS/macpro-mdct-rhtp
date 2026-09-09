@@ -8,7 +8,7 @@ import { putDataSet } from "../../storage/dataset";
 
 export const createDataSet = handler(emptyParser, async (request) => {
   const { user, body } = request;
-  const { name, status } = body as { name: string; status: boolean };
+  const { name, status } = body as { name: string; status: string };
 
   if (!canWriteBanner(user)) {
     return forbidden(error.UNAUTHORIZED);

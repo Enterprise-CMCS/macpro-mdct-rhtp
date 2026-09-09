@@ -20,8 +20,8 @@ export const isValidDataSet = (dataset: unknown): dataset is DataSetType => {
     return false;
   }
 
-  if (!("status" in dataset) || "boolean" !== typeof dataset.status) {
-    logger.warn("Invalid: dataset.status must be a boolean");
+  if (!("status" in dataset) || "string" !== typeof dataset.status) {
+    logger.warn("Invalid: dataset.status must be a string");
     return false;
   }
 

@@ -5,7 +5,7 @@ import { getRequestHeaders } from "utils/api/requestMethods/getRequestHeaders";
 export type DataSetType = {
   key?: string;
   name: string;
-  status: boolean;
+  status: string;
   createdAt?: string;
   createdBy?: string;
 };
@@ -20,7 +20,7 @@ export async function createDataSet(dataSetData: {
     body: { ...dataSetData },
   };
 
-  return await apiLib.post<{ name: string; status: Boolean }>(
+  return await apiLib.post<{ name: string; status: string }>(
     "/datasets",
     options
   );
@@ -41,8 +41,6 @@ export async function updateDataSet(dataSetData: DataSetType) {
     headers: { ...requestHeaders },
     body: { ...dataSetData },
   };
-
-  console.log(options);
 
   return await apiLib.put(`/datasets/${dataSetData.key}`, options);
 }

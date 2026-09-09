@@ -29,7 +29,7 @@ type DataSetModalProps = {
 
 const defaultDataSet = {
   name: "",
-  status: undefined,
+  status: "",
 };
 
 const DataSetModal = ({
@@ -40,7 +40,7 @@ const DataSetModal = ({
 }: DataSetModalProps) => {
   const errorContent = {
     name: "Must enter a valid data set name.",
-    status: "Must select at least one state.",
+    status: "Must select a status.",
   };
   const [displayValue, setDisplayValue] = useState(dataSet ?? defaultDataSet);
   const [errorMessage, setErrorMessage] = useState({ name: "", status: "" });
@@ -88,6 +88,22 @@ const DataSetModal = ({
     }
   };
 
+  const buildChoices = () => {
+    const options = [
+      {
+        label: "Active (Visible to states)",
+        value: "active",
+        checked: displayValue.status === "active",
+      },
+      {
+        label: "Inactive (Hidden from states)",
+        value: "inactive",
+        checked: displayValue.status === "inactive",
+      },
+    ];
+    return options;
+  };
+
   return (
     <Modal
       modalDisclosure={{
@@ -122,18 +138,7 @@ const DataSetModal = ({
           type={"radio"}
           label={"Status"}
           hint="Inactive data sets are hidden from state submission options but preserved in historic admin exports."
-          choices={[
-            {
-              label: "Active (Visible to states)",
-              value: 1,
-              checked: displayValue.status,
-            },
-            {
-              label: "Inactive (Hidden from states)",
-              value: 0,
-              checked: displayValue.status,
-            },
-          ]}
+          choices={buildChoices()}
           onChange={({ target }) => {
             setDisplayValue({
               ...displayValue,
@@ -178,8 +183,11 @@ export const ManageDataSets = () => {
           Edit
         </Button>
       );
-
-      formattedRows.push([name, status ? "Active" : "Inactive", columnActions]);
+      formattedRows.push([
+        name,
+        status === "active" ? "Active" : "Inactive",
+        columnActions,
+      ]);
     });
     setRows(formattedRows);
     setLoading(false);
@@ -208,7 +216,9 @@ export const ManageDataSets = () => {
           Add Data Set
         </Button>
       </Stack>
-      {ResponsiveTable(headers, rows)}
+      <Stack sx={sx.container}>
+        {ResponsiveTable(headers, rows, undefined, undefined)}
+      </Stack>
       {rows.length === 0 &&
         (loading ? (
           <Box alignSelf={"center"}>
@@ -238,5 +248,11 @@ export const ManageDataSets = () => {
 const sx = {
   subHeaderText: {
     color: "gray_dark",
+  },
+  container: {
+    "td:last-of-type": {
+      display: "flex",
+      justifyContent: "center",
+    },
   },
 };
