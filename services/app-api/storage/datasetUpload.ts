@@ -9,7 +9,15 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { collectPageItems, createClient } from "./dynamo/dynamodb-lib";
 import s3 from "../libs/s3-lib";
-import { UploadData } from "../types/uploads";
+
+export type DataSetUploadType = {
+  filename: string;
+  fileId: string;
+  datasetId: string;
+  uploadedUsername: string;
+  uploadedDate: string;
+  uploadedState: string;
+};
 
 const uploadTableName = process.env.DataSetUploadsTable!;
 const client = createClient();
@@ -65,7 +73,7 @@ export const updateUpload = async (
   await client.send(new UpdateCommand(params));
 };
 
-export const batchPutUploads = async (uploads: UploadData[]) => {
+export const batchPutUploads = async (uploads: DataSetUploadType[]) => {
   const BATCH_SIZE = 25;
   for (let i = 0; i < uploads.length; i += BATCH_SIZE) {
     const batch = uploads.slice(i, i + BATCH_SIZE);
@@ -101,7 +109,7 @@ export const queryViewUploads = async () => {
   for await (const page of pages) {
     items.push(...(page.Items ?? []));
   }
-  return items as UploadData[];
+  return items as DataSetUploadType[];
 };
 
 export const queryStateUpload = async (state: string) => {
@@ -116,5 +124,5 @@ export const queryStateUpload = async (state: string) => {
   const response = paginateQuery({ client }, params);
   const uploads = await collectPageItems(response);
 
-  return uploads as UploadData[];
+  return uploads as DataSetUploadType[];
 };

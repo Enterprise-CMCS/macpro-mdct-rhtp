@@ -18,7 +18,7 @@ const getFileName = async (key: string) => {
   if (!TagSet) return "RHTP.zip";
   const state = TagSet.find((tag) => tag.Key === "state")?.Value as StateAbbr;
   const subTypeKeys = TagSet.find((tag) => tag.Key === "subTypeKeys")?.Value;
-  return `RHTP_${state ?? "ALL_STATES"}_${subTypeKeys}.zip`;
+  return `MCDT_${state ?? "ALL_STATES"}_${subTypeKeys}.zip`;
 };
 
 export const getPSURL = async (zipId: string) => {
