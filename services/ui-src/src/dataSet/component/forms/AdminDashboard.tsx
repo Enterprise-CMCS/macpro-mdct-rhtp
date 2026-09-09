@@ -109,6 +109,8 @@ export const AdminDashboard = () => {
   const sortRows = (row: string, type: SORT_TYPE) => {
     const getValue = (answer: DataSetUploadType, type: string) => {
       switch (type) {
+        case "State/Territory":
+          return answer.uploadedState;
         case "File name":
           return answer.filename;
         case "Data Set":
