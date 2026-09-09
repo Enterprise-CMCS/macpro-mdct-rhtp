@@ -60,7 +60,7 @@ export const ExportFilesPage = () => {
     actionButtonText: string;
     closeButtonText?: string;
   }>({ heading: "", actionButtonText: "Export", closeButtonText: "Cancel" });
-  const [view, setView] = useState<"STATE" | "REPORTS" | undefined>();
+  const [view, setView] = useState<"STATE" | "DATASET" | undefined>();
 
   const [selectedState, setSelectedState] = useState<string>();
   const [selectedDataSets, setSelectedDataSets] = useState<string[]>([]);
@@ -110,9 +110,9 @@ export const ExportFilesPage = () => {
     }
   };
 
-  const setExportData = (view: "STATE" | "REPORTS") => {
+  const setExportData = (view: "STATE" | "DATASET") => {
     switch (view) {
-      case "REPORTS":
+      case "DATASET":
         setModalData({
           ...modalData,
           heading: "Export by Data Set (All States)",
@@ -136,7 +136,7 @@ export const ExportFilesPage = () => {
   const onExport = async () => {
     if (view === "STATE") {
       setIsStateExporting(true);
-    } else if (view === "REPORTS") {
+    } else if (view === "DATASET") {
       setIsReportsExporting(true);
     }
     setModalOpen(false);
@@ -151,7 +151,7 @@ export const ExportFilesPage = () => {
 
     if (view === "STATE") {
       setIsStateExporting(false);
-    } else if (view === "REPORTS") {
+    } else if (view === "DATASET") {
       setIsReportsExporting(false);
     }
   };
@@ -179,7 +179,7 @@ export const ExportFilesPage = () => {
         {ExportCard(
           "By Data Set (All States)",
           "Bulk export submitted files from all participating states for a single data set request.",
-          () => setExportData("REPORTS"),
+          () => setExportData("DATASET"),
           isReportsExporting
         )}
         {ExportCard(

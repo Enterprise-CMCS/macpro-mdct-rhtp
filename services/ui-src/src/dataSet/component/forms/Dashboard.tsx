@@ -10,7 +10,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { AlertTypes, StateNames } from "@rhtp/shared";
-import { PageTemplate } from "components";
+import { PageTemplate, Modal } from "components";
 import { ResponsiveTable, SORT_TYPE } from "components/tables/ResponsiveTable";
 import { useStore } from "utils";
 import { MultiSelect } from "components/forms/Multiselect";
@@ -49,6 +49,8 @@ export const Dashboard = () => {
   const [uploadDrawerOpen, setUploadDrawerOpen] = useState(false);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [deleteFile, setDeleteFile] = useState<DataSetUploadType | undefined>();
 
   const setDataSetHandler = (dataSet: string[]) => {
     setFilterDataSet(dataSet);
@@ -95,10 +97,14 @@ export const Dashboard = () => {
     setEditDrawerOpen(true);
   };
 
-  const onDeleteHandler = (file: DataSetUploadType) => {
-    removeFile(state!, file.datasetId, file.fileId).then(async () => {
+  const onDeleteHandler = async () => {
+    if (deleteFile) {
+      setModalLoading(true);
+      await removeFile(state!, deleteFile.datasetId, deleteFile.fileId);
       await reloadFiles();
-    });
+      setModalLoading(false);
+      setDeleteModal(false);
+    }
   };
 
   const onModalClose = () => {
@@ -127,17 +133,27 @@ export const Dashboard = () => {
           <Button
             variant="link"
             fontWeight="bold"
-            onClick={() => onDeleteHandler(file)}
+            onClick={() => {
+              setDeleteModal(true);
+              setDeleteFile(file);
+            }}
             rightIcon={<Image src={cancelIcon} alt="Remove" />}
           ></Button>
         </HStack>
       );
 
+      const dataObj = new Date(file.uploadedDate);
+      const formattedDate = dataObj.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+
       return [
         file.filename,
         dataSetOptions.find((opt) => opt.value === file.datasetId)?.label,
         file.uploadedUsername,
-        file.uploadedDate,
+        formattedDate,
         columnAction,
       ];
     });
@@ -207,7 +223,7 @@ export const Dashboard = () => {
     setModalLoading(true);
     await updateUploadedFile(state!, displayValue as DataSetUploadType);
     setIsLoading(true);
-    reloadFiles();
+    await reloadFiles();
     setEditDrawerOpen(false);
     setModalLoading(false);
   };
@@ -307,6 +323,25 @@ export const Dashboard = () => {
         file={displayValue as DataSetUploadType}
         submitting={modalLoading}
       />
+      <Modal
+        data-testid="delete-modal"
+        modalDisclosure={{
+          isOpen: deleteModal,
+          onClose: () => {
+            setDeleteModal(false);
+          },
+        }}
+        onConfirmHandler={onDeleteHandler}
+        content={{
+          heading: "Delete file?",
+          actionButtonText: "Delete",
+          closeButtonText: "Cancel",
+        }}
+        submitting={modalLoading}
+      >
+        Deleting {deleteFile?.filename} will remove it from the system and
+        revokes CMS access. This action cannot be undone.{" "}
+      </Modal>
     </PageTemplate>
   );
 };
