@@ -219,7 +219,13 @@ export const Dashboard = () => {
     };
   };
 
-  const saveFiles = async () => {
+  const uploadFileSave = async () => {
+    setIsLoading(true);
+    await reloadFiles();
+    setModalLoading(false);
+  };
+
+  const editFileSave = async () => {
     setModalLoading(true);
     await updateUploadedFile(state!, displayValue as DataSetUploadType);
     setIsLoading(true);
@@ -299,7 +305,7 @@ export const Dashboard = () => {
           />
         }
         answer={[]}
-        saveToReport={reloadFiles}
+        saveToReport={uploadFileSave}
         notification={getNotification()}
         disabled={!displayValue?.datasetId}
         dataSetId={displayValue?.datasetId ?? ""}
@@ -319,7 +325,7 @@ export const Dashboard = () => {
             value={displayValue?.datasetId}
           />
         }
-        onModalSubmit={saveFiles}
+        onModalSubmit={editFileSave}
         file={displayValue as DataSetUploadType}
         submitting={modalLoading}
       />

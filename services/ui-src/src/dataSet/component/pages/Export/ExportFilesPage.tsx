@@ -18,8 +18,10 @@ import {
   StateDropdownOptions,
 } from "../../../../../../shared/src/utils/constants";
 import { MultiSelect } from "components/forms/Multiselect";
-import { RhtpSubTypeMap, ZipRequestTypes } from "@rhtp/shared";
+import { ZipRequestTypes } from "@rhtp/shared";
 import { getZipFile } from "utils/other/fileUtils";
+import { DropdownOptions } from "types";
+import { getDataSets } from "dataSet/component/api/requestMethods/datasets";
 
 const ExportCard = (
   title: string,
@@ -64,18 +66,21 @@ export const ExportFilesPage = () => {
 
   const [selectedState, setSelectedState] = useState<string>();
   const [selectedDataSets, setSelectedDataSets] = useState<string[]>([]);
+  const [dataSetOptions, setDataSetOptions] = useState<DropdownOptions[]>([]);
 
-  const buildReportOptions = () => {
-    const subType = Object.entries(RhtpSubTypeMap)
-      .filter((item) => item[1].openDate < Date.now())
-      .map((item) => ({ label: item[1].name, value: item[0] }));
-
-    return [{ label: "All", value: "all" }, ...subType];
+  const reloadDataSet = async () => {
+    const dataSets = await getDataSets();
+    setDataSetOptions(
+      dataSets.map((set) => ({ label: set.name, value: set.key! }))
+    );
   };
+
+  useEffect(() => {
+    reloadDataSet();
+  }, []);
 
   //using all states of now until we get a report lite route
   const stateOptions = [dropdownEmptyOption, ...StateDropdownOptions];
-  const dataSetOptions = buildReportOptions();
 
   useEffect(() => {
     setSelectedState("");
