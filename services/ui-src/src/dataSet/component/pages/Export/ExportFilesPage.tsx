@@ -72,9 +72,10 @@ export const ExportFilesPage = () => {
   const reloadDataSet = async () => {
     setIsLoading(true);
     const dataSets = await getDataSets();
-    setDataSetOptions(
-      dataSets.map((set) => ({ label: set.name, value: set.key! }))
-    );
+    setDataSetOptions([
+      { label: "All", value: "all" },
+      ...dataSets.map((set) => ({ label: set.name, value: set.key! })),
+    ]);
     setIsLoading(false);
   };
 
