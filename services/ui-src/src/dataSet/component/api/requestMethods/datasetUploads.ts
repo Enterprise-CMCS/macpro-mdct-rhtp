@@ -87,14 +87,17 @@ export const getFileDownloadUrl = async (
 
 export const updateUploadedFile = async (
   state: string,
-  id: string,
-  fileId: string
+  file: DataSetUploadType
 ) => {
   const requestHeaders = await getRequestHeaders();
   const options = {
     headers: { ...requestHeaders },
+    body: { ...file },
   };
-  await apiLib.put(`/dataset/${state}/${id}/files/${fileId}`, options);
+  await apiLib.put(
+    `/dataset/${state}/${file.datasetId}/files/${file.fileId}`,
+    options
+  );
 };
 
 export const deleteUploadedFile = async (

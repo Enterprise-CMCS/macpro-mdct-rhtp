@@ -40,10 +40,10 @@ export const deleteUpload = async (
 export const updateUpload = async (
   state: string,
   username: string,
-  uploadedFileName: string,
+  filename: string,
   fileId: string,
   datasetId: string,
-  uploadedFileSize: number
+  filesize: number
 ) => {
   const params = {
     TableName: uploadTableName,
@@ -56,8 +56,8 @@ export const updateUpload = async (
     ExpressionAttributeValues: {
       ":uploadedUsername": username,
       ":uploadedDate": new Date().toISOString(),
-      ":filename": uploadedFileName,
-      ":filesize": uploadedFileSize,
+      ":filename": filename,
+      ":filesize": filesize,
       ":datasetId": datasetId,
     },
   };

@@ -29,7 +29,7 @@ type DataSetModalProps = {
 
 const defaultDataSet = {
   name: "",
-  status: true,
+  status: undefined,
 };
 
 const DataSetModal = ({
@@ -43,7 +43,7 @@ const DataSetModal = ({
     status: "Must select at least one state.",
   };
   const [displayValue, setDisplayValue] = useState(dataSet ?? defaultDataSet);
-  const [errorMessage, _setErrorMessage] = useState(errorContent);
+  const [errorMessage, setErrorMessage] = useState({ name: "", status: "" });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -53,19 +53,33 @@ const DataSetModal = ({
   const onClose = () => {
     setLoading(false);
     setDisplayValue(defaultDataSet);
-    // setErrorMessage(defaultErrorMessage);
+    setErrorMessage({ name: "", status: "" });
     modalDisclosure.onClose();
   };
 
-  const onEmailBlur = () => {};
+  const onBlur = (key: "name" | "status") => {
+    if (!displayValue[key])
+      setErrorMessage({ ...errorMessage, [key]: errorContent[key] });
+    else setErrorMessage({ ...errorMessage, [key]: "" });
+  };
 
   const onSubmit = async () => {
+    const newErrors = { ...errorMessage };
+    const values = Object.entries(displayValue);
+    values.forEach((item) => {
+      const key = item[0] as keyof typeof errorContent;
+      newErrors[key] = !item[1] ? errorContent[key] : "";
+    });
+    setErrorMessage(newErrors);
+
+    if (values.some((item) => item[1] === "" || item[1] === undefined)) return;
+
     setLoading(true);
     try {
       if (state === "Add") {
-        await createDataSet(displayValue);
+        await createDataSet(displayValue as any);
       } else if (state === "Edit") {
-        await updateDataSet(displayValue);
+        await updateDataSet(displayValue as any);
       }
     } finally {
       setLoading(false);
@@ -100,7 +114,7 @@ const DataSetModal = ({
               name: target.value,
             });
           }}
-          onBlur={onEmailBlur}
+          onBlur={() => onBlur("name")}
           errorMessage={errorMessage.name}
         />
         <ChoiceList
@@ -110,23 +124,23 @@ const DataSetModal = ({
           hint="Inactive data sets are hidden from state submission options but preserved in historic admin exports."
           choices={[
             {
-              label: "Active (Visible to states",
+              label: "Active (Visible to states)",
               value: 1,
               checked: displayValue.status,
             },
             {
               label: "Inactive (Hidden from states)",
               value: 0,
-              checked: !displayValue.status,
+              checked: displayValue.status,
             },
           ]}
           onChange={({ target }) => {
             setDisplayValue({
               ...displayValue,
-              status: Boolean(target.value),
+              status: target.value,
             });
           }}
-          onBlur={onEmailBlur}
+          onBlur={() => onBlur("status")}
           errorMessage={errorMessage.status}
         />
       </Stack>

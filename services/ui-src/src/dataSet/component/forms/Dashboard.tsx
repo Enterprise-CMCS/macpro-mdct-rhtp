@@ -30,6 +30,7 @@ import { DropdownOptions } from "types";
 export const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<DataSetUploadType[]>([]);
+  const [sortedFiles, setSortedFiles] = useState<DataSetUploadType[]>([]);
   const [tableRows, setTableRows] = useState<
     (string | number | JSX.Element | undefined)[][]
   >([]);
@@ -45,9 +46,9 @@ export const Dashboard = () => {
     DataSetUploadType | { datasetId: string; fileId?: string }
   >();
   const [dataSetOptions, setDataSetOptions] = useState<DropdownOptions[]>([]);
-
   const [uploadDrawerOpen, setUploadDrawerOpen] = useState(false);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
 
   const setDataSetHandler = (dataSet: string[]) => {
     setFilterDataSet(dataSet);
@@ -55,10 +56,9 @@ export const Dashboard = () => {
   const reloadDataSet = async () => {
     setIsLoading(true);
     const dataSets = await getDataSets();
-    setDataSetOptions([
-      { label: "- Select an option -", value: "" },
-      ...dataSets.map((set) => ({ label: set.name, value: set.key! })),
-    ]);
+    setDataSetOptions(
+      dataSets.map((set) => ({ label: set.name, value: set.key! }))
+    );
   };
 
   const reloadFiles = async () => {
@@ -75,8 +75,16 @@ export const Dashboard = () => {
   }, []);
 
   useEffect(() => {
+    if (filterDataSet.length > 0) {
+      setSortedFiles(
+        files.filter((file) => filterDataSet.includes(file.datasetId))
+      );
+    } else setSortedFiles(files);
+  }, [files, filterDataSet]);
+
+  useEffect(() => {
     sortRows(lastSorted.sort, lastSorted.type);
-  }, [files]);
+  }, [sortedFiles]);
 
   const clearFilter = () => {
     setDataSetHandler([]);
@@ -91,6 +99,12 @@ export const Dashboard = () => {
     removeFile(state!, file.datasetId, file.fileId).then(async () => {
       await reloadFiles();
     });
+  };
+
+  const onModalClose = () => {
+    setDisplayValue(undefined);
+    setEditDrawerOpen(false);
+    setUploadDrawerOpen(false);
   };
 
   const buildRows = (data: DataSetUploadType[]) => {
@@ -159,7 +173,7 @@ export const Dashboard = () => {
           });
     };
     setLastSorted({ sort: row, type: type });
-    setTableRows(buildRows(runSort(files)));
+    setTableRows(buildRows(runSort(sortedFiles)));
   };
 
   const setDataSetDropdown = (
@@ -190,15 +204,12 @@ export const Dashboard = () => {
   };
 
   const saveFiles = async () => {
-    if (displayValue) {
-      await updateUploadedFile(
-        state!,
-        displayValue.datasetId!,
-        displayValue.fileId!
-      );
-      setEditDrawerOpen(false);
-    }
+    setModalLoading(true);
+    await updateUploadedFile(state!, displayValue as DataSetUploadType);
+    setIsLoading(true);
     reloadFiles();
+    setEditDrawerOpen(false);
+    setModalLoading(false);
   };
 
   return (
@@ -257,19 +268,22 @@ export const Dashboard = () => {
       <UploadDrawer
         modalDisclosure={{
           isOpen: uploadDrawerOpen,
-          onClose: () => setUploadDrawerOpen(false),
+          onClose: onModalClose,
         }}
         selections={
           <Dropdown
             label={"Select the associated data set for the file(s)."}
             name="associated-data-set"
             onChange={setDataSetDropdown}
-            options={dataSetOptions}
+            options={[
+              { label: "- Select an option -", value: "" },
+              ...dataSetOptions,
+            ]}
             value={displayValue?.datasetId}
           />
         }
         answer={[]}
-        saveToReport={saveFiles}
+        saveToReport={reloadFiles}
         notification={getNotification()}
         disabled={!displayValue?.datasetId}
         dataSetId={displayValue?.datasetId ?? ""}
@@ -277,7 +291,7 @@ export const Dashboard = () => {
       <EditDrawer
         modalDisclosure={{
           isOpen: editDrawerOpen,
-          onClose: () => setEditDrawerOpen(false),
+          onClose: onModalClose,
         }}
         selections={
           <Dropdown
@@ -291,6 +305,7 @@ export const Dashboard = () => {
         }
         onModalSubmit={saveFiles}
         file={displayValue as DataSetUploadType}
+        submitting={modalLoading}
       />
     </PageTemplate>
   );

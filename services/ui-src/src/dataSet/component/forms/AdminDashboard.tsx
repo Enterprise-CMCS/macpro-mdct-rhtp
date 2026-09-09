@@ -16,7 +16,7 @@ import { DropdownOptions } from "types";
 export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<DataSetUploadType[]>([]);
-  const [_displayValue, _setDisplayValue] = useState<string>();
+  const [sortedFiles, setSortedFiles] = useState<DataSetUploadType[]>([]);
   const [tableRows, setTableRows] = useState<
     (string | number | JSX.Element | undefined)[][]
   >([]);
@@ -60,8 +60,16 @@ export const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
+    if (selectedDataSets.length > 0) {
+      setSortedFiles(
+        files.filter((file) => selectedDataSets.includes(file.datasetId))
+      );
+    } else setSortedFiles(files);
+  }, [files, selectedDataSets]);
+
+  useEffect(() => {
     sortRows(lastSorted.sort, lastSorted.type);
-  }, [files]);
+  }, [sortedFiles]);
 
   const clearFilter = () => {
     setStatesHandler([]);
@@ -120,7 +128,7 @@ export const AdminDashboard = () => {
           });
     };
     setLastSorted({ sort: row, type: type });
-    setTableRows(buildRows(runSort(files)));
+    setTableRows(buildRows(runSort(sortedFiles)));
   };
 
   return (
