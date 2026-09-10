@@ -1,4 +1,11 @@
-import { rhtpReportTemplate } from "../../forms/2026/rhtp/rhtp";
+import { buildGeneralInformationPage } from "../../forms/2026/rhtp/pages/general-information/general-information";
+import { initiativeAttachments } from "../../forms/2026/rhtp/pages/initiative-attachments";
+import { buildInitiativePages } from "../../forms/2026/rhtp/pages/initiatives/initiatives";
+import { initiativesTable } from "../../forms/2026/rhtp/pages/initiatives-table";
+import { reviewAndSubmit } from "../../forms/2026/rhtp/pages/review-and-submit";
+import { buildStatePolicyCommitments } from "../../forms/2026/rhtp/pages/state-policy-commitments/state-policy-commitments";
+import { buildSustainabilityAndHighlightsPage } from "../../forms/2026/rhtp/pages/sustainability-and-highlights/sustainability-and-highlights";
+import { obligatedAndSpentFunds } from "../../forms/2026/rhtp/pages/obligated-and-spent-funds";
 import {
   Report,
   PageType,
@@ -16,7 +23,31 @@ import {
   ActionAnswerShape,
 } from "@rhtp/shared";
 
-const pages = rhtpReportTemplate("PA");
+const state = "PA";
+
+// data is passed explicitly so these page builders resolve synchronously (no S3 call), mirroring rhtp.ts's page order
+const pages = [
+  {
+    id: "root",
+    childPageIds: [
+      "general-information",
+      "initiatives",
+      "initiative-attachments",
+      "state-policy-commitments",
+      "obligated-and-spent-funds",
+      "sustainability-and-highlights",
+      "review-submit",
+    ],
+  },
+  buildGeneralInformationPage(state, {}) as FormPageTemplate,
+  initiativesTable,
+  initiativeAttachments,
+  buildStatePolicyCommitments(state, {}) as FormPageTemplate,
+  obligatedAndSpentFunds,
+  buildSustainabilityAndHighlightsPage(state, {}) as FormPageTemplate,
+  reviewAndSubmit,
+  ...(buildInitiativePages(state, {}) as InitiativePageTemplate[]),
+] as Report["pages"];
 
 export const validReport: Report = {
   type: ReportType.RHTP,

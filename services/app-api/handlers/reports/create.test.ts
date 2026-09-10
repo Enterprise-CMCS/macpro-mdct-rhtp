@@ -32,6 +32,16 @@ vi.mock("../../utils/featureFlags", () => ({
   isFeatureFlagEnabled: vi.fn(),
 }));
 
+vi.mock("../../libs/s3-lib", () => ({
+  default: {
+    getObject: vi.fn().mockResolvedValue({
+      Body: {
+        transformToString: () => Promise.resolve(JSON.stringify({})),
+      },
+    }),
+  },
+}));
+
 const testEvent = {
   queryStringParameters: {},
   pathParameters: { reportType: "RHTP", state: "PA" },

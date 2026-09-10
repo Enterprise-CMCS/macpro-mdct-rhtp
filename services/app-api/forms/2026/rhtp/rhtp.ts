@@ -1,14 +1,16 @@
 import { ReportPages } from "@rhtp/shared";
-import { generalInformation } from "./pages/general-information";
+import { buildGeneralInformationPage } from "./pages/general-information/general-information";
 import { initiativeAttachments } from "./pages/initiative-attachments";
 import { buildInitiativePages } from "./pages/initiatives/initiatives";
 import { initiativesTable } from "./pages/initiatives-table";
 import { reviewAndSubmit } from "./pages/review-and-submit";
 import { buildStatePolicyCommitments } from "./pages/state-policy-commitments/state-policy-commitments";
-import { sustainabilityAndHighlights } from "./pages/sustainability-and-highlights";
+import { buildSustainabilityAndHighlightsPage } from "./pages/sustainability-and-highlights/sustainability-and-highlights";
 import { obligatedAndSpentFunds } from "./pages/obligated-and-spent-funds";
 
-export const rhtpReportTemplate = (state: string): ReportPages => [
+export const rhtpReportTemplate = async (
+  state: string
+): Promise<ReportPages> => [
   {
     id: "root",
     childPageIds: [
@@ -21,12 +23,12 @@ export const rhtpReportTemplate = (state: string): ReportPages => [
       "review-submit",
     ],
   },
-  generalInformation,
+  await buildGeneralInformationPage(state),
   initiativesTable,
   initiativeAttachments,
-  buildStatePolicyCommitments(state),
+  await buildStatePolicyCommitments(state),
   obligatedAndSpentFunds,
-  sustainabilityAndHighlights,
+  await buildSustainabilityAndHighlightsPage(state),
   reviewAndSubmit,
-  ...buildInitiativePages(state),
+  ...(await buildInitiativePages(state)),
 ];
