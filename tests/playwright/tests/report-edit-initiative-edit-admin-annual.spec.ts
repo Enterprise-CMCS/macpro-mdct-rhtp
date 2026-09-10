@@ -2,6 +2,7 @@ import { test, expect } from "./fixtures/base";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   createArtifactId,
+  getReportTestRunId,
   INITIATIVES_SECTION,
   waitForAutosaveWithSectionRefresh,
 } from "../utils/report-edit-shared-helpers";
@@ -22,6 +23,7 @@ import {
   editMetric,
   getMetricsTable,
   openCheckpointUploadDrawer,
+  openAttachmentCommentDrawerAndVerifyPreviousComment,
   openInitiativeFromList,
   selectCheckpoint,
   uploadCheckpointAttachment,
@@ -36,8 +38,10 @@ import {
   verifyMetricsTableRows,
   verifyAbandonedMetricRow,
   verifyMetricRow,
+  expectCommentResponseStatus,
   returnToInitiativesDashboard,
   reopenInitiativeFromDashboard,
+  waitForCommentResponse,
   withUploadFixture,
 } from "../utils/report-edit-initiative-edit-helpers";
 import { ReportEditorPage } from "./pageObjects/report-editor.page";
@@ -477,7 +481,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
     });
 
     test("should persist a checkpoint attachment comment for admin users @regression", async () => {
-      const commentText = `Admin initiative comment ${createArtifactId()}`;
+      const commentText = `Admin initiative comment ${getReportTestRunId()}`;
 
       await withUploadFixture(async (fixture) => {
         const checkpointRow = await uploadCheckpointAttachment(
@@ -500,16 +504,19 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           .getByRole("radio", { name: /^External \(Shared with States\)$/i })
           .check();
         await commentField.fill(commentText);
+        const createCommentResponsePromise = waitForCommentResponse(
+          editor,
+          "POST"
+        );
         await commentDrawer
           .getByRole("button", { name: /^Add comment$/i })
           .click();
+        const createCommentResponse = await createCommentResponsePromise;
+        await expectCommentResponseStatus(createCommentResponse, 201);
         await expect(commentDrawer).toContainText(commentText, {
           timeout: TIMEOUT_UI,
         });
         await closeCommentDrawer(commentDrawer);
-        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-          timeoutMs: TIMEOUT_UI,
-        });
 
         await returnToInitiativesDashboard(editor);
         const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -520,21 +527,14 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           CHECKPOINT_STAGE_LABELS[0],
           fixture.fileName
         );
-        await getCommentAttachmentButton(
-          reopenedCheckpointRow,
-          fixture.fileName
-        ).click();
-
-        const reopenedCommentDrawer = editor.page.getByRole("dialog");
-        const previousCommentField = reopenedCommentDrawer.locator(
-          '[name^="previous-comment-"]'
-        );
-        await expect(previousCommentField).toBeDisabled({
-          timeout: TIMEOUT_UI,
-        });
-        await expect(previousCommentField).toHaveValue(commentText, {
-          timeout: TIMEOUT_UI,
-        });
+        const reopenedCommentDrawer =
+          await openAttachmentCommentDrawerAndVerifyPreviousComment(
+            editor,
+            reopenedCheckpointRow,
+            fixture.fileName,
+            commentText,
+            { disabled: true }
+          );
         await closeCommentDrawer(reopenedCommentDrawer);
       });
     });

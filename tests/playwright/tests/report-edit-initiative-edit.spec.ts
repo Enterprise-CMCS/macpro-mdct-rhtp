@@ -1,7 +1,7 @@
 import { test, expect } from "./fixtures/base";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
-  createArtifactId,
+  getReportTestRunId,
   INITIATIVES_SECTION,
 } from "../utils/report-edit-shared-helpers";
 import {
@@ -14,6 +14,7 @@ import {
   getManageAttachmentButton,
   getOpenInitiativeHeadingText,
   openReportFromDashboard,
+  openAttachmentCommentDrawerAndVerifyPreviousComment,
   openCheckpointUploadDrawer,
   openInitiativeFromList,
   reopenInitiativeFromDashboard,
@@ -25,6 +26,8 @@ import {
   verifyCheckpointTableHeaders,
   verifyMetricsTableHeaders,
   verifyMetricsTableRows,
+  expectCommentResponseStatus,
+  waitForCommentResponse,
   withUploadFixture,
   type ReportPeriod,
 } from "../utils/report-edit-initiative-edit-helpers";
@@ -365,8 +368,8 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
       });
     });
 
-    test("should submit a comment for a checkpoint attachment for a non-admin user @regression", async () => {
-      const commentText = `Initiative attachment comment ${createArtifactId()}`;
+    test("should submit and persist a comment for a checkpoint attachment for a non-admin user @regression", async () => {
+      const commentText = `Initiative attachment comment ${getReportTestRunId()}`;
       await withUploadFixture(async (fixture) => {
         const checkpointRow = await uploadCheckpointAttachment(
           editor,
@@ -401,12 +404,42 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
         await expect(addCommentButton).toBeEnabled();
 
         await commentField.fill(commentText);
+        const createCommentResponsePromise = waitForCommentResponse(
+          editor,
+          "POST"
+        );
         await addCommentButton.click();
+        const createCommentResponse = await createCommentResponsePromise;
+        await expectCommentResponseStatus(createCommentResponse, 201);
 
         await expect(commentDrawer).toContainText(commentText, {
           timeout: TIMEOUT_UI,
         });
         await closeCommentDrawer(commentDrawer);
+
+        // Verify comment persists after returning to dashboard and reopening
+        await returnToInitiativesDashboard(editor);
+        const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+        expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
+
+        const reopenedCheckpointRow = getCheckpointStage(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0]
+        )
+          .getByRole("table")
+          .locator("tbody")
+          .getByRole("row")
+          .filter({ hasText: fixture.fileName })
+          .first();
+        const reopenedCommentDrawer =
+          await openAttachmentCommentDrawerAndVerifyPreviousComment(
+            editor,
+            reopenedCheckpointRow,
+            fixture.fileName,
+            commentText,
+            { disabled: true }
+          );
+        await closeCommentDrawer(reopenedCommentDrawer);
       });
     });
 

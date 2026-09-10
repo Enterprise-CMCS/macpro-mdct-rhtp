@@ -648,6 +648,34 @@ export const getCheckpointAttachmentRowByFileName = (
 
 export type UploadFixture = { fileName: string; filePath: string };
 
+export const waitForCommentResponse = (
+  editor: ReportEditorPage,
+  method: "GET" | "POST"
+) =>
+  editor.page.waitForResponse(
+    (response) =>
+      response.request().method() === method &&
+      response.url().includes("/comments/")
+  );
+
+export const expectCommentResponseStatus = async (
+  response: Awaited<ReturnType<typeof waitForCommentResponse>>,
+  expectedStatus: number
+): Promise<void> => {
+  expect(response.status()).toBe(expectedStatus);
+};
+
+export const expectCommentInResponse = async (
+  response: Awaited<ReturnType<typeof waitForCommentResponse>>,
+  commentText: string
+): Promise<void> => {
+  expect(response.status()).toBe(200);
+  const comments = (await response.json()) as Array<{ comment?: string }>;
+  expect(comments.some((comment) => comment.comment === commentText)).toBe(
+    true
+  );
+};
+
 export const withUploadFixture = async (
   callback: (fixture: UploadFixture) => Promise<void>
 ): Promise<void> => {
@@ -741,6 +769,34 @@ export const closeCommentDrawer = async (drawer: Locator): Promise<void> => {
     .getByRole("button", { name: /^Close$/i })
     .click();
   await expect(drawer).toBeHidden({ timeout: TIMEOUT_UI });
+};
+
+export const openAttachmentCommentDrawerAndVerifyPreviousComment = async (
+  editor: ReportEditorPage,
+  row: Locator,
+  fileName: string,
+  commentText: string,
+  options: { disabled?: boolean } = {}
+): Promise<Locator> => {
+  const commentsResponsePromise = waitForCommentResponse(editor, "GET");
+  await getCommentAttachmentButton(row, fileName).click();
+  const commentsResponse = await commentsResponsePromise;
+  await expectCommentInResponse(commentsResponse, commentText);
+
+  const commentDrawer = editor.page.getByRole("dialog");
+  const previousCommentField = commentDrawer.locator(
+    '[name^="previous-comment-"]'
+  );
+  if (options.disabled) {
+    await expect(previousCommentField).toBeDisabled({
+      timeout: TIMEOUT_UI,
+    });
+  }
+  await expect(previousCommentField).toHaveValue(commentText, {
+    timeout: TIMEOUT_UI,
+  });
+
+  return commentDrawer;
 };
 
 export const uploadCheckpointAttachment = async (
