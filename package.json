@@ -58,5 +58,8 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
+  "resolutions": {
+    "undici": "^7.29.1"
+  },
   "packageManager": "yarn@4.12.0"
 }

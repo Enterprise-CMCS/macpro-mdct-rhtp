@@ -1,6 +1,16 @@
 import { ElementType, FormPageTemplate, PageType } from "@rhtp/shared";
+import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 
-export const sustainabilityAndHighlights: FormPageTemplate = {
+const SUCCESS_AND_HIGHLIGHTS_KEY = "import/success-and-highlights.json";
+
+export type SuccessAndHighlightsData = {
+  [key: string]: { successStory: string; sustainabilityPlanning: string };
+};
+
+const buildPage = (
+  state: string,
+  data: SuccessAndHighlightsData
+): FormPageTemplate => ({
   id: "sustainability-and-highlights",
   title: "Sustainability and Highlights",
   type: PageType.Standard,
@@ -26,6 +36,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       required: true,
       quarterly: true,
       charLimit: 3000,
+      answer: data[state]?.successStory || "",
     },
     {
       id: "success-stories-paragraph",
@@ -72,6 +83,7 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       required: true,
       quarterly: false,
       charLimit: 3000,
+      answer: data[state]?.sustainabilityPlanning || "",
     },
     {
       id: "sustainability-paragraph",
@@ -102,4 +114,15 @@ export const sustainabilityAndHighlights: FormPageTemplate = {
       quarterly: false,
     },
   ],
+});
+
+// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+export const buildSustainabilityAndHighlightsPage = (
+  state: string,
+  data?: SuccessAndHighlightsData
+): FormPageTemplate | Promise<FormPageTemplate> => {
+  if (data) return buildPage(state, data);
+  return getJsonFromS3<SuccessAndHighlightsData>(
+    SUCCESS_AND_HIGHLIGHTS_KEY
+  ).then((fetched) => buildPage(state, fetched ?? {}));
 };

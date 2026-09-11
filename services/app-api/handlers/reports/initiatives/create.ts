@@ -52,7 +52,7 @@ export const createInitiative = handler(
         },
       ],
     };
-    const newPages = buildInitiativePages(state, newInitiative);
+    const newPages = await buildInitiativePages(state, newInitiative);
     report.pages.push(...newPages);
 
     // validate new report
