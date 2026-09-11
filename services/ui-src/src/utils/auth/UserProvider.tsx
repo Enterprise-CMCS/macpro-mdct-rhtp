@@ -69,6 +69,7 @@ export const UserProvider = ({ children }: Props) => {
     }
   };
 
+  // TODO: Update for non-rhtp users
   const checkAuthState = useCallback(async () => {
     // Allow Post Logout flow alongside user login flow
     if (location?.pathname.toLowerCase() === "/postlogout") {

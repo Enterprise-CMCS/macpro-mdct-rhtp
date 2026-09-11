@@ -43,6 +43,7 @@ export const AppRoutes = () => {
     <main id="main-content" tabIndex={-1}>
       <ReportAutosaveProvider>
         <Routes>
+          {/* TODO: Toggle the below routes render for RHTP users, and add routes that flip on for non-rhtp users*/}
           {/* General Routes */}
           <Route path="/" element={<HomePage />} />
           <Route

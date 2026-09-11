@@ -30,6 +30,7 @@ interface CreateApiComponentsProps {
   kafkaAuthorizedSubnets: ec2.ISubnet[];
   brokerString: string;
   attachmentsBucket: s3.IBucket;
+  datasetBucket: s3.IBucket;
   launchDarklyServer: string;
   launchDarklyLocalFlags?: string;
 }
@@ -45,6 +46,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     brokerString,
     tables,
     attachmentsBucket,
+    datasetBucket,
     launchDarklyServer,
     launchDarklyLocalFlags = '{"local": false, "flags": {}}',
   } = props;
@@ -181,6 +183,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     launchDarklyServer,
     launchDarklyLocalFlags,
     attachmentsBucketName: attachmentsBucket.bucketName,
+    datasetBucketName: datasetBucket.bucketName,
     ...Object.fromEntries(
       tables.map((table) => [`${table.node.id}Table`, table.table.tableName])
     ),
@@ -195,7 +198,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     environment,
     isDev,
     tables,
-    buckets: [attachmentsBucket],
+    buckets: [attachmentsBucket, datasetBucket],
   };
 
   // Banner handlers
@@ -438,6 +441,81 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     method: "DELETE",
     ...commonProps,
   });
+
+  //------------------- Start of DataSet API Routes -------------------
+  new Lambda(scope, "createDataSetUpload", {
+    entry: "services/app-api/handlers/datasetUpload/create.ts",
+    handler: "createDataSetUpload",
+    path: "/dataset/{state}/{id}",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getUploadsByState", {
+    entry: "services/app-api/handlers/datasetUpload/get.ts",
+    handler: "getUploadsByState",
+    path: "/dataset/{state}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getDataSetUploadsByFileId", {
+    entry: "services/app-api/handlers/datasetUpload/get.ts",
+    handler: "getDataSetUploadsByFileId",
+    path: "/dataset/{state}/{id}/files/{fileId}",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getDataSetUploads", {
+    entry: "services/app-api/handlers/datasetUpload/get.ts",
+    handler: "getDataSetUploads",
+    path: "dataset",
+    method: "GET",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "updateDataSetUpload", {
+    entry: "services/app-api/handlers/datasetUpload/update.ts",
+    handler: "updateDataSetUpload",
+    path: "/dataset/{state}/{id}/files/{fileId}",
+    method: "PUT",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "deleteDataSetUpload", {
+    entry: "services/app-api/handlers/datasetUpload/delete.ts",
+    handler: "deleteDataSetUpload",
+    path: "/dataset/{state}/{id}/files/{fileId}",
+    method: "DELETE",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "createDataSet", {
+    entry: "services/app-api/handlers/dataset/create.ts",
+    handler: "createDataSet",
+    path: "datasets",
+    method: "POST",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "updateDataSet", {
+    entry: "services/app-api/handlers/dataset/update.ts",
+    handler: "updateDataSet",
+    path: "datasets/{id}",
+    method: "PUT",
+    ...commonProps,
+  });
+
+  new Lambda(scope, "getDataSets", {
+    entry: "services/app-api/handlers/dataset/get.ts",
+    handler: "getDataSets",
+    path: "datasets",
+    method: "GET",
+    ...commonProps,
+  });
+
+  //------------------- End of DataSet API Routes -------------------
 
   new LambdaDynamoEventSource(scope, "postKafkaData", {
     entry: "services/app-api/handlers/kafka/postKafkaData.ts",
