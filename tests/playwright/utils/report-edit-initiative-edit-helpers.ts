@@ -784,9 +784,24 @@ export const openAttachmentCommentDrawerAndVerifyPreviousComment = async (
   await expectCommentInResponse(commentsResponse, commentText);
 
   const commentDrawer = editor.page.getByRole("dialog");
-  const previousCommentField = commentDrawer.locator(
+  const previousCommentFields = commentDrawer.locator(
     '[name^="previous-comment-"]'
   );
+  await expect(previousCommentFields.first()).toBeAttached({
+    timeout: TIMEOUT_UI,
+  });
+
+  const previousCommentCount = await previousCommentFields.count();
+  let matchingCommentIndex = -1;
+  for (let index = 0; index < previousCommentCount; index += 1) {
+    if ((await previousCommentFields.nth(index).inputValue()) === commentText) {
+      matchingCommentIndex = index;
+      break;
+    }
+  }
+
+  expect(matchingCommentIndex).toBeGreaterThanOrEqual(0);
+  const previousCommentField = previousCommentFields.nth(matchingCommentIndex);
   if (options.disabled) {
     await expect(previousCommentField).toBeDisabled({
       timeout: TIMEOUT_UI,
