@@ -1,13 +1,22 @@
+import { Mock } from "vitest";
 import { ElementType, PageType } from "@rhtp/shared";
 import {
   getDropdownOptions,
   STATE_POLICY_COMMITMENT_NAMES,
 } from "../constants";
 import { buildStatePolicyCommitments } from "../state-policy-commitments";
+import STATE_POLICY_COMMITMENTS from "../data/empty-commitments.json";
+import s3Lib from "../../../../../../libs/s3-lib";
+
+vi.mock("../../../../../../libs/s3-lib", () => ({
+  default: {
+    getObject: vi.fn(),
+  },
+}));
 
 describe("test state policy commitment functions", () => {
   test("buildStatePolicyCommitments()", () => {
-    const page = buildStatePolicyCommitments("PA");
+    const page = buildStatePolicyCommitments("PA", STATE_POLICY_COMMITMENTS);
     expect(page).toEqual(
       // expected page
       expect.objectContaining({
@@ -45,6 +54,16 @@ describe("test state policy commitment functions", () => {
           }),
         ]),
       })
+    );
+  });
+
+  test("uses empty commitments data when S3 does not return data", async () => {
+    (s3Lib.getObject as Mock).mockResolvedValueOnce({});
+
+    const page = await buildStatePolicyCommitments("PA");
+
+    expect(page).toEqual(
+      buildStatePolicyCommitments("PA", STATE_POLICY_COMMITMENTS)
     );
   });
 

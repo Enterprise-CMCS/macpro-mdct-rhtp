@@ -757,5 +757,59 @@
         "Value": "ZZ"
       }
     ]
+  },
+  {
+    "username": "adminuploaduser@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "adminuploaduser@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "Adam"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Admins"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdct-bor"
+      }
+    ]
+  },
+  {
+    "username": "stateuploaduser@test.com",
+    "attributes": [
+      {
+        "Name": "email",
+        "Value": "stateuploaduser@test.com"
+      },
+      {
+        "Name": "given_name",
+        "Value": "Penn"
+      },
+      {
+        "Name": "family_name",
+        "Value": "Woods"
+      },
+      {
+        "Name": "email_verified",
+        "Value": "true"
+      },
+      {
+        "Name": "custom:cms_roles",
+        "Value": "mdct-state-user"
+      },
+      {
+        "Name": "custom:cms_state",
+        "Value": "PA"
+      }
+    ]
   }
 ]

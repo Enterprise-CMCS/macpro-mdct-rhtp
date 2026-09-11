@@ -141,6 +141,7 @@ export function createUploadsComponents(props: CreateUploadsComponentsProps) {
         `${attachmentsBucket.bucketArn}/*.xltx`,
         `${attachmentsBucket.bucketArn}/*.xls`,
         `${attachmentsBucket.bucketArn}/*.xml`,
+        `${attachmentsBucket.bucketArn}/*.json`,
       ],
     })
   );

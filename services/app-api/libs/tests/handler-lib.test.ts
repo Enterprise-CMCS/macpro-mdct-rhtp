@@ -10,6 +10,7 @@ vi.mock("../debug-lib", () => ({
   debug: vi.fn(),
   error: vi.fn(),
   flush: vi.fn(),
+  logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 vi.mock("../../utils/authentication", () => ({

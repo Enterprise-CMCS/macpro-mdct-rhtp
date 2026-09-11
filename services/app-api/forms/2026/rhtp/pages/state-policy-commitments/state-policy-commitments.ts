@@ -9,12 +9,19 @@ import {
   ParagraphTemplate,
   TextAreaBoxTemplate,
 } from "@rhtp/shared";
-import STATE_POLICY_COMMITMENTS from "./data/commitments.json";
 import {
   cmsEvaluationStatusDefault,
   cmsCommitmentFulfilled,
   getDropdownOptions,
 } from "./constants";
+import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
+import EMPTY_STATE_POLICY_COMMITMENTS from "./data/empty-commitments.json";
+
+const COMMITMENTS_KEY = "import/commitments.json";
+
+type StatePolicyCommitmentsData = {
+  [key: string]: { label: string; status: string; links: string[] }[];
+};
 
 const commitmentStatusDropdown = (
   label: string,
@@ -56,7 +63,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   };
 };
 
-const commitmentLinkListInput: ListInputTemplate = {
+const commitmentLinkListInput = (links?: string[]): ListInputTemplate => ({
   type: ElementType.ListInput,
   id: "commitment-links",
   label: "Links",
@@ -65,7 +72,8 @@ const commitmentLinkListInput: ListInputTemplate = {
   buttonText: "Add link",
   validation: "link",
   required: false,
-};
+  answer: links || [],
+});
 
 const commitmentSupportParagraph: ParagraphTemplate = {
   type: ElementType.Paragraph,
@@ -86,21 +94,19 @@ const commitmentNotes: TextAreaBoxTemplate = {
 
 const buildCommitments = (
   state: string,
-  statePolicyCommitments: {
-    [key: string]: { label: string; status: string }[];
-  } = STATE_POLICY_COMMITMENTS
+  statePolicyCommitments: StatePolicyCommitmentsData
 ) => {
   if (!(state in statePolicyCommitments)) return [];
   const commitmentsForState = statePolicyCommitments[state];
   const commitments = [];
-  for (const { label, status } of commitmentsForState) {
+  for (const { label, status, links } of commitmentsForState) {
     commitments.push({
       label,
       elements: [
         commitmentStatusDropdown(label, status),
         cmsStatusEvaluation(label),
         commitmentSupportParagraph,
-        commitmentLinkListInput,
+        commitmentLinkListInput(links),
         commitmentAttachmentArea(label),
         commitmentNotes,
       ],
@@ -109,8 +115,9 @@ const buildCommitments = (
   return commitments;
 };
 
-export const buildStatePolicyCommitments = (
-  state: string
+const buildPage = (
+  state: string,
+  statePolicyCommitments: StatePolicyCommitmentsData
 ): FormPageTemplate => ({
   id: "state-policy-commitments",
   title: "State Policy Action Commitments",
@@ -130,7 +137,7 @@ export const buildStatePolicyCommitments = (
     {
       type: ElementType.AccordionGroup,
       id: "state-policy-commitments-group",
-      accordions: [...buildCommitments(state)],
+      accordions: [...buildCommitments(state, statePolicyCommitments)],
       required: false,
     },
     {
@@ -143,3 +150,15 @@ export const buildStatePolicyCommitments = (
     },
   ],
 });
+
+// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+export const buildStatePolicyCommitments = (
+  state: string,
+  statePolicyCommitments?: StatePolicyCommitmentsData
+): FormPageTemplate | Promise<FormPageTemplate> => {
+  if (statePolicyCommitments) return buildPage(state, statePolicyCommitments);
+  return getJsonFromS3<StatePolicyCommitmentsData>(COMMITMENTS_KEY).then(
+    // Use manually uploaded S3 data if available, otherwise use empty commitments JSON
+    (fetched) => buildPage(state, fetched ?? EMPTY_STATE_POLICY_COMMITMENTS)
+  );
+};

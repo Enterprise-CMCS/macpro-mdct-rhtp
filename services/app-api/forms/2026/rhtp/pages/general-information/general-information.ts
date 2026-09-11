@@ -1,6 +1,21 @@
 import { ElementType, FormPageTemplate, PageType } from "@rhtp/shared";
+import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 
-export const generalInformation: FormPageTemplate = {
+const GENERAL_INFORMATION_KEY = "import/general-information.json";
+
+export type GeneralInformationData = {
+  [key: string]: {
+    AOR: string;
+    AORemail: string;
+    PIPD: string;
+    PIPDemail: string;
+  };
+};
+
+const buildPage = (
+  state: string,
+  data: GeneralInformationData
+): FormPageTemplate => ({
   id: "general-information",
   title: "General Information",
   type: PageType.Standard,
@@ -19,6 +34,7 @@ export const generalInformation: FormPageTemplate = {
       helperText:
         "Enter the name for CMS to contact with questions about this report.",
       quarterly: true,
+      answer: data[state]?.AOR || "",
     },
     {
       type: ElementType.Textbox,
@@ -27,6 +43,7 @@ export const generalInformation: FormPageTemplate = {
       required: true,
       helperText: "Enter the email address for the AOR.",
       quarterly: true,
+      answer: data[state]?.AORemail || "",
     },
     {
       id: "pipd-name",
@@ -36,6 +53,7 @@ export const generalInformation: FormPageTemplate = {
       helperText:
         "Enter the name for CMS to contact with questions about this report.",
       quarterly: true,
+      answer: data[state]?.PIPD || "",
     },
     {
       type: ElementType.Textbox,
@@ -44,6 +62,7 @@ export const generalInformation: FormPageTemplate = {
       required: true,
       helperText: "Enter the email address for the PI/PD.",
       quarterly: true,
+      answer: data[state]?.PIPDemail || "",
     },
     {
       type: ElementType.Textbox,
@@ -63,4 +82,15 @@ export const generalInformation: FormPageTemplate = {
       quarterly: true,
     },
   ],
+});
+
+// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+export const buildGeneralInformationPage = (
+  state: string,
+  data?: GeneralInformationData
+): FormPageTemplate | Promise<FormPageTemplate> => {
+  if (data) return buildPage(state, data);
+  return getJsonFromS3<GeneralInformationData>(GENERAL_INFORMATION_KEY).then(
+    (fetched) => buildPage(state, fetched ?? {})
+  );
 };
