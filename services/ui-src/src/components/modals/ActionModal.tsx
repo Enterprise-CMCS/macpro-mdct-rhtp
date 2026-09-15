@@ -51,16 +51,16 @@ export const ActionModal = ({
 
     const submittedErrors = renderElements.map((element) => {
       const value = formData.find((item) => item.id === element.id)?.value;
-      return [
-        element.id,
+      const message =
         !value && element.required
           ? ErrorMessages.requiredResponse
-          : (errorMessages.get(element.id) ?? ""),
-      ] as [string, string];
+          : (errorMessages.get(element.id) ?? "");
+
+      return [element.id, message] as [string, string];
     });
     const newErrorMessages = new Map([...errorMessages, ...submittedErrors]);
     setErrorMessages(newErrorMessages);
-    if (submittedErrors.some(([, error]) => error != "")) return;
+    if (submittedErrors.some((errorEntry) => errorEntry[1] != "")) return;
 
     setSubmitting(true);
     onSave(formData);
