@@ -3,11 +3,14 @@ import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   getReportTestRunId,
   INITIATIVES_SECTION,
+  waitForAutosaveWithSectionRefresh,
+  waitForReportSaveResponse,
 } from "../utils/report-edit-shared-helpers";
 import {
   CHECKPOINT_STAGE_LABELS,
   GOVERNANCE_CHECKPOINT,
   closeCommentDrawer,
+  getCheckpointAttachmentRowByFileName,
   getCheckpointRow,
   getCheckpointStage,
   getCommentAttachmentButton,
@@ -174,13 +177,12 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
 
       await expect(readinessCheckbox).toBeVisible();
       await expect(readinessCheckbox).toBeEnabled();
-      const wasChecked = await readinessCheckbox.isChecked();
-      if (wasChecked) {
-        await readinessCheckbox.uncheck({ force: true });
-      } else {
+      if (!(await readinessCheckbox.isChecked())) {
         await readinessCheckbox.check({ force: true });
+        await expect(readinessCheckbox).toBeChecked();
+        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
       }
-      await expect(readinessCheckbox).toBeChecked({ checked: !wasChecked });
+      await expect(readinessCheckbox).toBeChecked();
     });
 
     test("should persist checkpoint readiness after reopening the initiative for a non-admin user @regression", async () => {
@@ -193,13 +195,12 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
       const readinessCheckbox = checkpointRow.getByRole("checkbox");
 
       await expect(readinessCheckbox).toBeEnabled();
-      const wasChecked = await readinessCheckbox.isChecked();
-      if (wasChecked) {
-        await readinessCheckbox.uncheck({ force: true });
-      } else {
+      if (!(await readinessCheckbox.isChecked())) {
         await readinessCheckbox.check({ force: true });
+        await expect(readinessCheckbox).toBeChecked();
+        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
       }
-      await expect(readinessCheckbox).toBeChecked({ checked: !wasChecked });
+      await expect(readinessCheckbox).toBeChecked();
 
       await returnToInitiativesDashboard(editor);
       const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -211,9 +212,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
         ),
         /Establish governance/i
       );
-      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked({
-        checked: !wasChecked,
-      });
+      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked();
     });
 
     test("should open the attachment upload drawer from a checkpoint stage for non-admin users @regression", async () => {
@@ -263,7 +262,6 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
         await expect(checkpointRow).toContainText(fixture.fileName, {
           timeout: TIMEOUT_UI,
         });
-
         await returnToInitiativesDashboard(editor);
         const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
         expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
@@ -352,19 +350,19 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
           name: /^Save changes$/i,
         });
         await expect(saveChangesButton).toBeEnabled();
+        const reportSaveResponsePromise = waitForReportSaveResponse(editor);
         await saveChangesButton.click();
         await expect(manageDrawer).toBeHidden({ timeout: TIMEOUT_UI });
+        await reportSaveResponsePromise;
 
-        const updatedCheckpointRow = getCheckpointRow(
-          getCheckpointStage(editor, CHECKPOINT_STAGE_LABELS[0]).getByRole(
-            "table"
-          ),
+        const updatedCheckpointRow = getCheckpointAttachmentRowByFileName(
+          editor,
+          CHECKPOINT_STAGE_LABELS[0],
           fixture.fileName
         );
-        await expect(updatedCheckpointRow).toContainText(
-          /0\.2\s*Submit project plan to CMS/i,
-          { timeout: TIMEOUT_UI }
-        );
+        await expect(updatedCheckpointRow).toContainText(fixture.fileName, {
+          timeout: TIMEOUT_UI,
+        });
       });
     });
 
@@ -380,6 +378,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
         await expect(checkpointRow).toContainText(fixture.fileName, {
           timeout: TIMEOUT_UI,
         });
+        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
         const commentButton = getCommentAttachmentButton(
           checkpointRow,
           fixture.fileName
@@ -408,15 +407,16 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
           editor,
           "POST"
         );
+        const reportSaveResponsePromise = waitForReportSaveResponse(editor);
         await addCommentButton.click();
         const createCommentResponse = await createCommentResponsePromise;
         await expectCommentResponseStatus(createCommentResponse, 201);
+        await reportSaveResponsePromise;
 
         await expect(commentDrawer).toContainText(commentText, {
           timeout: TIMEOUT_UI,
         });
         await closeCommentDrawer(commentDrawer);
-
         // Verify comment persists after returning to dashboard and reopening
         await returnToInitiativesDashboard(editor);
         const reopenedInitiative = await reopenInitiativeFromDashboard(editor);

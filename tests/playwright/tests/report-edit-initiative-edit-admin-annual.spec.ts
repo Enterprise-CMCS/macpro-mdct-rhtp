@@ -5,6 +5,7 @@ import {
   getReportTestRunId,
   INITIATIVES_SECTION,
   waitForAutosaveWithSectionRefresh,
+  waitForReportSaveResponse,
 } from "../utils/report-edit-shared-helpers";
 import {
   CHECKPOINT_STAGE_LABELS,
@@ -24,6 +25,7 @@ import {
   getMetricsTable,
   openCheckpointUploadDrawer,
   openAttachmentCommentDrawerAndVerifyPreviousComment,
+  openReportFromDashboard,
   openInitiativeFromList,
   selectCheckpoint,
   uploadCheckpointAttachment,
@@ -45,7 +47,7 @@ import {
   withUploadFixture,
 } from "../utils/report-edit-initiative-edit-helpers";
 import { ReportEditorPage } from "./pageObjects/report-editor.page";
-import { TIMEOUT_UI } from "../utils/timeouts";
+import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "../utils/timeouts";
 
 const REPORT_PERIOD_LABEL = /Annual Report/i;
 
@@ -97,6 +99,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
     }
 
     editor = result;
+    await openReportFromDashboard(editor, "annual");
     await verifyReportContextFromHeader(editor, REPORT_PERIOD_LABEL);
 
     const table = editor.page.getByRole("table");
@@ -147,9 +150,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       );
       await editor.page.keyboard.press("Tab");
 
-      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-        timeoutMs: TIMEOUT_UI,
-      });
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
 
       await returnToInitiativesDashboard(editor);
 
@@ -196,9 +197,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       const metricsTable = getMetricsTable(editor);
       await verifyMetricRow(metricsTable, metric);
 
-      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-        timeoutMs: TIMEOUT_UI,
-      });
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
       await returnToInitiativesDashboard(editor);
 
       const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -227,9 +226,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
 
       await verifyMetricRow(metricsTable, metric);
 
-      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-        timeoutMs: TIMEOUT_UI,
-      });
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
       await returnToInitiativesDashboard(editor);
 
       const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -253,9 +250,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       await abandonMetric(editor, activeMetricRow);
       await verifyAbandonedMetricRow(metricsTable, metric.name);
 
-      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-        timeoutMs: TIMEOUT_UI,
-      });
+      await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
       await returnToInitiativesDashboard(editor);
 
       const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
@@ -301,9 +296,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
       if (!wasChecked) {
         await readinessCheckbox.check({ force: true });
         await expect(readinessCheckbox).toBeChecked();
-        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-          timeoutMs: TIMEOUT_UI,
-        });
+        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
       }
 
       await returnToInitiativesDashboard(editor);
@@ -351,7 +344,6 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
         await expect(checkpointRow).toContainText(fixture.fileName, {
           timeout: TIMEOUT_UI,
         });
-
         await returnToInitiativesDashboard(editor);
         const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
         expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
@@ -403,7 +395,6 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           GOVERNANCE_CHECKPOINT,
           fixture
         );
-
         const manageDrawer = await openManageAttachmentDrawer(
           editor,
           checkpointRow,
@@ -415,24 +406,57 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           manageDrawer,
           /0\.2 Submit project plan to CMS/i
         );
+        const reportSaveResponsePromise = editor.page.waitForResponse(
+          (response) => {
+            if (
+              response.request().method() !== "PUT" ||
+              !response.url().includes("/reports/")
+            ) {
+              return false;
+            }
+
+            const payload = response.request().postDataJSON();
+            const attachments = payload.pages
+              .flatMap(
+                (page: { elements?: Array<{ answer?: unknown }> }) =>
+                  page.elements ?? []
+              )
+              .flatMap((element: { answer?: unknown }) =>
+                Array.isArray(element.answer) ? element.answer : []
+              ) as Array<{
+              attachment?: { name?: string };
+              checkpoint?: string;
+            }>;
+            const fixtureAttachment = attachments.find(
+              (attachment) => attachment.attachment?.name === fixture.fileName
+            );
+
+            expect(fixtureAttachment).toMatchObject({
+              checkpoint: "planning-2",
+            });
+            return true;
+          },
+          { timeout: TIMEOUT_AUTOSAVE }
+        );
         await manageDrawer
           .getByRole("button", { name: /^Save changes$/i })
           .click();
         await expect(manageDrawer).toBeHidden({ timeout: TIMEOUT_UI });
+        await reportSaveResponsePromise;
 
         await returnToInitiativesDashboard(editor);
         const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
         expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
 
-        const updatedCheckpointRow = getCheckpointAttachmentRowByFileName(
+        const updatedAttachmentRow = getCheckpointAttachmentRowByFileName(
           editor,
           CHECKPOINT_STAGE_LABELS[0],
           fixture.fileName
         );
-        await expect(updatedCheckpointRow).toContainText(
-          /0\.2\s*Submit project plan to CMS/i,
-          { timeout: TIMEOUT_UI }
-        );
+        await expect(updatedAttachmentRow).toHaveCount(1);
+        await expect(updatedAttachmentRow).toContainText(fixture.fileName, {
+          timeout: TIMEOUT_UI,
+        });
       });
     });
 
@@ -451,6 +475,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           fixture.fileName
         );
 
+        const reportSaveResponsePromise = waitForReportSaveResponse(editor);
         await manageDrawer
           .getByRole("button", { name: /^Delete attachment$/i })
           .click();
@@ -463,9 +488,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
         );
         await expect(deletedAttachmentRow).toHaveCount(0);
 
-        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION, {
-          timeoutMs: TIMEOUT_UI,
-        });
+        await reportSaveResponsePromise;
         await returnToInitiativesDashboard(editor);
         const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
         expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
@@ -490,7 +513,6 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           GOVERNANCE_CHECKPOINT,
           fixture
         );
-
         await getCommentAttachmentButton(
           checkpointRow,
           fixture.fileName
@@ -508,16 +530,17 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Admin)", () => {
           editor,
           "POST"
         );
+        const reportSaveResponsePromise = waitForReportSaveResponse(editor);
         await commentDrawer
           .getByRole("button", { name: /^Add comment$/i })
           .click();
         const createCommentResponse = await createCommentResponsePromise;
         await expectCommentResponseStatus(createCommentResponse, 201);
+        await reportSaveResponsePromise;
         await expect(commentDrawer).toContainText(commentText, {
           timeout: TIMEOUT_UI,
         });
         await closeCommentDrawer(commentDrawer);
-
         await returnToInitiativesDashboard(editor);
         const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
         expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);

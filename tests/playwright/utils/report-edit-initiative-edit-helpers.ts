@@ -5,6 +5,7 @@ import {
   getReportTestRunId,
   INITIATIVES_SECTION,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
+  waitForReportSaveResponse,
 } from "./report-edit-shared-helpers";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import { TIMEOUT_UI } from "./timeouts";
@@ -557,23 +558,32 @@ export const openCheckpointUploadDrawer = async (
 export const selectCheckpoint = async (
   editor: ReportEditorPage,
   uploadDrawer: Locator,
-  checkpointName: RegExp
+  checkpointName: string | RegExp
 ): Promise<void> => {
   const checkpointDropdown = uploadDrawer
-    .getByRole("button", {
-      name: /Which stage\/checkpoint does this attachment apply to\?/i,
-    })
+    .locator('select[name="checkpoint"]')
     .first();
+  const checkpointOptions = checkpointDropdown.locator("option");
 
-  await expect(checkpointDropdown).toBeVisible();
+  await expect(checkpointDropdown).toBeAttached();
   await expect(checkpointDropdown).toBeEnabled();
-  await checkpointDropdown.click();
 
-  const checkpointOption = editor.page.getByRole("option", {
-    name: checkpointName,
+  const matchingOption = checkpointOptions.filter({
+    hasText: checkpointName,
   });
-  await expect(checkpointOption).toBeVisible();
-  await checkpointOption.click();
+
+  await expect(matchingOption).toHaveCount(1, {
+    timeout: TIMEOUT_UI,
+  });
+
+  const checkpointValue = await matchingOption.first().getAttribute("value");
+  expect(checkpointValue).toBeTruthy();
+
+  await checkpointDropdown.selectOption({
+    value: checkpointValue as string,
+  });
+
+  await expect(checkpointDropdown).toHaveValue(/.+/);
 };
 
 export const getCheckpointRow = (
@@ -638,13 +648,19 @@ export const getCheckpointAttachmentRowByFileName = (
   editor: ReportEditorPage,
   stageLabel: string,
   fileName: string
-): Locator =>
-  getCheckpointStage(editor, stageLabel)
+): Locator => {
+  const checkpointTable = getCheckpointStage(editor, stageLabel)
     .getByRole("table")
+    .filter({
+      has: editor.page.getByRole("columnheader", { name: /^Checkpoint$/i }),
+    });
+
+  return checkpointTable
     .locator("tbody")
     .getByRole("row")
     .filter({ hasText: fileName })
     .first();
+};
 
 export type UploadFixture = { fileName: string; filePath: string };
 
@@ -793,9 +809,9 @@ export const openAttachmentCommentDrawerAndVerifyPreviousComment = async (
 
   const previousCommentCount = await previousCommentFields.count();
   let matchingCommentIndex = -1;
-  for (let index = 0; index < previousCommentCount; index += 1) {
-    if ((await previousCommentFields.nth(index).inputValue()) === commentText) {
-      matchingCommentIndex = index;
+  for (let i = 0; i < previousCommentCount; i += 1) {
+    if ((await previousCommentFields.nth(i).inputValue()) === commentText) {
+      matchingCommentIndex = i;
       break;
     }
   }
@@ -825,6 +841,7 @@ export const uploadCheckpointAttachment = async (
 
   const fileInput = uploadDrawer.locator('input[type="file"]');
   await expect(fileInput).toBeEnabled();
+  const reportSaveResponsePromise = waitForReportSaveResponse(editor);
   await fileInput.setInputFiles(fixture.filePath);
   await expect(
     uploadDrawer.getByRole("heading", { name: /^Upload Status$/i })
@@ -835,6 +852,7 @@ export const uploadCheckpointAttachment = async (
 
   await uploadDrawer.getByRole("button", { name: /^Done$/i }).click();
   await expect(uploadDrawer).toBeHidden({ timeout: TIMEOUT_UI });
+  await reportSaveResponsePromise;
 
   return getCheckpointStage(editor, stageLabel)
     .getByRole("table")
