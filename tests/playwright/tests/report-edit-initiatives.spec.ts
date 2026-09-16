@@ -16,8 +16,7 @@ const INITIATIVE_ROW_PATTERN = /^\d+:\s*.+/;
 const STATUS_TEXT_PATTERN =
   /^Status: (Minimum requirements (not )?met|Abandoned)$/i;
 
-const getStatusIcon = (row: Locator): Locator =>
-  row.getByRole("img", { name: /icon$/i });
+const getStatusIcon = (row: Locator): Locator => row.getByRole("img");
 
 const getStatusText = (row: Locator): Locator =>
   row.getByText(STATUS_TEXT_PATTERN);
