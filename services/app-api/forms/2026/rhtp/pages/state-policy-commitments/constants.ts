@@ -53,94 +53,119 @@ export const cmsCommitmentFulfilled = {
   value: "Commitment fulfilled",
 };
 
+export const cmsCommitmentAbandoned = {
+  label: "Commitment abandoned",
+  value: "Commitment abandoned",
+};
+
 export const getDropdownOptions = (label: string) => {
   switch (label) {
+    case "B.2. Presidential Fitness Test":
+      return [
+        {
+          label:
+            "0 Points: A State does not require schools to reestablish the Presidential Fitness Test",
+          value:
+            "0 Points: A State does not require schools to reestablish the Presidential Fitness Test",
+        },
+        {
+          label:
+            "100 Points: A State requires schools to reestablish the Presidential Fitness Test that is aligned with federal guidance associated with Executive Order 14327",
+          value:
+            "100 Points: A State requires schools to reestablish the Presidential Fitness Test that is aligned with federal guidance associated with Executive Order 14327",
+        },
+      ];
     case "B.3. SNAP Food Restriction Waiver Policy":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "0 Points: No pending State legislation",
-          value: "0 Points: No pending State legislation",
+          label:
+            "0 Points: State has no pending or approved USDA SNAP food restriction waiver prohibiting the purchase of non-nutritious items or no pending State bill requiring a food restriction waiver be submitted to USDA",
+          value:
+            "0 Points: State has no pending or approved USDA SNAP food restriction waiver prohibiting the purchase of non-nutritious items or no pending State bill requiring a food restriction waiver be submitted to USDA",
         },
         {
-          label: "25 Points: Active bill in the State legislative process",
-          value: "25 Points: Active bill in the State legislative process",
+          label:
+            "25 Points: State with active bill in the State legislative process",
+          value:
+            "25 Points: State with active bill in the State legislative process",
         },
         {
-          label: "50 Points: State bill was passed to submit a USDA waiver",
-          value: "50 Points: State bill was passed to submit a USDA waiver",
+          label:
+            "50 Points: State bill was passed to submit a USDA food restriction waiver",
+          value:
+            "50 Points: State bill was passed to submit a USDA food restriction waiver",
         },
         {
-          label: "75 Points: Waiver is in processing with USDA",
-          value: "75 Points: Waiver is in processing with USDA",
+          label:
+            "75 Points: State submitted a waiver prohibiting the purchase of non-nutritious items in SNAP and waiver is in processing with USDA",
+          value:
+            "75 Points: State submitted a waiver prohibiting the purchase of non-nutritious items in SNAP and waiver is in processing with USDA",
         },
         {
-          label: "100 Points: USDA approved waiver",
-          value: "100 Points: USDA approved waiver",
-        },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label:
+            "100 Points: USDA approved State waiver prohibiting the purchase of non-nutritious items in SNAP",
+          value:
+            "100 Points: USDA approved State waiver prohibiting the purchase of non-nutritious items in SNAP",
         },
       ];
     case "B.4. Nutrition Continuing Medical Education":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "0 Points: No pending State legislation",
-          value: "0 Points: No pending State legislation",
+          label:
+            "0 Points: States that have no requirement for nutrition to be included in continuing medical education (CME) for physicians as well as no pending State bill requiring nutrition to be included in CME for physicians",
+          value:
+            "0 Points: States that have no requirement for nutrition to be included in continuing medical education (CME) for physicians as well as no pending State bill requiring nutrition to be included in CME for physicians",
         },
         {
           label:
-            "25 Points: Active bill in the State legislative process or regulation proposed",
+            "25 Points: States with an active bill in the State legislative process or regulation proposed",
           value:
-            "25 Points: Active bill in the State legislative process or regulation proposed",
+            "25 Points: States with an active bill in the State legislative process or regulation proposed",
         },
         {
           label:
-            "75 Points: State bill passed or regulation finalized but not yet implemented",
+            "75 Points: State bill requiring nutrition to be included in CME for physicians was passed or regulation finalized but not yet implemented or enforced",
           value:
-            "75 Points: State bill passed or regulation finalized but not yet implemented",
+            "75 Points: State bill requiring nutrition to be included in CME for physicians was passed or regulation finalized but not yet implemented or enforced",
         },
         {
-          label: "100 Points: Requirement in place and enforced",
-          value: "100 Points: Requirement in place and enforced",
-        },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label:
+            "100 Points: Requirement for nutrition to be included in CME for physicians is currently in place and enforced",
+          value:
+            "100 Points: Requirement for nutrition to be included in CME for physicians is currently in place and enforced",
         },
       ];
     case "C.3. Overall CON Score":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
+          label:
+            "0 Points: 100 score from Cicero report for States with universal CONs for all facility categories",
+          value:
+            "0 Points: 100 score from Cicero report for States with universal CONs for all facility categories",
         },
         {
-          label: "0 Points: Score of 100 on Cicero report methodology",
-          value: "0 Points: Score of 100 on Cicero report methodology",
+          label:
+            "25 Points: 80-99 score from Cicero report for States with stringent CONs across facility categories",
+          value:
+            "25 Points: 80-99 score from Cicero report for States with stringent CONs across facility categories",
         },
         {
-          label: "25 Points: Score of 80-99 on Cicero report methodology",
-          value: "25 Points: Score of 80-99 on Cicero report methodology",
+          label:
+            "50 Points: 45-79 score from the Cicero report for States with moderate CONs across facility categories",
+          value:
+            "50 Points: 45-79 score from the Cicero report for States with moderate CONs across facility categories",
         },
         {
-          label: "50 Points: Score of 45-79 on Cicero report methodology",
-          value: "50 Points: Score of 45-79 on Cicero report methodology",
+          label:
+            "75 Points: 1-44 score from Cicero report for States with limited CONs across facility categories",
+          value:
+            "75 Points: 1-44 score from Cicero report for States with limited CONs across facility categories",
         },
         {
-          label: "75 Points: Score of 1-44 on Cicero report methodology",
-          value: "75 Points: Score of 1-44 on Cicero report methodology",
-        },
-        {
-          label: "100 Points: Score of 0 on Cicero report methodology",
-          value: "100 Points: Score of 0 on Cicero report methodology",
-        },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label:
+            "100 Points: 0 score from Cicero report for States with no CONs across facility categories",
+          value:
+            "100 Points: 0 score from Cicero report for States with no CONs across facility categories",
         },
       ];
     case "C.3. CON - Behavioral Outpatient":
@@ -153,26 +178,23 @@ export const getDropdownOptions = (label: string) => {
     case "C.3. CON - Ancillaries":
     case "C.3. CON - Other":
       return [
-        { label: "Not yet started", value: "Not yet started" },
-        { label: "In progress", value: "In progress" },
-        { label: "CON restriction removed", value: "CON restriction removed" },
+        { label: "Restricted", value: "Restricted" },
         {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label: "Unrestricted",
+          value: "Unrestricted",
         },
       ];
     case "D.2. Physician - Medical Licensure Compact":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label:
-            "0 Points: Not a Member State and no pending State legislation",
-          value:
-            "0 Points: Not a Member State and no pending State legislation",
+          label: "0 Points: Not a Member State",
+          value: "0 Points: Not a Member State",
         },
         {
-          label: "50 Points: IMLC member State issuing non-SPL licenses",
-          value: "50 Points: IMLC member State issuing non-SPL licenses",
+          label:
+            "50 Points: Interstate Medical Licensure Compact (IMLC) member State issuing non-State of Principal Licensure (SPL) licenses only OR compact legislation introduced (towards serving as SPL)",
+          value:
+            "50 Points: Interstate Medical Licensure Compact (IMLC) member State issuing non-State of Principal Licensure (SPL) licenses only OR compact legislation introduced (towards serving as SPL)",
         },
         {
           label: "50 Points: Legislation introduced to become SPL",
@@ -183,43 +205,33 @@ export const getDropdownOptions = (label: string) => {
           value: "75 Points: IMLC passed; implementation phase",
         },
         {
-          label: "100 Points: IMLC member state serving as SPL",
-          value: "100 Points: IMLC member state serving as SPL",
-        },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label:
+            "100 Points: IMLC Member State serving as SPL (State of principal license)",
+          value:
+            "100 Points: IMLC Member State serving as SPL (State of principal license)",
         },
       ];
     case "D.2. Nurse - Nurse Licensure Compact":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label:
-            "0 Points: Not a Member State and no pending State legislation",
-          value:
-            "0 Points: Not a Member State and no pending State legislation",
+          label: "0 Points: Not a Member State",
+          value: "0 Points: Not a Member State",
         },
         {
           label: "50 Points: Pending NLC legislation",
           value: "50 Points: Pending NLC legislation",
         },
         {
-          label: "75 Points: NLC legislation enacted",
-          value: "75 Points: NLC legislation enacted",
+          label: "75 Points: NLC legislation enacted; implementation phase",
+          value: "75 Points: NLC legislation enacted; implementation phase",
         },
         {
           label: "100 Points: NLC state",
           value: "100 Points: NLC state",
         },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
       ];
     case "D.2. Psychology - PSYPACT":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
           label: "0 Points: non-PSYPACT participating",
           value: "0 Points: non-PSYPACT participating",
@@ -229,21 +241,18 @@ export const getDropdownOptions = (label: string) => {
           value: "50 Points: PSYPACT legislation introduced",
         },
         {
-          label: "75 Points: enacted PSYPACT legislation",
-          value: "75 Points: enacted PSYPACT legislation",
+          label:
+            "75 Points: Enacted PSYPACT legislation practice; implementation phase",
+          value:
+            "75 Points: Enacted PSYPACT legislation practice; implementation phase",
         },
         {
           label: "100 Points: PSYPACT participating",
           value: "100 Points: PSYPACT participating",
         },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
       ];
     case "D.2. Physician Assistant - PA Compact":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
           label:
             "0 Points: No active legislation to become a PA Compact member",
@@ -255,21 +264,25 @@ export const getDropdownOptions = (label: string) => {
           value: "50 Points: Legislation filed to become a PA Compact member",
         },
         {
-          label: "100 Points: Legislation enacted",
-          value: "100 Points: Legislation enacted",
+          label:
+            "100 Points: Legislation enacted to become a PA Compact member – State is a compact member",
+          value:
+            "100 Points: Legislation enacted to become a PA Compact member – State is a compact member",
+        },
+      ];
+    case "D.2. EMS - EMS Compact":
+      return [
+        {
+          label: "0 Points: Not a Member State",
+          value: "0 Points: Not a Member State",
         },
         {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label: "100 Points: Is-a-licensure compact member of the EMS Compact",
+          value: "100 Points: Is-a-licensure compact member of the EMS Compact",
         },
       ];
     case "D.3. PA - Scope of Practice":
       return [
-        { label: "Not yet started", value: "Not yet started" },
-        {
-          label: "In Progress",
-          value: "In Progress",
-        },
         {
           label: "0 Points: Reduced Scope of Practice",
           value: "0 Points: Reduced Scope of Practice",
@@ -286,18 +299,9 @@ export const getDropdownOptions = (label: string) => {
           label: "100 Points: Optimal Scope of Practice",
           value: "100 Points: Optimal Scope of Practice",
         },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
       ];
     case "D.3. NP - Scope of Practice":
       return [
-        { label: "Not yet started", value: "Not yet started" },
-        {
-          label: "In Progress",
-          value: "In Progress",
-        },
         {
           label: "0 Points: Restricted Scope of Practice",
           value: "0 Points: Restricted Scope of Practice",
@@ -310,42 +314,30 @@ export const getDropdownOptions = (label: string) => {
           label: "100 Points: Full Scope of Practice",
           value: "100 Points: Full Scope of Practice",
         },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
       ];
     case "D.3. Pharmacist - Overall Score":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
+          label:
+            "0 Points: 0-3 score from Cicero report for States with restricted authority",
+          value:
+            "0 Points: 0-3 score from Cicero report for States with restricted authority",
         },
         {
-          label: "0 Points: 0-3 score based on Cicero report methodology",
-          value: "0 Points: 0-3 score based on Cicero report methodology",
+          label:
+            "50 Points: 4-7 score from Cicero report for States with Formulary-Based Authority",
+          value:
+            "50 Points: 4-7 score from Cicero report for States with Formulary-Based Authority",
         },
         {
-          label: "50 Points: 4-7 score based on Cicero report methodology",
-          value: "50 Points: 4-7 score based on Cicero report methodology",
-        },
-        {
-          label: "100 Points: 8-10 score based on Cicero report methodology",
-          value: "100 Points: 8-10 score based on Cicero report methodology",
-        },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label:
+            "100 Points: 8-10 score from Cicero report for States with full authority",
+          value:
+            "100 Points: 8-10 score from Cicero report for States with full authority",
         },
       ];
     case "D.3. Pharmacist - Drug Administration":
       return [
-        { label: "Not yet started", value: "Not yet started" },
-        {
-          label: "In Progress",
-          value: "In Progress",
-        },
         {
           label: "0 Points: Restricted Authority",
           value: "0 Points: Restricted Authority",
@@ -358,21 +350,12 @@ export const getDropdownOptions = (label: string) => {
           label: "2 Points: Full Authority",
           value: "2 Points: Full Authority",
         },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
       ];
     case "D.3. Pharmacist - Lab Testing":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
-        },
-        {
-          label: "0 Points: Restricted Authority",
-          value: "0 Points: Restricted Authority",
+          label: "0 Points: Restricted Authority (Narrow CLIA-Waived List)",
+          value: "0 Points: Restricted Authority (Narrow CLIA-Waived List)",
         },
         {
           label: "1 Point: CLIA-Waived Authority",
@@ -382,21 +365,12 @@ export const getDropdownOptions = (label: string) => {
           label: "2 Points: Full Authority",
           value: "2 Points: Full Authority",
         },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
       ];
     case "D.3. Pharmacist - Independent Prescribing":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
-        },
-        {
-          label: "0 points: Restricted Authority",
-          value: "0 points: Restricted Authority",
+          label: "0 Points: Restricted Authority",
+          value: "0 Points: Restricted Authority",
         },
         {
           label: "3 points: Formulary-Based Authority",
@@ -408,45 +382,46 @@ export const getDropdownOptions = (label: string) => {
           value:
             "6 points: Full Authority Grounded in a Standard of Care Model",
         },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
       ];
     case "D.3. Dental Hygienist - Overall Score":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
-        },
-        {
-          label: "0 Points: Restricted Scope of Practice (0-2 types of tasks)",
-          value: "0 Points: Restricted Scope of Practice (0-2 types of tasks)",
+          label: "0 Points: Restricted Scope of Practice (0-2 types tasks)",
+          value: "0 Points: Restricted Scope of Practice (0-2 types tasks)",
         },
         {
           label:
-            "50 Points: Semi-Restricted Scope of Practice (3-5 types of tasks)",
+            "50 Points: Semi Restricted Scope of Practice (3-5 types tasks)",
           value:
-            "50 Points: Semi-Restricted Scope of Practice (3-5 types of tasks)",
+            "50 Points: Semi Restricted Scope of Practice (3-5 types tasks)",
         },
         {
-          label:
-            "100 Points: Unrestricted Scope of Practice (6-8 types of tasks)",
-          value:
-            "100 Points: Unrestricted Scope of Practice (6-8 types of tasks)",
+          label: "100 Points: Unrestricted Scope of Practice (6-8 types tasks)",
+          value: "100 Points: Unrestricted Scope of Practice (6-8 types tasks)",
+        },
+      ];
+    case "D.3. Dental Hygienist - Dental Hygiene Diagnosis":
+    case "D.3. Dental Hygienist - Prescriptive Authority":
+    case "D.3. Dental Hygienist - Supervision of Dental Assistants":
+    case "D.3. Dental Hygienist - Direct Medicaid Reimbursement":
+    case "D.3. Dental Hygienist - Dental Hygiene Treatment Planning":
+    case "D.3. Dental Hygienist - Provision of Sealants":
+    case "D.3. Dental Hygienist - Direct Access to Prophylaxis":
+      return [
+        {
+          label: "Allowable Task",
+          value: "Allowable Task",
         },
         {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label: "Unallowable Task",
+          value: "Unallowable Task",
         },
       ];
     case "D.3. Dental Hygienist - Local Anesthesia":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
+          label: "General",
+          value: "General",
         },
         {
           label: "Direct",
@@ -456,84 +431,76 @@ export const getDropdownOptions = (label: string) => {
           label: "Indirect",
           value: "Indirect",
         },
+      ];
+    case "E.3. Short-term, limited-duration insurance (STLDI)":
+      return [
         {
-          label: "General",
-          value: "General",
+          label:
+            "0 Points: STLDI plans are restricted in the State beyond the latest federal guidance",
+          value:
+            "0 Points: STLDI plans are restricted in the State beyond the latest federal guidance",
         },
         {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label:
+            "100 Points: STLDI plans are not restricted in the State beyond the latest federal guidance",
+          value:
+            "100 Points: STLDI plans are not restricted in the State beyond the latest federal guidance",
         },
       ];
     case "F.1. Medicaid Payment for Store and Forward":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
+          label: "0 Points: No payment",
+          value: "0 Points: No payment",
         },
         {
-          label: "Only CTBS Reimbursement Implemented",
-          value: "Only CTBS Reimbursement Implemented",
+          label:
+            "50 Points: Only reimbursing Communication Technology Based Services (CTBS)",
+          value:
+            "50 Points: Only reimbursing Communication Technology Based Services (CTBS)",
         },
         {
-          label: "Full Implementation",
-          value: "Full Implementation",
-        },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label: "100 Points: Reimbursed",
+          value: "100 Points: Reimbursed",
         },
       ];
     case "F.1. Medicaid Payment for Remote Patient Monitoring (RPM)":
-    case "F.1. In-State Licensing Requirement Exception":
       return [
-        { label: "Not yet started", value: "Not yet started" },
         {
-          label: "In Progress",
-          value: "In Progress",
+          label: "0 Points: No payment",
+          value: "0 Points: No payment",
         },
         {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label: "100 Points: Reimbursed",
+          value: "100 Points: Reimbursed",
         },
       ];
-    case "B.2. Presidential Fitness Test":
-    case "D.2. EMS - EMS Compact":
-    case "D.3. Dental Hygienist - Dental Hygiene Diagnosis":
-    case "D.3. Dental Hygienist - Prescriptive Authority":
-    case "D.3. Dental Hygienist - Supervision of Dental Assistants":
-    case "D.3. Dental Hygienist - Direct Medicaid Reimbursement":
-    case "D.3. Dental Hygienist - Dental Hygiene Treatment Planning":
-    case "D.3. Dental Hygienist - Provision of Sealants":
-    case "D.3. Dental Hygienist - Direct Access to Prophylaxis":
-    case "E.3. Short-term, limited-duration insurance (STLDI)":
+    case "F.1. In-State Licensing Requirement Exception":
+      return [
+        {
+          label: "0 Points: No exceptions are in place",
+          value: "0 Points: No exceptions are in place",
+        },
+        {
+          label: "100 Points: Exceptions are in place",
+          value: "100 Points: Exceptions are in place",
+        },
+      ];
+
     case "F.1. Medicaid Payment for at Least One Form of Live Video":
       return [
-        { label: "Not yet started", value: "Not yet started" },
-        { label: "In progress", value: "In progress" },
-        { label: "Implemented", value: "Implemented" },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
-        },
+        { label: "0 Points: No payment", value: "0 Points: No payment" },
+        { label: "100 Points: Reimbursed", value: "100 Points: Reimbursed" },
       ];
     case "F.1. Telehealth License/Registration Process (including special licenses)":
       return [
-        { label: "Not yet started", value: "Not yet started" },
-        { label: "In progress", value: "In progress" },
         {
-          label: "0 Points: No registration process in place.",
-          value: "0 Points: No registration process in place.",
+          label: "0 Points: No registration process in place",
+          value: "0 Points: No registration process in place",
         },
         {
-          label: "100 Points: A registration process is in place.",
-          value: "100 Points: A registration process is in place.",
-        },
-        { label: "Implemented", value: "Implemented" },
-        {
-          label: "Commitment abandoned",
-          value: "Commitment abandoned",
+          label: "100 Points: Registration process is in place",
+          value: "100 Points: Registration process is in place",
         },
       ];
     default:
