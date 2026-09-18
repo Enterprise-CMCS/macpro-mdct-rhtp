@@ -46,6 +46,7 @@ export interface ZipRequestBody {
 export enum ZipRequestTypes {
   REPORT = "REPORT",
   OBLIGATED_AND_SPENT_FUNDS = "OBLIGATED_AND_SPENT_FUNDS",
+  DATA_SET = "DATA_SET",
 }
 
 export interface ZipRequestReportDetails {

@@ -18,6 +18,7 @@ import { isLocalStack } from "../local/util.ts";
 import { createUploadsComponents } from "./uploads.ts";
 import { getSubnets } from "../utils/vpc.ts";
 import { createTopicsComponents } from "./topics.ts";
+import { createDataSetComponents } from "./mdct-dataset.ts";
 
 export class ParentStack extends Stack {
   constructor(
@@ -48,6 +49,7 @@ export class ParentStack extends Stack {
     const kafkaAuthorizedSubnets = getSubnets(this, kafkaAuthorizedSubnetIds);
 
     const attachmentsBucketName = `uploads-${stage}-attachments-${Aws.ACCOUNT_ID}`;
+    const datasetBucketName = `uploads-${stage}-datasets-${Aws.ACCOUNT_ID}`; // TODO: Remove after migrate
 
     const loggingBucket = s3.Bucket.fromBucketName(
       this,
@@ -63,12 +65,19 @@ export class ParentStack extends Stack {
       attachmentsBucketName: attachmentsBucketName!,
     });
 
+    const datasetBucket = createDataSetComponents({
+      ...commonProps,
+      loggingBucket,
+      datasetBucketName: datasetBucketName!,
+    });
+
     const { apiGatewayRestApiUrl, restApiId } = createApiComponents({
       ...commonProps,
       tables,
       vpc,
       kafkaAuthorizedSubnets,
       attachmentsBucket,
+      datasetBucket,
     });
 
     if (isLocalStack) {

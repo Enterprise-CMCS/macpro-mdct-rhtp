@@ -6,6 +6,9 @@ export enum UserRoles {
   STATE_USER = "mdctrhtp-state-user", // "MDCT RHTP State User",
   PROJECT_OFFICER = "mdctrhtp-project-officer", // "MDCT RHTP Project Officer"
 }
+
+// TODO: user roles for non-rhtp users
+
 export const isUserRole = (role: string): role is UserRoles => {
   return Object.values(UserRoles).includes(role as UserRoles);
 };
