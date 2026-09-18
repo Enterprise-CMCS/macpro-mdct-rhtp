@@ -13,7 +13,6 @@ import {
   cmsEvaluationStatusDefault,
   cmsCommitmentFulfilled,
   getDropdownOptions,
-  cmsCommitmentAbandoned,
 } from "./constants";
 import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 import EMPTY_STATE_POLICY_COMMITMENTS from "./data/empty-commitments.json";
@@ -26,7 +25,7 @@ type StatePolicyCommitmentsData = {
 
 const commitmentStatusDropdown = (
   label: string,
-  status: string = "Not yet started"
+  status: string
 ): DropdownTemplate => ({
   type: ElementType.Dropdown,
   id: "commitment-status",
@@ -49,7 +48,6 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
   const dropdownOptions = [
     cmsEvaluationStatusDefault,
     ...getDropdownOptions(label),
-    cmsCommitmentAbandoned,
     cmsCommitmentFulfilled,
   ];
 

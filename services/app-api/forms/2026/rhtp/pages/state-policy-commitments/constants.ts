@@ -62,6 +62,7 @@ export const getDropdownOptions = (label: string) => {
   switch (label) {
     case "B.2. Presidential Fitness Test":
       return [
+        cmsCommitmentAbandoned,
         {
           label:
             "0 Points: A State does not require schools to reestablish the Presidential Fitness Test",
@@ -77,6 +78,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "B.3. SNAP Food Restriction Waiver Policy":
       return [
+        cmsCommitmentAbandoned,
         {
           label:
             "0 Points: State has no pending or approved USDA SNAP food restriction waiver prohibiting the purchase of non-nutritious items or no pending State bill requiring a food restriction waiver be submitted to USDA",
@@ -110,6 +112,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "B.4. Nutrition Continuing Medical Education":
       return [
+        cmsCommitmentAbandoned,
         {
           label:
             "0 Points: States that have no requirement for nutrition to be included in continuing medical education (CME) for physicians as well as no pending State bill requiring nutrition to be included in CME for physicians",
@@ -137,6 +140,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "C.3. Overall CON Score":
       return [
+        cmsCommitmentAbandoned,
         {
           label:
             "0 Points: 100 score from Cicero report for States with universal CONs for all facility categories",
@@ -178,6 +182,7 @@ export const getDropdownOptions = (label: string) => {
     case "C.3. CON - Ancillaries":
     case "C.3. CON - Other":
       return [
+        cmsCommitmentAbandoned,
         { label: "Restricted", value: "Restricted" },
         {
           label: "Unrestricted",
@@ -186,6 +191,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.2. Physician - Medical Licensure Compact":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Not a Member State",
           value: "0 Points: Not a Member State",
@@ -213,6 +219,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.2. Nurse - Nurse Licensure Compact":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Not a Member State",
           value: "0 Points: Not a Member State",
@@ -232,6 +239,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.2. Psychology - PSYPACT":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: non-PSYPACT participating",
           value: "0 Points: non-PSYPACT participating",
@@ -253,6 +261,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.2. Physician Assistant - PA Compact":
       return [
+        cmsCommitmentAbandoned,
         {
           label:
             "0 Points: No active legislation to become a PA Compact member",
@@ -272,6 +281,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.2. EMS - EMS Compact":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Not a Member State",
           value: "0 Points: Not a Member State",
@@ -283,6 +293,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. PA - Scope of Practice":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Reduced Scope of Practice",
           value: "0 Points: Reduced Scope of Practice",
@@ -302,6 +313,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. NP - Scope of Practice":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Restricted Scope of Practice",
           value: "0 Points: Restricted Scope of Practice",
@@ -317,6 +329,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. Pharmacist - Overall Score":
       return [
+        cmsCommitmentAbandoned,
         {
           label:
             "0 Points: 0-3 score from Cicero report for States with restricted authority",
@@ -338,6 +351,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. Pharmacist - Drug Administration":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Restricted Authority",
           value: "0 Points: Restricted Authority",
@@ -353,6 +367,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. Pharmacist - Lab Testing":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Restricted Authority (Narrow CLIA-Waived List)",
           value: "0 Points: Restricted Authority (Narrow CLIA-Waived List)",
@@ -368,6 +383,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. Pharmacist - Independent Prescribing":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Restricted Authority",
           value: "0 Points: Restricted Authority",
@@ -385,6 +401,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. Dental Hygienist - Overall Score":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: Restricted Scope of Practice (0-2 types tasks)",
           value: "0 Points: Restricted Scope of Practice (0-2 types tasks)",
@@ -408,6 +425,7 @@ export const getDropdownOptions = (label: string) => {
     case "D.3. Dental Hygienist - Provision of Sealants":
     case "D.3. Dental Hygienist - Direct Access to Prophylaxis":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "Allowable Task",
           value: "Allowable Task",
@@ -419,6 +437,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "D.3. Dental Hygienist - Local Anesthesia":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "General",
           value: "General",
@@ -434,6 +453,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "E.3. Short-term, limited-duration insurance (STLDI)":
       return [
+        cmsCommitmentAbandoned,
         {
           label:
             "0 Points: STLDI plans are restricted in the State beyond the latest federal guidance",
@@ -449,6 +469,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "F.1. Medicaid Payment for Store and Forward":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: No payment",
           value: "0 Points: No payment",
@@ -466,6 +487,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "F.1. Medicaid Payment for Remote Patient Monitoring (RPM)":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: No payment",
           value: "0 Points: No payment",
@@ -477,6 +499,7 @@ export const getDropdownOptions = (label: string) => {
       ];
     case "F.1. In-State Licensing Requirement Exception":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: No exceptions are in place",
           value: "0 Points: No exceptions are in place",
@@ -489,11 +512,13 @@ export const getDropdownOptions = (label: string) => {
 
     case "F.1. Medicaid Payment for at Least One Form of Live Video":
       return [
+        cmsCommitmentAbandoned,
         { label: "0 Points: No payment", value: "0 Points: No payment" },
         { label: "100 Points: Reimbursed", value: "100 Points: Reimbursed" },
       ];
     case "F.1. Telehealth License/Registration Process (including special licenses)":
       return [
+        cmsCommitmentAbandoned,
         {
           label: "0 Points: No registration process in place",
           value: "0 Points: No registration process in place",
