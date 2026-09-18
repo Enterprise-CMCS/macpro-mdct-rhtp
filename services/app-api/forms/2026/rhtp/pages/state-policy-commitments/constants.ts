@@ -44,18 +44,18 @@ export const STATE_POLICY_COMMITMENT_NAMES = [
 ];
 
 export const cmsEvaluationStatusDefault = {
-  label: "Not yet evaluated",
-  value: "Not yet evaluated",
+  label: "Not Yet Evaluated",
+  value: "Not Yet Evaluated",
 };
 
 export const cmsCommitmentFulfilled = {
-  label: "Commitment fulfilled",
-  value: "Commitment fulfilled",
+  label: "Commitment Fulfilled",
+  value: "Commitment Fulfilled",
 };
 
 export const cmsCommitmentAbandoned = {
-  label: "Commitment abandoned",
-  value: "Commitment abandoned",
+  label: "Commitment Abandoned",
+  value: "Commitment Abandoned",
 };
 
 export const getDropdownOptions = (label: string) => {

@@ -41,8 +41,8 @@ describe("test state policy commitment functions", () => {
                     // expected dropdown options
                     options: expect.arrayContaining([
                       {
-                        label: "Commitment abandoned",
-                        value: "Commitment abandoned",
+                        label: "Commitment Abandoned",
+                        value: "Commitment Abandoned",
                       },
                     ]),
                   }),
@@ -74,8 +74,8 @@ describe("test state policy commitment functions", () => {
         // all known commitments have these options
         expect.arrayContaining([
           {
-            label: "Commitment abandoned",
-            value: "Commitment abandoned",
+            label: "Commitment Abandoned",
+            value: "Commitment Abandoned",
           },
         ])
       );

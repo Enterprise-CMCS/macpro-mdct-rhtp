@@ -8,7 +8,10 @@
  * in this directory, run `node dataTransform.js`
  */
 
-const { STATE_POLICY_COMMITMENT_NAMES } = require("../constants.ts");
+const {
+  STATE_POLICY_COMMITMENT_NAMES,
+  getDropdownOptions,
+} = require("../constants.ts");
 const { exit } = require("node:process");
 const fs = require("node:fs");
 const Papa = require("papaparse");
@@ -43,6 +46,16 @@ function main() {
       );
     }
 
+    const status = stripNewlineAndTrim(stateData["Current Status"]);
+    const options = getDropdownOptions(label);
+
+    const optionExists = options.some((option) => option.value === status);
+    if (status && !optionExists) {
+      throw new Error(
+        `Unexpected status found for commitment "${label}" in row ${rowIndex + 1}: ${status}. Please correct and rerun`
+      );
+    }
+
     const links = stripNewlineAndTrim(stateData["Supporting Evidence"])
       .split(",")
       .map((link) => link.trim())
@@ -50,7 +63,7 @@ function main() {
 
     const commitment = {
       label,
-      status: stripNewlineAndTrim(stateData["Current Status"]),
+      status,
       links,
     };
     const commitmentsByState = commitmentMap.get(state) || [];
