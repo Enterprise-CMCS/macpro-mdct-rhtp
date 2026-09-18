@@ -40,10 +40,9 @@ describe("test state policy commitment functions", () => {
                     label: "Current Status",
                     // expected dropdown options
                     options: expect.arrayContaining([
-                      { label: "Not yet started", value: "Not yet started" },
                       {
-                        label: "Commitment abandoned",
-                        value: "Commitment abandoned",
+                        label: "Commitment Abandoned",
+                        value: "Commitment Abandoned",
                       },
                     ]),
                   }),
@@ -68,16 +67,15 @@ describe("test state policy commitment functions", () => {
   });
 
   test.each(STATE_POLICY_COMMITMENT_NAMES)(
-    "getDropdownOptions() returns two options minimum for all commitments",
+    "getDropdownOptions() returns one options minimum for all commitments",
     (commitmentName) => {
       const options = getDropdownOptions(commitmentName);
       expect(options).toEqual(
         // all known commitments have these options
         expect.arrayContaining([
-          { label: "Not yet started", value: "Not yet started" },
           {
-            label: "Commitment abandoned",
-            value: "Commitment abandoned",
+            label: "Commitment Abandoned",
+            value: "Commitment Abandoned",
           },
         ])
       );
