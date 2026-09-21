@@ -25,7 +25,7 @@ type StatePolicyCommitmentsData = {
 
 const commitmentStatusDropdown = (
   label: string,
-  status: string = "Not yet started"
+  status: string
 ): DropdownTemplate => ({
   type: ElementType.Dropdown,
   id: "commitment-status",
