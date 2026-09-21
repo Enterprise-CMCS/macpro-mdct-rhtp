@@ -203,10 +203,6 @@ export const getDropdownOptions = (label: string) => {
             "50 Points: Interstate Medical Licensure Compact (IMLC) member State issuing non-State of Principal Licensure (SPL) licenses only OR compact legislation introduced (towards serving as SPL)",
         },
         {
-          label: "50 Points: Legislation introduced to become SPL",
-          value: "50 Points: Legislation introduced to become SPL",
-        },
-        {
           label: "75 Points: IMLC passed; implementation phase",
           value: "75 Points: IMLC passed; implementation phase",
         },
