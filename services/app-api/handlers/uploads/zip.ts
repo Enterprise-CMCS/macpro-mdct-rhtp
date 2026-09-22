@@ -6,7 +6,7 @@ import { ReportType, StateAbbr, ZipRequestTypes } from "@rhtp/shared";
 import JSZip from "jszip";
 import {
   addReportFilesToZip,
-  addObligatedAndSpentFundsFilesToZip,
+  addDataSetFilesToZip,
 } from "../../utils/zips/buildZip";
 import { getPSURL, zipBuffer, startZipWorker } from "../../utils/zips/polling";
 import { isZipRequestBody } from "../../utils/reportValidation";
@@ -58,9 +58,12 @@ export const zipWorker = async (
     await addReportFilesToZip(report, zip);
     tags = `${tags}&reportType=${reportType}&state=${state}&id=${id}&subTypeKeys=${report.subTypeKey}`;
   } else if (type === ZipRequestTypes.OBLIGATED_AND_SPENT_FUNDS) {
-    const { reportSubTypeKeys, state } = event;
-    await addObligatedAndSpentFundsFilesToZip(reportSubTypeKeys, zip, state);
-    tags = `${tags}&subTypeKeys=${reportSubTypeKeys.join("-")}${state ? `&state=${state}` : ""}`;
+    const { reportSubTypeKeys: dataSetKeys, state } = event;
+    await addDataSetFilesToZip(dataSetKeys, zip);
+    tags = `${tags}&subTypeKeys=${dataSetKeys.join("-")}${state ? `&state=${state}` : ""}`;
+  } else if (type === ZipRequestTypes.DATA_SET) {
+    const { reportSubTypeKeys: dataSetKeys, state } = event;
+    tags = `${tags}&subTypeKeys=${(dataSetKeys as []).join("-")}${state ? `&state=${state}` : ""}`;
   } else {
     return badRequest(`Unidentified type. Cannot proceed. Event: ${event}`);
   }

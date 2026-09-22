@@ -119,12 +119,13 @@ export const acceptedFileTypes = [
 ];
 
 export const tabTitleMap = {
-  "/": "Rural Health Transformation Program",
+  "/": "Medicaid Data Collection Tool", //TO DO: TEMPORARY
   "/help": "How can we help you? - RHTP",
   "/profile": "My Account - RHTP",
-  "/export": "Export RHTP Files and Data - RHTP",
+  "/export": "Export Files - MDCT", //TO DO: TEMPORARY
   "/admin": "Banner Admin - RHTP",
   "/403": "Access Denied",
+  "/data-sets": "Manage Data Sets - MDCT", //TO DO: TEMPORARY
 };
 
 export const getExtension = (filename: string): string | undefined => {
