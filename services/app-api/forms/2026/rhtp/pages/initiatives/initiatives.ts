@@ -339,6 +339,7 @@ export const buildInitiativePages = (
   initiatives?: InitiativesData
 ): ReturnType<typeof buildPages> | Promise<ReturnType<typeof buildPages>> => {
   if (initiatives) return buildPages(state, initiatives);
+  //TO-DO: Make this only fetch data for first report of a state
   return getJsonFromS3<InitiativesData>(INITIATIVES_KEY).then((fetched) =>
     // Use manually uploaded S3 data if available, otherwise use empty initiatives JSON
     buildPages(state, fetched ?? (EMPTY_INITIATIVES as InitiativesData))

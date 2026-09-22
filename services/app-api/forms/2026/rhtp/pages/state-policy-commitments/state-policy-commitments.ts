@@ -170,6 +170,7 @@ export const buildStatePolicyCommitments = (
   statePolicyCommitments?: StatePolicyCommitmentsData
 ): FormPageTemplate | Promise<FormPageTemplate> => {
   if (statePolicyCommitments) return buildPage(state, statePolicyCommitments);
+  //TO-DO: Make this only fetch data for first report of a state
   return getJsonFromS3<StatePolicyCommitmentsData>(COMMITMENTS_KEY).then(
     // Use manually uploaded S3 data if available, otherwise use empty commitments JSON
     (fetched) => buildPage(state, fetched ?? EMPTY_STATE_POLICY_COMMITMENTS)

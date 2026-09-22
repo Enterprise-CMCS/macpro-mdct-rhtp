@@ -135,6 +135,7 @@ export const buildSustainabilityAndHighlightsPage = (
   data?: SuccessAndHighlightsData
 ): FormPageTemplate | Promise<FormPageTemplate> => {
   if (data) return buildPage(state, data);
+  //TO-DO: Make this only fetch data for first report of a state
   return getJsonFromS3<SuccessAndHighlightsData>(
     SUCCESS_AND_HIGHLIGHTS_KEY
   ).then((fetched) => buildPage(state, fetched ?? {}));
