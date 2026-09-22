@@ -36,6 +36,7 @@ type InitiativeData = {
   status?: PageStatus | undefined;
   numberOfPeopleServed?: string;
   metrics?: MetricData[];
+  skipFirstYearCharLimit?: boolean;
 };
 
 const returnToInitiativesDashboard: ButtonLinkTemplate = {
@@ -117,12 +118,14 @@ const checkpointsInstructions: ParagraphTemplate = {
   },
 };
 
-const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
+const initiativeNarrative = (
+  narrative: string = "",
+  skipFirstYearCharLimit: boolean = false
+): TextAreaBoxTemplate => ({
   type: ElementType.TextAreaField,
   id: "initiative-narrative",
   label: "Narrative",
-  helperText:
-    "Narrative is optional for quarterly reporting. Limit responses to 2,000 characters, or approximately 250–350 words.",
+
   helperTextLink: {
     link: "Initiative Progress Narrative Guidance",
     label: "Initiative Progress Narrative Guidance",
@@ -134,7 +137,14 @@ const initiativeNarrative = (narrative: string = ""): TextAreaBoxTemplate => ({
   required: true,
   answer: narrative,
   quarterly: true,
-  charLimit: 2000,
+
+  ...(skipFirstYearCharLimit
+    ? { helperText: "Narrative is optional for quarterly reporting." }
+    : {
+        charLimit: 2000,
+        helperText:
+          "Narrative is optional for quarterly reporting. Limit responses to 2,000 characters, or approximately 250–350 words.",
+      }),
 });
 
 const initiativeNumberOfPeopleServed = (
@@ -291,6 +301,7 @@ const buildPages = (state: string, initiatives: InitiativesData) => {
     initiativeNumber,
     status,
     narrative,
+    skipFirstYearCharLimit,
     numberOfPeopleServed,
     metrics,
   } of initiativesForState) {
@@ -307,7 +318,7 @@ const buildPages = (state: string, initiatives: InitiativesData) => {
         initiativeHeader(title, initiativeNumber),
         initiativeInstructions,
         initiativeAccordion,
-        initiativeNarrative(narrative),
+        initiativeNarrative(narrative, skipFirstYearCharLimit),
         initiativeNumberOfPeopleServed(numberOfPeopleServed),
         metricTable(metrics),
         checkpointsHeader,

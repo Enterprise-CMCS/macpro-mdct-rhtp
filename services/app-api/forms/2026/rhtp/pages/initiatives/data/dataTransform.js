@@ -74,6 +74,7 @@ function main() {
         initiativeData["Initiative Number"]
       ),
       narrative: initiativeData["Initiative Narrative"],
+      skipFirstYearCharLimit: true,
       status: stripNewlineAndTrim(initiativeData["Initiative Status"]),
       numberOfPeopleServed: stripNewlineAndTrim(
         initiativeData["Number of People Served"]
