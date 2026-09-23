@@ -56,6 +56,18 @@ function main() {
       );
     }
 
+    const statusEvaluation = stripNewlineAndTrim(
+      stateData["CMS Confirmed Status"]
+    );
+    const optionExistsEvaluation = getDropdownOptions(label).some(
+      (option) => option.value === statusEvaluation
+    );
+    if (statusEvaluation && !optionExistsEvaluation) {
+      throw new Error(
+        `Unexpected CMS confirmed status found for commitment "${label}" in row ${rowIndex + 1}: ${statusEvaluation}. Please correct and rerun`
+      );
+    }
+
     const links = stripNewlineAndTrim(stateData["Supporting Evidence"])
       .split(",")
       .map((link) => link.trim())
@@ -64,6 +76,7 @@ function main() {
     const commitment = {
       label,
       status,
+      statusEvaluation,
       links,
     };
     const commitmentsByState = commitmentMap.get(state) || [];
