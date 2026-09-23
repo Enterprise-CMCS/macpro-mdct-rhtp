@@ -3,27 +3,11 @@ import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
   getReportTestRunId,
   INITIATIVES_SECTION,
-  waitForAutosaveWithSectionRefresh,
-  waitForReportSaveResponse,
 } from "../utils/report-edit-shared-helpers";
 import {
   CHECKPOINT_STAGE_LABELS,
   GOVERNANCE_CHECKPOINT,
-  closeCommentDrawer,
-  getCheckpointAttachmentRowByFileName,
-  getCheckpointRow,
-  getCheckpointStage,
-  getCommentAttachmentButton,
-  getManageAttachmentButton,
-  getOpenInitiativeHeadingText,
-  openReportFromDashboard,
   openAttachmentCommentDrawerAndVerifyPreviousComment,
-  openCheckpointUploadDrawer,
-  openInitiativeFromList,
-  reopenInitiativeFromDashboard,
-  returnToInitiativesDashboard,
-  selectCheckpoint,
-  uploadCheckpointAttachment,
   verifyAdminMetricControls,
   verifyCheckpointStageRows,
   verifyCheckpointTableHeaders,
@@ -32,16 +16,18 @@ import {
   expectCommentResponseStatus,
   waitForCommentResponse,
   withUploadFixture,
-  type ReportPeriod,
 } from "../utils/report-edit-initiative-edit-helpers";
-import { ReportEditorPage } from "./pageObjects/report-editor.page";
+import {
+  ReportInitiativePage,
+  type ReportPeriod,
+} from "./pageObjects/report-initiative.page";
 import { TIMEOUT_UI } from "../utils/timeouts";
 
 const REPORT_PERIOD: ReportPeriod = "annual";
 const REPORT_PERIOD_LABEL = /Annual Report/i;
 
 const verifyReportContextFromHeader = async (
-  editor: ReportEditorPage
+  editor: ReportInitiativePage
 ): Promise<void> => {
   await expect(
     editor.page
@@ -52,7 +38,7 @@ const verifyReportContextFromHeader = async (
 };
 
 test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () => {
-  let editor: ReportEditorPage;
+  let editor: ReportInitiativePage;
   let selectedInitiativeNumberAndName = "";
 
   test.beforeEach(async ({ statePage }) => {
@@ -68,72 +54,46 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
       );
     }
 
-    editor = result;
-    await openReportFromDashboard(editor, REPORT_PERIOD);
+    editor = new ReportInitiativePage(result.page);
+    await editor.openReportFromDashboard(REPORT_PERIOD);
     await verifyReportContextFromHeader(editor);
 
-    const table = editor.page.getByRole("table");
-    await expect(table).toBeVisible({ timeout: TIMEOUT_UI });
-    selectedInitiativeNumberAndName = await openInitiativeFromList(
-      editor,
-      table
-    );
+    await expect(editor.initiativesTable).toBeVisible({ timeout: TIMEOUT_UI });
+    selectedInitiativeNumberAndName = await editor.openInitiativeFromList();
   });
 
   test.describe("report and initiative navigation", () => {
     test("should display an initiative heading that matches the selected initiative correctly for non-admin users @regression", async () => {
-      const openInitiativeHeading = await getOpenInitiativeHeadingText(editor);
+      const openInitiativeHeading = (
+        (await editor.openInitiativeHeading.textContent()) ?? ""
+      ).trim();
       expect(openInitiativeHeading).toBe(selectedInitiativeNumberAndName);
     });
 
     test("should return to the initiatives dashboard from initiative edit for non-admin users @regression", async () => {
-      await returnToInitiativesDashboard(editor);
-
-      const initiativesTable = editor.page.getByRole("table").filter({
-        has: editor.page.getByRole("columnheader", { name: "Initiative" }),
-      });
-      await expect(initiativesTable).toBeVisible({
-        timeout: TIMEOUT_UI,
-      });
+      await editor.returnToInitiativesDashboard();
+      await editor.expectInitiativesDashboardVisible();
     });
   });
 
   test.describe("annual initiative fields", () => {
     test("should display a Narrative label, prepopulated editable text area, and be required for non-admin users @regression", async () => {
-      const narrativeRequiredLabel = editor.page
-        .locator("label")
-        .filter({ hasText: /^NarrativeRequired$/i });
-      const narrativeTextArea = editor.page.getByRole("textbox", {
-        name: /^Narrative/i,
-      });
-
-      await expect(narrativeRequiredLabel).toBeVisible();
-      await expect(narrativeTextArea).toBeVisible();
-      await expect(narrativeTextArea).toHaveValue(/\S+/); // Ensure the text area is prepopulated with non-whitespace content
+      await expect(editor.narrativeRequiredLabel).toBeVisible();
+      await expect(editor.narrativeField).toBeVisible();
+      await expect(editor.narrativeField).toHaveValue(/\S+/);
     });
 
     test("should display a Number of people served label, editable text area, and be required for non-admin users @regression", async () => {
-      const peopleServedRequiredLabel = editor.page
-        .locator("label")
-        .filter({ hasText: /^Number of people servedRequired$/i });
-      const peopleServedTextArea = editor.page.getByRole("textbox", {
-        name: /Number of people served/i,
-      });
-
-      await expect(peopleServedRequiredLabel).toBeVisible();
-      await expect(peopleServedTextArea).toBeVisible();
-      await expect(peopleServedTextArea).toBeEditable();
+      await expect(editor.peopleServedRequiredLabel).toBeVisible();
+      await expect(editor.peopleServedField).toBeVisible();
+      await expect(editor.peopleServedField).toBeEditable();
     });
   });
 
   test.describe("metrics UI", () => {
     test("should display the Metrics heading and table for non-admin users @regression", async () => {
-      const metricsHeading = editor.page.getByRole("heading", {
-        name: /^Track Initiative Performance Metrics\s*Required$/i,
-      });
-      const metricsTable = editor.page.getByRole("table").filter({
-        has: editor.page.getByRole("columnheader", { name: "Metric" }),
-      });
+      const metricsHeading = editor.metricsHeading;
+      const metricsTable = editor.metricsTable;
 
       await expect(metricsHeading).toBeVisible({ timeout: TIMEOUT_UI });
       await expect(metricsTable).toBeVisible({ timeout: TIMEOUT_UI });
@@ -145,13 +105,11 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
 
   test.describe("checkpoint UI", () => {
     test("should display every checkpoint stage with an upload button and steps table for non-admin users @regression", async () => {
-      const checkpointsHeading = editor.page.getByRole("heading", {
-        name: /^Checkpoints$/i,
-      });
+      const checkpointsHeading = editor.checkpointsHeading;
       await expect(checkpointsHeading).toBeVisible();
 
       for (const stageLabel of CHECKPOINT_STAGE_LABELS) {
-        const stage = getCheckpointStage(editor, stageLabel);
+        const stage = editor.checkpointStage(stageLabel);
         const uploadButton = stage.getByRole("button", {
           name: /^Upload attachments$/i,
         });
@@ -167,57 +125,49 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
     });
 
     test("should mark a checkpoint ready for CMS review for a non-admin user @regression", async () => {
-      const firstStage = getCheckpointStage(editor, CHECKPOINT_STAGE_LABELS[0]);
-      const checkpointTable = firstStage.getByRole("table");
-      const firstCheckpointRow = getCheckpointRow(
-        checkpointTable,
+      const readinessCheckbox = editor.checkpointReadinessCheckbox(
+        CHECKPOINT_STAGE_LABELS[0],
         /Establish governance/i
       );
-      const readinessCheckbox = firstCheckpointRow.getByRole("checkbox");
 
       await expect(readinessCheckbox).toBeVisible();
       await expect(readinessCheckbox).toBeEnabled();
       if (!(await readinessCheckbox.isChecked())) {
         await readinessCheckbox.check({ force: true });
         await expect(readinessCheckbox).toBeChecked();
-        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
+        await editor.waitForAutosaveWithSectionRefresh(INITIATIVES_SECTION);
       }
       await expect(readinessCheckbox).toBeChecked();
     });
 
     test("should persist checkpoint readiness after reopening the initiative for a non-admin user @regression", async () => {
-      const firstStage = getCheckpointStage(editor, CHECKPOINT_STAGE_LABELS[0]);
-      const checkpointTable = firstStage.getByRole("table");
-      const checkpointRow = getCheckpointRow(
-        checkpointTable,
+      const readinessCheckbox = editor.checkpointReadinessCheckbox(
+        CHECKPOINT_STAGE_LABELS[0],
         /Establish governance/i
       );
-      const readinessCheckbox = checkpointRow.getByRole("checkbox");
 
       await expect(readinessCheckbox).toBeEnabled();
       if (!(await readinessCheckbox.isChecked())) {
         await readinessCheckbox.check({ force: true });
         await expect(readinessCheckbox).toBeChecked();
-        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
+        await editor.waitForAutosaveWithSectionRefresh(INITIATIVES_SECTION);
       }
       await expect(readinessCheckbox).toBeChecked();
 
-      await returnToInitiativesDashboard(editor);
-      const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+      await editor.returnToInitiativesDashboard();
+      const reopenedInitiative = await editor.reopenInitiativeFromDashboard();
       expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
 
-      const reopenedCheckpointRow = getCheckpointRow(
-        getCheckpointStage(editor, CHECKPOINT_STAGE_LABELS[0]).getByRole(
-          "table"
-        ),
-        /Establish governance/i
-      );
-      await expect(reopenedCheckpointRow.getByRole("checkbox")).toBeChecked();
+      await expect(
+        editor.checkpointReadinessCheckbox(
+          CHECKPOINT_STAGE_LABELS[0],
+          /Establish governance/i
+        )
+      ).toBeChecked();
     });
 
     test("should open the attachment upload drawer from a checkpoint stage for non-admin users @regression", async () => {
-      const uploadDrawer = await openCheckpointUploadDrawer(
-        editor,
+      const uploadDrawer = await editor.openCheckpointUploadDrawer(
         CHECKPOINT_STAGE_LABELS[0]
       );
       await expect(
@@ -246,35 +196,30 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
       await expect(fileInput).toHaveAttribute("accept", /\./);
       await expect(doneButton).toBeVisible();
 
-      await selectCheckpoint(editor, uploadDrawer, GOVERNANCE_CHECKPOINT);
+      await editor.selectCheckpoint(uploadDrawer, GOVERNANCE_CHECKPOINT);
 
       await expect(fileInput).toBeEnabled();
     });
 
     test("should upload and persist a checkpoint attachment for a non-admin user @regression", async () => {
       await withUploadFixture(async (fixture) => {
-        const checkpointRow = await uploadCheckpointAttachment(
-          editor,
+        const checkpointRow = await editor.uploadCheckpointAttachment(
           CHECKPOINT_STAGE_LABELS[0],
           GOVERNANCE_CHECKPOINT,
-          fixture
+          fixture.filePath,
+          fixture.fileName
         );
         await expect(checkpointRow).toContainText(fixture.fileName, {
           timeout: TIMEOUT_UI,
         });
-        await returnToInitiativesDashboard(editor);
-        const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+        await editor.returnToInitiativesDashboard();
+        const reopenedInitiative = await editor.reopenInitiativeFromDashboard();
         expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
 
-        const reopenedCheckpointRow = getCheckpointStage(
-          editor,
-          CHECKPOINT_STAGE_LABELS[0]
-        )
-          .getByRole("table")
-          .locator("tbody")
-          .getByRole("row")
-          .filter({ hasText: fixture.fileName })
-          .first();
+        const reopenedCheckpointRow = editor.checkpointAttachmentRow(
+          CHECKPOINT_STAGE_LABELS[0],
+          fixture.fileName
+        );
         await expect(reopenedCheckpointRow).toContainText(fixture.fileName, {
           timeout: TIMEOUT_UI,
         });
@@ -283,17 +228,17 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
 
     test("should open manage and comment controls for a checkpoint attachment for a non-admin user @regression", async () => {
       await withUploadFixture(async (fixture) => {
-        const checkpointRow = await uploadCheckpointAttachment(
-          editor,
+        const checkpointRow = await editor.uploadCheckpointAttachment(
           CHECKPOINT_STAGE_LABELS[0],
           GOVERNANCE_CHECKPOINT,
-          fixture
+          fixture.filePath,
+          fixture.fileName
         );
-        const manageButton = getManageAttachmentButton(
+        const manageButton = editor.manageAttachmentButton(
           checkpointRow,
           fixture.fileName
         );
-        const commentButton = getCommentAttachmentButton(
+        const commentButton = editor.commentAttachmentButton(
           checkpointRow,
           fixture.fileName
         );
@@ -309,26 +254,23 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
         await manageDrawer.getByRole("button", { name: /^Close$/i }).click();
         await expect(manageDrawer).toBeHidden({ timeout: TIMEOUT_UI });
 
-        await commentButton.click();
-        const commentDrawer = editor.page.getByRole("dialog");
-        await expect(
-          commentDrawer.getByRole("heading", {
-            name: /^Add comment to attachment$/i,
-          })
-        ).toBeVisible({ timeout: TIMEOUT_UI });
-        await closeCommentDrawer(commentDrawer);
+        const commentDrawer = await editor.openCommentDrawer(
+          checkpointRow,
+          fixture.fileName
+        );
+        await editor.closeDrawer(commentDrawer);
       });
     });
 
     test("should save checkpoint changes from the Manage Attachment drawer for a non-admin user @regression", async () => {
       await withUploadFixture(async (fixture) => {
-        const uploadedRow = await uploadCheckpointAttachment(
-          editor,
+        const uploadedRow = await editor.uploadCheckpointAttachment(
           CHECKPOINT_STAGE_LABELS[0],
           GOVERNANCE_CHECKPOINT,
-          fixture
+          fixture.filePath,
+          fixture.fileName
         );
-        const manageButton = getManageAttachmentButton(
+        const manageButton = editor.manageAttachmentButton(
           uploadedRow,
           fixture.fileName
         );
@@ -340,8 +282,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
           manageDrawer.getByRole("heading", { name: /^Manage Attachment$/i })
         ).toBeVisible({ timeout: TIMEOUT_UI });
 
-        await selectCheckpoint(
-          editor,
+        await editor.selectCheckpoint(
           manageDrawer,
           /0\.2 Submit project plan to CMS/i
         );
@@ -350,13 +291,12 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
           name: /^Save changes$/i,
         });
         await expect(saveChangesButton).toBeEnabled();
-        const reportSaveResponsePromise = waitForReportSaveResponse(editor);
+        const reportSaveResponsePromise = editor.waitForSaveResponse();
         await saveChangesButton.click();
         await expect(manageDrawer).toBeHidden({ timeout: TIMEOUT_UI });
         await reportSaveResponsePromise;
 
-        const updatedCheckpointRow = getCheckpointAttachmentRowByFileName(
-          editor,
+        const updatedCheckpointRow = editor.checkpointAttachmentRow(
           CHECKPOINT_STAGE_LABELS[0],
           fixture.fileName
         );
@@ -369,17 +309,17 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
     test("should submit and persist a comment for a checkpoint attachment for a non-admin user @regression", async () => {
       const commentText = `Initiative attachment comment ${getReportTestRunId()}`;
       await withUploadFixture(async (fixture) => {
-        const checkpointRow = await uploadCheckpointAttachment(
-          editor,
+        const checkpointRow = await editor.uploadCheckpointAttachment(
           CHECKPOINT_STAGE_LABELS[0],
           GOVERNANCE_CHECKPOINT,
-          fixture
+          fixture.filePath,
+          fixture.fileName
         );
         await expect(checkpointRow).toContainText(fixture.fileName, {
           timeout: TIMEOUT_UI,
         });
-        await waitForAutosaveWithSectionRefresh(editor, INITIATIVES_SECTION);
-        const commentButton = getCommentAttachmentButton(
+        await editor.waitForAutosaveWithSectionRefresh(INITIATIVES_SECTION);
+        const commentButton = editor.commentAttachmentButton(
           checkpointRow,
           fixture.fileName
         );
@@ -407,30 +347,23 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
           editor,
           "POST"
         );
-        const reportSaveResponsePromise = waitForReportSaveResponse(editor);
         await addCommentButton.click();
         const createCommentResponse = await createCommentResponsePromise;
         await expectCommentResponseStatus(createCommentResponse, 201);
-        await reportSaveResponsePromise;
 
         await expect(commentDrawer).toContainText(commentText, {
           timeout: TIMEOUT_UI,
         });
-        await closeCommentDrawer(commentDrawer);
+        await editor.closeDrawer(commentDrawer);
         // Verify comment persists after returning to dashboard and reopening
-        await returnToInitiativesDashboard(editor);
-        const reopenedInitiative = await reopenInitiativeFromDashboard(editor);
+        await editor.returnToInitiativesDashboard();
+        const reopenedInitiative = await editor.reopenInitiativeFromDashboard();
         expect(reopenedInitiative).toBe(selectedInitiativeNumberAndName);
 
-        const reopenedCheckpointRow = getCheckpointStage(
-          editor,
-          CHECKPOINT_STAGE_LABELS[0]
-        )
-          .getByRole("table")
-          .locator("tbody")
-          .getByRole("row")
-          .filter({ hasText: fixture.fileName })
-          .first();
+        const reopenedCheckpointRow = editor.checkpointAttachmentRow(
+          CHECKPOINT_STAGE_LABELS[0],
+          fixture.fileName
+        );
         const reopenedCommentDrawer =
           await openAttachmentCommentDrawerAndVerifyPreviousComment(
             editor,
@@ -439,26 +372,25 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
             commentText,
             { disabled: true }
           );
-        await closeCommentDrawer(reopenedCommentDrawer);
+        await editor.closeDrawer(reopenedCommentDrawer);
       });
     });
 
     test("should require comment text before submitting an attachment comment for a non-admin user @regression", async () => {
       await withUploadFixture(async (fixture) => {
-        const checkpointRow = await uploadCheckpointAttachment(
-          editor,
+        const checkpointRow = await editor.uploadCheckpointAttachment(
           CHECKPOINT_STAGE_LABELS[0],
           GOVERNANCE_CHECKPOINT,
-          fixture
+          fixture.filePath,
+          fixture.fileName
         );
         await expect(checkpointRow).toContainText(fixture.fileName, {
           timeout: TIMEOUT_UI,
         });
 
-        await getCommentAttachmentButton(
-          checkpointRow,
-          fixture.fileName
-        ).click();
+        await editor
+          .commentAttachmentButton(checkpointRow, fixture.fileName)
+          .click();
 
         const commentDrawer = editor.page.getByRole("dialog");
         await expect(
@@ -480,7 +412,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
           editor.page.getByText(/A comment is required\./i)
         ).toBeVisible({ timeout: TIMEOUT_UI });
 
-        await closeCommentDrawer(commentDrawer);
+        await editor.closeDrawer(commentDrawer);
       });
     });
   });

@@ -9,7 +9,6 @@ import {
   GENERAL_INFO_FIELDS,
   getReportTestRunId,
   REVIEW_SUBMIT_SECTION,
-  waitForAutosaveWithSectionRefresh,
 } from "../utils/report-edit-shared-helpers";
 import {
   prepareAndSubmitReport,
@@ -181,8 +180,7 @@ test.describe("Report Editing - Submission and Read-only", () => {
     await ensureGeneralInfoReadyForEdit(editor);
     await editor.fillTextField(AOR_NAME_LABEL, aorValue);
     await editor.page.keyboard.press("Tab");
-    await waitForAutosaveWithSectionRefresh(
-      editor,
+    await editor.waitForAutosaveWithSectionRefresh(
       GENERAL_INFORMATION_SECTION,
       {
         timeoutMs: TIMEOUT_LOADING,
