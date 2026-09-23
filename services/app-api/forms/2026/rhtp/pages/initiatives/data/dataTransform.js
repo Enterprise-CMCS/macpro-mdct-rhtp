@@ -38,6 +38,82 @@ const Papa = require("papaparse");
 
 const initiativesMap = new Map();
 
+const intFormat = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+});
+
+const numberNAMask = (value = "") => {
+  const rawValue = String(value);
+  let formattedValue = "";
+  let numericValue = undefined;
+
+  const hasDigits = /\d/.test(rawValue);
+  const startsWithN = rawValue.startsWith("N") || rawValue.startsWith("n");
+  const hasNegative = rawValue.includes("-");
+  const stripped = rawValue.replaceAll(/[^\d\.]/g, "").match(/^(\d*\.?\d*)/)[1];
+  if (!hasDigits && startsWithN) {
+    formattedValue = "N/A";
+  } else if (hasDigits) {
+    numericValue = Number(stripped);
+
+    formattedValue = `${commaSeparatedMask(numericValue)}`;
+
+    if (hasNegative) {
+      formattedValue = `-${formattedValue}`;
+    }
+  }
+
+  return formattedValue;
+};
+
+const commaSeparatedMask = (value) => {
+  if (!value && value !== 0) return "";
+  const str = value.toString().trim().replaceAll(",", "");
+  if (!str) return "";
+
+  const dotIndex = str.indexOf(".");
+  const intPart = dotIndex !== -1 ? str.slice(0, dotIndex) : str;
+  const decPart = dotIndex !== -1 ? str.slice(dotIndex) : ""; // e.g. "." or ".5" or ".50"
+
+  const intNum = Number(intPart || "0");
+  if (isNaN(intNum)) return "";
+
+  const sign = intPart.startsWith("-") ? "-" : "";
+  return sign + intFormat.format(Math.abs(intNum)) + decPart;
+};
+
+const magicNumberMask = (value = "") => {
+  const rawValue = String(value);
+  let formattedValue = "";
+  let numericValue = undefined;
+
+  const hasDigits = /\d/.test(rawValue);
+  const startsWithN = rawValue.startsWith("N") || rawValue.startsWith("n");
+  const hasNegative = rawValue.includes("-");
+  const hasDollar = rawValue.includes("$");
+  const hasPercent = rawValue.includes("%");
+  const stripped = rawValue.replaceAll(/[^\d\.]/g, "").match(/^(\d*\.?\d*)/)[1];
+  if (!hasDigits && startsWithN) {
+    formattedValue = "N/A";
+  } else if (hasDigits) {
+    numericValue = Number(stripped);
+
+    if (hasPercent) {
+      formattedValue = `${numericValue}%`;
+    } else if (hasDollar) {
+      formattedValue = `$${commaSeparatedMask(numericValue)}`;
+    } else {
+      formattedValue = commaSeparatedMask(numericValue);
+    }
+
+    if (hasNegative) {
+      formattedValue = `-${formattedValue}`;
+    }
+  }
+
+  return formattedValue;
+};
+
 function stripNewlineAndTrim(input) {
   return input.replaceAll("\n", " ").trim();
 }
@@ -67,6 +143,7 @@ function main() {
       initiativeData["Metric Current Value Date (Semicolon-Separated)"].split(
         ";"
       );
+
     const initiative = {
       id: crypto.randomUUID(),
       title: stripNewlineAndTrim(initiativeData["Initiative Name"]),
@@ -76,8 +153,8 @@ function main() {
       narrative: initiativeData["Initiative Narrative"],
       skipFirstYearCharLimit: true,
       status: stripNewlineAndTrim(initiativeData["Initiative Status"]),
-      numberOfPeopleServed: stripNewlineAndTrim(
-        initiativeData["Number of People Served"]
+      numberOfPeopleServed: numberNAMask(
+        stripNewlineAndTrim(initiativeData["Number of People Served"])
       ),
     };
 
@@ -88,7 +165,7 @@ function main() {
         status: metricStatuses[index]?.trim() || "Active",
         // target: metricTargets[index]?.trim() || "", // TODO: comment back in if we get this data
         target: "",
-        currValue: metricCurrentValue[index]?.trim() || "",
+        currValue: magicNumberMask(metricCurrentValue[index]?.trim()) || "",
         date: metricDates[index]?.trim() || "",
       };
       metrics.push(metric);
