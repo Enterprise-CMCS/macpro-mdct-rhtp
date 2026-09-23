@@ -38,6 +38,7 @@ function main() {
     successAndHighlightsObj[state] = {
       successStory,
       sustainabilityPlanning,
+      skipFirstYearCharLimit: true,
     };
   }
 

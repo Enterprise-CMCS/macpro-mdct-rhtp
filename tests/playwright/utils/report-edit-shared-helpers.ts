@@ -189,6 +189,16 @@ export const waitForAutosaveWithSectionRefresh = async (
   return waitForAutosaveVisible();
 };
 
+export const waitForReportSaveResponse = (editor: ReportEditorPage) =>
+  editor.page.waitForResponse(
+    (response) =>
+      response.request().method() === "PUT" &&
+      /\/reports\/[^/]+\/[^/]+\/[^/]+$/.test(response.url()) &&
+      response.status() >= 200 &&
+      response.status() < 300,
+    { timeout: TIMEOUT_AUTOSAVE }
+  );
+
 export const confirmAutosaveIndicatorIsVisible = async (
   editor: ReportEditorPage
 ): Promise<void> => {

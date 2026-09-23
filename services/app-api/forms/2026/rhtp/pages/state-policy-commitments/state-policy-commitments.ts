@@ -20,12 +20,17 @@ import EMPTY_STATE_POLICY_COMMITMENTS from "./data/empty-commitments.json";
 const COMMITMENTS_KEY = "import/commitments.json";
 
 type StatePolicyCommitmentsData = {
-  [key: string]: { label: string; status: string; links: string[] }[];
+  [key: string]: {
+    label: string;
+    status: string;
+    links: string[];
+    statusEvaluation?: string;
+  }[];
 };
 
 const commitmentStatusDropdown = (
   label: string,
-  status: string = "Not yet started"
+  status: string
 ): DropdownTemplate => ({
   type: ElementType.Dropdown,
   id: "commitment-status",
@@ -44,7 +49,10 @@ const commitmentAttachmentArea = (label: string): AttachmentAreaTemplate => ({
   helperText: "Upload state legislation.",
   required: false,
 });
-const cmsStatusEvaluation = (label: string): DropdownTemplate => {
+const cmsStatusEvaluation = (
+  label: string,
+  statusEvaluation?: string
+): DropdownTemplate => {
   const dropdownOptions = [
     cmsEvaluationStatusDefault,
     ...getDropdownOptions(label),
@@ -57,7 +65,7 @@ const cmsStatusEvaluation = (label: string): DropdownTemplate => {
     label: "CMS Status Evaluation",
     options: dropdownOptions,
     required: false,
-    answer: cmsEvaluationStatusDefault.value,
+    answer: statusEvaluation ?? cmsEvaluationStatusDefault.value,
     onlyCmsAdminCanEdit: true,
     cmsAdminCanEditInSubmitted: true,
   };
@@ -99,12 +107,17 @@ const buildCommitments = (
   if (!(state in statePolicyCommitments)) return [];
   const commitmentsForState = statePolicyCommitments[state];
   const commitments = [];
-  for (const { label, status, links } of commitmentsForState) {
+  for (const {
+    label,
+    status,
+    links,
+    statusEvaluation,
+  } of commitmentsForState) {
     commitments.push({
       label,
       elements: [
         commitmentStatusDropdown(label, status),
-        cmsStatusEvaluation(label),
+        cmsStatusEvaluation(label, statusEvaluation),
         commitmentSupportParagraph,
         commitmentLinkListInput(links),
         commitmentAttachmentArea(label),
@@ -157,6 +170,7 @@ export const buildStatePolicyCommitments = (
   statePolicyCommitments?: StatePolicyCommitmentsData
 ): FormPageTemplate | Promise<FormPageTemplate> => {
   if (statePolicyCommitments) return buildPage(state, statePolicyCommitments);
+  //TO-DO: Make this only fetch data for first report of a state
   return getJsonFromS3<StatePolicyCommitmentsData>(COMMITMENTS_KEY).then(
     // Use manually uploaded S3 data if available, otherwise use empty commitments JSON
     (fetched) => buildPage(state, fetched ?? EMPTY_STATE_POLICY_COMMITMENTS)

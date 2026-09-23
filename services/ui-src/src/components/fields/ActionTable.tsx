@@ -37,6 +37,9 @@ const generateAriaLabel = (header: string, answer: ActionAnswerShape) => {
   return `${label} ${header}`;
 };
 
+const buildEmptyErrorMessages = (answer: ActionAnswerShape) =>
+  new Map<string, string>(answer.map((item) => [item.id, ""]));
+
 const buildRows = (
   rows: ActionRowElement[],
   answer: ActionAnswerShape[],
@@ -72,7 +75,7 @@ const buildRows = (
           (value) =>
             onChange(value, answerRowIndex, column.id, formattedCol.type),
           generateAriaLabel(column.header, answerRow),
-          errorMessages[answerRowIndex].get(column.id)
+          errorMessages[answerRowIndex]?.get(column.id)
         );
         rowElement.push(value || "--");
       }
@@ -129,11 +132,20 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
 
   const [errorMessages, setErrorMessages] = useState<
     Array<Map<string, string>>
-  >(
-    answer?.map(
-      (row) => new Map<string, string>(row.map((item) => [item.id, ""]))
-    ) ?? []
-  );
+  >(answer?.map((row) => buildEmptyErrorMessages(row)) ?? []);
+
+  const modalErrorMessageIndex = modalData.index ?? 0;
+  const modalErrorMessages =
+    errorMessages[modalErrorMessageIndex] ??
+    buildEmptyErrorMessages(modalData.data);
+
+  const updateModalErrorMessages = (rowErrorMessages: Map<string, string>) => {
+    setErrorMessages((current) => {
+      const newErrorMessages = [...current];
+      newErrorMessages[modalErrorMessageIndex] = rowErrorMessages;
+      return newErrorMessages;
+    });
+  };
 
   const formatAnswers = (
     data: ActionAnswerShape,
@@ -166,7 +178,6 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     const newErrorMessages = [...errorMessages];
     const rowIndex = newAnswer[index].findIndex((answer) => answer.id === id);
     const errorMessage = getErrorMessage(type, false, value);
-
     newErrorMessages[index].set(id, errorMessage);
     setErrorMessages(newErrorMessages);
     const formattedValue = formatAnswers(
@@ -182,6 +193,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const onModalEdit = (index: number) => {
     if (!answer) return;
     setModalData({ data: structuredClone(answer[index]), index });
+    setErrorMessages((current) => {
+      if (current[index]) return current;
+      const newErrorMessages = [...current];
+      newErrorMessages[index] = buildEmptyErrorMessages(answer[index]);
+      return newErrorMessages;
+    });
     setModalOpen(true);
   };
 
@@ -198,7 +215,10 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
   const onSave = (data: ActionAnswerShape) => {
     const newData = formatAnswers(data, "modal");
     if (modalData.index === undefined) {
-      setErrorMessages([...errorMessages, new Map<string, string>()]);
+      setErrorMessages((current) => [
+        ...current.slice(0, answer?.length ?? 0),
+        buildEmptyErrorMessages(newData),
+      ]);
       props.updateElement({ answer: [...(answer ?? []), newData] });
     } else {
       const newAnswer = [...answer!];
@@ -227,6 +247,12 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
           onClick={() => {
             setModalOpen(true);
             setModalData({ data: initial, index: undefined });
+            setErrorMessages((current) => {
+              const newErrorMessages = current.slice(0, answer?.length ?? 0);
+              newErrorMessages[answer?.length ?? 0] =
+                buildEmptyErrorMessages(initial);
+              return newErrorMessages;
+            });
           }}
           disabled={actionsDisabled}
         >
@@ -238,6 +264,8 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
         modal={modal}
         form={modalData}
         onSave={onSave}
+        errorMessages={modalErrorMessages}
+        setErrorMessages={updateModalErrorMessages}
         modalDisclosure={{
           isOpen: isModalOpen,
           onClose: () => {
