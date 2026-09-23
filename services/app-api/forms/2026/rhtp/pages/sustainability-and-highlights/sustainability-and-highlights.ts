@@ -4,7 +4,11 @@ import { getJsonFromS3 } from "../../../../../libs/s3-json-lib";
 const SUCCESS_AND_HIGHLIGHTS_KEY = "import/success-and-highlights.json";
 
 export type SuccessAndHighlightsData = {
-  [key: string]: { successStory: string; sustainabilityPlanning: string };
+  [key: string]: {
+    successStory: string;
+    sustainabilityPlanning: string;
+    skipFirstYearCharLimit?: boolean;
+  };
 };
 
 const buildPage = (
@@ -31,11 +35,15 @@ const buildPage = (
       type: ElementType.TextAreaField,
       label:
         "Share success stories that you want to highlight as result of your State’s implementation of the RHT Program.",
-      helperText:
-        "Limit responses to 3,000 characters, approximately 400–500 words.",
       required: true,
       quarterly: true,
-      charLimit: 3000,
+      ...(data[state]?.skipFirstYearCharLimit
+        ? {}
+        : {
+            charLimit: 3000,
+            helperText:
+              "Limit responses to 3,000 characters, approximately 400–500 words.",
+          }),
       answer: data[state]?.successStory || "",
     },
     {
@@ -78,11 +86,16 @@ const buildPage = (
       id: "sustainability-planning",
       label:
         "What are the most significant updates or changes to your sustainability plan based on the past year’s experiences, successes, and challenges?",
-      helperText:
-        "Limit responses to 3,000 characters, approximately 400–500 words.",
+
       required: true,
       quarterly: false,
-      charLimit: 3000,
+      ...(data[state]?.skipFirstYearCharLimit
+        ? {}
+        : {
+            charLimit: 3000,
+            helperText:
+              "Limit responses to 3,000 characters, approximately 400–500 words.",
+          }),
       answer: data[state]?.sustainabilityPlanning || "",
     },
     {
@@ -122,6 +135,7 @@ export const buildSustainabilityAndHighlightsPage = (
   data?: SuccessAndHighlightsData
 ): FormPageTemplate | Promise<FormPageTemplate> => {
   if (data) return buildPage(state, data);
+  //TO-DO: Make this only fetch data for first report of a state
   return getJsonFromS3<SuccessAndHighlightsData>(
     SUCCESS_AND_HIGHLIGHTS_KEY
   ).then((fetched) => buildPage(state, fetched ?? {}));

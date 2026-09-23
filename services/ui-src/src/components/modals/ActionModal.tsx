@@ -13,25 +13,20 @@ export const ActionModal = ({
   form,
   modalDisclosure,
   onSave,
+  errorMessages,
+  setErrorMessages,
   disabled,
 }: Props) => {
   const isEdit = form.index !== undefined;
   const renderElements = !isEdit
     ? modal.elements.filter((element) => !element.editOnly)
     : modal.elements;
-  const [errorMessages, setErrorMessages] = useState<string[]>(
-    renderElements.map(() => "")
-  );
 
   const [formData, setFormData] = useState<ActionAnswerShape>(form.data);
   const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     setFormData(form.data);
   }, [form.data]);
-
-  useEffect(() => {
-    setErrorMessages(renderElements.map(() => ""));
-  }, [modalDisclosure.isOpen]);
 
   const onModalChange = (value: string[], id: string, index: number) => {
     const newData = [...formData];
@@ -40,12 +35,10 @@ export const ActionModal = ({
     setFormData(newData);
 
     const element = renderElements[index];
-    const newErrorMessages = [...errorMessages];
-    newErrorMessages[index] = getErrorMessage(
-      element.type,
-      element.required,
-      value
-    );
+    const newErrorMessages = new Map([
+      ...errorMessages,
+      [id, getErrorMessage(element.type, element.required, value)],
+    ]);
     setErrorMessages(newErrorMessages);
   };
 
@@ -56,18 +49,18 @@ export const ActionModal = ({
   const onSubmit = (event: SubmitEvent) => {
     event.preventDefault();
 
-    const activeKeys = renderElements.map((element) => element.id);
-    const values = form.data
-      .filter((item) => activeKeys.includes(item.id))
-      .map((item) => item.value);
+    const submittedErrors = renderElements.map((element) => {
+      const value = formData.find((item) => item.id === element.id)?.value;
+      const message =
+        !value && element.required
+          ? ErrorMessages.requiredResponse
+          : (errorMessages.get(element.id) ?? "");
 
-    const errors = values.map((value, index) =>
-      !value && renderElements[index].required
-        ? ErrorMessages.requiredResponse
-        : errorMessages[index]
-    );
-    setErrorMessages(errors);
-    if (errors.some((error) => error != "")) return;
+      return [element.id, message] as [string, string];
+    });
+    const newErrorMessages = new Map([...errorMessages, ...submittedErrors]);
+    setErrorMessages(newErrorMessages);
+    if (submittedErrors.some((errorEntry) => errorEntry[1] != "")) return;
 
     setSubmitting(true);
     onSave(formData);
@@ -100,7 +93,7 @@ export const ActionModal = ({
               formData.find((data) => data.id === element.id)?.value!,
               (value) => onModalChange(value, element.id, index),
               element.label,
-              errorMessages[index]
+              errorMessages.get(element.id)
             )
           )}
         </Flex>
@@ -117,6 +110,8 @@ interface Props {
   };
   form: { data: ActionAnswerShape; index: number | undefined };
   onSave: (data: ActionAnswerShape) => void;
+  errorMessages: Map<string, string>;
+  setErrorMessages: (errorMessages: Map<string, string>) => void;
   modalDisclosure: {
     isOpen: boolean;
     onClose: () => void;

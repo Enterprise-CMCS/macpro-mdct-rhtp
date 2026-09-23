@@ -80,9 +80,9 @@ export const optionalInQuarterly = [
 ];
 
 export const cmsStatusThatLocksSPAC = [
-  "Commitment abandoned",
+  "Commitment Abandoned",
   "Implemented",
-  "Commitment fulfilled",
+  "Commitment Fulfilled",
 ];
 
 export const SPACItemsThatLock = [

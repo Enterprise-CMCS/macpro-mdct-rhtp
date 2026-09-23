@@ -2,9 +2,11 @@ import { render, screen } from "@testing-library/react";
 import { ActionModal } from "./ActionModal";
 import { ElementType } from "@rhtp/shared";
 import userEvent from "@testing-library/user-event";
+import { ErrorMessages } from "../../constants";
 
 const mockCloseHandler = vi.fn();
 const mockSaveHandler = vi.fn();
+const mockSetErrorMessages = vi.fn();
 
 const rows = [
   { id: "no", header: "#", type: ElementType.Paragraph },
@@ -43,23 +45,33 @@ const modal = {
   ],
 };
 
+const renderActionModal = (
+  errorMessages = new Map<string, string>(),
+  index: number | undefined = undefined
+) => {
+  const initial = rows.map((row) => ({ id: row.id, value: "" }));
+  render(
+    <ActionModal
+      modal={modal}
+      form={{
+        data: initial,
+        index,
+      }}
+      onSave={mockSaveHandler}
+      errorMessages={errorMessages}
+      setErrorMessages={mockSetErrorMessages}
+      modalDisclosure={{
+        isOpen: true,
+        onClose: mockCloseHandler,
+      }}
+    />
+  );
+};
+
 describe("Test ActionModal component", () => {
   beforeEach(() => {
-    const initial = rows.map((row) => ({ id: row.id, value: "" }));
-    render(
-      <ActionModal
-        modal={modal}
-        form={{
-          data: initial,
-          index: undefined,
-        }}
-        onSave={mockSaveHandler}
-        modalDisclosure={{
-          isOpen: true,
-          onClose: mockCloseHandler,
-        }}
-      />
-    );
+    vi.clearAllMocks();
+    renderActionModal();
   });
   test("Modal renders", () => {
     expect(screen.getByText("Add Mock Modal")).toBeInTheDocument();
@@ -75,6 +87,18 @@ describe("Test ActionModal component", () => {
     const textbox = screen.getByRole("textbox", { name: "Mock textbox" });
     await userEvent.type(textbox, "hello");
     expect(textbox).toHaveValue("hello");
+  });
+  test("Modal writes submit errors to shared error map", async () => {
+    const saveBtn = screen.getByRole("button", { name: "Save" });
+    await userEvent.click(saveBtn);
+
+    expect(mockSetErrorMessages).toHaveBeenCalledWith(
+      new Map<string, string>([
+        ["mock-textbox", ErrorMessages.requiredResponse],
+        ["mock-date", ErrorMessages.requiredResponse],
+      ])
+    );
+    expect(mockSaveHandler).not.toHaveBeenCalled();
   });
   test("Modal save", async () => {
     const textbox = screen.getByRole("textbox", { name: "Mock textbox" });
