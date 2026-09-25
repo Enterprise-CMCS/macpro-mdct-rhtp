@@ -1,6 +1,11 @@
-import { Page, Locator } from "@playwright/test";
+import { expect, Page, Locator } from "@playwright/test";
 import { BasePage } from "./base.page";
-import { TIMEOUT_LOADING } from "../../utils/timeouts";
+import { TIMEOUT_AUTOSAVE, TIMEOUT_LOADING } from "../../utils/timeouts";
+
+export type AutosaveRefreshOptions = {
+  timeoutMs?: number;
+  fallbackSectionId?: string;
+};
 
 export class ReportEditorPage extends BasePage {
   constructor(page: Page) {
@@ -120,6 +125,54 @@ export class ReportEditorPage extends BasePage {
   }
 
   // ===== Actions =====
+
+  async waitForAutosaveWithSectionRefresh(
+    sectionId: string,
+    options: AutosaveRefreshOptions = {}
+  ): Promise<boolean> {
+    const timeoutMs = options.timeoutMs ?? TIMEOUT_AUTOSAVE;
+    const fallbackSectionId =
+      options.fallbackSectionId ?? "initiative-attachments";
+    const waitForAutosaveVisible = async () =>
+      this.saveStatusText
+        .waitFor({ state: "visible", timeout: timeoutMs })
+        .then(() => true)
+        .catch(() => false);
+
+    if (await waitForAutosaveVisible()) {
+      return true;
+    }
+
+    const { reportType, state, reportId } = this.getCurrentRouteParams();
+    if (fallbackSectionId !== sectionId) {
+      await this.navigateToSection(
+        reportType,
+        state,
+        reportId,
+        fallbackSectionId
+      );
+    }
+    await this.navigateToSection(reportType, state, reportId, sectionId);
+
+    return waitForAutosaveVisible();
+  }
+
+  waitForSaveResponse() {
+    return this.page.waitForResponse(
+      (response) =>
+        response.request().method() === "PUT" &&
+        /\/reports\/[^/]+\/[^/]+\/[^/]+$/.test(response.url()) &&
+        response.status() >= 200 &&
+        response.status() < 300,
+      { timeout: TIMEOUT_AUTOSAVE }
+    );
+  }
+
+  async expectAutosaveIndicator(): Promise<void> {
+    await expect(this.saveStatusText).toBeVisible({
+      timeout: TIMEOUT_AUTOSAVE,
+    });
+  }
 
   async fillTextField(label: string | RegExp, value: string): Promise<void> {
     const field = this.page.getByLabel(label);

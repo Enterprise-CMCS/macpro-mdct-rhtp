@@ -11,7 +11,6 @@ import {
   PIPD_EMAIL_LABEL,
   PIPD_NAME_LABEL,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-  waitForAutosaveWithSectionRefresh,
 } from "../utils/report-edit-shared-helpers";
 import {
   verifyFieldValue,
@@ -59,8 +58,7 @@ test.describe("Report Editing - General Information Persistence", () => {
     // Act
     await fillFields(editor, testDataMultiple);
     await editor.page.keyboard.press("Tab");
-    await waitForAutosaveWithSectionRefresh(
-      editor,
+    await editor.waitForAutosaveWithSectionRefresh(
       GENERAL_INFORMATION_SECTION,
       {
         timeoutMs: TIMEOUT_AUTOSAVE,

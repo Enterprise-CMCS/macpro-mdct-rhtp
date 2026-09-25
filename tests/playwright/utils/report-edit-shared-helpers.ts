@@ -2,7 +2,6 @@ import { expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
-import { TIMEOUT_AUTOSAVE } from "./timeouts";
 
 export type ReportEditLabel = string | RegExp;
 
@@ -17,8 +16,8 @@ export const escapeRegExp = (str: string): string =>
   str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 
 export const GENERAL_INFORMATION_SECTION = "general-information";
-export const INITIATIVE_ATTACHMENTS_SECTION = "initiative-attachments";
 export const INITIATIVES_SECTION = "initiatives";
+export const INITIATIVE_ATTACHMENTS_SECTION = "initiative-attachments";
 export const STATE_POLICY_COMMITMENTS_SECTION = "state-policy-commitments";
 export const OBLIGATED_AND_SPENT_FUNDS_SECTION = "obligated-and-spent-funds";
 export const SUSTAINABILITY_AND_HIGHLIGHTS_SECTION =
@@ -142,69 +141,11 @@ export const editGeneralInformationFields = async (
   }
 };
 
-type AutosaveRefreshOptions = {
-  timeoutMs?: number;
-  fallbackSectionId?: string;
-};
-
 type UploadViaDialogOptions = {
   filePath: string;
   fileInputSelector?: string;
   expectedFileName?: string | RegExp;
   timeoutMs?: number;
-};
-
-export const waitForAutosaveWithSectionRefresh = async (
-  editor: ReportEditorPage,
-  sectionId: string,
-  options: AutosaveRefreshOptions = {}
-): Promise<boolean> => {
-  const timeoutMs = options.timeoutMs ?? TIMEOUT_AUTOSAVE;
-  const fallbackSectionId =
-    options.fallbackSectionId ?? INITIATIVE_ATTACHMENTS_SECTION;
-
-  const waitForAutosaveVisible = async () =>
-    editor.saveStatusText
-      .waitFor({ state: "visible", timeout: timeoutMs })
-      .then(() => true)
-      .catch(() => false);
-
-  const autosaveVisible = await waitForAutosaveVisible();
-
-  if (autosaveVisible) {
-    return true;
-  }
-
-  const { reportType, state, reportId } = editor.getCurrentRouteParams();
-  if (fallbackSectionId !== sectionId) {
-    await editor.navigateToSection(
-      reportType,
-      state,
-      reportId,
-      fallbackSectionId
-    );
-  }
-  await editor.navigateToSection(reportType, state, reportId, sectionId);
-
-  return waitForAutosaveVisible();
-};
-
-export const waitForReportSaveResponse = (editor: ReportEditorPage) =>
-  editor.page.waitForResponse(
-    (response) =>
-      response.request().method() === "PUT" &&
-      /\/reports\/[^/]+\/[^/]+\/[^/]+$/.test(response.url()) &&
-      response.status() >= 200 &&
-      response.status() < 300,
-    { timeout: TIMEOUT_AUTOSAVE }
-  );
-
-export const confirmAutosaveIndicatorIsVisible = async (
-  editor: ReportEditorPage
-): Promise<void> => {
-  await expect(editor.saveStatusText).toBeVisible({
-    timeout: TIMEOUT_AUTOSAVE,
-  });
 };
 
 export const uploadFileViaDialog = async (

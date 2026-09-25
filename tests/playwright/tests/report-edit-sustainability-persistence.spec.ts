@@ -7,7 +7,6 @@ import {
 import {
   GENERAL_INFORMATION_SECTION,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-  confirmAutosaveIndicatorIsVisible,
 } from "../utils/report-edit-shared-helpers";
 import {
   SUCCESS_STORIES_LABEL,
@@ -92,7 +91,7 @@ test.describe("Report Editing - Sustainability Persistence", () => {
     await editor.page.keyboard.press("Tab");
 
     // Assert
-    await confirmAutosaveIndicatorIsVisible(editor);
+    await editor.expectAutosaveIndicator();
   });
 
   test("should edit text fields in Sustainability and Highlights and verify persistence @regression", async ({
