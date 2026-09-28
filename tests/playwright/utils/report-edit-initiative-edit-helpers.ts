@@ -3,11 +3,10 @@ import {
   createArtifactId,
   escapeRegExp,
   getReportTestRunId,
-  INITIATIVES_SECTION,
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
-  waitForReportSaveResponse,
 } from "./report-edit-shared-helpers";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
+import { ReportInitiativePage } from "../tests/pageObjects/report-initiative.page";
 import { TIMEOUT_UI } from "./timeouts";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
@@ -33,12 +32,10 @@ export const CHECKPOINT_TABLE_HEADERS = [
   "Actions",
 ];
 
-const INITIATIVE_ROW_PATTERN = /^\d+:\s*.+/;
-const EDITABLE_STATUS_PATTERN = /^(Not started|In progress|In revision)$/i;
 const CHECKPOINT_STATUS_PATTERN =
   /^(Pending Review|Needs Revision|Locked for Scoring|Informational|Archived)$/i;
 
-export type ReportPeriod = "annual" | "quarterly";
+export type { ReportPeriod } from "../tests/pageObjects/report-initiative.page";
 export type AdminMetricControlsVisibility = "visible" | "hidden";
 export type MetricsTableOptions = {
   adminControls?: boolean;
@@ -51,32 +48,6 @@ export type MetricTestData = {
   currentDisplay: string;
   date: string;
 };
-
-const REPORT_PERIOD_LABELS: Record<ReportPeriod, string> = {
-  annual: "Annual Report",
-  quarterly: "Quarterly Report",
-};
-
-const getInitiativeRows = (table: Locator): Locator =>
-  table.getByRole("row").filter({ hasText: INITIATIVE_ROW_PATTERN });
-
-const getEditButton = (row: Locator): Locator =>
-  row.getByRole("link", { name: /^(Edit|View)\b/i });
-
-const getNonAbandonedInitiativeRows = (table: Locator): Locator =>
-  getInitiativeRows(table).filter({ hasNotText: /Status:\s*Abandoned/i });
-
-export const getMetricsTable = (editor: ReportEditorPage): Locator =>
-  editor.page.getByRole("table").filter({
-    has: editor.page.getByRole("columnheader", { name: "Metric" }),
-  });
-
-export const getMetricRow = (table: Locator, metricName: string): Locator =>
-  table
-    .locator("tbody")
-    .getByRole("row")
-    .filter({ hasText: metricName })
-    .first();
 
 export const createMetricTestData = (
   name: string,
@@ -93,88 +64,6 @@ export const createMetricTestData = (
     currentDisplay: currentNumber.toLocaleString("en-US"),
     date,
   };
-};
-
-export const addMetric = async (
-  editor: ReportEditorPage,
-  metric: MetricTestData
-): Promise<void> => {
-  const addMetricButton = editor.page.getByRole("button", {
-    name: /^Add Metric$/i,
-  });
-
-  await expect(addMetricButton).toBeVisible({ timeout: TIMEOUT_UI });
-  await addMetricButton.click();
-  await expect(editor.page.getByRole("dialog")).toBeVisible({
-    timeout: TIMEOUT_UI,
-  });
-
-  await editor.fillTextField(/^Metric name/i, metric.name);
-  await editor.fillTextField(
-    /^What is the target for this metric/i,
-    metric.targetInput
-  );
-  await editor.fillTextField(
-    /^What is the metric['’]s current value/i,
-    metric.currentInput
-  );
-  await editor.fillTextField(/^Date of the current value/i, metric.date);
-
-  await editor.page.getByRole("button", { name: /^Save$/i }).click();
-  await expect(editor.page.getByRole("dialog")).toBeHidden({
-    timeout: TIMEOUT_UI,
-  });
-};
-
-export const editMetric = async (
-  editor: ReportEditorPage,
-  row: Locator,
-  metric: MetricTestData
-): Promise<void> => {
-  await row.getByRole("button", { name: /^Edit\/Abandon$/i }).click();
-
-  const dialog = editor.page.getByRole("dialog");
-  await expect(
-    dialog.getByRole("heading", { name: /^Edit Metric$/i })
-  ).toBeVisible({ timeout: TIMEOUT_UI });
-
-  await editor.fillTextField(/^Metric name/i, metric.name);
-  await editor.fillTextField(
-    /^What is the target for this metric/i,
-    metric.targetInput
-  );
-  await editor.fillTextField(
-    /^What is the metric['’]s current value/i,
-    metric.currentInput
-  );
-  await editor.fillTextField(/^Date of the current value/i, metric.date);
-
-  await dialog.getByRole("button", { name: /^Save$/i }).click();
-  await expect(dialog).toBeHidden({ timeout: TIMEOUT_UI });
-};
-
-export const abandonMetric = async (
-  editor: ReportEditorPage,
-  row: Locator
-): Promise<void> => {
-  await row.getByRole("button", { name: /^Edit\/Abandon$/i }).click();
-
-  const dialog = editor.page.getByRole("dialog");
-  await expect(
-    dialog.getByRole("heading", { name: /^Edit Metric$/i })
-  ).toBeVisible({ timeout: TIMEOUT_UI });
-
-  const statusDropdown = dialog.getByLabel(/^Status$/i);
-  await statusDropdown.click();
-  const abandonedOption = editor.page.getByRole("option", {
-    name: /^Abandoned$/i,
-  });
-  await expect(abandonedOption).toBeVisible({ timeout: TIMEOUT_UI });
-  await abandonedOption.click();
-  await expect(statusDropdown).toHaveText(/^Abandoned$/i);
-
-  await dialog.getByRole("button", { name: /^Save$/i }).click();
-  await expect(dialog).toBeHidden({ timeout: TIMEOUT_UI });
 };
 
 export const verifyAbandonedMetricRow = async (
@@ -439,163 +328,6 @@ export const verifyCheckpointStageRows = async (
   }
 };
 
-const getInitiativeNumberAndName = (row: Locator): Locator =>
-  row.getByText(INITIATIVE_ROW_PATTERN).first();
-
-const getOpenInitiativeHeading = (editor: ReportEditorPage): Locator =>
-  editor.page.getByRole("heading", { name: INITIATIVE_ROW_PATTERN }).first();
-
-const getInitiativeNumberAndNameText = async (row: Locator): Promise<string> =>
-  ((await getInitiativeNumberAndName(row).textContent()) ?? "").trim();
-
-export const getOpenInitiativeHeadingText = async (
-  editor: ReportEditorPage
-): Promise<string> =>
-  ((await getOpenInitiativeHeading(editor).textContent()) ?? "").trim();
-
-const waitForInitiativeRows = async (table: Locator, timeout: number) => {
-  await expect
-    .poll(() => getInitiativeRows(table).count(), { timeout })
-    .toBeGreaterThan(0);
-
-  return getInitiativeRows(table);
-};
-
-export const openInitiativeFromList = async (
-  editor: ReportEditorPage,
-  table: Locator
-): Promise<string> => {
-  const dataRows = await waitForInitiativeRows(table, TIMEOUT_UI);
-  const nonAbandonedRows = getNonAbandonedInitiativeRows(table);
-  const rowToOpen =
-    (await nonAbandonedRows.count()) > 0
-      ? nonAbandonedRows.first()
-      : dataRows.first();
-
-  const selectedInitiativeNumberAndName =
-    await getInitiativeNumberAndNameText(rowToOpen);
-  const editButton = getEditButton(rowToOpen);
-  await expect(editButton).toBeVisible({ timeout: TIMEOUT_UI });
-  await editButton.click();
-
-  await expect(editor.page).toHaveURL(
-    /\/report\/[^/]+\/[^/]+\/[^/]+\/[^/?#]+(\?.*)?$/,
-    { timeout: TIMEOUT_UI }
-  );
-
-  return selectedInitiativeNumberAndName;
-};
-
-export const openReportFromDashboard = async (
-  editor: ReportEditorPage,
-  period: ReportPeriod
-): Promise<void> => {
-  const { reportType, state } = editor.getCurrentRouteParams();
-  await editor.navigateTo(`/report/${reportType}/${state}`);
-  await editor.waitForLoadingComplete();
-
-  const reportRow = editor.page
-    .getByRole("table")
-    .getByRole("row")
-    .filter({ hasText: REPORT_PERIOD_LABELS[period] })
-    .filter({
-      has: editor.page.getByRole("cell", { name: EDITABLE_STATUS_PATTERN }),
-    })
-    .first();
-
-  await expect(reportRow).toBeVisible({ timeout: TIMEOUT_UI });
-  const openReportButton = reportRow
-    .getByRole("button", { name: /View .* report/i })
-    .first();
-  await expect(openReportButton).toBeVisible({ timeout: TIMEOUT_UI });
-
-  await Promise.all([
-    editor.page.waitForURL(
-      /\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?(?:[?#].*)?$/
-    ),
-    openReportButton.click(),
-  ]);
-  await editor.waitForLoadingComplete();
-
-  const {
-    reportType: openedReportType,
-    state: openedState,
-    reportId,
-  } = editor.getCurrentRouteParams();
-  await editor.navigateToSection(
-    openedReportType,
-    openedState,
-    reportId,
-    INITIATIVES_SECTION
-  );
-};
-
-export const getCheckpointStage = (
-  editor: ReportEditorPage,
-  stageLabel: string
-): Locator => {
-  const label = editor.page.getByText(stageLabel, { exact: true });
-  return label.locator("..").filter({
-    has: editor.page.getByRole("button", {
-      name: /^Upload attachments$/i,
-    }),
-  });
-};
-
-export const openCheckpointUploadDrawer = async (
-  editor: ReportEditorPage,
-  stageLabel: string
-): Promise<Locator> => {
-  await getCheckpointStage(editor, stageLabel)
-    .getByRole("button", { name: /^Upload attachments$/i })
-    .click();
-
-  const uploadDrawer = editor.page.getByRole("dialog");
-  await expect(uploadDrawer).toBeVisible({ timeout: TIMEOUT_UI });
-  return uploadDrawer;
-};
-
-export const selectCheckpoint = async (
-  editor: ReportEditorPage,
-  uploadDrawer: Locator,
-  checkpointName: string | RegExp
-): Promise<void> => {
-  const checkpointDropdown = uploadDrawer
-    .locator('select[name="checkpoint"]')
-    .first();
-  const checkpointOptions = checkpointDropdown.locator("option");
-
-  await expect(checkpointDropdown).toBeAttached();
-  await expect(checkpointDropdown).toBeEnabled();
-
-  const matchingOption = checkpointOptions.filter({
-    hasText: checkpointName,
-  });
-
-  await expect(matchingOption).toHaveCount(1, {
-    timeout: TIMEOUT_UI,
-  });
-
-  const checkpointValue = await matchingOption.first().getAttribute("value");
-  expect(checkpointValue).toBeTruthy();
-
-  await checkpointDropdown.selectOption({
-    value: checkpointValue as string,
-  });
-
-  await expect(checkpointDropdown).toHaveValue(/.+/);
-};
-
-export const getCheckpointRow = (
-  table: Locator,
-  checkpointName: string | RegExp
-): Locator =>
-  table
-    .locator("tbody")
-    .getByRole("row")
-    .filter({ hasText: checkpointName })
-    .first();
-
 export const getCheckpointStatusFromRow = async (
   row: Locator
 ): Promise<string> => {
@@ -608,22 +340,6 @@ export const getCheckpointStatusFromRow = async (
   return status;
 };
 
-export const returnToInitiativesDashboard = async (
-  editor: ReportEditorPage
-): Promise<void> => {
-  const backButton = editor.page.getByRole("button", {
-    name: "Back to Initiatives",
-  });
-  await expect(backButton).toBeVisible({ timeout: TIMEOUT_UI });
-
-  await Promise.all([
-    editor.page.waitForURL(
-      /\/report\/[^/]+\/[^/]+\/[^/]+\/initiatives(?:\?.*)?$/
-    ),
-    backButton.click(),
-  ]);
-};
-
 export const verifyInitiativesDashboardVisible = async (
   editor: ReportEditorPage
 ): Promise<void> => {
@@ -632,34 +348,6 @@ export const verifyInitiativesDashboardVisible = async (
   });
 
   await expect(initiativesTable).toBeVisible({ timeout: TIMEOUT_UI });
-};
-
-export const reopenInitiativeFromDashboard = async (
-  editor: ReportEditorPage
-): Promise<string> => {
-  await verifyInitiativesDashboardVisible(editor);
-  const initiativesTable = editor.page.getByRole("table").filter({
-    has: editor.page.getByRole("columnheader", { name: "Initiative" }),
-  });
-  return openInitiativeFromList(editor, initiativesTable);
-};
-
-export const getCheckpointAttachmentRowByFileName = (
-  editor: ReportEditorPage,
-  stageLabel: string,
-  fileName: string
-): Locator => {
-  const checkpointTable = getCheckpointStage(editor, stageLabel)
-    .getByRole("table")
-    .filter({
-      has: editor.page.getByRole("columnheader", { name: /^Checkpoint$/i }),
-    });
-
-  return checkpointTable
-    .locator("tbody")
-    .getByRole("row")
-    .filter({ hasText: fileName })
-    .first();
 };
 
 export type UploadFixture = { fileName: string; filePath: string };
@@ -706,32 +394,6 @@ export const withUploadFixture = async (
   }
 };
 
-export const getManageAttachmentButton = (
-  row: Locator,
-  fileName: string
-): Locator =>
-  row.getByRole("button", {
-    name: `Manage file or info for ${fileName}`,
-    exact: true,
-  });
-
-export const openManageAttachmentDrawer = async (
-  editor: ReportEditorPage,
-  row: Locator,
-  fileName: string
-): Promise<Locator> => {
-  const manageButton = getManageAttachmentButton(row, fileName);
-  await expect(manageButton).toBeVisible({ timeout: TIMEOUT_UI });
-  await manageButton.click();
-
-  const manageDrawer = editor.page.getByRole("dialog");
-  await expect(
-    manageDrawer.getByRole("heading", { name: /^Manage Attachment$/i })
-  ).toBeVisible({ timeout: TIMEOUT_UI });
-
-  return manageDrawer;
-};
-
 export const verifyManageAttachmentDrawerControls = async (
   drawer: Locator,
   fileName: string,
@@ -770,32 +432,15 @@ export const verifyManageAttachmentDrawerControls = async (
   await expect(saveChangesButton).toBeEnabled();
 };
 
-export const getCommentAttachmentButton = (
-  row: Locator,
-  fileName: string
-): Locator =>
-  row.getByRole("button", {
-    name: `Comment on ${fileName}`,
-    exact: true,
-  });
-
-export const closeCommentDrawer = async (drawer: Locator): Promise<void> => {
-  await drawer
-    .getByRole("contentinfo")
-    .getByRole("button", { name: /^Close$/i })
-    .click();
-  await expect(drawer).toBeHidden({ timeout: TIMEOUT_UI });
-};
-
 export const openAttachmentCommentDrawerAndVerifyPreviousComment = async (
-  editor: ReportEditorPage,
+  editor: ReportInitiativePage,
   row: Locator,
   fileName: string,
   commentText: string,
   options: { disabled?: boolean } = {}
 ): Promise<Locator> => {
   const commentsResponsePromise = waitForCommentResponse(editor, "GET");
-  await getCommentAttachmentButton(row, fileName).click();
+  await editor.commentAttachmentButton(row, fileName).click();
   const commentsResponse = await commentsResponsePromise;
   await expectCommentInResponse(commentsResponse, commentText);
 
@@ -828,36 +473,4 @@ export const openAttachmentCommentDrawerAndVerifyPreviousComment = async (
   });
 
   return commentDrawer;
-};
-
-export const uploadCheckpointAttachment = async (
-  editor: ReportEditorPage,
-  stageLabel: string,
-  checkpointName: RegExp,
-  fixture: UploadFixture
-): Promise<Locator> => {
-  const uploadDrawer = await openCheckpointUploadDrawer(editor, stageLabel);
-  await selectCheckpoint(editor, uploadDrawer, checkpointName);
-
-  const fileInput = uploadDrawer.locator('input[type="file"]');
-  await expect(fileInput).toBeEnabled();
-  const reportSaveResponsePromise = waitForReportSaveResponse(editor);
-  await fileInput.setInputFiles(fixture.filePath);
-  await expect(
-    uploadDrawer.getByRole("heading", { name: /^Upload Status$/i })
-  ).toBeVisible({ timeout: TIMEOUT_UI });
-  await expect(
-    uploadDrawer.getByText(fixture.fileName, { exact: true })
-  ).toBeVisible({ timeout: TIMEOUT_UI });
-
-  await uploadDrawer.getByRole("button", { name: /^Done$/i }).click();
-  await expect(uploadDrawer).toBeHidden({ timeout: TIMEOUT_UI });
-  await reportSaveResponsePromise;
-
-  return getCheckpointStage(editor, stageLabel)
-    .getByRole("table")
-    .locator("tbody")
-    .getByRole("row")
-    .filter({ hasText: fixture.fileName })
-    .first();
 };
