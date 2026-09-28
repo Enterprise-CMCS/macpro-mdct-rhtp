@@ -59,6 +59,9 @@ const copyAnswer = (
       const newElement = newElements.find(
         (newElement) => newElement.id === oldElement.id
       ) as AccordionGroupTemplate;
+      if (newElement.accordions.length === 0) {
+        newElement.accordions = structuredClone(oldElement.accordions);
+      }
       copyStatePolicyCommitments(oldElement.accordions, newElement.accordions);
     }
 

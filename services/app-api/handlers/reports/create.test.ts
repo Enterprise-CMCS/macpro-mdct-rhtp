@@ -7,6 +7,7 @@ import { ReportStatus, RhtpSubType, UserRoles } from "@rhtp/shared";
 import { RhtpSubTypeTemplateMap } from "../../utils/constants";
 import { authenticatedUser } from "../../utils/authentication";
 import { User } from "../../types/types";
+import s3Lib from "../../libs/s3-lib";
 
 vi.mock("../../utils/authentication");
 const mockAuthenticatedUser = vi.mocked(authenticatedUser);
@@ -82,6 +83,7 @@ describe("Test create report handler", () => {
   test("Test successful create first report", async () => {
     const res = await createReport(testEvent);
 
+    expect(s3Lib.getObject).toHaveBeenCalledTimes(4);
     expect(putReport).toHaveBeenCalled();
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });
@@ -168,6 +170,7 @@ describe("Test create report handler", () => {
     };
     const res = await createReport(copyEvent);
 
+    expect(s3Lib.getObject).not.toHaveBeenCalled();
     expect(putReport).toHaveBeenCalled();
     expect(res.statusCode).toBe(StatusCodes.Ok);
   });

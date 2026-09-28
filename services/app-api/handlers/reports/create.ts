@@ -80,7 +80,7 @@ export const createReport = handler(
       subTypeKey: nextReportKey,
       name: `${state} - ${name} - ${dateRangeString}`,
       budgetPeriod,
-      pages: await reportTemplateBuilder!(state),
+      pages: await reportTemplateBuilder!(state, nextReportKey === "A1"),
       copyFromReportId: latestReportId,
     };
 

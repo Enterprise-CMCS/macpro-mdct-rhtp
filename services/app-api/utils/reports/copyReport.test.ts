@@ -1,5 +1,6 @@
 import {
   ActionTableTemplate,
+  AccordionGroupTemplate,
   ElementType,
   FormPageTemplate,
   PageStatus,
@@ -116,6 +117,18 @@ delete mockNewReport.pages[1].elements[1].answer;
 delete mockNewReport.pages[5].elements[0].answer; // remove answer from sustainability and highlights element
 
 describe("copyReport util", () => {
+  test("copies commitments into an empty group on subsequent reports", async () => {
+    mockGetReport.mockReturnValue(mockOldReport);
+    const nextReport = structuredClone(mockNewReport);
+    nextReport.pages[4].elements[0].accordions = [];
+
+    await copyReport(nextReport);
+
+    expect(nextReport.pages[4].elements[0].accordions).toEqual(
+      (mockOldReport.pages[4].elements![0] as AccordionGroupTemplate).accordions
+    );
+  });
+
   test("copyReport copies data from old report into new one, including initiative pages and answers", async () => {
     mockGetReport.mockReturnValue(mockOldReport);
     // no answer in report before copy
