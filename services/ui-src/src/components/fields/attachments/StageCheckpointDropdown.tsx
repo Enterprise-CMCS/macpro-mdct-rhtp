@@ -25,6 +25,7 @@ export const StageCheckpointDropdown = ({
   errorCheck,
 }: Props) => {
   const { report } = useStore();
+  const [selectCSS, setSelectCSS] = useState("");
 
   const initiatives = (report?.pages.filter(
     (page) => "initiativeNumber" in page
@@ -69,12 +70,12 @@ export const StageCheckpointDropdown = ({
         (option) => option.value === value
       );
       choices[choiceIndex].checked = !choices[choiceIndex].checked;
-      choices[0].checked =
-        choices.filter((choice) => choice.checked && choice.value != "all")
-          .length ==
-        initiativeOptions.length - 1;
+      choices[0].checked = choices.some(
+        (choice) => choice.checked && choice.value != "all"
+      );
     }
     setInitiativeOptions(choices);
+    setSelectCSS(choices.every((choice) => choice.checked) ? "" : "dash");
 
     //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
     if (choices.every((choice) => !choice.checked)) {
@@ -109,7 +110,7 @@ export const StageCheckpointDropdown = ({
   };
 
   return (
-    <Stack gap="1.5rem">
+    <Stack gap="1.5rem" sx={sx.container}>
       {!hideInitiative && (
         <ChoiceList
           choices={initiativeOptions}
@@ -119,6 +120,7 @@ export const StageCheckpointDropdown = ({
           onChange={onChoiceChangeHandler}
           disabled={disabled}
           errorMessage={getErrorMsg()}
+          className={selectCSS}
         />
       )}
       <Dropdown
@@ -131,4 +133,16 @@ export const StageCheckpointDropdown = ({
       />
     </Stack>
   );
+};
+
+const sx = {
+  container: {
+    ".dash > div:first-of-type": {
+      "input:after": {
+        borderWidth: "0 0 4px 0",
+        transform: "none",
+        width: "16px",
+      },
+    },
+  },
 };
