@@ -57,12 +57,12 @@ export const buildReport = async (
     pages,
   };
 
-  if (report.subType === RhtpSubType.QUARTERLY) {
-    makeQuarterlyChanges(report.pages);
-  }
-
   if (report.copyFromReportId) {
     await copyReport(report);
+  }
+
+  if (report.subType === RhtpSubType.QUARTERLY) {
+    makeQuarterlyChanges(report.pages);
   }
 
   /**

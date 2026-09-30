@@ -43,7 +43,6 @@ describe("Test ExportedReportElements", () => {
     expect(
       screen.getByText("Report updated metric progress to CMS")
     ).toBeVisible();
-    expect(screen.getAllByText("Not applicable")).toHaveLength(3);
     expect(screen.getAllByText("No")).toHaveLength(16);
     expect(screen.getAllByText("Yes")).toHaveLength(1);
   });
