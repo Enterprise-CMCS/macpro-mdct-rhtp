@@ -81,10 +81,15 @@ const initiativeAccordion: AccordionTemplate = {
     "  <li>Initiative Metrics</li>" +
     "  <li>Initiative Checkpoints</li>" +
     "</ul>" +
-    "<b>Quarterly Reporting Data can include:</b>" +
+    "<b>Quarterly Reporting should include any available updates to:</b>" +
     "<ul>" +
-    "  <li>Initiative Progress Narrative (Optional)" +
     "  <li>Initiative Checkpoints</li>" +
+    "</ul>" +
+    "<b>Quarterly Reporting may also include:</b>" +
+    "<ul>" +
+    "  <li>Initiative Progress Narrative (Optional)</li>" +
+    "  <li>Initiative People Served  (Optional)</li>" +
+    "  <li>Initiative Metrics (Optional)</li>" +
     "</ul>",
 };
 
