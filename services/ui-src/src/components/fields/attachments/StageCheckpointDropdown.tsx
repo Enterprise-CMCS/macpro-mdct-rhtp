@@ -46,18 +46,34 @@ export const StageCheckpointDropdown = ({
 
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
-  >(getInitiativeOptions());
+  >([
+    { label: "Select All", value: "all", checked: false },
+    ...getInitiativeOptions(),
+  ]);
   const [checkpoint, setCheckpoint] = useState(answer?.checkpoint ?? "");
 
   const onChoiceChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
-    const choices = [...initiativeOptions];
-    const choiceIndex = initiativeOptions.findIndex(
-      (option) => option.value === value
-    );
-    choices[choiceIndex].checked = !choices[choiceIndex].checked;
+    let choices = [...initiativeOptions];
+
+    const choiceAll = choices[0];
+
+    if (value === "all") {
+      if (!choiceAll.checked)
+        choices = choices.map((choice) => ({ ...choice, checked: true }));
+      else choices = choices.map((choice) => ({ ...choice, checked: false }));
+    } else {
+      const choiceIndex = initiativeOptions.findIndex(
+        (option) => option.value === value
+      );
+      choices[choiceIndex].checked = !choices[choiceIndex].checked;
+      choices[0].checked =
+        choices.filter((choice) => choice.checked && choice.value != "all")
+          .length ==
+        initiativeOptions.length - 1;
+    }
     setInitiativeOptions(choices);
 
     //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
