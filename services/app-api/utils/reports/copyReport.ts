@@ -16,10 +16,14 @@ import KSUID from "ksuid";
 import { queryUpload, batchPutUploads } from "../../storage/upload";
 import { UploadData } from "../../types/uploads";
 import s3 from "../../libs/s3-lib";
+import { buildInitiativePages } from "../../forms/2026/rhtp/pages/initiatives/initiatives";
+import { buildStatePolicyCommitments } from "../../forms/2026/rhtp/pages/state-policy-commitments/state-policy-commitments";
 
 const SKIP_COPY_ANSWER_IDS = [
   "obligated-and-spent-funds-attachment",
   "initiative-narrative",
+  "initiative-number-of-people-served",
+  "commitment-notes",
 ];
 
 const SKIP_COPY_PAGE_IDS = ["sustainability-and-highlights"];
@@ -39,6 +43,8 @@ const copyStatePolicyCommitments = (
         const newChildItem = newAccordionItem?.elements.find(
           (newChildItem) => newChildItem.id === oldChildItem.id
         ) as PageElement;
+        if (!newChildItem || SKIP_COPY_ANSWER_IDS.includes(newChildItem.id))
+          continue;
         if (oldChildItem?.type === newChildItem.type) {
           newChildItem.answer = structuredClone(oldChildItem.answer);
         }
@@ -47,10 +53,11 @@ const copyStatePolicyCommitments = (
   }
 };
 
-const copyAnswer = (
+const copyAnswer = async (
   oldElements: PageElement[],
   newElements: PageElement[],
   newSubType: RhtpSubType,
+  state: string,
   status?: PageStatus
 ) => {
   for (const oldElement of oldElements) {
@@ -59,6 +66,19 @@ const copyAnswer = (
       const newElement = newElements.find(
         (newElement) => newElement.id === oldElement.id
       ) as AccordionGroupTemplate;
+      if (newElement.accordions.length === 0) {
+        const templatePage = await buildStatePolicyCommitments(state, {
+          [state]: oldElement.accordions.map(({ label }) => ({
+            label,
+            status: "",
+            links: [],
+          })),
+        });
+        const templateGroup = templatePage.elements.find(
+          (element) => element.id === oldElement.id
+        ) as AccordionGroupTemplate;
+        newElement.accordions = templateGroup.accordions;
+      }
       copyStatePolicyCommitments(oldElement.accordions, newElement.accordions);
     }
 
@@ -77,13 +97,10 @@ const copyAnswer = (
       continue;
     }
     if (newElement?.type === oldElement.type) {
-      //special copy of metrics table when it's a new annual report
-      if (
-        newElement.id === "metrics-table" &&
-        newSubType === RhtpSubType.ANNUAL
-      ) {
+      if (newElement.id === "metrics-table") {
         newElement.answer = copyMetricAnswers(
-          oldElement.answer as ActionAnswerShape[]
+          oldElement.answer as ActionAnswerShape[],
+          newSubType
         );
       } else if (SKIP_COPY_ANSWER_IDS.includes(newElement.id)) {
         delete newElement.answer;
@@ -94,14 +111,19 @@ const copyAnswer = (
   }
 };
 
-const copyMetricAnswers = (oldAnswerRows: ActionAnswerShape[]) => {
+const copyMetricAnswers = (
+  oldAnswerRows: ActionAnswerShape[],
+  newSubType: RhtpSubType
+) => {
   return oldAnswerRows.map((oldAnswerRow) => {
     const newAnswerRow = structuredClone(oldAnswerRow);
-    const indexes = ["prevValue", "currValue"].map((key) =>
-      oldAnswerRow.findIndex((row) => row.id === key)
-    );
-    newAnswerRow[indexes[0]].value = oldAnswerRow[indexes[1]].value ?? "";
-    newAnswerRow[indexes[1]].value = "";
+    if (newSubType === RhtpSubType.ANNUAL) {
+      const indexes = ["prevValue", "currValue"].map((key) =>
+        oldAnswerRow.findIndex((row) => row.id === key)
+      );
+      newAnswerRow[indexes[0]].value = oldAnswerRow[indexes[1]].value ?? "";
+      newAnswerRow[indexes[1]].value = "";
+    }
     return newAnswerRow;
   });
 };
@@ -224,10 +246,20 @@ export const copyReport = async (newReport: Report) => {
     if (SKIP_COPY_PAGE_IDS.includes(oldPage.id)) continue;
     if (oldPage.elements) {
       let newPage = newPages.find((newPage) => newPage.id === oldPage.id);
-      // ensure initiatives not in base template get copied
+
       if (!newPage && "initiativeNumber" in oldPage) {
-        newPages.push(oldPage);
-        newPage = oldPage;
+        const [initiativePage] = await buildInitiativePages(state, {
+          [state]: [
+            {
+              id: oldPage.id,
+              title: oldPage.title,
+              initiativeNumber: oldPage.initiativeNumber,
+              status: oldPage.status,
+            },
+          ],
+        });
+        newPage = initiativePage;
+        newPages.push(newPage);
       }
 
       const newElements = newPage?.elements;
@@ -237,7 +269,13 @@ export const copyReport = async (newReport: Report) => {
         newPage.status = oldPage.status;
       }
 
-      copyAnswer(oldPage.elements, newElements, subType, newPage?.status);
+      await copyAnswer(
+        oldPage.elements,
+        newElements,
+        subType,
+        state,
+        newPage?.status
+      );
     }
   }
 

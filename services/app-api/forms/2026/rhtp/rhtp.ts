@@ -9,7 +9,8 @@ import { buildSustainabilityAndHighlightsPage } from "./pages/sustainability-and
 import { obligatedAndSpentFunds } from "./pages/obligated-and-spent-funds";
 
 export const rhtpReportTemplate = async (
-  state: string
+  state: string,
+  isFirstReport: boolean
 ): Promise<ReportPages> => [
   {
     id: "root",
@@ -23,12 +24,15 @@ export const rhtpReportTemplate = async (
       "review-submit",
     ],
   },
-  await buildGeneralInformationPage(state),
+  await buildGeneralInformationPage(state, isFirstReport ? undefined : {}),
   initiativesTable,
   initiativeAttachments,
-  await buildStatePolicyCommitments(state),
+  await buildStatePolicyCommitments(state, isFirstReport ? undefined : {}),
   obligatedAndSpentFunds,
-  await buildSustainabilityAndHighlightsPage(state),
+  await buildSustainabilityAndHighlightsPage(
+    state,
+    isFirstReport ? undefined : {}
+  ),
   reviewAndSubmit,
-  ...(await buildInitiativePages(state)),
+  ...(await buildInitiativePages(state, isFirstReport ? undefined : {})),
 ];

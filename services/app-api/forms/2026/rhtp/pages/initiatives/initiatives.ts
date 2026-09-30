@@ -333,15 +333,14 @@ const buildPages = (state: string, initiatives: InitiativesData) => {
   return initiativePages;
 };
 
-// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+// Fetches from S3 for first report of a state (later reports pass in empty data object)
 export const buildInitiativePages = (
   state: string,
   initiatives?: InitiativesData
 ): ReturnType<typeof buildPages> | Promise<ReturnType<typeof buildPages>> => {
   if (initiatives) return buildPages(state, initiatives);
-  //TO-DO: Make this only fetch data for first report of a state
   return getJsonFromS3<InitiativesData>(INITIATIVES_KEY).then((fetched) =>
-    // Use manually uploaded S3 data if available, otherwise use empty initiatives JSON
+    // Use manually uploaded S3 data if available, otherwise use empty initiatives JSON (should only be in testing envs)
     buildPages(state, fetched ?? (EMPTY_INITIATIVES as InitiativesData))
   );
 };
