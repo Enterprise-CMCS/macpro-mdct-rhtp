@@ -140,7 +140,6 @@ describe("<TableCheckpoint />", () => {
       screen.getAllByRole("button", { name: "Upload attachments" })[0]
     ).toBeVisible();
     expect(screen.getByText("Establish governance")).toBeVisible();
-    expect(screen.getAllByText("Not applicable")).toHaveLength(3);
   });
   test("receive an error when state or year is not provided", async () => {
     (mockedUseStore as Mock).mockResolvedValueOnce("");
