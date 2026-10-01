@@ -1,44 +1,53 @@
 import { test, expect, type Locator } from "./fixtures/base";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
 import {
+  createRunScopedInitiativeValues,
   INITIATIVES_SECTION,
   INITIATIVE_ATTACHMENTS_SECTION,
   GENERAL_INFORMATION_SECTION,
 } from "../utils/report-edit-shared-helpers";
 import {
+  skipIfUnavailable,
   verifyCurrentSection,
   verifyReportSectionShell,
 } from "../utils/report-edit-assertions";
 import { ReportEditorPage } from "./pageObjects/report-editor.page";
+import { INITIATIVE_UI_NAMES } from "./pageObjects/report-initiative.page";
 import { TIMEOUT_UI } from "../utils/timeouts";
-
-const INITIATIVE_ROW_PATTERN = /^\d+:\s*.+/;
-const STATUS_TEXT_PATTERN =
-  /^Status: (Minimum requirements (not )?met|Abandoned)$/i;
 
 const getStatusIcon = (row: Locator): Locator => row.getByRole("img");
 
 const getStatusText = (row: Locator): Locator =>
-  row.getByText(STATUS_TEXT_PATTERN);
+  row.getByText(INITIATIVE_UI_NAMES.status.initiativeRow);
 
 const getInitiativeName = (row: Locator): Locator =>
-  row.getByRole("cell").filter({ hasText: INITIATIVE_ROW_PATTERN });
+  row.getByRole("cell").filter({
+    hasText: INITIATIVE_UI_NAMES.rowPattern,
+  });
 
 const getInitiativeRows = (table: Locator): Locator =>
-  table.getByRole("row").filter({ hasText: INITIATIVE_ROW_PATTERN });
+  table.getByRole("row").filter({
+    hasText: INITIATIVE_UI_NAMES.rowPattern,
+  });
 
 const getEditButton = (row: Locator): Locator =>
-  row.getByRole("link", { name: /^(Edit|View)\b/i });
+  row.getByRole("link", { name: INITIATIVE_UI_NAMES.button.editOrView });
 
 const verifyInitiativesTableHeaders = async (table: Locator): Promise<void> => {
   await expect(
-    table.getByRole("columnheader", { name: "Status" })
+    table.getByRole("columnheader", {
+      name: INITIATIVE_UI_NAMES.column.status,
+    })
   ).toBeVisible();
   await expect(
-    table.getByRole("columnheader", { name: "Initiative" })
+    table.getByRole("columnheader", {
+      name: INITIATIVE_UI_NAMES.column.initiative,
+    })
   ).toBeVisible();
   await expect(
-    table.getByRole("columnheader", { name: "Actions" })
+    table.getByRole("columnheader", {
+      name: INITIATIVE_UI_NAMES.column.actions,
+    })
   ).toBeVisible();
 };
 
@@ -122,6 +131,64 @@ test.describe("Report Editing - Initiatives", () => {
         timeout: TIMEOUT_UI,
       }
     );
+  });
+
+  test("should add an initiative and persist it across section navigation @regression", async () => {
+    const addInitiativeButton = editor.page.getByRole("button", {
+      name: INITIATIVE_UI_NAMES.button.addInitiative,
+    });
+    const addInitiativeUnavailable = await skipIfUnavailable(
+      () => addInitiativeButton.isVisible(),
+      (reason) => test.skip(true, reason),
+      "Add initiative action is not available for this user"
+    );
+    if (addInitiativeUnavailable) {
+      return;
+    }
+
+    const { initiativeNumber, initiativeName, expectedDisplayName } =
+      createRunScopedInitiativeValues("initiatives-persistence");
+
+    await addInitiativeButton.click();
+
+    const initiativeModal = editor.page.getByRole("dialog");
+    await expect(initiativeModal).toBeVisible({ timeout: TIMEOUT_UI });
+    await expect(
+      initiativeModal.getByRole("heading", {
+        name: INITIATIVE_UI_NAMES.heading.addInitiative,
+      })
+    ).toBeVisible({ timeout: TIMEOUT_UI });
+
+    await initiativeModal
+      .getByRole("textbox", {
+        name: INITIATIVE_UI_NAMES.field.initiativeNumber,
+      })
+      .fill(initiativeNumber);
+    await initiativeModal
+      .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeName })
+      .fill(initiativeName);
+
+    await initiativeModal
+      .getByRole("button", { name: INITIATIVE_UI_NAMES.button.save })
+      .click();
+    await expect(initiativeModal).toBeHidden({ timeout: TIMEOUT_UI });
+    await expect(
+      editor.page.getByText(expectedDisplayName).first()
+    ).toBeVisible({ timeout: TIMEOUT_UI });
+
+    const { reportType, state, reportId } = editor.getCurrentRouteParams();
+    await editor.navigateToSectionAndBack(
+      reportType,
+      state,
+      reportId,
+      GENERAL_INFORMATION_SECTION,
+      INITIATIVES_SECTION
+    );
+
+    await verifyCurrentSection(editor, INITIATIVES_SECTION);
+    await expect(
+      editor.page.getByText(expectedDisplayName).first()
+    ).toBeVisible({ timeout: TIMEOUT_UI });
   });
 
   test("should navigate to the previous section when Previous is clicked @regression", async () => {

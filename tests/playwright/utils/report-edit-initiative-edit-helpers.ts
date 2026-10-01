@@ -1,4 +1,7 @@
 import { expect, type Locator } from "@playwright/test";
+import { promises as fs } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   createArtifactId,
   escapeRegExp,
@@ -6,36 +9,24 @@ import {
   OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH,
 } from "./report-edit-shared-helpers";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
-import { ReportInitiativePage } from "../tests/pageObjects/report-initiative.page";
+import {
+  INITIATIVE_UI_NAMES,
+  ReportInitiativePage,
+} from "../tests/pageObjects/report-initiative.page";
 import { TIMEOUT_UI } from "./timeouts";
-import { promises as fs } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 
-export const CHECKPOINT_STAGE_LABELS = [
-  "Stage 0: Planning",
-  "Stage 1: Project Preparation",
-  "Stage 2: Early Implementation",
-  "Stage 3: Midway Implementation",
-  "Stage 4: Preparing for Completion",
-  "Stage 5: Full Implementation",
-];
+export const verifyAnnualInitiativeFields = async (
+  editor: ReportInitiativePage
+): Promise<void> => {
+  await expect(editor.narrativeRequiredLabel).toBeVisible();
+  await expect(editor.narrativeField).toBeVisible();
+  await expect(editor.narrativeField).toHaveValue(/\S+/);
+  await expect(editor.narrativeField).toBeEditable();
+  await expect(editor.peopleServedRequiredLabel).toBeVisible();
+  await expect(editor.peopleServedField).toBeVisible();
+  await expect(editor.peopleServedField).toBeEditable();
+};
 
-export const GOVERNANCE_CHECKPOINT = /0\.1 Establish governance/i;
-
-export const CHECKPOINT_TABLE_HEADERS = [
-  "#",
-  "Checkpoint",
-  "Ready for CMS Review",
-  "Attachments",
-  "Status",
-  "Actions",
-];
-
-const CHECKPOINT_STATUS_PATTERN =
-  /^(Pending Review|Needs Revision|Locked for Scoring|Informational|Archived)$/i;
-
-export type { ReportPeriod } from "../tests/pageObjects/report-initiative.page";
 export type AdminMetricControlsVisibility = "visible" | "hidden";
 export type MetricsTableOptions = {
   adminControls?: boolean;
@@ -78,11 +69,13 @@ export const verifyAbandonedMetricRow = async (
   await expect(metricRow).toHaveCount(1);
   await expect(metricRow).toBeVisible({ timeout: TIMEOUT_UI });
   await expect(
-    metricRow.getByRole("cell", { name: /^Abandoned$/i })
+    metricRow.getByRole("cell", { name: INITIATIVE_UI_NAMES.status.abandoned })
   ).toBeVisible({ timeout: TIMEOUT_UI });
 
   const hasPreviousValueColumn = await table
-    .getByRole("columnheader", { name: /^Previous annual value$/i })
+    .getByRole("columnheader", {
+      name: INITIATIVE_UI_NAMES.column.previousAnnualValue,
+    })
     .isVisible()
     .catch(() => false);
   const cells = metricRow.getByRole("cell");
@@ -107,7 +100,9 @@ export const verifyMetricRow = async (
 
   const cells = metricRow.getByRole("cell");
   const hasPreviousValueColumn = await table
-    .getByRole("columnheader", { name: /^Previous annual value$/i })
+    .getByRole("columnheader", {
+      name: INITIATIVE_UI_NAMES.column.previousAnnualValue,
+    })
     .isVisible()
     .catch(() => false);
   const currentValueIndex = hasPreviousValueColumn ? 5 : 4;
@@ -126,14 +121,16 @@ export const verifyAdminMetricControls = async (
   visibility: AdminMetricControlsVisibility
 ): Promise<void> => {
   const addMetricButton = editor.page.getByRole("button", {
-    name: /^Add Metric$/i,
+    name: INITIATIVE_UI_NAMES.button.addMetric,
   });
   const metricsTable = editor.page.getByRole("table").filter({
-    has: editor.page.getByRole("columnheader", { name: "Metric" }),
+    has: editor.page.getByRole("columnheader", {
+      name: INITIATIVE_UI_NAMES.column.metric,
+    }),
   });
   const metricRows = metricsTable.locator("tbody").getByRole("row");
   const editAbandonButtons = metricRows.getByRole("button", {
-    name: /^Edit\/Abandon$/i,
+    name: INITIATIVE_UI_NAMES.button.editOrAbandonMetric,
   });
 
   await expect(metricsTable).toBeVisible({ timeout: TIMEOUT_UI });
@@ -152,7 +149,7 @@ export const verifyAdminMetricControls = async (
   for (let index = 0; index < metricRowCount; index++) {
     await expect(
       metricRows.nth(index).getByRole("button", {
-        name: /^Edit\/Abandon$/i,
+        name: INITIATIVE_UI_NAMES.button.editOrAbandonMetric,
       })
     ).toBeVisible({ timeout: TIMEOUT_UI });
   }
@@ -173,20 +170,22 @@ export const verifyMetricsTableHeaders = async (
   options: MetricsTableOptions = {}
 ): Promise<boolean> => {
   const previousAnnualValueHeader = table.getByRole("columnheader", {
-    name: /^Previous annual value$/i,
+    name: INITIATIVE_UI_NAMES.column.previousAnnualValue,
   });
   const hasPreviousValueColumn = await previousAnnualValueHeader
     .isVisible()
     .catch(() => false);
   const expectedHeaders = [
-    "#",
-    "Status",
-    "Metric",
-    "Target",
-    ...(hasPreviousValueColumn ? ["Previous annual value"] : []),
-    "Current value",
-    "As of Date MM/DD/YYYY",
-    ...(options.adminControls ? ["Actions"] : []),
+    INITIATIVE_UI_NAMES.column.number,
+    INITIATIVE_UI_NAMES.column.status,
+    INITIATIVE_UI_NAMES.column.metric,
+    INITIATIVE_UI_NAMES.column.target,
+    ...(hasPreviousValueColumn
+      ? [INITIATIVE_UI_NAMES.column.previousAnnualValue]
+      : []),
+    INITIATIVE_UI_NAMES.column.currentValue,
+    INITIATIVE_UI_NAMES.column.currentValueDate,
+    ...(options.adminControls ? [INITIATIVE_UI_NAMES.column.actions] : []),
   ];
 
   await verifyTableHeaders(table, expectedHeaders);
@@ -215,7 +214,9 @@ export const verifyMetricsTableRows = async (
       (hasPreviousValueColumn ? 7 : 6) + (options.adminControls ? 1 : 0)
     );
     await expect(cells.nth(0)).toHaveText(/^[1-9]\d*$/);
-    await expect(cells.nth(1)).toHaveText(/^(Active|Abandoned)$/i);
+    await expect(cells.nth(1)).toHaveText(
+      INITIATIVE_UI_NAMES.status.activeOrAbandoned
+    );
     await expect(cells.nth(2)).toHaveText(/\S+/);
     await expect(cells.nth(3)).toHaveText(/^(--|\S[\s\S]*)$/);
 
@@ -229,7 +230,7 @@ export const verifyMetricsTableRows = async (
       await expect(cells.nth(4).locator("input")).toBeDisabled();
     }
 
-    if (/^Abandoned$/i.test(status)) {
+    if (INITIATIVE_UI_NAMES.status.abandoned.test(status)) {
       await expect(currentValueInput).toBeDisabled();
       await expect(dateInput).toBeDisabled();
     } else {
@@ -242,42 +243,24 @@ export const verifyMetricsTableRows = async (
     if (options.adminControls) {
       await expect(
         cells.nth(hasPreviousValueColumn ? 7 : 6).getByRole("button", {
-          name: /^Edit\/Abandon$/i,
+          name: INITIATIVE_UI_NAMES.button.editOrAbandonMetric,
         })
       ).toBeVisible({ timeout: TIMEOUT_UI });
     }
   }
 };
 
-export const verifyVisibleAnnualInitiativeFields = async (
-  editor: ReportEditorPage
-): Promise<void> => {
-  const narrativeRequiredLabel = editor.page
-    .locator("label")
-    .filter({ hasText: /^NarrativeRequired$/i });
-  const narrativeTextArea = editor.page.getByRole("textbox", {
-    name: /^Narrative/i,
-  });
-  const peopleServedRequiredLabel = editor.page
-    .locator("label")
-    .filter({ hasText: /^Number of people servedRequired$/i });
-  const peopleServedTextArea = editor.page.getByRole("textbox", {
-    name: /Number of people served/i,
-  });
-
-  await expect(narrativeRequiredLabel).toBeVisible();
-  await expect(narrativeTextArea).toBeVisible();
-  await expect(narrativeTextArea).toHaveValue(/\S+/);
-  await expect(narrativeTextArea).toBeEditable();
-  await expect(peopleServedRequiredLabel).toBeVisible();
-  await expect(peopleServedTextArea).toBeVisible();
-  await expect(peopleServedTextArea).toBeEditable();
-};
-
 export const verifyCheckpointTableHeaders = async (
   table: Locator
 ): Promise<void> => {
-  await verifyTableHeaders(table, CHECKPOINT_TABLE_HEADERS);
+  await verifyTableHeaders(table, [
+    INITIATIVE_UI_NAMES.column.number,
+    INITIATIVE_UI_NAMES.column.checkpoint,
+    INITIATIVE_UI_NAMES.column.readiness,
+    INITIATIVE_UI_NAMES.column.attachments,
+    INITIATIVE_UI_NAMES.column.status,
+    INITIATIVE_UI_NAMES.column.actions,
+  ]);
 };
 
 export const verifyCheckpointStageRows = async (
@@ -314,12 +297,18 @@ export const verifyCheckpointStageRows = async (
     await expect(cells.nth(3)).toHaveText(/^(|Not applicable|--|\S[\s\S]*)$/);
 
     if (hasAttachment) {
-      await expect(cells.nth(4)).toHaveText(CHECKPOINT_STATUS_PATTERN);
+      await expect(cells.nth(4)).toHaveText(
+        INITIATIVE_UI_NAMES.status.checkpoint
+      );
       await expect(
-        cells.nth(5).getByRole("button", { name: /Manage file or info/i })
+        cells.nth(5).getByRole("button", {
+          name: INITIATIVE_UI_NAMES.button.manageAttachmentPrefix,
+        })
       ).toBeVisible();
       await expect(
-        cells.nth(5).getByRole("button", { name: /Comment on/i })
+        cells.nth(5).getByRole("button", {
+          name: INITIATIVE_UI_NAMES.button.commentAttachmentPrefix,
+        })
       ).toBeVisible();
     } else {
       await expect(cells.nth(4)).toHaveText(/^$/);
@@ -340,20 +329,62 @@ export const getCheckpointStatusFromRow = async (
   return status;
 };
 
-export const verifyInitiativesDashboardVisible = async (
-  editor: ReportEditorPage
-): Promise<void> => {
-  const initiativesTable = editor.page.getByRole("table").filter({
-    has: editor.page.getByRole("columnheader", { name: "Initiative" }),
-  });
-
-  await expect(initiativesTable).toBeVisible({ timeout: TIMEOUT_UI });
-};
-
 export type UploadFixture = { fileName: string; filePath: string };
 
+export const withUploadFixture = async (
+  callback: (fixture: UploadFixture) => Promise<void>
+): Promise<void> => {
+  const fileName = `initiative-attachment-${getReportTestRunId()}-${createArtifactId()}.csv`;
+  const filePath = join(tmpdir(), fileName);
+  await fs.copyFile(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH, filePath);
+
+  try {
+    await callback({ fileName, filePath });
+  } finally {
+    await fs.unlink(filePath).catch(() => {});
+  }
+};
+
+export const verifyManageAttachmentDrawerControls = async (
+  drawer: Locator,
+  fileName: string,
+  checkpointStatus: string
+): Promise<void> => {
+  await expect(drawer).toContainText(fileName);
+  await expect(drawer).toContainText(INITIATIVE_UI_NAMES.label.currentStatus);
+  await expect(drawer).toContainText(
+    new RegExp(escapeRegExp(checkpointStatus), "i")
+  );
+
+  const statusDropdown = drawer
+    .getByRole("button", { name: INITIATIVE_UI_NAMES.label.optionalStatus })
+    .first();
+  const initiativeChoices = drawer.getByRole("checkbox");
+  const checkpointDropdown = drawer
+    .getByRole("button", {
+      name: INITIATIVE_UI_NAMES.label.checkpoint,
+    })
+    .first();
+  const deleteAttachmentButton = drawer.getByRole("button", {
+    name: INITIATIVE_UI_NAMES.button.deleteAttachment,
+  });
+  const saveChangesButton = drawer.getByRole("button", {
+    name: INITIATIVE_UI_NAMES.button.saveChanges,
+  });
+
+  await expect(statusDropdown).toBeVisible();
+  await expect(statusDropdown).toBeEnabled();
+  await expect(initiativeChoices.first()).toBeVisible();
+  await expect(checkpointDropdown).toBeVisible();
+  await expect(checkpointDropdown).toBeEnabled();
+  await expect(deleteAttachmentButton).toBeVisible();
+  await expect(deleteAttachmentButton).toBeEnabled();
+  await expect(saveChangesButton).toBeVisible();
+  await expect(saveChangesButton).toBeEnabled();
+};
+
 export const waitForCommentResponse = (
-  editor: ReportEditorPage,
+  editor: ReportInitiativePage,
   method: "GET" | "POST"
 ) =>
   editor.page.waitForResponse(
@@ -380,61 +411,9 @@ export const expectCommentInResponse = async (
   );
 };
 
-export const withUploadFixture = async (
-  callback: (fixture: UploadFixture) => Promise<void>
-): Promise<void> => {
-  const fileName = `initiative-attachment-${getReportTestRunId()}-${createArtifactId()}.csv`;
-  const filePath = join(tmpdir(), fileName);
-  await fs.copyFile(OBLIGATED_AND_SPENT_FUNDS_FIXTURE_PATH, filePath);
-
-  try {
-    await callback({ fileName, filePath });
-  } finally {
-    await fs.unlink(filePath).catch(() => {});
-  }
-};
-
-export const verifyManageAttachmentDrawerControls = async (
-  drawer: Locator,
-  fileName: string,
-  checkpointStatus: string
-): Promise<void> => {
-  await expect(drawer).toContainText(fileName);
-  await expect(drawer).toContainText(/Current status/i);
-  await expect(drawer).toContainText(
-    new RegExp(escapeRegExp(checkpointStatus), "i")
-  );
-
-  const statusDropdown = drawer
-    .getByRole("button", { name: /Status\s*\(optional\)/i })
-    .first();
-  const initiativeChoices = drawer.getByRole("checkbox");
-  const checkpointDropdown = drawer
-    .getByRole("button", {
-      name: /Which stage\/checkpoint does this attachment apply to\?/i,
-    })
-    .first();
-  const deleteAttachmentButton = drawer.getByRole("button", {
-    name: /^Delete attachment$/i,
-  });
-  const saveChangesButton = drawer.getByRole("button", {
-    name: /^Save changes$/i,
-  });
-
-  await expect(statusDropdown).toBeVisible();
-  await expect(statusDropdown).toBeEnabled();
-  await expect(initiativeChoices.first()).toBeVisible();
-  await expect(checkpointDropdown).toBeVisible();
-  await expect(checkpointDropdown).toBeEnabled();
-  await expect(deleteAttachmentButton).toBeVisible();
-  await expect(deleteAttachmentButton).toBeEnabled();
-  await expect(saveChangesButton).toBeVisible();
-  await expect(saveChangesButton).toBeEnabled();
-};
-
 export const openAttachmentCommentDrawerAndVerifyPreviousComment = async (
   editor: ReportInitiativePage,
-  row: Locator,
+  row: ReturnType<ReportInitiativePage["checkpointAttachmentRow"]>,
   fileName: string,
   commentText: string,
   options: { disabled?: boolean } = {}
@@ -454,9 +433,9 @@ export const openAttachmentCommentDrawerAndVerifyPreviousComment = async (
 
   const previousCommentCount = await previousCommentFields.count();
   let matchingCommentIndex = -1;
-  for (let i = 0; i < previousCommentCount; i += 1) {
-    if ((await previousCommentFields.nth(i).inputValue()) === commentText) {
-      matchingCommentIndex = i;
+  for (let index = 0; index < previousCommentCount; index += 1) {
+    if ((await previousCommentFields.nth(index).inputValue()) === commentText) {
+      matchingCommentIndex = index;
       break;
     }
   }

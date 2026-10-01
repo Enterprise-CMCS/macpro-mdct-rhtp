@@ -3,6 +3,15 @@ import { BasePage } from "./base.page";
 import { TIMEOUT_LOADING, TIMEOUT_UI } from "../../utils/timeouts";
 
 export type DashboardState = "empty" | "unsubmitted" | "submitted";
+export type ReportPeriod = "annual" | "quarterly";
+
+const REPORT_PERIOD_LABELS: Record<ReportPeriod, string> = {
+  annual: "Annual Report",
+  quarterly: "Quarterly Report",
+};
+
+const EDITABLE_REPORT_STATUS_PATTERN =
+  /^(Not started|In progress|In revision)$/i;
 
 export class DashboardPage extends BasePage {
   constructor(page: Page) {
@@ -13,6 +22,33 @@ export class DashboardPage extends BasePage {
   async navigateToDashboard(reportType: string, state: string): Promise<void> {
     const route = `/report/${reportType}/${state}`;
     await this.navigateTo(route);
+    await this.waitForLoadingComplete();
+  }
+
+  async openEditableReportByPeriod(period: ReportPeriod): Promise<void> {
+    await this.waitForDashboardReady();
+
+    const reportRow = this.page
+      .getByRole("table")
+      .getByRole("row")
+      .filter({ hasText: REPORT_PERIOD_LABELS[period] })
+      .filter({
+        has: this.page.getByRole("cell", {
+          name: EDITABLE_REPORT_STATUS_PATTERN,
+        }),
+      })
+      .first();
+    await expect(reportRow).toBeVisible({ timeout: TIMEOUT_UI });
+
+    const reportAction = reportRow.getByRole("button", {
+      name: /^(Edit|View)\b/i,
+    });
+    await expect(reportAction).toBeVisible({ timeout: TIMEOUT_UI });
+
+    await Promise.all([
+      this.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?/),
+      reportAction.click(),
+    ]);
     await this.waitForLoadingComplete();
   }
 
