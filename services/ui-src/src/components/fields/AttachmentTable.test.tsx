@@ -100,6 +100,11 @@ describe("<AttachmentTable />", () => {
             initiativeNumber: "123",
             title: "Init Title",
           },
+          {
+            id: "mock-init-2",
+            initiativeNumber: "456",
+            title: "Init Title",
+          },
         ],
       },
     });
@@ -123,6 +128,11 @@ describe("<AttachmentTable />", () => {
       expect(screen.getByText("Upload Initiative Attachments")).toBeVisible();
     });
 
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select All" }));
+    await userEvent.click(
+      screen.getByRole("checkbox", { name: "456: Init Title" })
+    );
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select All" }));
     await userEvent.click(
       screen.getByRole("checkbox", { name: "123: Init Title" })
     );
