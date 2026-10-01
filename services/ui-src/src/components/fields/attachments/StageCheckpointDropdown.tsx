@@ -5,7 +5,7 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { InitiativePageTemplate, PageStatus } from "@rhtp/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "utils";
 import { checkpointAttachableOptions } from "verbiage/checkpoints";
 
@@ -43,14 +43,29 @@ export const StageCheckpointDropdown = ({
       };
     });
   };
-
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
   >([
-    { label: "Select All", value: "all", checked: false },
+    {
+      label: "Select All",
+      value: "all",
+      checked: answer ? answer.initiatives.length > 0 : false,
+    },
     ...getInitiativeOptions(),
   ]);
   const [checkpoint, setCheckpoint] = useState(answer?.checkpoint ?? "");
+
+  useEffect(() => {
+    //for changing the select all checkbox to indeterminate after rendering an edit view.
+    if (answer?.initiatives) {
+      const input = document.querySelector(
+        'input[value="all"]'
+      ) as HTMLInputElement;
+      input.indeterminate =
+        answer?.initiatives.length > 0 &&
+        answer?.initiatives.length < initiativeOptions.length - 1;
+    }
+  }, []);
 
   const onChoiceChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -69,11 +84,16 @@ export const StageCheckpointDropdown = ({
         (option) => option.value === value
       );
       choices[choiceIndex].checked = !choices[choiceIndex].checked;
+
+      //set checks and indeterminate valye for select all
       choices[0].checked = choices.some(
         (choice) => choice.checked && choice.value != "all"
       );
-      const inputs = document.getElementsByTagName("input");
-      inputs[0].indeterminate = !choices.every((choice) => choice.checked);
+      const input = document.querySelector(
+        'input[value="all"]'
+      ) as HTMLInputElement;
+      input.indeterminate =
+        choices[0].checked && !choices.every((choice) => choice.checked);
     }
     setInitiativeOptions(choices);
 
@@ -82,7 +102,9 @@ export const StageCheckpointDropdown = ({
       setCheckpoint("");
     }
     onDropdownHandler(
-      initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
+      initiativeOptions
+        .filter((opt) => opt.checked && opt.value !== "all")
+        .map((opt) => opt.value),
       checkpoint
     );
   };
@@ -97,7 +119,9 @@ export const StageCheckpointDropdown = ({
     const newCheckpoint = event.target.value;
     setCheckpoint(newCheckpoint);
     onDropdownHandler(
-      initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
+      initiativeOptions
+        .filter((opt) => opt.checked && opt.value !== "all")
+        .map((opt) => opt.value),
       newCheckpoint
     );
   };
