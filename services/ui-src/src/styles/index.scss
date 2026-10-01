@@ -162,6 +162,16 @@ button {
   &:disabled::before {
     box-shadow: inset 0 0 4em 1em var(--chakra-colors-gray_light);
   }
+  &:indeterminate {
+    background: #0071bc;
+    border-width: 0;
+    &::after {
+      opacity: 1;
+      border-width: 0 0 4px 0;
+      transform: none;
+      width: 16px;
+    }
+  }
 }
 
 .ds-c-label,
