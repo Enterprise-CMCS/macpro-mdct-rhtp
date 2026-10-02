@@ -1,4 +1,7 @@
-import { DashboardPage } from "../tests/pageObjects/dashboard.page";
+import {
+  DashboardPage,
+  type ReportPeriod,
+} from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import { ReportModalPage } from "../tests/pageObjects/report-modal.page";
 import type { StatePage } from "../tests/pageObjects/state.page";
@@ -6,12 +9,28 @@ import { reportType, stateAbbreviation } from "./consts";
 import { determineRetryAfterDateBlock } from "./report-date-gate-retry";
 import { TIMEOUT_OPEN_REPORT_SECTION } from "./timeouts";
 
-const REPORT_TYPE = reportType;
-const STATE = stateAbbreviation;
-
 export type OpenReportSectionResult =
   | { ok: true; editor: ReportEditorPage }
   | { ok: false; reason: string };
+
+export const openReportPeriodSection = async (
+  editor: ReportEditorPage,
+  period: ReportPeriod,
+  sectionId: string
+): Promise<void> => {
+  const { reportType, state } = editor.getCurrentRouteParams();
+  const dashboard = new DashboardPage(editor.page);
+  await dashboard.navigateToDashboard(reportType, state);
+  await dashboard.openEditableReportByPeriod(period);
+
+  const openedReport = editor.getCurrentRouteParams();
+  await editor.navigateToSection(
+    openedReport.reportType,
+    openedReport.state,
+    openedReport.reportId,
+    sectionId
+  );
+};
 
 type OpenReportSectionOptions = {
   timeoutMs?: number;
@@ -73,7 +92,7 @@ const openDashboardModal = async (
     return true;
   } catch {
     try {
-      await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+      await dashboard.navigateToDashboard(reportType, stateAbbreviation);
       await openModal();
       return true;
     } catch {
@@ -101,7 +120,7 @@ export const openReportSection = async (
   const modal = new ReportModalPage(statePage.page);
 
   try {
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    await dashboard.navigateToDashboard(reportType, stateAbbreviation);
     let dashboardState = await refreshDashboardState(dashboard, statePage);
 
     if (targetState === "unsubmitted" && dashboardState === "empty") {
@@ -133,7 +152,7 @@ export const openReportSection = async (
           createOutcome,
           dashboard,
           async () => {
-            await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+            await dashboard.navigateToDashboard(reportType, stateAbbreviation);
             const reopenedCreateModal = await openDashboardModal(
               () => dashboard.openCreateModal(),
               dashboard
@@ -146,7 +165,7 @@ export const openReportSection = async (
         );
 
         if (createOutcome.status !== "created") {
-          await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+          await dashboard.navigateToDashboard(reportType, stateAbbreviation);
           dashboardState = await refreshDashboardState(dashboard, statePage);
           if (dashboardState === "empty") {
             return {
@@ -156,7 +175,7 @@ export const openReportSection = async (
           }
         }
 
-        await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+        await dashboard.navigateToDashboard(reportType, stateAbbreviation);
         dashboardState = await refreshDashboardState(dashboard, statePage);
       }
     }
@@ -176,7 +195,7 @@ export const openReportSection = async (
         dashboard,
         async () => {
           await modal.closeModalIfOpen();
-          await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+          await dashboard.navigateToDashboard(reportType, stateAbbreviation);
           const reopenedCopyModal = await openDashboardModal(
             () => dashboard.openCopyModal(),
             dashboard
@@ -187,11 +206,11 @@ export const openReportSection = async (
       );
 
       if (copyOutcome.status !== "copied") {
-        await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+        await dashboard.navigateToDashboard(reportType, stateAbbreviation);
         dashboardState = await refreshDashboardState(dashboard, statePage);
         if (dashboardState !== "unsubmitted") {
           const resetSucceeded = await dashboard
-            .deleteAllReportsViaDevTools(STATE)
+            .deleteAllReportsViaDevTools(stateAbbreviation)
             .catch(() => false);
 
           if (!resetSucceeded) {
@@ -201,7 +220,7 @@ export const openReportSection = async (
             };
           }
 
-          await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+          await dashboard.navigateToDashboard(reportType, stateAbbreviation);
           dashboardState = await refreshDashboardState(dashboard, statePage);
 
           if (dashboardState === "empty") {
@@ -218,7 +237,10 @@ export const openReportSection = async (
               createOutcome,
               dashboard,
               async () => {
-                await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+                await dashboard.navigateToDashboard(
+                  reportType,
+                  stateAbbreviation
+                );
                 const reopenedCreateModal = await openDashboardModal(
                   () => dashboard.openCreateModal(),
                   dashboard
@@ -237,7 +259,7 @@ export const openReportSection = async (
               };
             }
 
-            await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+            await dashboard.navigateToDashboard(reportType, stateAbbreviation);
             dashboardState = await refreshDashboardState(dashboard, statePage);
           }
 
@@ -250,7 +272,7 @@ export const openReportSection = async (
         }
       }
 
-      await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+      await dashboard.navigateToDashboard(reportType, stateAbbreviation);
       dashboardState = await refreshDashboardState(dashboard, statePage);
     }
 
