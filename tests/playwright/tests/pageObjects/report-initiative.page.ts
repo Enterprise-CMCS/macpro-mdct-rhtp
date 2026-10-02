@@ -20,6 +20,11 @@ export const CHECKPOINT_STAGE_LABELS = [
 
 export const GOVERNANCE_CHECKPOINT = /Establish governance/i;
 
+const createAttachmentButtonNames = (prefix: string) => ({
+  prefix: new RegExp(`^${prefix}`, "i"),
+  exact: (fileName: string) => `${prefix}${fileName}`,
+});
+
 export const INITIATIVE_UI_NAMES = {
   rowPattern: /^\d+:\s*.+/,
   button: {
@@ -36,11 +41,8 @@ export const INITIATIVE_UI_NAMES = {
     addComment: /^Add comment$/i,
     editOrView: /^(Edit|View)\b/i,
     edit: /^Edit\b/i,
-    manageAttachmentPrefix: /^Manage file or info/i,
-    commentAttachmentPrefix: /^Comment on/i,
-    manageAttachment: (fileName: string) =>
-      `Manage file or info for ${fileName}`,
-    commentAttachment: (fileName: string) => `Comment on ${fileName}`,
+    manageAttachment: createAttachmentButtonNames("Manage file or info for "),
+    commentAttachment: createAttachmentButtonNames("Comment on "),
   },
   field: {
     narrative: /^Narrative/i,
@@ -391,14 +393,14 @@ export class ReportInitiativePage extends ReportEditorPage {
 
   manageAttachmentButton(row: Locator, fileName: string): Locator {
     return row.getByRole("button", {
-      name: INITIATIVE_UI_NAMES.button.manageAttachment(fileName),
+      name: INITIATIVE_UI_NAMES.button.manageAttachment.exact(fileName),
       exact: true,
     });
   }
 
   commentAttachmentButton(row: Locator, fileName: string): Locator {
     return row.getByRole("button", {
-      name: INITIATIVE_UI_NAMES.button.commentAttachment(fileName),
+      name: INITIATIVE_UI_NAMES.button.commentAttachment.exact(fileName),
       exact: true,
     });
   }

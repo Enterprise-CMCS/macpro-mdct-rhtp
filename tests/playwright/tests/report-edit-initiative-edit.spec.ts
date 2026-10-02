@@ -224,7 +224,7 @@ test.describe("Report Editing - Initiative Edit Page (Annual, Non-Admin)", () =>
       const fileDropArea = uploadDrawer.getByLabel("file drop area");
       const fileInput = uploadDrawer.locator('input[type="file"]');
       const doneButton = uploadDrawer.getByRole("button", {
-        name: /^Done$/i,
+        name: INITIATIVE_UI_NAMES.button.done,
       });
 
       await expect(initiativeChoices.first()).toBeVisible();

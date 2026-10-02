@@ -11,6 +11,7 @@ import {
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import {
   INITIATIVE_UI_NAMES,
+  type InitiativeMetricData,
   ReportInitiativePage,
 } from "../tests/pageObjects/report-initiative.page";
 import { TIMEOUT_UI } from "./timeouts";
@@ -31,13 +32,9 @@ export type AdminMetricControlsVisibility = "visible" | "hidden";
 export type MetricsTableOptions = {
   adminControls?: boolean;
 };
-export type MetricTestData = {
-  name: string;
-  targetInput: string;
+export type MetricTestData = InitiativeMetricData & {
   targetDisplay: string;
-  currentInput: string;
   currentDisplay: string;
-  date: string;
 };
 
 export const createMetricTestData = (
@@ -302,12 +299,12 @@ export const verifyCheckpointStageRows = async (
       );
       await expect(
         cells.nth(5).getByRole("button", {
-          name: INITIATIVE_UI_NAMES.button.manageAttachmentPrefix,
+          name: INITIATIVE_UI_NAMES.button.manageAttachment.prefix,
         })
       ).toBeVisible();
       await expect(
         cells.nth(5).getByRole("button", {
-          name: INITIATIVE_UI_NAMES.button.commentAttachmentPrefix,
+          name: INITIATIVE_UI_NAMES.button.commentAttachment.prefix,
         })
       ).toBeVisible();
     } else {
