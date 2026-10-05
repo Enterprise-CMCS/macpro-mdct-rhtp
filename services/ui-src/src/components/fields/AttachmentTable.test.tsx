@@ -100,6 +100,11 @@ describe("<AttachmentTable />", () => {
             initiativeNumber: "123",
             title: "Init Title",
           },
+          {
+            id: "mock-init-2",
+            initiativeNumber: "456",
+            title: "Init Title",
+          },
         ],
       },
     });
@@ -107,7 +112,7 @@ describe("<AttachmentTable />", () => {
   it("AttachmentTable renders with no attachments", () => {
     render(AttachmentTableComponent(mockAttachmentAreaElementEmpty));
     expect(
-      screen.getByRole("button", { name: "Add Attachment" })
+      screen.queryAllByRole("button", { name: "Add Attachment" })[0]
     ).toBeVisible();
     expect(
       screen.getByText(
@@ -117,12 +122,19 @@ describe("<AttachmentTable />", () => {
   });
   it("Mock adding attachment to AttachmentTable", async () => {
     render(AttachmentTableComponent(mockAttachmentAreaElementEmpty));
-    const addBtn = screen.getByRole("button", { name: "Add Attachment" });
+    const addBtn = screen.queryAllByRole("button", {
+      name: "Add Attachment",
+    })[0];
     await userEvent.click(addBtn);
     await waitFor(() => {
       expect(screen.getByText("Upload Initiative Attachments")).toBeVisible();
     });
 
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select All" }));
+    await userEvent.click(
+      screen.getByRole("checkbox", { name: "456: Init Title" })
+    );
+    await userEvent.click(screen.getByRole("checkbox", { name: "Select All" }));
     await userEvent.click(
       screen.getByRole("checkbox", { name: "123: Init Title" })
     );
