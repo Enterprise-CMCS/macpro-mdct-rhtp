@@ -5,7 +5,7 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { InitiativePageTemplate, PageStatus } from "@rhtp/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "utils";
 import { checkpointAttachableOptions } from "verbiage/checkpoints";
 
@@ -43,21 +43,58 @@ export const StageCheckpointDropdown = ({
       };
     });
   };
-
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean }[]
-  >(getInitiativeOptions());
+  >([
+    {
+      label: "Select All",
+      value: "all",
+      checked: answer ? answer.initiatives.length > 0 : false,
+    },
+    ...getInitiativeOptions(),
+  ]);
   const [checkpoint, setCheckpoint] = useState(answer?.checkpoint ?? "");
+
+  useEffect(() => {
+    //for changing the select all checkbox to indeterminate after rendering an edit view.
+    if (answer?.initiatives) {
+      const input = document.querySelector(
+        'input[value="all"]'
+      ) as HTMLInputElement;
+      input.indeterminate =
+        answer?.initiatives.length > 0 &&
+        answer?.initiatives.length < initiativeOptions.length - 1;
+    }
+  }, []);
 
   const onChoiceChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
-    const choices = [...initiativeOptions];
-    const choiceIndex = initiativeOptions.findIndex(
-      (option) => option.value === value
-    );
-    choices[choiceIndex].checked = !choices[choiceIndex].checked;
+    let choices = [...initiativeOptions];
+
+    const choiceAll = choices[0];
+
+    if (value === "all") {
+      if (!choiceAll.checked)
+        choices = choices.map((choice) => ({ ...choice, checked: true }));
+      else choices = choices.map((choice) => ({ ...choice, checked: false }));
+    } else {
+      const choiceIndex = initiativeOptions.findIndex(
+        (option) => option.value === value
+      );
+      choices[choiceIndex].checked = !choices[choiceIndex].checked;
+
+      //set checks and indeterminate valye for select all
+      choices[0].checked = choices.some(
+        (choice) => choice.checked && choice.value != "all"
+      );
+      const input = document.querySelector(
+        'input[value="all"]'
+      ) as HTMLInputElement;
+      input.indeterminate =
+        choices[0].checked && !choices.every((choice) => choice.checked);
+    }
     setInitiativeOptions(choices);
 
     //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
@@ -65,7 +102,9 @@ export const StageCheckpointDropdown = ({
       setCheckpoint("");
     }
     onDropdownHandler(
-      initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
+      initiativeOptions
+        .filter((opt) => opt.checked && opt.value !== "all")
+        .map((opt) => opt.value),
       checkpoint
     );
   };
@@ -80,7 +119,9 @@ export const StageCheckpointDropdown = ({
     const newCheckpoint = event.target.value;
     setCheckpoint(newCheckpoint);
     onDropdownHandler(
-      initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
+      initiativeOptions
+        .filter((opt) => opt.checked && opt.value !== "all")
+        .map((opt) => opt.value),
       newCheckpoint
     );
   };

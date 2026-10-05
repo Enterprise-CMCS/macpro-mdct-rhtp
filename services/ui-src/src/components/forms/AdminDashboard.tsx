@@ -275,7 +275,7 @@ export const AdminDashboard = () => {
     const getValue = (answer: Report, type: string) => {
       switch (type) {
         case "State/Territory":
-          return answer.state;
+          return StateNames[answer.state] || "";
         case "Report Name":
           return answer.name;
         case "Budget Period":
