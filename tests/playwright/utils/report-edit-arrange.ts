@@ -13,16 +13,21 @@ export type OpenReportSectionResult =
   | { ok: true; editor: ReportEditorPage }
   | { ok: false; reason: string };
 
-export const openReportPeriodSection = async (
-  editor: ReportEditorPage,
+export const openEditableReportSectionForPeriodOrSkip = async (
+  statePage: StatePage,
   period: ReportPeriod,
-  sectionId: string
-): Promise<void> => {
-  const { reportType, state } = editor.getCurrentRouteParams();
-  const dashboard = new DashboardPage(editor.page);
-  await dashboard.navigateToDashboard(reportType, state);
-  await dashboard.openEditableReportByPeriod(period);
+  sectionId: string,
+  skip: (reason: string) => void
+): Promise<ReportEditorPage | undefined> => {
+  const dashboard = new DashboardPage(statePage.page);
+  await dashboard.navigateToDashboard(reportType, stateAbbreviation);
 
+  if (!(await dashboard.openEditableReportByPeriod(period))) {
+    skip(`No editable ${period} report on the dashboard`);
+    return undefined;
+  }
+
+  const editor = new ReportEditorPage(statePage.page);
   const openedReport = editor.getCurrentRouteParams();
   await editor.navigateToSection(
     openedReport.reportType,
@@ -30,6 +35,7 @@ export const openReportPeriodSection = async (
     openedReport.reportId,
     sectionId
   );
+  return editor;
 };
 
 type OpenReportSectionOptions = {

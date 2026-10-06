@@ -25,10 +25,8 @@ export class DashboardPage extends BasePage {
     await this.waitForLoadingComplete();
   }
 
-  async openEditableReportByPeriod(period: ReportPeriod): Promise<void> {
-    await this.waitForDashboardReady();
-
-    const reportRow = this.page
+  private getEditableReportRow(period: ReportPeriod) {
+    return this.page
       .getByRole("table")
       .getByRole("row")
       .filter({ hasText: REPORT_PERIOD_LABELS[period] })
@@ -38,6 +36,15 @@ export class DashboardPage extends BasePage {
         }),
       })
       .first();
+  }
+
+  async openEditableReportByPeriod(period: ReportPeriod): Promise<boolean> {
+    await this.waitForDashboardReady();
+
+    const reportRow = this.getEditableReportRow(period);
+    if ((await reportRow.count()) === 0) {
+      return false;
+    }
     await expect(reportRow).toBeVisible({ timeout: TIMEOUT_UI });
 
     const reportAction = reportRow.getByRole("button", {
@@ -50,6 +57,7 @@ export class DashboardPage extends BasePage {
       reportAction.click(),
     ]);
     await this.waitForLoadingComplete();
+    return true;
   }
 
   async waitForDashboardReady(): Promise<void> {

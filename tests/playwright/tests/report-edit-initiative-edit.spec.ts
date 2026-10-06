@@ -1,8 +1,5 @@
 import { test, expect } from "./fixtures/base";
-import {
-  openReportPeriodSection,
-  openReportSectionOrSkip,
-} from "../utils/report-edit-arrange";
+import { openEditableReportSectionForPeriodOrSkip } from "../utils/report-edit-arrange";
 import {
   createArtifactId,
   getReportTestRunId,
@@ -35,26 +32,25 @@ const verifyReportContextFromHeader = async (
 type InitiativeSkipHandler = (reason: string) => void;
 
 const setupAnnualInitiativeEditor = async (
-  page: Parameters<typeof openReportSectionOrSkip>[0],
+  page: Parameters<typeof openEditableReportSectionForPeriodOrSkip>[0],
   skip: InitiativeSkipHandler
 ): Promise<{
   editor: ReportInitiativePage;
   selectedInitiativeNumberAndName: string;
 }> => {
-  const result = await openReportSectionOrSkip(
+  const reportEditor = await openEditableReportSectionForPeriodOrSkip(
     page,
-    "unsubmitted",
+    REPORT_PERIOD,
     INITIATIVES_SECTION,
     skip
   );
-  if (!result) {
+  if (!reportEditor) {
     throw new Error(
-      "openReportSectionOrSkip returned undefined without skipping the test"
+      "openEditableReportSectionForPeriodOrSkip returned undefined without skipping the test"
     );
   }
 
-  const editor = new ReportInitiativePage(result.page);
-  await openReportPeriodSection(editor, REPORT_PERIOD, INITIATIVES_SECTION);
+  const editor = new ReportInitiativePage(reportEditor.page);
   await verifyReportContextFromHeader(editor);
   await expect(editor.initiativesTable).toBeVisible({ timeout: TIMEOUT_UI });
 
