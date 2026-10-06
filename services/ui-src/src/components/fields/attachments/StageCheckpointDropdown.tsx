@@ -44,12 +44,13 @@ export const StageCheckpointDropdown = ({
     });
   };
   const [initiativeOptions, setInitiativeOptions] = useState<
-    { label: string; value: string; checked: boolean }[]
+    { label: string; value: string; checked: boolean; disabled: boolean }[]
   >([
     {
       label: "Select All",
       value: "all",
       checked: answer ? answer.initiatives.length > 0 : false,
+      disabled: false,
     },
     ...getInitiativeOptions(),
   ]);
@@ -76,9 +77,15 @@ export const StageCheckpointDropdown = ({
     const choiceAll = choices[0];
 
     if (value === "all") {
-      if (!choiceAll.checked)
-        choices = choices.map((choice) => ({ ...choice, checked: true }));
-      else choices = choices.map((choice) => ({ ...choice, checked: false }));
+      choices = choices.map((choice) => {
+        const isChecked = !choice.disabled
+          ? !choiceAll.checked
+          : choice.checked;
+        return {
+          ...choice,
+          checked: isChecked,
+        };
+      });
     } else {
       const choiceIndex = initiativeOptions.findIndex(
         (option) => option.value === value
