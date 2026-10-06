@@ -75,6 +75,7 @@ export const StageCheckpointDropdown = ({
     let choices = [...initiativeOptions];
 
     const choiceAll = choices[0];
+    const filteredChoices = choices.filter((choice) => !choice.disabled);
 
     if (value === "all") {
       choices = choices.map((choice) => {
@@ -93,19 +94,20 @@ export const StageCheckpointDropdown = ({
       choices[choiceIndex].checked = !choices[choiceIndex].checked;
 
       //set checks and indeterminate valye for select all
-      choices[0].checked = choices.some(
+      choices[0].checked = filteredChoices.some(
         (choice) => choice.checked && choice.value != "all"
       );
       const input = document.querySelector(
         'input[value="all"]'
       ) as HTMLInputElement;
       input.indeterminate =
-        choices[0].checked && !choices.every((choice) => choice.checked);
+        choices[0].checked &&
+        !filteredChoices.every((choice) => choice.checked);
     }
     setInitiativeOptions(choices);
 
     //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
-    if (choices.every((choice) => !choice.checked)) {
+    if (filteredChoices.every((choice) => !choice.checked)) {
       setCheckpoint("");
     }
     onDropdownHandler(
