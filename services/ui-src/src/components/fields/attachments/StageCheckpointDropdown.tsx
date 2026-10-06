@@ -64,7 +64,8 @@ export const StageCheckpointDropdown = ({
       ) as HTMLInputElement;
       input.indeterminate =
         answer?.initiatives.length > 0 &&
-        answer?.initiatives.length < initiativeOptions.length - 1;
+        answer?.initiatives.length <
+          initiativeOptions.filter((options) => !options.disabled).length - 1;
     }
   }, []);
 
@@ -75,6 +76,7 @@ export const StageCheckpointDropdown = ({
     let choices = [...initiativeOptions];
 
     const choiceAll = choices[0];
+    //ignoring initiatives that have been abandoned
     const filteredChoices = choices.filter((choice) => !choice.disabled);
 
     if (value === "all") {
