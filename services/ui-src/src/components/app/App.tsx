@@ -48,7 +48,7 @@ export const App = () => {
   useEffect(() => {
     //setting tab title for each page
     document.title = getTabTitle(pathname, currentPage);
-  }, [pathname, currentPage]);
+  }, [pathname, currentPage, user]);
 
   const authenticatedRoutes = (
     <>
