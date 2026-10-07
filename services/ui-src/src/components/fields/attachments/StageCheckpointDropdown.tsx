@@ -26,51 +26,49 @@ export const StageCheckpointDropdown = ({
 }: Props) => {
   const { report } = useStore();
 
-  const initiatives = (report?.pages.filter(
-    (page) => "initiativeNumber" in page
-  ) || []) as InitiativePageTemplate[];
+  const initiatives = (
+    (report?.pages.filter((page) => "initiativeNumber" in page) ||
+      []) as InitiativePageTemplate[]
+  ).map(({ id, initiativeNumber, status, title }) => {
+    const isAbandoned = status === PageStatus.ABANDONED;
+    const isChecked = answer?.initiatives.includes(id);
 
-  const getInitiativeOptions = () => {
-    return initiatives.map(({ id, initiativeNumber, status, title }) => {
-      const isAbandoned = status === PageStatus.ABANDONED;
-      const isChecked = answer?.initiatives.includes(id);
+    return {
+      label: `${initiativeNumber}: ${title}${isAbandoned ? " (abandoned)" : ""}`,
+      value: id,
+      checked: !!isChecked,
+      disabled: isAbandoned,
+    };
+  });
 
-      return {
-        label: `${initiativeNumber}: ${title}${isAbandoned ? " (abandoned)" : ""}`,
-        value: id,
-        checked: !!isChecked,
-        disabled: isAbandoned,
-      };
-    });
-  };
+  //an initiative could have been active when selected and became disabled along
+  const activeAnswers = answer?.initiatives.filter(
+    (initiative) =>
+      !initiatives.find((option) => option.value === initiative)?.disabled
+  );
+
   const [initiativeOptions, setInitiativeOptions] = useState<
     { label: string; value: string; checked: boolean; disabled: boolean }[]
   >([
     {
       label: "Select All",
       value: "all",
-      checked: answer ? answer.initiatives.length > 0 : false,
+      checked: activeAnswers ? activeAnswers.length > 0 : false,
       disabled: false,
     },
-    ...getInitiativeOptions(),
+    ...initiatives,
   ]);
   const [checkpoint, setCheckpoint] = useState(answer?.checkpoint ?? "");
 
   useEffect(() => {
-    //an initiative could have been active when selected and became disabled along the way
-    const activeInitiatives = answer?.initiatives.filter(
-      (initiative) =>
-        !initiativeOptions.find((option) => option.value === initiative)
-          ?.disabled
-    );
     //for changing the select all checkbox to indeterminate after rendering an edit view.
-    if (activeInitiatives) {
+    if (activeAnswers) {
       const input = document.querySelector(
         'input[value="all"]'
       ) as HTMLInputElement;
       input.indeterminate =
-        activeInitiatives.length > 0 &&
-        activeInitiatives.length <
+        activeAnswers.length > 0 &&
+        activeAnswers.length <
           initiativeOptions.filter((options) => !options.disabled).length - 1;
     }
   }, []);
