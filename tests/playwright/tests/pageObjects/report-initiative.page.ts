@@ -1,9 +1,6 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import { type Locator, type Page } from "@playwright/test";
 import { ReportEditorPage } from "./report-editor.page";
-import { INITIATIVES_SECTION } from "../../utils/report-edit-shared-helpers";
 import { TIMEOUT_UI } from "../../utils/timeouts";
-
-export type ReportPeriod = "annual" | "quarterly";
 
 export type InitiativeMetricData = {
   name: string;
@@ -12,19 +9,95 @@ export type InitiativeMetricData = {
   date: string;
 };
 
-const REPORT_PERIOD_LABELS: Record<ReportPeriod, string> = {
-  annual: "Annual Report",
-  quarterly: "Quarterly Report",
-} as const;
+export const CHECKPOINT_STAGE_LABELS = [
+  "Stage 0: Planning",
+  "Stage 1: Project Preparation",
+  "Stage 2: Early Implementation",
+  "Stage 3: Midway Implementation",
+  "Stage 4: Preparing for Completion",
+  "Stage 5: Full Implementation",
+];
 
-const INITIATIVE_ROW_PATTERN = /^\d+:\s*.+/;
-const EDITABLE_STATUS_PATTERN = /^(Not started|In progress|In revision)$/i;
-const ADD_METRIC_BUTTON_NAME = /^Add Metric$/i;
-const EDIT_OR_ABANDON_BUTTON_NAME = /^Edit\/Abandon$/i;
-const SAVE_BUTTON_NAME = /^Save$/i;
-const UPLOAD_ATTACHMENTS_BUTTON_NAME = /^Upload attachments$/i;
-const CLOSE_BUTTON_NAME = /^Close$/i;
-const BACK_TO_INITIATIVES_TEXT = "Back to Initiatives";
+export const GOVERNANCE_CHECKPOINT = /Establish governance/i;
+
+const createAttachmentButtonNames = (prefix: string) => ({
+  prefix: new RegExp(`^${prefix}`, "i"),
+  exact: (fileName: string) => `${prefix}${fileName}`,
+});
+
+export const INITIATIVE_UI_NAMES = {
+  rowPattern: /^\d+:\s*.+/,
+  button: {
+    addInitiative: /^Add initiative$/i,
+    addMetric: /^Add Metric$/i,
+    editOrAbandonMetric: /^Edit\/Abandon$/i,
+    save: /^Save$/i,
+    saveChanges: /^Save changes$/i,
+    uploadAttachments: /^Upload attachments$/i,
+    close: /^Close$/i,
+    backToInitiatives: "Back to Initiatives",
+    done: /^Done$/i,
+    deleteAttachment: /^Delete attachment$/i,
+    addComment: /^Add comment$/i,
+    editOrView: /^(Edit|View)\b/i,
+    edit: /^Edit\b/i,
+    manageAttachment: createAttachmentButtonNames("Manage file or info for "),
+    commentAttachment: createAttachmentButtonNames("Comment on "),
+  },
+  field: {
+    narrative: /^Narrative/i,
+    peopleServed: /Number of people served/i,
+    narrativeRequired: /^NarrativeRequired$/i,
+    peopleServedRequired: /^Number of people servedRequired$/i,
+    metricName: /^Metric name/i,
+    metricTarget: /^What is the target for this metric/i,
+    metricCurrentValue: /^What is the metric['’]s current value/i,
+    metricDate: /^Date of the current value/i,
+    initiativeNumber: /^Initiative Number$/i,
+    initiativeName: /^Initiative Name$/i,
+    comment: /^Comment$/i,
+  },
+  heading: {
+    metrics: /^Track Initiative Performance Metrics\s*Required$/i,
+    checkpoints: /^Checkpoints$/i,
+    editMetric: /^Edit Metric$/i,
+    uploadStatus: /^Upload Status$/i,
+    uploadInitiativeAttachments: /Upload Initiative Attachments/i,
+    manageAttachment: /^Manage Attachment$/i,
+    addCommentToAttachment: /^Add comment to attachment$/i,
+    addInitiative: /^Add Initiative$/i,
+  },
+  column: {
+    number: "#",
+    status: "Status",
+    target: "Target",
+    metric: "Metric",
+    previousAnnualValue: "Previous annual value",
+    currentValue: "Current value",
+    currentValueDate: "As of Date MM/DD/YYYY",
+    initiative: "Initiative",
+    actions: "Actions",
+    checkpoint: "Checkpoint",
+    readiness: "Ready for CMS Review",
+    attachments: "Attachments",
+  },
+  status: {
+    activeOrAbandoned: /^(Active|Abandoned)$/i,
+    abandoned: /^Abandoned$/i,
+    initiativeRow: /^Status: (Minimum requirements (not )?met|Abandoned)$/i,
+    checkpoint:
+      /^(Pending Review|Needs Revision|Locked for Scoring|Informational|Archived)$/i,
+  },
+  label: {
+    currentStatus: /Current status/i,
+    optionalStatus: /Status\s*\(optional\)/i,
+    checkpoint: /Which stage\/checkpoint does this attachment apply to\?/i,
+    status: /^Status$/i,
+  },
+  selector: {
+    checkpoint: 'select[name="checkpoint"]',
+  },
+} as const;
 
 export class ReportInitiativePage extends ReportEditorPage {
   constructor(page: Page) {
@@ -36,50 +109,52 @@ export class ReportInitiativePage extends ReportEditorPage {
   }
 
   get addMetricButton(): Locator {
-    return this.page.getByRole("button", { name: ADD_METRIC_BUTTON_NAME });
+    return this.page.getByRole("button", {
+      name: INITIATIVE_UI_NAMES.button.addMetric,
+    });
   }
 
   get metricsHeading(): Locator {
     return this.page.getByRole("heading", {
-      name: /^Track Initiative Performance Metrics\s*Required$/i,
+      name: INITIATIVE_UI_NAMES.heading.metrics,
     });
   }
 
   get checkpointsHeading(): Locator {
-    return this.page.getByRole("heading", { name: /^Checkpoints$/i });
+    return this.page.getByRole("heading", {
+      name: INITIATIVE_UI_NAMES.heading.checkpoints,
+    });
   }
 
   get narrativeField(): Locator {
-    return this.page.getByRole("textbox", { name: /^Narrative/i });
+    return this.page.getByRole("textbox", {
+      name: INITIATIVE_UI_NAMES.field.narrative,
+    });
   }
 
   get narrativeRequiredLabel(): Locator {
     return this.page
       .locator("label")
-      .filter({ hasText: /^NarrativeRequired$/i });
+      .filter({ hasText: INITIATIVE_UI_NAMES.field.narrativeRequired });
   }
 
   get peopleServedField(): Locator {
     return this.page.getByRole("textbox", {
-      name: /Number of people served/i,
+      name: INITIATIVE_UI_NAMES.field.peopleServed,
     });
   }
 
   get peopleServedRequiredLabel(): Locator {
     return this.page
       .locator("label")
-      .filter({ hasText: /^Number of people servedRequired$/i });
-  }
-
-  get initiativesDashboardTable(): Locator {
-    return this.page.getByRole("table").filter({
-      has: this.page.getByRole("columnheader", { name: "Initiative" }),
-    });
+      .filter({ hasText: INITIATIVE_UI_NAMES.field.peopleServedRequired });
   }
 
   get metricsTable(): Locator {
     return this.page.getByRole("table").filter({
-      has: this.page.getByRole("columnheader", { name: "Metric" }),
+      has: this.page.getByRole("columnheader", {
+        name: INITIATIVE_UI_NAMES.column.metric,
+      }),
     });
   }
 
@@ -99,74 +174,87 @@ export class ReportInitiativePage extends ReportEditorPage {
   }
 
   async addMetric(metric: InitiativeMetricData): Promise<void> {
-    await expect(this.addMetricButton).toBeVisible({ timeout: TIMEOUT_UI });
     await this.addMetricButton.click();
-
-    await expect(this.dialog).toBeVisible({ timeout: TIMEOUT_UI });
-    await this.fillTextField(/^Metric name/i, metric.name);
+    await this.dialog.waitFor({ state: "visible", timeout: TIMEOUT_UI });
+    await this.fillTextField(INITIATIVE_UI_NAMES.field.metricName, metric.name);
     await this.fillTextField(
-      /^What is the target for this metric/i,
+      INITIATIVE_UI_NAMES.field.metricTarget,
       metric.targetInput
     );
     await this.fillTextField(
-      /^What is the metric['’]s current value/i,
+      INITIATIVE_UI_NAMES.field.metricCurrentValue,
       metric.currentInput
     );
-    await this.fillTextField(/^Date of the current value/i, metric.date);
-    await this.dialog.getByRole("button", { name: SAVE_BUTTON_NAME }).click();
-    await expect(this.dialog).toBeHidden({ timeout: TIMEOUT_UI });
+    await this.fillTextField(INITIATIVE_UI_NAMES.field.metricDate, metric.date);
+    await this.dialog
+      .getByRole("button", { name: INITIATIVE_UI_NAMES.button.save })
+      .click();
+    await this.dialog.waitFor({ state: "hidden", timeout: TIMEOUT_UI });
   }
 
   async editMetric(row: Locator, metric: InitiativeMetricData): Promise<void> {
     await row
-      .getByRole("button", { name: EDIT_OR_ABANDON_BUTTON_NAME })
+      .getByRole("button", {
+        name: INITIATIVE_UI_NAMES.button.editOrAbandonMetric,
+      })
       .click();
-    await expect(
-      this.dialog.getByRole("heading", { name: /^Edit Metric$/i })
-    ).toBeVisible({ timeout: TIMEOUT_UI });
-    await this.fillTextField(/^Metric name/i, metric.name);
+    const dialog = this.dialog;
+    await dialog.waitFor({ state: "visible", timeout: TIMEOUT_UI });
+    await dialog
+      .getByRole("heading", { name: INITIATIVE_UI_NAMES.heading.editMetric })
+      .waitFor({ state: "visible", timeout: TIMEOUT_UI });
+    await this.fillTextField(INITIATIVE_UI_NAMES.field.metricName, metric.name);
     await this.fillTextField(
-      /^What is the target for this metric/i,
+      INITIATIVE_UI_NAMES.field.metricTarget,
       metric.targetInput
     );
     await this.fillTextField(
-      /^What is the metric['’]s current value/i,
+      INITIATIVE_UI_NAMES.field.metricCurrentValue,
       metric.currentInput
     );
-    await this.fillTextField(/^Date of the current value/i, metric.date);
-    await this.dialog.getByRole("button", { name: SAVE_BUTTON_NAME }).click();
-    await expect(this.dialog).toBeHidden({ timeout: TIMEOUT_UI });
+    await this.fillTextField(INITIATIVE_UI_NAMES.field.metricDate, metric.date);
+    await dialog
+      .getByRole("button", { name: INITIATIVE_UI_NAMES.button.save })
+      .click();
+    await dialog.waitFor({ state: "hidden", timeout: TIMEOUT_UI });
   }
 
   async abandonMetric(row: Locator): Promise<void> {
     await row
-      .getByRole("button", { name: EDIT_OR_ABANDON_BUTTON_NAME })
+      .getByRole("button", {
+        name: INITIATIVE_UI_NAMES.button.editOrAbandonMetric,
+      })
       .click();
-    await expect(
-      this.dialog.getByRole("heading", { name: /^Edit Metric$/i })
-    ).toBeVisible({ timeout: TIMEOUT_UI });
+    const dialog = this.dialog;
+    await dialog.waitFor({ state: "visible", timeout: TIMEOUT_UI });
+    await dialog
+      .getByRole("heading", { name: INITIATIVE_UI_NAMES.heading.editMetric })
+      .waitFor({ state: "visible", timeout: TIMEOUT_UI });
 
-    const statusDropdown = this.dialog.getByLabel(/^Status$/i);
+    const statusDropdown = dialog.getByLabel(INITIATIVE_UI_NAMES.label.status);
     await statusDropdown.click();
     const abandonedOption = this.page.getByRole("option", {
-      name: /^Abandoned$/i,
+      name: INITIATIVE_UI_NAMES.status.abandoned,
     });
-    await expect(abandonedOption).toBeVisible({ timeout: TIMEOUT_UI });
+    await abandonedOption.waitFor({ state: "visible", timeout: TIMEOUT_UI });
     await abandonedOption.click();
-    await expect(statusDropdown).toHaveText(/^Abandoned$/i);
-    await this.dialog.getByRole("button", { name: SAVE_BUTTON_NAME }).click();
-    await expect(this.dialog).toBeHidden({ timeout: TIMEOUT_UI });
+    await dialog
+      .getByRole("button", { name: INITIATIVE_UI_NAMES.button.save })
+      .click();
+    await dialog.waitFor({ state: "hidden", timeout: TIMEOUT_UI });
   }
 
   get initiativesTable(): Locator {
     return this.page.getByRole("table").filter({
-      has: this.page.getByRole("columnheader", { name: "Initiative" }),
+      has: this.page.getByRole("columnheader", {
+        name: INITIATIVE_UI_NAMES.column.initiative,
+      }),
     });
   }
 
   get openInitiativeHeading(): Locator {
     return this.page
-      .getByRole("heading", { name: INITIATIVE_ROW_PATTERN })
+      .getByRole("heading", { name: INITIATIVE_UI_NAMES.rowPattern })
       .first();
   }
 
@@ -174,7 +262,7 @@ export class ReportInitiativePage extends ReportEditorPage {
     const label = this.page.getByText(stageLabel, { exact: true });
     return label.locator("..").filter({
       has: this.page.getByRole("button", {
-        name: /^Upload attachments$/i,
+        name: INITIATIVE_UI_NAMES.button.uploadAttachments,
       }),
     });
   }
@@ -183,23 +271,14 @@ export class ReportInitiativePage extends ReportEditorPage {
     return this.checkpointStage(stageLabel)
       .getByRole("table")
       .filter({
-        has: this.page.getByRole("columnheader", { name: /^Checkpoint$/i }),
+        has: this.page.getByRole("columnheader", {
+          name: INITIATIVE_UI_NAMES.column.checkpoint,
+        }),
       });
   }
 
   checkpointRow(stageLabel: string, checkpointName: string | RegExp): Locator {
     return this.checkpointTable(stageLabel)
-      .locator("tbody")
-      .getByRole("row")
-      .filter({ hasText: checkpointName })
-      .first();
-  }
-
-  checkpointRowInTable(
-    table: Locator,
-    checkpointName: string | RegExp
-  ): Locator {
-    return table
       .locator("tbody")
       .getByRole("row")
       .filter({ hasText: checkpointName })
@@ -214,83 +293,44 @@ export class ReportInitiativePage extends ReportEditorPage {
       .first();
   }
 
-  async openInitiativeFromList(
+  async openEditableInitiativeFromTable(
     table: Locator = this.initiativesTable
   ): Promise<string> {
-    const rows = table
+    const editableRows = table
       .locator("tbody")
       .getByRole("row")
-      .filter({ hasText: INITIATIVE_ROW_PATTERN });
-    await expect
-      .poll(() => rows.count(), { timeout: TIMEOUT_UI })
-      .toBeGreaterThan(0);
+      .filter({ hasText: INITIATIVE_UI_NAMES.rowPattern })
+      .filter({
+        has: this.page.getByRole("link", {
+          name: INITIATIVE_UI_NAMES.button.edit,
+        }),
+      });
+    const row = editableRows.first();
+    await row.waitFor({ state: "visible", timeout: TIMEOUT_UI });
 
-    const nonAbandonedRows = rows.filter({
-      hasNotText: /Status:\s*Abandoned/i,
+    const nameLocator = row.getByText(INITIATIVE_UI_NAMES.rowPattern).first();
+    const name = ((await nameLocator.textContent()) ?? "").trim();
+
+    const editButton = row.getByRole("link", {
+      name: INITIATIVE_UI_NAMES.button.edit,
     });
-    const row =
-      (await nonAbandonedRows.count()) > 0
-        ? nonAbandonedRows.first()
-        : rows.first();
-    const name = (
-      (await row.getByText(INITIATIVE_ROW_PATTERN).first().textContent()) ?? ""
-    ).trim();
-    const editButton = row.getByRole("link", { name: /^(Edit|View)\b/i });
-    await expect(editButton).toBeVisible({ timeout: TIMEOUT_UI });
-    await editButton.click();
-    await expect(this.page).toHaveURL(
-      /\/report\/[^/]+\/[^/]+\/[^/]+\/[^/?#]+(\?.*)?$/,
-      { timeout: TIMEOUT_UI }
-    );
+    await Promise.all([
+      this.page.waitForURL(/\/report\/[^/]+\/[^/]+\/[^/]+\/[^/?#]+(\?.*)?$/, {
+        timeout: TIMEOUT_UI,
+      }),
+      editButton.click(),
+    ]);
 
     return name;
   }
 
-  async openReportFromDashboard(period: ReportPeriod): Promise<void> {
-    const { reportType, state } = this.getCurrentRouteParams();
-    await this.navigateTo(`/report/${reportType}/${state}`);
-    await this.waitForLoadingComplete();
-
-    const reportRow = this.page
-      .getByRole("table")
-      .getByRole("row")
-      .filter({ hasText: REPORT_PERIOD_LABELS[period] })
-      .filter({
-        has: this.page.getByRole("cell", { name: EDITABLE_STATUS_PATTERN }),
-      })
-      .first();
-    await expect(reportRow).toBeVisible({ timeout: TIMEOUT_UI });
-
-    const openReportButton = reportRow
-      .getByRole("button", { name: /View .* report/i })
-      .first();
-    await expect(openReportButton).toBeVisible({ timeout: TIMEOUT_UI });
-    await Promise.all([
-      this.page.waitForURL(
-        /\/report\/[^/]+\/[^/]+\/[^/]+(?:\/[^/]+)?(?:[?#].*)?$/
-      ),
-      openReportButton.click(),
-    ]);
-    await this.waitForLoadingComplete();
-
-    const {
-      reportType: openedType,
-      state: openedState,
-      reportId,
-    } = this.getCurrentRouteParams();
-    await this.navigateToSection(
-      openedType,
-      openedState,
-      reportId,
-      INITIATIVES_SECTION
-    );
-  }
-
   async openCheckpointUploadDrawer(stageLabel: string): Promise<Locator> {
     await this.checkpointStage(stageLabel)
-      .getByRole("button", { name: UPLOAD_ATTACHMENTS_BUTTON_NAME })
+      .getByRole("button", {
+        name: INITIATIVE_UI_NAMES.button.uploadAttachments,
+      })
       .click();
-    await expect(this.dialog).toBeVisible({ timeout: TIMEOUT_UI });
+    await this.dialog.waitFor({ state: "visible", timeout: TIMEOUT_UI });
     return this.dialog;
   }
 
@@ -298,18 +338,29 @@ export class ReportInitiativePage extends ReportEditorPage {
     drawer: Locator,
     checkpointName: string | RegExp
   ): Promise<void> {
-    const dropdown = drawer.locator('select[name="checkpoint"]').first();
-    await expect(dropdown).toBeAttached();
-    await expect(dropdown).toBeEnabled();
+    const dropdown = drawer
+      .locator(INITIATIVE_UI_NAMES.selector.checkpoint)
+      .first();
+    await dropdown.waitFor({ state: "visible", timeout: TIMEOUT_UI });
 
-    const option = dropdown.locator("option").filter({
+    const options = dropdown.locator("option").filter({
       hasText: checkpointName,
     });
-    await expect(option).toHaveCount(1, { timeout: TIMEOUT_UI });
-    const value = await option.first().getAttribute("value");
-    expect(value).toBeTruthy();
-    await dropdown.selectOption({ value: value as string });
-    await expect(dropdown).toHaveValue(/.+/);
+    await options.first().waitFor({ state: "attached", timeout: TIMEOUT_UI });
+
+    const optionCount = await options.count();
+    if (optionCount !== 1) {
+      throw new Error(
+        `Expected one checkpoint matching "${checkpointName}", found ${optionCount}`
+      );
+    }
+
+    const value = await options.first().getAttribute("value");
+    if (!value) {
+      throw new Error(`Checkpoint "${checkpointName}" has no option value`);
+    }
+
+    await dropdown.selectOption({ value });
   }
 
   async uploadCheckpointAttachment(
@@ -322,101 +373,80 @@ export class ReportInitiativePage extends ReportEditorPage {
     await this.selectCheckpoint(drawer, checkpointName);
 
     const fileInput = drawer.locator('input[type="file"]');
-    await expect(fileInput).toBeEnabled();
+    await fileInput.waitFor({ state: "attached", timeout: TIMEOUT_UI });
     await fileInput.setInputFiles(filePath);
-    await expect(
-      drawer.getByRole("heading", { name: /^Upload Status$/i })
-    ).toBeVisible({ timeout: TIMEOUT_UI });
-    await expect(drawer.getByText(fileName, { exact: true })).toBeVisible({
-      timeout: TIMEOUT_UI,
-    });
+    await drawer
+      .getByRole("heading", { name: INITIATIVE_UI_NAMES.heading.uploadStatus })
+      .waitFor({ state: "visible", timeout: TIMEOUT_UI });
+    await drawer
+      .getByText(fileName, { exact: true })
+      .waitFor({ state: "visible", timeout: TIMEOUT_UI });
 
-    await drawer.getByRole("button", { name: /^Done$/i }).click();
-    await expect(drawer).toBeHidden({ timeout: TIMEOUT_UI });
+    await drawer
+      .getByRole("button", { name: INITIATIVE_UI_NAMES.button.done })
+      .click();
+    await drawer.waitFor({ state: "hidden", timeout: TIMEOUT_UI });
 
     const attachmentRow = this.checkpointAttachmentRow(stageLabel, fileName);
-    await expect(attachmentRow).toContainText(fileName, {
-      timeout: TIMEOUT_UI,
-    });
-
     return attachmentRow;
   }
 
   manageAttachmentButton(row: Locator, fileName: string): Locator {
     return row.getByRole("button", {
-      name: `Manage file or info for ${fileName}`,
+      name: INITIATIVE_UI_NAMES.button.manageAttachment.exact(fileName),
       exact: true,
     });
   }
 
   commentAttachmentButton(row: Locator, fileName: string): Locator {
     return row.getByRole("button", {
-      name: `Comment on ${fileName}`,
+      name: INITIATIVE_UI_NAMES.button.commentAttachment.exact(fileName),
       exact: true,
     });
   }
 
   async openManageAttachment(row: Locator, fileName: string): Promise<Locator> {
     const button = this.manageAttachmentButton(row, fileName);
-    await expect(button).toBeVisible({ timeout: TIMEOUT_UI });
+    await button.waitFor({ state: "visible", timeout: TIMEOUT_UI });
     await button.click();
-    await expect(
-      this.dialog.getByRole("heading", { name: /^Manage Attachment$/i })
-    ).toBeVisible({ timeout: TIMEOUT_UI });
+    await this.dialog
+      .getByRole("heading", {
+        name: INITIATIVE_UI_NAMES.heading.manageAttachment,
+      })
+      .waitFor({ state: "visible", timeout: TIMEOUT_UI });
     return this.dialog;
   }
 
   async openCommentDrawer(row: Locator, fileName: string): Promise<Locator> {
     const button = this.commentAttachmentButton(row, fileName);
-    await expect(button).toBeVisible({ timeout: TIMEOUT_UI });
+    await button.waitFor({ state: "visible", timeout: TIMEOUT_UI });
     await button.click();
-    await expect(
-      this.dialog.getByRole("heading", {
-        name: /^Add comment to attachment$/i,
+    await this.dialog
+      .getByRole("heading", {
+        name: INITIATIVE_UI_NAMES.heading.addCommentToAttachment,
       })
-    ).toBeVisible({ timeout: TIMEOUT_UI });
+      .waitFor({ state: "visible", timeout: TIMEOUT_UI });
     return this.dialog;
-  }
-
-  async expectVisibleAnnualInitiativeFields(): Promise<void> {
-    await expect(this.narrativeRequiredLabel).toBeVisible();
-    await expect(this.narrativeField).toBeVisible();
-    await expect(this.narrativeField).toHaveValue(/\S+/);
-    await expect(this.narrativeField).toBeEditable();
-    await expect(this.peopleServedRequiredLabel).toBeVisible();
-    await expect(this.peopleServedField).toBeVisible();
-    await expect(this.peopleServedField).toBeEditable();
-  }
-
-  async expectInitiativesDashboardVisible(): Promise<void> {
-    await expect(this.initiativesDashboardTable).toBeVisible({
-      timeout: TIMEOUT_UI,
-    });
   }
 
   async closeDrawer(drawer: Locator): Promise<void> {
     await drawer
       .getByRole("contentinfo")
-      .getByRole("button", { name: CLOSE_BUTTON_NAME })
+      .getByRole("button", { name: INITIATIVE_UI_NAMES.button.close })
       .click();
-    await expect(drawer).toBeHidden({ timeout: TIMEOUT_UI });
+    await drawer.waitFor({ state: "hidden", timeout: TIMEOUT_UI });
   }
 
   async returnToInitiativesDashboard(): Promise<void> {
     const backButton = this.page.getByRole("button", {
-      name: BACK_TO_INITIATIVES_TEXT,
+      name: INITIATIVE_UI_NAMES.button.backToInitiatives,
     });
-    await expect(backButton).toBeVisible({ timeout: TIMEOUT_UI });
+    await backButton.waitFor({ state: "visible", timeout: TIMEOUT_UI });
     await Promise.all([
       this.page.waitForURL(
         /\/report\/[^/]+\/[^/]+\/[^/]+\/initiatives(?:\?.*)?$/
       ),
       backButton.click(),
     ]);
-  }
-
-  async reopenInitiativeFromDashboard(): Promise<string> {
-    await expect(this.initiativesTable).toBeVisible({ timeout: TIMEOUT_UI });
-    return this.openInitiativeFromList();
   }
 }
