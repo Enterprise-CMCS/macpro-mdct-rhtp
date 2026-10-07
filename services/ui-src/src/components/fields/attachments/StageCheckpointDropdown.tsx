@@ -125,7 +125,9 @@ export const StageCheckpointDropdown = ({
   };
 
   const isStageEnabled = () => {
-    return initiativeOptions.every((option) => option.checked != true);
+    return initiativeOptions
+      .filter((choice) => !choice.disabled)
+      .every((option) => option.checked != true);
   };
 
   const onCheckpointHandler = (
