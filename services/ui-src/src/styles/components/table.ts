@@ -44,6 +44,9 @@ const stripedVariant = () => ({
     "td, tr": {
       border: "none",
     },
+    "tr:nth-of-type(2n+1)": {
+      background: "gray_lightest",
+    },
   },
 });
 const statusVariant = {
