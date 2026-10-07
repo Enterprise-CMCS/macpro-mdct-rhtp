@@ -57,14 +57,20 @@ export const StageCheckpointDropdown = ({
   const [checkpoint, setCheckpoint] = useState(answer?.checkpoint ?? "");
 
   useEffect(() => {
+    //an initiative could have been active when selected and became disabled along the way
+    const activeInitiatives = answer?.initiatives.filter(
+      (initiative) =>
+        !initiativeOptions.find((option) => option.value === initiative)
+          ?.disabled
+    );
     //for changing the select all checkbox to indeterminate after rendering an edit view.
-    if (answer?.initiatives) {
+    if (activeInitiatives) {
       const input = document.querySelector(
         'input[value="all"]'
       ) as HTMLInputElement;
       input.indeterminate =
-        answer?.initiatives.length > 0 &&
-        answer?.initiatives.length <
+        activeInitiatives.length > 0 &&
+        activeInitiatives.length <
           initiativeOptions.filter((options) => !options.disabled).length - 1;
     }
   }, []);
