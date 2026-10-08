@@ -2,7 +2,7 @@ import { type Locator, type Page } from "@playwright/test";
 import { ReportEditorPage } from "./report-editor.page";
 
 export const SUCCESS_STORIES_LABEL = /success stories/i;
-export const SUSTAINABILITY_PLANNING_LABEL = /sustainability planning/i;
+export const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
 
 export class ReportSustainabilityPage extends ReportEditorPage {
   constructor(page: Page) {
