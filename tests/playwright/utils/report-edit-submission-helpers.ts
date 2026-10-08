@@ -1,6 +1,10 @@
 import { expect } from "@playwright/test";
 import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
+import {
+  SUCCESS_STORIES_LABEL,
+  SUSTAINABILITY_PLANNING_LABEL,
+} from "../tests/pageObjects/report-sustainability.page";
 import type { StatePage } from "../tests/pageObjects/state.page";
 import { reportType, stateAbbreviation } from "./consts";
 import {
@@ -24,9 +28,6 @@ import { TIMEOUT_LOADING, TIMEOUT_UI } from "./timeouts";
 
 const REPORT_TYPE = reportType;
 const STATE = stateAbbreviation;
-
-export const SUCCESS_STORIES_LABEL = /success stories/i;
-export const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
 
 const REPORT_TEST_RUN_ID = getReportTestRunId();
 

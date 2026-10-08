@@ -11,8 +11,8 @@ import {
 import {
   SUCCESS_STORIES_LABEL,
   SUSTAINABILITY_PLANNING_LABEL,
-  SUSTAINABILITY_TEST_DATA,
-} from "../utils/report-edit-submission-helpers";
+} from "../tests/pageObjects/report-sustainability.page";
+import { SUSTAINABILITY_TEST_DATA } from "../utils/report-edit-submission-helpers";
 
 test.describe("Report Editing - Sustainability Persistence", () => {
   test("should fill Sustainability and Highlights text areas", async ({
