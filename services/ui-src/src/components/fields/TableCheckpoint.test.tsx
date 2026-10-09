@@ -96,6 +96,7 @@ window.open = vi.fn();
 
 const mockReport = {
   id: "mock-init-1",
+  user: { userIsEndUser: true },
   report: {
     id: "mock-report-id",
     state: "PA",

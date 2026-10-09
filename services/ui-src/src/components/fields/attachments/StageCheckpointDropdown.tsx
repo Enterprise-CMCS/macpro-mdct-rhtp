@@ -24,7 +24,8 @@ export const StageCheckpointDropdown = ({
   hideInitiative,
   errorCheck,
 }: Props) => {
-  const { report } = useStore();
+  const { report, user } = useStore();
+  const isDisabled = disabled || !user?.userIsEndUser;
 
   const initiatives = (
     (report?.pages.filter((page) => "initiativeNumber" in page) ||
@@ -99,7 +100,7 @@ export const StageCheckpointDropdown = ({
       );
       choices[choiceIndex].checked = !choices[choiceIndex].checked;
 
-      //set checks and indeterminate valye for select all
+      //set checks and indeterminate value for select all
       choices[0].checked = filteredChoices.some(
         (choice) => choice.checked && choice.value != "all"
       );
@@ -159,7 +160,7 @@ export const StageCheckpointDropdown = ({
           type={"checkbox"}
           label={"Which initiative does this attachment apply to?"}
           onChange={onChoiceChangeHandler}
-          disabled={disabled}
+          disabled={isDisabled}
           errorMessage={getErrorMsg()}
         />
       )}
@@ -169,7 +170,7 @@ export const StageCheckpointDropdown = ({
         options={checkpointAttachableOptions}
         value={checkpoint}
         onChange={onCheckpointHandler}
-        disabled={isStageEnabled() || disabled}
+        disabled={isStageEnabled() || isDisabled}
       />
     </Stack>
   );
