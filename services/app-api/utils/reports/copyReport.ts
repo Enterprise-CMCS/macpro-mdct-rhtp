@@ -28,9 +28,13 @@ const SKIP_COPY_ANSWER_IDS = [
 
 const SKIP_COPY_PAGE_IDS = ["sustainability-and-highlights"];
 
+//example: going from A2 to Q4, this key will not copyover but will copyover from Q3 to A2
+const SKIP_ANNUAL_TO_QUARTERLY = ["commitment-attachments"];
+
 const copyStatePolicyCommitments = (
   oldAccordions: AccordionGroupItem[],
-  newAccordions: AccordionGroupItem[]
+  newAccordions: AccordionGroupItem[],
+  annualToQuarterly?: boolean
 ) => {
   for (const oldAccordionItem of oldAccordions) {
     for (const oldChildItem of oldAccordionItem.elements) {
@@ -43,7 +47,12 @@ const copyStatePolicyCommitments = (
         const newChildItem = newAccordionItem?.elements.find(
           (newChildItem) => newChildItem.id === oldChildItem.id
         ) as PageElement;
-        if (!newChildItem || SKIP_COPY_ANSWER_IDS.includes(newChildItem.id))
+        if (
+          !newChildItem ||
+          SKIP_COPY_ANSWER_IDS.includes(newChildItem.id) ||
+          (annualToQuarterly &&
+            SKIP_ANNUAL_TO_QUARTERLY.includes(newChildItem.id))
+        )
           continue;
         if (oldChildItem?.type === newChildItem.type) {
           newChildItem.answer = structuredClone(oldChildItem.answer);
@@ -58,7 +67,8 @@ const copyAnswer = async (
   newElements: PageElement[],
   newSubType: RhtpSubType,
   state: string,
-  status?: PageStatus
+  status?: PageStatus,
+  annualToQuarterly?: boolean
 ) => {
   for (const oldElement of oldElements) {
     // Copying over State Policy Action Commitments
@@ -79,7 +89,11 @@ const copyAnswer = async (
         ) as AccordionGroupTemplate;
         newElement.accordions = templateGroup.accordions;
       }
-      copyStatePolicyCommitments(oldElement.accordions, newElement.accordions);
+      copyStatePolicyCommitments(
+        oldElement.accordions,
+        newElement.accordions,
+        annualToQuarterly
+      );
     }
 
     const newElement = newElements.find(
@@ -242,6 +256,10 @@ export const copyReport = async (newReport: Report) => {
   );
   if (!reportToCopy) return;
 
+  const annualToQuarterly =
+    reportToCopy.subType === RhtpSubType.ANNUAL &&
+    newReport.subType === RhtpSubType.QUARTERLY;
+
   for (const oldPage of reportToCopy.pages) {
     if (SKIP_COPY_PAGE_IDS.includes(oldPage.id)) continue;
     if (oldPage.elements) {
@@ -274,7 +292,8 @@ export const copyReport = async (newReport: Report) => {
         newElements,
         subType,
         state,
-        newPage?.status
+        newPage?.status,
+        annualToQuarterly
       );
     }
   }

@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
+import { INITIATIVE_UI_NAMES } from "../tests/pageObjects/report-initiative.page";
 import type { StatePage } from "../tests/pageObjects/state.page";
 import { reportType, stateAbbreviation } from "./consts";
 import {
@@ -21,9 +22,6 @@ import {
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
 } from "./report-edit-shared-helpers";
 import { TIMEOUT_LOADING, TIMEOUT_UI } from "./timeouts";
-
-const REPORT_TYPE = reportType;
-const STATE = stateAbbreviation;
 
 export const SUCCESS_STORIES_LABEL = /success stories/i;
 export const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
@@ -73,7 +71,7 @@ export const openUnsubmittedSectionWithSustainabilityRetry = async (
   sectionId: string
 ): Promise<OpenReportSectionResult> => {
   const dashboard = new DashboardPage(statePage.page);
-  await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+  await dashboard.navigateToDashboard(reportType, stateAbbreviation);
   const editableCount = await dashboard.getEditableReportCount();
   const maxAttempts = Math.min(Math.max(editableCount, 2), 3);
 
@@ -247,10 +245,10 @@ const completeInitiativesForSubmission = async (
   ).toBeVisible({ timeout: TIMEOUT_UI });
 
   await initiativeModal
-    .getByRole("textbox", { name: /^Initiative Number$/i })
+    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeNumber })
     .fill(initiativeNumber);
   await initiativeModal
-    .getByRole("textbox", { name: /^Initiative Name$/i })
+    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeName })
     .fill(initiativeName);
 
   await initiativeModal.getByRole("button", { name: /^Save$/i }).click();
