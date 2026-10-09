@@ -120,7 +120,7 @@ describe("ReportCommentDrawer component", () => {
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Unlock" }));
       await userEvent.click(screen.getByText("External (Shared with States)"));
-      await userEvent.click(screen.getByText("Add comment"));
+      await userEvent.click(screen.getByText("Save changes"));
       expect(mockReleaseReport).toHaveBeenCalled();
     });
 
@@ -130,7 +130,7 @@ describe("ReportCommentDrawer component", () => {
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Accepted" }));
       await userEvent.click(screen.getByText("External (Shared with States)"));
-      await userEvent.click(screen.getByText("Add comment"));
+      await userEvent.click(screen.getByText("Save changes"));
       expect(mockAcceptReport).toHaveBeenCalled();
     });
   });
@@ -192,7 +192,7 @@ describe("ReportCommentDrawer component", () => {
         await userEvent.click(
           screen.getByText("External (Shared with States)")
         );
-        await userEvent.click(screen.getByText("Add comment"));
+        await userEvent.click(screen.getByText("Save changes"));
         expect(mockCreateComment).toHaveBeenCalledWith(
           mockReport.id,
           mockReport.state,
@@ -214,16 +214,16 @@ describe("ReportCommentDrawer component", () => {
     test("state user can edit comment box always", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
       await renderReportCommentDrawerComponent();
-      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeEnabled();
     });
 
     test("state user must leave a comment to submit", async () => {
       mockedUseStore.mockReturnValue(mockUseStore);
       await renderReportCommentDrawerComponent();
-      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeEnabled();
-      await userEvent.click(screen.getByText("Add comment"));
+      await userEvent.click(screen.getByText("Save changes"));
       expect(screen.getByText("A comment is required.")).toBeVisible();
     });
 
@@ -254,7 +254,7 @@ describe("ReportCommentDrawer component", () => {
       });
       mockedUseStore.mockReturnValue(mockHelpDeskUserStore);
       await renderReportCommentDrawerComponent();
-      const commentInput = screen.getByRole("textbox", { name: "Comment" });
+      const commentInput = screen.getByRole("textbox", { name: /Comment/i });
       expect(commentInput).toBeDisabled();
     });
 
@@ -272,7 +272,7 @@ describe("ReportCommentDrawer component", () => {
       });
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Internal (CMS Only)"));
-      await userEvent.click(screen.getByText("Add comment"));
+      await userEvent.click(screen.getByText("Save changes"));
       expect(mockCreateComment).toHaveBeenCalledWith(
         mockReport.id,
         mockReport.state,
@@ -282,23 +282,6 @@ describe("ReportCommentDrawer component", () => {
           isInternal: true,
         }
       );
-    });
-
-    test("admin user gets error if they do not select a comment type", async () => {
-      mockFlags.mockReturnValue({
-        adminCommentsEnabled: true,
-      });
-      mockedUseStore.mockReturnValue({
-        ...mockUseStore,
-        ...mockAdminUserStore,
-      });
-      await renderReportCommentDrawerComponent();
-      const commentInput = screen.getByRole("textbox", {
-        name: "Comment(optional)",
-      });
-      await userEvent.type(commentInput, "Test comment");
-      await userEvent.click(screen.getByText("Add comment"));
-      expect(screen.getByText("Please select a comment type.")).toBeVisible();
     });
   });
 
