@@ -40,6 +40,7 @@ export const UploadArea = ({
   const { report } = useStore();
   const { id, state, type: reportType } = report!;
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+  const [failedUploadNames, setFailedUploadNames] = useState<string[]>([]);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
   const [uploadStatus, setUploadStatus] = useState<
     {
@@ -51,17 +52,20 @@ export const UploadArea = ({
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
-        await onUploadFiles().then(({ savedFiles, failedFiles }) => {
+        await onUploadFiles().then((response) => {
           setUploadStatus([
             ...uploadStatus,
-            ...savedFiles.map((file) => ({
+            ...response.map((file) => ({
               fileId: file.fileId,
-              message: failedFiles.includes(file.name)
+              message: failedUploadNames.includes(file.name)
                 ? `File ${file.name} failed to upload`
                 : (notification?.success ?? ""),
             })),
           ]);
           setFilesToUpload([]);
+          const savedFiles = response.filter(
+            (file) => !failedUploadNames.includes(file.name)
+          );
           saveToReport(savedFiles);
         });
       fetchData();
@@ -146,9 +150,9 @@ export const UploadArea = ({
   };
 
   const onUploadFiles = async () => {
+    setFailedUploadNames([]);
     const files = filesToUpload ?? [];
     const savedFiles = [];
-    const failedFiles = [];
     for (var i = 0; i < files.length; i++) {
       const displayName = files[i].name;
       const file = getFileWithSafeName(files[i]);
@@ -160,26 +164,25 @@ export const UploadArea = ({
             id,
             file
           );
-        await uploadFileToS3({ presignedUploadUrl }, file);
         savedFiles.push({ name: displayName, fileId, size: file.size });
+        await uploadFileToS3({ presignedUploadUrl }, file);
       } catch (error) {
         console.error("File upload error", error);
         setUploadErrors((prevErrors) => [
           ...(prevErrors ?? []),
-          `File ${file.name} failed to upload`,
+          `A file failed to upload (see details below)`,
         ]);
-        failedFiles.push(displayName);
+        setFailedUploadNames([...failedUploadNames, displayName]);
       }
     }
-    return { savedFiles, failedFiles };
+    return savedFiles;
   };
 
   const modifiedAnswer = (answer: UploadListProp[]) => {
     return answer.map((item) => ({
       ...item,
-      message:
-        uploadStatus.find((success) => success.fileId === item.fileId)
-          ?.message ?? `File ${item.name} failed to upload`,
+      message: uploadStatus.find((success) => success.fileId === item.fileId)
+        ?.message,
     }));
   };
 
