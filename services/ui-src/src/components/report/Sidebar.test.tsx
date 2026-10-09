@@ -1,5 +1,5 @@
 import { Mock, MockedFunction } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { mockUseStore } from "utils/testing/setupTest";
 import { BrowserRouter as Router, useParams } from "react-router";
@@ -106,5 +106,46 @@ describe("Sidebar", () => {
     await userEvent.click(expandButton);
 
     expect(screen.getByText("Child 1")).toBeInTheDocument();
+  });
+
+  test("Sidebar not expanded when closed", async () => {
+    // note: tests sidebar nav at non-desktop size, so it is closed to start
+    render(
+      <Router>
+        <Sidebar />
+      </Router>
+    );
+    const sidebarNav = screen.getByRole("navigation");
+    await waitFor(() => {
+      expect(sidebarNav).toHaveClass("closed");
+    });
+
+    const sidebarButton = screen.getByRole("button", { name: "Sidebar" });
+    await waitFor(() => {
+      expect(sidebarButton).toHaveAttribute("aria-expanded", "false");
+    });
+  });
+  test("Sidebar expanded when open", async () => {
+    (useStore as unknown as Mock).mockReturnValueOnce({
+      pageMap: mockPageMap,
+      report,
+      currentPageId: "id-1",
+      setCurrentPageId,
+      sidebarOpen: true,
+    });
+    render(
+      <Router>
+        <Sidebar />
+      </Router>
+    );
+    const sidebarNav = screen.getByRole("navigation");
+    await waitFor(() => {
+      expect(sidebarNav).toHaveClass("open");
+    });
+
+    const sidebarButton = screen.getByRole("button", { name: "Sidebar" });
+    await waitFor(() => {
+      expect(sidebarButton).toHaveAttribute("aria-expanded", "true");
+    });
   });
 });
