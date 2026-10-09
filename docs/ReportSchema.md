@@ -41,7 +41,7 @@ Comments added to the reports or to attached files are sent in a separate topic:
 - `subType` (string): One of "ANNUAL", "QUARTERLY", or "FINAL".
 - `subTypeKey` (string): Ex: "A1" for "Annual Report 1". A key associated with data for determining report information.
 - `budgetPeriod` (number): Range 1-5 corresponding to RHTP report budget periods.
-- `status` (string): "Not started", "In progress", or "Submitted"
+- `status` (string): "Not started", "In progress", "Submitted", or "Accepted"
 - `name` (string): The system assigned name for the report, based on state, report type, and reporting period.
   Ex: `PA - Annual Report 1 - 12/29/2025-7/31/2026`
 - `year` (number): The year for which data is being reported.
