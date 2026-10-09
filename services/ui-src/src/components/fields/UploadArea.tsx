@@ -41,7 +41,7 @@ export const UploadArea = ({
   const { id, state, type: reportType } = report!;
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
-  const [uploadSuccess, setUploadSuccess] = useState<
+  const [uploadStatus, setUploadStatus] = useState<
     {
       fileId: string;
       message: string;
@@ -51,16 +51,18 @@ export const UploadArea = ({
   useEffect(() => {
     if (filesToUpload && filesToUpload.length > 0) {
       const fetchData = async () =>
-        await onUploadFiles().then((response) => {
-          setUploadSuccess([
-            ...uploadSuccess,
-            ...response.map((file) => ({
+        await onUploadFiles().then(({ savedFiles, failedFiles }) => {
+          setUploadStatus([
+            ...uploadStatus,
+            ...savedFiles.map((file) => ({
               fileId: file.fileId,
-              message: notification?.success ?? "",
+              message: failedFiles.includes(file.name)
+                ? `File ${file.name} failed to upload`
+                : (notification?.success ?? ""),
             })),
           ]);
           setFilesToUpload([]);
-          saveToReport(response);
+          saveToReport(savedFiles);
         });
       fetchData();
     }
@@ -146,6 +148,7 @@ export const UploadArea = ({
   const onUploadFiles = async () => {
     const files = filesToUpload ?? [];
     const savedFiles = [];
+    const failedFiles = [];
     for (var i = 0; i < files.length; i++) {
       const displayName = files[i].name;
       const file = getFileWithSafeName(files[i]);
@@ -158,24 +161,25 @@ export const UploadArea = ({
             file
           );
         await uploadFileToS3({ presignedUploadUrl }, file);
-        savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
+        savedFiles.push({ name: displayName, fileId, size: file.size });
       } catch (error) {
         console.error("File upload error", error);
         setUploadErrors((prevErrors) => [
           ...(prevErrors ?? []),
           `File ${file.name} failed to upload`,
         ]);
+        failedFiles.push(displayName);
       }
     }
-    return savedFiles;
+    return { savedFiles, failedFiles };
   };
 
   const modifiedAnswer = (answer: UploadListProp[]) => {
     return answer.map((item) => ({
       ...item,
       message:
-        uploadSuccess.find((success) => success.fileId === item.fileId)
-          ?.message || `File ${item.name} failed to upload`,
+        uploadStatus.find((success) => success.fileId === item.fileId)
+          ?.message ?? `File ${item.name} failed to upload`,
     }));
   };
 
