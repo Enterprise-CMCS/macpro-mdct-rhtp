@@ -95,10 +95,15 @@ export const Sidebar = () => {
   if (root == undefined) return null;
 
   return (
-    <Box sx={sx.sidebar} className={sidebarOpen ? "open" : "closed"}>
+    <Box
+      sx={sx.sidebar}
+      role="navigation"
+      className={sidebarOpen ? "open" : "closed"}
+    >
       <Flex sx={sx.sidebarNav}>
         <Button
-          aria-label="Open/Close sidebar menu"
+          aria-label="Sidebar"
+          aria-expanded={!!sidebarOpen}
           variant="sidebarToggle"
           onClick={() => setSidebar(!sidebarOpen)}
           className={sidebarOpen ? "open" : "closed"}
