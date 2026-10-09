@@ -89,12 +89,16 @@ export const uploadListRender = (
                   </Button>
                 )}
                 <span>{bytesToKiloBytes(file.size)} KB</span>
-                {"message" in file && file.message && (
-                  <span className="successMsg">
-                    <Image src={successIcon} />
-                    Uploaded to: {parseHtml(file.message)}
-                  </span>
-                )}
+                {"message" in file &&
+                  file.message &&
+                  (!file.message.includes("fail") ? (
+                    <span className="successMsg">
+                      <Image src={successIcon} alt="success" />
+                      Uploaded to: {parseHtml(file.message)}
+                    </span>
+                  ) : (
+                    <span className="failMsg">{parseHtml(file.message)}</span>
+                  ))}
               </VStack>
               {onRemove && (
                 <Button

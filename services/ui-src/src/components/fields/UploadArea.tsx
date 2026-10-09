@@ -157,8 +157,8 @@ export const UploadArea = ({
             id,
             file
           );
-        savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
         await uploadFileToS3({ presignedUploadUrl }, file);
+        savedFiles.push({ name: displayName, fileId: fileId, size: file.size });
       } catch (error) {
         console.error("File upload error", error);
         setUploadErrors((prevErrors) => [
@@ -173,8 +173,9 @@ export const UploadArea = ({
   const modifiedAnswer = (answer: UploadListProp[]) => {
     return answer.map((item) => ({
       ...item,
-      message: uploadSuccess.find((success) => success.fileId === item.fileId)
-        ?.message,
+      message:
+        uploadSuccess.find((success) => success.fileId === item.fileId)
+          ?.message || `File ${item.name} failed to upload`,
     }));
   };
 
