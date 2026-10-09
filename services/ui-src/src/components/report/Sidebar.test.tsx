@@ -120,7 +120,7 @@ describe("Sidebar", () => {
       expect(sidebarNav).toHaveClass("closed");
     });
 
-    const sidebarButton = screen.getByLabelText("Sidebar");
+    const sidebarButton = screen.getByRole("button", { name: "Sidebar" });
     await waitFor(() => {
       expect(sidebarButton).toHaveAttribute("aria-expanded", "false");
     });
@@ -143,7 +143,7 @@ describe("Sidebar", () => {
       expect(sidebarNav).toHaveClass("open");
     });
 
-    const sidebarButton = screen.getByLabelText("Sidebar");
+    const sidebarButton = screen.getByRole("button", { name: "Sidebar" });
     await waitFor(() => {
       expect(sidebarButton).toHaveAttribute("aria-expanded", "true");
     });

@@ -97,7 +97,8 @@ export const Sidebar = () => {
   return (
     <Box
       sx={sx.sidebar}
-      role="navigation"
+      as="nav"
+      aria-label="Sidebar"
       className={sidebarOpen ? "open" : "closed"}
     >
       <Flex sx={sx.sidebarNav}>
