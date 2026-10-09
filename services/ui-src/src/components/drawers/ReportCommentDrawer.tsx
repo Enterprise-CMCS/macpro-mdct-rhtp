@@ -13,8 +13,9 @@ import {
   CommentType,
   Comment,
   LiteReport,
+  CompletedReportStatuses,
 } from "@rhtp/shared";
-import { acceptReport, releaseReport, useStore } from "utils";
+import { acceptReport, optionalTag, releaseReport, useStore } from "utils";
 import { useFlags } from "launchdarkly-react-client-sdk";
 import {
   createComment,
@@ -43,7 +44,7 @@ export const ReportCommentDrawer = ({
   } = {
     comment: "",
     status: status,
-    commentType: userIsAdmin ? "" : "external",
+    commentType: "external",
   };
 
   const noErrorState = {
@@ -66,7 +67,8 @@ export const ReportCommentDrawer = ({
   const commentsDisabled = !userCanAddComment;
 
   const commentsOptional = userIsAdmin;
-  const statusDisabled = status !== ReportStatus.SUBMITTED || !userIsAdmin;
+  const statusDisabled =
+    !CompletedReportStatuses.includes(status) || !userIsAdmin;
 
   const fetchComments = async () => {
     setCommentsLoading(true);
@@ -121,14 +123,6 @@ export const ReportCommentDrawer = ({
 
     try {
       if (commentsDisabled) {
-        return;
-      }
-
-      if (displayValue.commentType === "" && userIsAdmin) {
-        setErrorMessages({
-          ...errorMessages,
-          commentType: "Please select a comment type.",
-        });
         return;
       }
 
@@ -213,12 +207,7 @@ export const ReportCommentDrawer = ({
         {userIsAdmin && (
           <Fragment>
             <Dropdown
-              label={
-                <>
-                  Status
-                  <span className="optionalText"> (optional)</span>
-                </>
-              }
+              label={optionalTag({ label: "Status", required: false })}
               name="status"
               onChange={onChange}
               options={statusOptions}
@@ -227,7 +216,10 @@ export const ReportCommentDrawer = ({
               errorMessage={errorMessages.status}
             />
             <ChoiceList
-              label="External or Internal Comment"
+              label={optionalTag({
+                label: "External or Internal Comment",
+                required: false,
+              })}
               hint="Choose whether this comment is hidden from the state or shared."
               name="commentType"
               type="radio"
@@ -245,14 +237,7 @@ export const ReportCommentDrawer = ({
         )}
         <TextField
           name={"comment"}
-          label={
-            <>
-              Comment
-              {commentsOptional && (
-                <span className="optionalText"> (optional)</span>
-              )}
-            </>
-          }
+          label={optionalTag({ label: "Comment", required: !commentsOptional })}
           onChange={onChange}
           value={displayValue.comment}
           disabled={commentsDisabled}
@@ -267,7 +252,7 @@ export const ReportCommentDrawer = ({
         isLoading={submitting}
         variant="outline"
       >
-        Add comment
+        Save changes
       </Button>
       <Divider marginTop={"spacer3"} borderColor={"black"} />
       {commentsLoading ? (

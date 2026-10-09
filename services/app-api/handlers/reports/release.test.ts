@@ -7,6 +7,7 @@ import { proxyEvent } from "../../testing/proxyEvent";
 import { ReportStatus, UserRoles } from "@rhtp/shared";
 import { authenticatedUser } from "../../utils/authentication";
 import { sendEmail } from "../../utils/notifications/email";
+import { putReport } from "../../storage/reports";
 
 vi.mock("../../utils/authentication");
 vi.mocked(authenticatedUser).mockReturnValue({
@@ -64,7 +65,14 @@ describe("Test releaseReport handler", () => {
     expect(response.statusCode).toBe(StatusCodes.Forbidden);
   });
 
-  test("Test unlocked report", async () => {
+  test("should return not found for no report found", async () => {
+    mockGet.mockReturnValueOnce(undefined);
+    const res = await releaseReport(testEvent);
+
+    expect(res.statusCode).toBe(StatusCodes.NotFound);
+  });
+
+  test("Test unlocking submitted report", async () => {
     mockGet.mockReturnValueOnce({
       id: "A report",
       status: ReportStatus.SUBMITTED,
@@ -72,11 +80,30 @@ describe("Test releaseReport handler", () => {
     const res = await releaseReport(testEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Ok);
+    expect(putReport).toHaveBeenCalled();
+    expect(sendEmail).toHaveBeenCalled();
   });
-  test("Test successful lock of report", async () => {
+  test("Test unlocking accepted report", async () => {
+    mockGet.mockReturnValueOnce({
+      id: "A report",
+      status: ReportStatus.ACCEPTED,
+    });
     const res = await releaseReport(testEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Ok);
+    expect(putReport).toHaveBeenCalled();
     expect(sendEmail).toHaveBeenCalled();
+  });
+
+  test("Test unlocking in progress report does nothing", async () => {
+    mockGet.mockReturnValueOnce({
+      id: "A report",
+      status: ReportStatus.IN_PROGRESS,
+    });
+    const res = await releaseReport(testEvent);
+
+    expect(res.statusCode).toBe(StatusCodes.Ok);
+    expect(putReport).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 });
