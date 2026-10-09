@@ -72,10 +72,14 @@ export const uploadFileToS3 = async (
   { presignedUploadUrl }: { presignedUploadUrl: string },
   file: File
 ) => {
-  return await fetch(presignedUploadUrl, {
+  const result = await fetch(presignedUploadUrl, {
     method: "PUT",
     body: file,
   });
+  if (result.status >= 400) {
+    throw new Error("file upload error");
+  }
+  return result;
 };
 
 export const getFileDownloadUrl = async (

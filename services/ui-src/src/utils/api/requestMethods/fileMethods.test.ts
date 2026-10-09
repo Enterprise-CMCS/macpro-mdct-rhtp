@@ -50,6 +50,13 @@ describe("Test fileApi functions", () => {
     const result = await uploadFileToS3(mockPostData, mockPng);
     expect(result).toBe("200 or whatever");
   });
+  test("uploadFileToS3 throws error for 400+ status codes", async () => {
+    window.fetch = vi.fn().mockResolvedValue({ status: 403 });
+    const mockPostData = { presignedUploadUrl: "mock.s3/url" };
+    await expect(uploadFileToS3(mockPostData, mockPng)).rejects.toThrow(
+      "file upload error"
+    );
+  });
   test("getFileDownloadUrl", async () => {
     (apiLib.get as Mock).mockReturnValue({ psurl: "mock.s3/url" });
     const result = await getFileDownloadUrl("RHTP", "PA", "mock-id", "2025");
