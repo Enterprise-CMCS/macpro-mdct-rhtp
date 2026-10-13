@@ -187,11 +187,11 @@ export const ReportCommentDrawer = ({
   return (
     <Drawer
       modalDisclosure={modalDisclosure}
-      onConfirmHandler={modalDisclosure.onClose}
+      onOutlineHandler={modalDisclosure.onClose}
       content={{
         heading: "Add comment to report",
         subheading: userSpecificSubheading,
-        solidButtonText: "Close",
+        outlineButtonText: "Close",
       }}
     >
       <Flex direction="column" gap="spacer4" marginBottom="spacer4">
@@ -250,7 +250,7 @@ export const ReportCommentDrawer = ({
         onClick={onSubmit}
         isDisabled={commentsDisabled}
         isLoading={submitting}
-        variant="outline"
+        variant="primary"
       >
         Save changes
       </Button>

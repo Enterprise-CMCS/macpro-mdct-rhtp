@@ -28,7 +28,7 @@ export const optionalTag = (element: {
         (element.required ? (
           <span className="requiredText">Required</span>
         ) : (
-          <span className="optionalText"> (optional)</span>
+          <span className="optionalText"> (Optional)</span>
         ))}
     </>
   );

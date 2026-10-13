@@ -90,7 +90,7 @@ describe("ReportCommentDrawer component", () => {
         })
       ).toBeInTheDocument();
       expect(
-        screen.getAllByLabelText("Status (optional)")[1]
+        screen.getAllByLabelText("Status (Optional)")[1]
       ).toBeInTheDocument();
     });
 
@@ -100,7 +100,7 @@ describe("ReportCommentDrawer component", () => {
     });
 
     test("Status dropdown disabled for unsubmitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status (optional)")[1];
+      const statusDropdown = screen.getAllByLabelText("Status (Optional)")[1];
       expect(statusDropdown).toBeDisabled();
     });
   });
@@ -115,7 +115,7 @@ describe("ReportCommentDrawer component", () => {
     });
 
     test("Admin can release a submitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status (optional)")[1];
+      const statusDropdown = screen.getAllByLabelText("Status (Optional)")[1];
       expect(statusDropdown).toBeEnabled();
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Unlock" }));
@@ -125,7 +125,7 @@ describe("ReportCommentDrawer component", () => {
     });
 
     test("Admin can accept a submitted report", async () => {
-      const statusDropdown = screen.getAllByLabelText("Status (optional)")[1];
+      const statusDropdown = screen.getAllByLabelText("Status (Optional)")[1];
       expect(statusDropdown).toBeEnabled();
       await userEvent.click(statusDropdown);
       await userEvent.click(screen.getByRole("option", { name: "Accepted" }));
@@ -186,7 +186,7 @@ describe("ReportCommentDrawer component", () => {
 
       test("Fill and save comment", async () => {
         const commentInput = screen.getByRole("textbox", {
-          name: "Comment(optional)",
+          name: "Comment(Optional)",
         });
         await userEvent.type(commentInput, "Test comment");
         await userEvent.click(
@@ -268,7 +268,7 @@ describe("ReportCommentDrawer component", () => {
       });
       await renderReportCommentDrawerComponent();
       const commentInput = screen.getByRole("textbox", {
-        name: "Comment(optional)",
+        name: "Comment(Optional)",
       });
       await userEvent.type(commentInput, "Test comment");
       await userEvent.click(screen.getByText("Internal (CMS Only)"));
