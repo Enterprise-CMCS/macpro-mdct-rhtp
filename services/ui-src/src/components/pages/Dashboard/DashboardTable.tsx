@@ -46,7 +46,9 @@ export const HorizontalTable = (props: TableProps) => {
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
           </Td>
-          <Td>{report.lastEditedBy}</Td>
+          <Text>
+            {report.subTypeKey === "A1" ? "CMS" : report.lastEditedBy}
+          </Text>
           <Td>{getStatus(report)}</Td>
           {props.showReportSubmissionsColumn && (
             <Td width="3rem">{report.submissionCount ?? 0}</Td>
@@ -97,7 +99,9 @@ export const VerticalTable = (props: TableProps) => {
             </div>
             <div>
               <Text variant="gray">Edited By</Text>
-              <Text>{report.lastEditedBy}</Text>
+              <Text>
+                {report.subTypeKey === "A1" ? "CMS" : report.lastEditedBy}
+              </Text>
             </div>
           </HStack>
           <div>
