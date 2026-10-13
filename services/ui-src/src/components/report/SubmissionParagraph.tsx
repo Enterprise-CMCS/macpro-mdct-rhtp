@@ -7,13 +7,14 @@ export const SubmissionParagraph = () => {
   if (!report || !report.submitted) return null;
 
   const submitted = new Date(report.submitted);
+  const submittedBy = report.subTypeKey === "A1" ? "CMS" : report.submittedBy;
 
   const readableDate = new Intl.DateTimeFormat("en-US", {
     dateStyle: "long",
   }).format(submitted);
   const submissionText = `${getReportName(report.type)} submission for ${
     report.state
-  } was submitted on ${readableDate} by ${report.submittedBy}.`;
+  } was submitted on ${readableDate} by ${submittedBy}.`;
   return (
     <Stack>
       <Text fontSize="heading_md" fontWeight="heading_md">
