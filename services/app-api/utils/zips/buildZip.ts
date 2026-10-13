@@ -148,13 +148,19 @@ export const addObligatedAndSpentFundsFilesToZip = async (
   for (const obligatedAndSpentFundsFile of obligatedAndSpentFundsFiles) {
     const { id, file, state, subType } = obligatedAndSpentFundsFile;
     if (!file?.fileId || !file?.name) continue;
-    const item = await s3Lib.getObject({
-      Bucket: process.env.attachmentsBucketName,
-      Key: `${ObligatedAndSpentFundsReportType}/${state}/${id}/${file.fileId}`,
-    });
-    const bytes = await item.Body?.transformToByteArray();
-    if (bytes) {
-      zip.file(`${state}/${subType.toUpperCase()}/${file.name}`, bytes);
+
+    try {
+      const item = await s3Lib.getObject({
+        Bucket: process.env.attachmentsBucketName,
+        Key: `${ObligatedAndSpentFundsReportType}/${state}/${id}/${file.fileId}`,
+      });
+      const bytes = await item.Body?.transformToByteArray();
+      if (bytes) {
+        zip.file(`${state}/${subType.toUpperCase()}/${file.name}`, bytes);
+      }
+    } catch {
+      //skip the failed file and move to next one
+      continue;
     }
   }
 };
