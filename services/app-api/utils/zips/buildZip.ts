@@ -84,21 +84,21 @@ export const addReportFilesToZip = async (report: Report, zip: JSZip) => {
 
   for (const folder of zipFolders) {
     for (const file of folder.files) {
-      let bytes = undefined;
       try {
         const item = await s3Lib.getObject({
           Bucket: process.env.attachmentsBucketName,
           Key: `${reportType}/${state}/${id}/${file?.fileId}`,
         });
-        bytes = await item.Body?.transformToByteArray();
+        const bytes = await item.Body?.transformToByteArray();
+        if (bytes && file?.name) {
+          zip.file(
+            `${state}/${report?.subType.toUpperCase()}/${folder.name}/${file.name}`,
+            bytes
+          );
+        }
       } catch {
+        //skip if the file failed to be retrieved
         continue;
-      }
-      if (bytes && file?.name) {
-        zip.file(
-          `${state}/${report?.subType.toUpperCase()}/${folder.name}/${file.name}`,
-          bytes
-        );
       }
     }
   }
@@ -159,7 +159,7 @@ export const addObligatedAndSpentFundsFilesToZip = async (
         zip.file(`${state}/${subType.toUpperCase()}/${file.name}`, bytes);
       }
     } catch {
-      //skip the failed file and move to next one
+      //skip if the file failed to be retrieved
       continue;
     }
   }
