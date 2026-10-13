@@ -74,7 +74,7 @@ export const openUnsubmittedSectionWithSustainabilityRetry = async (
   sectionId: string
 ): Promise<OpenReportSectionResult> => {
   const dashboard = new DashboardPage(statePage.page);
-  await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+  await dashboard.navigateToDashboard(reportType, stateAbbreviation);
   const editableCount = await dashboard.getEditableReportCount();
   const maxAttempts = Math.min(Math.max(editableCount, 2), 3);
 
@@ -248,10 +248,10 @@ const completeInitiativesForSubmission = async (
   ).toBeVisible({ timeout: TIMEOUT_UI });
 
   await initiativeModal
-    .getByRole("textbox", { name: /^Initiative Number$/i })
+    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeNumber })
     .fill(initiativeNumber);
   await initiativeModal
-    .getByRole("textbox", { name: /^Initiative Name$/i })
+    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeName })
     .fill(initiativeName);
 
   await initiativeModal.getByRole("button", { name: /^Save$/i }).click();

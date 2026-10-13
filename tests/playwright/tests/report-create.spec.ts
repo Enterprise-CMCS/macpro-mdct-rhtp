@@ -9,14 +9,11 @@ import { reportType, stateAbbreviation } from "../utils/consts";
 import { determineRetryAfterDateBlock } from "../utils/report-date-gate-retry";
 
 test.describe("Report Creation", () => {
-  const REPORT_TYPE = reportType;
-  const STATE = stateAbbreviation;
-
   const recoverFromDateBlockedCreate = async (
     dashboard: DashboardPage,
     modal: ReportModalPage
   ): Promise<CreateModalSubmitResult> => {
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    await dashboard.navigateToDashboard(reportType, stateAbbreviation);
     await dashboard.openCreateModal();
     return modal.submitCreateModal();
   };
@@ -25,7 +22,7 @@ test.describe("Report Creation", () => {
     dashboard: DashboardPage,
     modal: ReportModalPage
   ): Promise<CopyModalSubmitResult> => {
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    await dashboard.navigateToDashboard(reportType, stateAbbreviation);
     await dashboard.openCopyModal();
     return modal.submitCopyModal();
   };
@@ -33,7 +30,7 @@ test.describe("Report Creation", () => {
   const navigateAndGetState = async (
     dashboard: DashboardPage
   ): Promise<DashboardState> => {
-    await dashboard.navigateToDashboard(REPORT_TYPE, STATE);
+    await dashboard.navigateToDashboard(reportType, stateAbbreviation);
     return dashboard.getDashboardState();
   };
 

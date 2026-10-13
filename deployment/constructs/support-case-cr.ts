@@ -1,3 +1,4 @@
+// This file is managed by macpro-mdct-core so if you'd like to change it let's do it there
 import { CustomResource, Duration } from "aws-cdk-lib";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";

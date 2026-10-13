@@ -29,7 +29,7 @@ export const stageList = [
         id: "project-prop-1",
         checkpointNumber: "1.1",
         label: "CMS approval of project plan",
-        attachable: false,
+        attachable: true,
       },
       {
         id: "project-prop-2",
@@ -79,7 +79,7 @@ export const stageList = [
         id: "midway-imp-1",
         checkpointNumber: "3.1",
         label: "CMS approval of updated project plan",
-        attachable: false,
+        attachable: true,
       },
       {
         id: "midway-imp-2",
@@ -110,7 +110,7 @@ export const stageList = [
         id: "project-for-complete-2",
         checkpointNumber: "4.2",
         label: "CMS approval of final deliverables plan",
-        attachable: false,
+        attachable: true,
       },
       {
         id: "project-for-complete-3",

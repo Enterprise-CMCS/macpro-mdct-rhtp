@@ -33,7 +33,7 @@ export const getTabTitle = (
 
   //if not a single tab title is found in the map or page element, pull it from the first h1 element on the page else, it is highly likely not a real page
   if (!pathTabTitle && !reportTabTitle)
-    return findPageH1()?.textContent ?? "Page not Found";
+    return findPageH1()?.textContent ?? "Loading...";
 
   return pathTabTitle ?? `${reportTabTitle} - RHTP`;
 };

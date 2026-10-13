@@ -272,6 +272,16 @@ export const AttachmentTable = (
           No attachments found. Select “Add Attachment” to get started.
         </Text>
       )}
+      <Button
+        aria-label="Add Attachment"
+        variant="outline"
+        alignSelf="flex-start"
+        leftIcon={<Image src={disabled ? addGray : addPrimary} alt="Add" />}
+        onClick={onAddClick}
+        disabled={disabled}
+      >
+        Add Attachment
+      </Button>
       <UploadDrawer
         modalDisclosure={{
           isOpen: isModalOpen,

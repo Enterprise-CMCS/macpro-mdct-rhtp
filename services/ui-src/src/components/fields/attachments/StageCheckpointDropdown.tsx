@@ -5,7 +5,7 @@ import {
   DropdownChangeObject,
 } from "@cmsgov/design-system";
 import { InitiativePageTemplate, PageStatus } from "@rhtp/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "utils";
 import { checkpointAttachableOptions } from "verbiage/checkpoints";
 
@@ -26,52 +26,108 @@ export const StageCheckpointDropdown = ({
 }: Props) => {
   const { report } = useStore();
 
-  const initiatives = (report?.pages.filter(
-    (page) => "initiativeNumber" in page
-  ) || []) as InitiativePageTemplate[];
+  const initiatives = (
+    (report?.pages.filter((page) => "initiativeNumber" in page) ||
+      []) as InitiativePageTemplate[]
+  ).map(({ id, initiativeNumber, status, title }) => {
+    const isAbandoned = status === PageStatus.ABANDONED;
+    const isChecked = answer?.initiatives.includes(id);
 
-  const getInitiativeOptions = () => {
-    return initiatives.map(({ id, initiativeNumber, status, title }) => {
-      const isAbandoned = status === PageStatus.ABANDONED;
-      const isChecked = answer?.initiatives.includes(id);
+    return {
+      label: `${initiativeNumber}: ${title}${isAbandoned ? " (abandoned)" : ""}`,
+      value: id,
+      checked: !!isChecked,
+      disabled: isAbandoned,
+    };
+  });
 
-      return {
-        label: `${initiativeNumber}: ${title}${isAbandoned ? " (abandoned)" : ""}`,
-        value: id,
-        checked: !!isChecked,
-        disabled: isAbandoned,
-      };
-    });
-  };
+  //an initiative could have been active when selected and became disabled along
+  const activeAnswers = answer?.initiatives.filter(
+    (initiative) =>
+      !initiatives.find((option) => option.value === initiative)?.disabled
+  );
 
   const [initiativeOptions, setInitiativeOptions] = useState<
-    { label: string; value: string; checked: boolean }[]
-  >(getInitiativeOptions());
+    { label: string; value: string; checked: boolean; disabled: boolean }[]
+  >([
+    {
+      label: "Select All",
+      value: "all",
+      checked: activeAnswers ? activeAnswers.length > 0 : false,
+      disabled: false,
+    },
+    ...initiatives,
+  ]);
   const [checkpoint, setCheckpoint] = useState(answer?.checkpoint ?? "");
+
+  useEffect(() => {
+    //for changing the select all checkbox to indeterminate after rendering an edit view.
+    if (activeAnswers) {
+      const input = document.querySelector(
+        'input[value="all"]'
+      ) as HTMLInputElement;
+      input.indeterminate =
+        activeAnswers.length > 0 &&
+        activeAnswers.length <
+          initiativeOptions.filter((options) => !options.disabled).length - 1;
+    }
+  }, []);
 
   const onChoiceChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
-    const choices = [...initiativeOptions];
-    const choiceIndex = initiativeOptions.findIndex(
-      (option) => option.value === value
-    );
-    choices[choiceIndex].checked = !choices[choiceIndex].checked;
+    let choices = [...initiativeOptions];
+
+    const choiceAll = choices[0];
+    //ignoring initiatives that have been abandoned
+    const filteredChoices = choices.filter((choice) => !choice.disabled);
+
+    if (value === "all") {
+      choices = choices.map((choice) => {
+        const isChecked = !choice.disabled
+          ? !choiceAll.checked
+          : choice.checked;
+        return {
+          ...choice,
+          checked: isChecked,
+        };
+      });
+    } else {
+      const choiceIndex = initiativeOptions.findIndex(
+        (option) => option.value === value
+      );
+      choices[choiceIndex].checked = !choices[choiceIndex].checked;
+
+      //set checks and indeterminate valye for select all
+      choices[0].checked = filteredChoices.some(
+        (choice) => choice.checked && choice.value != "all"
+      );
+      const input = document.querySelector(
+        'input[value="all"]'
+      ) as HTMLInputElement;
+      input.indeterminate =
+        choices[0].checked &&
+        !filteredChoices.every((choice) => choice.checked);
+    }
     setInitiativeOptions(choices);
 
     //if no checkbox is checked, we want to reset any options selected into the stage and checkpoint
-    if (choices.every((choice) => !choice.checked)) {
+    if (filteredChoices.every((choice) => !choice.checked)) {
       setCheckpoint("");
     }
     onDropdownHandler(
-      initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
+      initiativeOptions
+        .filter((opt) => opt.checked && opt.value !== "all")
+        .map((opt) => opt.value),
       checkpoint
     );
   };
 
   const isStageEnabled = () => {
-    return initiativeOptions.every((option) => option.checked != true);
+    return initiativeOptions
+      .filter((choice) => !choice.disabled)
+      .every((option) => option.checked != true);
   };
 
   const onCheckpointHandler = (
@@ -80,7 +136,9 @@ export const StageCheckpointDropdown = ({
     const newCheckpoint = event.target.value;
     setCheckpoint(newCheckpoint);
     onDropdownHandler(
-      initiativeOptions.filter((opt) => opt.checked).map((opt) => opt.value),
+      initiativeOptions
+        .filter((opt) => opt.checked && opt.value !== "all")
+        .map((opt) => opt.value),
       newCheckpoint
     );
   };

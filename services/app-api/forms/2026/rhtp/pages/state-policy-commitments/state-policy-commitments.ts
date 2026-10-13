@@ -164,15 +164,14 @@ const buildPage = (
   ],
 });
 
-// fetches from S3 when no data is given; pass data explicitly (e.g. in tests) to skip the S3 call
+// Fetches from S3 for first report of a state (later reports pass in empty data object)
 export const buildStatePolicyCommitments = (
   state: string,
   statePolicyCommitments?: StatePolicyCommitmentsData
 ): FormPageTemplate | Promise<FormPageTemplate> => {
   if (statePolicyCommitments) return buildPage(state, statePolicyCommitments);
-  //TO-DO: Make this only fetch data for first report of a state
   return getJsonFromS3<StatePolicyCommitmentsData>(COMMITMENTS_KEY).then(
-    // Use manually uploaded S3 data if available, otherwise use empty commitments JSON
+    // Use manually uploaded S3 data if available, otherwise use empty commitments JSON (should only be in testing envs)
     (fetched) => buildPage(state, fetched ?? EMPTY_STATE_POLICY_COMMITMENTS)
   );
 };

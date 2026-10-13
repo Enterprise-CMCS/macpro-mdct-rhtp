@@ -4,7 +4,7 @@ import { useStore } from "utils";
 import checkIcon from "assets/icons/check/icon_check_gray.png";
 
 export const SubnavBar = () => {
-  const { report, lastSavedTime } = useStore();
+  const { report, lastSavedTime, setCurrentPageId } = useStore();
   const { userIsAdmin, userIsEndUser } = useStore().user ?? {};
   const saveStatusText = "Last saved " + lastSavedTime;
   const title = report?.name;
@@ -34,6 +34,9 @@ export const SubnavBar = () => {
               to={returnRoute}
               sx={sx.leaveFormLink}
               variant="outlineButton"
+              onClick={() => {
+                setCurrentPageId("");
+              }}
             >
               Leave form
             </Link>
