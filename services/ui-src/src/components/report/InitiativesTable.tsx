@@ -121,7 +121,7 @@ export const InitiativesTable = (
                 variant="link"
                 onClick={() => editInitiative(initiative)}
                 aria-label={`Edit status of ${displayName}`}
-                disabled={disabled}
+                disabled={isCompleteStatus(report?.status)}
               >
                 Edit status
               </Button>

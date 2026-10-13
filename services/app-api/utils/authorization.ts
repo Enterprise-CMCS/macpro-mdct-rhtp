@@ -36,8 +36,7 @@ export const canReadState = (user: User, state: StateAbbr) => {
 };
 
 export const canWriteState = (user: User, state: StateAbbr) => {
-  // TODO: For the first year, Admins will be entering data manually for the states
-  // Remove the bottom line to stop allowing Admins to create/edit reports.
+  // Admins are always allowed to edit certain fields of a report
   if (isAdminUser(user)) return true;
 
   if (user.role == UserRoles.STATE_USER && user.state === state) {

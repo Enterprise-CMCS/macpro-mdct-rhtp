@@ -10,6 +10,7 @@ import {
   ElementType,
   InitiativePageTemplate,
   PageStatus,
+  isCompleteStatus,
 } from "@rhtp/shared";
 import { optionalTag, parseHtml, useStore } from "utils";
 import {
@@ -98,7 +99,7 @@ const buildRows = (
 };
 
 export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
-  const { disabled, element } = props;
+  const { element } = props;
   const { heading, helperText, label, modal, rows, answer } = element;
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const { userIsAdmin: canAddOrChangeStatus } = useStore().user ?? {};
@@ -108,7 +109,9 @@ export const ActionTable = (props: PageElementProps<ActionTableTemplate>) => {
     (page) => page.id === pageId
   ) as InitiativePageTemplate;
   const actionsDisabled =
-    disabled || element.disabled || initiative?.status === PageStatus.ABANDONED;
+    isCompleteStatus(report?.status) ||
+    element.disabled ||
+    initiative?.status === PageStatus.ABANDONED;
 
   const dropdownIds = modal.elements
     .filter((element) => element.type === ElementType.Dropdown)

@@ -82,6 +82,7 @@ export const ManageDrawer = ({
       initiatives: initiatives,
       checkpoint: checkpoint,
       status: status,
+      canDelete: file.canDelete && status === file.status,
     };
 
     const fileIndex = files.findIndex(
