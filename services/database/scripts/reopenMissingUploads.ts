@@ -3,8 +3,7 @@
  * Re-opens the given report without triggering an email, removes the entry from the report, and dynamo.
  * The upload already is missing in s3 in these scenarios
  *
- * Export AWS Credentials first, then and STAGE.
- * in by branch alone.
+ * Export AWS Credentials first, make sure stage is included
  *
  * STAGE="main" npx tsx scripts/reopenMissingUploads.ts {{state}} {{reportId}} {{fileId}}
  */
