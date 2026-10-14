@@ -77,6 +77,10 @@ export const reportTitle = (report: Report) => {
   }`;
 };
 
+const setLastEditedBy = (report: Report) => {
+  return report.subTypeKey === "A1" ? "CMS" : report.lastEditedBy;
+};
+
 export const reportDetails = (report: Report) => {
   return (
     <Table variant={"reportDetails"}>
@@ -92,7 +96,7 @@ export const reportDetails = (report: Report) => {
         <Tr>
           <Td>{report.budgetPeriod}</Td>
           <Td>{formatMonthDayYear(report.lastEdited!)}</Td>
-          <Td>{report.lastEditedBy}</Td>
+          <Td>{setLastEditedBy(report)}</Td>
           <Td>{report.status}</Td>
         </Tr>
       </Tbody>

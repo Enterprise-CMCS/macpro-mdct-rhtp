@@ -64,7 +64,7 @@ export const Drawer = ({
           justifyContent="space-between"
           flexDirection="row-reverse"
         >
-          {onConfirmHandler && (
+          {onConfirmHandler && content?.solidButtonText && (
             <Button
               sx={sx.action}
               onClick={() => onConfirmHandler()}
@@ -73,7 +73,7 @@ export const Drawer = ({
               {submitting ? <Spinner size="md" /> : content.solidButtonText}
             </Button>
           )}
-          {onOutlineHandler && (
+          {onOutlineHandler && content?.outlineButtonText && (
             <Button
               variant="outline"
               onClick={() => onOutlineHandler()}
@@ -97,7 +97,7 @@ interface Props {
   content: {
     heading: string;
     subheading?: string;
-    solidButtonText: string | ReactNode;
+    solidButtonText?: string | ReactNode;
     outlineButtonText?: string;
   };
   onOutlineHandler?: () => void;

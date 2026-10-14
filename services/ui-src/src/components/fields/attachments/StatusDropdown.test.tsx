@@ -25,12 +25,12 @@ describe("<StatusDropdown />", () => {
   test("StatusDropdown renders", () => {
     expect(screen.getByRole("heading", { name: "Status" })).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Pending Review Status(optional)" })
+      screen.getByRole("button", { name: "Pending Review Status(Optional)" })
     ).toBeInTheDocument();
   });
   test("Test status on change", async () => {
     await userEvent.click(
-      screen.getByRole("button", { name: "Pending Review Status(optional)" })
+      screen.getByRole("button", { name: "Pending Review Status(Optional)" })
     );
     expect(
       screen.queryByRole("option", { name: "Needs Revision" })
