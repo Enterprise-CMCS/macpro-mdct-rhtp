@@ -30,6 +30,10 @@ interface TableProps extends DashboardTableProps {
   openCommentsDrawer: Function;
 }
 
+const setLastEditedBy = (report: LiteReport) => {
+  return report.subTypeKey === "A1" ? "CMS" : report.lastEditedBy;
+};
+
 export const HorizontalTable = (props: TableProps) => {
   return (
     <Table content={props.tableContent}>
@@ -46,7 +50,7 @@ export const HorizontalTable = (props: TableProps) => {
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
           </Td>
-          <Td>{report.lastEditedBy}</Td>
+          <Td>{setLastEditedBy(report)}</Td>
           <Td>{getStatus(report)}</Td>
           {props.showReportSubmissionsColumn && (
             <Td width="3rem">{report.submissionCount ?? 0}</Td>
@@ -97,7 +101,7 @@ export const VerticalTable = (props: TableProps) => {
             </div>
             <div>
               <Text variant="gray">Edited By</Text>
-              <Text>{report.lastEditedBy}</Text>
+              <Text>{setLastEditedBy(report)}</Text>
             </div>
           </HStack>
           <div>

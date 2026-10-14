@@ -84,16 +84,21 @@ export const addReportFilesToZip = async (report: Report, zip: JSZip) => {
 
   for (const folder of zipFolders) {
     for (const file of folder.files) {
-      const item = await s3Lib.getObject({
-        Bucket: process.env.attachmentsBucketName,
-        Key: `${reportType}/${state}/${id}/${file?.fileId}`,
-      });
-      const bytes = await item.Body?.transformToByteArray();
-      if (bytes && file?.name) {
-        zip.file(
-          `${state}/${report?.subType.toUpperCase()}/${folder.name}/${file.name}`,
-          bytes
-        );
+      try {
+        const item = await s3Lib.getObject({
+          Bucket: process.env.attachmentsBucketName,
+          Key: `${reportType}/${state}/${id}/${file?.fileId}`,
+        });
+        const bytes = await item.Body?.transformToByteArray();
+        if (bytes && file?.name) {
+          zip.file(
+            `${state}/${report?.subType.toUpperCase()}/${folder.name}/${file.name}`,
+            bytes
+          );
+        }
+      } catch {
+        //skip if the file failed to be retrieved
+        continue;
       }
     }
   }
@@ -143,13 +148,19 @@ export const addObligatedAndSpentFundsFilesToZip = async (
   for (const obligatedAndSpentFundsFile of obligatedAndSpentFundsFiles) {
     const { id, file, state, subType } = obligatedAndSpentFundsFile;
     if (!file?.fileId || !file?.name) continue;
-    const item = await s3Lib.getObject({
-      Bucket: process.env.attachmentsBucketName,
-      Key: `${ObligatedAndSpentFundsReportType}/${state}/${id}/${file.fileId}`,
-    });
-    const bytes = await item.Body?.transformToByteArray();
-    if (bytes) {
-      zip.file(`${state}/${subType.toUpperCase()}/${file.name}`, bytes);
+
+    try {
+      const item = await s3Lib.getObject({
+        Bucket: process.env.attachmentsBucketName,
+        Key: `${ObligatedAndSpentFundsReportType}/${state}/${id}/${file.fileId}`,
+      });
+      const bytes = await item.Body?.transformToByteArray();
+      if (bytes) {
+        zip.file(`${state}/${subType.toUpperCase()}/${file.name}`, bytes);
+      }
+    } catch {
+      //skip if the file failed to be retrieved
+      continue;
     }
   }
 };

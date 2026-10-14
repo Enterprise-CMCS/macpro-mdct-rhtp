@@ -125,7 +125,7 @@ describe("DashboardPage with state user", () => {
     };
     expect(cellContent("Submission name")).toBe("Mock Report Name");
     expect(cellContent("Last edited")).toBe("10/24/2026");
-    expect(cellContent("Edited by")).toBe("Mock User");
+    expect(cellContent("Edited by")).toBe("CMS");
   });
 
   test("should be able to filter reports", async () => {
@@ -160,7 +160,7 @@ describe("DashboardPage with state user", () => {
     };
     expect(cellContent("Submission name")).toBe("Mock Report Name");
     expect(cellContent("Last edited")).toBe("10/24/2026");
-    expect(cellContent("Edited by")).toBe("Mock User");
+    expect(cellContent("Edited by")).toBe("CMS");
     expect(screen.queryByText("Mock Report 2027")).not.toBeInTheDocument();
   });
 

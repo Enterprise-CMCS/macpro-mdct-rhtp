@@ -30,7 +30,7 @@ describe("utils/parsing", () => {
       });
       render(element);
       expect(screen.getByText("mock label")).toBeInTheDocument();
-      expect(screen.getByText("(optional)")).toBeInTheDocument();
+      expect(screen.getByText("(Optional)")).toBeInTheDocument();
     });
     test("required annual elements should have (Required Annually) appended to the label", () => {
       const element = optionalTag({

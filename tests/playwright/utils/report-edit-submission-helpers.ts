@@ -2,6 +2,10 @@ import { expect } from "@playwright/test";
 import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import { INITIATIVE_UI_NAMES } from "../tests/pageObjects/report-initiative.page";
+import {
+  SUCCESS_STORIES_LABEL,
+  SUSTAINABILITY_PLANNING_LABEL,
+} from "../tests/pageObjects/report-sustainability.page";
 import type { StatePage } from "../tests/pageObjects/state.page";
 import { reportType, stateAbbreviation } from "./consts";
 import {
@@ -22,9 +26,6 @@ import {
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
 } from "./report-edit-shared-helpers";
 import { TIMEOUT_LOADING, TIMEOUT_UI } from "./timeouts";
-
-export const SUCCESS_STORIES_LABEL = /success stories/i;
-export const SUSTAINABILITY_PLANNING_LABEL = /sustainability plan/i;
 
 const REPORT_TEST_RUN_ID = getReportTestRunId();
 

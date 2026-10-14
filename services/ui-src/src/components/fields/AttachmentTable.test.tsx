@@ -7,6 +7,8 @@ import {
   AttachmentTableTemplate,
   AttachmentStatus,
   InitiativeAnswerProp,
+  ReportStatus,
+  UserRoles,
 } from "@rhtp/shared";
 import { useStore } from "utils";
 import { testA11y } from "utils/testing/commonTests";
@@ -94,6 +96,7 @@ describe("<AttachmentTable />", () => {
         id: "mock-report-id",
         type: "RHTP",
         state: "PA",
+        status: ReportStatus.IN_PROGRESS,
         pages: [
           {
             id: "mock-init-1",
@@ -107,6 +110,7 @@ describe("<AttachmentTable />", () => {
           },
         ],
       },
+      user: { userIsEndUser: true },
     });
   });
   it("AttachmentTable renders with no attachments", () => {
@@ -170,6 +174,167 @@ describe("<AttachmentTable />", () => {
 
     const deleteBtn = screen.getByRole("button", { name: "Delete attachment" });
     expect(deleteBtn).toBeDisabled();
+  });
+
+  it("disables stage/checkpoint editing for non-end-users", async () => {
+    mockedUseStore.mockReturnValue({
+      report: {
+        id: "mock-report-id",
+        type: "RHTP",
+        state: "PA",
+        status: ReportStatus.IN_PROGRESS,
+        pages: [
+          { id: "mock-init-1", initiativeNumber: "123", title: "Init Title" },
+          { id: "mock-init-2", initiativeNumber: "456", title: "Init Title" },
+        ],
+      },
+      user: { userIsEndUser: false, userRole: UserRoles.APPROVER },
+    });
+
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Manage file or info for mock-file" })
+    );
+
+    expect(
+      screen.getAllByLabelText(
+        "Which stage/checkpoint does this attachment apply to?"
+      )[0]
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("checkbox", { name: "123: Init Title" })
+    ).toBeDisabled();
+  });
+
+  it("requires an initiative and checkpoint before saving", async () => {
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Manage file or info for mock-file" })
+    );
+
+    await userEvent.click(
+      screen.getByRole("checkbox", { name: "123: Init Title" })
+    );
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
+  });
+
+  it("requires a checkpoint before saving", async () => {
+    const attachment = structuredClone(mockAttachmentAreaElement);
+    attachment.answer![0].checkpoint = "";
+    render(AttachmentTableComponent(attachment));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Manage file or info for mock-file" })
+    );
+
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
+  });
+
+  it("makes an attachment non-deletable after a status change", async () => {
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Manage file or info for mock-file" })
+    );
+
+    await userEvent.selectOptions(
+      screen.getAllByLabelText(/Status/)[0],
+      AttachmentStatus.ARCHIVED
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    expect(mockUpdateElement).toHaveBeenCalledWith(
+      expect.objectContaining({
+        answer: expect.arrayContaining([
+          expect.objectContaining({
+            status: AttachmentStatus.ARCHIVED,
+            canDelete: false,
+          }),
+        ]),
+      })
+    );
+  });
+
+  it.each([
+    [
+      "locked attachment",
+      ReportStatus.IN_PROGRESS,
+      AttachmentStatus.LOCKED_FOR_SCORING,
+    ],
+    [
+      "submitted report",
+      ReportStatus.SUBMITTED,
+      AttachmentStatus.PENDING_REVIEW,
+    ],
+  ])(
+    "prevents state users editing a %s",
+    async (_label, reportStatus, fileStatus) => {
+      const report = {
+        id: "mock-report-id",
+        type: "RHTP",
+        state: "PA",
+        status: reportStatus,
+        pages: [
+          { id: "mock-init-1", initiativeNumber: "123", title: "Init Title" },
+          { id: "mock-init-2", initiativeNumber: "456", title: "Init Title" },
+        ],
+      };
+      mockedUseStore.mockReturnValue({
+        report,
+        user: {
+          userIsEndUser: true,
+          userRole: UserRoles.STATE_USER,
+        },
+      });
+      const attachment = structuredClone(mockAttachmentAreaElement);
+      attachment.answer![0].status = fileStatus;
+
+      render(AttachmentTableComponent(attachment));
+      await userEvent.click(
+        screen.getByRole("button", {
+          name: "Manage file or info for mock-file",
+        })
+      );
+
+      expect(screen.getAllByLabelText(/Status/)[0]).toBeDisabled();
+      expect(
+        screen.getAllByLabelText(
+          "Which stage/checkpoint does this attachment apply to?"
+        )[0]
+      ).toBeDisabled();
+    }
+  );
+
+  it.each([
+    [ReportStatus.IN_PROGRESS, false],
+    [ReportStatus.SUBMITTED, false],
+    [ReportStatus.ACCEPTED, true],
+  ])("allows admins to edit status in %s", async (reportStatus, disabled) => {
+    mockedUseStore.mockReturnValue({
+      report: {
+        id: "mock-report-id",
+        type: "RHTP",
+        state: "PA",
+        status: reportStatus,
+        pages: [
+          { id: "mock-init-1", initiativeNumber: "123", title: "Init Title" },
+          { id: "mock-init-2", initiativeNumber: "456", title: "Init Title" },
+        ],
+      },
+      user: {
+        userIsAdmin: true,
+        userIsEndUser: false,
+        userRole: UserRoles.APPROVER,
+      },
+    });
+
+    render(AttachmentTableComponent(mockAttachmentAreaElement));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Manage file or info for mock-file" })
+    );
+
+    expect(screen.getAllByLabelText(/Status/)[0]).toHaveProperty(
+      "disabled",
+      disabled
+    );
   });
 
   it("Mock on remove file call", async () => {
