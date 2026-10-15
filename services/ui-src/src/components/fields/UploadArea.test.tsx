@@ -15,6 +15,7 @@ import {
   uploadFileToS3,
 } from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
+import { validateFileContentMatchesExtension } from "@rhtp/shared";
 
 vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -40,6 +41,11 @@ vi.mock("utils", async (importOriginal) => ({
     },
   }),
 }));
+vi.mock("@rhtp/shared", async (importOriginal) => ({
+  ...(await importOriginal()),
+  validateFileContentMatchesExtension: vi.fn(),
+}));
+const mockValidateFile = vi.mocked(validateFileContentMatchesExtension);
 
 const mockDeleteFromReport = vi.fn();
 
@@ -60,10 +66,12 @@ const mockInvalidType = new File(["0xMockEpubData"], "bar.epub", {
 });
 
 window.open = vi.fn();
+console.error = vi.fn();
 
 describe("<Upload />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockValidateFile.mockResolvedValue(true);
   });
   test("Upload is visible", async () => {
     await act(async () => {
@@ -218,6 +226,7 @@ describe("<Upload />", () => {
   });
 
   test("error when invalid file type", async () => {
+    mockValidateFile.mockResolvedValue(false);
     await act(async () => {
       render(<UploadArea {...props} />);
     });
@@ -230,9 +239,7 @@ describe("<Upload />", () => {
       });
     });
     expect(
-      screen.getByText(
-        "File bar.epub has unsupported file type and was not uploaded"
-      )
+      screen.getByText("File bar.epub has an issue and was not uploaded")
     ).toBeInTheDocument();
   });
 

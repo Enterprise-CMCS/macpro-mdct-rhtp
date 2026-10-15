@@ -32,6 +32,11 @@ vi.mock("utils", async (importOriginal) => ({
   }),
 }));
 
+vi.mock("@rhtp/shared", async (importOriginal) => ({
+  ...(await importOriginal()),
+  validateFileContentMatchesExtension: vi.fn(() => true),
+}));
+
 const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 
 const modalComponent = (

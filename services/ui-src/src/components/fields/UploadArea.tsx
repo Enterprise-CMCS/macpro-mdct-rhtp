@@ -121,7 +121,6 @@ export const UploadArea = ({
         ]);
         continue;
       }
-
       const isValid = await isValidFile(file);
       if (!isValid) {
         setUploadErrors((prevErrors) => [
