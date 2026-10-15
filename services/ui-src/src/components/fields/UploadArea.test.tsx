@@ -239,7 +239,9 @@ describe("<Upload />", () => {
       });
     });
     expect(
-      screen.getByText("File bar.epub has an issue and was not uploaded")
+      screen.getByText(
+        "There is a problem with bar.epub. Try re-exporting the file from your system and uploading it again. If you still have trouble, contact the help desk."
+      )
     ).toBeInTheDocument();
   });
 

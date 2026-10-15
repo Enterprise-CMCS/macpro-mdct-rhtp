@@ -125,7 +125,7 @@ export const UploadArea = ({
       if (!isValid) {
         setUploadErrors((prevErrors) => [
           ...(prevErrors ?? []),
-          `File ${file.name} has an issue and was not uploaded`,
+          `There is a problem with ${file.name}. Try re-exporting the file from your system and uploading it again. If you still have trouble, contact the help desk.`,
         ]);
         continue;
       }
