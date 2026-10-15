@@ -5,8 +5,11 @@ import { queryUpload } from "../../storage/upload";
 import { forbidden, ok } from "../../libs/response-lib";
 import { fixLocalstackUrl } from "../../libs/localstack";
 import { error } from "../../utils/constants";
-import { getExtension, isAllowedFileExtension } from "@rhtp/shared";
-import { validateFileContentMatchesExtension } from "../../utils/fileContentValidation";
+import {
+  getExtension,
+  isAllowedFileExtension,
+  validateFileContentMatchesExtension,
+} from "@rhtp/shared";
 
 const FILE_HEADER_BYTE_RANGE = "bytes=0-4100";
 
