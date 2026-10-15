@@ -91,25 +91,23 @@ export const UserProvider = ({ children }: Props) => {
       // "custom:cms_roles" is an string of concat roles so we need to check for the one applicable to RHTP
       const userRole = cms_role.split(",").find((r) => r.includes("mdctrhtp"));
       const full_name = [given_name, " ", family_name].join("");
+      const roleSets = [
+        { role: UserRoles.ADMIN, flag: flags?.adminCanEditReport },
+        { role: UserRoles.APPROVER, flag: flags?.adminCanEditReport },
+        { role: UserRoles.PROJECT_OFFICER, flag: flags?.poCanEditReport },
+      ];
 
-      const adminCanEditReport = flags?.adminCanEditReport ?? false;
-      const userIsAdmin =
-        userRole === UserRoles.ADMIN || userRole === UserRoles.APPROVER;
-
-      //Project officers are separated from the admin user
-      const poCanEditReport = flags?.poCanEditReport ?? false;
-      const userIsPO = userRole === UserRoles.PROJECT_OFFICER;
+      const userIsAdmin = roleSets.find((set) => set.role === userRole);
 
       const userCheck = {
-        userIsAdmin,
+        userIsAdmin: !!userIsAdmin,
         userIsReadOnly:
           userRole === UserRoles.HELP_DESK || userRole === UserRoles.INTERNAL,
         // TODO: For the first year, Admins will be entering data manually for the states
         // Switch the adminCanEditReport flag when we want to stop allowing Admins to create/edit reports.
         userIsEndUser:
           userRole === UserRoles.STATE_USER ||
-          (adminCanEditReport && userIsAdmin) ||
-          (poCanEditReport && userIsPO),
+          (!!userIsAdmin && userIsAdmin?.flag),
       };
       const currentUser: User = {
         email,
