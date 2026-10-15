@@ -47,9 +47,9 @@ export class DashboardPage extends BasePage {
     }
     await expect(reportRow).toBeVisible({ timeout: TIMEOUT_UI });
 
-    const reportAction = reportRow
-      .getByRole("button")
-      .filter({ hasText: "Report" });
+    const reportAction = reportRow.getByRole("button", {
+      name: /^(View|Enter)\b/i,
+    });
     await expect(reportAction).toBeVisible({ timeout: TIMEOUT_UI });
 
     await Promise.all([
@@ -103,7 +103,7 @@ export class DashboardPage extends BasePage {
   }
 
   private getViewReportButton() {
-    return this.page.getByRole("button").filter({ hasText: "Report" }).first();
+    return this.page.getByRole("button", { name: /^(View|Enter)\b/i }).first();
   }
 
   private getReportActionButtonForStatus(statusPattern: RegExp) {
@@ -111,14 +111,14 @@ export class DashboardPage extends BasePage {
       .locator("tbody tr")
       .filter({ has: this.page.getByRole("cell", { name: statusPattern }) })
       .first();
-    return row.getByRole("button").filter({ hasText: "Report" }).first();
+    return row.getByRole("button", { name: /^(View|Enter)\b/i }).first();
   }
 
   private getReportActionButtonsForStatus(statusPattern: RegExp) {
     const rows = this.page
       .locator("tbody tr")
       .filter({ has: this.page.getByRole("cell", { name: statusPattern }) });
-    return rows.getByRole("button").filter({ hasText: "Report" });
+    return rows.getByRole("button", { name: /^(View|Enter)\b/i });
   }
 
   async getEditableReportCount(): Promise<number> {
@@ -303,9 +303,7 @@ export class DashboardPage extends BasePage {
             /^(Not started|In progress|In revision)$/i
           );
     const fallbackButton = this.page
-      .getByRole("table")
-      .getByRole("button")
-      .filter({ hasText: "Report" })
+      .getByRole("button", { name: /^(View|Enter)\b/i })
       .first();
 
     const targetButton = (await editButton.isVisible().catch(() => false))
@@ -322,8 +320,7 @@ export class DashboardPage extends BasePage {
   async openFirstSubmittedReport(): Promise<void> {
     const viewButton = this.getReportActionButtonForStatus(/^Submitted$/i);
     const fallbackButton = this.page
-      .getByRole("button")
-      .filter({ hasText: "Report" })
+      .getByRole("button", { name: /^(View|Enter)\b/i })
       .first();
 
     const targetButton = (await viewButton.isVisible().catch(() => false))

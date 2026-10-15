@@ -47,8 +47,7 @@ type SkipHandler = (reason: string) => void;
 
 const getHasAnyReportButton = async (statePage: StatePage): Promise<boolean> =>
   statePage.page
-    .getByRole("button")
-    .filter({ hasText: "Report" })
+    .getByRole("button", { name: /^View .* report$/i })
     .first()
     .isVisible()
     .catch(() => false);
