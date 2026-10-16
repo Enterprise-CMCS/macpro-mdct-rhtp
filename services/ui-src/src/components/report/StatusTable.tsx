@@ -44,6 +44,7 @@ export const StatusTableElement = () => {
           <Button
             variant="outline"
             width="100%"
+            aria-label={`Edit ${section.title}`}
             onClick={() => handleEditClick(section.id)}
           >
             Edit
