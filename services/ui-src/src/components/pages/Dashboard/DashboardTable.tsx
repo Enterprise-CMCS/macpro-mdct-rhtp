@@ -60,7 +60,11 @@ export const HorizontalTable = (props: TableProps) => {
               <Button
                 onClick={() => props.navigate(reportBasePath(report))}
                 variant="outline"
-                aria-label={`View ${report.name} report`}
+                aria-label={
+                  isCompleteStatus(report.status)
+                    ? `View Report ${report.name}`
+                    : `Enter Active Report ${report.name}`
+                }
               >
                 {isCompleteStatus(report.status)
                   ? "View Report"
@@ -69,6 +73,7 @@ export const HorizontalTable = (props: TableProps) => {
               <Button
                 variant="link"
                 fontWeight="bold"
+                aria-label={`Comment on ${report.name}`}
                 onClick={() => props.openCommentsDrawer(report)}
               >
                 Comment
