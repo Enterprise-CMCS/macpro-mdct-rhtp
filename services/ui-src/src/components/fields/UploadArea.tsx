@@ -1,6 +1,12 @@
 import { Box, Heading, Text, VStack, Image } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
-import { acceptedFileTypes, AlertTypes, UploadListProp } from "@rhtp/shared";
+import {
+  acceptedFileTypes,
+  AlertTypes,
+  getExtension,
+  UploadListProp,
+  validateFileContentMatchesExtension,
+} from "@rhtp/shared";
 import {
   deleteUploadedFile,
   recordFileInDatabaseAndGetUploadUrl,
@@ -91,38 +97,46 @@ export const UploadArea = ({
     event.preventDefault();
   };
 
-  const filterFilesAndStartUpload = (files: File[]) => {
-    const filteredFiles = files.filter((file) => {
-      if (file === null) return false;
-      const splitName = file.name.split(".");
+  const isValidFile = async (file: File) => {
+    const fileExtension = getExtension(file.name);
+    if (!fileExtension) {
+      return false;
+    }
+    return await validateFileContentMatchesExtension(
+      await file.bytes(),
+      fileExtension
+    );
+  };
 
+  const filterFilesAndStartUpload = async (files: File[]) => {
+    const filteredFiles: File[] = [];
+    for (const file of files) {
+      if (file === null) continue;
+
+      const splitName = file.name.split(".");
       if (splitName.at(0)?.trim() === "") {
         setUploadErrors((prevErrors) => [
           ...(prevErrors ?? []),
           `File ${file.name} has an invalid name and was not uploaded`,
         ]);
-        return false;
+        continue;
       }
-
-      const fileType = splitName.at(-1)?.toLowerCase();
-
-      if (!fileType || !acceptedFileTypes.includes(`.${fileType}`)) {
+      const isValid = await isValidFile(file);
+      if (!isValid) {
         setUploadErrors((prevErrors) => [
           ...(prevErrors ?? []),
-          `File ${file.name} has unsupported file type and was not uploaded`,
+          `There is a problem with ${file.name}. Try re-exporting the file from your system and uploading it again. If you still have trouble, contact the help desk.`,
         ]);
-        return false;
+        continue;
       }
-
-      return true;
-    });
+      filteredFiles.push(file);
+    }
 
     const prevFiles = filesToUpload ?? [];
-
     setFilesToUpload([...prevFiles, ...filteredFiles]);
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     if (disableUploadArea()) return;
 
@@ -134,13 +148,13 @@ export const UploadArea = ({
       setUploadErrors(["File is limited to 1"]);
     } else {
       setUploadErrors([]);
-      filterFilesAndStartUpload(files);
+      await filterFilesAndStartUpload(files);
     }
   };
 
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      filterFilesAndStartUpload([...event.target.files]);
+      await filterFilesAndStartUpload([...event.target.files]);
     }
   };
 

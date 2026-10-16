@@ -126,15 +126,3 @@ export const tabTitleMap = {
   "/admin": "Banner Admin - RHTP",
   "/403": "Access Denied",
 };
-
-export const getExtension = (filename: string): string | undefined => {
-  const lastDot = filename.lastIndexOf(".");
-  if (lastDot <= 0 || lastDot === filename.length - 1) {
-    return undefined;
-  }
-  return filename.slice(lastDot).toLowerCase();
-};
-
-export const isAllowedFileExtension = (ext: string): boolean => {
-  return acceptedFileTypes.includes(ext.toLowerCase());
-};

@@ -34,6 +34,10 @@ vi.mock("utils/api/requestMethods/fileMethods", async (importOriginal) => ({
       { filename: "mock-name", fileSize: 100, fileId: "mock-id" },
     ]),
 }));
+vi.mock("@rhtp/shared", async (importOriginal) => ({
+  ...(await importOriginal()),
+  validateFileContentMatchesExtension: vi.fn(() => true),
+}));
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 

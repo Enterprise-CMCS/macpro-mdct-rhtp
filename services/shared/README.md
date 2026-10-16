@@ -29,6 +29,20 @@ Everything should work when you run:
 ./run local
 ```
 
+## Testing
+
+Run shared service tests with:
+
+```bash
+yarn test
+```
+
+OR
+
+```bash
+yarn test --coverage
+```
+
 ## Troubleshooting
 
 Make sure you've run `yarn install` at the root of the project:
