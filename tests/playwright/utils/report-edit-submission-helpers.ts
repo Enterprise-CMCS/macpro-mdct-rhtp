@@ -47,20 +47,6 @@ const SUBMISSION_PREPARATION_TIMEOUT_REASON =
 const SUBMISSION_PREPARATION_INTERRUPTED_REASON =
   "Submission preparation interrupted by deployed environment page closure";
 
-const getSustainabilityFieldEditability = async (
-  editor: ReportSustainabilityPage
-): Promise<{ successStories: boolean; sustainabilityPlanning: boolean }> => {
-  const [successEnabled, planningEnabled] = await Promise.all([
-    editor.successStoriesField.isEnabled().catch(() => false),
-    editor.sustainabilityPlanningField.isEnabled().catch(() => false),
-  ]);
-
-  return {
-    successStories: successEnabled,
-    sustainabilityPlanning: planningEnabled,
-  };
-};
-
 export const openUnsubmittedSectionWithSustainabilityRetry = async (
   statePage: StatePage,
   sectionId: string
@@ -107,8 +93,7 @@ export const openUnsubmittedSectionWithSustainabilityRetry = async (
     const sustainabilityEditor = new ReportSustainabilityPage(
       opened.editor.page
     );
-    const fields =
-      await getSustainabilityFieldEditability(sustainabilityEditor);
+    const fields = await sustainabilityEditor.getFieldEditability();
     if (fields.successStories) {
       return opened;
     }
@@ -190,7 +175,7 @@ const completeSustainabilityForSubmission = async (
     SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
   );
 
-  const fields = await getSustainabilityFieldEditability(sustainabilityEditor);
+  const fields = await sustainabilityEditor.getFieldEditability();
 
   if (!fields.successStories) {
     return false;
