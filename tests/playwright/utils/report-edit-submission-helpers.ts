@@ -2,10 +2,7 @@ import { expect } from "@playwright/test";
 import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import { INITIATIVE_UI_NAMES } from "../tests/pageObjects/report-initiative.page";
-import {
-  SUCCESS_STORIES_LABEL,
-  SUSTAINABILITY_PLANNING_LABEL,
-} from "../tests/pageObjects/report-sustainability.page";
+import { ReportSustainabilityPage } from "../tests/pageObjects/report-sustainability.page";
 import type { StatePage } from "../tests/pageObjects/state.page";
 import { reportType, stateAbbreviation } from "./consts";
 import {
@@ -50,23 +47,6 @@ const SUBMISSION_PREPARATION_TIMEOUT_REASON =
 const SUBMISSION_PREPARATION_INTERRUPTED_REASON =
   "Submission preparation interrupted by deployed environment page closure";
 
-const sustainabilityFieldsEditable = async (
-  editor: ReportEditorPage
-): Promise<boolean> => {
-  const [successEnabled, planningEnabled] = await Promise.all([
-    editor
-      .getTextField(SUCCESS_STORIES_LABEL)
-      .isEnabled()
-      .catch(() => false),
-    editor
-      .getTextField(SUSTAINABILITY_PLANNING_LABEL)
-      .isEnabled()
-      .catch(() => false),
-  ]);
-
-  return successEnabled && planningEnabled;
-};
-
 export const openUnsubmittedSectionWithSustainabilityRetry = async (
   statePage: StatePage,
   sectionId: string
@@ -110,7 +90,11 @@ export const openUnsubmittedSectionWithSustainabilityRetry = async (
       return opened;
     }
 
-    if (await sustainabilityFieldsEditable(opened.editor)) {
+    const sustainabilityEditor = new ReportSustainabilityPage(
+      opened.editor.page
+    );
+    const fields = await sustainabilityEditor.getFieldEditability();
+    if (fields.successStories) {
       return opened;
     }
 
@@ -181,27 +165,32 @@ const completeGeneralInformationForSubmission = async (
 const completeSustainabilityForSubmission = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
-  const { reportType, state, reportId } = editor.getCurrentRouteParams();
-  await editor.navigateToSection(
+  const sustainabilityEditor = new ReportSustainabilityPage(editor.page);
+  const { reportType, state, reportId } =
+    sustainabilityEditor.getCurrentRouteParams();
+  await sustainabilityEditor.navigateToSection(
     reportType,
     state,
     reportId,
     SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
   );
 
-  if (!(await sustainabilityFieldsEditable(editor))) {
+  const fields = await sustainabilityEditor.getFieldEditability();
+
+  if (!fields.successStories) {
     return false;
   }
 
-  await editor.fillTextField(
-    SUCCESS_STORIES_LABEL,
+  await sustainabilityEditor.fillSuccessStories(
     `Success story for submission ${REPORT_TEST_RUN_ID}`
   );
-  await editor.fillTextField(
-    SUSTAINABILITY_PLANNING_LABEL,
-    `Sustainability plan for submission ${REPORT_TEST_RUN_ID}`
-  );
-  await editor.page.keyboard.press("Tab");
+
+  if (fields.sustainabilityPlanning) {
+    await sustainabilityEditor.fillSustainabilityPlanning(
+      `Sustainability plan for submission ${REPORT_TEST_RUN_ID}`
+    );
+  }
+  await sustainabilityEditor.page.keyboard.press("Tab");
 
   return true;
 };
