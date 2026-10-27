@@ -123,6 +123,7 @@ export const ObligatedAndSpentFundsAttachmentElement = (
           <CmsdsDropdownField
             name="budgetPeriodFilter"
             label="Which budget period does this document apply to?"
+            hint="Only one attachment can be added per budget period"
             value={budgetPeriod}
             onChange={handleBudgetPeriodChange}
             options={budgetPeriodDropdownOptions}
