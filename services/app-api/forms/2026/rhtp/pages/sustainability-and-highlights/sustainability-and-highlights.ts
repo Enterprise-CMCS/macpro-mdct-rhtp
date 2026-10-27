@@ -97,7 +97,7 @@ const buildPage = (
               "Limit responses to 3,000 characters, approximately 400–500 words.",
           }),
       helperText:
-        "Please include any activities to establish and begin operation of a state-specific Rural Health Sustainability Fund and to raise capital from private and public sources other than the RHTP for long-term investment in activities authorized under permissible uses A though K in the state, including the amount of any RHTP funds used for that purpose.",
+        "Please include any activities to establish and begin operation of a state-specific Rural Health Sustainability Fund and to raise capital from private and public sources other than the RHTP for long-term investment in activities authorized under permissible uses A through K in the state, including the amount of any RHTP funds used for that purpose.",
       answer: data[state]?.sustainabilityPlanning || "",
     },
     {
