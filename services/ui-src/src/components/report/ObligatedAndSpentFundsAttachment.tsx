@@ -75,21 +75,30 @@ export const ObligatedAndSpentFundsAttachmentElement = (
     const selectedBudget = budgetPeriodDropdownOptions.find(
       (opt) => opt.value == budgetPeriod
     );
-    const instruction =
-      budgetPeriod === "All" || !budgetPeriod
-        ? {
-            type: AlertTypes.WARNING,
-            text: "Select a budget period to enable upload.",
-          }
-        : {
-            type: AlertTypes.INFO,
-            text: `Attaching to: ${selectedBudget?.label}`,
-          };
 
-    return {
-      instruction: instruction,
-      success: `${selectedBudget?.label}`,
-    };
+    if (findUploadedFiles().length > 0) {
+      return {
+        instruction: {
+          type: AlertTypes.WARNING,
+          text: "A file has already been attached.",
+        },
+      };
+    } else {
+      const instruction =
+        budgetPeriod === "All" || !budgetPeriod
+          ? {
+              type: AlertTypes.WARNING,
+              text: "Select a budget period to enable upload.",
+            }
+          : {
+              type: AlertTypes.INFO,
+              text: `Attaching to: ${selectedBudget?.label}`,
+            };
+      return {
+        instruction: instruction,
+        success: `${selectedBudget?.label}`,
+      };
+    }
   };
 
   const findUploadedFiles = () => {
