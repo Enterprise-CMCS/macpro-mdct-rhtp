@@ -37,18 +37,10 @@ const setLastEditedBy = (report: LiteReport) => {
 
 export const HorizontalTable = (props: TableProps) => {
   return (
-    <Table content={props.tableContent}>
+    <Table content={props.tableContent} variant="dashboard">
       {props.reports.map((report) => (
         <Tr key={report.id}>
-          <Th
-            scope="row"
-            fontWeight={"bold"}
-            maxWidth={"14.25rem"}
-            fontSize="body_md"
-            padding="16px 16px 16px 0"
-          >
-            {report.name ?? "{Name of form}"}
-          </Th>
+          <Th scope="row">{report.name ?? "{Name of form}"}</Th>
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
           </Td>
@@ -74,7 +66,6 @@ export const HorizontalTable = (props: TableProps) => {
               </Button>
               <Button
                 variant="link"
-                fontWeight="bold"
                 aria-label={`Comment on ${report.name}`}
                 onClick={() => props.openCommentsDrawer(report)}
               >
