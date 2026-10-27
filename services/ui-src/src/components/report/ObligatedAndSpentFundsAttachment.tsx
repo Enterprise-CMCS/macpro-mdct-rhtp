@@ -92,6 +92,13 @@ export const ObligatedAndSpentFundsAttachmentElement = (
     };
   };
 
+  const findUploadedFiles = () => {
+    const budgetPeriodLabel = budgetPeriodDropdownOptions.find(
+      (option) => option.value == budgetPeriod
+    )?.label;
+    return files.filter((file) => file.label === budgetPeriodLabel);
+  };
+
   return (
     <Fragment>
       <Button
@@ -122,10 +129,11 @@ export const ObligatedAndSpentFundsAttachmentElement = (
           />
         }
         modalHeading={"Add Obligated and Spent Funds"}
-        answer={files}
+        answer={findUploadedFiles()}
         saveToReport={saveToReport}
         notification={getNotification()}
         disabled={budgetPeriod === ""}
+        multiple={false}
       ></UploadDrawer>
       {files.length > 0 && (
         <Heading as="h2" fontWeight="bold" marginBottom="-0.5rem">
