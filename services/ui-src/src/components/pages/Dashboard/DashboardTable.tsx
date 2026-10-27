@@ -8,6 +8,7 @@ import {
   Text,
   Divider,
   HStack,
+  Th,
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
@@ -39,14 +40,15 @@ export const HorizontalTable = (props: TableProps) => {
     <Table content={props.tableContent}>
       {props.reports.map((report) => (
         <Tr key={report.id}>
-          <Td
+          <Th
+            scope="row"
             fontWeight={"bold"}
             maxWidth={"14.25rem"}
             fontSize="body_md"
             padding="16px 16px 16px 0"
           >
             {report.name ?? "{Name of form}"}
-          </Td>
+          </Th>
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
           </Td>
