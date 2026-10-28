@@ -207,6 +207,13 @@ const completeInitiativesForSubmission = async (
   const editableInitiatives =
     await initiativesEditor.getEditableInitiativeUrls();
 
+  const narrative = `Narrative for submission ${REPORT_TEST_RUN_ID}`;
+  const metricDate = new Date().toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+  });
+
   for (const url of editableInitiatives) {
     const narrativeField = initiativesEditor.narrativeField;
     const peopleServedField = initiativesEditor.peopleServedField;
@@ -228,25 +235,50 @@ const completeInitiativesForSubmission = async (
 
     await initiativesEditor.page.goto(url);
     await expect(
-      activeMetricRow,
-      `Expected an active metric for initiative ${url}`
-    ).toBeVisible({ timeout: TIMEOUT_UI });
-    await initiativesEditor.fillAndSaveField(
       narrativeField,
-      `Narrative for submission ${REPORT_TEST_RUN_ID}`
-    );
-    if (await peopleServedField.isEnabled()) {
-      await initiativesEditor.fillAndSaveField(peopleServedField, "100");
-    }
-    await initiativesEditor.fillAndSaveField(metricCurrentValueField, "100");
-    await initiativesEditor.fillAndSaveField(
-      metricDateField,
-      new Date().toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-      })
-    );
+      `Expected visible narrative field for initiative ${url}`
+    ).toBeVisible({ timeout: TIMEOUT_UI });
+
+    const hasActiveMetric = (await activeMetricRow.count()) > 0;
+    const peopleServed = (await peopleServedField.isEnabled())
+      ? "100"
+      : undefined;
+    const metric = hasActiveMetric
+      ? {
+          index: await activeMetricRow.evaluate((row) => {
+            if (!row.parentElement) throw new Error("Metric row has no parent");
+            return [...row.parentElement.children].indexOf(row);
+          }),
+          value: "100",
+          date: metricDate,
+        }
+      : undefined;
+
+    await Promise.all([
+      initiativesEditor.waitForInitiativeSave({
+        narrative,
+        peopleServed,
+        metric,
+      }),
+      (async () => {
+        await narrativeField.fill(narrative);
+        if (peopleServed !== undefined) {
+          await peopleServedField.fill(peopleServed);
+        }
+        if (metric) {
+          await metricCurrentValueField.fill(metric.value);
+          await metricDateField.fill(metric.date);
+        }
+
+        let lastEditedField = narrativeField;
+        if (metric) {
+          lastEditedField = metricDateField;
+        } else if (peopleServed !== undefined) {
+          lastEditedField = peopleServedField;
+        }
+        await lastEditedField.blur();
+      })(),
+    ]);
   }
 
   return true;

@@ -1,6 +1,19 @@
 import { type Locator, type Page } from "@playwright/test";
 import { ReportEditorPage } from "./report-editor.page";
-import { TIMEOUT_UI } from "../../utils/timeouts";
+import { TIMEOUT_AUTOSAVE, TIMEOUT_UI } from "../../utils/timeouts";
+
+type InitiativeSaveValues = {
+  narrative: string;
+  peopleServed?: string;
+  metric?: {
+    index: number;
+    value: string;
+    date: string;
+  };
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
 
 export type InitiativeMetricData = {
   name: string;
@@ -173,14 +186,65 @@ export class ReportInitiativePage extends ReportEditorPage {
     return this.checkpointRow(stageLabel, checkpointName).getByRole("checkbox");
   }
 
-  async fillAndSaveField(field: Locator, value: string): Promise<void> {
-    await Promise.all([
-      this.waitForSaveResponse(),
-      (async () => {
-        await field.fill(value);
-        await field.blur();
-      })(),
-    ]);
+  waitForInitiativeSave(expected: InitiativeSaveValues) {
+    const { reportType, state, reportId, pageId } =
+      this.getCurrentRouteParams();
+    return this.page.waitForResponse(
+      (response) => {
+        if (
+          response.request().method() !== "PUT" ||
+          !new URL(response.url()).pathname.endsWith(
+            `/reports/${reportType}/${state}/${reportId}`
+          ) ||
+          !response.ok()
+        ) {
+          return false;
+        }
+
+        const payload: unknown = response.request().postDataJSON();
+        if (!isRecord(payload) || !Array.isArray(payload.pages)) return false;
+        const initiative = payload.pages.find(
+          (page: unknown) => isRecord(page) && page.id === pageId
+        );
+        if (!isRecord(initiative) || !Array.isArray(initiative.elements)) {
+          return false;
+        }
+        const elements: unknown[] = initiative.elements;
+        const answer = (id: string): unknown => {
+          const element = elements.find(
+            (element) => isRecord(element) && element.id === id
+          );
+          return isRecord(element) ? element.answer : undefined;
+        };
+        const fieldsMatch =
+          answer("initiative-narrative") === expected.narrative &&
+          (expected.peopleServed === undefined ||
+            answer("initiative-number-of-people-served") ===
+              expected.peopleServed);
+
+        if (!fieldsMatch) return false;
+
+        const expectedMetric = expected.metric;
+        if (expectedMetric === undefined) return true;
+        const metrics = answer("metrics-table");
+        const metric: unknown = Array.isArray(metrics)
+          ? metrics[expectedMetric.index]
+          : undefined;
+        if (!Array.isArray(metric)) return false;
+        const metricAnswer = (id: string): unknown => {
+          const column: unknown = metric.find(
+            (column: unknown) => isRecord(column) && column.id === id
+          );
+          return isRecord(column) ? column.value : undefined;
+        };
+
+        return (
+          metricAnswer("currValue") === expectedMetric.value &&
+          metricAnswer("date") === expectedMetric.date
+        );
+      },
+      { timeout: TIMEOUT_AUTOSAVE }
+    );
   }
 
   async addMetric(metric: InitiativeMetricData): Promise<void> {
