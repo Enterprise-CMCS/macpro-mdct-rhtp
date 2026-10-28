@@ -111,9 +111,7 @@ describe("<ObligatedAndSpentFundsAttachmentElement />", () => {
       )[0];
       await userEvent.selectOptions(dropdown, "Budget Period 2");
       await userEvent.click(addButton);
-      expect(
-        screen.getByText("Select a file or files to upload")
-      ).toBeVisible();
+      expect(screen.getByText("Select a file to upload")).toBeVisible();
       const dropArea = screen.getByLabelText("file drop area");
       await act(async () => {
         fireEvent.drop(dropArea, {
