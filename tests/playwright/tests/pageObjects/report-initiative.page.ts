@@ -173,6 +173,16 @@ export class ReportInitiativePage extends ReportEditorPage {
     return this.checkpointRow(stageLabel, checkpointName).getByRole("checkbox");
   }
 
+  async fillAndSaveField(field: Locator, value: string): Promise<void> {
+    await Promise.all([
+      this.waitForSaveResponse(),
+      (async () => {
+        await field.fill(value);
+        await field.blur();
+      })(),
+    ]);
+  }
+
   async addMetric(metric: InitiativeMetricData): Promise<void> {
     await this.addMetricButton.click();
     await this.dialog.waitFor({ state: "visible", timeout: TIMEOUT_UI });
@@ -322,6 +332,24 @@ export class ReportInitiativePage extends ReportEditorPage {
     ]);
 
     return name;
+  }
+
+  async getEditableInitiativeUrls(): Promise<string[]> {
+    const urls: string[] = [];
+    const editLinks = this.initiativesTable.getByRole("link", {
+      name: INITIATIVE_UI_NAMES.button.edit,
+    });
+    await editLinks.first().waitFor({ state: "visible", timeout: TIMEOUT_UI });
+    const allLinks = await editLinks.all();
+    for (let i = 0; i < allLinks.length; i++) {
+      const href = await allLinks[i].getAttribute("href");
+      if (href) {
+        urls.push(href);
+      } else {
+        throw new Error(`Edit link at index ${i} has no href attribute`);
+      }
+    }
+    return urls;
   }
 
   async openCheckpointUploadDrawer(stageLabel: string): Promise<Locator> {

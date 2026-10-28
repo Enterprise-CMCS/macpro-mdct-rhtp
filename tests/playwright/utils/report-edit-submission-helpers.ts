@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test";
 import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
-import { INITIATIVE_UI_NAMES } from "../tests/pageObjects/report-initiative.page";
+import { ReportInitiativePage } from "../tests/pageObjects/report-initiative.page";
 import { ReportSustainabilityPage } from "../tests/pageObjects/report-sustainability.page";
 import type { StatePage } from "../tests/pageObjects/state.page";
 import { reportType, stateAbbreviation } from "./consts";
@@ -11,7 +11,6 @@ import {
   type OpenReportSectionResult,
 } from "./report-edit-arrange";
 import {
-  createRunScopedInitiativeValues,
   editGeneralInformationFields,
   GENERAL_INFO_FIELDS,
   GENERAL_INFORMATION_SECTION,
@@ -181,16 +180,13 @@ const completeSustainabilityForSubmission = async (
     return false;
   }
 
-  await sustainabilityEditor.fillSuccessStories(
-    `Success story for submission ${REPORT_TEST_RUN_ID}`
+  await sustainabilityEditor.fillEditableFields(
+    {
+      successStories: `Success story for submission ${REPORT_TEST_RUN_ID}`,
+      sustainabilityPlan: `Sustainability plan for submission ${REPORT_TEST_RUN_ID}`,
+    },
+    fields
   );
-
-  if (fields.sustainabilityPlanning) {
-    await sustainabilityEditor.fillSustainabilityPlanning(
-      `Sustainability plan for submission ${REPORT_TEST_RUN_ID}`
-    );
-  }
-  await sustainabilityEditor.page.keyboard.press("Tab");
 
   return true;
 };
@@ -198,55 +194,60 @@ const completeSustainabilityForSubmission = async (
 const completeInitiativesForSubmission = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
-  const { reportType, state, reportId } = editor.getCurrentRouteParams();
-  await editor.navigateToSection(
+  const initiativesEditor = new ReportInitiativePage(editor.page);
+  const { reportType, state, reportId } =
+    initiativesEditor.getCurrentRouteParams();
+  await initiativesEditor.navigateToSection(
     reportType,
     state,
     reportId,
     INITIATIVES_SECTION
   );
 
-  const addInitiativeButton = editor.page.getByRole("button", {
-    name: /^Add initiative$/i,
-  });
+  const editableInitiatives =
+    await initiativesEditor.getEditableInitiativeUrls();
 
-  const canAddInitiative = await addInitiativeButton
-    .waitFor({ state: "visible", timeout: TIMEOUT_UI })
-    .then(() => true)
-    .catch(() => false);
-  if (!canAddInitiative) {
-    const existingInitiativeVisible = await editor.page
-      .getByText(/^\d{1,6}:\s+.+/)
-      .first()
-      .isVisible()
-      .catch(() => false);
-    return existingInitiativeVisible;
+  for (const url of editableInitiatives) {
+    const narrativeField = initiativesEditor.narrativeField;
+    const peopleServedField = initiativesEditor.peopleServedField;
+    const activeMetricRow = initiativesEditor.metricsTable
+      .getByRole("row")
+      .filter({
+        has: initiativesEditor.page.getByRole("cell", {
+          name: "Active",
+          exact: true,
+        }),
+      })
+      .first();
+    const metricCurrentValueField = activeMetricRow.getByRole("textbox", {
+      name: "Current value",
+    });
+    const metricDateField = activeMetricRow.getByRole("textbox", {
+      name: "As of Date MM/DD/YYYY",
+    });
+
+    await initiativesEditor.page.goto(url);
+    await expect(
+      activeMetricRow,
+      `Expected an active metric for initiative ${url}`
+    ).toBeVisible({ timeout: TIMEOUT_UI });
+    await initiativesEditor.fillAndSaveField(
+      narrativeField,
+      `Narrative for submission ${REPORT_TEST_RUN_ID}`
+    );
+    if (await peopleServedField.isEnabled()) {
+      await initiativesEditor.fillAndSaveField(peopleServedField, "100");
+    }
+    await initiativesEditor.fillAndSaveField(metricCurrentValueField, "100");
+    await initiativesEditor.fillAndSaveField(
+      metricDateField,
+      new Date().toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      })
+    );
   }
-
-  const { initiativeNumber, initiativeName, expectedDisplayName } =
-    createRunScopedInitiativeValues("submit-readiness", REPORT_TEST_RUN_ID);
-
-  await addInitiativeButton.click();
-
-  const initiativeModal = editor.page.getByRole("dialog");
-  await expect(initiativeModal).toBeVisible({ timeout: TIMEOUT_UI });
-  await expect(
-    initiativeModal.getByRole("heading", { name: /^Add Initiative$/i })
-  ).toBeVisible({ timeout: TIMEOUT_UI });
-
-  await initiativeModal
-    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeNumber })
-    .fill(initiativeNumber);
-  await initiativeModal
-    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeName })
-    .fill(initiativeName);
-
-  await initiativeModal.getByRole("button", { name: /^Save$/i }).click();
-  await expect(initiativeModal).toBeHidden({ timeout: TIMEOUT_UI });
-
-  await expect(editor.page.getByText(expectedDisplayName).first()).toBeVisible({
-    timeout: TIMEOUT_UI,
-  });
 
   return true;
 };
@@ -391,8 +392,9 @@ const ensureReportIsSubmittable = async (
     ) {
       return {
         submittable: false,
-        reason:
-          "Report completion made no progress between attempts; required sections remain incomplete",
+        reason: `Report completion made no progress between attempts: ${incompleteSections
+          .map(({ title, status }) => `${title} (${status})`)
+          .join(", ")}`,
       };
     }
     previousIncompleteSignature = currentIncompleteSignature;
@@ -411,6 +413,14 @@ const ensureReportIsSubmittable = async (
         reason: `Unable to auto-complete required sections: ${unhandled.join(", ")}`,
       };
     }
+
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      REVIEW_SUBMIT_SECTION
+    );
+    await expect(finalSubmitButton).toBeVisible();
   }
 
   const remaining = await getIncompleteReviewSections(editor);
