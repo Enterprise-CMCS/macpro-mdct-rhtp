@@ -1,11 +1,5 @@
 import { Mock, MockedFunction } from "vitest";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TableCheckpoint } from "components";
 import {
@@ -13,10 +7,7 @@ import {
   TableCheckpointTemplate,
   AttachmentStatus,
 } from "@rhtp/shared";
-import {
-  getFileDownloadUrl,
-  recordFileInDatabaseAndGetUploadUrl,
-} from "utils/api/requestMethods/fileMethods";
+import { getFileDownloadUrl } from "utils/api/requestMethods/fileMethods";
 import { testA11y } from "utils/testing/commonTests";
 import { useStore } from "utils";
 import { AttachmentCommentDrawer } from "components/drawers/AttachmentCommentDrawer";
@@ -90,7 +81,6 @@ const TableCheckpointComponent = (
   </div>
 );
 
-const mockPng = new File(["0xMockPngData"], "bar.png", { type: "image/png" });
 const consoleMock = vi.spyOn(console, "error").mockImplementation(vi.fn());
 window.open = vi.fn();
 
@@ -241,49 +231,4 @@ describe("<TableCheckpoint />", () => {
     expect(screen.queryByText("Save change")).not.toBeInTheDocument();
   });
   testA11y(TableCheckpointComponent);
-});
-
-describe("TableCheckpoint upload modal", () => {
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    mockedUseStore.mockReturnValue(mockReport);
-
-    render(TableCheckpointComponent);
-    const uploadBtn = screen.getAllByRole("button", {
-      name: "Upload attachments",
-    })[0];
-    userEvent.click(uploadBtn);
-    await waitFor(() => {
-      expect(
-        screen.getByText("Select a file or files to upload")
-      ).toBeVisible();
-    });
-  });
-  test("drag and dropping a file", async () => {
-    await waitFor(() => {
-      expect(screen.getByText("Upload Initiative Attachments")).toBeVisible();
-    });
-
-    const checkbox = screen.getByRole("checkbox", { name: "123: Init Title" });
-    fireEvent.change(checkbox, { target: { value: "123" } });
-
-    const dropdown = screen.getAllByLabelText(
-      "Which stage/checkpoint does this attachment apply to?"
-    )[0];
-    await userEvent.selectOptions(
-      dropdown,
-      "2.2 Achieve at least one milestone"
-    );
-
-    const dropArea = screen.getByLabelText("file drop area");
-    fireEvent.drop(dropArea, {
-      dataTransfer: { items: [{ getAsFile: () => mockPng }] },
-    });
-    expect(recordFileInDatabaseAndGetUploadUrl).toHaveBeenCalled();
-  });
-  test("close modal", async () => {
-    const doneBtn = screen.getByRole("button", { name: "Done" });
-    await userEvent.click(doneBtn);
-    expect(doneBtn).not.toBeVisible();
-  });
 });

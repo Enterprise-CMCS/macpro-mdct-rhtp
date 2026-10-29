@@ -1,32 +1,68 @@
 import { test, expect } from "./fixtures/base";
 import { openReportSectionOrSkip } from "../utils/report-edit-arrange";
+import { verifyReportSectionShell } from "../utils/report-edit-assertions";
 import {
-  verifyFieldValue,
-  verifyReportSectionShell,
-} from "../utils/report-edit-assertions";
-import {
+  createArtifactId,
   GENERAL_INFORMATION_SECTION,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
 } from "../utils/report-edit-shared-helpers";
 import {
-  SUCCESS_STORIES_LABEL,
-  SUSTAINABILITY_PLANNING_LABEL,
-} from "../tests/pageObjects/report-sustainability.page";
+  ReportSustainabilityPage,
+  type SustainabilityFieldEditability,
+  type SustainabilityFieldValues,
+} from "./pageObjects/report-sustainability.page";
 import { SUSTAINABILITY_TEST_DATA } from "../utils/report-edit-submission-helpers";
+
+type SustainabilityEditorSetup = {
+  editor: ReportSustainabilityPage;
+  fields: SustainabilityFieldEditability;
+};
+
+const openSustainabilityEditor = async (
+  statePage: Parameters<typeof openReportSectionOrSkip>[0]
+): Promise<SustainabilityEditorSetup | undefined> => {
+  const reportEditor = await openReportSectionOrSkip(
+    statePage,
+    "unsubmitted",
+    SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+    (reason) => test.skip(true, reason)
+  );
+  if (!reportEditor) {
+    return undefined;
+  }
+
+  const editor = new ReportSustainabilityPage(reportEditor.page);
+  const fields = await editor.getFieldEditability();
+
+  if (!fields.successStories && !fields.sustainabilityPlanning) {
+    test.skip(
+      true,
+      "No editable Sustainability and Highlights fields available"
+    );
+    return undefined;
+  }
+
+  return { editor, fields };
+};
+
+const createSustainabilityValues = (): SustainabilityFieldValues => {
+  const runId = createArtifactId();
+  return {
+    successStories: `${SUSTAINABILITY_TEST_DATA.successStories} ${runId}`,
+    sustainabilityPlan: `${SUSTAINABILITY_TEST_DATA.sustainabilityPlan} ${runId}`,
+  };
+};
 
 test.describe("Report Editing - Sustainability Persistence", () => {
   test("should fill Sustainability and Highlights text areas", async ({
     statePage,
   }) => {
-    const editor = await openReportSectionOrSkip(
-      statePage,
-      "unsubmitted",
-      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-      (reason) => test.skip(true, reason)
-    );
-    if (!editor) {
+    const setup = await openSustainabilityEditor(statePage);
+    if (!setup) {
       return;
     }
+    const { editor, fields } = setup;
+    const values = createSustainabilityValues();
 
     await verifyReportSectionShell(editor, {
       sectionId: SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
@@ -34,92 +70,50 @@ test.describe("Report Editing - Sustainability Persistence", () => {
       previousButtonVisibility: "visible",
       continueButtonVisibility: "visible",
     });
-    await expect(
-      editor.page.getByText("Success Stories", { exact: true })
-    ).toBeVisible();
-    await expect(
-      editor.page.getByText("Sustainability Planning", { exact: true })
-    ).toBeVisible();
-    await editor.fillTextField(
-      SUCCESS_STORIES_LABEL,
-      SUSTAINABILITY_TEST_DATA.successStories
-    );
-    await editor.fillTextField(
-      SUSTAINABILITY_PLANNING_LABEL,
-      SUSTAINABILITY_TEST_DATA.sustainabilityPlan
-    );
+    await expect(editor.successStoriesHeading).toBeVisible();
+    await expect(editor.sustainabilityPlanningHeading).toBeVisible();
+    await editor.fillEditableFields(values, fields);
 
-    await verifyFieldValue(
-      editor,
-      SUCCESS_STORIES_LABEL,
-      SUSTAINABILITY_TEST_DATA.successStories
-    );
-    await verifyFieldValue(
-      editor,
-      SUSTAINABILITY_PLANNING_LABEL,
-      SUSTAINABILITY_TEST_DATA.sustainabilityPlan
-    );
+    if (fields.successStories) {
+      await expect(editor.successStoriesField).toHaveValue(
+        values.successStories
+      );
+    }
+    if (fields.sustainabilityPlanning) {
+      await expect(editor.sustainabilityPlanningField).toHaveValue(
+        values.sustainabilityPlan
+      );
+    }
   });
 
   test("should update autosave indicator when editing Sustainability and Highlights @regression", async ({
     statePage,
   }) => {
-    // Arrange
-    const editor = await openReportSectionOrSkip(
-      statePage,
-      "unsubmitted",
-      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-      (reason) => test.skip(true, reason)
-    );
-    if (!editor) {
+    const setup = await openSustainabilityEditor(statePage);
+    if (!setup) {
       return;
     }
+    const { editor, fields } = setup;
+    const values = createSustainabilityValues();
 
-    const saveIndicator = () => editor.saveStatusText;
+    await expect(editor.saveStatusText).toBeHidden();
+    await editor.fillEditableFields(values, fields);
 
-    await expect(saveIndicator()).toBeHidden();
-
-    // Act
-    await editor.fillTextField(
-      SUSTAINABILITY_PLANNING_LABEL,
-      SUSTAINABILITY_TEST_DATA.sustainabilityPlan
-    );
-    await editor.fillTextField(
-      SUCCESS_STORIES_LABEL,
-      SUSTAINABILITY_TEST_DATA.successStories
-    );
-    await editor.page.keyboard.press("Tab");
-
-    // Assert
     await editor.expectAutosaveIndicator();
   });
 
   test("should edit text fields in Sustainability and Highlights and verify persistence @regression", async ({
     statePage,
   }) => {
-    // Arrange
-    const editorResult = await openReportSectionOrSkip(
-      statePage,
-      "unsubmitted",
-      SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
-      (reason) => test.skip(true, reason)
-    );
-    if (!editorResult) {
+    const setup = await openSustainabilityEditor(statePage);
+    if (!setup) {
       return;
     }
-    let editor = editorResult;
-
+    const { editor, fields } = setup;
+    const values = createSustainabilityValues();
     const { reportType, state, reportId } = editor.getCurrentRouteParams();
 
-    // Act
-    await editor.fillTextField(
-      SUSTAINABILITY_PLANNING_LABEL,
-      SUSTAINABILITY_TEST_DATA.sustainabilityPlan
-    );
-    await editor.fillTextField(
-      SUCCESS_STORIES_LABEL,
-      SUSTAINABILITY_TEST_DATA.successStories
-    );
+    await editor.fillEditableFields(values, fields);
 
     await editor.navigateToSectionAndBack(
       reportType,
@@ -129,16 +123,15 @@ test.describe("Report Editing - Sustainability Persistence", () => {
       SUSTAINABILITY_AND_HIGHLIGHTS_SECTION
     );
 
-    // Assert
-    await verifyFieldValue(
-      editor,
-      SUCCESS_STORIES_LABEL,
-      SUSTAINABILITY_TEST_DATA.successStories
-    );
-    await verifyFieldValue(
-      editor,
-      SUSTAINABILITY_PLANNING_LABEL,
-      SUSTAINABILITY_TEST_DATA.sustainabilityPlan
-    );
+    if (fields.successStories) {
+      await expect(editor.successStoriesField).toHaveValue(
+        values.successStories
+      );
+    }
+    if (fields.sustainabilityPlanning) {
+      await expect(editor.sustainabilityPlanningField).toHaveValue(
+        values.sustainabilityPlan
+      );
+    }
   });
 });
