@@ -147,10 +147,15 @@ export const AdminDashboard = () => {
   const [createReportModalOpen, setCreateReportModalOpen] = useState(false);
   const { email: userEmail, userRole } = useStore().user ?? {};
   const flags = useFlags();
-  const userCanStartReport =
-    [UserRoles.ADMIN, UserRoles.PROJECT_OFFICER].includes(
-      userRole as UserRoles
-    ) && flags?.adminCanEditReport;
+
+  const roleSets = [
+    { role: UserRoles.ADMIN, flag: flags?.adminCanEditReport },
+    { role: UserRoles.PROJECT_OFFICER, flag: flags?.poCanEditReport },
+  ];
+
+  const userCanStartReport = roleSets.find(
+    (set) => set.role === (userRole as UserRoles)
+  )?.flag;
 
   const setStatesHandler = (states: string[]) => {
     const sortedStates = states.toSorted();

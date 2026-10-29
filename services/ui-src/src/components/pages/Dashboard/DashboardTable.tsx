@@ -8,6 +8,7 @@ import {
   Text,
   Divider,
   HStack,
+  Th,
 } from "@chakra-ui/react";
 import { Table } from "components";
 import { NavigateFunction, useNavigate } from "react-router";
@@ -36,17 +37,10 @@ const setLastEditedBy = (report: LiteReport) => {
 
 export const HorizontalTable = (props: TableProps) => {
   return (
-    <Table content={props.tableContent}>
+    <Table content={props.tableContent} variant="dashboard">
       {props.reports.map((report) => (
         <Tr key={report.id}>
-          <Td
-            fontWeight={"bold"}
-            maxWidth={"14.25rem"}
-            fontSize="body_md"
-            padding="16px 16px 16px 0"
-          >
-            {report.name ?? "{Name of form}"}
-          </Td>
+          <Th scope="row">{report.name ?? "{Name of form}"}</Th>
           <Td>
             {!!report.lastEdited && formatMonthDayYear(report.lastEdited)}
           </Td>
@@ -60,7 +54,11 @@ export const HorizontalTable = (props: TableProps) => {
               <Button
                 onClick={() => props.navigate(reportBasePath(report))}
                 variant="outline"
-                aria-label={`View ${report.name} report`}
+                aria-label={
+                  isCompleteStatus(report.status)
+                    ? `View Report ${report.name}`
+                    : `Enter Active Report ${report.name}`
+                }
               >
                 {isCompleteStatus(report.status)
                   ? "View Report"
@@ -68,7 +66,7 @@ export const HorizontalTable = (props: TableProps) => {
               </Button>
               <Button
                 variant="link"
-                fontWeight="bold"
+                aria-label={`Comment on ${report.name}`}
                 onClick={() => props.openCommentsDrawer(report)}
               >
                 Comment

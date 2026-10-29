@@ -42,6 +42,10 @@ vi.mock("utils/api/requestMethods/commentMethods", () => ({
   getComments: vi.fn().mockReturnValue([]),
   createComment: () => {},
 }));
+vi.mock("@rhtp/shared", async (importOriginal) => ({
+  ...(await importOriginal()),
+  validateFileContentMatchesExtension: vi.fn(() => true),
+}));
 
 const mockAttachmentAreaElementEmpty: AttachmentTableTemplate = {
   id: "mock-attachment-area-id",

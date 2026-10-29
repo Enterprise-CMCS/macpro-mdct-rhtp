@@ -107,10 +107,11 @@ describe("DashboardPage with state user", () => {
     });
 
     const table = container.querySelector("table")!;
-    const columns = [...table.querySelectorAll("tr th")].map(
+    const columns = [...table.querySelectorAll("thead tr th")].map(
       (th) => th.textContent!
     );
     const rows = [...table.querySelectorAll("tbody tr")].map((tr) => [
+      ...tr.querySelectorAll("th"),
       ...tr.querySelectorAll("td"),
     ]);
 
@@ -142,10 +143,11 @@ describe("DashboardPage with state user", () => {
     );
 
     const table = container.querySelector("table")!;
-    const columns = [...table.querySelectorAll("tr th")].map(
+    const columns = [...table.querySelectorAll("thead tr th")].map(
       (th) => th.textContent!
     );
     const rows = [...table.querySelectorAll("tbody tr")].map((tr) => [
+      ...tr.querySelectorAll("th"),
       ...tr.querySelectorAll("td"),
     ]);
 

@@ -12,7 +12,16 @@
       "default": "./src/index.ts"
     }
   },
+  "scripts": {
+    "coverage": "vitest run --coverage",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "file-type": "^22.0.1"
+  },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "@vitest/coverage-v8": "4.0.18",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
   }
 }

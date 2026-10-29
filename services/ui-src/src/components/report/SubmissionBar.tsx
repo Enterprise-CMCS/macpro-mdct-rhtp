@@ -96,8 +96,7 @@ export const SubmissionBar = () => {
           </Heading>
           <Text paddingY={"1rem"}>
             After submitting your report, download the PDF copy of the report
-            and the ZIP file of attachments, then upload them to Grant Solutions
-            for official record-keeping.
+            and the ZIP file of attachments as needed for record-keeping.
           </Text>
           {isPdfActive && (
             <Button

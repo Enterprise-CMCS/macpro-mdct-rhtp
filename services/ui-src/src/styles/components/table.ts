@@ -235,6 +235,24 @@ const pdfVariant = {
   },
 };
 
+const dashboardVariant = {
+  table: {
+    tbody: {
+      th: {
+        color: "base",
+        fontSize: "body_md",
+        maxWidth: "14.25rem",
+        padding: "16px 16px 16px 0",
+      },
+      tr: {
+        button: {
+          fontWeight: "bold",
+        },
+      },
+    },
+  },
+};
+
 const variants = {
   striped: stripedVariant,
   status: statusVariant,
@@ -243,6 +261,7 @@ const variants = {
   metric: metricVariant,
   initiative: initiativeVariant,
   pdf: pdfVariant,
+  dashboard: dashboardVariant,
 };
 
 const sizes = {};

@@ -1,5 +1,5 @@
 import { fileTypeFromBuffer } from "file-type";
-import { isAllowedFileExtension } from "@rhtp/shared";
+import { acceptedFileTypes } from "./constants";
 
 const ZIP_CONTAINER = "application/zip";
 const CFB = "application/x-cfb";
@@ -54,6 +54,18 @@ export const EXTENSION_MIME_MAP: Record<string, string[]> = {
 };
 
 const MARKUP_PREFIXES = ["<svg", "<?xml", "<!doctype html", "<html"] as const;
+
+export const getExtension = (filename: string): string | undefined => {
+  const lastDot = filename.lastIndexOf(".");
+  if (lastDot <= 0 || lastDot === filename.length - 1) {
+    return undefined;
+  }
+  return filename.slice(lastDot).toLowerCase();
+};
+
+export const isAllowedFileExtension = (ext: string): boolean => {
+  return acceptedFileTypes.includes(ext.toLowerCase());
+};
 
 const hasBlockedMarkupOrScriptPrefix = (buffer: Uint8Array): boolean => {
   if (buffer.length === 0) {
