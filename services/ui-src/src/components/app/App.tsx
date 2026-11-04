@@ -40,11 +40,6 @@ export const App = () => {
     }
   }, [mqClasses]);
 
-  // on app load, check for clicked link pathname
-  useEffect(() => {
-    localStorage.setItem("ReturnURL", pathname);
-  }, []);
-
   useEffect(() => {
     //setting tab title for each page
     document.title = getTabTitle(pathname, currentPage);

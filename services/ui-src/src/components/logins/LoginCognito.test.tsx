@@ -17,9 +17,11 @@ vi.mock("aws-amplify/auth", () => ({
 }));
 
 const mockUseNavigate = vi.fn();
+const mockPathname = "/requested/path";
 
 vi.mock("react-router", () => ({
   useNavigate: () => mockUseNavigate,
+  useLocation: () => ({ pathname: mockPathname }),
 }));
 
 describe("<LoginCognito />", () => {
@@ -39,7 +41,7 @@ describe("<LoginCognito />", () => {
         username: "email@address.com",
         password: "p@$$w0rd", //pragma: allowlist secret
       });
-      expect(mockUseNavigate).toHaveBeenCalledWith("/");
+      expect(mockUseNavigate).toHaveBeenCalledWith(mockPathname);
     });
   });
 
