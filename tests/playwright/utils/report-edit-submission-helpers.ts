@@ -1,15 +1,8 @@
 import { expect } from "@playwright/test";
-import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
 import { ReportInitiativePage } from "../tests/pageObjects/report-initiative.page";
 import { ReportSustainabilityPage } from "../tests/pageObjects/report-sustainability.page";
-import type { StatePage } from "../tests/pageObjects/state.page";
-import { reportType, stateAbbreviation } from "./consts";
-import {
-  isEnvironmentInterruptionError,
-  openReportSection,
-  type OpenReportSectionResult,
-} from "./report-edit-arrange";
+import { isEnvironmentInterruptionError } from "./report-edit-arrange";
 import {
   editGeneralInformationFields,
   GENERAL_INFO_FIELDS,
@@ -25,102 +18,10 @@ import { TIMEOUT_LOADING, TIMEOUT_UI } from "./timeouts";
 
 const REPORT_TEST_RUN_ID = getReportTestRunId();
 
-export const SUSTAINABILITY_TEST_DATA = {
-  successStories:
-    "This is a test success story demonstrating measurable outcomes from RHT implementation." +
-    ` Run: ${REPORT_TEST_RUN_ID}`,
-  sustainabilityPlan:
-    "Our sustainability strategy includes long-term funding commitments and workforce development partnerships." +
-    ` Run: ${REPORT_TEST_RUN_ID}`,
-};
-
-const SUSTAINABILITY_RETRY_INTERRUPTED_REASON =
-  "Sustainability section retry was interrupted before a writable report was found";
-const SUSTAINABILITY_READ_ONLY_REASON =
-  "Sustainability fields are read-only on available unsubmitted reports";
-const NO_EDITABLE_REPORT_REASON =
-  "No editable report candidates were available";
-
 const SUBMISSION_PREPARATION_TIMEOUT_REASON =
   "Submission preparation timed out in deployed environment";
 const SUBMISSION_PREPARATION_INTERRUPTED_REASON =
   "Submission preparation interrupted by deployed environment page closure";
-
-export const openUnsubmittedSectionWithSustainabilityRetry = async (
-  statePage: StatePage,
-  sectionId: string
-): Promise<OpenReportSectionResult> => {
-  const dashboard = new DashboardPage(statePage.page);
-  await dashboard.navigateToDashboard(reportType, stateAbbreviation);
-  const editableCount = await dashboard.getEditableReportCount();
-  const maxAttempts = Math.min(Math.max(editableCount, 2), 3);
-
-  let sawReadOnlySustainability = false;
-  let lastFailureReason = NO_EDITABLE_REPORT_REASON;
-
-  const openCandidate = async (
-    candidateIndex: number
-  ): Promise<OpenReportSectionResult> => {
-    try {
-      return await openReportSection(
-        statePage,
-        "unsubmitted",
-        sectionId,
-        candidateIndex
-      );
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (/Target page, context or browser has been closed/i.test(message)) {
-        return {
-          ok: false,
-          reason: SUSTAINABILITY_RETRY_INTERRUPTED_REASON,
-        };
-      }
-
-      throw error;
-    }
-  };
-
-  const openWritableCandidate = async (
-    candidateIndex: number
-  ): Promise<OpenReportSectionResult> => {
-    const opened = await openCandidate(candidateIndex);
-    if (!opened.ok) {
-      return opened;
-    }
-
-    const sustainabilityEditor = new ReportSustainabilityPage(
-      opened.editor.page
-    );
-    const fields = await sustainabilityEditor.getFieldEditability();
-    if (fields.successStories) {
-      return opened;
-    }
-
-    sawReadOnlySustainability = true;
-    return { ok: false, reason: SUSTAINABILITY_READ_ONLY_REASON };
-  };
-
-  for (let i = 0; i < maxAttempts; i++) {
-    const opened = await openWritableCandidate(i);
-
-    if (!opened.ok) {
-      lastFailureReason = opened.reason;
-      continue;
-    }
-
-    return opened;
-  }
-
-  if (sawReadOnlySustainability) {
-    return {
-      ok: false,
-      reason: SUSTAINABILITY_READ_ONLY_REASON,
-    };
-  }
-
-  return { ok: false, reason: lastFailureReason };
-};
 
 const getIncompleteReviewSections = async (
   editor: ReportEditorPage
@@ -497,7 +398,7 @@ const ensureReportIsSubmittable = async (
   };
 };
 
-export const prepareReportForSubmission = async (
+const prepareReportForSubmission = async (
   editor: ReportEditorPage
 ): Promise<{ submittable: boolean; reason?: string }> => {
   await completeGeneralInformationForSubmission(editor);
@@ -513,12 +414,12 @@ export const prepareReportForSubmission = async (
   return ensureReportIsSubmittable(editor);
 };
 
-export type SubmissionPreparationResult = {
+type SubmissionPreparationResult = {
   submittable: boolean;
   reason?: string;
 };
 
-export type SubmissionOutcome = {
+type SubmissionOutcome = {
   submitted: boolean;
   reason?: string;
 };
