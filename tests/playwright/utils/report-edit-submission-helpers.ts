@@ -1,17 +1,9 @@
 import { expect } from "@playwright/test";
-import { DashboardPage } from "../tests/pageObjects/dashboard.page";
 import { ReportEditorPage } from "../tests/pageObjects/report-editor.page";
-import { INITIATIVE_UI_NAMES } from "../tests/pageObjects/report-initiative.page";
+import { ReportInitiativePage } from "../tests/pageObjects/report-initiative.page";
 import { ReportSustainabilityPage } from "../tests/pageObjects/report-sustainability.page";
-import type { StatePage } from "../tests/pageObjects/state.page";
-import { reportType, stateAbbreviation } from "./consts";
+import { isEnvironmentInterruptionError } from "./report-edit-arrange";
 import {
-  isEnvironmentInterruptionError,
-  openReportSection,
-  type OpenReportSectionResult,
-} from "./report-edit-arrange";
-import {
-  createRunScopedInitiativeValues,
   editGeneralInformationFields,
   GENERAL_INFO_FIELDS,
   GENERAL_INFORMATION_SECTION,
@@ -26,102 +18,10 @@ import { TIMEOUT_LOADING, TIMEOUT_UI } from "./timeouts";
 
 const REPORT_TEST_RUN_ID = getReportTestRunId();
 
-export const SUSTAINABILITY_TEST_DATA = {
-  successStories:
-    "This is a test success story demonstrating measurable outcomes from RHT implementation." +
-    ` Run: ${REPORT_TEST_RUN_ID}`,
-  sustainabilityPlan:
-    "Our sustainability strategy includes long-term funding commitments and workforce development partnerships." +
-    ` Run: ${REPORT_TEST_RUN_ID}`,
-};
-
-const SUSTAINABILITY_RETRY_INTERRUPTED_REASON =
-  "Sustainability section retry was interrupted before a writable report was found";
-const SUSTAINABILITY_READ_ONLY_REASON =
-  "Sustainability fields are read-only on available unsubmitted reports";
-const NO_EDITABLE_REPORT_REASON =
-  "No editable report candidates were available";
-
 const SUBMISSION_PREPARATION_TIMEOUT_REASON =
   "Submission preparation timed out in deployed environment";
 const SUBMISSION_PREPARATION_INTERRUPTED_REASON =
   "Submission preparation interrupted by deployed environment page closure";
-
-export const openUnsubmittedSectionWithSustainabilityRetry = async (
-  statePage: StatePage,
-  sectionId: string
-): Promise<OpenReportSectionResult> => {
-  const dashboard = new DashboardPage(statePage.page);
-  await dashboard.navigateToDashboard(reportType, stateAbbreviation);
-  const editableCount = await dashboard.getEditableReportCount();
-  const maxAttempts = Math.min(Math.max(editableCount, 2), 3);
-
-  let sawReadOnlySustainability = false;
-  let lastFailureReason = NO_EDITABLE_REPORT_REASON;
-
-  const openCandidate = async (
-    candidateIndex: number
-  ): Promise<OpenReportSectionResult> => {
-    try {
-      return await openReportSection(
-        statePage,
-        "unsubmitted",
-        sectionId,
-        candidateIndex
-      );
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (/Target page, context or browser has been closed/i.test(message)) {
-        return {
-          ok: false,
-          reason: SUSTAINABILITY_RETRY_INTERRUPTED_REASON,
-        };
-      }
-
-      throw error;
-    }
-  };
-
-  const openWritableCandidate = async (
-    candidateIndex: number
-  ): Promise<OpenReportSectionResult> => {
-    const opened = await openCandidate(candidateIndex);
-    if (!opened.ok) {
-      return opened;
-    }
-
-    const sustainabilityEditor = new ReportSustainabilityPage(
-      opened.editor.page
-    );
-    const fields = await sustainabilityEditor.getFieldEditability();
-    if (fields.successStories) {
-      return opened;
-    }
-
-    sawReadOnlySustainability = true;
-    return { ok: false, reason: SUSTAINABILITY_READ_ONLY_REASON };
-  };
-
-  for (let i = 0; i < maxAttempts; i++) {
-    const opened = await openWritableCandidate(i);
-
-    if (!opened.ok) {
-      lastFailureReason = opened.reason;
-      continue;
-    }
-
-    return opened;
-  }
-
-  if (sawReadOnlySustainability) {
-    return {
-      ok: false,
-      reason: SUSTAINABILITY_READ_ONLY_REASON,
-    };
-  }
-
-  return { ok: false, reason: lastFailureReason };
-};
 
 const getIncompleteReviewSections = async (
   editor: ReportEditorPage
@@ -181,16 +81,13 @@ const completeSustainabilityForSubmission = async (
     return false;
   }
 
-  await sustainabilityEditor.fillSuccessStories(
-    `Success story for submission ${REPORT_TEST_RUN_ID}`
+  await sustainabilityEditor.fillEditableFields(
+    {
+      successStories: `Success story for submission ${REPORT_TEST_RUN_ID}`,
+      sustainabilityPlan: `Sustainability plan for submission ${REPORT_TEST_RUN_ID}`,
+    },
+    fields
   );
-
-  if (fields.sustainabilityPlanning) {
-    await sustainabilityEditor.fillSustainabilityPlanning(
-      `Sustainability plan for submission ${REPORT_TEST_RUN_ID}`
-    );
-  }
-  await sustainabilityEditor.page.keyboard.press("Tab");
 
   return true;
 };
@@ -198,55 +95,92 @@ const completeSustainabilityForSubmission = async (
 const completeInitiativesForSubmission = async (
   editor: ReportEditorPage
 ): Promise<boolean> => {
-  const { reportType, state, reportId } = editor.getCurrentRouteParams();
-  await editor.navigateToSection(
+  const initiativesEditor = new ReportInitiativePage(editor.page);
+  const { reportType, state, reportId } =
+    initiativesEditor.getCurrentRouteParams();
+  await initiativesEditor.navigateToSection(
     reportType,
     state,
     reportId,
     INITIATIVES_SECTION
   );
 
-  const addInitiativeButton = editor.page.getByRole("button", {
-    name: /^Add initiative$/i,
+  const editableInitiatives =
+    await initiativesEditor.getEditableInitiativeUrls();
+
+  const narrative = `Narrative for submission ${REPORT_TEST_RUN_ID}`;
+  const metricDate = new Date().toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
   });
 
-  const canAddInitiative = await addInitiativeButton
-    .waitFor({ state: "visible", timeout: TIMEOUT_UI })
-    .then(() => true)
-    .catch(() => false);
-  if (!canAddInitiative) {
-    const existingInitiativeVisible = await editor.page
-      .getByText(/^\d{1,6}:\s+.+/)
-      .first()
-      .isVisible()
-      .catch(() => false);
-    return existingInitiativeVisible;
+  for (const url of editableInitiatives) {
+    const narrativeField = initiativesEditor.narrativeField;
+    const peopleServedField = initiativesEditor.peopleServedField;
+    const activeMetricRow = initiativesEditor.metricsTable
+      .getByRole("row")
+      .filter({
+        has: initiativesEditor.page.getByRole("cell", {
+          name: "Active",
+          exact: true,
+        }),
+      })
+      .first();
+    const metricCurrentValueField = activeMetricRow.getByRole("textbox", {
+      name: "Current value",
+    });
+    const metricDateField = activeMetricRow.getByRole("textbox", {
+      name: "As of Date MM/DD/YYYY",
+    });
+
+    await initiativesEditor.page.goto(url);
+    await expect(
+      narrativeField,
+      `Expected visible narrative field for initiative ${url}`
+    ).toBeVisible({ timeout: TIMEOUT_UI });
+
+    const hasActiveMetric = (await activeMetricRow.count()) > 0;
+    const peopleServed = (await peopleServedField.isEnabled())
+      ? "100"
+      : undefined;
+    const metric = hasActiveMetric
+      ? {
+          index: await activeMetricRow.evaluate((row) => {
+            if (!row.parentElement) throw new Error("Metric row has no parent");
+            return [...row.parentElement.children].indexOf(row);
+          }),
+          value: "100",
+          date: metricDate,
+        }
+      : undefined;
+
+    await Promise.all([
+      initiativesEditor.waitForInitiativeSave({
+        narrative,
+        peopleServed,
+        metric,
+      }),
+      (async () => {
+        await narrativeField.fill(narrative);
+        if (peopleServed !== undefined) {
+          await peopleServedField.fill(peopleServed);
+        }
+        if (metric) {
+          await metricCurrentValueField.fill(metric.value);
+          await metricDateField.fill(metric.date);
+        }
+
+        let lastEditedField = narrativeField;
+        if (metric) {
+          lastEditedField = metricDateField;
+        } else if (peopleServed !== undefined) {
+          lastEditedField = peopleServedField;
+        }
+        await lastEditedField.blur();
+      })(),
+    ]);
   }
-
-  const { initiativeNumber, initiativeName, expectedDisplayName } =
-    createRunScopedInitiativeValues("submit-readiness", REPORT_TEST_RUN_ID);
-
-  await addInitiativeButton.click();
-
-  const initiativeModal = editor.page.getByRole("dialog");
-  await expect(initiativeModal).toBeVisible({ timeout: TIMEOUT_UI });
-  await expect(
-    initiativeModal.getByRole("heading", { name: /^Add Initiative$/i })
-  ).toBeVisible({ timeout: TIMEOUT_UI });
-
-  await initiativeModal
-    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeNumber })
-    .fill(initiativeNumber);
-  await initiativeModal
-    .getByRole("textbox", { name: INITIATIVE_UI_NAMES.field.initiativeName })
-    .fill(initiativeName);
-
-  await initiativeModal.getByRole("button", { name: /^Save$/i }).click();
-  await expect(initiativeModal).toBeHidden({ timeout: TIMEOUT_UI });
-
-  await expect(editor.page.getByText(expectedDisplayName).first()).toBeVisible({
-    timeout: TIMEOUT_UI,
-  });
 
   return true;
 };
@@ -391,8 +325,9 @@ const ensureReportIsSubmittable = async (
     ) {
       return {
         submittable: false,
-        reason:
-          "Report completion made no progress between attempts; required sections remain incomplete",
+        reason: `Report completion made no progress between attempts: ${incompleteSections
+          .map(({ title, status }) => `${title} (${status})`)
+          .join(", ")}`,
       };
     }
     previousIncompleteSignature = currentIncompleteSignature;
@@ -411,6 +346,14 @@ const ensureReportIsSubmittable = async (
         reason: `Unable to auto-complete required sections: ${unhandled.join(", ")}`,
       };
     }
+
+    await editor.navigateToSection(
+      reportType,
+      state,
+      reportId,
+      REVIEW_SUBMIT_SECTION
+    );
+    await expect(finalSubmitButton).toBeVisible();
   }
 
   const remaining = await getIncompleteReviewSections(editor);
@@ -455,7 +398,7 @@ const ensureReportIsSubmittable = async (
   };
 };
 
-export const prepareReportForSubmission = async (
+const prepareReportForSubmission = async (
   editor: ReportEditorPage
 ): Promise<{ submittable: boolean; reason?: string }> => {
   await completeGeneralInformationForSubmission(editor);
@@ -471,12 +414,12 @@ export const prepareReportForSubmission = async (
   return ensureReportIsSubmittable(editor);
 };
 
-export type SubmissionPreparationResult = {
+type SubmissionPreparationResult = {
   submittable: boolean;
   reason?: string;
 };
 
-export type SubmissionOutcome = {
+type SubmissionOutcome = {
   submitted: boolean;
   reason?: string;
 };

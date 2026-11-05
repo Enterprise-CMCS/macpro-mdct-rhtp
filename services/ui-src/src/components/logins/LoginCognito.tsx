@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { signIn } from "aws-amplify/auth";
 import { Box, Button, Heading, Input, Stack, Text } from "@chakra-ui/react";
 import { Alert } from "components";
@@ -8,6 +8,7 @@ import { getReturnUrl } from "utils";
 
 export const LoginCognito = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | undefined>();
@@ -16,6 +17,7 @@ export const LoginCognito = () => {
     event.preventDefault();
     setError(undefined);
     try {
+      localStorage.setItem("ReturnURL", pathname);
       await signIn({ username, password });
       navigate(getReturnUrl());
     } catch (error) {
