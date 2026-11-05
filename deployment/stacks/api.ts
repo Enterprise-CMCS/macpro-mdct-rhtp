@@ -237,6 +237,7 @@ export function createApiComponents(props: CreateApiComponentsProps) {
     handler: "createReport",
     path: "reports/{reportType}/{state}",
     method: "POST",
+    timeout: Duration.seconds(29), // api gateway max, without further requests
     ...commonProps,
   });
 

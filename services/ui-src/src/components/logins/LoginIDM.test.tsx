@@ -26,7 +26,9 @@ describe("<LoginIDM />", () => {
     render(loginIDMComponent);
     const loginButton = screen.getByRole("button");
     await userEvent.click(loginButton);
+    expect(localStorage.getItem("ReturnURL")).toBe("/");
     expect(mockGetReturnUrl).toHaveBeenCalled();
+    localStorage.removeItem("ReturnURL");
   });
 
   testA11y(loginIDMComponent);
