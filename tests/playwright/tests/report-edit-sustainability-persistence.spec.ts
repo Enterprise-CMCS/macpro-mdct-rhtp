@@ -5,13 +5,24 @@ import {
   createArtifactId,
   GENERAL_INFORMATION_SECTION,
   SUSTAINABILITY_AND_HIGHLIGHTS_SECTION,
+  getReportTestRunId,
 } from "../utils/report-edit-shared-helpers";
 import {
   ReportSustainabilityPage,
   type SustainabilityFieldEditability,
   type SustainabilityFieldValues,
 } from "./pageObjects/report-sustainability.page";
-import { SUSTAINABILITY_TEST_DATA } from "../utils/report-edit-submission-helpers";
+
+const REPORT_TEST_RUN_ID = getReportTestRunId();
+
+const SUSTAINABILITY_TEST_DATA = {
+  successStories:
+    "This is a test success story demonstrating measurable outcomes from RHT implementation." +
+    ` Run: ${REPORT_TEST_RUN_ID}`,
+  sustainabilityPlan:
+    "Our sustainability strategy includes long-term funding commitments and workforce development partnerships." +
+    ` Run: ${REPORT_TEST_RUN_ID}`,
+};
 
 type SustainabilityEditorSetup = {
   editor: ReportSustainabilityPage;
