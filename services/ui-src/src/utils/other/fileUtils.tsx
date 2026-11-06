@@ -18,14 +18,15 @@ import cancelIconGray from "assets/icons/cancel/icon_cancel_gray.svg";
 import successIcon from "assets/icons/status/icon_status_check.svg";
 import DOMPurify from "dompurify";
 import { bytesToKiloBytes, parseHtml } from "./parsing";
-import { ReportType, UploadListProp, ZipRequestBody } from "@rhtp/shared";
-
-const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
+import {
+  getSafeName,
+  ReportType,
+  UploadListProp,
+  ZipRequestBody,
+} from "@rhtp/shared";
 
 export const getFileWithSafeName = (file: File) => {
-  const newName = file.name
-    .replaceAll(negatedAllowedCharacters, "")
-    .replace(/\.[^.]*$/, (extension) => extension.toLowerCase());
+  const newName = getSafeName(file.name);
 
   return new File([file], newName, {
     type: file.type,

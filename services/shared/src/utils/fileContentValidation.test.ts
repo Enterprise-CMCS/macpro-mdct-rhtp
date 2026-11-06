@@ -1,5 +1,6 @@
 import {
   getExtension,
+  getSafeName,
   isAllowedFileExtension,
   validateFileContentMatchesExtension,
 } from "./fileContentValidation";
@@ -100,6 +101,24 @@ describe("fileContentValidation util", () => {
       ["foo", undefined],
     ])("%s has %s extension", (fileName, extension) => {
       expect(getExtension(fileName)).toEqual(extension);
+    });
+  });
+  describe("getSafeName()", () => {
+    test("creates file with safe name", () => {
+      const fileName = "name#needs%help.png";
+      const result = getSafeName(fileName);
+      expect(result).toEqual("nameneedshelp.png");
+    });
+    test.each([
+      ["70KB.PDF", "70KB.pdf"],
+      ["Report.PdF", "Report.pdf"],
+      ["Report.pdf", "Report.pdf"],
+      ["Report.Final.DOCX", "Report.Final.docx"],
+      ["Report#Final.PDF", "ReportFinal.pdf"],
+      ["Report", "Report"],
+    ])("normalizes only the extension of %s", (fileName, expectedName) => {
+      const result = getSafeName(fileName);
+      expect(result).toEqual(expectedName);
     });
   });
 });
