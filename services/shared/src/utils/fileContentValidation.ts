@@ -63,6 +63,15 @@ export const getExtension = (filename: string): string | undefined => {
   return filename.slice(lastDot).toLowerCase();
 };
 
+const negatedAllowedCharacters = /[^0-9a-zA-Z._-]+/g;
+export const getSafeName = (filename: string) => {
+  const newName = filename
+    .replaceAll(negatedAllowedCharacters, "")
+    .replace(/\.[^.]*$/, (extension) => extension.toLowerCase());
+
+  return newName;
+};
+
 export const isAllowedFileExtension = (ext: string): boolean => {
   return acceptedFileTypes.includes(ext.toLowerCase());
 };

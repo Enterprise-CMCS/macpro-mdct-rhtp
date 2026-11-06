@@ -11,6 +11,7 @@ import {
   Comment,
   ElementType,
   PageStatus,
+  getSafeName,
 } from "@rhtp/shared";
 import KSUID from "ksuid";
 import { queryUpload, batchPutUploads } from "../../storage/upload";
@@ -163,7 +164,10 @@ export const copyAttachmentsAndTheirComments = async (newReport: Report) => {
 
   if ("answer" in initiativeAttachmentsTable) {
     for (const answer of initiativeAttachmentsTable.answer) {
-      const newFileId = `${KSUID.randomSync().string}_${answer.attachment.name}`;
+      // Make sure that we always save as lowercase, despite what the friendly name says
+      const filename = getSafeName(answer.attachment.name);
+
+      const newFileId = `${KSUID.randomSync().string}_${filename}`;
       uploadsToCopy.push({
         fileId: newFileId,
         previousReportId: copyFromReportId,
