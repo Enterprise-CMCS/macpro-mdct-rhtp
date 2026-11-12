@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router";
+import { Routes, Route, useLocation, useNavigate } from "react-router";
 import {
   AppRoutes,
   Error,
@@ -18,10 +18,12 @@ import {
   makeMediaQueryClasses,
   UserContext,
   useStore,
+  getReturnUrl,
 } from "utils";
 import { currentPageSelector } from "utils/state/selectors";
 
 export const App = () => {
+  const navigate = useNavigate();
   const mqClasses = makeMediaQueryClasses();
   const context = useContext(UserContext);
   const { logout } = context;
@@ -44,6 +46,14 @@ export const App = () => {
     //setting tab title for each page
     document.title = getTabTitle(pathname, currentPage);
   }, [pathname, currentPage, user]);
+
+  // on app load, check for stored redirect URL
+  useEffect(() => {
+    const returnUrl = getReturnUrl();
+    if (returnUrl !== "/") {
+      navigate(returnUrl);
+    }
+  }, []);
 
   const authenticatedRoutes = (
     <>

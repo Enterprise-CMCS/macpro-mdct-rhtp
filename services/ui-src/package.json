@@ -26,7 +26,7 @@
     "file-saver": "2.0.5",
     "framer-motion": "^11",
     "html-react-parser": "^3.0.16",
-    "launchdarkly-react-client-sdk": "^3.3.0",
+    "launchdarkly-react-client-sdk": "^3.9.4",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-error-boundary": "^3.1.4",

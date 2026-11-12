@@ -1,17 +1,15 @@
 import { useContext } from "react";
-import { getReturnUrl, UserContext } from "utils";
-import { useLocation, useNavigate } from "react-router";
+import { UserContext } from "utils";
+import { useLocation } from "react-router";
 import { Box, Button, Heading } from "@chakra-ui/react";
 
 export const LoginIDM = () => {
-  const navigate = useNavigate();
   const { loginWithIDM } = useContext(UserContext);
   const { pathname } = useLocation();
 
   const handleLogin = async () => {
     localStorage.setItem("ReturnURL", pathname);
     await loginWithIDM();
-    navigate(getReturnUrl());
   };
 
   return (
