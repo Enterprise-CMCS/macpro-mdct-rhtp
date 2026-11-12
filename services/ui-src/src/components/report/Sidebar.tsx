@@ -54,12 +54,14 @@ export const Sidebar = () => {
     const page = report.pages[section];
     const childSections = page.childPageIds?.map((child) => pageMap.get(child));
     const hasChildSections = childSections && childSections.length > 0;
+    const isCurrentPage = page.id === currentPageId;
 
     return (
       <Box key={page.id} inert={!sidebarOpen}>
         <Link
           variant={"sidebar"}
-          className={page.id === currentPageId ? "selected" : ""}
+          className={isCurrentPage ? "selected" : ""}
+          aria-current={isCurrentPage}
           href={`/report/${reportType}/${state}/${reportId}/${page.id}`}
           onClick={(e) => {
             e.preventDefault();
