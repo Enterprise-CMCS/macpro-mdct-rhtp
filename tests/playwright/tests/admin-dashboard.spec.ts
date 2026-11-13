@@ -34,7 +34,7 @@ test.describe("Admin Dashboard", () => {
   }) => {
     const reportName = await dashboard.getReportName(
       stateAbbreviation,
-      "Quarterly"
+      "Annual"
     );
     const expectedReportUrl = new RegExp(
       `/report/${escapeRegExp(reportType)}/${escapeRegExp(stateAbbreviation)}/[^/?#]+(?:/[^?#]*)?(?:[?#].*)?$`

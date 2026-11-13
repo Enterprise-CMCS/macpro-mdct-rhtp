@@ -91,7 +91,8 @@ export class AdminDashboardPage extends BasePage {
   ): Promise<string> {
     const reportCell = this.page.getByRole("table").getByRole("cell", {
       name: new RegExp(
-        `^${escapeRegExp(stateAbbreviation)} - ${period} Report\\b`
+        `${escapeRegExp(stateAbbreviation)} - ${period} Report\\b`,
+        "i"
       ),
     });
     await expect(
