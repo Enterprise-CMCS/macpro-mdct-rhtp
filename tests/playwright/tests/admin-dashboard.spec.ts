@@ -7,6 +7,9 @@ test.describe("Admin Dashboard", () => {
   let dashboard: AdminDashboardPage;
 
   test.beforeEach(async ({ adminPage }) => {
+    await adminPage.page.addInitScript(() => {
+      window.localStorage.setItem("states", "");
+    });
     dashboard = new AdminDashboardPage(adminPage.page);
     await dashboard.navigateToAdminDashboard();
   });

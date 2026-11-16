@@ -97,7 +97,7 @@ export class AdminDashboardPage extends BasePage {
     });
     await expect(
       reportCell,
-      `Expected one ${period} report for ${stateAbbreviation}`
+      `Expected a ${period} report for ${stateAbbreviation}`
     ).toHaveCount(1);
 
     const reportName = (await reportCell.textContent())?.trim();
