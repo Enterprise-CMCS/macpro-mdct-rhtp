@@ -8,9 +8,30 @@ export class AdminDashboardPage extends BasePage {
   }
 
   async navigateToAdminDashboard(): Promise<void> {
+    const reportsResponsePromise = this.page.waitForResponse((response) => {
+      const pathname = new URL(response.url()).pathname;
+      return (
+        response.request().method() === "GET" &&
+        /\/reports\/RHTP\/?$/.test(pathname)
+      );
+    });
+
     await this.navigateTo("/");
     await this.adminPageHeading.waitFor({ state: "visible" });
-    await this.page.getByRole("table").waitFor({ state: "visible" });
+
+    const reportsResponse = await reportsResponsePromise;
+    if (!reportsResponse.ok()) {
+      throw new Error(`Failed to load reports: ${reportsResponse.status()}`);
+    }
+
+    const reports: unknown = await reportsResponse.json();
+    if (!Array.isArray(reports)) {
+      throw new TypeError("Admin reports response is not an array");
+    }
+
+    const table = this.page.getByRole("table");
+    await table.waitFor({ state: "visible" });
+    await expect(table.getByRole("row")).toHaveCount(reports.length + 1);
   }
 
   get adminPageHeading() {
