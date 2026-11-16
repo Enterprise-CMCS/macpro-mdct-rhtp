@@ -172,7 +172,7 @@ describe("copyReport util", () => {
       quarterly: true,
     });
     expect(narrative).not.toHaveProperty("answer");
-    expect(peopleServed).toMatchObject({ required: true, quarterly: false });
+    expect(peopleServed).toMatchObject({ required: true, quarterly: true });
     expect(peopleServed).not.toHaveProperty("answer");
     expect(peopleServed).not.toHaveProperty("disabled");
   });
