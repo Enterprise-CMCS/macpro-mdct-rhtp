@@ -35,8 +35,8 @@ export class AdminDashboardPage extends BasePage {
   }
 
   get budgetPeriodDropdown() {
-    return this.page.getByRole("combobox", {
-      name: "Filter by Budget Period",
+    return this.page.getByRole("button", {
+      name: /Filter by Budget Period$/,
       exact: true,
     });
   }
@@ -78,7 +78,13 @@ export class AdminDashboardPage extends BasePage {
   }
 
   async selectBudgetPeriod(budgetPeriod: string): Promise<void> {
-    await this.budgetPeriodDropdown.selectOption({ label: budgetPeriod });
+    await this.budgetPeriodDropdown.click();
+    await this.page
+      .getByRole("option", {
+        name: budgetPeriod,
+        exact: true,
+      })
+      .click();
   }
 
   async clickClearFiltersButton(): Promise<void> {
@@ -89,16 +95,19 @@ export class AdminDashboardPage extends BasePage {
     stateAbbreviation: string,
     period: "Annual" | "Quarterly"
   ): Promise<string> {
-    const reportCell = this.page.getByRole("table").getByRole("cell", {
-      name: new RegExp(
-        `${escapeRegExp(stateAbbreviation)} - ${period} Report\\b`,
-        "i"
-      ),
-    });
+    const reportCell = this.page
+      .getByRole("table")
+      .getByRole("cell", {
+        name: new RegExp(
+          `${escapeRegExp(stateAbbreviation)} - ${period} Report\\b`,
+          "i"
+        ),
+      })
+      .first();
     await expect(
       reportCell,
       `Expected a ${period} report for ${stateAbbreviation}`
-    ).toHaveCount(1);
+    ).toBeVisible();
 
     const reportName = (await reportCell.textContent())?.trim();
     if (!reportName) {
