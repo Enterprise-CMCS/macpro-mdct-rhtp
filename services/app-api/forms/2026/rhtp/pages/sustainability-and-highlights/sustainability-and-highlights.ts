@@ -88,7 +88,7 @@ const buildPage = (
         "What are the most significant updates or changes to your sustainability plan based on the past year’s experiences, successes, and challenges?",
 
       required: true,
-      quarterly: false,
+      quarterly: true,
       ...(data[state]?.skipFirstYearCharLimit
         ? {}
         : {
