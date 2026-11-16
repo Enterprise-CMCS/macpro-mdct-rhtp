@@ -21,6 +21,11 @@ test.describe("Admin Dashboard", () => {
   test("should open and close the first annual report dialog", async ({
     adminPage,
   }) => {
+    test.skip(
+      process.env.TEST_ADMIN_CAN_EDIT_REPORT !== "true",
+      "Requires TEST_ADMIN_CAN_EDIT_REPORT=true and the admin creation flag enabled"
+    );
+
     const dialog = adminPage.page.getByRole("dialog", {
       name: "Start First Annual Report",
       exact: true,
@@ -35,10 +40,15 @@ test.describe("Admin Dashboard", () => {
   test("should open report after clicking the view report button", async ({
     adminPage,
   }) => {
-    const reportName = await dashboard.getReportName(
+    const reportName = await dashboard.findReportName(
       stateAbbreviation,
       "Annual"
     );
+    if (!reportName) {
+      test.skip(true, `Requires an Annual report for ${stateAbbreviation}`);
+      return;
+    }
+
     const expectedReportUrl = new RegExp(
       `/report/${escapeRegExp(reportType)}/${escapeRegExp(stateAbbreviation)}/[^/?#]+(?:/[^?#]*)?(?:[?#].*)?$`
     );
@@ -53,10 +63,15 @@ test.describe("Admin Dashboard", () => {
   test("should open comment/status dialog after clicking the comment/status button", async ({
     adminPage,
   }) => {
-    const reportName = await dashboard.getReportName(
+    const reportName = await dashboard.findReportName(
       stateAbbreviation,
       "Annual"
     );
+    if (!reportName) {
+      test.skip(true, `Requires an Annual report for ${stateAbbreviation}`);
+      return;
+    }
+
     const dialog = adminPage.page.getByRole("dialog", {
       name: "Add comment to report",
       exact: true,

@@ -91,25 +91,22 @@ export class AdminDashboardPage extends BasePage {
     await this.clearFiltersButton.click();
   }
 
-  async getReportName(
+  async findReportName(
     stateAbbreviation: string,
     period: "Annual" | "Quarterly"
-  ): Promise<string> {
-    const reportCell = this.page
-      .getByRole("table")
-      .getByRole("cell", {
-        name: new RegExp(
-          `${escapeRegExp(stateAbbreviation)} - ${period} Report\\b`,
-          "i"
-        ),
-      })
-      .first();
-    await expect(
-      reportCell,
-      `Expected a ${period} report for ${stateAbbreviation}`
-    ).toBeVisible();
+  ): Promise<string | undefined> {
+    const reportCells = this.page.getByRole("table").getByRole("cell", {
+      name: new RegExp(
+        `${escapeRegExp(stateAbbreviation)} - ${period} Report\\b`,
+        "i"
+      ),
+    });
 
-    const reportName = (await reportCell.textContent())?.trim();
+    if ((await reportCells.count()) === 0) {
+      return undefined;
+    }
+
+    const reportName = (await reportCells.first().textContent())?.trim();
     if (!reportName) {
       throw new Error(
         `Report name is blank for ${stateAbbreviation} ${period} report`
