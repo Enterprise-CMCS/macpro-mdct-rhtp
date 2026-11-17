@@ -175,7 +175,7 @@ const initiativeNumberOfPeopleServed = (
       "</ul>",
   },
   required: true,
-  quarterly: false,
+  quarterly: true,
   answer: numberOfPeopleServed,
 });
 

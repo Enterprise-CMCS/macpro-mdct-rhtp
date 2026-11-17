@@ -1,0 +1,86 @@
+import { test, expect } from "./fixtures/base";
+import { AdminDashboardPage } from "./pageObjects/admin-dashboard.page";
+import { reportType, stateAbbreviation } from "../utils/consts";
+import { escapeRegExp } from "../utils/report-edit-shared-helpers";
+
+test.describe("Admin Dashboard", () => {
+  let dashboard: AdminDashboardPage;
+
+  test.beforeEach(async ({ adminPage }) => {
+    await adminPage.page.addInitScript(() => {
+      window.localStorage.setItem("states", "");
+    });
+    dashboard = new AdminDashboardPage(adminPage.page);
+    await dashboard.navigateToAdminDashboard();
+  });
+
+  test("should display the admin dashboard", async () => {
+    await expect(dashboard.adminPageHeading).toBeVisible();
+  });
+
+  test("should open and close the first annual report dialog", async ({
+    adminPage,
+  }) => {
+    test.skip(
+      process.env.TEST_ADMIN_CAN_EDIT_REPORT !== "true",
+      "Requires TEST_ADMIN_CAN_EDIT_REPORT=true and the admin creation flag enabled"
+    );
+
+    const dialog = adminPage.page.getByRole("dialog", {
+      name: "Start First Annual Report",
+      exact: true,
+    });
+
+    await dashboard.clickStartFirstAnnualReportButton();
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: /^Close(?:\s+Close)?$/i }).click();
+    await expect(dialog).toBeHidden();
+  });
+
+  test("should open report after clicking the view report button", async ({
+    adminPage,
+  }) => {
+    const reportName = await dashboard.findReportName(
+      stateAbbreviation,
+      "Annual"
+    );
+    if (!reportName) {
+      test.skip(true, `Requires an Annual report for ${stateAbbreviation}`);
+      return;
+    }
+
+    const expectedReportUrl = new RegExp(
+      `/report/${escapeRegExp(reportType)}/${escapeRegExp(stateAbbreviation)}/[^/?#]+(?:/[^?#]*)?(?:[?#].*)?$`
+    );
+
+    await dashboard.clickViewReportButton(reportName);
+    await expect(adminPage.page).toHaveURL(expectedReportUrl);
+    await expect(
+      adminPage.page.getByText(reportName, { exact: true })
+    ).toBeVisible();
+  });
+
+  test("should open comment/status dialog after clicking the comment/status button", async ({
+    adminPage,
+  }) => {
+    const reportName = await dashboard.findReportName(
+      stateAbbreviation,
+      "Annual"
+    );
+    if (!reportName) {
+      test.skip(true, `Requires an Annual report for ${stateAbbreviation}`);
+      return;
+    }
+
+    const dialog = adminPage.page.getByRole("dialog", {
+      name: "Add comment to report",
+      exact: true,
+    });
+
+    await dashboard.clickCommentStatusButton(reportName);
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByText(`Report: ${reportName}`, { exact: true })
+    ).toBeVisible();
+  });
+});

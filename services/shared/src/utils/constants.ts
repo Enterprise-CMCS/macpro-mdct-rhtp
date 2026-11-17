@@ -75,8 +75,10 @@ export const StateDropdownOptions = Object.entries(StateNames).map(
 //This also clears the answer when copied, assuming it's a string, see reports/copyReport.ts
 export const optionalInQuarterly = [
   "initiative-narrative",
-  "success-stories",
+  "initiative-number-of-people-served",
   "metrics-table",
+  "success-stories",
+  "sustainability-planning",
 ];
 
 export const cmsStatusThatLocksSPAC = [

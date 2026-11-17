@@ -3,6 +3,7 @@ import {
   ActionTableTemplate,
   ElementType,
   FormPageTemplate,
+  MaskType,
   PageElement,
   PageStatus,
   ParentPageTemplate,
@@ -39,14 +40,16 @@ export const DevReportTools = () => {
     .filter((section) => section?.displayStatus === "Optional")
     .map((page) => page?.section.id);
 
-  const getAnswerByType = (type: string, id?: string) => {
+  const getAnswerByType = (type: string, id?: string, mask?: MaskType) => {
     switch (type) {
       case ElementType.NumberField:
         return "1234";
       case ElementType.Date:
         return "02/02/2026";
       case ElementType.Textbox:
-        return id?.includes("email") ? "mock@email.com" : "mock text input";
+        if (id?.includes("email")) return "mock@email.com";
+        if (mask) return "1234"; // we only mask textbox fields where we expect a number
+        return "mock text input";
       case ElementType.TextAreaField:
         return "mock text area field";
       case ElementType.ObligatedAndSpentFundsAttachment:
@@ -62,7 +65,10 @@ export const DevReportTools = () => {
       if (!col.value || col.value === "") {
         const typeInfo = rows.find((row) => row.id === col.id);
         if (typeInfo && !typeInfo.disabled) {
-          return { ...col, value: getAnswerByType(typeInfo.type, typeInfo.id) };
+          return {
+            ...col,
+            value: getAnswerByType(typeInfo.type, typeInfo.id, typeInfo?.mask),
+          };
         }
       }
       return col;
@@ -88,9 +94,10 @@ export const DevReportTools = () => {
             ? element.answer
             : undefined;
 
+        const mask = "mask" in element ? element.mask : undefined;
         return {
           ...element,
-          answer: answer ?? getAnswerByType(element.type, element.id),
+          answer: answer ?? getAnswerByType(element.type, element.id, mask),
         };
       }
     });
