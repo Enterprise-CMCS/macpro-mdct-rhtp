@@ -11,7 +11,7 @@ const logPrefix = () => new Date().toISOString() + " | ";
 
 async function main() {
   console.info("Beginning Scan of DB Records");
-  const reports = await scanAndCompileReports(["Q1"], "GA"); // get Q1 reports for all states
+  const reports = await scanAndCompileReports(["Q1"], undefined); // get Q1 reports for all states
   for (const record of reports) {
     for (const page of record.pages) {
       if (page.id === "sustainability-and-highlights") {
