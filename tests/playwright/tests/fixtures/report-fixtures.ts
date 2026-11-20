@@ -38,10 +38,19 @@ export const test = base.extend<ReportFixtures>({
       throw new Error("The A1 builder did not return a report");
     }
 
-    await putReport(report);
-    await use({ id: report.id, state: report.state });
+    await testInfo.attach("seeded-report", {
+      body: JSON.stringify(
+        { id: report.id, state: report.state, type: report.type },
+        null,
+        2
+      ),
+      contentType: "application/json",
+    });
 
-    if (testInfo.status === "passed") {
+    try {
+      await putReport(report);
+      await use({ id: report.id, state: report.state });
+    } finally {
       await deleteReport(report.type, report.state, report.id);
     }
   },
