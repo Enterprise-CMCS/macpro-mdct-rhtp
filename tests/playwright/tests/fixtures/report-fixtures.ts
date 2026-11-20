@@ -7,7 +7,7 @@ type ReportFixtures = {
 };
 
 export const test = base.extend<ReportFixtures>({
-  annualReport: async ({ baseURL }, use) => {
+  annualReport: async ({ baseURL }, use, testInfo) => {
     if (
       process.env.E2E_SEED_TARGET !== "localstack" ||
       baseURL !== "http://localhost:3000"
@@ -23,16 +23,26 @@ export const test = base.extend<ReportFixtures>({
     process.env.attachmentsBucketName =
       "uploads-localstack-attachments-000000000000";
 
-    const { buildAnnualReport } =
-      await import("../../../seeds/fixtures/annual-report");
-    const { putReport } =
-      await import("../../../../services/app-api/storage/reports.js");
-    const report = await buildAnnualReport();
+    const [
+      { buildAnnualReport },
+      { deleteReport, putReport },
+      { stateAbbreviation },
+    ] = await Promise.all([
+      import("../../../seeds/fixtures/annual-report.js"),
+      import("../../../../services/app-api/storage/reports.js"),
+      import("../../utils/consts.js"),
+    ]);
+
+    const report = await buildAnnualReport(stateAbbreviation);
     if (!report) {
       throw new Error("The A1 builder did not return a report");
     }
 
     await putReport(report);
     await use({ id: report.id, state: report.state });
+
+    if (testInfo.status === "passed") {
+      await deleteReport(report.type, report.state, report.id);
+    }
   },
 });

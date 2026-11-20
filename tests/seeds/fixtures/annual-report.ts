@@ -1,9 +1,12 @@
-import { ReportType, UserRoles } from "@rhtp/shared";
+import { isStateAbbr, ReportType, UserRoles } from "@rhtp/shared";
 import { RhtpSubTypeTemplateMap } from "../../../services/app-api/utils/constants";
 import { buildReport } from "../../../services/app-api/utils/reports/buildReport";
 
-export async function buildAnnualReport() {
-  const state = "SC";
+export async function buildAnnualReport(state: string) {
+  if (!isStateAbbr(state)) {
+    throw new Error(`Invalid report state: ${state}`);
+  }
+
   const a1 = RhtpSubTypeTemplateMap.A1;
 
   if (!a1.reportTemplateBuilder) {
