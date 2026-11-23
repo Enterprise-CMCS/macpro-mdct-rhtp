@@ -9,7 +9,7 @@ import { authenticatedUser } from "../../utils/authentication";
 import { sendEmail } from "../../utils/notifications/email";
 
 vi.mock("../../utils/authentication");
-vi.mocked(authenticatedUser).mockReturnValue({
+vi.mocked(authenticatedUser).mockResolvedValue({
   role: UserRoles.ADMIN,
   state: "PA",
   fullName: "State User",

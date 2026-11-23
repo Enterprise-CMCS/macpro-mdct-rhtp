@@ -20,7 +20,7 @@ vi.mock("../../utils/authorization", () => ({
 
 vi.mock("../../utils/authentication");
 const mockAuthenticatedUser = vi.mocked(authenticatedUser);
-mockAuthenticatedUser.mockReturnValue({
+mockAuthenticatedUser.mockResolvedValue({
   role: UserRoles.STATE_USER,
   state: "PA",
   fullName: "Mock User",
