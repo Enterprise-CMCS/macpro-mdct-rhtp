@@ -16,7 +16,7 @@ import { UserRoles } from "@rhtp/shared";
 
 vi.mock("../../utils/authentication");
 const mockAuthenticatedUser = vi.mocked(authenticatedUser);
-mockAuthenticatedUser.mockReturnValue({
+mockAuthenticatedUser.mockResolvedValue({
   role: UserRoles.STATE_USER,
   state: "PA",
   fullName: "Anthony Soprano",

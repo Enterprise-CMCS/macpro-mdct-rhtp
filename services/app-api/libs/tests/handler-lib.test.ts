@@ -24,7 +24,7 @@ describe("Test Lambda Handler Lib", () => {
     const testFunc = vi.fn().mockReturnValue(ok("test"));
     const handler = handlerLib(parser, testFunc);
 
-    (authenticatedUser as Mock).mockReturnValue({});
+    (authenticatedUser as Mock).mockResolvedValue({});
     const res = await handler(proxyEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Ok);
@@ -52,7 +52,7 @@ describe("Test Lambda Handler Lib", () => {
     const testFunc = vi.fn();
     const handler = handlerLib(parser, testFunc);
 
-    (authenticatedUser as Mock).mockReturnValue(undefined);
+    (authenticatedUser as Mock).mockResolvedValue(undefined);
     const res = await handler(proxyEvent);
 
     expect(res.statusCode).toBe(StatusCodes.Unauthenticated);
@@ -66,7 +66,7 @@ describe("Test Lambda Handler Lib", () => {
     });
     const handler = handlerLib(parser, testFunc);
 
-    (authenticatedUser as Mock).mockReturnValue({});
+    (authenticatedUser as Mock).mockResolvedValue({});
     const res = await handler(proxyEvent);
 
     expect(testFunc).toHaveBeenCalled();

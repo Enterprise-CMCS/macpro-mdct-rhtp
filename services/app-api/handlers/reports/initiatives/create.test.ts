@@ -10,7 +10,7 @@ import { getReport, putReport } from "../../../storage/reports";
 import { buildInitiativePages } from "../../../forms/2026/rhtp/pages/initiatives/initiatives";
 
 vi.mock("../../../utils/authentication");
-vi.mocked(authenticatedUser).mockReturnValue({
+vi.mocked(authenticatedUser).mockResolvedValue({
   role: UserRoles.STATE_USER,
   state: "PA",
   fullName: "State User",

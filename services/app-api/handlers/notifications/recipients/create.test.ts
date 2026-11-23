@@ -9,7 +9,7 @@ import { putRecipient } from "../../../storage/notificationRecipients";
 import { proxyEvent } from "../../../testing/proxyEvent";
 
 vi.mock("../../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockReturnValue({
+  authenticatedUser: vi.fn().mockResolvedValue({
     role: UserRoles.APPROVER,
     state: "PA",
     fullName: "mock approver user",

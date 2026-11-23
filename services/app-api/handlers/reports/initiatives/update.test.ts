@@ -15,7 +15,7 @@ import { APIGatewayProxyEvent, User } from "../../../types/types";
 import { getReport, putReport } from "../../../storage/reports";
 
 vi.mock("../../../utils/authentication");
-vi.mocked(authenticatedUser).mockReturnValue({
+vi.mocked(authenticatedUser).mockResolvedValue({
   role: UserRoles.STATE_USER,
   state: "PA",
   fullName: "State User",

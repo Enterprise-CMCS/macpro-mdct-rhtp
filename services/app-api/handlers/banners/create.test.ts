@@ -8,7 +8,7 @@ import { error } from "../../utils/constants";
 import { putBanner } from "../../storage/banners";
 
 vi.mock("../../utils/authentication", () => ({
-  authenticatedUser: vi.fn().mockReturnValue({
+  authenticatedUser: vi.fn().mockResolvedValue({
     role: UserRoles.ADMIN,
     state: "PA",
     fullName: "mock state user",

@@ -10,7 +10,7 @@ import { sendEmail } from "../../utils/notifications/email";
 import { putReport } from "../../storage/reports";
 
 vi.mock("../../utils/authentication");
-vi.mocked(authenticatedUser).mockReturnValue({
+vi.mocked(authenticatedUser).mockResolvedValue({
   role: UserRoles.ADMIN,
   state: "PA",
   fullName: "State User",
