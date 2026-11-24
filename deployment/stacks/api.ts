@@ -205,7 +205,12 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       tables.map((table) => [`${table.node.id}Table`, table.table.tableName])
     ),
     brokerString,
-    ...(isLocalStack && { AWS_ENDPOINT_URL: process.env.AWS_ENDPOINT_URL }),
+    ...(isLocalStack && {
+      AWS_ENDPOINT_URL: process.env.AWS_ENDPOINT_URL,
+      // Deployed stages get these from setCognitoEnvironment; locally, use .env
+      COGNITO_USER_POOL_ID: process.env.COGNITO_USER_POOL_ID,
+      COGNITO_USER_POOL_CLIENT_ID: process.env.COGNITO_USER_POOL_CLIENT_ID,
+    }),
   };
 
   const commonProps = {
@@ -257,7 +262,6 @@ export function createApiComponents(props: CreateApiComponentsProps) {
       method: "GET",
       ...commonProps,
     }),
-
     // Report handlers
     new Lambda(scope, "createReport", {
       entry: "services/app-api/handlers/reports/create.ts",

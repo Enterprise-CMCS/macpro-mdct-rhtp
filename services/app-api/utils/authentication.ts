@@ -44,7 +44,8 @@ const verifyAndParseToken = async (apiKey: string | undefined) => {
 
   try {
     return await verifier.verify(apiKey!);
-  } catch {
+  } catch (error) {
+    logger.error(error);
     return undefined;
   }
 };
